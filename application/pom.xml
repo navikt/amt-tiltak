@@ -18,6 +18,16 @@
 
     <build>
         <finalName>amt-tiltak</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>no.nav.amt.tiltak.application.ApplicationKt</mainClass>
+                </configuration>
+            </plugin>
+
+        </plugins>
     </build>
 
 </project>
