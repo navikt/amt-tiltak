@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.adapter.input
 
 import no.nav.amt.tiltak.core.port.input.CreateUserUseCase
 import no.nav.amt.tiltak.core.port.input.GetUsersUseCase
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -16,8 +17,9 @@ class UserController(
         return getUsersUseCase.getAll().map { UserDTO(it.name, it.age) }
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    fun lagreTestData(@RequestBody createUserDTO: CreateUserDTO) {
+    fun createUser(@RequestBody createUserDTO: CreateUserDTO) {
         createUserUseCase.create(CreateUserUseCase.CreateUserCommand(createUserDTO.name, createUserDTO.age))
     }
 
