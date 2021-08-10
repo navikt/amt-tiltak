@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.application.model
+package no.nav.amt.tiltak.core.model
 
 data class User(
     val name: String,

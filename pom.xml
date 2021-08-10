@@ -10,6 +10,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>adapter</module>
         <module>application</module>
         <module>core</module>
     </modules>
@@ -28,6 +29,8 @@
         <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
         <maven.compiler.source>15</maven.compiler.source>
         <maven.compiler.target>15</maven.compiler.target>
+
+        <junit.version>5.7.1</junit.version>
     </properties>
 
 

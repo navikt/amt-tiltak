@@ -1,6 +1,6 @@
-package no.nav.amt.tiltak.application
+package no.nav.amt.tiltak.core
 
-import no.nav.amt.tiltak.application.model.User
+import no.nav.amt.tiltak.core.model.User
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
