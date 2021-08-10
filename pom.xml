@@ -5,12 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>amt-tiltak</artifactId>
-    <modules>
-        <module>application</module>
-    </modules>
     <groupId>no.nav.amt-tiltak</groupId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+
+    <modules>
+        <module>application</module>
+        <module>core</module>
+    </modules>
 
     <name>AMT-Tiltak</name>
 
@@ -70,6 +72,7 @@
             <artifactId>kotlin-stdlib-jdk8</artifactId>
             <version>1.5.10</version>
         </dependency>
+
     </dependencies>
 
 </project>
