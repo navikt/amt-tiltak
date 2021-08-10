@@ -34,3 +34,9 @@ spec:
   azure:
     application:
       enabled: true
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_12
+        databases:
+          - name: amt-tiltak-db
+            envVarPrefix: DB
