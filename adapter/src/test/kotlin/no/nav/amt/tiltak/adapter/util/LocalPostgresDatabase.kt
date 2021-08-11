@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.application.util
+package no.nav.amt.tiltak.adapter.util
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.testcontainers.containers.PostgreSQLContainer
 import javax.sql.DataSource
 
+// TODO: Dont duplicate this
 object LocalPostgresDatabase {
 
     fun createPostgresContainer(): PostgreSQLContainer<Nothing> {
