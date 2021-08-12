@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.adapter
+package no.nav.amt.tiltak
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 

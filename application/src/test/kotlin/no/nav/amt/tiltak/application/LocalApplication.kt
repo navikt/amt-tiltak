@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.application
 
-import no.nav.amt.tiltak.application.util.LocalPostgresDatabase.createPostgresContainer
+import no.nav.amt.tiltak.util.LocalPostgresDatabase.createPostgresContainer
 import org.springframework.boot.SpringApplication
 
 fun main(args: Array<String>) {

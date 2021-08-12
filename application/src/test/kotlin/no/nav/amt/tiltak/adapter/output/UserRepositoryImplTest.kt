@@ -1,9 +1,9 @@
 package no.nav.amt.tiltak.adapter.output
 
-import no.nav.amt.tiltak.adapter.util.LocalPostgresDatabase.cleanAndMigrate
-import no.nav.amt.tiltak.adapter.util.LocalPostgresDatabase.createJdbcTemplate
-import no.nav.amt.tiltak.adapter.util.LocalPostgresDatabase.createPostgresContainer
 import no.nav.amt.tiltak.core.port.output.UserRepository
+import no.nav.amt.tiltak.util.LocalPostgresDatabase.cleanAndMigrate
+import no.nav.amt.tiltak.util.LocalPostgresDatabase.createJdbcTemplate
+import no.nav.amt.tiltak.util.LocalPostgresDatabase.createPostgresContainer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.testcontainers.containers.PostgreSQLContainer

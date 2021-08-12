@@ -10,7 +10,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>adapter</module>
         <module>application</module>
         <module>core</module>
     </modules>

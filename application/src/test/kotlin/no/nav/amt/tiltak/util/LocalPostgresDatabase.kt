@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.application.util
+package no.nav.amt.tiltak.util
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
