@@ -1,0 +1,15 @@
+version: '3.3'
+services:
+  amt-tiltak-postgres:
+    image: 'postgres:12-alpine'
+    container_name: amt-tiltak-postgres
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    ports:
+      - '5454:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=qwerty
+      - POSTGRES_DB=amt-tiltak-db
+volumes:
+  postgres-db-volume:
