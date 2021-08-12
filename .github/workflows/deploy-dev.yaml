@@ -1,5 +1,9 @@
-name: Deploy to dev and prod
-on: push
+name: Deploy to dev
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 env:
   IMAGE_TAG: ${{ github.sha }}
   IMAGE: ghcr.io/${{ github.repository }}/amt-tiltak
@@ -9,7 +13,6 @@ jobs:
   test-build-and-push:
     name: Test, build and push
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -33,9 +36,8 @@ jobs:
           docker build -t ${IMAGE}:${IMAGE_TAG} .
           docker push ${IMAGE}:${IMAGE_TAG}
 
-  deploy-dev:
+  deploy:
     name: Deploy application to dev
-    if: github.ref == 'refs/heads/main'
     needs: test-build-and-push
     runs-on: ubuntu-latest
     steps:
