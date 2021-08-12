@@ -31,6 +31,11 @@
 
         <testcontainers.version>1.15.2</testcontainers.version>
         <mockito-kotlin.version>3.2.0</mockito-kotlin.version>
+
+        <!--   Used by SonarCloud     -->
+        <sonar.projectKey>navikt_amt-tiltak</sonar.projectKey>
+        <sonar.organization>navit</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
 
