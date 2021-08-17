@@ -1,5 +1,12 @@
 # AMT Tiltak
 
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=navikt_amt-tiltak&metric=bugs)](https://sonarcloud.io/dashboard?id=navikt_amt-tiltak)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=navikt_amt-tiltak&metric=code_smells)](https://sonarcloud.io/dashboard?id=navikt_amt-tiltak)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=navikt_amt-tiltak&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=navikt_amt-tiltak)
+
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=navikt_amt-tiltak&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=navikt_amt-tiltak)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=navikt_amt-tiltak&metric=security_rating)](https://sonarcloud.io/dashboard?id=navikt_amt-tiltak)
+
 ## Kjør opp lokalt
 
 For å kjøre opp lokalt så må det startes en postgres database med følgende paramtere:
@@ -19,3 +26,6 @@ Start applikasjonen ved å kjøre **main** funksjonen i `application/src/test/ko
 ## Slett data i lokal database
 1. Stopp postgres med `docker-compose down`.
 2. Slett den lagrede dataen med `docker volume rm amt-tiltak_postgres-db-volume` 
+
+## SonarCloud
+https://sonarcloud.io/dashboard?id=navikt_amt-tiltak
