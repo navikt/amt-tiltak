@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.adapter.input
 
 import no.nav.amt.tiltak.core.port.input.CreateUserUseCase
 import no.nav.amt.tiltak.core.port.input.GetUsersUseCase
+import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
@@ -12,11 +13,13 @@ class UserController(
     private val getUsersUseCase: GetUsersUseCase
     ) {
 
+	@Protected
     @GetMapping
     fun getUsers(): List<UserDTO> {
         return getUsersUseCase.getAll().map { UserDTO(it.name, it.age) }
     }
 
+	@Protected
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun createUser(@RequestBody createUserDTO: CreateUserDTO) {

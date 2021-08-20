@@ -40,3 +40,7 @@ spec:
         databases:
           - name: amt-tiltak-db
             envVarPrefix: DB
+  accessPolicy:
+    inbound:
+      rules:
+        - application: amt-auth-proxy
