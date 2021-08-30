@@ -2,9 +2,9 @@ kind: Application
 apiVersion: nais.io/v1alpha1
 metadata:
   name: amt-tiltak
-  namespace: pto
+  namespace: amt
   labels:
-    team: pto
+    team: amt
 spec:
   image: ghcr.io/navikt/amt-tiltak/amt-tiltak:{{version}}
   port: 8080
