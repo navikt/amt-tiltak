@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.core.port.output
 
-import no.nav.amt.tiltak.core.model.User
+import no.nav.amt.tiltak.core.domain.User
 
 interface UserRepository {
     fun saveNewUser(command: SaveNewUserCommand)
