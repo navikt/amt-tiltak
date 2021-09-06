@@ -10,13 +10,7 @@ class AuthenticationController {
 
 	@GetMapping("/tiltaksveileder")
 	fun hentInnloggetTiltaksveileder(): InnloggetTiltaksveileder {
-
-		// TODO: Hent info direkte fra token eller fra auth-proxy
-
-		return InnloggetTiltaksveileder(
-			navn = "TODO",
-			tilgjengeligeBedrifter = emptyList()
-		)
+		TODO()
 	}
 
 	data class InnloggetTiltaksveileder(
