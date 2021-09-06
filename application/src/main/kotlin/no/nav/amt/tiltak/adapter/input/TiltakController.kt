@@ -14,7 +14,7 @@ class TiltakController {
 	}
 
 	@GetMapping("/instans/{id}/brukere")
-	fun hentBrukerePaTiltak(@PathVariable id: UUID): List<TiltakInstansBrukerDTO> {
+	fun hentDeltagerePaTiltak(@PathVariable id: UUID): List<DeltagerDTO> {
 		TODO()
 	}
 
@@ -34,7 +34,7 @@ data class TiltakInstansDTO (
 	val tiltaksnavn: String
 )
 
-data class TiltakInstansBrukerDTO (
+data class DeltagerDTO (
 	val fornavn: String,
 	val etternavn: String,
 	val fodselsdato: String,

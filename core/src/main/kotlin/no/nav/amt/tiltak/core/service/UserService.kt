@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.core.service
 
-import no.nav.amt.tiltak.core.model.User
+import no.nav.amt.tiltak.core.domain.User
 import no.nav.amt.tiltak.core.port.input.CreateUserUseCase
 import no.nav.amt.tiltak.core.port.input.GetUsersUseCase
 import no.nav.amt.tiltak.core.port.output.UserRepository

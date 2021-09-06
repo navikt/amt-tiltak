@@ -1,11 +1,10 @@
 package no.nav.amt.tiltak.adapter.input
 
-import no.nav.amt.tiltak.core.model.User
+import no.nav.amt.tiltak.core.domain.User
 import no.nav.amt.tiltak.core.port.input.CreateUserUseCase
 import no.nav.amt.tiltak.core.port.input.GetUsersUseCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired

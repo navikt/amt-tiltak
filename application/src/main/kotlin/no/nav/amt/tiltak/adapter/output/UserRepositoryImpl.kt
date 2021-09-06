@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.adapter.output
 
-import no.nav.amt.tiltak.core.model.User
+import no.nav.amt.tiltak.core.domain.User
 import no.nav.amt.tiltak.core.port.output.UserRepository
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
