@@ -4,7 +4,7 @@ CREATE TYPE arena_tiltakstatuskode AS ENUM (
     'AVSLUTT',
     'GJENNOMFOR',
     'AVLYST',
-    'PLANLAGT',
+    'PLANLAGT'
 );
 
 CREATE TABLE arena_tiltak (
@@ -12,21 +12,21 @@ CREATE TABLE arena_tiltak (
   tiltaksgruppekode varchar,
   tiltakskode varchar,
   administrasjonskode varchar,
-  reg_dato datetime,
-  mod_dato datetime,
-  dato_fra datetime,
-  dato_til datetime
+  reg_dato timestamp,
+  mod_dato timestamp,
+  dato_fra timestamp,
+  dato_til timestamp
 );
 
 CREATE TABLE arena_tiltaksgjennomforing (
   tiltaksgjennomforing_id SERIAL PRIMARY KEY,
   tiltakskode varchar,
-  antall_deltagere datetime,
-  dato_fra datetime,
-  dato_til datetime,
+  antall_deltagere timestamp,
+  dato_fra timestamp,
+  dato_til timestamp,
   tekst_fagbeskrivelse varchar,
   tekst_maalgruppe varchar,
-  reg_dato datetime,
+  reg_dato timestamp,
   reg_user varchar,
   mod_dato varchar,
   mod_user varchar,
@@ -47,24 +47,24 @@ CREATE TABLE arena_arbgiverenhet (
   altnavn varchar,
   postnr varchar,
   postnr_sted varchar,
-  reg_dato datetime,
-  mod_dato datetime
+  reg_dato timestamp,
+  mod_dato timestamp
 );
 
 CREATE TABLE arena_tiltakdeltaker (
   tiltakdeltaker_id SERIAL PRIMARY KEY,
   person_id varchar,
-  tiltakgjennomforing_id id,
+  tiltakgjennomforing_id int,
   deltakerstatuskode varchar,
   deltakertypekode varchar,
   aarsakverdikode_status varchar,
   prioritet int,
   begrunnelse_innsokt varchar,
   begrunnelse_prioritering varchar,
-  reg_dato datetime,
-  mod_dato datetime,
-  dato_fra datetime,
-  dato_til datetime,
+  reg_dato timestamp,
+  mod_dato timestamp,
+  dato_fra timestamp,
+  dato_til timestamp,
   prosent_deltid float,
   antall_dager_pr_uke varchar
 );
