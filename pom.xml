@@ -12,6 +12,8 @@
     <modules>
         <module>application</module>
         <module>core</module>
+        <module>connectors</module>
+        <module>tiltaksleverandor</module>
     </modules>
 
     <name>AMT-Tiltak</name>
@@ -68,6 +70,16 @@
             </plugin>
         </plugins>
     </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
