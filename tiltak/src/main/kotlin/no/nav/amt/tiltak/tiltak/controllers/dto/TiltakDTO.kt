@@ -1,11 +1,16 @@
 package no.nav.amt.tiltak.tiltak.controllers.dto
 
-import java.util.*
+import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 
 data class TiltakDTO(
-	val id: UUID,
-	val navn: String, //sveisekurs
-	val type: String, //GRUPPE_AMO
-	val typeNavn: String, //Gruppe AMO
+	val tiltakskode: String,
+	val tiltaksnavn: String,
+
 	val instanser: List<TiltakInstansDTO>
-)
+) {
+	companion object {
+		fun create(tiltakListe: List<Tiltak>) {
+
+		}
+	}
+}
