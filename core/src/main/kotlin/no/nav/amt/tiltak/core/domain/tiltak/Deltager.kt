@@ -8,5 +8,10 @@ class Deltager(
 	val fodselsdato: String,
 	val startdato: LocalDateTime,
 	val sluttdato: LocalDateTime,
-	val status: String // TODO: Convert to enum
-	)
+	val status: Status // TODO: Convert to enum
+	) {
+
+	enum class Status {
+		NY_BRUKER, GJENNOMFORES, AVBRUTT, FULLFORT
+	}
+}
