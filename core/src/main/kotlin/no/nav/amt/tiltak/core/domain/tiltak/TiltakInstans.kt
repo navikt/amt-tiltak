@@ -8,6 +8,11 @@ data class TiltakInstans(
 	val navn: String,
 	val oppstartsdato: LocalDateTime,
 	val sluttdato: LocalDateTime,
+	val status: Status,
 
 	val tiltak: Tiltak
-)
+) {
+	enum class Status {
+		GJENNOMFORES, AVSLUTTET, IKKE_STARTET
+	}
+}
