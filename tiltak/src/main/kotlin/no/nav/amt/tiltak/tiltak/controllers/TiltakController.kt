@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.tiltak.controllers
 
-import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakDTO
+import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakInstansDto
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 class TiltakController {
 
 	@GetMapping
-	fun hentAlleTiltak(@RequestParam("tiltaksleverandorId") tiltaksleverandorId: String): List<TiltakDTO> {
+	fun hentAlleTiltak(@RequestParam("tiltaksleverandorId") tiltaksleverandorId: String): List<TiltakInstansDto> {
 		TODO()
 	}
 

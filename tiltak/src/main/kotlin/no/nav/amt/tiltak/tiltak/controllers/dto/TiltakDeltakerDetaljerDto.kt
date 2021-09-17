@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.*
 
-data class TiltakDeltakerDetaljerDTO(
+data class TiltakDeltakerDetaljerDto(
 	val id: UUID,
 	val fornavn: String,
 	val mellomnavn: String? = null,
@@ -16,7 +16,8 @@ data class TiltakDeltakerDetaljerDTO(
 	val navVeileder: NavVeilederDTO,
 	val startdato: ZonedDateTime,
 	val sluttdato: ZonedDateTime,
-	val status: String
+	val status: String,
+	val tiltakInstans: TiltakInstansDto
 )
 
 data class NavKontorDTO(

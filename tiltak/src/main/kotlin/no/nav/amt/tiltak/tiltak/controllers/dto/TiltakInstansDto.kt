@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.tiltak.controllers.dto
 import java.time.ZonedDateTime
 import java.util.*
 
-data class TiltakInstansDTO(
+data class TiltakInstansDto(
 	val id: UUID,
 	val navn: String,
 	val startdato: ZonedDateTime,
@@ -11,4 +11,5 @@ data class TiltakInstansDTO(
 	val status: String, // TODO: Egentlig en enum, f.eks GJENNOMFORES (kan utledes fra dato?)
 	val antallDeltakere: Int,
 	val deltakerKapasitet: Int,
+	val tiltak: TiltakDto
 )

@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.tiltak.controllers
 
-import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakDeltakerDTO
+import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakDeltakerDto
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 class TiltakInstansController {
 
 	@GetMapping("/{tiltkInstansId}/deltakere")
-	fun hentDeltakere(@PathVariable("tiltkInstansId") tiltkInstansId: String): List<TiltakDeltakerDTO> {
+	fun hentDeltakere(@PathVariable("tiltkInstansId") tiltkInstansId: String): List<TiltakDeltakerDto> {
 		TODO()
 	}
 
