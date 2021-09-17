@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 class TiltakController {
 
 	@GetMapping
-	fun hentTiltak(@RequestParam tiltaksleverandorId: String): List<TiltakDTO> {
+	fun hentAlleTiltak(@RequestParam("tiltaksleverandorId") tiltaksleverandorId: String): List<TiltakDTO> {
 		TODO()
 	}
 
