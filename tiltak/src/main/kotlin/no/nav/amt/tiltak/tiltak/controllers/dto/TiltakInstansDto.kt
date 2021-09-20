@@ -10,7 +10,7 @@ data class TiltakInstansDto(
 	val startdato: ZonedDateTime,
 	val sluttdato: ZonedDateTime,
 	val status: TiltakInstans.Status, // TODO: Avgjøre om man skal DTOifisere denne
-	val antallDeltagere: Int,
+	val deltagerAntall: Int,
 	val deltagerKapasitet: Int,
 	val tiltak: TiltakDto
 )

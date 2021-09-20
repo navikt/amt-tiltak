@@ -41,7 +41,7 @@ class TiltakDeltagerController {
 				startdato = ZonedDateTime.now().minusDays(1),
 				sluttdato = ZonedDateTime.now().plusDays(8),
 				status = TiltakInstans.Status.GJENNOMFORES,
-				antallDeltagere = 5,
+				deltagerAntall = 5,
 				deltagerKapasitet = 8,
 				TiltakDto(
 					tiltakskode = "GRUPPEAMO",

@@ -6,7 +6,6 @@ import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakInstansDto
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -22,7 +21,7 @@ class TiltakController {
 				startdato = ZonedDateTime.now().plusDays(1),
 				sluttdato = ZonedDateTime.now().plusDays(3),
 				status = TiltakInstans.Status.IKKE_STARTET,
-				antallDeltagere = 8,
+				deltagerAntall = 8,
 				deltagerKapasitet = 4,
 				TiltakDto(
 					tiltakskode = "GRUPPEAMO",
@@ -35,7 +34,7 @@ class TiltakController {
 				startdato = ZonedDateTime.now().minusDays(1),
 				sluttdato = ZonedDateTime.now().plusDays(8),
 				status = TiltakInstans.Status.GJENNOMFORES,
-				antallDeltagere = 5,
+				deltagerAntall = 5,
 				deltagerKapasitet = 8,
 				TiltakDto(
 					tiltakskode = "GRUPPEAMO",
@@ -48,7 +47,7 @@ class TiltakController {
 				startdato = ZonedDateTime.now().minusDays(10),
 				sluttdato = ZonedDateTime.now().minusDays(8),
 				status = TiltakInstans.Status.AVSLUTTET,
-				antallDeltagere = 5,
+				deltagerAntall = 5,
 				deltagerKapasitet = 8,
 				TiltakDto(
 					tiltakskode = "JOBBK",
