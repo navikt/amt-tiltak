@@ -7,12 +7,14 @@ import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakDto
 import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakInstansDto
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.*
 
-@RestController("/api/tiltak-instans")
+@RestController
+@RequestMapping("/api/tiltak-instans")
 class TiltakInstansController {
 
 	@GetMapping("/{tiltakInstansId}")

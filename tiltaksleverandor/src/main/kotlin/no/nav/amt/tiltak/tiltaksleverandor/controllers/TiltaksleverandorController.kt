@@ -1,8 +1,10 @@
 package no.nav.amt.tiltak.tiltaksleverandor.controllers
 
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@RestController("/api/tiltaksleverandor")
+@RestController
+@RequestMapping("/api/tiltaksleverandor")
 class TiltaksleverandorController {
 
 	// TODO unødvendig inntil videre?

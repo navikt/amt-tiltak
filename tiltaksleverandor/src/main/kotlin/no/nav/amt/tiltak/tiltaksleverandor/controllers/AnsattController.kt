@@ -5,10 +5,12 @@ import no.nav.amt.tiltak.tiltaksleverandor.controllers.dto.AnsattDTO
 import no.nav.amt.tiltak.tiltaksleverandor.controllers.dto.AnsattRolle
 import no.nav.amt.tiltak.tiltaksleverandor.controllers.dto.VirksomhetDTO
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
-@RestController("/api/tiltaksleverandor/ansatt")
+@RestController
+@RequestMapping("/api/tiltaksleverandor/ansatt")
 class AnsattController(
     private val service: Tiltaksleverandor
 ) {
