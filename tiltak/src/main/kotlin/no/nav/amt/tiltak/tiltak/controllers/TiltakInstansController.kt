@@ -1,7 +1,10 @@
 package no.nav.amt.tiltak.tiltak.controllers
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltager
+import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakDeltagerDto
+import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakDto
+import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakInstansDto
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
@@ -11,6 +14,23 @@ import java.util.*
 
 @RestController("/api/tiltak-instans")
 class TiltakInstansController {
+
+	@GetMapping("/{tiltakInstansId}")
+	fun hentTiltakInstans(@PathVariable("tiltakInstansId") tiltakInstansId: String): TiltakInstansDto {
+		return TiltakInstansDto(
+			id = UUID.randomUUID(),
+			navn = "Truckførerkurs",
+			startdato = ZonedDateTime.now().plusDays(1),
+			sluttdato = ZonedDateTime.now().plusDays(3),
+			status = TiltakInstans.Status.IKKE_STARTET,
+			deltagerAntall = 8,
+			deltagerKapasitet = 4,
+			TiltakDto(
+				tiltakskode = "GRUPPEAMO",
+				tiltaksnavn = "Gruppe AMO"
+			),
+		)
+	}
 
 	@GetMapping("/{tiltkInstansId}/deltagere")
 	fun hentDeltagere(@PathVariable("tiltkInstansId") tiltkInstansId: String): List<TiltakDeltagerDto> {
