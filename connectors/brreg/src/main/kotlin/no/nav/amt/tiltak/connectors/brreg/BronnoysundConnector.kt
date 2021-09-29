@@ -7,10 +7,7 @@ import no.nav.amt.tiltak.core.port.EnhetsregisterConnector
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.slf4j.LoggerFactory
-import org.springframework.http.client.SimpleClientHttpRequestFactory
 import org.springframework.stereotype.Service
-import org.springframework.web.client.RestTemplate
-import org.springframework.web.server.ResponseStatusException
 import java.time.Duration
 import java.time.Instant
 
