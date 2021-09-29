@@ -43,7 +43,7 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>connectors</artifactId>
+            <artifactId>nom</artifactId>
             <version>${project.version}</version>
         </dependency>
 
