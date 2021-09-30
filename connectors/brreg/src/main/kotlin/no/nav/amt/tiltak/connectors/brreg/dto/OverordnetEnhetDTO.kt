@@ -1,7 +1,11 @@
 package no.nav.amt.tiltak.connectors.brreg.dto
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class OverordnetEnhetDTO(
-    val organisasjonsnummer: String,
-    val navn: String,
-    val forretningsadresse: AdresseDTO
+    @JsonProperty("organisasjonsnummer") val organisasjonsnummer: String,
+    @JsonProperty("navn") val navn: String,
+    @JsonProperty("forretningsadresse") val forretningsadresse: AdresseDTO
 )

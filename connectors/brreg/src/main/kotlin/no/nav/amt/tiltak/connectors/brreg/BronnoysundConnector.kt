@@ -1,11 +1,11 @@
 package no.nav.amt.tiltak.connectors.brreg
 
-import no.nav.amt.tiltak.connectors.brreg.dto.LinkDTO
-import no.nav.amt.tiltak.connectors.brreg.dto.OverordnetEnhetDTO
-import no.nav.amt.tiltak.connectors.brreg.dto.VirksomhetDTO
-import no.nav.amt.tiltak.connectors.brreg.dto.toModel
+import com.fasterxml.jackson.databind.ObjectMapper
+import no.nav.amt.tiltak.connectors.brreg.dto.*
 import no.nav.amt.tiltak.core.domain.tiltaksleverandor.Virksomhet
 import no.nav.amt.tiltak.core.port.EnhetsregisterConnector
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import org.slf4j.LoggerFactory
 import org.springframework.http.client.SimpleClientHttpRequestFactory
 import org.springframework.stereotype.Service
@@ -20,57 +20,47 @@ class BronnoysundConnector: EnhetsregisterConnector {
     private val basePath = "https://data.brreg.no/enhetsregisteret/api"
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    private val restTemplate: RestTemplate
-
-    init {
-        val factory = SimpleClientHttpRequestFactory()
-        factory.setConnectTimeout(5000)
-        factory.setReadTimeout(60000)
-
-        restTemplate = RestTemplate(factory)
-    }
+    private val restClient = OkHttpClient()
+    private val objectMapper = ObjectMapper()
 
     override fun virksomhetsinformasjon(virksomhetsnummer: String): Virksomhet {
         val virksomhetsUrl = "$basePath/underenheter/$virksomhetsnummer"
 
         val virksomhet = getVirksomhet(virksomhetsUrl)
-        val overordnetEnhet = getOverordnetEnhet(getLink(virksomhet.links, "overordnetEnhet"))
+        val overordnetEnhet = getOverordnetEnhet(virksomhet.links.href("overordnetEnhet"))
 
         return toModel(virksomhet, overordnetEnhet)
     }
 
     private fun getVirksomhet(url: String): VirksomhetDTO {
-        val start = Instant.now()
+        val request = Request.Builder()
+            .url(url)
+            .build()
 
-        val response = restTemplate.getForEntity(url, VirksomhetDTO::class.java)
-
-        if(!response.hasBody()) {
-            throw ResponseStatusException(response.statusCode, "GET kall til $url returnerer ikke body")
-        }
-
-        logTimeOk(start, url)
-        return response.body
+        return get(request, VirksomhetDTO::class.java)
     }
 
     private fun getOverordnetEnhet(url: String): OverordnetEnhetDTO {
-        val start = Instant.now()
+        val request = Request.Builder()
+            .url(url)
+            .build()
 
-        val response = restTemplate.getForEntity(url, OverordnetEnhetDTO::class.java)
-
-        if(!response.hasBody()) {
-            throw ResponseStatusException(response.statusCode, "GET kall til $url returnerer ikke body")
-        }
-
-        logTimeOk(start, url)
-        return response.body
+        return get(request, OverordnetEnhetDTO::class.java)
     }
 
-    private fun getLink(links: Map<String, LinkDTO>, name: String): String {
-        if(links[name] == null) {
-            throw UnsupportedOperationException("The link $name does not exist")
+    private fun <T>get(request: Request, clazz: Class<T>): T {
+        val start = Instant.now()
+
+        val response = restClient.newCall(request).execute()
+
+        if(!response.isSuccessful || response.body == null) {
+            throw IllegalArgumentException("GET kall til ${request.url} returnerer ikke body, eller er ikke successful (response code ${response.code}).")
         }
 
-        return links[name]!!.href
+        val responseBody = objectMapper.readValue(response.body!!.byteStream(), clazz)
+        logTimeOk(start, request.url.toString())
+
+        return responseBody
     }
 
     private fun toModel(virksomhet: VirksomhetDTO, overordnetEnhet: OverordnetEnhetDTO): Virksomhet {
