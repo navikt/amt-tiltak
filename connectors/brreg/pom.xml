@@ -3,19 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>amt-tiltak</artifactId>
+        <artifactId>connectors</artifactId>
         <groupId>no.nav.amt-tiltak</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>connectors</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>pdl</module>
-        <module>nom</module>
-        <module>brreg</module>
-    </modules>
+    <artifactId>brreg</artifactId>
 
     <properties>
         <maven.compiler.source>15</maven.compiler.source>
@@ -24,19 +18,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>core</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
         </dependency>
     </dependencies>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp</artifactId>
-                <version>4.9.1</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
 </project>
