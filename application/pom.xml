@@ -50,6 +50,16 @@
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>brreg</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>arena-ingestor</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>no.nav.common</groupId>
+            <artifactId>kafka</artifactId>
+            <version>${common.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -15,6 +15,7 @@
         <module>connectors</module>
         <module>tiltaksleverandor</module>
         <module>tiltak</module>
+        <module>ingestors</module>
     </modules>
 
     <name>AMT-Tiltak</name>
@@ -34,6 +35,8 @@
 
         <testcontainers.version>1.15.2</testcontainers.version>
         <mockito-kotlin.version>3.2.0</mockito-kotlin.version>
+
+        <common.version>2.2021.09.17_07.09-67428a6422cc</common.version>
     </properties>
 
 
@@ -84,6 +87,11 @@
                 <artifactId>brreg</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>arena-ingestor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -93,7 +101,6 @@
             <artifactId>kotlin-stdlib-jdk8</artifactId>
             <version>1.5.10</version>
         </dependency>
-
     </dependencies>
 
 </project>
