@@ -14,13 +14,13 @@ open class KafkaBeans {
     open fun kafkaConsumerProperties(): KafkaProperties {
         return object : KafkaProperties {
             override fun consumer(): Properties {
-                return KafkaPropertiesPreset.aivenDefaultConsumerProperties("groupId")
+                return KafkaPropertiesPreset.aivenDefaultConsumerProperties("amt-tiltak-consumer")
             }
 
             override fun producer(): Properties {
                 throw NotImplementedError("Not yet implemented")
             }
-
         }
     }
+
 }
