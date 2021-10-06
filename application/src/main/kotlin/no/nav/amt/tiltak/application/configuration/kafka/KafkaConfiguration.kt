@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.application.configuration.kafka
 
-import no.nav.amt.tiltak.ingestors.arena.ArenaIngestorImpl
+import no.nav.amt.tiltak.core.port.ArenaIngestor
 import no.nav.common.kafka.consumer.KafkaConsumerClient
 import no.nav.common.kafka.consumer.util.KafkaConsumerClientBuilder
 import no.nav.common.kafka.consumer.util.deserializer.Deserializers.stringDeserializer
@@ -14,7 +14,7 @@ import java.util.function.Consumer
 open class KafkaConfiguration(
     kafkaTopicProperties: KafkaTopicProperties,
 	kafkaProperties: KafkaProperties,
-    private val arenaIngestor: ArenaIngestorImpl
+    private val arenaIngestor: ArenaIngestor
 ) {
     private var client: KafkaConsumerClient
 

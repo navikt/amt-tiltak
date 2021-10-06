@@ -9,7 +9,7 @@ class ArenaIngestorImpl: ArenaIngestor {
 
     private val objectMapper = ObjectMapper()
 
-    fun ingest(data: String) {
+    override fun ingest(data: String) {
 		println("Ingesting data: $data")
 //        val dto = objectMapper.readValue(data, ArenaDataDTO::class.java)
 

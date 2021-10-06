@@ -1,11 +1,12 @@
 package no.nav.amt.tiltak.configuration.kafka
 
+import junit.framework.Assert.assertEquals
 import no.nav.amt.tiltak.application.configuration.kafka.KafkaConfiguration
 import no.nav.amt.tiltak.application.configuration.kafka.KafkaProperties
 import no.nav.amt.tiltak.application.configuration.kafka.KafkaTopicProperties
-import no.nav.amt.tiltak.ingestors.arena.ArenaIngestorImpl
+import no.nav.amt.tiltak.core.port.ArenaIngestor
 import no.nav.common.kafka.producer.KafkaProducerClientImpl
-import no.nav.common.kafka.producer.util.ProducerUtils
+import no.nav.common.kafka.producer.util.ProducerUtils.toJsonProducerRecord
 import no.nav.common.kafka.util.KafkaPropertiesBuilder
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
@@ -15,6 +16,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 @Testcontainers
 class KafkaConfigurationTest {
@@ -23,13 +25,13 @@ class KafkaConfigurationTest {
     var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.4.3"))
 
     @Test
-    fun test() {
+    fun `should ingest arena records after configuring kafka`() {
 
         val kafkaTopicProperties = KafkaTopicProperties(
-            arenaTiltakDeltakerTopic = "arena-tiltak",
+            arenaTiltakTopic = "arena-tiltak",
             arenaTiltaksgjennomforingTopic = "arena-tiltaksgjennomforing",
             arenaTiltaksgruppeTopic = "arena-tiltaksgruppe",
-            arenaTiltakTopic = "arena-tiltak",
+            arenaTiltakDeltakerTopic = "arena-tiltak-deltaker",
         )
 
         val kafkaProperties = object : KafkaProperties {
@@ -52,8 +54,15 @@ class KafkaConfigurationTest {
             }
         }
 
-        val arenaIngestor = ArenaIngestorImpl()
+		val counter = AtomicInteger()
 
+        val arenaIngestor = object : ArenaIngestor {
+			override fun ingest(data: String) {
+				counter.incrementAndGet()
+			}
+		}
+
+		// Creating the config will automatically start the consumer
         KafkaConfiguration(
             kafkaTopicProperties,
             kafkaProperties,
@@ -62,12 +71,18 @@ class KafkaConfigurationTest {
 
         val kafkaProducer = KafkaProducerClientImpl<String, String>(kafkaProperties.producer())
 
-        val record = ProducerUtils.toJsonProducerRecord("arena-tiltak", "1", "some value")
+		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltak", "1", "some value"))
+		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltaksgjennomforing", "1", "some value"))
+		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltaksgruppe", "1", "some value"))
+		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltak-deltaker", "1", "some value"))
 
-        kafkaProducer.sendSync(record)
         kafkaProducer.close()
 
-        Thread.sleep(5000)
+		// This test can be rewritten to retry the assertion until a given time has passed to speed things up
+
+        Thread.sleep(3000)
+
+		assertEquals(4, counter.get())
     }
 
 }
