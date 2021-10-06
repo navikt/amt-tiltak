@@ -7,9 +7,11 @@ import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.lang.RuntimeException
 import java.util.concurrent.TimeUnit
+import java.util.function.Supplier
 
 class NomGraphqlClient(
-	private val nomApiUrl: String
+	private val nomApiUrl: String,
+	private val tokenSupplier : Supplier<String>
 ) {
 
 	private val MEDIA_TYPE_JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
@@ -20,7 +22,7 @@ class NomGraphqlClient(
 		.readTimeout(15, TimeUnit.SECONDS)
 		.build()
 
-	private fun createBearerToken(): String = "dummytoken"
+	private fun createBearerToken(): String = tokenSupplier.get()
 
 	private fun hentVeilederTilIdenter(navIdenter: List<String>): List<Veileder> {
 

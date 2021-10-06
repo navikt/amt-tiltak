@@ -51,3 +51,6 @@ spec:
         databases:
           - name: amt-tiltak-db
             envVarPrefix: DB
+  env:
+    - name: NOM_SCOPE
+      value: api://dev-gcp.nom.nom-api/.default
