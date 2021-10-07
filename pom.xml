@@ -36,6 +36,7 @@
 
         <testcontainers.version>1.16.0</testcontainers.version>
         <mockito-kotlin.version>3.2.0</mockito-kotlin.version>
+        <schedlock.version>4.27.0</schedlock.version>
 
         <common.version>2.2021.09.17_07.09-67428a6422cc</common.version>
     </properties>
