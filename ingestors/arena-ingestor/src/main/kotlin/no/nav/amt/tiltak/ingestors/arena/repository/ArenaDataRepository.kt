@@ -18,7 +18,7 @@ data class CreateArenaData(
 )
 
 @Repository
-class ArenaDataRepository(
+open class ArenaDataRepository(
 	private val jdbcTemplate: JdbcTemplate
 ) {
 
