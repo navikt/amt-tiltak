@@ -16,6 +16,7 @@
         <module>tiltaksleverandor</module>
         <module>tiltak</module>
         <module>ingestors</module>
+        <module>db-migrations</module>
     </modules>
 
     <name>AMT-Tiltak</name>
@@ -105,6 +106,11 @@
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>arena-ingestor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>db-migrations</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
