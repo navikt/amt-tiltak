@@ -8,12 +8,21 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
+data class CreateArenaData(
+	val tableName: String,
+	val operationType: OperationType,
+	val operationPosition: Long,
+	val operationTimestamp: LocalDateTime,
+	val before: String?,
+	val after: String?
+)
+
 @Repository
 class ArenaDataRepository(
 	private val jdbcTemplate: JdbcTemplate
 ) {
 
-	private companion object Table {
+	companion object Table {
 		const val TABLE_NAME = "arena_data"
 
 		const val FIELD_ID = "id"
@@ -29,57 +38,58 @@ class ArenaDataRepository(
 		const val FIELD_AFTER = "after"
 	}
 
-	private val rowMapper =
+	val rowMapper =
 		RowMapper { rs, _ ->
 			ArenaData(
 				id = rs.getInt(FIELD_ID),
 				tableName = rs.getString(FIELD_TABLE_NAME),
-				operationType = OperationType.DELETE,
+				operationType = OperationType.valueOf(rs.getString(FIELD_OPERATION_TYPE)),
 				operationPosition = rs.getLong(FIELD_OPERATION_POS),
-				operationTimestamp = LocalDateTime.now(),
-				ingestStatus = IngestStatus.INGESTED,
-				ingestedTimestamp = LocalDateTime.now(),
+				operationTimestamp = rs.getTimestamp(FIELD_OPERATION_TIMESTAMP).toLocalDateTime(),
+				ingestStatus = IngestStatus.valueOf(rs.getString(FIELD_INGEST_STATUS)),
+				ingestedTimestamp = rs.getTimestamp(FIELD_INGESTED_TIMESTAMP)?.toLocalDateTime(),
 				ingestAttempts = rs.getInt(FIELD_INGEST_ATTEMPTS),
-				lastRetry = LocalDateTime.now(),
+				lastRetry = rs.getTimestamp(FIELD_LAST_RETRY)?.toLocalDateTime(),
 				before = rs.getString(FIELD_BEFORE),
 				after = rs.getString(FIELD_AFTER)
 			)
 		}
 
-	fun insert(arenaData: ArenaData) {
+	fun insert(arenaData: CreateArenaData) {
 		val sql =
 			"""
-				INSERT INT $TABLE_NAME (
+				INSERT INTO $TABLE_NAME (
 					$FIELD_TABLE_NAME, $FIELD_OPERATION_TYPE, $FIELD_OPERATION_POS,
 					$FIELD_OPERATION_TIMESTAMP, $FIELD_INGEST_STATUS, $FIELD_BEFORE, $FIELD_AFTER
 				)
-				VALUES (?, ?::arena_operation_type, ?, ?, ?::arena_ingest_status, ?, ?)
+				VALUES (?, ?::arena_operation_type, ?, ?, ?::arena_ingest_status, ?::json, ?::json)
 			""".trimIndent()
 
 		jdbcTemplate.update(
 			sql,
 			arenaData.tableName, arenaData.operationType.toString(),
 			arenaData.operationPosition, arenaData.operationTimestamp,
-			arenaData.ingestStatus.toString(), arenaData.before, arenaData.after
+			IngestStatus.NEW.toString(), arenaData.before, arenaData.after
 		)
     }
 
     fun getUningestedData(offset: Int = 0, limit: Int = 100): List<ArenaData> {
 		val sql =
 			"""
-				SELECT * FROM $TABLE_NAME WHERE $FIELD_INGEST_STATUS = ? OR $FIELD_INGEST_STATUS = ? ORDER BY $FIELD_OPERATION_POS ASC OFFSET ? LIMIT ?
+				SELECT * FROM $TABLE_NAME WHERE $FIELD_INGEST_STATUS = ?::arena_ingest_status OR $FIELD_INGEST_STATUS = ?::arena_ingest_status
+				 ORDER BY $FIELD_OPERATION_POS ASC OFFSET ? LIMIT ?
 			""".trimIndent()
 
-		return jdbcTemplate.query(sql, rowMapper, arrayOf(IngestStatus.NEW, IngestStatus.RETRY, offset, limit))
+		return jdbcTemplate.query(sql, rowMapper, IngestStatus.NEW.toString(), IngestStatus.RETRY.toString(), offset, limit)
     }
 
     fun getFailedData(offset: Int = 0, limit: Int = 100): List<ArenaData> {
 		val sql =
 			"""
-				SELECT * FROM $TABLE_NAME WHERE $FIELD_INGEST_STATUS = ? ORDER BY $FIELD_OPERATION_POS ASC OFFSET ? LIMIT ?
+				SELECT * FROM $TABLE_NAME WHERE $FIELD_INGEST_STATUS = ?::arena_ingest_status ORDER BY $FIELD_OPERATION_POS ASC OFFSET ? LIMIT ?
 			""".trimIndent()
 
-		return jdbcTemplate.query(sql, rowMapper, arrayOf(IngestStatus.FAILED, offset, limit))
+		return jdbcTemplate.query(sql, rowMapper, IngestStatus.FAILED.toString(), offset, limit)
     }
 
 	fun markAsIngested(id: Int) {
