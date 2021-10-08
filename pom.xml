@@ -34,6 +34,7 @@
 
         <testcontainers.version>1.15.2</testcontainers.version>
         <mockito-kotlin.version>3.2.0</mockito-kotlin.version>
+        <wiremock.version>2.31.0</wiremock.version>
     </properties>
 
 
@@ -83,6 +84,12 @@
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>brreg</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.tomakehurst</groupId>
+                <artifactId>wiremock-jre8</artifactId>
+                <version>${wiremock.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
