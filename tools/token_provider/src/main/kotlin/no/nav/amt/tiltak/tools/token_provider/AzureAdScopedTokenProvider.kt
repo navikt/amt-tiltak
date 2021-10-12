@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tools.azure_ad
+package no.nav.amt.tiltak.tools.token_provider
 
 import com.nimbusds.oauth2.sdk.*
 import com.nimbusds.oauth2.sdk.auth.ClientAuthentication

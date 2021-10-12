@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tools.azure_ad
+package no.nav.amt.tiltak.tools.token_provider
 
 class AzureAdServiceTokenProvider(private val scopedTokenProvider: ScopedTokenProvider) : ServiceToServiceTokenProvider {
 

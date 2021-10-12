@@ -1,12 +1,12 @@
-package no.nav.amt.tiltak.tools.azure_ad.utils
+package no.nav.amt.tiltak.tools.token_provider.utils
 
-import no.nav.amt.tiltak.tools.azure_ad.AzureAdScopedTokenProvider
-import no.nav.amt.tiltak.tools.azure_ad.AzureAdServiceTokenProvider
-import no.nav.amt.tiltak.tools.azure_ad.CachedScopedTokenProvider
-import no.nav.amt.tiltak.tools.azure_ad.ScopedTokenProvider
-import no.nav.amt.tiltak.tools.azure_ad.utils.AzureAdEnvironmentVariables.AZURE_APP_CLIENT_ID
-import no.nav.amt.tiltak.tools.azure_ad.utils.AzureAdEnvironmentVariables.AZURE_APP_CLIENT_SECRET
-import no.nav.amt.tiltak.tools.azure_ad.utils.AzureAdEnvironmentVariables.AZURE_OPENID_CONFIG_TOKEN_ENDPOINT
+import no.nav.amt.tiltak.tools.token_provider.AzureAdScopedTokenProvider
+import no.nav.amt.tiltak.tools.token_provider.AzureAdServiceTokenProvider
+import no.nav.amt.tiltak.tools.token_provider.CachedScopedTokenProvider
+import no.nav.amt.tiltak.tools.token_provider.ScopedTokenProvider
+import no.nav.amt.tiltak.tools.token_provider.utils.AzureAdEnvironmentVariables.AZURE_APP_CLIENT_ID
+import no.nav.amt.tiltak.tools.token_provider.utils.AzureAdEnvironmentVariables.AZURE_APP_CLIENT_SECRET
+import no.nav.amt.tiltak.tools.token_provider.utils.AzureAdEnvironmentVariables.AZURE_OPENID_CONFIG_TOKEN_ENDPOINT
 
 class AzureAdServiceTokenProviderBuilder private constructor() {
 	private var clientId: String? = null

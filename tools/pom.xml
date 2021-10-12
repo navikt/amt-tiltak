@@ -13,7 +13,7 @@
     <name>no.nav.amt-tiltak tools</name>
 
     <modules>
-        <module>azure_ad</module>
+        <module>token_provider</module>
     </modules>
 
 </project>

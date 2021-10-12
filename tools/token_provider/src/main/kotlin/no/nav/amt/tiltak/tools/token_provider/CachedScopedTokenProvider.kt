@@ -1,8 +1,8 @@
-package no.nav.amt.tiltak.tools.azure_ad
+package no.nav.amt.tiltak.tools.token_provider
 
 import com.nimbusds.jwt.JWT
 import com.nimbusds.jwt.JWTParser
-import no.nav.amt.tiltak.tools.azure_ad.utils.TokenUtils.tokenNeedsRefresh
+import no.nav.amt.tiltak.tools.token_provider.utils.TokenUtils.tokenNeedsRefresh
 import java.util.concurrent.ConcurrentHashMap
 
 class CachedScopedTokenProvider(private val scopedTokenProvider: ScopedTokenProvider) : ScopedTokenProvider {
