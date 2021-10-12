@@ -7,19 +7,18 @@
         <groupId>no.nav.amt-tiltak</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>tiltaksleverandor</artifactId>
-
-    <properties>
-        <maven.compiler.source>15</maven.compiler.source>
-        <maven.compiler.target>15</maven.compiler.target>
-    </properties>
 
     <dependencies>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.security</groupId>
+            <artifactId>token-validation-spring</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
