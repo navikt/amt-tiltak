@@ -40,6 +40,11 @@ spec:
     inbound:
       rules:
         - application: amt-tiltaksarrangor-flate-auth-proxy
+  env:
+    - name: PDL_SCOPE
+      value: api://dev-fss.pdl.pdl-api/.default
+    - name: PDL_URL
+      value: https://pdl-api.dev-fss-pub.nais.io
   gcp:
     sqlInstances:
       - type: POSTGRES_12
