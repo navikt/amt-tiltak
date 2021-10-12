@@ -38,6 +38,7 @@
         <wiremock.version>2.31.0</wiremock.version>
         <nimbus.version>9.18</nimbus.version>
         <mockk.version>1.12.0</mockk.version>
+        <okhttp.version>4.9.2</okhttp.version>
     </properties>
 
 
@@ -87,6 +88,12 @@
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>brreg</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
             </dependency>
 
             <dependency>
