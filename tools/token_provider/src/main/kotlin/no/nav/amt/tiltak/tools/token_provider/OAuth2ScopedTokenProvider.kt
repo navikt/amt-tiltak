@@ -10,11 +10,11 @@ import java.io.IOException
 import java.net.URI
 
 /**
- * Provides access tokens from Azure Ad through OAuth 2.0 credentials flow
+ * Provides access tokens through OAuth 2.0 credentials flow
  */
-class AzureAdScopedTokenProvider(clientId: String, clientSecret: String, tokenEndpointUrl: String) : ScopedTokenProvider {
+class OAuth2ScopedTokenProvider(clientId: String, clientSecret: String, tokenEndpointUrl: String) : ScopedTokenProvider {
 
-	private val log = LoggerFactory.getLogger(AzureAdScopedTokenProvider::class.java)
+	private val log = LoggerFactory.getLogger(OAuth2ScopedTokenProvider::class.java)
 
 	private val clientAuth: ClientAuthentication
 	private val tokenEndpoint: URI

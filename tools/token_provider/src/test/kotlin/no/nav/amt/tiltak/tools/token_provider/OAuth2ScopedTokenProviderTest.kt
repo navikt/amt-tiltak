@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 import java.util.*
 
 @WireMockTest
-class AzureAdScopedTokenProviderTest {
+class OAuth2ScopedTokenProviderTest {
 
 	@Test
 	fun `should create correct token request`(wmRuntimeInfo: WireMockRuntimeInfo) {
@@ -38,7 +38,7 @@ class AzureAdScopedTokenProviderTest {
 				)
 		)
 
-		val tokenProvider = AzureAdScopedTokenProvider(
+		val tokenProvider = OAuth2ScopedTokenProvider(
 			clientId,
 			clientSecret,
 			"${wmRuntimeInfo.httpBaseUrl}/oauth2/v2.0/token"
