@@ -29,26 +29,34 @@
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>core</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>tiltak</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>tiltaksleverandor</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>nom</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>brreg</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>pdl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>arena_ords_proxy</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>token_provider</artifactId>
         </dependency>
 
         <dependency>
