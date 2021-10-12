@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tools.azure_ad
+package no.nav.amt.tiltak.tools.token_provider
 
 /**
  * Provides tokens for service to service authentication where each services requires a specific token

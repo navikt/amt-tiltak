@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tools.azure_ad.utils
+package no.nav.amt.tiltak.tools.token_provider.utils
 
 object AzureAdEnvironmentVariables {
 
