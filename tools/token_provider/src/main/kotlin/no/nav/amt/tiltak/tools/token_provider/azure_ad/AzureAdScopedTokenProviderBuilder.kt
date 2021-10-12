@@ -1,11 +1,11 @@
-package no.nav.amt.tiltak.tools.token_provider.utils
+package no.nav.amt.tiltak.tools.token_provider.azure_ad
 
 import no.nav.amt.tiltak.tools.token_provider.CachedScopedTokenProvider
 import no.nav.amt.tiltak.tools.token_provider.OAuth2ScopedTokenProvider
 import no.nav.amt.tiltak.tools.token_provider.ScopedTokenProvider
-import no.nav.amt.tiltak.tools.token_provider.utils.AzureAdEnvironmentVariables.AZURE_APP_CLIENT_ID
-import no.nav.amt.tiltak.tools.token_provider.utils.AzureAdEnvironmentVariables.AZURE_APP_CLIENT_SECRET
-import no.nav.amt.tiltak.tools.token_provider.utils.AzureAdEnvironmentVariables.AZURE_OPENID_CONFIG_TOKEN_ENDPOINT
+import no.nav.amt.tiltak.tools.token_provider.azure_ad.AzureAdEnvironmentVariables.AZURE_APP_CLIENT_ID
+import no.nav.amt.tiltak.tools.token_provider.azure_ad.AzureAdEnvironmentVariables.AZURE_APP_CLIENT_SECRET
+import no.nav.amt.tiltak.tools.token_provider.azure_ad.AzureAdEnvironmentVariables.AZURE_OPENID_CONFIG_TOKEN_ENDPOINT
 
 typealias ScopedTokenProviderCacheCreator = (provider: ScopedTokenProvider) -> ScopedTokenProvider
 
