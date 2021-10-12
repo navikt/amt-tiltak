@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.tools.token_provider
 
 import com.nimbusds.jwt.JWT
 import com.nimbusds.jwt.JWTParser
-import no.nav.amt.tiltak.tools.token_provider.utils.TokenUtils.tokenNeedsRefresh
+import no.nav.amt.tiltak.tools.token_provider.azure_ad.JwtUtils.needsRefresh
 import java.util.concurrent.ConcurrentHashMap
 
 class CachedScopedTokenProvider(private val scopedTokenProvider: ScopedTokenProvider) : ScopedTokenProvider {
@@ -12,7 +12,7 @@ class CachedScopedTokenProvider(private val scopedTokenProvider: ScopedTokenProv
 	override fun getToken(scope: String): String {
 		var token: JWT? = cachedTokens[scope]
 
-		if (tokenNeedsRefresh(token)) {
+		if (token == null || token.needsRefresh()) {
 			token = JWTParser.parse(scopedTokenProvider.getToken(scope))
 			cachedTokens[scope] = token
 		}
