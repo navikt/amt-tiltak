@@ -13,7 +13,7 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @RestController
-@RequestMapping("/api/tiltak-deltager/")
+@RequestMapping("/api/tiltak-deltager")
 class TiltakDeltagerController {
 
 	@Protected

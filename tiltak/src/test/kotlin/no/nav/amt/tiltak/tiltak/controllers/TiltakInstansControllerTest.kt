@@ -1,20 +1,19 @@
-package no.nav.amt.tiltak.tiltaksleverandor.controllers
+package no.nav.amt.tiltak.tiltak.controllers
 
-import no.nav.amt.tiltak.core.port.Tiltaksleverandor
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [AnsattController::class])
-class AnsattControllerTest {
+@WebMvcTest(controllers = [TiltakInstansController::class])
+class TiltakInstansControllerTest {
 
 	companion object {
 		private val server = MockOAuth2Server()
@@ -34,28 +33,46 @@ class AnsattControllerTest {
 	@Autowired
 	private lateinit var mockMvc: MockMvc
 
-	@MockBean
-	private lateinit var tiltaksleverandor: Tiltaksleverandor
-
 	@Test
-	fun `getInnloggetAnsatt() should return 401 when not authenticated`() {
+	fun `hentTiltakInstans() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltaksleverandor/ansatt/meg")
+			MockMvcRequestBuilders.get("/api/tiltak-instans/ID")
 		).andReturn().response
 
 		assertEquals(401, response.status)
 	}
 
 	@Test
-	fun `getInnloggetAnsatt() should return 200 when authenticated`() {
+	fun `hentTiltakInstans() should return 200 when authenticated`() {
 		val token = server.issueToken("tokenx", "test", "test").serialize()
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltaksleverandor/ansatt/meg")
+			MockMvcRequestBuilders.get("/api/tiltak-instans/ID")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
-		assertEquals(200, response.status)
+		Assertions.assertEquals(200, response.status)
+	}
+
+	@Test
+	fun `hentDeltagere() should return 401 when not authenticated`() {
+		val response = mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/tiltak-instans/ID/deltagere")
+		).andReturn().response
+
+		Assertions.assertEquals(401, response.status)
+	}
+
+	@Test
+	fun `hentDeltagere() should return 200 when authenticated`() {
+		val token = server.issueToken("tokenx", "test", "test").serialize()
+
+		val response = mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/tiltak-instans/ID/deltagere")
+				.header("Authorization", "Bearer $token")
+		).andReturn().response
+
+		Assertions.assertEquals(200, response.status)
 	}
 
 }
