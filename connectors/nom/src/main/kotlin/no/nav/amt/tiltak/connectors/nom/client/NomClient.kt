@@ -7,6 +7,7 @@ import no.nav.amt.tiltak.core.port.NomConnector
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.slf4j.LoggerFactory
 import java.lang.RuntimeException
 import java.util.concurrent.TimeUnit
 import java.util.function.Supplier
@@ -17,14 +18,17 @@ class NomClient(
 ) : NomConnector {
 
 	private val objectMapper = ObjectMapper().registerKotlinModule()
+	companion object {
+		private val logger = LoggerFactory.getLogger(NomClient::class.java)
+	}
 
 	private val client = OkHttpClient.Builder()
 		.connectTimeout(10, TimeUnit.SECONDS)
 		.readTimeout(15, TimeUnit.SECONDS)
 		.build()
 
-	override fun hentVeileder(ident: String) : Veileder {
-		return hentVeilederTilIdenter(listOf(ident)).firstOrNull()!! // TODO Håndtere ingen resultat
+	override fun hentVeileder(ident: String) : Veileder? {
+		return hentVeilederTilIdenter(listOf(ident)).firstOrNull()
 	}
 
 	private fun hentVeilederTilIdenter(navIdenter: List<String>): List<Veileder> {
@@ -45,7 +49,7 @@ class NomClient(
 
 			val nomResponse = objectMapper.readValue(response.body!!.string(), HentIdenterResponse::class.java)
 
-			return nomResponse.veiledere()
+			return nomResponse.toVeiledere()
 		}
 	}
 }

@@ -7,22 +7,23 @@ import io.kotest.matchers.shouldNotBe
 
 class HentIdenterRequestTest : StringSpec({
 
-	"HentIdenterRequest inneholder rett ident som variabel" {
+	val identerJsonPath = "$.variables.identer"
+	"HentIdenterRequest - inneholder rett ident som variabel" {
 		HentIdenterRequest(listOf("A11111")).asJson()
-			.shouldContainJsonKeyValue("$.variables.identer", listOf("A11111"))
+			.shouldContainJsonKeyValue(identerJsonPath, listOf("A11111"))
 	}
 
-	"HentIdenterRequest inneholder alle identer den mottar" {
+	"HentIdenterRequest - inneholder alle identer den mottar" {
 		HentIdenterRequest(listOf("A11111", "B222")).asJson()
-			.shouldContainJsonKeyValue("$.variables.identer", listOf("A11111", "B222"))
+			.shouldContainJsonKeyValue(identerJsonPath, listOf("A11111", "B222"))
 	}
 
-	"HentIdenterRequest inneholder ingen ident når den ikke mottar noen" {
+	"HentIdenterRequest - inneholder ingen ident når den ikke mottar noen" {
 		HentIdenterRequest(listOf()).asJson()
-			.shouldContainJsonKeyValue("$.variables.identer", listOf<String>())
+			.shouldContainJsonKeyValue(identerJsonPath, listOf<String>())
 	}
 
-	"HentIdenterRequest skal produsere gyldig json" {
+	"HentIdenterRequest - skal produsere gyldig json" {
 		ObjectMapper().readTree(HentIdenterRequest(listOf("A11111", "B222")).asJson()) shouldNotBe null
 	}
 

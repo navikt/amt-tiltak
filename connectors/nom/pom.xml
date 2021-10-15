@@ -37,26 +37,22 @@
         <dependency>
             <groupId>io.kotest</groupId>
             <artifactId>kotest-runner-junit5-jvm</artifactId>
-            <version>5.0.0.M2</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>io.kotest</groupId>
             <artifactId>kotest-assertions-core-jvm</artifactId>
-            <version>5.0.0.M2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.kotest</groupId>
             <artifactId>kotest-assertions-json-jvm</artifactId>
-            <version>5.0.0.M2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>mockwebserver</artifactId>
-            <version>4.9.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
