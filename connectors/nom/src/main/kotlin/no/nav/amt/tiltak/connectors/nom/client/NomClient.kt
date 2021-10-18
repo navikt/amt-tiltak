@@ -28,7 +28,9 @@ class NomClient(
 		.build()
 
 	override fun hentVeileder(ident: String) : Veileder? {
-		return hentVeilederTilIdenter(listOf(ident)).firstOrNull()
+		return hentVeilederTilIdenter(listOf(ident))
+			.firstOrNull()
+			.also { if(it == null) logger.info("Fant ikke veileder i NOM med ident $ident") }
 	}
 
 	private fun hentVeilederTilIdenter(navIdenter: List<String>): List<Veileder> {
