@@ -6,6 +6,8 @@ import java.util.*
 
 interface Tiltaksleverandor {
 
-    fun getVirksomheterForAnsatt(ansattId: UUID): List<Virksomhet>
-    fun getAnsatt(ansattId: UUID): Ansatt
+	fun addVirksomhet(virksomhetsnummer: String): Virksomhet
+
+	fun getVirksomheterForAnsatt(ansattId: UUID): List<Virksomhet>
+	fun getAnsatt(ansattId: UUID): Ansatt
 }

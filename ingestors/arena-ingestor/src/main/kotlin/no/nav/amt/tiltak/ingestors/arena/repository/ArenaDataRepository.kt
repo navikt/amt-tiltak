@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.ingestors.arena.repository
 import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
 import no.nav.amt.tiltak.ingestors.arena.domain.IngestStatus
 import no.nav.amt.tiltak.ingestors.arena.domain.OperationType
+import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
@@ -21,6 +22,8 @@ data class CreateArenaData(
 open class ArenaDataRepository(
 	private val jdbcTemplate: JdbcTemplate
 ) {
+
+	private val logger = LoggerFactory.getLogger(javaClass)
 
 	companion object Table {
 		const val TABLE_NAME = "arena_data"
@@ -71,26 +74,33 @@ open class ArenaDataRepository(
 			arenaData.operationPosition, arenaData.operationTimestamp,
 			IngestStatus.NEW.toString(), arenaData.before, arenaData.after
 		)
-    }
+	}
 
-    fun getUningestedData(offset: Int = 0, limit: Int = 100): List<ArenaData> {
+	fun getUningestedData(offset: Int = 0, limit: Int = 100): List<ArenaData> {
 		val sql =
 			"""
 				SELECT * FROM $TABLE_NAME WHERE $FIELD_INGEST_STATUS = ?::arena_ingest_status OR $FIELD_INGEST_STATUS = ?::arena_ingest_status
 				 ORDER BY $FIELD_OPERATION_POS ASC OFFSET ? LIMIT ?
 			""".trimIndent()
 
-		return jdbcTemplate.query(sql, rowMapper, IngestStatus.NEW.toString(), IngestStatus.RETRY.toString(), offset, limit)
-    }
+		return jdbcTemplate.query(
+			sql,
+			rowMapper,
+			IngestStatus.NEW.toString(),
+			IngestStatus.RETRY.toString(),
+			offset,
+			limit
+		)
+	}
 
-    fun getFailedData(offset: Int = 0, limit: Int = 100): List<ArenaData> {
+	fun getFailedData(offset: Int = 0, limit: Int = 100): List<ArenaData> {
 		val sql =
 			"""
 				SELECT * FROM $TABLE_NAME WHERE $FIELD_INGEST_STATUS = ?::arena_ingest_status ORDER BY $FIELD_OPERATION_POS ASC OFFSET ? LIMIT ?
 			""".trimIndent()
 
 		return jdbcTemplate.query(sql, rowMapper, IngestStatus.FAILED.toString(), offset, limit)
-    }
+	}
 
 	fun markAsIngested(id: Int) {
 		val sql =
@@ -110,13 +120,37 @@ open class ArenaDataRepository(
 		jdbcTemplate.update(sql, IngestStatus.RETRY.toString(), currentRetries + 1, id)
 	}
 
-    fun markAsFailed(id: Int) {
+	fun markAsFailed(id: Int) {
 		val sql =
 			"""
 				UPDATE $TABLE_NAME SET $FIELD_INGEST_STATUS = ?::arena_ingest_status WHERE $FIELD_ID = ?
 			""".trimIndent()
 
 		jdbcTemplate.update(sql, IngestStatus.FAILED.toString(), id)
-    }
+	}
+
+	fun setRetry(message: ArenaData, reason: String? = null, exception: Exception? = null) {
+		if (reason != null) {
+			if (exception != null) {
+				logger.warn(reason, exception)
+			} else {
+				logger.warn(reason)
+			}
+		}
+
+		incrementRetry(message.id, message.ingestAttempts)
+	}
+
+	fun setFailed(message: ArenaData, reason: String? = null, exception: Exception? = null) {
+		if (reason != null) {
+			if (exception != null) {
+				logger.warn(reason, exception)
+			} else {
+				logger.warn(reason)
+			}
+		}
+
+		markAsFailed(message.id)
+	}
 
 }

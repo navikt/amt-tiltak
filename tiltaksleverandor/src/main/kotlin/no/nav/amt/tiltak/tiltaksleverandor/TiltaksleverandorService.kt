@@ -9,14 +9,18 @@ import java.util.*
 
 @Service
 class TiltaksleverandorService(
-    private val ansattService: AnsattService // Trenger ikke dette enda
+	private val ansattService: AnsattService // Trenger ikke dette enda
 ) : Tiltaksleverandor {
 
-    override fun getAnsatt(ansattId: UUID): Ansatt {
-        return ansattService.getAnsatt(ansattId)
-    }
+	override fun addVirksomhet(virksomhetsnummer: String): Virksomhet {
+		TODO("Not yet implemented")
+	}
 
-    override fun getVirksomheterForAnsatt(ansattId: UUID): List<Virksomhet> {
-        TODO("Not yet implemented")
-    }
+	override fun getAnsatt(ansattId: UUID): Ansatt {
+		return ansattService.getAnsatt(ansattId)
+	}
+
+	override fun getVirksomheterForAnsatt(ansattId: UUID): List<Virksomhet> {
+		TODO("Not yet implemented")
+	}
 }
