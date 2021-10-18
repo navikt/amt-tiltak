@@ -45,6 +45,8 @@ spec:
       value: api://dev-fss.pdl.pdl-api/.default
     - name: PDL_URL
       value: https://pdl-api.dev-fss-pub.nais.io
+    - name: NOM_SCOPE
+      value: api://dev-gcp.nom.nom-api/.default
   gcp:
     sqlInstances:
       - type: POSTGRES_12
