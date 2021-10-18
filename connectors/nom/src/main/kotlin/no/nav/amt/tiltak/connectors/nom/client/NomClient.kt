@@ -38,7 +38,7 @@ class NomClient(
 		val request: Request = Request.Builder()
 			.url(nomApiUrl)
 			.header("Accept", "application/json; charset=utf-8")
-			.header("Authorization", tokenSupplier.get())
+			.header("Authorization", "Bearer ${tokenSupplier.get()}")
 			.post(HentIdenterRequest(navIdenter).asJson().toRequestBody("application/graphql".toMediaType()))
 			.build()
 

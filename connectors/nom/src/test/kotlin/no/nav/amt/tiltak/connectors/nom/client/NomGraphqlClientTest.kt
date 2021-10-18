@@ -8,6 +8,7 @@ import no.nav.amt.tiltak.core.domain.veileder.Veileder
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 
+const val token = "DUMMYTOKEN"
 
 class NomGraphqlClientTest : StringSpec({
 
@@ -19,7 +20,7 @@ class NomGraphqlClientTest : StringSpec({
 	beforeTest {
 		server = MockWebServer()
 
-		client = NomClient(server.url("").toString(), { "dummytoken" })
+		client = NomClient(server.url("").toString(), { token })
 	}
 
 	"hentVeileder - veileder finnes - returnerer veileder" {
@@ -64,6 +65,29 @@ class NomGraphqlClientTest : StringSpec({
 
 		val veileder = client.hentVeileder(expectedVeileder.navIdent)
 		veileder shouldBe null
+	}
+
+	"hentVeileder - token legges på - token mottas på server" {
+		val veilederRespons = """
+		{
+			"data": {
+				"ressurser": [
+				  {
+					"code": "NOT_FOUND",
+					"ressurs": null
+				  }
+				]
+  			}
+		}
+		"""
+
+		server.enqueue(MockResponse().setBody(veilederRespons))
+
+		client.hentVeileder(expectedVeileder.navIdent)
+
+		val recordedRequest = server.takeRequest()
+
+		recordedRequest.getHeader("Authorization") shouldBe "Bearer $token"
 	}
 })
 
