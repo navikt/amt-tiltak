@@ -38,6 +38,7 @@
         <wiremock.version>2.31.0</wiremock.version>
         <nimbus.version>9.18</nimbus.version>
         <mockk.version>1.12.0</mockk.version>
+        <kotest.version>5.0.0.M2</kotest.version>
         <okhttp.version>4.9.2</okhttp.version>
     </properties>
 
@@ -53,6 +54,11 @@
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M4</version>
+            </plugin>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
@@ -145,26 +151,25 @@
             <dependency>
                 <groupId>io.kotest</groupId>
                 <artifactId>kotest-runner-junit5-jvm</artifactId>
-                <version>5.0.0.M2</version>
+                <version>${kotest.version}</version>
                 <scope>test</scope>
             </dependency>
-
             <dependency>
                 <groupId>io.kotest</groupId>
                 <artifactId>kotest-assertions-core-jvm</artifactId>
-                <version>5.0.0.M2</version>
+                <version>${kotest.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>io.kotest</groupId>
                 <artifactId>kotest-assertions-json-jvm</artifactId>
-                <version>5.0.0.M2</version>
+                <version>${kotest.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>mockwebserver</artifactId>
-                <version>4.9.1</version>
+                <version>${okhttp.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

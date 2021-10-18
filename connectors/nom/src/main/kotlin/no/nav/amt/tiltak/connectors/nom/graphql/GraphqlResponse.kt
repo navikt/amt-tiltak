@@ -19,7 +19,7 @@ internal data class Error (
 	}
 
 	fun logError() {
-		log.error("Graphql returnerte med feil: {}", message) // TODO kanskje spisse mer - men da må vi tenke på om alt skal logges på level error
+		log.error("Graphql returnerte med feil: {}", message)
 	}
 
 }
