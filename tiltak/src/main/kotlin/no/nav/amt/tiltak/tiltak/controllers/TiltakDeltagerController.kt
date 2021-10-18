@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.tiltak.controllers
 import no.nav.amt.tiltak.core.domain.tiltak.Deltager
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.tiltak.controllers.dto.*
+import no.nav.security.token.support.core.api.Protected
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -12,9 +13,10 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @RestController
-@RequestMapping("/api/tiltak-deltager/")
+@RequestMapping("/api/tiltak-deltager")
 class TiltakDeltagerController {
 
+	@Protected
 	@GetMapping("/{tiltakDeltagerId}")
 	fun hentTiltakDeltagerDetaljer(@PathVariable("tiltakDeltagerId") tiltakDeltagerId: String): TiltakDeltagerDetaljerDto {
 		return TiltakDeltagerDetaljerDto(

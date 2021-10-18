@@ -4,6 +4,7 @@ import no.nav.amt.tiltak.core.port.Tiltaksleverandor
 import no.nav.amt.tiltak.tiltaksleverandor.controllers.dto.AnsattDTO
 import no.nav.amt.tiltak.tiltaksleverandor.controllers.dto.AnsattRolle
 import no.nav.amt.tiltak.tiltaksleverandor.controllers.dto.VirksomhetDTO
+import no.nav.security.token.support.core.api.Protected
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -15,6 +16,7 @@ class AnsattController(
     private val service: Tiltaksleverandor
 ) {
 
+	@Protected
     @GetMapping("/meg")
     fun getInnloggetAnsatt(): AnsattDTO {
         return AnsattDTO(
@@ -24,7 +26,7 @@ class AnsattController(
 			virksomheter = listOf(VirksomhetDTO(
 				id = UUID.randomUUID(),
 				virksomhetsnummer = "123456789",
-				virksomhetsnavn = "Mulgiheter",
+				virksomhetsnavn = "Muligheter",
 				roller = listOf(AnsattRolle.KOORDINATOR, AnsattRolle.VEILEDER)
 			))) // TODO dummy data
     }
