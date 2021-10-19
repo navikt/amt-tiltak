@@ -13,16 +13,16 @@ class TiltaksleverandorRepository(
 ) {
 
 	companion object Table {
-		const val TABLE_NAME = "tiltaksleverandor"
+		private const val TABLE_NAME = "tiltaksleverandor"
 
-		const val FIELD_ID = "id"
-		const val FIELD_EXTERNAL_ID = "external_id"
-		const val FIELD_ORGANISASJONSNUMMER = "organisasjonsnummer"
-		const val FIELD_ORGANISASJONSNAVN = "organisasjonsnavn"
-		const val FIELD_VIRKSOMHETSNUMMER = "virksomhetsnummer"
-		const val FIELD_VIRKSOMHETSNAVN = "virksomhetsnavn"
-		const val FIELD_CREATED_AT = "created_at"
-		const val FIELD_MODIFIED_AT = "modified_at"
+		private const val FIELD_ID = "id"
+		private const val FIELD_EXTERNAL_ID = "external_id"
+		private const val FIELD_ORGANISASJONSNUMMER = "organisasjonsnummer"
+		private const val FIELD_ORGANISASJONSNAVN = "organisasjonsnavn"
+		private const val FIELD_VIRKSOMHETSNUMMER = "virksomhetsnummer"
+		private const val FIELD_VIRKSOMHETSNAVN = "virksomhetsnavn"
+		private const val FIELD_CREATED_AT = "created_at"
+		private const val FIELD_MODIFIED_AT = "modified_at"
 	}
 
 	private val rowMapper = RowMapper { rs, _ ->

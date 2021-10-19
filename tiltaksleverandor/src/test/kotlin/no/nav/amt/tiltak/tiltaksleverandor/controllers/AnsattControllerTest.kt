@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.tiltaksleverandor.controllers
 
-import no.nav.amt.tiltak.core.port.Tiltaksleverandor
+import no.nav.amt.tiltak.core.port.TiltaksleverandorService
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -35,7 +35,7 @@ class AnsattControllerTest {
 	private lateinit var mockMvc: MockMvc
 
 	@MockBean
-	private lateinit var tiltaksleverandor: Tiltaksleverandor
+	private lateinit var tiltaksleverandorService: TiltaksleverandorService
 
 	@Test
 	fun `getInnloggetAnsatt() should return 401 when not authenticated`() {

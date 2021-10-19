@@ -4,7 +4,7 @@ import no.nav.amt.tiltak.core.domain.tiltaksleverandor.Ansatt
 import no.nav.amt.tiltak.core.domain.tiltaksleverandor.Virksomhet
 import java.util.*
 
-interface Tiltaksleverandor {
+interface TiltaksleverandorService {
 
 	fun addVirksomhet(virksomhetsnummer: String): Virksomhet
 

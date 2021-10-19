@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.tiltaksleverandor.controllers
 
-import no.nav.amt.tiltak.core.port.Tiltaksleverandor
+import no.nav.amt.tiltak.core.port.TiltaksleverandorService
 import no.nav.amt.tiltak.tiltaksleverandor.controllers.dto.AnsattDTO
 import no.nav.amt.tiltak.tiltaksleverandor.controllers.dto.AnsattRolle
 import no.nav.amt.tiltak.tiltaksleverandor.controllers.dto.VirksomhetDTO
@@ -13,7 +13,7 @@ import java.util.*
 @RestController
 @RequestMapping("/api/tiltaksleverandor/ansatt")
 class AnsattController(
-    private val service: Tiltaksleverandor
+    private val service: TiltaksleverandorService
 ) {
 
 	@Protected

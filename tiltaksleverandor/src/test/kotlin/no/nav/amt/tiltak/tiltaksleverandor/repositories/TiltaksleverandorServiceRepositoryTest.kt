@@ -15,7 +15,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
 
 @Testcontainers
-internal class TiltaksleverandorRepositoryTest {
+internal class TiltaksleverandorServiceRepositoryTest {
 
 	@Container
 	val postgresContainer: PostgreSQLContainer<Nothing> =

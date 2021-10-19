@@ -2,15 +2,15 @@ package no.nav.amt.tiltak.tiltaksleverandor
 
 import no.nav.amt.tiltak.core.domain.tiltaksleverandor.Ansatt
 import no.nav.amt.tiltak.core.domain.tiltaksleverandor.Virksomhet
-import no.nav.amt.tiltak.core.port.Tiltaksleverandor
+import no.nav.amt.tiltak.core.port.TiltaksleverandorService
 import no.nav.amt.tiltak.tiltaksleverandor.ansatt.AnsattService
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class TiltaksleverandorService(
+class TiltaksleverandorServiceService(
 	private val ansattService: AnsattService // Trenger ikke dette enda
-) : Tiltaksleverandor {
+) : TiltaksleverandorService {
 
 	override fun addVirksomhet(virksomhetsnummer: String): Virksomhet {
 		TODO("Not yet implemented")
