@@ -2,13 +2,11 @@ package no.nav.amt.tiltak.tiltak.repositories
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.testcontainers.containers.PostgreSQLContainer
@@ -56,54 +54,35 @@ internal class TiltakRepositoryTest {
 
     @Test
     internal fun `insert() should insert tiltak and return object`() {
-        val tiltak = Tiltak(
-            id = null,
-            tiltaksleverandorId = TILTAKSLEVERANDOR_1_ID,
-            kode = "AMO",
-            navn = "Dette er et testtiltak"
-        )
+        val arenaId = "1"
+        val navn = "Navn"
+        val kode = "Kode"
 
-        val savedDbo = repository.insert("1", tiltak)
+        val savedDbo = repository.insert(arenaId, navn, kode)
 
         assertNotNull(savedDbo)
         assertNotNull(savedDbo.internalId)
         assertNotNull(savedDbo.externalId)
 
-        assertEquals(tiltak.kode, savedDbo.type)
-        assertEquals(tiltak.navn, savedDbo.navn)
+        assertEquals(arenaId, savedDbo.arenaId)
+        assertEquals(kode, savedDbo.type)
+        assertEquals(navn, savedDbo.navn)
 
-    }
-
-    @Test
-    internal fun `insert on nonexistent tiltaksleverandor should throw`() {
-        val tiltak = Tiltak(
-            id = null,
-            tiltaksleverandorId = TILTAKSLEVERANDOR_ID_NOT_EXIST,
-            kode = "AMO",
-            navn = "VIL FEILE?!"
-        )
-
-        assertThrows<Exception> { repository.insert("1", tiltak) }
     }
 
     @Test
     internal fun `getByArenaId returns the correct object`() {
         val arenaId = "1"
+        val navn = "Navn"
+        val kode = "Kode"
 
-        val tiltak = Tiltak(
-            id = null,
-            tiltaksleverandorId = TILTAKSLEVERANDOR_1_ID,
-            kode = "AMO",
-            navn = "Dette er et testtiltak"
-        )
-
-        repository.insert(arenaId, tiltak)
+        repository.insert(arenaId, navn, kode)
 
         val savedDbo = repository.getByArenaId(arenaId)
 
         assertNotNull(savedDbo)
-        assertEquals(tiltak.kode, savedDbo?.type)
-        assertEquals(tiltak.navn, savedDbo?.navn)
+        assertEquals(kode, savedDbo?.type)
+        assertEquals(navn, savedDbo?.navn)
 
     }
 

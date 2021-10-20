@@ -50,26 +50,34 @@ CREATE TABLE tiltaksleverandor_ansatt_rolle
 
 CREATE TABLE tiltak
 (
-    id                   serial PRIMARY KEY,
-    external_id          uuid    not null UNIQUE,
-    arena_id             varchar not null unique,
-    tiltaksleverandor_id integer not null references tiltaksleverandor (id),
-    navn                 varchar,
-    adresse              varchar,
-    type                 varchar,
-    created_at           timestamp with time zone default current_timestamp,
-    modified_at          timestamp with time zone default current_timestamp
+    id          serial PRIMARY KEY,
+    external_id uuid    not null UNIQUE,
+    arena_id    varchar not null unique,
+    navn        varchar,
+    type        varchar,
+    created_at  timestamp with time zone default current_timestamp,
+    modified_at timestamp with time zone default current_timestamp
+);
+
+CREATE TYPE tiltaksinstans_status AS ENUM (
+    'GJENNOMFORES', 'AVSLUTTET', 'IKKE_STARTET'
 );
 
 CREATE TABLE tiltaksinstans
 (
-    id             serial PRIMARY KEY,
-    external_id    uuid                     not null UNIQUE,
-    tiltak_id      integer                  not null references tiltak (id),
-    navn           varchar,
-    antall_plasser integer,
-    created_at     timestamp with time zone not null default current_timestamp,
-    modified_at    timestamp with time zone not null default current_timestamp
+    id                   serial PRIMARY KEY,
+    external_id          uuid                     not null UNIQUE,
+    arena_id             integer                  not null unique,
+    tiltak_id            integer                  not null references tiltak (id),
+    tiltaksleverandor_id integer                  not null references tiltaksleverandor (id),
+    navn                 varchar,
+    status               tiltaksinstans_status,
+    oppstart_dato        timestamp with time zone,
+    slutt_dato           timestamp with time zone,
+    registrert_dato      timestamp with time zone,
+    fremmote_dato        timestamp with time zone,
+    created_at           timestamp with time zone not null default current_timestamp,
+    modified_at          timestamp with time zone not null default current_timestamp
 );
 
 CREATE TABLE bruker

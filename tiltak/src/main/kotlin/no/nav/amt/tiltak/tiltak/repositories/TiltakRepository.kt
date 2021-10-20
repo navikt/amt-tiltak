@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.tiltak.repositories
 
-import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.tiltak.dbo.TiltakDbo
 import no.nav.amt.tiltak.tiltak.repositories.statements.insert.TiltakInsertStatement
 import no.nav.amt.tiltak.tiltak.repositories.statements.parts.tiltak.TiltakArenaIdEqualsQueryPart
@@ -15,13 +14,12 @@ open class TiltakRepository(
     private val template: NamedParameterJdbcTemplate
 ) {
 
-    fun insert(arenaId: String, tiltak: Tiltak): TiltakDbo {
+    fun insert(arenaId: String, navn: String, kode: String): TiltakDbo {
         val externalId = TiltakInsertStatement(
             template = template,
             arenaId = arenaId,
-            tiltaksleverandorId = tiltak.tiltaksleverandorId,
-            navn = tiltak.navn,
-            kode = tiltak.kode
+            navn = navn,
+            kode = kode
         ).execute()
 
         return get(externalId)

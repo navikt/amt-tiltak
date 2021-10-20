@@ -29,7 +29,7 @@ class TiltaksgjennomforingProcessor(
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     override fun insert(data: ArenaData) {
-        val newFields = jsonObject(data.after)
+        val newFields = jsonObject(data.after, ArenaTiltaksgjennomforing::class.java)
 
         val virksomhet = addVirksomhet(newFields)
         val tiltak = addTiltak(virksomhet, newFields)
@@ -75,15 +75,6 @@ class TiltaksgjennomforingProcessor(
         )
 
         return tiltakService.addTiltaksinstans(arenaId, unsavedTiltaksinstans)
-    }
-
-    // TODO generaliser
-    private fun jsonObject(s: String?): ArenaTiltaksgjennomforing {
-		if (s == null) {
-            throw UnsupportedOperationException("Expected AreanaTiltaksgjennomforing not to be null!")
-        }
-
-        return ObjectMapper().readValue(s, ArenaTiltaksgjennomforing::class.java)
     }
 
     private fun stringToLocalDate(string: String?): LocalDate? {

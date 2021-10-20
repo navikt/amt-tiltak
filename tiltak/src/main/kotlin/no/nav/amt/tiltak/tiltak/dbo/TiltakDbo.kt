@@ -8,8 +8,6 @@ data class TiltakDbo(
     val internalId: Int,
     val externalId: UUID,
     val arenaId: String,
-    val tiltaksleverandorInternalId: Int,
-    val tiltaksleverandorExternalId: UUID,
     val navn: String,
     val type: String,
     val createdAt: LocalDateTime,
@@ -19,7 +17,6 @@ data class TiltakDbo(
     fun toTiltak(): Tiltak {
         return Tiltak(
             id = externalId,
-            tiltaksleverandorId = tiltaksleverandorExternalId,
             navn = navn,
             kode = type
         )

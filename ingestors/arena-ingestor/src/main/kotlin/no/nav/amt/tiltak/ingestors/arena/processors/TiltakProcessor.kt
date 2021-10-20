@@ -2,20 +2,24 @@ package no.nav.amt.tiltak.ingestors.arena.processors
 
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
+import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltak
 import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
 class TiltakProcessor(
     repository: ArenaDataRepository,
-    val tiltakService: TiltakService
+    private val tiltakService: TiltakService
 ) : AbstractArenaProcessor(repository) {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
-
     override fun insert(data: ArenaData) {
-        TODO("Not yet implemented")
+        val newFields = jsonObject(data.after, ArenaTiltak::class.java)
+
+        tiltakService.addUpdateTiltak(
+            newFields.TILTAKSKODE,
+            newFields.TILTAKSNAVN,
+            newFields.TILTAKSKODE
+        )
     }
 
     override fun update(data: ArenaData) {

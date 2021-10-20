@@ -20,14 +20,11 @@ class GetTiltakQueryStatement(
             select tiltak.id                     as tiltak_internal_id,
                    tiltak.external_id            as tiltak_external_id,
                    tiltak.arena_id               as tiltak_arena_id,
-                   tiltak.tiltaksleverandor_id   as tiltaksleverandor_internal_id,
-                   tiltaksleverandor.external_id as tiltaksleverandor_external_id,
                    tiltak.navn                   as tiltak_navn,
                    tiltak.type                   as tiltak_type,
                    tiltak.created_at             as created_at,
                    tiltak.modified_at            as modified_at
             from tiltak
-                     inner join tiltaksleverandor on tiltak.tiltaksleverandor_id = tiltaksleverandor.id
         """.trimIndent()
     }
 
@@ -37,8 +34,6 @@ class GetTiltakQueryStatement(
                 internalId = rs.getInt("tiltak_internal_id"),
                 externalId = UUID.fromString(rs.getString("tiltak_external_id")),
                 arenaId = rs.getString("tiltak_arena_id"),
-                tiltaksleverandorInternalId = rs.getInt("tiltaksleverandor_internal_id"),
-                tiltaksleverandorExternalId = UUID.fromString(rs.getString("tiltaksleverandor_external_id")),
                 navn = rs.getString("tiltak_navn"),
                 type = rs.getString("tiltak_type"),
                 createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
