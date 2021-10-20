@@ -16,17 +16,19 @@ class GetTiltakQueryStatement(
 
     override fun getSqlString(): String {
         //language=PostgreSQL
-        return "select tiltak.id                     as tiltak_internal_id, " +
-                "       tiltak.external_id            as tiltak_external_id, " +
-                "       tiltak.arena_id               as tiltak_arena_id, " +
-                "       tiltak.tiltaksleverandor_id   as tiltaksleverandor_internal_id, " +
-                "       tiltaksleverandor.external_id as tiltaksleverandor_external_id, " +
-                "       tiltak.navn                   as tiltak_navn, " +
-                "       tiltak.type                   as tiltak_type, " +
-                "       tiltak.created_at             as created_at, " +
-                "       tiltak.modified_at            as modified_at " +
-                "from tiltak " +
-                "         inner join tiltaksleverandor on tiltak.tiltaksleverandor_id = tiltaksleverandor.id "
+        return """
+            select tiltak.id                     as tiltak_internal_id,
+                   tiltak.external_id            as tiltak_external_id,
+                   tiltak.arena_id               as tiltak_arena_id,
+                   tiltak.tiltaksleverandor_id   as tiltaksleverandor_internal_id,
+                   tiltaksleverandor.external_id as tiltaksleverandor_external_id,
+                   tiltak.navn                   as tiltak_navn,
+                   tiltak.type                   as tiltak_type,
+                   tiltak.created_at             as created_at,
+                   tiltak.modified_at            as modified_at
+            from tiltak
+                     inner join tiltaksleverandor on tiltak.tiltaksleverandor_id = tiltaksleverandor.id
+        """.trimIndent()
     }
 
     override fun getMapper(): RowMapper<TiltakDbo> {

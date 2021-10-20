@@ -31,7 +31,6 @@ internal class TiltakRepositoryTest {
 
     companion object TestData {
         val TILTAKSLEVERANDOR_1_ID = UUID.fromString("0dc9ccec-fd1e-4c4e-b91a-c23e6d89c18e")
-        val TILTAKSLEVERANDOR_2_ID = UUID.fromString("4d1ad2c5-71a6-472b-a3bb-79aaa262527b")
         val TILTAKSLEVERANDOR_ID_NOT_EXIST = UUID.fromString("3cc09a7b-147b-4b0f-b186-e24cb199c8dc")
     }
 
@@ -50,7 +49,7 @@ internal class TiltakRepositoryTest {
         jdbcTemplate = JdbcTemplate(dataSource)
         namedJdbcTemplate = NamedParameterJdbcTemplate(dataSource)
 
-        repository = TiltakRepository(jdbcTemplate, namedJdbcTemplate)
+        repository = TiltakRepository(namedJdbcTemplate)
 
         jdbcTemplate.update(this::class.java.getResource("/tiltak-repository_test-data.sql").readText())
     }
@@ -64,14 +63,14 @@ internal class TiltakRepositoryTest {
             navn = "Dette er et testtiltak"
         )
 
-        val savedDto = repository.insert("1", tiltak)
+        val savedDbo = repository.insert("1", tiltak)
 
-        assertNotNull(savedDto)
-        assertNotNull(savedDto.internalId)
-        assertNotNull(savedDto.externalId)
+        assertNotNull(savedDbo)
+        assertNotNull(savedDbo.internalId)
+        assertNotNull(savedDbo.externalId)
 
-        assertEquals(tiltak.kode, savedDto.type)
-        assertEquals(tiltak.navn, savedDto.navn)
+        assertEquals(tiltak.kode, savedDbo.type)
+        assertEquals(tiltak.navn, savedDbo.navn)
 
     }
 
@@ -85,6 +84,27 @@ internal class TiltakRepositoryTest {
         )
 
         assertThrows<Exception> { repository.insert("1", tiltak) }
+    }
+
+    @Test
+    internal fun `getByArenaId returns the correct object`() {
+        val arenaId = "1"
+
+        val tiltak = Tiltak(
+            id = null,
+            tiltaksleverandorId = TILTAKSLEVERANDOR_1_ID,
+            kode = "AMO",
+            navn = "Dette er et testtiltak"
+        )
+
+        repository.insert(arenaId, tiltak)
+
+        val savedDbo = repository.getByArenaId(arenaId)
+
+        assertNotNull(savedDbo)
+        assertEquals(tiltak.kode, savedDbo?.type)
+        assertEquals(tiltak.navn, savedDbo?.navn)
+
     }
 
     private fun createDataSource(container: PostgreSQLContainer<Nothing>): HikariDataSource {
