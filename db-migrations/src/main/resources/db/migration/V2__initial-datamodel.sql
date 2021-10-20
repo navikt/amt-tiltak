@@ -1,7 +1,7 @@
 CREATE TYPE tiltaksleverandor_rolle AS ENUM (
     'KOORDINATOR',
     'VEILEDER'
-);
+    );
 
 CREATE TABLE nav_ansatt
 (
@@ -16,43 +16,44 @@ CREATE TABLE nav_ansatt
 CREATE TABLE tiltaksleverandor
 (
     id                  serial PRIMARY KEY,
-    external_id         uuid UNIQUE,
-    organisasjonsnummer varchar,
-    organisasjonsnavn   varchar,
-    virksomhetsnummer   varchar,
-    virksomhetsnavn     varchar,
-    created_at          timestamp with time zone default current_timestamp,
-    modified_at         timestamp with time zone default current_timestamp
+    external_id         uuid                     not null UNIQUE,
+    organisasjonsnummer varchar                  not null,
+    organisasjonsnavn   varchar                  not null,
+    virksomhetsnummer   varchar                  not null,
+    virksomhetsnavn     varchar                  not null,
+    created_at          timestamp with time zone not null default current_timestamp,
+    modified_at         timestamp with time zone not null default current_timestamp
 );
 
 CREATE TABLE tiltaksleverandor_ansatt
 (
     id              serial PRIMARY KEY,
-    external_id     uuid UNIQUE,
+    external_id     uuid                     not null UNIQUE,
     personlig_ident varchar,
     fornavn         varchar,
     etternavn       varchar,
     telefonnummer   varchar,
     epost           varchar,
-    created_at      timestamp with time zone default current_timestamp,
-    modified_at     timestamp with time zone default current_timestamp
+    created_at      timestamp with time zone not null default current_timestamp,
+    modified_at     timestamp with time zone not null default current_timestamp
 );
 
 CREATE TABLE tiltaksleverandor_ansatt_rolle
 (
     id                   serial PRIMARY KEY,
-    ansatt_id            integer references tiltaksleverandor_ansatt (id),
-    tiltaksleverandor_id integer references tiltaksleverandor (id),
-    rolle                tiltaksleverandor_rolle,
-    created_at           timestamp with time zone default current_timestamp
+    ansatt_id            integer                  not null references tiltaksleverandor_ansatt (id),
+    tiltaksleverandor_id integer                  not null references tiltaksleverandor (id),
+    rolle                tiltaksleverandor_rolle  not null,
+    created_at           timestamp with time zone not null default current_timestamp
 
 );
 
 CREATE TABLE tiltak
 (
     id                   serial PRIMARY KEY,
-    external_id          uuid UNIQUE,
-    tiltaksleverandor_id integer references tiltaksleverandor (id),
+    external_id          uuid    not null UNIQUE,
+    arena_id             varchar not null unique,
+    tiltaksleverandor_id integer not null references tiltaksleverandor (id),
     navn                 varchar,
     adresse              varchar,
     type                 varchar,
@@ -63,17 +64,17 @@ CREATE TABLE tiltak
 CREATE TABLE tiltaksinstans
 (
     id             serial PRIMARY KEY,
-    external_id    uuid UNIQUE,
-    tiltak_id      integer references tiltak (id),
+    external_id    uuid                     not null UNIQUE,
+    tiltak_id      integer                  not null references tiltak (id),
     navn           varchar,
     antall_plasser integer,
-    created_at     timestamp with time zone default current_timestamp,
-    modified_at    timestamp with time zone default current_timestamp
+    created_at     timestamp with time zone not null default current_timestamp,
+    modified_at    timestamp with time zone not null default current_timestamp
 );
 
 CREATE TABLE bruker
 (
-    id                    serial PRIMARY KEY,
+    id                    serial not null PRIMARY KEY,
     personlig_ident       varchar,
     fornavn               varchar,
     etternavn             varchar,
@@ -86,10 +87,10 @@ CREATE TABLE bruker
 
 CREATE TABLE deltaker
 (
-    id                serial PRIMARY KEY,
-    external_id       uuid UNIQUE,
-    bruker_id         integer references bruker (id),
-    tiltaksinstans_id integer references tiltaksinstans (id),
+    id                serial  not null PRIMARY KEY,
+    external_id       uuid    not null UNIQUE,
+    bruker_id         integer not null references bruker (id),
+    tiltaksinstans_id integer not null references tiltaksinstans (id),
     status            varchar,
     created_at        timestamp with time zone default current_timestamp,
     modified_at       timestamp with time zone default current_timestamp

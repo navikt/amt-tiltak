@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Repository
-class TiltaksleverandorRepository(
+open class TiltaksleverandorRepository(
 	private val jdbcTemplate: JdbcTemplate
 ) {
 
