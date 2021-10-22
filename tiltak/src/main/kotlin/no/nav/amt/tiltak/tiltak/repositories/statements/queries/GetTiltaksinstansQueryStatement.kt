@@ -31,7 +31,9 @@ class GetTiltaksinstansQueryStatement(
 			       tiltaksinstans.oppstart_dato                                                as oppstart_dato,
 			       tiltaksinstans.slutt_dato                                                   as slutt_dato,
 			       tiltaksinstans.registrert_dato                                              as registrert_dato,
-			       tiltaksinstans.fremmote_dato                                                as fremmote_dato
+			       tiltaksinstans.fremmote_dato                                                as fremmote_dato,
+				   tiltaksinstans.created_at 												   as created_at,
+				   tiltaksinstans.modified_at                                                  as modified_at
 			FROM tiltaksinstans
 		""".trimIndent()
 	}
@@ -53,7 +55,9 @@ class GetTiltaksinstansQueryStatement(
 				oppstartDato = rs.getDate("oppstart_dato")?.toLocalDate(),
 				sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
 				registrertDato = rs.getTimestamp("registrert_dato")?.toLocalDateTime(),
-				fremmoteDato = rs.getTimestamp("fremmote_dato")?.toLocalDateTime()
+				fremmoteDato = rs.getTimestamp("fremmote_dato")?.toLocalDateTime(),
+				createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
+				modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
 			)
 		}
 	}

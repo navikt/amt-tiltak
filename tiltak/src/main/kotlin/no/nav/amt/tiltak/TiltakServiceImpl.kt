@@ -28,11 +28,9 @@ class TiltakServiceImpl(
 				)
 			)
 
-			if(update.status == UpdateStatus.UPDATED) {
-				tiltakRepository.update(update.updatedObject!!)
+			if (update.status == UpdateStatus.UPDATED) {
+				return tiltakRepository.update(update.updatedObject!!).toTiltak()
 			}
-
-			throw NotImplementedError("Update is not yet implemented") //TODO
 		}
 
 		return tiltakRepository.insert(arenaId, navn, kode).toTiltak()
@@ -56,7 +54,20 @@ class TiltakServiceImpl(
 		val storedTiltaksinstans = tiltaksinstansRepository.getByArenaId(arenaId)
 
 		if (storedTiltaksinstans != null) {
-			throw NotImplementedError("Update is not yet implemented") //TODO
+			val update = storedTiltaksinstans.update(
+				storedTiltaksinstans.copy(
+					navn = navn,
+					status = status,
+					oppstartDato = oppstartDato,
+					sluttDato = sluttDato,
+					registrertDato = registrertDato,
+					fremmoteDato = fremmoteDato
+				)
+			)
+
+			if (update.status == UpdateStatus.UPDATED) {
+				return tiltaksinstansRepository.update(update.updatedObject!!).toTiltaksinstans()
+			}
 		}
 
 		return tiltaksinstansRepository.insert(

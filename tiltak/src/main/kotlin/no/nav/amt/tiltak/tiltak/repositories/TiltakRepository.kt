@@ -28,7 +28,7 @@ open class TiltakRepository(
 	}
 
 	fun update(tiltak: TiltakDbo): TiltakDbo {
-		TiltakUpdateStatement(template, tiltak)
+		TiltakUpdateStatement(template, tiltak).execute()
 
 		return get(tiltak.externalId)
 			?: throw NoSuchElementException("Tiltak med id ${tiltak.externalId} finnes ikke")

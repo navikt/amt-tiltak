@@ -6,6 +6,7 @@ import no.nav.amt.tiltak.tiltak.repositories.statements.insert.TiltaksinstansIns
 import no.nav.amt.tiltak.tiltak.repositories.statements.parts.tiltaksinstans.TiltaksinstansArenaIdEqualsQueryPart
 import no.nav.amt.tiltak.tiltak.repositories.statements.parts.tiltaksinstans.TiltaksinstansExternalIdEqualQueryPart
 import no.nav.amt.tiltak.tiltak.repositories.statements.queries.GetTiltaksinstansQueryStatement
+import no.nav.amt.tiltak.tiltak.repositories.statements.update.TiltaksinstansUpdateStatement
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
@@ -42,6 +43,14 @@ open class TiltaksinstansRepository(private val template: NamedParameterJdbcTemp
 		return get(externalId)
 			?: throw NoSuchElementException("Tiltak med id $externalId finnes ikke")
 	}
+
+	fun update(tiltaksinstans: TiltaksinstansDbo): TiltaksinstansDbo {
+		TiltaksinstansUpdateStatement(template, tiltaksinstans).exexute()
+
+		return get(tiltaksinstans.externalId)
+			?: throw NoSuchElementException("Tiltak med id ${tiltaksinstans.externalId} finnes ikke")
+	}
+
 
 	fun get(id: UUID): TiltaksinstansDbo? {
 		return GetTiltaksinstansQueryStatement(template)

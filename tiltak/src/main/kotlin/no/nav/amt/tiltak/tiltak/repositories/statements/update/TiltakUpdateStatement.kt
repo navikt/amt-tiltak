@@ -23,7 +23,8 @@ class TiltakUpdateStatement(
 			mapOf(
 				"navn" to tiltak.navn,
 				"type" to tiltak.type,
-				"modifiedAt" to tiltak.modifiedAt
+				"modifiedAt" to tiltak.modifiedAt,
+				"id" to tiltak.internalId
 			)
 		)
 

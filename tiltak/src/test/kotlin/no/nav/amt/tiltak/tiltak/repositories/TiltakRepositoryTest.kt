@@ -107,8 +107,8 @@ internal class TiltakRepositoryTest {
 			)
 		)
 
-		assertEquals(navn, updatedTiltak.navn)
-		assertEquals(kode, updatedTiltak.type)
+		assertEquals(updatedNavn, updatedTiltak.navn)
+		assertEquals(updatedKode, updatedTiltak.type)
 	}
 
 	@Test
