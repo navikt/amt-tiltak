@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.tiltaksleverandor.controllers.dto
 
-import no.nav.amt.tiltak.core.domain.tiltaksleverandor.Virksomhet
+import no.nav.amt.tiltak.core.domain.tiltaksleverandor.Tiltaksleverandor
 import java.util.*
 
 data class VirksomhetDTO(
@@ -10,8 +10,8 @@ data class VirksomhetDTO(
 	val roller: List<AnsattRolle>
 )
 
-fun Virksomhet.toDto(roller: List<AnsattRolle>): VirksomhetDTO {
-	if(this.id == null) {
+fun Tiltaksleverandor.toDto(roller: List<AnsattRolle>): VirksomhetDTO {
+	if (this.id == null) {
 		throw UnsupportedOperationException("Virksomheten er ikke lagret, og kan dermed ikke sendes")
 	}
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.amt.tiltak.connectors.brreg.dto.OverordnetEnhetDTO
 import no.nav.amt.tiltak.connectors.brreg.dto.VirksomhetDTO
 import no.nav.amt.tiltak.connectors.brreg.dto.href
-import no.nav.amt.tiltak.core.domain.tiltaksleverandor.Virksomhet
+import no.nav.amt.tiltak.core.domain.enhetsregister.Virksomhet
 import no.nav.amt.tiltak.core.port.EnhetsregisterConnector
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -64,7 +64,6 @@ class BronnoysundConnector : EnhetsregisterConnector {
 
 	private fun toModel(virksomhet: VirksomhetDTO, overordnetEnhet: OverordnetEnhetDTO): Virksomhet {
 		return Virksomhet(
-			id = null,
 			organisasjonsnummer = overordnetEnhet.organisasjonsnummer,
 			organisasjonsnavn = overordnetEnhet.navn,
 			virksomhetsnummer = virksomhet.organisasjonsnummer,

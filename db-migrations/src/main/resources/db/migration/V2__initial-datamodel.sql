@@ -19,7 +19,7 @@ CREATE TABLE tiltaksleverandor
     external_id         uuid                     not null UNIQUE,
     organisasjonsnummer varchar                  not null,
     organisasjonsnavn   varchar                  not null,
-    virksomhetsnummer   varchar                  not null,
+    virksomhetsnummer   varchar                  not null UNIQUE,
     virksomhetsnavn     varchar                  not null,
     created_at          timestamp with time zone not null default current_timestamp,
     modified_at         timestamp with time zone not null default current_timestamp
@@ -61,7 +61,7 @@ CREATE TABLE tiltak
 
 CREATE TYPE tiltaksinstans_status AS ENUM (
     'GJENNOMFORES', 'AVSLUTTET', 'IKKE_STARTET'
-);
+    );
 
 CREATE TABLE tiltaksinstans
 (

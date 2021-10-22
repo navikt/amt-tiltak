@@ -32,7 +32,9 @@ abstract class AbstractArenaProcessor(
         } catch (e: Exception) {
             if (data.ingestAttempts >= MAX_INGEST_ATTEMPTS) {
                 repository.setFailed(data, e.message, e)
-            }
+            } else {
+            	repository.setRetry(data)
+			}
         }
     }
 

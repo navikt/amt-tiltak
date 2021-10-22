@@ -8,27 +8,31 @@ import org.springframework.stereotype.Component
 
 @Component
 class TiltakProcessor(
-    repository: ArenaDataRepository,
-    private val tiltakService: TiltakService
+	repository: ArenaDataRepository,
+	private val tiltakService: TiltakService
 ) : AbstractArenaProcessor(repository) {
 
-    override fun insert(data: ArenaData) {
-        val newFields = jsonObject(data.after, ArenaTiltak::class.java)
+	override fun insert(data: ArenaData) {
+		insertUpdate(data)
+	}
 
-        tiltakService.addUpdateTiltak(
-            newFields.TILTAKSKODE,
-            newFields.TILTAKSNAVN,
-            newFields.TILTAKSKODE
-        )
-    }
+	override fun update(data: ArenaData) {
+		insertUpdate(data)
+	}
 
-    override fun update(data: ArenaData) {
-        TODO("Not yet implemented")
-    }
+	override fun delete(data: ArenaData) {
+		throw UnsupportedOperationException("Cannot delete Arena Data for table ${data.tableName}")
+	}
 
-    override fun delete(data: ArenaData) {
-        TODO("Not yet implemented")
-    }
 
+	private fun insertUpdate(data: ArenaData) {
+		val newFields = jsonObject(data.after, ArenaTiltak::class.java)
+
+		tiltakService.addUpdateTiltak(
+			newFields.TILTAKSKODE,
+			newFields.TILTAKSNAVN,
+			newFields.TILTAKSKODE
+		)
+	}
 
 }

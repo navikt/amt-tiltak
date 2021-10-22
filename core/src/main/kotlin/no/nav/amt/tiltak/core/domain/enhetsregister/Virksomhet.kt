@@ -1,9 +1,6 @@
-package no.nav.amt.tiltak.core.domain.tiltaksleverandor
-
-import java.util.*
+package no.nav.amt.tiltak.core.domain.enhetsregister
 
 data class Virksomhet(
-	val id: UUID? = null,
 	val organisasjonsnummer: String,
 	val organisasjonsnavn: String,
 	val virksomhetsnummer: String,

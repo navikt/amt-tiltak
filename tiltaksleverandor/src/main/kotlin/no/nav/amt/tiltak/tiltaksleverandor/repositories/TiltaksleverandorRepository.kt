@@ -1,103 +1,46 @@
 package no.nav.amt.tiltak.tiltaksleverandor.repositories
 
-import no.nav.amt.tiltak.core.domain.tiltaksleverandor.Virksomhet
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
+import no.nav.amt.tiltak.tiltaksleverandor.dbo.TiltaksleverandorDbo
+import no.nav.amt.tiltak.tiltaksleverandor.repositories.statements.insert.TiltaksleverandorInsertStatement
+import no.nav.amt.tiltak.tiltaksleverandor.repositories.statements.parts.TiltaksleverandorVirksomhetsnummerEqualsQueryPart
+import no.nav.amt.tiltak.tiltaksleverandor.repositories.statements.query.GetTiltaksleverandorQueryStatement
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
-import java.time.LocalDateTime
-import java.util.*
 
 @Repository
 open class TiltaksleverandorRepository(
-	private val jdbcTemplate: JdbcTemplate
+	private val template: NamedParameterJdbcTemplate,
 ) {
 
-	companion object Table {
-		private const val TABLE_NAME = "tiltaksleverandor"
-
-		private const val FIELD_ID = "id"
-		private const val FIELD_EXTERNAL_ID = "external_id"
-		private const val FIELD_ORGANISASJONSNUMMER = "organisasjonsnummer"
-		private const val FIELD_ORGANISASJONSNAVN = "organisasjonsnavn"
-		private const val FIELD_VIRKSOMHETSNUMMER = "virksomhetsnummer"
-		private const val FIELD_VIRKSOMHETSNAVN = "virksomhetsnavn"
-		private const val FIELD_CREATED_AT = "created_at"
-		private const val FIELD_MODIFIED_AT = "modified_at"
-	}
-
-	private val rowMapper = RowMapper { rs, _ ->
-		TiltaksleverandorDto(
-			id = rs.getInt(FIELD_ID),
-			externalId = UUID.fromString(rs.getString(FIELD_EXTERNAL_ID)),
-			organisasjonsnummer = rs.getString(FIELD_ORGANISASJONSNUMMER),
-			organisasjonsnavn = rs.getString(FIELD_ORGANISASJONSNAVN),
-			virksomhetsnummer = rs.getString(FIELD_VIRKSOMHETSNUMMER),
-			virksomhetsnavn = rs.getString(FIELD_VIRKSOMHETSNAVN),
-			createdAt = rs.getTimestamp(FIELD_CREATED_AT).toLocalDateTime(),
-			modifiedAt = rs.getTimestamp(FIELD_MODIFIED_AT).toLocalDateTime()
-		)
-	}
-
-	fun insert(virksomhet: Virksomhet): TiltaksleverandorDto {
-		val savedTiltaksleverandor = getByVirksomhetsnummer(virksomhet.virksomhetsnummer)
+	fun insert(
+		organisasjonsnavn: String,
+		organisasjonsnummer: String,
+		virksomhetsnummer: String,
+		virksomhetsnavn: String
+	): TiltaksleverandorDbo {
+		val savedTiltaksleverandor = getByVirksomhetsnummer(virksomhetsnummer)
 
 		if (savedTiltaksleverandor != null) {
 			return savedTiltaksleverandor
 		}
 
-		val sql = """
-			INSERT INTO $TABLE_NAME(
-			$FIELD_EXTERNAL_ID, $FIELD_ORGANISASJONSNAVN, $FIELD_ORGANISASJONSNUMMER,
-			$FIELD_VIRKSOMHETSNAVN, $FIELD_VIRKSOMHETSNUMMER
-			)
-			VALUES (?, ?, ?, ?, ?)
-		""".trimIndent()
-
-		jdbcTemplate.update(
-			sql,
-			UUID.randomUUID(),
-			virksomhet.organisasjonsnavn,
-			virksomhet.organisasjonsnummer,
-			virksomhet.virksomhetsnavn,
-			virksomhet.virksomhetsnummer
-		)
-
-		return getByVirksomhetsnummer(virksomhet.virksomhetsnummer)
-			?: throw NoSuchElementException("Virksomhet med virksomhetsnummer ${virksomhet.virksomhetsnummer} finnes ikke")
-	}
-
-	fun getByVirksomhetsnummer(virksomhetsnummer: String): TiltaksleverandorDto? {
-		val sql = """
-			SELECT * FROM $TABLE_NAME WHERE $FIELD_VIRKSOMHETSNUMMER = ?
-		""".trimIndent()
-
-		return jdbcTemplate.query(
-			sql,
-			rowMapper,
-			virksomhetsnummer
-		).firstOrNull()
-	}
-
-}
-
-data class TiltaksleverandorDto(
-	val id: Int,
-	val externalId: UUID,
-	val organisasjonsnummer: String,
-	val organisasjonsnavn: String,
-	val virksomhetsnummer: String,
-	val virksomhetsnavn: String,
-	val createdAt: LocalDateTime,
-	val modifiedAt: LocalDateTime
-) {
-
-	fun toVirksomhet(): Virksomhet {
-		return Virksomhet(
-			id = externalId,
+		TiltaksleverandorInsertStatement(
+			template = template,
 			organisasjonsnummer = organisasjonsnummer,
 			organisasjonsnavn = organisasjonsnavn,
 			virksomhetsnummer = virksomhetsnummer,
 			virksomhetsnavn = virksomhetsnavn
-		)
+		).execute()
+
+		return getByVirksomhetsnummer(virksomhetsnummer)
+			?: throw NoSuchElementException("Virksomhet med virksomhetsnummer $virksomhetsnummer finnes ikke")
 	}
+
+	fun getByVirksomhetsnummer(virksomhetsnummer: String): TiltaksleverandorDbo? {
+		return GetTiltaksleverandorQueryStatement(template)
+			.addPart(TiltaksleverandorVirksomhetsnummerEqualsQueryPart(virksomhetsnummer))
+			.execute()
+			.firstOrNull()
+	}
+
 }

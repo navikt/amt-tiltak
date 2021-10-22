@@ -1,13 +1,15 @@
 package no.nav.amt.tiltak.ingestors.arena.processors
 
-import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
-import no.nav.amt.tiltak.core.domain.tiltaksleverandor.Virksomhet
+import no.nav.amt.tiltak.core.domain.tiltaksleverandor.Tiltaksleverandor
+import no.nav.amt.tiltak.core.port.ArenaOrdsProxyConnector
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.core.port.TiltaksleverandorService
 import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
 import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltaksgjennomforing
+import no.nav.amt.tiltak.ingestors.arena.exceptions.DependencyNotIngestedException
 import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
 import org.slf4j.LoggerFactory
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -19,7 +21,7 @@ class TiltaksgjennomforingProcessor(
 	repository: ArenaDataRepository,
 	private val tiltaksleverandorService: TiltaksleverandorService,
 	private val tiltakService: TiltakService,
-//    private val ords: ArenaOrdsProxyConnector
+	private val ords: ArenaOrdsProxyConnector
 ) : AbstractArenaProcessor(repository) {
 
 	private val logger = LoggerFactory.getLogger(javaClass)
@@ -28,39 +30,63 @@ class TiltaksgjennomforingProcessor(
 	override fun insert(data: ArenaData) {
 		val newFields = jsonObject(data.after, ArenaTiltaksgjennomforing::class.java)
 
-		val virksomhet = addVirksomhet(newFields)
-		val tiltaksinstans = addTiltaksinstans(newFields.TILTAKSKODE, newFields)
+		val tiltak = tiltakService.getTiltakFromArenaId(newFields.TILTAKSKODE)
+			?: throw DependencyNotIngestedException("Tiltak med ID ${newFields.TILTAKSKODE} er ikke ingested.")
+
+		val tiltaksleverandor = addTiltaksleverandor(newFields)
+
+		tiltakService.addUpdateTiltaksinstans(
+			arenaId = newFields.TILTAKGJENNOMFORING_ID.toInt(),
+			tiltakId = tiltak.id,
+			tiltaksleverandorId = tiltaksleverandor.id,
+			navn = newFields.LOKALTNAVN
+				?: throw DataIntegrityViolationException("Forventet at LOKALTNAVN ikke er null"),
+			status = null,
+			oppstartDato = stringToLocalDate(newFields.DATO_FRA),
+			sluttDato = stringToLocalDate(newFields.DATO_TIL),
+			registrertDato = stringToLocalDateTime(newFields.REG_DATO),
+			fremmoteDato = datoKlokketidToLocalDateTime(newFields.DATO_FREMMOTE, newFields.KLOKKETID_FREMMOTE)
+		)
 	}
 
 	override fun update(data: ArenaData) {
-		TODO("Not yet implemented")
+		val newFields = jsonObject(data.after, ArenaTiltaksgjennomforing::class.java)
+
+		val virksomhetsnummer = ords.hentVirksomhetsnummer(newFields.ARBGIV_ID_ARRANGOR.toString())
+
+		val tiltaksleverandor = tiltaksleverandorService.getTiltaksleverandorByVirksomhetsnummer(virksomhetsnummer)
+			?: throw DependencyNotIngestedException("Tiltaksleverandør med virksomhetsnummer $virksomhetsnummer er ikke ingested enda.")
+
+		val tiltak = tiltakService.getTiltakFromArenaId(newFields.TILTAKSKODE)
+			?: throw DependencyNotIngestedException("Tilktak med ArenaId $virksomhetsnummer er ikke ingested enda.")
+
+
+		tiltakService.addUpdateTiltaksinstans(
+			arenaId = newFields.TILTAKGJENNOMFORING_ID.toInt(),
+			tiltakId = tiltak.id,
+			tiltaksleverandorId = tiltaksleverandor.id,
+			navn = newFields.LOKALTNAVN
+				?: throw DataIntegrityViolationException("Forventet at LOKALTNAVN ikke er null"),
+			status = null,
+			oppstartDato = stringToLocalDate(newFields.DATO_FRA),
+			sluttDato = stringToLocalDate(newFields.DATO_TIL),
+			registrertDato = stringToLocalDateTime(newFields.REG_DATO),
+			fremmoteDato = datoKlokketidToLocalDateTime(newFields.DATO_FREMMOTE, newFields.KLOKKETID_FREMMOTE)
+		)
+
 	}
 
 	override fun delete(data: ArenaData) {
 		TODO("Not yet implemented")
 	}
 
-	private fun addVirksomhet(fields: ArenaTiltaksgjennomforing): Virksomhet {
-		TODO("Not yet implemented")
-//		val virksomhetsnummer = ords.hentVirksomhetsnummer(fields.ARBGIV_ID_ARRANGOR.toString())
-//		return tiltaksleverandorService.addVirksomhet(virksomhetsnummer)
+	private fun insertUpdate(data: ArenaData) {
+
 	}
 
-	private fun addTiltaksinstans(tiltakArenaId: String, fields: ArenaTiltaksgjennomforing): TiltakInstans {
-		val arenaId = fields.TILTAKGJENNOMFORING_ID.toInt()
-
-//        val unsavedTiltaksinstans = TiltakInstans(
-//            id = null,
-//            navn = fields.LOKALTNAVN!!,
-//            status = null,
-//            oppstartDato = stringToLocalDate(fields.DATO_FRA),
-//            sluttDato = stringToLocalDate(fields.DATO_TIL),
-//            registrertDato = stringToLocalDateTime(fields.REG_DATO),
-//            fremmoteDato = datoKlokketidToLocalDateTime(fields.DATO_FREMMOTE, fields.KLOKKETID_FREMMOTE)
-//        )
-//
-//        return tiltakService.addTiltaksinstans(arenaId, unsavedTiltaksinstans)
-		TODO("Not yet implemented")
+	private fun addTiltaksleverandor(fields: ArenaTiltaksgjennomforing): Tiltaksleverandor {
+		val virksomhetsnummer = ords.hentVirksomhetsnummer(fields.ARBGIV_ID_ARRANGOR.toString())
+		return tiltaksleverandorService.addTiltaksleverandor(virksomhetsnummer)
 	}
 
 	private fun stringToLocalDate(string: String?): LocalDate? {
