@@ -2,12 +2,12 @@ package no.nav.amt.tiltak.tiltak.repositories
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -18,74 +18,117 @@ import java.util.*
 
 @Testcontainers
 internal class TiltaksinstansRepositoryTest {
-    @Container
-    val postgresContainer: PostgreSQLContainer<Nothing> =
-        PostgreSQLContainer(DockerImageName.parse("postgres:12-alpine"))
+	@Container
+	val postgresContainer: PostgreSQLContainer<Nothing> =
+		PostgreSQLContainer(DockerImageName.parse("postgres:12-alpine"))
 
-    lateinit var jdbcTemplate: JdbcTemplate
+	lateinit var jdbcTemplate: JdbcTemplate
+	lateinit var template: NamedParameterJdbcTemplate
 
-    lateinit var repository: TiltaksinstansRepository
+	lateinit var repository: TiltaksinstansRepository
 
-    companion object TestData {
-        val TILTAK_ID = UUID.fromString("9665b0b6-ea7d-44b0-b9c2-8867c2a6c106")
-        val TILTAK_INTERNAL_ID = 1
-    }
+	companion object TestData {
+		val TILTAK_ID = UUID.fromString("9665b0b6-ea7d-44b0-b9c2-8867c2a6c106")
+		val TILTAK_INTERNAL_ID = 1
 
-    @BeforeEach
-    fun migrate() {
-        val dataSource = createDataSource(postgresContainer)
+		val TILTAKSLEVERANDOR_ID = UUID.fromString("0dc9ccec-fd1e-4c4e-b91a-c23e6d89c18e")
+		val TILTAKSLEVERANDOR_INTERNAL_ID = 1
+	}
 
-        // TODO: Kopiert fra LocalPostgresDatabase.kt. Hadde det vært bedre med en modul for test-verktøy?
-        val flyway: Flyway = Flyway.configure()
-            .dataSource(dataSource)
-            .load()
+	@BeforeEach
+	fun migrate() {
+		val dataSource = createDataSource(postgresContainer)
 
-        flyway.clean()
-        flyway.migrate()
+		// TODO: Kopiert fra LocalPostgresDatabase.kt. Hadde det vært bedre med en modul for test-verktøy?
+		val flyway: Flyway = Flyway.configure()
+			.dataSource(dataSource)
+			.load()
 
-        jdbcTemplate = JdbcTemplate(dataSource)
-        repository = TiltaksinstansRepository(jdbcTemplate)
+		flyway.clean()
+		flyway.migrate()
 
-        jdbcTemplate.update(this::class.java.getResource("/tiltaksinstans-repository_test-data.sql").readText())
-    }
+		jdbcTemplate = JdbcTemplate(dataSource)
 
-    @Test
-    internal fun `insert() should insert tiltaksinstans and return object`() {
-        val instans = TiltakInstans(
-            id = null,
-            tiltakId = TILTAK_ID,
-            "TEST Tiltaksinstans",
-            status = null,
-            oppstartDato = LocalDate.now().plusDays(2),
-            sluttDato = LocalDate.now().plusDays(10),
-            registrertDato = LocalDateTime.now(),
-            fremmoteDato = LocalDateTime.now().plusDays(2).minusHours(2)
-        )
+		template = NamedParameterJdbcTemplate(dataSource)
+		repository = TiltaksinstansRepository(template)
 
-        val savedInstans = repository.insert(1, instans)
+		jdbcTemplate.update(this::class.java.getResource("/tiltaksinstans-repository_test-data.sql").readText())
+	}
 
-        assertNotNull(savedInstans)
-        assertNotNull(savedInstans.id)
-        assertNotNull(savedInstans.externalId)
+	@Test
+	internal fun `insert() should insert tiltaksinstans and return object`() {
+		val arenaId = 1
+		val navn = "TEST Tiltaksinstans"
+		val status = null
+		val oppstartDato = LocalDate.now().plusDays(2)
+		val sluttDato = LocalDate.now().plusDays(10)
+		val registrertDato = LocalDateTime.now()
+		val fremmoteDato = LocalDateTime.now().plusDays(2).minusHours(2)
 
-        assertEquals(TILTAK_INTERNAL_ID, savedInstans.tiltaksId)
-        assertEquals(instans.navn, savedInstans.navn)
-        assertEquals(instans.status, savedInstans.status)
+		val savedInstans = repository.insert(
+			arenaId = arenaId,
+			tiltakId = TILTAK_ID,
+			tiltaksleverandorId = TILTAKSLEVERANDOR_ID,
+			navn = navn,
+			status = status,
+			oppstartDato = oppstartDato,
+			sluttDato = sluttDato,
+			registrertDato = registrertDato,
+			fremmoteDato = fremmoteDato
+		)
 
-        assertTrue(instans.oppstartDato!!.isEqualTo(savedInstans.oppstartsdato!!))
-        assertTrue(instans.sluttDato!!.isEqualTo(savedInstans.sluttdato!!))
-        assertTrue(instans.registrertDato!!.isEqualTo(savedInstans.registrertDato!!))
-        assertTrue(instans.fremmoteDato!!.isEqualTo(savedInstans.fremmoteDato!!))
-    }
+		assertNotNull(savedInstans)
+		assertNotNull(savedInstans.internalId)
+		assertNotNull(savedInstans.externalId)
 
-    private fun createDataSource(container: PostgreSQLContainer<Nothing>): HikariDataSource {
-        val config = HikariConfig()
-        config.username = container.username
-        config.password = container.password
-        config.jdbcUrl = container.jdbcUrl
-        config.driverClassName = container.driverClassName
-        return HikariDataSource(config)
-    }
+		assertEquals(TILTAK_INTERNAL_ID, savedInstans.tiltakInternalId)
+		assertEquals(TILTAK_ID, savedInstans.tiltakExternalId)
+		assertEquals(TILTAKSLEVERANDOR_INTERNAL_ID, savedInstans.tiltaksleverandorInternalId)
+		assertEquals(TILTAKSLEVERANDOR_ID, savedInstans.tiltaksleverandorExternalId)
+		assertEquals(navn, savedInstans.navn)
+		assertEquals(status, savedInstans.status)
+
+		assertTrue(oppstartDato!!.isEqualTo(savedInstans.oppstartDato!!))
+		assertTrue(sluttDato!!.isEqualTo(savedInstans.sluttDato!!))
+		assertTrue(registrertDato!!.isEqualTo(savedInstans.registrertDato!!))
+		assertTrue(fremmoteDato!!.isEqualTo(savedInstans.fremmoteDato!!))
+	}
+
+	@Test
+	internal fun `getByArenaId returns the correct object`() {
+		val arenaId = 1
+		val navn = "TEST Tiltaksinstans"
+		val status = null
+		val oppstartDato = LocalDate.now().plusDays(2)
+		val sluttDato = LocalDate.now().plusDays(10)
+		val registrertDato = LocalDateTime.now()
+		val fremmoteDato = LocalDateTime.now().plusDays(2).minusHours(2)
+
+		val savedInstans = repository.insert(
+			arenaId = arenaId,
+			tiltakId = TILTAK_ID,
+			tiltaksleverandorId = TILTAKSLEVERANDOR_ID,
+			navn = navn,
+			status = status,
+			oppstartDato = oppstartDato,
+			sluttDato = sluttDato,
+			registrertDato = registrertDato,
+			fremmoteDato = fremmoteDato
+		)
+
+		val gottenObject = repository.getByArenaId(arenaId)
+
+		assertEquals(savedInstans, gottenObject)
+	}
+
+	private fun createDataSource(container: PostgreSQLContainer<Nothing>): HikariDataSource {
+		val config = HikariConfig()
+		config.username = container.username
+		config.password = container.password
+		config.jdbcUrl = container.jdbcUrl
+		config.driverClassName = container.driverClassName
+		return HikariDataSource(config)
+	}
 }
 
 
@@ -93,17 +136,17 @@ internal class TiltaksinstansRepositoryTest {
  * A helping function as SQL Timestamp and LocalDateTime does not have the same precision
  */
 fun LocalDateTime.isEqualTo(other: LocalDateTime): Boolean {
-    return this.year == other.year
-            && this.month == other.month
-            && this.dayOfMonth == other.dayOfMonth
-            && this.hour == other.hour
-            && this.minute == other.minute
-            && this.second == other.second
+	return this.year == other.year
+		&& this.month == other.month
+		&& this.dayOfMonth == other.dayOfMonth
+		&& this.hour == other.hour
+		&& this.minute == other.minute
+		&& this.second == other.second
 
 }
 
 fun LocalDate.isEqualTo(other: LocalDate): Boolean {
-    return this.year == other.year
-            && this.month == other.month
-            && this.dayOfMonth == other.dayOfMonth
+	return this.year == other.year
+		&& this.month == other.month
+		&& this.dayOfMonth == other.dayOfMonth
 }
