@@ -1,15 +1,15 @@
 package no.nav.amt.tiltak.core.domain.tiltak
 
-import java.time.LocalDateTime
+import java.time.LocalDate
 
-class Deltager(
+class Deltaker(
 	val fornavn: String,
 	val etternavn: String,
 	val fodselsdato: String,
-	val startdato: LocalDateTime,
-	val sluttdato: LocalDateTime,
-	val status: Status // TODO: Convert to enum
-	) {
+	val startdato: LocalDate?,
+	val sluttdato: LocalDate?,
+	val status: Status?
+) {
 
 	enum class Status {
 		NY_BRUKER, GJENNOMFORES, AVBRUTT, FULLFORT

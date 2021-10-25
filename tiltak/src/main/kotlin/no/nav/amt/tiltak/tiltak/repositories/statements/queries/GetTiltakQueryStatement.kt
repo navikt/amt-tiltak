@@ -7,16 +7,15 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.util.*
 
 class GetTiltakQueryStatement(
-    template: NamedParameterJdbcTemplate
+	template: NamedParameterJdbcTemplate
 ) : QueryStatement<TiltakDbo>(
-    LoggerFactory.getLogger(GetTiltakQueryStatement::class.java),
-    template,
-    true
+	logger = LoggerFactory.getLogger(GetTiltakQueryStatement::class.java),
+	template = template,
 ) {
 
-    override fun getSqlString(): String {
-        //language=PostgreSQL
-        return """
+	override fun getSqlString(): String {
+		//language=PostgreSQL
+		return """
             select tiltak.id                     as tiltak_internal_id,
                    tiltak.external_id            as tiltak_external_id,
                    tiltak.arena_id               as tiltak_arena_id,
@@ -26,19 +25,19 @@ class GetTiltakQueryStatement(
                    tiltak.modified_at            as modified_at
             from tiltak
         """.trimIndent()
-    }
+	}
 
-    override fun getMapper(): RowMapper<TiltakDbo> {
-        return RowMapper { rs, _ ->
-            TiltakDbo(
-                internalId = rs.getInt("tiltak_internal_id"),
-                externalId = UUID.fromString(rs.getString("tiltak_external_id")),
-                arenaId = rs.getString("tiltak_arena_id"),
-                navn = rs.getString("tiltak_navn"),
-                type = rs.getString("tiltak_type"),
-                createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
-                modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
-            )
-        }
-    }
+	override fun getMapper(): RowMapper<TiltakDbo> {
+		return RowMapper { rs, _ ->
+			TiltakDbo(
+				internalId = rs.getInt("tiltak_internal_id"),
+				externalId = UUID.fromString(rs.getString("tiltak_external_id")),
+				arenaId = rs.getString("tiltak_arena_id"),
+				navn = rs.getString("tiltak_navn"),
+				type = rs.getString("tiltak_type"),
+				createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
+				modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
+			)
+		}
+	}
 }

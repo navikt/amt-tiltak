@@ -16,36 +16,36 @@ import javax.sql.DataSource
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "PT60M")
 open class IngestCronJobs(
-    private val processor: ArenaDataProcessor
+	private val processor: ArenaDataProcessor
 ) {
 
-    companion object {
-        private val logger = LoggerFactory.getLogger(IngestCronJobs::class.java)
-    }
+	companion object {
+		private val logger = LoggerFactory.getLogger(IngestCronJobs::class.java)
+	}
 
-    @Bean
-    open fun lockProvider(datasource: DataSource): LockProvider {
-        return JdbcTemplateLockProvider(datasource)
-    }
+	@Bean
+	open fun lockProvider(datasource: DataSource): LockProvider {
+		return JdbcTemplateLockProvider(datasource)
+	}
 
-    @Scheduled(cron = "0 * * * * *")
-    @SchedulerLock(
-        name = "arena-ingest",
-        lockAtMostFor = "PT3M"
-    )
-    fun processUningestedArenaData() {
-        logger.debug("Starting processing job for uningested Arena Data")
-//        processor.processUningestedMessages()
-    }
+	@Scheduled(cron = "0 * * * * *")
+	@SchedulerLock(
+		name = "arena-ingest",
+		lockAtMostFor = "PT3M"
+	)
+	fun processUningestedArenaData() {
+		logger.debug("Starting processing job for uningested Arena Data")
+		processor.processUningestedMessages()
+	}
 
-    @Scheduled(cron = "0 0 0 * * *")
-    @SchedulerLock(
-        name = "arena-ingest-failed-retry",
-        lockAtMostFor = "PT60M"
-    )
-    fun processFailedArenaData() {
-        logger.debug("Starting processing job for failed Arena Data")
-//        processor.processFailedMessages()
-    }
+	@Scheduled(cron = "0 0 0 * * *")
+	@SchedulerLock(
+		name = "arena-ingest-failed-retry",
+		lockAtMostFor = "PT60M"
+	)
+	fun processFailedArenaData() {
+		logger.debug("Starting processing job for failed Arena Data")
+		processor.processFailedMessages()
+	}
 
 }

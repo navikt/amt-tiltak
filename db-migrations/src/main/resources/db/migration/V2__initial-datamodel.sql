@@ -82,10 +82,10 @@ CREATE TABLE tiltaksinstans
 
 CREATE TABLE bruker
 (
-    id                    serial not null PRIMARY KEY,
-    personlig_ident       varchar,
-    fornavn               varchar,
-    etternavn             varchar,
+    id                    serial  not null PRIMARY KEY,
+    fodselsnummer         varchar not null UNIQUE,
+    fornavn               varchar not null,
+    etternavn             varchar not null,
     telefonnummer         varchar,
     epost                 varchar,
     ansvarlig_veileder_id integer references nav_ansatt (id),
@@ -99,6 +99,8 @@ CREATE TABLE deltaker
     external_id       uuid    not null UNIQUE,
     bruker_id         integer not null references bruker (id),
     tiltaksinstans_id integer not null references tiltaksinstans (id),
+    oppstart_dato     date,
+    slutt_dato        date,
     status            varchar,
     created_at        timestamp with time zone default current_timestamp,
     modified_at       timestamp with time zone default current_timestamp

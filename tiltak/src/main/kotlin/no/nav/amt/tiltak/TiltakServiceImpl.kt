@@ -1,8 +1,10 @@
 package no.nav.amt.tiltak
 
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.core.port.TiltakService
+import no.nav.amt.tiltak.tiltak.deltaker.DeltakerService
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltaksinstansRepository
 import no.nav.amt.tiltak.tiltak.utils.UpdateStatus
@@ -14,7 +16,8 @@ import java.util.*
 @Service
 class TiltakServiceImpl(
 	private val tiltakRepository: TiltakRepository,
-	private val tiltaksinstansRepository: TiltaksinstansRepository
+	private val tiltaksinstansRepository: TiltaksinstansRepository,
+	private val deltakerService: DeltakerService
 ) : TiltakService {
 
 	override fun addUpdateTiltak(arenaId: String, navn: String, kode: String): Tiltak {
@@ -87,5 +90,8 @@ class TiltakServiceImpl(
 		return tiltaksinstansRepository.getByArenaId(arenaId)?.toTiltaksinstans()
 	}
 
+	override fun addUpdateDeltaker(tiltaksgjennomforing: UUID, fodselsnummer: String): Deltaker {
+		return deltakerService.addUpdateDeltaker(tiltaksgjennomforing, fodselsnummer)
+	}
 
 }

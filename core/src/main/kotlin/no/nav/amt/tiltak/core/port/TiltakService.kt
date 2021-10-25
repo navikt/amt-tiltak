@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.core.port
 
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import java.time.LocalDate
@@ -24,4 +25,6 @@ interface TiltakService {
 	): TiltakInstans
 
 	fun getTiltaksinstansFromArenaId(arenaId: Int): TiltakInstans?
+
+	fun addUpdateDeltaker(tiltaksgjennomforing: UUID, fodselsnummer: String): Deltaker
 }

@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 
 @ActiveProfiles("test")
 @WebMvcTest(controllers = [TiltakDeltagerController::class])
-class TiltakDeltagerControllerTest {
+class TiltakDeltakerControllerTest {
 
 	companion object {
 		private val server = MockOAuth2Server()
