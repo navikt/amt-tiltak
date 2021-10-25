@@ -17,6 +17,18 @@ class DeltakerProcessor(
 ) : AbstractArenaProcessor(repository) {
 
 	override fun insert(data: ArenaData) {
+		addUpdate(data)
+	}
+
+	override fun update(data: ArenaData) {
+		addUpdate(data)
+	}
+
+	override fun delete(data: ArenaData) {
+		TODO("Not yet implemented")
+	}
+
+	private fun addUpdate(data: ArenaData) {
 		val newFields = jsonObject(data.after, ArenaTiltakDeltaker::class.java)
 
 		val tiltaksgjennomforing = tiltakService.getTiltaksinstansFromArenaId(newFields.TILTAKGJENNOMFORING_ID.toInt())
@@ -25,17 +37,12 @@ class DeltakerProcessor(
 		val fodselsnummer = ords.hentFnr(newFields.PERSON_ID.toString())
 			?: throw DataIntegrityViolationException("Person med Arena ID ${newFields.PERSON_ID} returnerer ikke fødselsnummer")
 
-		val deltaker = tiltakService.addUpdateDeltaker(
+		tiltakService.addUpdateDeltaker(
 			tiltaksgjennomforing = tiltaksgjennomforing.id,
-			fodselsnummer = fodselsnummer
+			fodselsnummer = fodselsnummer,
+			oppstartDato = stringToLocalDate(newFields.DATO_FRA),
+			sluttDato = stringToLocalDate(newFields.DATO_TIL)
 		)
-	}
 
-	override fun update(data: ArenaData) {
-		TODO("Not yet implemented")
-	}
-
-	override fun delete(data: ArenaData) {
-		TODO("Not yet implemented")
 	}
 }

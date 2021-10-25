@@ -26,5 +26,11 @@ interface TiltakService {
 
 	fun getTiltaksinstansFromArenaId(arenaId: Int): TiltakInstans?
 
-	fun addUpdateDeltaker(tiltaksgjennomforing: UUID, fodselsnummer: String): Deltaker
+	fun addUpdateDeltaker(
+		tiltaksgjennomforing: UUID,
+		fodselsnummer: String,
+		oppstartDato: LocalDate?,
+		sluttDato: LocalDate?,
+		status: Deltaker.Status = Deltaker.Status.NY_BRUKER
+	): Deltaker
 }

@@ -90,8 +90,20 @@ class TiltakServiceImpl(
 		return tiltaksinstansRepository.getByArenaId(arenaId)?.toTiltaksinstans()
 	}
 
-	override fun addUpdateDeltaker(tiltaksgjennomforing: UUID, fodselsnummer: String): Deltaker {
-		return deltakerService.addUpdateDeltaker(tiltaksgjennomforing, fodselsnummer)
+	override fun addUpdateDeltaker(
+		tiltaksgjennomforing: UUID,
+		fodselsnummer: String,
+		oppstartDato: LocalDate?,
+		sluttDato: LocalDate?,
+		status: Deltaker.Status
+	): Deltaker {
+		return deltakerService.addUpdateDeltaker(
+			tiltaksinstans = tiltaksgjennomforing,
+			fodselsnummer = fodselsnummer,
+			oppstartDato = oppstartDato,
+			sluttDato = sluttDato,
+			status = status
+		)
 	}
 
 }

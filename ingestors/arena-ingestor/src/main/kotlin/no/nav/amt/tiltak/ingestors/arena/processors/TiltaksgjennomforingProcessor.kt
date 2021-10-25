@@ -24,9 +24,6 @@ class TiltaksgjennomforingProcessor(
 	private val ords: ArenaOrdsProxyConnector
 ) : AbstractArenaProcessor(repository) {
 
-	private val logger = LoggerFactory.getLogger(javaClass)
-	private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-
 	override fun insert(data: ArenaData) {
 		val newFields = jsonObject(data.after, ArenaTiltaksgjennomforing::class.java)
 
@@ -80,38 +77,8 @@ class TiltaksgjennomforingProcessor(
 		TODO("Not yet implemented")
 	}
 
-	private fun insertUpdate(data: ArenaData) {
-
-	}
-
 	private fun addTiltaksleverandor(fields: ArenaTiltaksgjennomforing): Tiltaksleverandor {
 		val virksomhetsnummer = ords.hentVirksomhetsnummer(fields.ARBGIV_ID_ARRANGOR.toString())
 		return tiltaksleverandorService.addTiltaksleverandor(virksomhetsnummer)
-	}
-
-	private fun stringToLocalDate(string: String?): LocalDate? {
-		return if (string != null) LocalDate.parse(string, formatter) else null
-	}
-
-	private fun stringToLocalDateTime(string: String?): LocalDateTime? {
-		return if (string != null) LocalDateTime.parse(string, formatter) else null
-	}
-
-	/**
-	 * Har ingen eksempler på hvordan klokketid ser ut, så må vente med det til vi har et eksempel.
-	 */
-	private fun datoKlokketidToLocalDateTime(dato: String?, klokketid: String?): LocalDateTime? {
-		if (dato == null) {
-			return null
-		}
-
-		val date = LocalDate.parse(dato, formatter)
-
-		val time = if (klokketid != null) {
-			logger.warn("Det er ikke implementert en handler for klokketid, pattern: $klokketid")
-			LocalTime.MIDNIGHT
-		} else LocalTime.MIDNIGHT
-
-		return LocalDateTime.of(date, time)
 	}
 }

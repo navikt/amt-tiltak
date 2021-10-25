@@ -33,14 +33,25 @@ data class DeltakerDbo(
 		)
 	}
 
-	fun update(other: DeltakerDbo): UpdateCheck<DeltakerDbo> {
-		if (this != other) {
+	fun update(
+		newStatus: Deltaker.Status,
+		newDeltakerStartDato: LocalDate?,
+		newDeltakerSluttDato: LocalDate?
+	): UpdateCheck<DeltakerDbo> {
+		if (status != newStatus
+			|| deltakerOppstartsdato != newDeltakerStartDato
+			|| deltakerSluttdato != newDeltakerSluttDato
+		) {
+
 			val updatedDeltaker = this.copy(
-				status = other.status,
+				status = newStatus,
+				deltakerOppstartsdato = newDeltakerStartDato,
+				deltakerSluttdato = newDeltakerSluttDato,
 				modifiedAt = LocalDateTime.now()
 			)
 
 			return UpdateCheck(UpdateStatus.UPDATED, updatedDeltaker)
+
 		}
 
 		return UpdateCheck(UpdateStatus.NO_CHANGE)
