@@ -1,3 +1,5 @@
+-- Testdata for ArenaDataRepositoryTest
+
 INSERT INTO arena_data (table_name, operation_type, operation_pos, operation_timestamp, ingest_status, before, after)
     VALUES ('tiltak', 'INSERT', 400, '2021-10-07T07:52:50', 'NEW', null, '{}');
 

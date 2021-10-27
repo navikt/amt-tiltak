@@ -11,38 +11,38 @@ import org.springframework.stereotype.Component
 
 @Component
 class DeltakerProcessor(
-	repository: ArenaDataRepository,
-	private val tiltakService: TiltakService,
-	private val ords: ArenaOrdsProxyConnector
+    repository: ArenaDataRepository,
+    private val tiltakService: TiltakService,
+    private val ords: ArenaOrdsProxyConnector
 ) : AbstractArenaProcessor(repository) {
 
-	override fun insert(data: ArenaData) {
-		addUpdate(data)
-	}
+    override fun insert(data: ArenaData) {
+        addUpdate(data)
+    }
 
-	override fun update(data: ArenaData) {
-		addUpdate(data)
-	}
+    override fun update(data: ArenaData) {
+        addUpdate(data)
+    }
 
-	override fun delete(data: ArenaData) {
-		TODO("Not yet implemented")
-	}
+    override fun delete(data: ArenaData) {
+        TODO("Not yet implemented")
+    }
 
-	private fun addUpdate(data: ArenaData) {
-		val newFields = jsonObject(data.after, ArenaTiltakDeltaker::class.java)
+    private fun addUpdate(data: ArenaData) {
+        val newFields = jsonObject(data.after, ArenaTiltakDeltaker::class.java)
 
-		val tiltaksgjennomforing = tiltakService.getTiltaksinstansFromArenaId(newFields.TILTAKGJENNOMFORING_ID.toInt())
-			?: throw DependencyNotIngestedException("Tiltaksgjennomføring med ID ${newFields.TILTAKGJENNOMFORING_ID} er ikke ingested.")
+        val tiltaksgjennomforing = tiltakService.getTiltaksinstansFromArenaId(newFields.TILTAKGJENNOMFORING_ID.toInt())
+            ?: throw DependencyNotIngestedException("Tiltaksgjennomføring med ID ${newFields.TILTAKGJENNOMFORING_ID} er ikke ingested.")
 
-		val fodselsnummer = ords.hentFnr(newFields.PERSON_ID.toString())
-			?: throw DataIntegrityViolationException("Person med Arena ID ${newFields.PERSON_ID} returnerer ikke fødselsnummer")
+        val fodselsnummer = ords.hentFnr(newFields.PERSON_ID.toString())
+            ?: throw DataIntegrityViolationException("Person med Arena ID ${newFields.PERSON_ID} returnerer ikke fødselsnummer")
 
-		tiltakService.addUpdateDeltaker(
-			tiltaksgjennomforing = tiltaksgjennomforing.id,
-			fodselsnummer = fodselsnummer,
-			oppstartDato = stringToLocalDate(newFields.DATO_FRA),
-			sluttDato = stringToLocalDate(newFields.DATO_TIL)
-		)
+        tiltakService.upsertDeltaker(
+            tiltaksgjennomforing = tiltaksgjennomforing.id,
+            fodselsnummer = fodselsnummer,
+            oppstartDato = newFields.DATO_FRA?.asLocalDate(),
+            sluttDato = newFields.DATO_TIL?.asLocalDate()
+        )
 
-	}
+    }
 }

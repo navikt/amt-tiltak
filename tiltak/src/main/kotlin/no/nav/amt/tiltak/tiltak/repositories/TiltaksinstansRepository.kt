@@ -45,7 +45,7 @@ open class TiltaksinstansRepository(private val template: NamedParameterJdbcTemp
 	}
 
 	fun update(tiltaksinstans: TiltaksinstansDbo): TiltaksinstansDbo {
-		TiltaksinstansUpdateStatement(template, tiltaksinstans).exexute()
+		TiltaksinstansUpdateStatement(template, tiltaksinstans).execute()
 
 		return get(tiltaksinstans.externalId)
 			?: throw NoSuchElementException("Tiltak med id ${tiltaksinstans.externalId} finnes ikke")

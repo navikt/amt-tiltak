@@ -8,11 +8,11 @@ import java.time.LocalDateTime
 import java.util.*
 
 interface TiltakService {
-	fun addUpdateTiltak(arenaId: String, navn: String, kode: String): Tiltak
+	fun upsertUpdateTiltak(arenaId: String, navn: String, kode: String): Tiltak
 
 	fun getTiltakFromArenaId(arenaId: String): Tiltak?
 
-	fun addUpdateTiltaksinstans(
+	fun upsertTiltaksinstans(
 		arenaId: Int,
 		tiltakId: UUID,
 		tiltaksleverandorId: UUID,
@@ -26,7 +26,7 @@ interface TiltakService {
 
 	fun getTiltaksinstansFromArenaId(arenaId: Int): TiltakInstans?
 
-	fun addUpdateDeltaker(
+	fun upsertDeltaker(
 		tiltaksgjennomforing: UUID,
 		fodselsnummer: String,
 		oppstartDato: LocalDate?,

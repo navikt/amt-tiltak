@@ -79,7 +79,9 @@ open class ArenaDataRepository(
 	fun getUningestedData(offset: Int = 0, limit: Int = 100): List<ArenaData> {
 		val sql =
 			"""
-				SELECT * FROM $TABLE_NAME WHERE $FIELD_INGEST_STATUS = ?::arena_ingest_status OR $FIELD_INGEST_STATUS = ?::arena_ingest_status
+				SELECT * FROM $TABLE_NAME 
+				 WHERE $FIELD_INGEST_STATUS = ?::arena_ingest_status 
+				 	OR $FIELD_INGEST_STATUS = ?::arena_ingest_status
 				 ORDER BY $FIELD_OPERATION_POS ASC OFFSET ? LIMIT ?
 			""".trimIndent()
 

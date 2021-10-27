@@ -22,7 +22,7 @@ class TiltaksinstansUpdateStatement(
 		WHERE id = :id
 	""".trimIndent()
 
-	fun exexute(): Int {
+	fun execute(): Int {
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
 				"navn" to tiltaksinstans.navn,

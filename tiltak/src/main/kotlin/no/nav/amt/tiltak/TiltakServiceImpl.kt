@@ -20,7 +20,7 @@ class TiltakServiceImpl(
 	private val deltakerService: DeltakerService
 ) : TiltakService {
 
-	override fun addUpdateTiltak(arenaId: String, navn: String, kode: String): Tiltak {
+	override fun upsertUpdateTiltak(arenaId: String, navn: String, kode: String): Tiltak {
 		val storedTiltak = tiltakRepository.getByArenaId(arenaId)
 
 		if (storedTiltak != null) {
@@ -43,7 +43,7 @@ class TiltakServiceImpl(
 		return tiltakRepository.getByArenaId(arenaId)?.toTiltak()
 	}
 
-	override fun addUpdateTiltaksinstans(
+	override fun upsertTiltaksinstans(
 		arenaId: Int,
 		tiltakId: UUID,
 		tiltaksleverandorId: UUID,
@@ -90,7 +90,7 @@ class TiltakServiceImpl(
 		return tiltaksinstansRepository.getByArenaId(arenaId)?.toTiltaksinstans()
 	}
 
-	override fun addUpdateDeltaker(
+	override fun upsertDeltaker(
 		tiltaksgjennomforing: UUID,
 		fodselsnummer: String,
 		oppstartDato: LocalDate?,

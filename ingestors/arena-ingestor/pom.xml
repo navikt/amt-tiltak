@@ -11,11 +11,6 @@
 
     <artifactId>arena-ingestor</artifactId>
 
-    <properties>
-        <maven.compiler.source>15</maven.compiler.source>
-        <maven.compiler.target>15</maven.compiler.target>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>

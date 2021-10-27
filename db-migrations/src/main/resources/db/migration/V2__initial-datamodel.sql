@@ -6,7 +6,7 @@ CREATE TYPE tiltaksleverandor_rolle AS ENUM (
 CREATE TABLE nav_ansatt
 (
     id              serial PRIMARY KEY,
-    personlig_ident varchar,
+    personlig_ident varchar NOT NULL UNIQUE,
     fornavn         varchar,
     etternavn       varchar,
     telefonnummer   varchar,
@@ -29,7 +29,7 @@ CREATE TABLE tiltaksleverandor_ansatt
 (
     id              serial PRIMARY KEY,
     external_id     uuid                     not null UNIQUE,
-    personlig_ident varchar,
+    personlig_ident varchar                  NOT NULL UNIQUE,
     fornavn         varchar,
     etternavn       varchar,
     telefonnummer   varchar,
