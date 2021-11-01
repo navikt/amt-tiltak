@@ -31,7 +31,7 @@ open class IngestCronJobs(
 	@Scheduled(cron = "0 * * * * *")
 	@SchedulerLock(
 		name = "arena-ingest",
-		lockAtMostFor = "PT3M"
+		lockAtMostFor = "PT60M"
 	)
 	fun processUningestedArenaData() {
 		logger.debug("Starting processing job for uningested Arena Data")

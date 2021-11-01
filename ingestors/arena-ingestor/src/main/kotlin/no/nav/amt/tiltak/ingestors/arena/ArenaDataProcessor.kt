@@ -38,7 +38,7 @@ class ArenaDataProcessor(
 		when (data.tableName.uppercase()) {
 			"ARENA_GOLDENGATE.TILTAK" -> tiltakProcessor.handle(data)
 			"ARENA_GOLDENGATE.TILTAKSGJENNOMFORING" -> tiltaksgjennomforingProcessor.handle(data)
-			"ARENA_GOLDENGATE.DELTAKER" -> deltakerProcessor.handle(data)
+			"ARENA_GOLDENGATE.TILTAKDELTAKER" -> deltakerProcessor.handle(data)
 			else -> repository.setFailed(data, "Data from table ${data.tableName} if not supported")
 		}
 	}

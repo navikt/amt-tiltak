@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 interface TiltakService {
-	fun upsertUpdateTiltak(arenaId: String, navn: String, kode: String): Tiltak
+	fun upsertTiltak(arenaId: String, navn: String, kode: String): Tiltak
 
 	fun getTiltakFromArenaId(arenaId: String): Tiltak?
 

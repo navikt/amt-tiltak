@@ -81,12 +81,12 @@ internal class TiltaksinstansRepositoryTest {
 		)
 
 		assertNotNull(savedInstans)
-		assertNotNull(savedInstans.internalId)
+		assertNotNull(savedInstans.id)
 		assertNotNull(savedInstans.externalId)
 
-		assertEquals(TILTAK_INTERNAL_ID, savedInstans.tiltakInternalId)
+		assertEquals(TILTAK_INTERNAL_ID, savedInstans.tiltakId)
 		assertEquals(TILTAK_ID, savedInstans.tiltakExternalId)
-		assertEquals(TILTAKSLEVERANDOR_INTERNAL_ID, savedInstans.tiltaksleverandorInternalId)
+		assertEquals(TILTAKSLEVERANDOR_INTERNAL_ID, savedInstans.tiltaksleverandorId)
 		assertEquals(TILTAKSLEVERANDOR_ID, savedInstans.tiltaksleverandorExternalId)
 		assertEquals(navn, savedInstans.navn)
 		assertEquals(status, savedInstans.status)
@@ -102,12 +102,12 @@ internal class TiltaksinstansRepositoryTest {
 		assertThrows<NoSuchElementException> {
 			repository.update(
 				TiltaksinstansDbo(
-					internalId = 999,
+					id = 999,
 					externalId = UUID.randomUUID(),
 					arenaId = 9999,
-					tiltaksleverandorInternalId = 9999,
+					tiltaksleverandorId = 9999,
 					tiltaksleverandorExternalId = UUID.randomUUID(),
-					tiltakInternalId = 9999,
+					tiltakId = 9999,
 					tiltakExternalId = UUID.randomUUID(),
 					navn = "idosfja",
 					status = null,

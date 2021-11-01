@@ -20,7 +20,8 @@ class TiltakServiceImpl(
 	private val deltakerService: DeltakerService
 ) : TiltakService {
 
-	override fun upsertUpdateTiltak(arenaId: String, navn: String, kode: String): Tiltak {
+	//TODO Update?!... :S
+	override fun upsertTiltak(arenaId: String, navn: String, kode: String): Tiltak {
 		val storedTiltak = tiltakRepository.getByArenaId(arenaId)
 
 		if (storedTiltak != null) {

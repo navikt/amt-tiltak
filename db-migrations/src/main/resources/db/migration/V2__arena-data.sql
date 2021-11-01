@@ -22,6 +22,6 @@ CREATE TABLE arena_data
     ingested_timestamp  TIMESTAMP,
     ingest_attempts     INT                  NOT NULL DEFAULT 0,
     last_retry          TIMESTAMP,
-    before              JSON,
-    after               JSON
+    before              JSONB,
+    after               JSONB
 )

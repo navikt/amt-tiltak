@@ -41,7 +41,7 @@ abstract class AbstractArenaProcessor(
             if (data.ingestAttempts >= MAX_INGEST_ATTEMPTS) {
                 repository.setFailed(data, e.message, e)
             } else {
-                repository.setRetry(data)
+                repository.incrementRetry(data.id, data.ingestAttempts)
             }
         }
     }

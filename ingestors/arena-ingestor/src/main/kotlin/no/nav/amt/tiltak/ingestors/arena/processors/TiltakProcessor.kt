@@ -28,7 +28,7 @@ class TiltakProcessor(
 	private fun insertUpdate(data: ArenaData) {
 		val newFields = jsonObject(data.after, ArenaTiltak::class.java)
 
-		tiltakService.upsertUpdateTiltak(
+		tiltakService.upsertTiltak(
 			newFields.TILTAKSKODE,
 			newFields.TILTAKSNAVN,
 			newFields.TILTAKSKODE

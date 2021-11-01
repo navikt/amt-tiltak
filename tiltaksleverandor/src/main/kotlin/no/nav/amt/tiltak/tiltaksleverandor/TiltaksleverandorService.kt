@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class TiltaksleverandorServiceService(
+class TiltaksleverandorService(
 	private val ansattService: AnsattService, // Trenger ikke dette enda
 	private val enhetsregisterConnector: EnhetsregisterConnector,
 	private val tiltaksleverandorRepository: TiltaksleverandorRepository

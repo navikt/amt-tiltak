@@ -30,11 +30,6 @@ internal class TiltakRepositoryTest {
 
 	lateinit var repository: TiltakRepository
 
-	companion object TestData {
-		val TILTAKSLEVERANDOR_1_ID = UUID.fromString("0dc9ccec-fd1e-4c4e-b91a-c23e6d89c18e")
-		val TILTAKSLEVERANDOR_ID_NOT_EXIST = UUID.fromString("3cc09a7b-147b-4b0f-b186-e24cb199c8dc")
-	}
-
 	@BeforeEach
 	fun migrate() {
 		val dataSource = createDataSource(postgresContainer)
