@@ -35,7 +35,7 @@ class GetTiltaksinstansQueryStatement(
 				   tiltaksinstans.created_at 												   as created_at,
 				   tiltaksinstans.modified_at                                                  as modified_at
 			FROM tiltaksinstans
-			WHERE arena_id = :arenaId
+			WHERE tiltaksinstans.arena_id = :arenaId
 		""".trimIndent()
 	}
 
@@ -44,12 +44,12 @@ class GetTiltaksinstansQueryStatement(
 			val statusString = rs.getString("status")
 
 			TiltaksinstansDbo(
-				id = rs.getInt("tiltaksinstans_internal_id"),
+				internalId = rs.getInt("tiltaksinstans_internal_id"),
 				externalId = UUID.fromString(rs.getString("tiltaksinstans_external_id")),
 				arenaId = rs.getInt("tiltaksinstans_arena_id"),
-				tiltaksleverandorId = rs.getInt("tiltaksleverandor_internal_id"),
+				tiltaksleverandorInternalId = rs.getInt("tiltaksleverandor_internal_id"),
 				tiltaksleverandorExternalId = UUID.fromString(rs.getString("tiltaksleverandor_external_id")),
-				tiltakId = rs.getInt("tiltak_internal_id"),
+				tiltakInternalId = rs.getInt("tiltak_internal_id"),
 				tiltakExternalId = UUID.fromString(rs.getString("tiltak_external_id")),
 				navn = rs.getString("navn"),
 				status = if (statusString != null) TiltakInstans.Status.valueOf(statusString) else null,
