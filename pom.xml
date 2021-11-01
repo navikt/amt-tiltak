@@ -234,6 +234,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>io.kotest.extensions</groupId>
+                <artifactId>kotest-extensions-testcontainers</artifactId>
+                <version>${kotest.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>mockwebserver</artifactId>
                 <version>${okhttp.version}</version>

@@ -21,68 +21,68 @@ import java.util.concurrent.atomic.AtomicInteger
 @Testcontainers
 class KafkaConfigurationTest {
 
-    @Container
-    var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.4.3"))
+	@Container
+	var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.4.3"))
 
-    @Test
-    fun `should ingest arena records after configuring kafka`() {
+	@Test
+	fun `should ingest arena records after configuring kafka`() {
 
-        val kafkaTopicProperties = KafkaTopicProperties(
-            arenaTiltakTopic = "arena-tiltak",
-            arenaTiltaksgjennomforingTopic = "arena-tiltaksgjennomforing",
-            arenaTiltaksgruppeTopic = "arena-tiltaksgruppe",
-            arenaTiltakDeltakerTopic = "arena-tiltak-deltaker",
-        )
+		val kafkaTopicProperties = KafkaTopicProperties(
+			arenaTiltakTopic = "arena-tiltak",
+			arenaTiltaksgjennomforingTopic = "arena-tiltaksgjennomforing",
+			arenaTiltaksgruppeTopic = "arena-tiltaksgruppe",
+			arenaTiltakDeltakerTopic = "arena-tiltak-deltaker",
+		)
 
-        val kafkaProperties = object : KafkaProperties {
-            override fun consumer(): Properties {
-                return KafkaPropertiesBuilder.consumerBuilder()
-                    .withBrokerUrl(kafkaContainer.bootstrapServers)
-                    .withBaseProperties()
-                    .withConsumerGroupId("amt-tiltak-consumer")
-                    .withDeserializers(ByteArrayDeserializer::class.java, ByteArrayDeserializer::class.java)
-                    .build()
-            }
+		val kafkaProperties = object : KafkaProperties {
+			override fun consumer(): Properties {
+				return KafkaPropertiesBuilder.consumerBuilder()
+					.withBrokerUrl(kafkaContainer.bootstrapServers)
+					.withBaseProperties()
+					.withConsumerGroupId("amt-tiltak-consumer")
+					.withDeserializers(ByteArrayDeserializer::class.java, ByteArrayDeserializer::class.java)
+					.build()
+			}
 
-            override fun producer(): Properties {
-                return KafkaPropertiesBuilder.producerBuilder()
-                    .withBrokerUrl(kafkaContainer.bootstrapServers)
-                    .withBaseProperties()
-                    .withProducerId("amt-tiltak-producer")
-                    .withSerializers(StringSerializer::class.java, StringSerializer::class.java)
-                    .build()
-            }
-        }
+			override fun producer(): Properties {
+				return KafkaPropertiesBuilder.producerBuilder()
+					.withBrokerUrl(kafkaContainer.bootstrapServers)
+					.withBaseProperties()
+					.withProducerId("amt-tiltak-producer")
+					.withSerializers(StringSerializer::class.java, StringSerializer::class.java)
+					.build()
+			}
+		}
 
 		val counter = AtomicInteger()
 
-        val arenaIngestor = object : ArenaIngestor {
+		val arenaIngestor = object : ArenaIngestor {
 			override fun ingest(data: String) {
 				counter.incrementAndGet()
 			}
 		}
 
 		// Creating the config will automatically start the consumer
-        KafkaConfiguration(
-            kafkaTopicProperties,
-            kafkaProperties,
-            arenaIngestor
-        )
+		KafkaConfiguration(
+			kafkaTopicProperties,
+			kafkaProperties,
+			arenaIngestor
+		)
 
-        val kafkaProducer = KafkaProducerClientImpl<String, String>(kafkaProperties.producer())
+		val kafkaProducer = KafkaProducerClientImpl<String, String>(kafkaProperties.producer())
 
 		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltak", "1", "some value"))
 		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltaksgjennomforing", "1", "some value"))
 		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltaksgruppe", "1", "some value"))
 		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltak-deltaker", "1", "some value"))
 
-        kafkaProducer.close()
+		kafkaProducer.close()
 
 		// This test can be rewritten to retry the assertion until a given time has passed to speed things up
 
-        Thread.sleep(3000)
+		Thread.sleep(3000)
 
 		assertEquals(4, counter.get())
-    }
+	}
 
 }

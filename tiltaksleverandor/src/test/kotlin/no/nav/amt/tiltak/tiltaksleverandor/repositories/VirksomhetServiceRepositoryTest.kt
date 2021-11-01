@@ -1,5 +1,7 @@
 package no.nav.amt.tiltak.tiltaksleverandor.repositories
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
@@ -7,6 +9,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.testcontainers.containers.PostgreSQLContainer
@@ -28,6 +31,9 @@ internal class VirksomhetServiceRepositoryTest {
 
 	@BeforeEach
 	fun migrate() {
+		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
+		rootLogger.level = Level.WARN
+
 		val dataSource = createDataSource(postgresContainer)
 
 		val flyway: Flyway = Flyway.configure()

@@ -1,53 +1,37 @@
 package no.nav.amt.tiltak.tiltak.repositories
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import no.nav.amt.tiltak.tiltak.dbo.TiltakDbo
-import org.flywaydb.core.Flyway
+import no.nav.amt.tiltak.tiltak.testutils.DatabaseTestUtils
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.springframework.jdbc.core.JdbcTemplate
+import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.utility.DockerImageName
 import java.time.LocalDateTime
 import java.util.*
 
 @Testcontainers
 internal class TiltakRepositoryTest {
 
-	@Container
-	val postgresContainer: PostgreSQLContainer<Nothing> =
-		PostgreSQLContainer(DockerImageName.parse("postgres:12-alpine"))
-
-	lateinit var jdbcTemplate: JdbcTemplate
-	lateinit var namedJdbcTemplate: NamedParameterJdbcTemplate
+	lateinit var template: NamedParameterJdbcTemplate
 
 	lateinit var repository: TiltakRepository
 
 	@BeforeEach
 	fun migrate() {
-		val dataSource = createDataSource(postgresContainer)
+		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
+		rootLogger.level = Level.WARN
 
-		// TODO: Kopiert fra LocalPostgresDatabase.kt. Hadde det vært bedre med en modul for test-verktøy?
-		val flyway: Flyway = Flyway.configure()
-			.dataSource(dataSource)
-			.load()
-
-		flyway.clean()
-		flyway.migrate()
-
-		jdbcTemplate = JdbcTemplate(dataSource)
-		namedJdbcTemplate = NamedParameterJdbcTemplate(dataSource)
-
-		repository = TiltakRepository(namedJdbcTemplate)
-
-		jdbcTemplate.update(this::class.java.getResource("/tiltak-repository_test-data.sql").readText())
+		template = DatabaseTestUtils.getDatabase("/tiltak-repository_test-data.sql")
+		repository = TiltakRepository(template)
 	}
 
 	@Test

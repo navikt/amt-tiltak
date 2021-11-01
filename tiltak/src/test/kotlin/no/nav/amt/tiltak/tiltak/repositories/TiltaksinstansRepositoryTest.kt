@@ -1,31 +1,26 @@
 package no.nav.amt.tiltak.tiltak.repositories
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.tiltak.dbo.TiltaksinstansDbo
-import org.flywaydb.core.Flyway
+import no.nav.amt.tiltak.tiltak.testutils.DatabaseTestUtils
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.springframework.jdbc.core.JdbcTemplate
+import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.utility.DockerImageName
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
 @Testcontainers
 internal class TiltaksinstansRepositoryTest {
-	@Container
-	val postgresContainer: PostgreSQLContainer<Nothing> =
-		PostgreSQLContainer(DockerImageName.parse("postgres:12-alpine"))
-
-	lateinit var jdbcTemplate: JdbcTemplate
 	lateinit var template: NamedParameterJdbcTemplate
 
 	lateinit var repository: TiltaksinstansRepository
@@ -40,22 +35,11 @@ internal class TiltaksinstansRepositoryTest {
 
 	@BeforeEach
 	fun migrate() {
-		val dataSource = createDataSource(postgresContainer)
+		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
+		rootLogger.level = Level.WARN
 
-		// TODO: Kopiert fra LocalPostgresDatabase.kt. Hadde det vært bedre med en modul for test-verktøy?
-		val flyway: Flyway = Flyway.configure()
-			.dataSource(dataSource)
-			.load()
-
-		flyway.clean()
-		flyway.migrate()
-
-		jdbcTemplate = JdbcTemplate(dataSource)
-
-		template = NamedParameterJdbcTemplate(dataSource)
+		template = DatabaseTestUtils.getDatabase("/tiltaksinstans-repository_test-data.sql")
 		repository = TiltaksinstansRepository(template)
-
-		jdbcTemplate.update(this::class.java.getResource("/tiltaksinstans-repository_test-data.sql").readText())
 	}
 
 	@Test
