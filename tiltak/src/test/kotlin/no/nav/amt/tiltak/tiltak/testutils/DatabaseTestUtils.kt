@@ -14,8 +14,10 @@ class DatabaseTestUtils {
 		private val postgresContainer: PostgreSQLContainer<Nothing> =
 			PostgreSQLContainer(DockerImageName.parse("postgres:12-alpine"))
 
+		private var dataSource: HikariDataSource? = null
 
-		fun getDatabase(dataFile: String?): NamedParameterJdbcTemplate {
+
+		fun getDatabase(dataFile: String? = null): NamedParameterJdbcTemplate {
 			if (!postgresContainer.isRunning) {
 				postgresContainer.start()
 			}
@@ -27,12 +29,20 @@ class DatabaseTestUtils {
 		}
 
 		private fun PostgreSQLContainer<Nothing>.createDatasource(): HikariDataSource {
-			val config = HikariConfig()
-			config.username = this.username
-			config.password = this.password
-			config.jdbcUrl = this.jdbcUrl
-			config.driverClassName = this.driverClassName
-			return HikariDataSource(config)
+			return if (dataSource != null) {
+				dataSource!!
+			} else {
+				val config = HikariConfig()
+				config.username = this.username
+				config.password = this.password
+				config.jdbcUrl = this.jdbcUrl
+				config.driverClassName = this.driverClassName
+				dataSource = HikariDataSource(config)
+
+				dataSource!!
+			}
+
+
 		}
 
 		private fun loadSchema(

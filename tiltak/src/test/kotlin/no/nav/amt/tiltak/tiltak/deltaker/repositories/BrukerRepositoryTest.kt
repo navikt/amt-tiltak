@@ -15,7 +15,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @Testcontainers
 class BrukerRepositoryTest : FunSpec({
 	lateinit var template: NamedParameterJdbcTemplate
-
 	lateinit var repository: BrukerRepository
 
 	beforeEach {
