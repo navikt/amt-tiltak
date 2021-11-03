@@ -1,0 +1,22 @@
+apiVersion: "nais.io/v1"
+kind: "Alert"
+metadata:
+  name: amt-tiltak-alerts
+  namespace: amt
+  labels:
+    team: amt
+spec:
+  receivers:
+    slack:
+      channel: 'team_komet_alerts'
+      prependText: '<!here> | '
+  alerts:
+    - alert: applikasjon nede
+      expr: kube_deployment_status_replicas_available{deployment="amt-tiltak"} == 0
+      for: 2m
+      description: "App {{ $labels.app }} er nede i namespace {{ $labels.kubernetes_namespace }}"
+      action: "`kubectl describe pod {{ $labels.kubernetes_pod_name }} -n {{ $labels.kubernetes_namespace }}` for events, og `kubectl logs {{ $labels.kubernetes_pod_name }} -n {{ $labels.kubernetes_namespace }}` for logger"
+    - alert: høy feilrate i logger
+      expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="amt-tiltak",log_level=~"Warning|Error"}[3m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="amt-tiltak"}[3m]))) > 10
+      for: 3m
+      action: "Sjekk loggene til app {{ $labels.log_app }} i namespace {{ $labels.log_namespace }}, for å se hvorfor det er så mye feil"
