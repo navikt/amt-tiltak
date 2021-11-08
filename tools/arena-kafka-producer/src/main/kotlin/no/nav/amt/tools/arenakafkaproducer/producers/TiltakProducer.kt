@@ -14,7 +14,7 @@ class TiltakProducer(
     kafkaProducer: KafkaProducerClientImpl<String, String>
 ) : Producer<ArenaTiltak, ArenaTiltakKafkaDto>(
     kafkaProducer = kafkaProducer,
-    topic = "topic1",
+    topic = "amt.aapen-arena-tiltakendret-v1-q2",
 ) {
     private var position = 0
 
@@ -22,7 +22,7 @@ class TiltakProducer(
         return ArenaTiltakKafkaDto(
             table = "ARENA_GOLDENGATE.TILTAK",
             op_type = ArenaOpType.I,
-            op_ts = LocalDateTime.now().toString(),
+            op_ts = LocalDateTime.now().format(operationTimestampFormatter),
             current_ts = LocalDateTime.now().toString(),
             pos = position++.toString(),
             after = entry,

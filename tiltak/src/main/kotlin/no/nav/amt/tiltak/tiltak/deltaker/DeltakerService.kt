@@ -12,7 +12,7 @@ import java.time.LocalDate
 import java.util.*
 
 @Service
-class DeltakerService(
+open class DeltakerService(
 	private val deltakerRepository: DeltakerRepository,
 	private val brukerRepository: BrukerRepository,
 	private val pdlConnector: PdlConnector

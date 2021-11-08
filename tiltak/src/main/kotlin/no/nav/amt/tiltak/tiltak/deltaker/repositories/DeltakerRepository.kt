@@ -10,7 +10,7 @@ import java.time.LocalDate
 import java.util.*
 
 @Repository
-class DeltakerRepository(
+open class DeltakerRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
 

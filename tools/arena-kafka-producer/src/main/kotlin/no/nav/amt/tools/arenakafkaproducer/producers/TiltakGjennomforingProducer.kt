@@ -14,7 +14,7 @@ class TiltakGjennomforingProducer(
     kafkaProducer: KafkaProducerClientImpl<String, String>
 ) : Producer<ArenaTiltaksgjennomforing, ArenaTiltaksgjennomforingKafkaDto>(
     kafkaProducer = kafkaProducer,
-    topic = "topic3"
+    topic = "amt.aapen-arena-tiltakgjennomforingendret-v1-q2"
 ) {
     private var position = 0
 
@@ -22,7 +22,7 @@ class TiltakGjennomforingProducer(
         return ArenaTiltaksgjennomforingKafkaDto(
             table = "ARENA_GOLDENGATE.TILTAKGJENNOMFORING",
             op_type = ArenaOpType.I,
-            op_ts = LocalDateTime.now().toString(),
+            op_ts = LocalDateTime.now().format(operationTimestampFormatter),
             current_ts = LocalDateTime.now().toString(),
             pos = position++.toString(),
             after = entry,

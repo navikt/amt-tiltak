@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
 
 @Repository
-class BrukerRepository(
+open class BrukerRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
 

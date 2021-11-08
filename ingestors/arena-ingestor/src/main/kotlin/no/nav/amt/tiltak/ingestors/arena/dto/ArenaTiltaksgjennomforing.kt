@@ -7,13 +7,13 @@ data class ArenaTiltaksgjennomforing(
 	val ANTALL_DELTAKERE: Int,
 	val ANTALL_VARIGHET: Int?,
 	val DATO_FRA: String?, // Ex: 2002-09-26 00:00:00
-	val DATO_TIL: String, // Ex: 2002-09-26 00:00:00
+	val DATO_TIL: String?, // Ex: 2002-09-26 00:00:00
 	val FAGPLANKODE: String?,
 	val MAALEENHET_VARIGHET: String?,
 	val TEKST_FAGBESKRIVELSE: String?,
 	val TEKST_KURSSTED: String?,
 	val TEKST_MAALGRUPPE: String?,
-	val STATUS_TREVERDIKODE_INNSOKNING: String, // Ex: J/N
+	val STATUS_TREVERDIKODE_INNSOKNING: String?, // Ex: J/N
 	val REG_DATO: String, // Ex: 2002-10-03 20:48:22,
 	val REG_USER: String,
 	val MOD_DATO: String, // Ex: 2007-10-06 00:28:33
@@ -30,10 +30,10 @@ data class ArenaTiltaksgjennomforing(
 	val AVTALE_ID: Long?,
 	val AKTIVITET_ID: Long?,
 	val DATO_INNSOKNINGSTART: String?,
-	val GML_FRA_DATO: String, // Ex: 2002-09-24 00:00:00,
-	val GML_TIL_DATO: String, // Ex: 2002-09-28 00:00:00,
-	val AETAT_FREMMOTEREG: String, // Ex: 1234 (NavEnhetId)
-	val AETAT_KONTERINGSSTED: String, // Ex: 1234 (NavEnhetId)
+	val GML_FRA_DATO: String?, // Ex: 2002-09-24 00:00:00,
+	val GML_TIL_DATO: String?, // Ex: 2002-09-28 00:00:00,
+	val AETAT_FREMMOTEREG: String?, // Ex: 1234 (NavEnhetId)
+	val AETAT_KONTERINGSSTED: String?, // Ex: 1234 (NavEnhetId)
 	val OPPLAERINGNIVAAKODE: String?,
 	val TILTAKGJENNOMFORING_ID_REL: String?,
 	val VURDERING_GJENNOMFORING: String?,

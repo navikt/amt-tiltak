@@ -1,35 +1,36 @@
 package no.nav.amt.tools.arenakafkaproducer.producers
 
+import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.amt.tools.arenakafkaproducer.domain.dto.ArenaTiltak
 import no.nav.common.kafka.producer.KafkaProducerClientImpl
 import org.apache.kafka.clients.producer.ProducerRecord
-import java.io.File
-import java.io.FileInputStream
+import java.time.format.DateTimeFormatter
 
 abstract class Producer<T, W>(
-	private val kafkaProducer: KafkaProducerClientImpl<String, String>,
-	private val topic: String
+    private val kafkaProducer: KafkaProducerClientImpl<String, String>,
+    private val topic: String
 ) {
 
-	val objectMapper = jacksonObjectMapper()
+    val objectMapper = jacksonObjectMapper()
+        .configure(MapperFeature.USE_STD_BEAN_NAMING, true)
 
-	fun run() {
-		send(topic, readFile())
-	}
+    val operationTimestampFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
-	abstract fun wrap(entry: T): W
-	abstract fun readFile(): List<T>
+    fun run() {
+        send(topic, readFile())
+    }
 
-	private fun send(topic: String, data: List<T>) {
-		data.forEach { entry ->
-			kafkaProducer.send(
-				ProducerRecord(
-					topic,
-					objectMapper.writeValueAsString(wrap(entry))
-				)
-			)
-		}
-	}
+    abstract fun wrap(entry: T): W
+    abstract fun readFile(): List<T>
+
+    private fun send(topic: String, data: List<T>) {
+        data.forEach { entry ->
+            kafkaProducer.send(
+                ProducerRecord(
+                    topic,
+                    objectMapper.writeValueAsString(wrap(entry))
+                )
+            )
+        }
+    }
 }

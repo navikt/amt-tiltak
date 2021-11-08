@@ -6,6 +6,7 @@ import no.nav.amt.tiltak.ingestors.arena.domain.OperationType
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
+import org.springframework.stereotype.Component
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
@@ -18,7 +19,7 @@ data class CreateArenaData(
     val after: String?
 )
 
-@Repository
+@Component
 open class ArenaDataRepository(
     private val jdbcTemplate: JdbcTemplate
 ) {

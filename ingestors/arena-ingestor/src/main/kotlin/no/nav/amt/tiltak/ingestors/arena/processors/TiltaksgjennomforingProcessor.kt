@@ -61,7 +61,7 @@ class TiltaksgjennomforingProcessor(
                 ?: throw DataIntegrityViolationException("Forventet at LOKALTNAVN ikke er null"),
             status = null,
             oppstartDato = newFields.DATO_FRA?.asLocalDate(),
-            sluttDato = newFields.DATO_TIL.asLocalDate(),
+            sluttDato = newFields.DATO_TIL?.asLocalDate(),
             registrertDato = newFields.REG_DATO.asLocalDateTime(),
             fremmoteDato = newFields.DATO_FREMMOTE?.asLocalDate() withTime newFields.KLOKKETID_FREMMOTE.asTime()
         )

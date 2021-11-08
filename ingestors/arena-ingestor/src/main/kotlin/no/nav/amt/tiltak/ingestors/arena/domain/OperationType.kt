@@ -1,16 +1,20 @@
 package no.nav.amt.tiltak.ingestors.arena.domain
 
+import no.nav.amt.tiltak.ingestors.arena.dto.ArenaOpType
+
 enum class OperationType {
     INSERT,
     UPDATE,
-    DELETE
-}
+    DELETE;
 
-fun OperationType.fromString(string: String): OperationType {
-    return when (string) {
-        "I" -> OperationType.INSERT
-        "U" -> OperationType.UPDATE
-        "D" -> OperationType.DELETE
-        else -> throw IllegalArgumentException("$string is not a supported operation type")
+    companion object {
+        fun fromArena(string: ArenaOpType): OperationType {
+            return when (string) {
+                ArenaOpType.I -> INSERT
+                ArenaOpType.U -> UPDATE
+                ArenaOpType.D -> DELETE
+            }
+        }
     }
+
 }
