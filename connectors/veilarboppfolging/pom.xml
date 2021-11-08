@@ -39,6 +39,14 @@
             <artifactId>kotest-runner-junit5-jvm</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.common</groupId>
+            <artifactId>types</artifactId>
+        </dependency>
 
     </dependencies>
 

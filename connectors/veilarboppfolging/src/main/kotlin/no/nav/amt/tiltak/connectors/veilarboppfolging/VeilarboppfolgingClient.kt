@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.connectors.veilarboppfolging
-
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import no.nav.amt.tiltak.core.port.VeilarboppfolgingConnector
 import okhttp3.OkHttpClient
@@ -17,18 +17,24 @@ class VeilarboppfolgingClient(
 
 	override fun hentVeilederIdent(fnr: String) : String? {
 		val request = Request.Builder()
-			.url("$apiUrl/person/$fnr/veileder")
+			.url("$apiUrl/v2/veileder?fnr=$fnr")
 			.header("Accept", "application/json; charset=utf-8")
 			.header("Authorization", "Bearer ${tokenSupplier.get()}")
 			.get()
 			.build()
 
 		httpClient.newCall(request).execute().use { response ->
-			response.takeUnless { it.isSuccessful }
-				?.let {throw RuntimeException("Uventet status ved kall mot veilarboppfolging ${it.code}")}
+			response.takeIf { !it.isSuccessful }
+				?.let { throw RuntimeException("Uventet status ved kall mot veilarboppfolging ${it.code}") }
 
-			val veilederRespons = objectMapper.readValue(response.body!!.string(), HentBrukersVeilederRespons::class.java)
-			return veilederRespons.veilederIdent
+			response.takeIf { it.code == 204 }
+				?.let { return null }
+
+			response.takeIf { it.body == null }
+				?.let { throw RuntimeException("Body mangler i respons fra veilarboppfolging") }
+
+			val veilederRespons = objectMapper.readValue<HentBrukersVeilederRespons>(response.body!!.string())
+			return veilederRespons.veilederIdent.toString()
 		}
 
 	}

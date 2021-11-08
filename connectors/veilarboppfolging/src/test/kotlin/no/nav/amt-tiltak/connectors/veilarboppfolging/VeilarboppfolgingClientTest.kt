@@ -1,10 +1,17 @@
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.kotest.core.spec.style.StringSpec
+import no.nav.amt.tiltak.connectors.veilarboppfolging.HentBrukersVeilederRespons
 import no.nav.amt.tiltak.connectors.veilarboppfolging.VeilarboppfolgingClient
+import no.nav.common.types.identer.NavIdent
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.jupiter.api.assertThrows
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 
 const val token = "DUMMYTOKEN"
 
@@ -22,8 +29,8 @@ class VeilarboppfolgingClientTest: StringSpec({
 
     "HentVeilederIdent - Bruker finnes - Returnerer veileder ident" {
 
-		val respons = """{"veilederIdent": "$veilederIdent"}"""
-		server.enqueue(MockResponse().setBody(respons))
+		val jsonRepons = """{"veilederIdent":"V123"}""".trimIndent()
+		server.enqueue(MockResponse().setBody(jsonRepons))
 
         val veileder = client.hentVeilederIdent(fnr)
         assertEquals(veilederIdent, veileder)
