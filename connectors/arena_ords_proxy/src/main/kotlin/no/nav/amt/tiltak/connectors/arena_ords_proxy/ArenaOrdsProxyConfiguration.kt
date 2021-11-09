@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.connectors.arena_ords_proxy
 import no.nav.amt.tiltak.core.port.ArenaOrdsProxyConnector
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import java.util.*
 import java.util.function.Supplier
 

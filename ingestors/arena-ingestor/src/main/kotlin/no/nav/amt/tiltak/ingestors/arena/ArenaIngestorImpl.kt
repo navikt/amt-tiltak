@@ -15,10 +15,6 @@ class ArenaIngestorImpl(
     override fun ingest(data: String) {
         val pojo = toPojo(data)
         arenaDataRepository.insert(pojo)
-
-        val d = arenaDataRepository.getUningestedData()
-
-        val s = "test"
     }
 
     private fun toPojo(data: String): CreateArenaData {

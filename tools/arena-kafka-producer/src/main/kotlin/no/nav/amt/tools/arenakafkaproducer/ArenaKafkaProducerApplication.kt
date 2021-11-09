@@ -9,19 +9,19 @@ import org.springframework.boot.runApplication
 
 @SpringBootApplication
 open class ArenaKafkaProducerApplication(
-    private val tiltakProducer: TiltakProducer,
-    private val tiltakDeltakerProducer: TiltakDeltakerProducer,
-    private val tiltakGjennomforingProducer: TiltakGjennomforingProducer
+	private val tiltakProducer: TiltakProducer,
+	private val tiltakDeltakerProducer: TiltakDeltakerProducer,
+	private val tiltakGjennomforingProducer: TiltakGjennomforingProducer
 ) : CommandLineRunner {
 
-    override fun run(vararg args: String?) {
-        tiltakProducer.run()
-        tiltakDeltakerProducer.run()
-        tiltakGjennomforingProducer.run()
-    }
+	override fun run(vararg args: String?) {
+		tiltakProducer.run()
+//        tiltakDeltakerProducer.run()
+//        tiltakGjennomforingProducer.run()
+	}
 
 }
 
 fun main(args: Array<String>) {
-    runApplication<ArenaKafkaProducerApplication>(*args)
+	runApplication<ArenaKafkaProducerApplication>(*args)
 }

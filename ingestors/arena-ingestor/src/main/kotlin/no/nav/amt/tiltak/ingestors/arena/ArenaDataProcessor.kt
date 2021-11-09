@@ -5,10 +5,11 @@ import no.nav.amt.tiltak.ingestors.arena.processors.DeltakerProcessor
 import no.nav.amt.tiltak.ingestors.arena.processors.TiltakProcessor
 import no.nav.amt.tiltak.ingestors.arena.processors.TiltaksgjennomforingProcessor
 import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
+import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 
-@Service
-class ArenaDataProcessor(
+@Component
+open class ArenaDataProcessor(
 	private val repository: ArenaDataRepository,
 	private val tiltakProcessor: TiltakProcessor,
 	private val tiltaksgjennomforingProcessor: TiltaksgjennomforingProcessor,

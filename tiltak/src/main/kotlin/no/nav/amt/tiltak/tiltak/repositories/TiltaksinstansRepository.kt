@@ -5,12 +5,13 @@ import no.nav.amt.tiltak.tiltak.dbo.TiltaksinstansDbo
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.stereotype.Repository
+import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-@Repository
+//TODO @Repository gir feilmelding (template == null), er det ikke dependency injection på @Repository?
+@Component
 open class TiltaksinstansRepository(private val template: NamedParameterJdbcTemplate) {
 
 	private val rowMapper = RowMapper { rs, _ ->

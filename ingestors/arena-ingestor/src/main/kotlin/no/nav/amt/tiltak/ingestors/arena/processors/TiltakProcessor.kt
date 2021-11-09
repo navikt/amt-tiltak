@@ -7,7 +7,7 @@ import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
 import org.springframework.stereotype.Component
 
 @Component
-class TiltakProcessor(
+open class TiltakProcessor(
 	repository: ArenaDataRepository,
 	private val tiltakService: TiltakService
 ) : AbstractArenaProcessor(repository) {

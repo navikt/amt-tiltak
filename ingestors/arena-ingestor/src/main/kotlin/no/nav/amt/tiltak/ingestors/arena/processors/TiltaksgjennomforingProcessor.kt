@@ -12,7 +12,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Component
 
 @Component
-class TiltaksgjennomforingProcessor(
+open class TiltaksgjennomforingProcessor(
     repository: ArenaDataRepository,
     private val tiltaksleverandorService: TiltaksleverandorService,
     private val tiltakService: TiltakService,

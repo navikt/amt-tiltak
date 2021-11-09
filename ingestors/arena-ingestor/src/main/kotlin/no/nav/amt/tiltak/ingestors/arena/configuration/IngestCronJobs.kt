@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
+import javax.annotation.PostConstruct
 import javax.sql.DataSource
 
 @Configuration
@@ -28,13 +29,25 @@ open class IngestCronJobs(
 		return JdbcTemplateLockProvider(datasource)
 	}
 
+
+	//TODO DELETEME
+	@SchedulerLock(
+		name = "arena-ingest",
+		lockAtMostFor = "PT60M"
+	)
+	@PostConstruct
+	open fun onStartup() {
+		logger.info("Starting processing job for uningested Arena Data")
+		processor.processUningestedMessages()
+	}
+
 	@Scheduled(cron = "0 * * * * *")
 	@SchedulerLock(
 		name = "arena-ingest",
 		lockAtMostFor = "PT60M"
 	)
-	fun processUningestedArenaData() {
-		logger.debug("Starting processing job for uningested Arena Data")
+	open fun processUningestedArenaData() {
+		logger.info("Starting processing job for uningested Arena Data")
 		processor.processUningestedMessages()
 	}
 
@@ -43,8 +56,8 @@ open class IngestCronJobs(
 		name = "arena-ingest-failed-retry",
 		lockAtMostFor = "PT60M"
 	)
-	fun processFailedArenaData() {
-		logger.debug("Starting processing job for failed Arena Data")
+	open fun processFailedArenaData() {
+		logger.info("Starting processing job for failed Arena Data")
 		processor.processFailedMessages()
 	}
 
