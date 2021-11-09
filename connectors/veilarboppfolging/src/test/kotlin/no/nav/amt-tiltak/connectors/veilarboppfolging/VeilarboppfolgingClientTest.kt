@@ -1,17 +1,9 @@
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.kotest.core.spec.style.StringSpec
-import no.nav.amt.tiltak.connectors.veilarboppfolging.HentBrukersVeilederRespons
+import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.connectors.veilarboppfolging.VeilarboppfolgingClient
-import no.nav.common.types.identer.NavIdent
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.jupiter.api.assertThrows
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 
 const val token = "DUMMYTOKEN"
 
@@ -33,7 +25,7 @@ class VeilarboppfolgingClientTest: StringSpec({
 		server.enqueue(MockResponse().setBody(jsonRepons))
 
         val veileder = client.hentVeilederIdent(fnr)
-        assertEquals(veilederIdent, veileder)
+		veileder shouldBe veilederIdent
     }
 
     "HentVeilederIdent - Manglende tilgang - Kaster exception" {
@@ -43,20 +35,20 @@ class VeilarboppfolgingClientTest: StringSpec({
 
 	"HentVeilederIdent - Requester korrekt url" {
 		val respons = """{"veilederIdent": "V123"}"""
-		server.enqueue(MockResponse().setBody(respons))
 
+		server.enqueue(MockResponse().setBody(respons))
 		client.hentVeilederIdent(fnr)
 
-		val request = server.takeRequest();
+		val request = server.takeRequest()
 
-		assertEquals("/api/person/$fnr/veileder", request.path)
+		request.path shouldBe "/api/api/v2/veileder?fnr=$fnr"
 	}
 
 	"HentVeilederIdent - Bruker finnes ikke - returnerer null" {
-		val respons = """{"veilederIdent": null}"""
-		server.enqueue(MockResponse().setBody(respons))
-
+		server.enqueue(MockResponse().setResponseCode(204))
 		val veileder = client.hentVeilederIdent(fnr)
-		assertNull(veileder)
+
+		veileder shouldBe null
 	}
+
 })

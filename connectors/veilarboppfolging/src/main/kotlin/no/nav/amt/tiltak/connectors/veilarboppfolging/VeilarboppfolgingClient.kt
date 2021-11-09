@@ -17,7 +17,7 @@ class VeilarboppfolgingClient(
 
 	override fun hentVeilederIdent(fnr: String) : String? {
 		val request = Request.Builder()
-			.url("$apiUrl/v2/veileder?fnr=$fnr")
+			.url("$apiUrl/api/v2/veileder?fnr=$fnr")
 			.header("Accept", "application/json; charset=utf-8")
 			.header("Authorization", "Bearer ${tokenSupplier.get()}")
 			.get()
