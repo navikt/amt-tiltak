@@ -2,7 +2,7 @@ name: Deploy alerts to NAIS
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - '.nais/alerts-dev.yaml'
       - '.github/workflows/deploy-alerts-dev.yaml'
