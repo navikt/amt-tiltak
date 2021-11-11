@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.ingestors.arena.processors
 import no.nav.amt.tiltak.core.port.ArenaOrdsProxyConnector
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
-import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltakDeltaker
+import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltakDeltakerDTO
 import no.nav.amt.tiltak.ingestors.arena.exceptions.DependencyNotIngestedException
 import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
 import org.springframework.dao.DataIntegrityViolationException
@@ -29,7 +29,7 @@ open class DeltakerProcessor(
 	}
 
 	private fun addUpdate(data: ArenaData) {
-		val newFields = jsonObject(data.after, ArenaTiltakDeltaker::class.java)
+		val newFields = jsonObject(data.after, ArenaTiltakDeltakerDTO::class.java)
 
 		val tiltaksgjennomforing = tiltakService.getTiltaksinstansFromArenaId(newFields.TILTAKGJENNOMFORING_ID.toInt())
 			?: throw DependencyNotIngestedException("Tiltaksgjennomføring med ID ${newFields.TILTAKGJENNOMFORING_ID} er ikke ingested.")

@@ -1,6 +1,7 @@
-package no.nav.amt.tiltak.ingestors.arena.dto
+package no.nav.amt.tools.arenakafkaproducer.domain.dto
 
-data class ArenaTiltaksgjennomforing(
+// @SONAR_START@
+data class ArenaTiltaksgjennomforingDTO(
 	val TILTAKGJENNOMFORING_ID: Long,
 	val SAK_ID: Long,
 	val TILTAKSKODE: String, // Ex: SPA
@@ -42,13 +43,14 @@ data class ArenaTiltaksgjennomforing(
 	val PARTISJON: Long,
 	val MAALFORM_KRAVBREV: String
 )
+// @SONAR_STOP@
 
-data class ArenaTiltaksgjennomforingKafkaDto(
+data class ArenaTiltaksgjennomforingKafkaDTO(
 	override val table: String,
 	override val op_type: ArenaOpType,
 	override val op_ts: String,
 	override val current_ts: String,
 	override val pos: String,
-	override val after: ArenaTiltaksgjennomforing?,
-	override val before: ArenaTiltaksgjennomforing?,
-) : GenericArenaKafkaDto<ArenaTiltaksgjennomforing>
+	override val after: ArenaTiltaksgjennomforingDTO?,
+	override val before: ArenaTiltaksgjennomforingDTO?,
+) : GenericArenaKafkaDTO<ArenaTiltaksgjennomforingDTO>

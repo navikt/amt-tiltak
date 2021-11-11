@@ -1,7 +1,7 @@
-package no.nav.amt.tools.arenakafkaproducer.domain.dto
+package no.nav.amt.tiltak.ingestors.arena.dto
 
-// NOSONAR
-data class ArenaTiltak(
+// @SONAR_START@
+data class ArenaTiltakDTO(
 	val TILTAKSNAVN: String, // Ex: Lønnstilskudd av lengre varighet
 	val TILTAKSGRUPPEKODE: String, // Ex: UTFAS
 	val REG_DATO: String, // Ex: 2005-12-17 11:05:03
@@ -37,13 +37,4 @@ data class ArenaTiltak(
 	val STATUS_HENVISNING_BREV: String, // Ex: J/N
 	val STATUS_KOPIBREV: String, // Ex: J/N
 )
-
-data class ArenaTiltakKafkaDto(
-	override val table: String,
-	override val op_type: ArenaOpType,
-	override val op_ts: String,
-	override val current_ts: String,
-	override val pos: String,
-	override val after: ArenaTiltak?,
-	override val before: ArenaTiltak?,
-) : GenericArenaKafkaDto<ArenaTiltak>
+// @SONAR_STOP@
