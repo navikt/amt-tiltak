@@ -6,7 +6,6 @@ import no.nav.amt.tiltak.ingestors.arena.processors.TiltakProcessor
 import no.nav.amt.tiltak.ingestors.arena.processors.TiltaksgjennomforingProcessor
 import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
 import org.springframework.stereotype.Component
-import org.springframework.stereotype.Service
 
 @Component
 open class ArenaDataProcessor(
@@ -16,8 +15,14 @@ open class ArenaDataProcessor(
 	private val deltakerProcessor: DeltakerProcessor
 ) {
 
+	val tiltakTableName = "ARENA_GOLDENGATE.TILTAK"
+	val tiltakgjennomforingTableName = "ARENA_GOLDENGATE.TILTAKGJENNOMFORING"
+	val tiltakDeltakerTableName = "ARENA_GOLDENGATE.TILTAKDELTAKER"
+
 	fun processUningestedMessages() {
-		processMessages { offset -> repository.getUningestedData(offset) }
+		processMessages { offset -> repository.getUningestedData(tableName = tiltakTableName, offset) }
+		processMessages { offset -> repository.getUningestedData(tableName = tiltakgjennomforingTableName, offset) }
+		processMessages { offset -> repository.getUningestedData(tableName = tiltakDeltakerTableName, offset) }
 	}
 
 	fun processFailedMessages() {
@@ -37,9 +42,9 @@ open class ArenaDataProcessor(
 
 	private fun processMessage(data: ArenaData) {
 		when (data.tableName.uppercase()) {
-			"ARENA_GOLDENGATE.TILTAK" -> tiltakProcessor.handle(data)
-			"ARENA_GOLDENGATE.TILTAKSGJENNOMFORING" -> tiltaksgjennomforingProcessor.handle(data)
-			"ARENA_GOLDENGATE.TILTAKDELTAKER" -> deltakerProcessor.handle(data)
+			tiltakTableName -> tiltakProcessor.handle(data)
+			tiltakgjennomforingTableName -> tiltaksgjennomforingProcessor.handle(data)
+			tiltakDeltakerTableName -> deltakerProcessor.handle(data)
 			else -> repository.setFailed(data, "Data from table ${data.tableName} if not supported")
 		}
 	}

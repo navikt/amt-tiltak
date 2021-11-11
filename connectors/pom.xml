@@ -17,6 +17,7 @@
         <module>brreg</module>
         <module>nom</module>
         <module>pdl</module>
+        <module>veilarboppfolging</module>
     </modules>
 
     <dependencies>

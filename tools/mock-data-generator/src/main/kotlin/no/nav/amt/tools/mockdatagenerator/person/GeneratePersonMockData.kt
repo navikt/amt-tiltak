@@ -2,7 +2,6 @@ package no.nav.amt.tools.mockdatagenerator.person
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
@@ -93,7 +92,7 @@ class GeneratePersonMockData {
 		val fileReader = FileInputStream("tools/arena-kafka-producer/data/arena_tiltak/TILTAKDELTAKER.json")
 		val data: List<ArenaData> = objectMapper.readValue(fileReader)
 
-		return data.map { d -> d.personId }.toSet()
+		return data.map { it.personId }.toSet()
 	}
 
 	private fun getFile(name: String): MutableList<String> {

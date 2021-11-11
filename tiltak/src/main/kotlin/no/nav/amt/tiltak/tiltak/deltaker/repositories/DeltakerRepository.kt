@@ -5,42 +5,42 @@ import no.nav.amt.tiltak.tiltak.deltaker.dbo.DeltakerDbo
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.stereotype.Repository
+import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.util.*
 
-@Repository
+@Component
 open class DeltakerRepository(
-	private val template: NamedParameterJdbcTemplate
+    private val template: NamedParameterJdbcTemplate
 ) {
 
-	private val rowMapper = RowMapper { rs, _ ->
-		val statusString = rs.getString("deltaker_status")
+    private val rowMapper = RowMapper { rs, _ ->
+        val statusString = rs.getString("deltaker_status")
 
-		DeltakerDbo(
-			internalId = rs.getInt("deltaker_internal_id"),
-			externalId = UUID.fromString(rs.getString("deltaker_external_id")),
-			brukerInternalId = rs.getInt("bruker_internal_id"),
-			brukerFodselsnummer = rs.getString("bruker_fodselsnummer"),
-			brukerFornavn = rs.getString("bruker_fornavn"),
-			brukerEtternavn = rs.getString("bruker_etternavn"),
-			deltakerOppstartsdato = rs.getDate("deltaker_oppstartsdato")?.toLocalDate(),
-			deltakerSluttdato = rs.getDate("deltaker_sluttdato")?.toLocalDate(),
-			tiltaksinstansInternalId = rs.getInt("tiltaksinstans_internal_id"),
-			status = if (statusString != null) Deltaker.Status.valueOf(statusString) else null,
-			createdAt = rs.getTimestamp("deltaker_created_at").toLocalDateTime(),
-			modifiedAt = rs.getTimestamp("deltaker_modified_at").toLocalDateTime()
-		)
-	}
+        DeltakerDbo(
+            internalId = rs.getInt("deltaker_internal_id"),
+            externalId = UUID.fromString(rs.getString("deltaker_external_id")),
+            brukerInternalId = rs.getInt("bruker_internal_id"),
+            brukerFodselsnummer = rs.getString("bruker_fodselsnummer"),
+            brukerFornavn = rs.getString("bruker_fornavn"),
+            brukerEtternavn = rs.getString("bruker_etternavn"),
+            deltakerOppstartsdato = rs.getDate("deltaker_oppstartsdato")?.toLocalDate(),
+            deltakerSluttdato = rs.getDate("deltaker_sluttdato")?.toLocalDate(),
+            tiltaksinstansInternalId = rs.getInt("tiltaksinstans_internal_id"),
+            status = if (statusString != null) Deltaker.Status.valueOf(statusString) else null,
+            createdAt = rs.getTimestamp("deltaker_created_at").toLocalDateTime(),
+            modifiedAt = rs.getTimestamp("deltaker_modified_at").toLocalDateTime()
+        )
+    }
 
-	fun insert(
-		brukerId: Int,
-		tiltaksgjennomforing: UUID,
-		oppstartDato: LocalDate?,
-		sluttDato: LocalDate?,
-		status: Deltaker.Status
-	): DeltakerDbo {
-		val sql = """
+    fun insert(
+        brukerId: Int,
+        tiltaksgjennomforing: UUID,
+        oppstartDato: LocalDate?,
+        sluttDato: LocalDate?,
+        status: Deltaker.Status
+    ): DeltakerDbo {
+        val sql = """
 			INSERT INTO deltaker(external_id, bruker_id, tiltaksinstans_id, oppstart_dato, slutt_dato, status)
 			VALUES (:externalId,
 					:brukerId,
@@ -50,28 +50,28 @@ open class DeltakerRepository(
 					:status)
 		""".trimIndent()
 
-		val externalId = UUID.randomUUID()
+        val externalId = UUID.randomUUID()
 
-		val parameters = MapSqlParameterSource().addValues(
-			mapOf(
-				"externalId" to externalId,
-				"brukerId" to brukerId,
-				"tiltaksinstansExternalId" to tiltaksgjennomforing,
-				"oppstartsdato" to oppstartDato,
-				"sluttdato" to sluttDato,
-				"status" to status.name
-			)
-		)
+        val parameters = MapSqlParameterSource().addValues(
+            mapOf(
+                "externalId" to externalId,
+                "brukerId" to brukerId,
+                "tiltaksinstansExternalId" to tiltaksgjennomforing,
+                "oppstartsdato" to oppstartDato,
+                "sluttdato" to sluttDato,
+                "status" to status.name
+            )
+        )
 
-		template.update(sql, parameters)
+        template.update(sql, parameters)
 
-		return get(externalId)
-			?: throw NoSuchElementException("Deltaker $brukerId finnes ikke på tiltaksgjennomføring $tiltaksgjennomforing")
+        return get(externalId)
+            ?: throw NoSuchElementException("Deltaker $brukerId finnes ikke på tiltaksgjennomføring $tiltaksgjennomforing")
 
-	}
+    }
 
-	fun update(deltaker: DeltakerDbo): DeltakerDbo {
-		val sql = """
+    fun update(deltaker: DeltakerDbo): DeltakerDbo {
+        val sql = """
 			UPDATE deltaker
 			SET status        = :deltakerStatus,
 				oppstart_dato = :oppstartDato,
@@ -80,25 +80,25 @@ open class DeltakerRepository(
 			WHERE id = :deltakerInternalId
 	""".trimIndent()
 
-		val parameters = MapSqlParameterSource().addValues(
-			mapOf(
-				"deltakerStatus" to deltaker.status?.name,
-				"oppstartDato" to deltaker.deltakerOppstartsdato,
-				"sluttDato" to deltaker.deltakerSluttdato,
-				"modifiedAt" to deltaker.modifiedAt,
-				"deltakerInternalId" to deltaker.internalId
-			)
-		)
+        val parameters = MapSqlParameterSource().addValues(
+            mapOf(
+                "deltakerStatus" to deltaker.status?.name,
+                "oppstartDato" to deltaker.deltakerOppstartsdato,
+                "sluttDato" to deltaker.deltakerSluttdato,
+                "modifiedAt" to deltaker.modifiedAt,
+                "deltakerInternalId" to deltaker.internalId
+            )
+        )
 
-		template.update(sql, parameters)
+        template.update(sql, parameters)
 
-		return get(deltaker.externalId)
-			?: throw NoSuchElementException("Deltaker ${deltaker.externalId} finnes ikke på tiltaksgjennomføring ${deltaker.tiltaksinstansInternalId}")
-	}
+        return get(deltaker.externalId)
+            ?: throw NoSuchElementException("Deltaker ${deltaker.externalId} finnes ikke på tiltaksgjennomføring ${deltaker.tiltaksinstansInternalId}")
+    }
 
 
-	fun get(externalId: UUID): DeltakerDbo? {
-		val sql = """
+    fun get(externalId: UUID): DeltakerDbo? {
+        val sql = """
 			SELECT deltaker.id                as deltaker_internal_id,
 				   deltaker.external_id       as deltaker_external_id,
 				   deltaker.bruker_id         as bruker_internal_id,
@@ -118,18 +118,18 @@ open class DeltakerRepository(
 			WHERE deltaker.external_id = :deltakerExternalId
 		""".trimIndent()
 
-		val parameters = MapSqlParameterSource().addValues(
-			mapOf(
-				"deltakerExternalId" to externalId
-			)
-		)
+        val parameters = MapSqlParameterSource().addValues(
+            mapOf(
+                "deltakerExternalId" to externalId
+            )
+        )
 
-		return template.query(sql, parameters, rowMapper)
-			.firstOrNull()
-	}
+        return template.query(sql, parameters, rowMapper)
+            .firstOrNull()
+    }
 
-	fun get(brukerId: Int, tiltaksinstans: UUID): DeltakerDbo? {
-		val sql = """
+    fun get(brukerId: Int, tiltaksinstans: UUID): DeltakerDbo? {
+        val sql = """
 			SELECT deltaker.id                as deltaker_internal_id,
 				   deltaker.external_id       as deltaker_external_id,
 				   deltaker.bruker_id         as bruker_internal_id,
@@ -150,19 +150,19 @@ open class DeltakerRepository(
 				AND tiltaksinstans.external_id = :tiltaksinstansExternalId
 		""".trimIndent()
 
-		val parameters = MapSqlParameterSource().addValues(
-			mapOf(
-				"brukerId" to brukerId,
-				"tiltaksinstansExternalId" to tiltaksinstans
-			)
-		)
+        val parameters = MapSqlParameterSource().addValues(
+            mapOf(
+                "brukerId" to brukerId,
+                "tiltaksinstansExternalId" to tiltaksinstans
+            )
+        )
 
-		return template.query(sql, parameters, rowMapper)
-			.firstOrNull()
-	}
+        return template.query(sql, parameters, rowMapper)
+            .firstOrNull()
+    }
 
-	fun get(fodselsnummer: String, tiltaksinstans: UUID): DeltakerDbo? {
-		val sql = """
+    fun get(fodselsnummer: String, tiltaksinstans: UUID): DeltakerDbo? {
+        val sql = """
 			SELECT deltaker.id                as deltaker_internal_id,
 				   deltaker.external_id       as deltaker_external_id,
 				   deltaker.bruker_id         as bruker_internal_id,
@@ -183,14 +183,14 @@ open class DeltakerRepository(
 				AND tiltaksinstans.external_id = :tiltaksinstansExternalId
 		""".trimIndent()
 
-		val parameters = MapSqlParameterSource().addValues(
-			mapOf(
-				"bruker_fodselsnummer" to fodselsnummer,
-				"tiltaksinstansExternalId" to tiltaksinstans
-			)
-		)
+        val parameters = MapSqlParameterSource().addValues(
+            mapOf(
+                "bruker_fodselsnummer" to fodselsnummer,
+                "tiltaksinstansExternalId" to tiltaksinstans
+            )
+        )
 
-		return template.query(sql, parameters, rowMapper)
-			.firstOrNull()
-	}
+        return template.query(sql, parameters, rowMapper)
+            .firstOrNull()
+    }
 }

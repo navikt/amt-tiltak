@@ -1,5 +1,6 @@
 package no.nav.amt.tools.arenakafkaproducer.domain.dto
 
+// NOSONAR
 data class ArenaTiltaksgruppe(
 	val TILTAKSGRUPPENAVN: String, // Ex: Arbeidsforberedende trening
 	val TILTAKSGRUPPEKODE: String, // Ex: AFT
@@ -12,6 +13,7 @@ data class ArenaTiltaksgruppe(
 	val VIS_LEGEOPPLYSNINGER_JN: String, // Ex: J/N
 )
 
+// NOSONAR
 data class ArenaTiltaksgruppeKafkaDto(
 	override val table: String,
 	override val op_type: ArenaOpType,

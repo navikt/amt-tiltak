@@ -76,6 +76,7 @@ open class DeltakerService(
 		return brukerRepository.insert(
 			fodselsnummer = fodselsnummer,
 			fornavn = newBruker.fornavn,
+			mellomnavn = newBruker.mellomnavn,
 			etternavn = newBruker.etternavn,
 			telefonnummer = newBruker.telefonnummer,
 			epost = null, //TODO

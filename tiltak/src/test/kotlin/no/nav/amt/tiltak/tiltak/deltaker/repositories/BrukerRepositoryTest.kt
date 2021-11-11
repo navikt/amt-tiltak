@@ -29,12 +29,13 @@ class BrukerRepositoryTest : FunSpec({
 	test("Insert should insert bruker and return BrukerDbo") {
 		val fodselsnummer = "123"
 		val fornavn = "Per"
+		val mellomnavn = null
 		val etternavn = "Testersen"
 		val telefonnummer = "74635462"
 		val epost = "per.testersen@test.no"
 		val ansvarligVeilederId = 1
 
-		val dbo = repository.insert(fodselsnummer, fornavn, etternavn, telefonnummer, epost, ansvarligVeilederId)
+		val dbo = repository.insert(fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarligVeilederId)
 
 		dbo shouldNotBe null
 		dbo.internalId shouldNotBe null

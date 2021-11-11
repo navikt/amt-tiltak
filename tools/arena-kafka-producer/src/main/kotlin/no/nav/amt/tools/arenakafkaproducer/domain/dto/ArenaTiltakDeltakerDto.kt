@@ -1,5 +1,6 @@
 package no.nav.amt.tools.arenakafkaproducer.domain.dto
 
+// NOSONAR
 data class ArenaTiltakDeltaker(
 	val TILTAKDELTAKER_ID: Long,
 	val PERSON_ID: Long,

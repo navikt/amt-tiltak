@@ -1,5 +1,6 @@
 package no.nav.amt.tools.arenakafkaproducer.domain.dto
 
+// NOSONAR
 data class ArenaTiltak(
 	val TILTAKSNAVN: String, // Ex: Lønnstilskudd av lengre varighet
 	val TILTAKSGRUPPEKODE: String, // Ex: UTFAS

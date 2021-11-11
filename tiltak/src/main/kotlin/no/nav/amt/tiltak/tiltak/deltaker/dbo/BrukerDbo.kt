@@ -6,6 +6,7 @@ data class BrukerDbo(
 	val internalId: Int,
 	val fodselsnummer: String,
 	val fornavn: String,
+	val mellomnavn: String?,
 	val etternavn: String,
 	val telefonnummer: String?,
 	val epost: String?,

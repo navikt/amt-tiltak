@@ -6,20 +6,25 @@ import no.nav.amt.tiltak.ingestors.arena.domain.OperationType
 import no.nav.amt.tiltak.ingestors.arena.exceptions.DependencyNotIngestedException
 import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
 import org.slf4j.LoggerFactory
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 abstract class AbstractArenaProcessor(
 	private val repository: ArenaDataRepository
 ) {
 
 	companion object {
-		private val MAX_INGEST_ATTEMPTS = 10
+		private const val MAX_INGEST_ATTEMPTS = 10
+
+		private val SUPPORTED_TILTAK = setOf(
+			"ARBFORB",
+			"AVKLARAG",
+			"GRUPPEAMO",
+			"INDOPPFAG",
+			"JOBBK",
+			"VASV"
+		)
+
 	}
 
-	private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 	private val logger = LoggerFactory.getLogger(javaClass)
 
 	fun handle(data: ArenaData) {
@@ -63,16 +68,9 @@ abstract class AbstractArenaProcessor(
 		return jacksonObjectMapper().readValue(string, clazz)
 	}
 
-	protected fun String.asLocalDate(): LocalDate = LocalDate.parse(this, formatter)
-
-	protected fun String.asLocalDateTime(): LocalDateTime = LocalDateTime.parse(this, formatter)
-
-	protected fun String?.asTime(): LocalTime {
-		if (this != null) logger.warn("Det er ikke implementert en handler for klokketid, pattern: $this")
-		return LocalTime.MIDNIGHT
+	protected fun isSupportedTiltak(tiltakskode: String): Boolean {
+		return SUPPORTED_TILTAK.contains(tiltakskode)
 	}
 
-	protected infix fun LocalDate?.withTime(time: LocalTime) =
-		if (this != null) LocalDateTime.of(this, time) else null
 
 }

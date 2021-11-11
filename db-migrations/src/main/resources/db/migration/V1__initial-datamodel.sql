@@ -85,6 +85,7 @@ CREATE TABLE bruker
     id                    serial  not null PRIMARY KEY,
     fodselsnummer         varchar not null UNIQUE,
     fornavn               varchar not null,
+    mellomnavn            varchar,
     etternavn             varchar not null,
     telefonnummer         varchar,
     epost                 varchar,

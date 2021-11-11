@@ -1,11 +1,13 @@
 package no.nav.amt.tools.arenakafkaproducer.domain.dto
 
+// NOSONAR
 enum class ArenaOpType(val type: String) {
 	I("I"),	// insert
 	U("U"),	// update
 	D("D"),	// delete
 }
 
+// NOSONAR
 interface GenericArenaKafkaDto<T> {
 	val table: String // Ex: ARENA_GOLDENGATE.TILTAKSAKTIVITET
 	val op_type: ArenaOpType

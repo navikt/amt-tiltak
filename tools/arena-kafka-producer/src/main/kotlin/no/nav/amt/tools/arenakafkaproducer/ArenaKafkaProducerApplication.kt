@@ -16,8 +16,8 @@ open class ArenaKafkaProducerApplication(
 
 	override fun run(vararg args: String?) {
 		tiltakProducer.run()
-//        tiltakDeltakerProducer.run()
-//        tiltakGjennomforingProducer.run()
+		tiltakDeltakerProducer.run()
+		tiltakGjennomforingProducer.run()
 	}
 
 }

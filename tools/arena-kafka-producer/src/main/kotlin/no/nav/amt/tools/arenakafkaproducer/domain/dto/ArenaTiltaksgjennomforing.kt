@@ -1,5 +1,6 @@
 package no.nav.amt.tools.arenakafkaproducer.domain.dto
 
+// NOSONAR
 data class ArenaTiltaksgjennomforing(
 	val TILTAKGJENNOMFORING_ID: Long,
 	val SAK_ID: Long,

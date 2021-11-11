@@ -40,7 +40,7 @@
         <mockito-kotlin.version>3.2.0</mockito-kotlin.version>
         <schedlock.version>4.27.0</schedlock.version>
 
-        <common.version>2.2021.09.17_07.09-67428a6422cc</common.version>
+        <common.version>2.2021.08.16_13.46-d90f8c15f6ff</common.version>
         <wiremock.version>2.31.0</wiremock.version>
         <nimbus.version>9.18</nimbus.version>
         <mockk.version>1.12.0</mockk.version>
@@ -250,6 +250,11 @@
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>mocks</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.common</groupId>
+                <artifactId>types</artifactId>
+                <version>${common.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

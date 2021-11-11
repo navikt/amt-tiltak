@@ -11,15 +11,24 @@ import org.springframework.stereotype.Component
 @Profile("local")
 class ArenaOrdsProxyMock : ArenaOrdsProxyConnector {
 
-	override fun hentFnr(arenaPersonId: String): String? {
-		return PersonMockDataProvider.getPersonByArenaId(arenaPersonId.toLong())?.fodselsnummer
-	}
+    override fun hentFnr(arenaPersonId: String): String? {
+        return PersonMockDataProvider.getPersonByArenaId(arenaPersonId.toLong())?.fodselsnummer
+    }
 
-	override fun hentArbeidsgiver(arenaArbeidsgiverId: String): Arbeidsgiver? {
-		TODO("Not yet implemented")
-	}
+    override fun hentArbeidsgiver(arenaArbeidsgiverId: String): Arbeidsgiver? {
+        val tiltaksleverandor =
+            TiltaksleverandorMockDataProvider.getTiltaksleverandorByArenaId(arenaArbeidsgiverId.toLong())
 
-	override fun hentVirksomhetsnummer(virksomhetsnummer: String): String {
-		TODO("Not yet implemented")
-	}
+        return if (tiltaksleverandor != null) {
+            Arbeidsgiver(tiltaksleverandor.virksomhetsnummer, tiltaksleverandor.organisasjonsnummer)
+        } else {
+            null
+        }
+
+    }
+
+    override fun hentVirksomhetsnummer(virksomhetsnummer: String): String {
+        return TiltaksleverandorMockDataProvider.getTiltaksleverandorByArenaId(virksomhetsnummer.toLong())?.virksomhetsnummer
+            ?: throw UnsupportedOperationException("Virksomhet med arena id $virksomhetsnummer existerer ikke")
+    }
 }

@@ -28,11 +28,12 @@ open class TiltakProcessor(
 	private fun insertUpdate(data: ArenaData) {
 		val newFields = jsonObject(data.after, ArenaTiltak::class.java)
 
-		tiltakService.upsertTiltak(
-			newFields.TILTAKSKODE,
-			newFields.TILTAKSNAVN,
-			newFields.TILTAKSKODE
-		)
+		if (isSupportedTiltak(newFields.TILTAKSKODE)) {
+			tiltakService.upsertTiltak(
+				newFields.TILTAKSKODE,
+				newFields.TILTAKSNAVN,
+				newFields.TILTAKSKODE
+			)
+		}
 	}
-
 }

@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
-import javax.annotation.PostConstruct
 import javax.sql.DataSource
 
 @Configuration
@@ -29,17 +28,7 @@ open class IngestCronJobs(
 		return JdbcTemplateLockProvider(datasource)
 	}
 
-
-	//TODO DELETEME
-	@SchedulerLock(
-		name = "arena-ingest",
-		lockAtMostFor = "PT60M"
-	)
-	@PostConstruct
-	open fun onStartup() {
-		logger.info("Starting processing job for uningested Arena Data")
-		processor.processUningestedMessages()
-	}
+	//TODO Kommenter inn processorene når vi vil ingeste filene
 
 	@Scheduled(cron = "0 * * * * *")
 	@SchedulerLock(
@@ -47,8 +36,9 @@ open class IngestCronJobs(
 		lockAtMostFor = "PT60M"
 	)
 	open fun processUningestedArenaData() {
-		logger.info("Starting processing job for uningested Arena Data")
-		processor.processUningestedMessages()
+		logger.debug("Starting processing job for uningested Arena Data...")
+//		processor.processUningestedMessages()
+		logger.debug("Finished processing job for uningested Arena Data!")
 	}
 
 	@Scheduled(cron = "0 0 0 * * *")
@@ -57,8 +47,9 @@ open class IngestCronJobs(
 		lockAtMostFor = "PT60M"
 	)
 	open fun processFailedArenaData() {
-		logger.info("Starting processing job for failed Arena Data")
-		processor.processFailedMessages()
+		logger.debug("Starting processing job for failed Arena Data...")
+//		processor.processFailedMessages()
+		logger.debug("Finished processing job for failed Arena Data!")
 	}
 
 }
