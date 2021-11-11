@@ -18,7 +18,7 @@ import java.util.*
 internal class DeltakerRepositoryTest : FunSpec({
 	lateinit var template: NamedParameterJdbcTemplate
 	lateinit var repository: DeltakerRepository
-	val tiltaksgjennomforingUUID = UUID.fromString("b3420940-5479-48c8-b2fa-3751c7a33aa2")
+	val tiltaksgjennomforingID = UUID.fromString("b3420940-5479-48c8-b2fa-3751c7a33aa2")
 
 	beforeEach {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
@@ -34,7 +34,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val sluttDato = null
 		val deltakerStatus = Deltaker.Status.NY_BRUKER
 
-		val dbo = repository.insert(brukerId, tiltaksgjennomforingUUID, oppstartDato, sluttDato, deltakerStatus)
+		val dbo = repository.insert(brukerId, tiltaksgjennomforingID, oppstartDato, sluttDato, deltakerStatus)
 
 		dbo shouldNotBe null
 		dbo.internalId shouldNotBe null
@@ -56,7 +56,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val sluttDato = null
 		val deltakerStatus = Deltaker.Status.NY_BRUKER
 
-		val dbo = repository.insert(brukerId, tiltaksgjennomforingUUID, oppstartDato, sluttDato, deltakerStatus)
+		val dbo = repository.insert(brukerId, tiltaksgjennomforingID, oppstartDato, sluttDato, deltakerStatus)
 
 		val updatedOppstartsdato = LocalDate.now().plusDays(1)
 		val updatedSluttdato = LocalDate.now().plusDays(14)
@@ -81,7 +81,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val sluttDato = null
 		val deltakerStatus = Deltaker.Status.NY_BRUKER
 
-		val dbo = repository.insert(brukerId, tiltaksgjennomforingUUID, oppstartDato, sluttDato, deltakerStatus)
+		val dbo = repository.insert(brukerId, tiltaksgjennomforingID, oppstartDato, sluttDato, deltakerStatus)
 
 		val gottenDbo = repository.get(dbo.externalId)
 
@@ -94,9 +94,9 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val sluttDato = null
 		val deltakerStatus = Deltaker.Status.NY_BRUKER
 
-		val dbo = repository.insert(brukerId, tiltaksgjennomforingUUID, oppstartDato, sluttDato, deltakerStatus)
+		val dbo = repository.insert(brukerId, tiltaksgjennomforingID, oppstartDato, sluttDato, deltakerStatus)
 
-		val gottenDbo = repository.get(dbo.brukerInternalId, tiltaksgjennomforingUUID)
+		val gottenDbo = repository.get(dbo.brukerInternalId, tiltaksgjennomforingID)
 
 		gottenDbo shouldBe dbo
 	}
@@ -107,9 +107,9 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val sluttDato = null
 		val deltakerStatus = Deltaker.Status.NY_BRUKER
 
-		val dbo = repository.insert(brukerId, tiltaksgjennomforingUUID, oppstartDato, sluttDato, deltakerStatus)
+		val dbo = repository.insert(brukerId, tiltaksgjennomforingID, oppstartDato, sluttDato, deltakerStatus)
 
-		val gottenDbo = repository.get("1", tiltaksgjennomforingUUID)
+		val gottenDbo = repository.get("1", tiltaksgjennomforingID)
 
 		gottenDbo shouldBe dbo
 	}
