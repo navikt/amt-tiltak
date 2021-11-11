@@ -9,10 +9,10 @@ import java.util.*
 data class TiltaksleverandorDbo(
 	val internalId: Int,
 	val externalId: UUID,
+	val navn: String,
 	val organisasjonsnummer: String,
-	val organisasjonsnavn: String,
-	val virksomhetsnummer: String,
-	val virksomhetsnavn: String,
+	val overordnetEnhetOrganisasjonsnummer: String?,
+	val overordnetEnhetNavn: String?,
 	val createdAt: LocalDateTime,
 	val modifiedAt: LocalDateTime
 ) {
@@ -21,19 +21,19 @@ data class TiltaksleverandorDbo(
 		return Tiltaksleverandor(
 			id = externalId,
 			organisasjonsnummer = organisasjonsnummer,
-			organisasjonsnavn = organisasjonsnavn,
-			virksomhetsnummer = virksomhetsnummer,
-			virksomhetsnavn = virksomhetsnavn
+			navn = navn,
+			overordnetEnhetOrganisasjonsnummer = overordnetEnhetOrganisasjonsnummer,
+			overordnetEnhetNavn = overordnetEnhetNavn,
 		)
 	}
 
 	fun update(other: TiltaksleverandorDbo): UpdateCheck<TiltaksleverandorDbo> {
 		if (this != other) {
 			val updated = this.copy(
+				overordnetEnhetOrganisasjonsnummer = other.overordnetEnhetOrganisasjonsnummer,
+				overordnetEnhetNavn = other.overordnetEnhetNavn,
 				organisasjonsnummer = other.organisasjonsnummer,
-				organisasjonsnavn = other.organisasjonsnavn,
-				virksomhetsnummer = other.virksomhetsnummer,
-				virksomhetsnavn = other.virksomhetsnavn,
+				navn = other.navn,
 				modifiedAt = LocalDateTime.now()
 			)
 

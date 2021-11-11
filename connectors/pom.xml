@@ -14,7 +14,7 @@
 
     <modules>
         <module>arena_ords_proxy</module>
-        <module>brreg</module>
+        <module>amt_enhetsregister</module>
         <module>nom</module>
         <module>pdl</module>
         <module>veilarboppfolging</module>

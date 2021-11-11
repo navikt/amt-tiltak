@@ -20,15 +20,15 @@ class TiltaksleverandorService(
 		val tiltaksleverandor = enhetsregisterConnector.hentVirksomhet(virksomhetsnummer)
 
 		return tiltaksleverandorRepository.insert(
-			organisasjonsnavn = tiltaksleverandor.overordnetEnhetNavn,
-			organisasjonsnummer = tiltaksleverandor.overordnetEnhetOrganisasjonsnummer,
-			virksomhetsnavn = tiltaksleverandor.navn,
-			virksomhetsnummer = tiltaksleverandor.organisasjonsnummer,
+			navn = tiltaksleverandor.navn,
+			organisasjonsnummer = tiltaksleverandor.organisasjonsnummer,
+			overordnetEnhetNavn = tiltaksleverandor.overordnetEnhetNavn,
+			overordnetEnhetOrganisasjonsnummer = tiltaksleverandor.overordnetEnhetOrganisasjonsnummer,
 		).toTiltaksleverandor()
 	}
 
 	override fun getTiltaksleverandorByVirksomhetsnummer(virksomhetsnummer: String): Tiltaksleverandor? {
-		return tiltaksleverandorRepository.getByVirksomhetsnummer(virksomhetsnummer)?.toTiltaksleverandor()
+		return tiltaksleverandorRepository.getByOrganisasjonsnummer(virksomhetsnummer)?.toTiltaksleverandor()
 	}
 
 	override fun getAnsatt(ansattId: UUID): Ansatt {
