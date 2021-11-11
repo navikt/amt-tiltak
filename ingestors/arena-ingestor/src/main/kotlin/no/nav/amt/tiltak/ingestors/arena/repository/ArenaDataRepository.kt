@@ -6,21 +6,15 @@ import no.nav.amt.tiltak.ingestors.arena.domain.OperationType
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
-data class CreateArenaData(
-	val tableName: String,
-	val operationType: OperationType,
-	val operationPosition: Long,
-	val operationTimestamp: LocalDateTime,
-	val before: String?,
-	val after: String?
-)
-
 @Component
 open class ArenaDataRepository(
-	private val jdbcTemplate: JdbcTemplate
+	private val jdbcTemplate: JdbcTemplate,
+	private val namedJdbcTemplate: NamedParameterJdbcTemplate
 ) {
 
 	private val logger = LoggerFactory.getLogger(javaClass)
@@ -58,23 +52,47 @@ open class ArenaDataRepository(
 			)
 		}
 
-	fun insert(arenaData: CreateArenaData) {
+	fun insert(arenaData: ArenaData) {
 		val sql =
 			"""
-				INSERT INTO $TABLE_NAME (
-					$FIELD_TABLE_NAME, $FIELD_OPERATION_TYPE, $FIELD_OPERATION_POS,
-					$FIELD_OPERATION_TIMESTAMP, $FIELD_INGEST_STATUS, $FIELD_BEFORE, $FIELD_AFTER
+				INSERT INTO arena_data (
+					table_name, operation_type, operation_pos, operation_timestamp, ingest_status, before, after
 				)
-				VALUES (?, ?::arena_operation_type, ?, ?, ?::arena_ingest_status, ?::json, ?::json)
+				VALUES (
+					:tableName,
+					:operationType::arena_operation_type,
+					:operationPosition,
+					:operationTimestamp,
+					:ingestStatus::arena_ingest_status,
+					:before::json,
+					:after::json)
+				ON CONFLICT DO
+				UPDATE SET
+					ingest_status = :ingestStatus::arena_ingest_status,
+					ingested_timestamp = :ingestedTimestamp,
+					ingest_attempts = :ingestAttempts,
+					last_retry = :lastRetry
 			""".trimIndent()
 
 		jdbcTemplate.update(
 			sql,
-			arenaData.tableName, arenaData.operationType.toString(),
-			arenaData.operationPosition, arenaData.operationTimestamp,
-			IngestStatus.NEW.toString(), arenaData.before, arenaData.after
+			arenaData.asParameterSource()
 		)
 	}
+
+	private fun ArenaData.asParameterSource() = MapSqlParameterSource().addValues(mapOf(
+			"id" to id,
+			"tableName" to tableName,
+			"operationType" to operationType,
+			"operationPosition" to operationPosition,
+			"operationTimestamp" to operationTimestamp,
+			"ingestStatus" to ingestStatus,
+			"ingestedTimestamp" to ingestedTimestamp,
+			"ingestAttempts" to ingestAttempts,
+			"lastRetry" to lastRetry,
+			"before" to before,
+			"after" to after
+	))
 
 	fun getUningestedData(offset: Int = 0, limit: Int = 100): List<ArenaData> {
 		val sql =
@@ -150,6 +168,15 @@ open class ArenaDataRepository(
 			""".trimIndent()
 
 		jdbcTemplate.update(sql, IngestStatus.FAILED.toString(), id)
+	}
+
+	fun markAsIgnored(id: Int) {
+		val sql =
+			"""
+				UPDATE $TABLE_NAME SET $FIELD_INGEST_STATUS = ?::arena_ingest_status WHERE $FIELD_ID = ?
+			""".trimIndent()
+
+		jdbcTemplate.update(sql, IngestStatus.IGNORED.toString(), id)
 	}
 
 	fun setFailed(message: ArenaData, reason: String? = null, exception: Exception? = null) {

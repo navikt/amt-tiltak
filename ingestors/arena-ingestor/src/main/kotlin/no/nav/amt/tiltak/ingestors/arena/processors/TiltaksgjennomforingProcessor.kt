@@ -8,12 +8,14 @@ import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
 import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltaksgjennomforing
 import no.nav.amt.tiltak.ingestors.arena.exceptions.DependencyNotIngestedException
 import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
+import no.nav.amt.tiltak.ingestors.arena.repository.ArenaTiltakIgnoredRepository
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Component
 
 @Component
 open class TiltaksgjennomforingProcessor(
 	repository: ArenaDataRepository,
+	private val ignoredTiltakRepository: ArenaTiltakIgnoredRepository,
 	private val tiltaksleverandorService: TiltaksleverandorService,
 	private val tiltakService: TiltakService,
 	private val ords: ArenaOrdsProxyConnector
@@ -37,9 +39,13 @@ open class TiltaksgjennomforingProcessor(
 				status = null,
 				oppstartDato = newFields.DATO_FRA?.asLocalDate(),
 				sluttDato = newFields.DATO_TIL?.asLocalDate(),
-				registrertDato = newFields.REG_DATO?.asLocalDateTime(),
+				registrertDato = newFields.REG_DATO.asLocalDateTime(),
 				fremmoteDato = newFields.DATO_FREMMOTE?.asLocalDate() withTime newFields.KLOKKETID_FREMMOTE.asTime()
 			)
+		} else {
+			ignoredTiltakRepository.insert(newFields.TILTAKGJENNOMFORING_ID)
+			repository.update(data.markAsIgnored())
+			repository.markAsIgnored(data.id)
 		}
 	}
 

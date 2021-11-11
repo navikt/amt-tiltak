@@ -4,5 +4,6 @@ enum class IngestStatus {
     NEW,
     INGESTED,
     RETRY,
-    FAILED
+    FAILED,
+	IGNORED
 }

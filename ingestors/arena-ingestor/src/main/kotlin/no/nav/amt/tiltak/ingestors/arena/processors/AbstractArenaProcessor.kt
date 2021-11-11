@@ -8,7 +8,7 @@ import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
 import org.slf4j.LoggerFactory
 
 abstract class AbstractArenaProcessor(
-	private val repository: ArenaDataRepository
+	protected val repository: ArenaDataRepository
 ) {
 
 	companion object {
