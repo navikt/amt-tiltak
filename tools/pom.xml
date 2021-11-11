@@ -13,6 +13,8 @@
 
     <modules>
         <module>token_provider</module>
+        <module>arena-kafka-producer</module>
+        <module>mock-data-generator</module>
     </modules>
 
 </project>

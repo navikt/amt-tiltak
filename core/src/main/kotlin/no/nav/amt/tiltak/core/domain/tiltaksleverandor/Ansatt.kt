@@ -7,5 +7,5 @@ data class Ansatt (
     val fornavn: String,
     val mellomnavn: String? = null,
     val etternavn: String,
-    val virksomheter: List<Virksomhet>?
+    val virksomheter: List<Tiltaksleverandor>?
 )
