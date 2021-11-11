@@ -43,7 +43,6 @@ data class ArenaTiltaksgjennomforingDTO(
 	val PARTISJON: Long,
 	val MAALFORM_KRAVBREV: String
 )
-// @SONAR_STOP@
 
 data class ArenaTiltaksgjennomforingKafkaDTO(
 	override val table: String,
@@ -54,3 +53,4 @@ data class ArenaTiltaksgjennomforingKafkaDTO(
 	override val after: ArenaTiltaksgjennomforingDTO?,
 	override val before: ArenaTiltaksgjennomforingDTO?,
 ) : GenericArenaKafkaDTO<ArenaTiltaksgjennomforingDTO>
+// @SONAR_STOP@

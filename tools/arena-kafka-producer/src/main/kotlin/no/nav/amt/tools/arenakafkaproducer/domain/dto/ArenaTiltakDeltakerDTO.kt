@@ -33,7 +33,6 @@ data class ArenaTiltakDeltakerDTO(
 	val BEGRUNNELSE_BESTILLING: String?,
 	val ANTALL_DAGER_PR_UKE: Int?
 )
-// @SONAR_STOP@
 
 data class ArenaTiltakDeltakerKafkaDTO(
 	override val table: String,
@@ -44,3 +43,4 @@ data class ArenaTiltakDeltakerKafkaDTO(
 	override val after: ArenaTiltakDeltakerDTO?,
 	override val before: ArenaTiltakDeltakerDTO?,
 ) : GenericArenaKafkaDTO<ArenaTiltakDeltakerDTO>
+// @SONAR_STOP@

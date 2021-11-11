@@ -12,7 +12,6 @@ data class ArenaTiltaksgruppeDTO(
 	val DATO_TIL: String, // Ex: 2099-01-01 00:00:00
 	val VIS_LEGEOPPLYSNINGER_JN: String, // Ex: J/N
 )
-// @SONAR_STOP@
 
 data class ArenaTiltaksgruppeKafkaDTO(
 	override val table: String,
@@ -23,3 +22,4 @@ data class ArenaTiltaksgruppeKafkaDTO(
 	override val after: ArenaTiltaksgruppeDTO?,
 	override val before: ArenaTiltaksgruppeDTO?,
 ) : GenericArenaKafkaDTO<ArenaTiltaksgruppeDTO>
+// @SONAR_STOP@

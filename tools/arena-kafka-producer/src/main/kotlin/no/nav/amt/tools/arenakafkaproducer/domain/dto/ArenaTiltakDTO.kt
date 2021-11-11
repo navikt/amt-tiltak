@@ -37,7 +37,6 @@ data class ArenaTiltakDTO(
 	val STATUS_HENVISNING_BREV: String, // Ex: J/N
 	val STATUS_KOPIBREV: String, // Ex: J/N
 )
-// @SONAR_STOP@
 
 data class ArenaTiltakKafkaDto(
 	override val table: String,
@@ -48,3 +47,4 @@ data class ArenaTiltakKafkaDto(
 	override val after: ArenaTiltakDTO?,
 	override val before: ArenaTiltakDTO?,
 ) : GenericArenaKafkaDTO<ArenaTiltakDTO>
+// @SONAR_STOP@
