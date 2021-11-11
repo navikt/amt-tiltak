@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.tiltak.controllers.dto
 
-import no.nav.amt.tiltak.core.domain.tiltak.Deltager
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.*
@@ -13,5 +13,5 @@ data class TiltakDeltagerDto(
 	val fodselsdato: LocalDate?,
 	val startdato: ZonedDateTime,
 	val sluttdato: ZonedDateTime,
-	val status: Deltager.Status
+	val status: Deltaker.Status
 )

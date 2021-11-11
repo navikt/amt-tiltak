@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.tiltak.controllers
 
-import no.nav.amt.tiltak.core.domain.tiltak.Deltager
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakDeltagerDto
 import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakDto
@@ -48,7 +48,7 @@ class TiltakInstansController {
 				fodselsdato = LocalDate.of(2001, 6, 8),
 				startdato = ZonedDateTime.now().minusDays(1),
 				sluttdato = ZonedDateTime.now().plusDays(1),
-				status = Deltager.Status.GJENNOMFORES
+				status = Deltaker.Status.GJENNOMFORES
 			),
 			TiltakDeltagerDto(
 				id = UUID.randomUUID(),
@@ -58,7 +58,7 @@ class TiltakInstansController {
 				fodselsdato = LocalDate.of(2001, 6, 8),
 				startdato = ZonedDateTime.now().plusDays(1),
 				sluttdato = ZonedDateTime.now().plusDays(4),
-				status = Deltager.Status.GJENNOMFORES
+				status = Deltaker.Status.GJENNOMFORES
 			),
 		)
 	}

@@ -6,6 +6,8 @@ interface ArenaOrdsProxyConnector {
 
 	fun hentArbeidsgiver(arenaArbeidsgiverId: String): Arbeidsgiver?
 
+	fun hentVirksomhetsnummer(virksomhetsnummer: String): String
+
 }
 
 data class Arbeidsgiver(

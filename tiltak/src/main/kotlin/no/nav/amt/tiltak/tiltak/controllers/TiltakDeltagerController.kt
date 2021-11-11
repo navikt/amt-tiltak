@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.tiltak.controllers
 
-import no.nav.amt.tiltak.core.domain.tiltak.Deltager
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.tiltak.controllers.dto.*
 import no.nav.security.token.support.core.api.Protected
@@ -27,7 +27,7 @@ class TiltakDeltagerController {
 			fodselsdato = LocalDate.of(2001, 6, 8),
 			startdato = ZonedDateTime.now().minusDays(1),
 			sluttdato = ZonedDateTime.now().plusDays(1),
-			status = Deltager.Status.GJENNOMFORES,
+			status = Deltaker.Status.GJENNOMFORES,
 			navVeileder = NavVeilederDTO(
 				navn = "Veileder Neilederesen",
 				telefon = "12345678",
