@@ -17,13 +17,13 @@ class TiltaksleverandorService(
 ) : TiltaksleverandorService {
 
 	override fun addTiltaksleverandor(virksomhetsnummer: String): Tiltaksleverandor {
-		val tiltaksleverandor = enhetsregisterConnector.virksomhetsinformasjon(virksomhetsnummer)
+		val tiltaksleverandor = enhetsregisterConnector.hentVirksomhet(virksomhetsnummer)
 
 		return tiltaksleverandorRepository.insert(
-			organisasjonsnavn = tiltaksleverandor.organisasjonsnavn,
-			organisasjonsnummer = tiltaksleverandor.organisasjonsnummer,
-			virksomhetsnavn = tiltaksleverandor.virksomhetsnavn,
-			virksomhetsnummer = tiltaksleverandor.virksomhetsnummer,
+			organisasjonsnavn = tiltaksleverandor.overordnetEnhetNavn,
+			organisasjonsnummer = tiltaksleverandor.overordnetEnhetOrganisasjonsnummer,
+			virksomhetsnavn = tiltaksleverandor.navn,
+			virksomhetsnummer = tiltaksleverandor.organisasjonsnummer,
 		).toTiltaksleverandor()
 	}
 
