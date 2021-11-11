@@ -1,5 +1,4 @@
 package no.nav.amt.tiltak.ingestors.arena.processors
-
 import no.nav.amt.tiltak.core.domain.tiltaksleverandor.Tiltaksleverandor
 import no.nav.amt.tiltak.core.port.ArenaOrdsProxyConnector
 import no.nav.amt.tiltak.core.port.TiltakService
@@ -72,7 +71,7 @@ open class TiltaksgjennomforingProcessor(
 	}
 
 	override fun delete(data: ArenaData) {
-		TODO("Not yet implemented")
+		throw NotImplementedError("Delete not yet implemented on TiltaksgjennomforingProcessor")
 	}
 
 	private fun addTiltaksleverandor(fields: ArenaTiltaksgjennomforing): Tiltaksleverandor {

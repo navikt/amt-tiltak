@@ -7,6 +7,4 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/tiltaksleverandor")
 class TiltaksleverandorController {
 
-	// TODO unødvendig inntil videre?
-
 }

@@ -25,7 +25,7 @@ open class DeltakerProcessor(
 	}
 
 	override fun delete(data: ArenaData) {
-		TODO("Not yet implemented")
+		throw NotImplementedError("Delete not yet implemented on DeltakerProcessor")
 	}
 
 	private fun addUpdate(data: ArenaData) {
