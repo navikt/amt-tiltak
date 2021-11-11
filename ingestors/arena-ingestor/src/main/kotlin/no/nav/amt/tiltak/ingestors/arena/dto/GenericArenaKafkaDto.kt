@@ -13,17 +13,6 @@ enum class ArenaOpType(val type: String) {
     D("D"),    // delete
 }
 
-interface GenericArenaKafkaDto<T> {
-    val table: String // Ex: ARENA_GOLDENGATE.TILTAKSAKTIVITET
-    val op_type: ArenaOpType
-    val op_ts: String // Ex: 2021-09-08 08:06:21.371796 (Er ikke ISO 8601)
-    val current_ts: String // Ex: 2021-09-08T08:07:50.726030 (Er ISO 8601)
-    val pos: String // Ex: 00000000000037764187
-    val after: T?
-    val before: T?
-}
-
-
 data class StringArenaKafkaDto(
     val table: String, // Ex: ARENA_GOLDENGATE.TILTAKSAKTIVITET
     val op_type: ArenaOpType,
