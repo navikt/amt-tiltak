@@ -54,7 +54,7 @@ class ArenaDataRepositoryTest {
 		jdbcTemplate = JdbcTemplate(dataSource)
 		namedJdbcTemplate = NamedParameterJdbcTemplate(dataSource)
 
-		arenaDataRepository = ArenaDataRepository(jdbcTemplate, namedJdbcTemplate)
+		arenaDataRepository = ArenaDataRepository(namedJdbcTemplate)
 
 		jdbcTemplate.update(this::class.java.getResource("/arena-data.sql").readText())
 	}
@@ -63,7 +63,7 @@ class ArenaDataRepositoryTest {
 	fun `insert() should insert arena data`() {
 		val now = LocalDateTime.now()
 
-		arenaDataRepository.insert(
+		arenaDataRepository.upsert(
 			ArenaData(
 				tableName = "TABLE_NAME",
 				operationType = OperationType.INSERT,
@@ -75,7 +75,7 @@ class ArenaDataRepositoryTest {
 		)
 
 		val arenaData = jdbcTemplate.query(
-			"SELECT * FROM ${ArenaDataRepository.TABLE_NAME} ORDER BY ${ArenaDataRepository.FIELD_ID} DESC",
+			"SELECT * FROM arena_data ORDER BY id DESC",
 			arenaDataRepository.rowMapper
 		)[0]
 
@@ -93,7 +93,7 @@ class ArenaDataRepositoryTest {
 
 	@Test
 	fun `getUningestedData() should return uningested data`() {
-		val uningestedData = arenaDataRepository.getUningestedData()
+		val uningestedData = arenaDataRepository.getUningestedData("tiltak")
 
 		assertEquals(3, uningestedData.size)
 
@@ -104,7 +104,7 @@ class ArenaDataRepositoryTest {
 
 	@Test
 	fun `getUningestedData() should return paginated uningested data`() {
-		val uningestedData = arenaDataRepository.getUningestedData(2, 1)
+		val uningestedData = arenaDataRepository.getUningestedData("tiltak", 2, 1)
 
 		assertEquals(1, uningestedData.size)
 		assertEquals(4, uningestedData[0].id)
@@ -112,7 +112,7 @@ class ArenaDataRepositoryTest {
 
 	@Test
 	fun `getFailedData() should return failed data`() {
-		val failedData = arenaDataRepository.getFailedData()
+		val failedData = arenaDataRepository.getFailedData("tiltak")
 
 		assertEquals(2, failedData.size)
 
@@ -123,7 +123,7 @@ class ArenaDataRepositoryTest {
 
 	@Test
 	fun `getFailedData() should return paginated failed data`() {
-		val failedData = arenaDataRepository.getFailedData(1, 1)
+		val failedData = arenaDataRepository.getFailedData("tiltak", 1, 1)
 
 		assertEquals(1, failedData.size)
 		assertEquals(6, failedData[0].id)
@@ -132,13 +132,13 @@ class ArenaDataRepositoryTest {
 	@Test
 	fun `markAsIngested() should mark data as ingested and set ingested timestamp`() {
 
-		val uningestedArenaData = getById(2)
+		val uningestedArenaData = arenaDataRepository.getById(2)
 
 		assertEquals(IngestStatus.NEW, uningestedArenaData.ingestStatus)
 
-		arenaDataRepository.markAsIngested(uningestedArenaData.id)
+		arenaDataRepository.upsert(uningestedArenaData.markAsIngested())
 
-		val ingestedArenaData = getById(2)
+		val ingestedArenaData = arenaDataRepository.getById(2)
 
 		assertEquals(IngestStatus.INGESTED, ingestedArenaData.ingestStatus)
 		assertTrue(ingestedArenaData.ingestedTimestamp!!.isAfter(LocalDateTime.now().minusMinutes(1)))
@@ -147,34 +147,26 @@ class ArenaDataRepositoryTest {
 	@Test
 	fun `markAsFailed() should mark data as failed`() {
 
-		val uningestedArenaData = getById(4)
+		val uningestedArenaData = arenaDataRepository.getById(4)
 
 		assertEquals(IngestStatus.RETRY, uningestedArenaData.ingestStatus)
 
-		arenaDataRepository.markAsFailed(uningestedArenaData.id)
+		arenaDataRepository.upsert(uningestedArenaData.markAsFailed())
 
-		val failedArenaData = getById(4)
+		val failedArenaData = arenaDataRepository.getById(4)
 
 		assertEquals(IngestStatus.FAILED, failedArenaData.ingestStatus)
 	}
 
 	@Test
 	fun `increment() shoud increment retry and update last retry`() {
-		val beforeIncrementData = getById(4)
+		val beforeIncrementData = arenaDataRepository.getById(4)
 
-		arenaDataRepository.incrementRetry(beforeIncrementData.id, beforeIncrementData.ingestAttempts)
+		arenaDataRepository.upsert(beforeIncrementData.retry())
 
-		val afterIncrementData = getById(4)
+		val afterIncrementData = arenaDataRepository.getById(4)
 
 		assertEquals(beforeIncrementData.ingestAttempts + 1, afterIncrementData.ingestAttempts)
 		assertTrue(afterIncrementData.lastRetry!!.isAfter(LocalDateTime.now().minusMinutes(1)))
 	}
-
-	private fun getById(id: Int): ArenaData {
-		return jdbcTemplate.query(
-			"SELECT * FROM ${ArenaDataRepository.TABLE_NAME} WHERE ${ArenaDataRepository.FIELD_ID} = $id",
-			arenaDataRepository.rowMapper
-		)[0]
-	}
-
 }

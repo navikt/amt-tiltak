@@ -32,26 +32,27 @@ abstract class AbstractArenaProcessor(
 			when (data.operationType) {
 				OperationType.INSERT -> {
 					insert(data)
-					repository.markAsIngested(data.id)
+					repository.upsert(data.markAsIngested())
 				}
 				OperationType.UPDATE -> {
 					update(data)
-					repository.markAsIngested(data.id)
+					repository.upsert(data.markAsIngested())
 				}
 				OperationType.DELETE -> {
 					delete(data)
-					repository.markAsIngested(data.id)
+					repository.upsert(data.markAsIngested())
 				}
 			}
 		} catch (e: Exception) {
 			if (data.ingestAttempts >= MAX_INGEST_ATTEMPTS) {
-				repository.setFailed(data, e.message, e)
+				logger.error(e.message, e)
+				repository.upsert(data.markAsFailed())
 			} else {
 				if (e !is DependencyNotIngestedException) {
 					logger.error(e.message, e)
 				}
 
-				repository.incrementRetry(data.id, data.ingestAttempts)
+				repository.upsert(data.retry())
 			}
 		}
 	}
@@ -71,6 +72,4 @@ abstract class AbstractArenaProcessor(
 	protected fun isSupportedTiltak(tiltakskode: String): Boolean {
 		return SUPPORTED_TILTAK.contains(tiltakskode)
 	}
-
-
 }
