@@ -15,6 +15,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 @Testcontainers
 class ArenaDataRepositoryTest {
@@ -74,9 +75,9 @@ class ArenaDataRepositoryTest {
 		assertEquals("TABLE_NAME", arenaData.tableName)
 		assertEquals(OperationType.INSERT, arenaData.operationType)
 		assertEquals(4L, arenaData.operationPosition)
-		assertEquals(now, arenaData.operationTimestamp)
+		assertEquals(now.truncatedTo(ChronoUnit.MILLIS), arenaData.operationTimestamp.truncatedTo(ChronoUnit.MILLIS))
 		assertEquals(IngestStatus.NEW, arenaData.ingestStatus)
-		assertNull( arenaData.ingestedTimestamp)
+		assertNull(arenaData.ingestedTimestamp)
 		assertEquals(0, arenaData.ingestAttempts)
 		assertNull(arenaData.lastRetry)
 		assertNull(arenaData.before)

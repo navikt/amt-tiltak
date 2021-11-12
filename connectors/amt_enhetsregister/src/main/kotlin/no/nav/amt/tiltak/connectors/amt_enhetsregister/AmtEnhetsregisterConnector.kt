@@ -15,9 +15,9 @@ class AmtEnhetsregisterConnector(
 	private val objectMapper: ObjectMapper = ObjectMapper().registerKotlinModule(),
 ) : EnhetsregisterConnector {
 
-	override fun hentVirksomhet(organisasjonsnumer: String): Virksomhet {
+	override fun hentVirksomhet(organisasjonsnummer: String): Virksomhet {
 		val request = Request.Builder()
-			.url("$url/api/enhet/$organisasjonsnumer")
+			.url("$url/api/enhet/$organisasjonsnummer")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
 			.get()
 			.build()
