@@ -31,9 +31,9 @@ open class DeltakerProcessor(
 	private fun addUpdate(data: ArenaData) {
 		val newFields = jsonObject(data.after, ArenaTiltakDeltaker::class.java)
 
-		if(newFields.TILTAKGJENNOMFORING_ID.inIgnoredTable()) {
-			// setToNotIngestable(); return
-		}
+//		if(newFields.TILTAKGJENNOMFORING_ID.inIgnoredTable()) {
+//			// setToNotIngestable(); return TODO
+//		}
 
 		val tiltaksgjennomforing = tiltakService.getTiltaksinstansFromArenaId(newFields.TILTAKGJENNOMFORING_ID.toInt())
 			?: throw DependencyNotIngestedException("Tiltaksgjennomføring med ID ${newFields.TILTAKGJENNOMFORING_ID} er ikke ingested.")

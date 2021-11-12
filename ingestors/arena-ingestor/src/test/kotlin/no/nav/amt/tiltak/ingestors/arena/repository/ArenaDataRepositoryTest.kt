@@ -10,6 +10,7 @@ import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -30,9 +31,11 @@ class ArenaDataRepositoryTest {
 	}
 
 	@Container
-	val postgresContainer: PostgreSQLContainer<Nothing> = PostgreSQLContainer(DockerImageName.parse("postgres:12-alpine"))
+	val postgresContainer: PostgreSQLContainer<Nothing> =
+		PostgreSQLContainer(DockerImageName.parse("postgres:12-alpine"))
 
 	lateinit var jdbcTemplate: JdbcTemplate
+	lateinit var namedJdbcTemplate: NamedParameterJdbcTemplate
 
 	lateinit var arenaDataRepository: ArenaDataRepository
 
@@ -49,7 +52,9 @@ class ArenaDataRepositoryTest {
 		flyway.migrate()
 
 		jdbcTemplate = JdbcTemplate(dataSource)
-		arenaDataRepository = ArenaDataRepository(jdbcTemplate)
+		namedJdbcTemplate = NamedParameterJdbcTemplate(dataSource)
+
+		arenaDataRepository = ArenaDataRepository(jdbcTemplate, namedJdbcTemplate)
 
 		jdbcTemplate.update(this::class.java.getResource("/arena-data.sql").readText())
 	}
@@ -58,25 +63,28 @@ class ArenaDataRepositoryTest {
 	fun `insert() should insert arena data`() {
 		val now = LocalDateTime.now()
 
-		arenaDataRepository.insert(CreateArenaData(
-			tableName = "TABLE_NAME",
-			operationType = OperationType.INSERT,
-			operationPosition = 4L,
-			operationTimestamp = now,
-			before = null,
-			after = "{}"
-		))
+		arenaDataRepository.insert(
+			ArenaData(
+				tableName = "TABLE_NAME",
+				operationType = OperationType.INSERT,
+				operationPosition = 4L,
+				operationTimestamp = now,
+				before = null,
+				after = "{}"
+			)
+		)
 
 		val arenaData = jdbcTemplate.query(
 			"SELECT * FROM ${ArenaDataRepository.TABLE_NAME} ORDER BY ${ArenaDataRepository.FIELD_ID} DESC",
-			arenaDataRepository.rowMapper)[0]
+			arenaDataRepository.rowMapper
+		)[0]
 
 		assertEquals("TABLE_NAME", arenaData.tableName)
 		assertEquals(OperationType.INSERT, arenaData.operationType)
 		assertEquals(4L, arenaData.operationPosition)
 		assertEquals(now, arenaData.operationTimestamp)
 		assertEquals(IngestStatus.NEW, arenaData.ingestStatus)
-		assertNull( arenaData.ingestedTimestamp)
+		assertNull(arenaData.ingestedTimestamp)
 		assertEquals(0, arenaData.ingestAttempts)
 		assertNull(arenaData.lastRetry)
 		assertNull(arenaData.before)
@@ -96,7 +104,7 @@ class ArenaDataRepositoryTest {
 
 	@Test
 	fun `getUningestedData() should return paginated uningested data`() {
-		val uningestedData = arenaDataRepository.getUningestedData(2,1)
+		val uningestedData = arenaDataRepository.getUningestedData(2, 1)
 
 		assertEquals(1, uningestedData.size)
 		assertEquals(4, uningestedData[0].id)
@@ -165,7 +173,8 @@ class ArenaDataRepositoryTest {
 	private fun getById(id: Int): ArenaData {
 		return jdbcTemplate.query(
 			"SELECT * FROM ${ArenaDataRepository.TABLE_NAME} WHERE ${ArenaDataRepository.FIELD_ID} = $id",
-			arenaDataRepository.rowMapper)[0]
+			arenaDataRepository.rowMapper
+		)[0]
 	}
 
 }

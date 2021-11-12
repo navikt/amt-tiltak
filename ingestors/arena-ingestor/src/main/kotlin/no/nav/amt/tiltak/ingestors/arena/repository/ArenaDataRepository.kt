@@ -55,26 +55,21 @@ open class ArenaDataRepository(
 	fun insert(arenaData: ArenaData) {
 		val sql =
 			"""
-				INSERT INTO arena_data (
-					table_name, operation_type, operation_pos, operation_timestamp, ingest_status, before, after
-				)
-				VALUES (
-					:tableName,
-					:operationType::arena_operation_type,
-					:operationPosition,
-					:operationTimestamp,
-					:ingestStatus::arena_ingest_status,
-					:before::json,
-					:after::json)
-				ON CONFLICT DO
-				UPDATE SET
-					ingest_status = :ingestStatus::arena_ingest_status,
-					ingested_timestamp = :ingestedTimestamp,
-					ingest_attempts = :ingestAttempts,
-					last_retry = :lastRetry
+				INSERT INTO arena_data (table_name, operation_type, operation_pos, operation_timestamp, ingest_status, before, after)
+				VALUES (:tableName,
+						:operationType::arena_operation_type,
+						:operationPosition,
+						:operationTimestamp,
+						:ingestStatus::arena_ingest_status,
+						:before::json,
+						:after::json)
+				ON CONFLICT(id) DO UPDATE SET ingest_status      = :ingestStatus::arena_ingest_status,
+										      ingested_timestamp = :ingestedTimestamp,
+										      ingest_attempts    = :ingestAttempts,
+										      last_retry         = :lastRetry
 			""".trimIndent()
 
-		jdbcTemplate.update(
+		namedJdbcTemplate.update(
 			sql,
 			arenaData.asParameterSource()
 		)
@@ -83,10 +78,10 @@ open class ArenaDataRepository(
 	private fun ArenaData.asParameterSource() = MapSqlParameterSource().addValues(mapOf(
 			"id" to id,
 			"tableName" to tableName,
-			"operationType" to operationType,
+			"operationType" to operationType.name,
 			"operationPosition" to operationPosition,
 			"operationTimestamp" to operationTimestamp,
-			"ingestStatus" to ingestStatus,
+			"ingestStatus" to ingestStatus.name,
 			"ingestedTimestamp" to ingestedTimestamp,
 			"ingestAttempts" to ingestAttempts,
 			"lastRetry" to lastRetry,

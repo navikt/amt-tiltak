@@ -1,6 +1,6 @@
 CREATE TABLE arena_tiltak_ids_ignored
 (
-    tiltak_id BIGINT PRIMARY KEY NOT NULL,
-)
+    tiltak_id BIGINT PRIMARY KEY NOT NULL
+);
 
-ALTER TYPE arena_ingest_status ADD VALUE ('IGNORED');
+ALTER TYPE arena_ingest_status ADD VALUE 'IGNORED';

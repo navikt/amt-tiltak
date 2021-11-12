@@ -44,7 +44,7 @@ open class TiltaksgjennomforingProcessor(
 			)
 		} else {
 			ignoredTiltakRepository.insert(newFields.TILTAKGJENNOMFORING_ID)
-			repository.update(data.markAsIgnored())
+			repository.insert(data.markAsIgnored())
 			repository.markAsIgnored(data.id)
 		}
 	}
