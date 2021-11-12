@@ -45,6 +45,10 @@ spec:
       value: api://dev-fss.pdl.pdl-api/.default
     - name: PDL_URL
       value: https://pdl-api.dev-fss-pub.nais.io
+    - name: AMT_ENHETSREGISTER_SCOPE
+      value: api://dev-gcp.amt.amt-enhetsregister/.default
+    - name: AMT_ENHETSREGISTER_URL
+      value: http://amt-enhetsregister.amt.svc.cluster.local
     - name: NOM_SCOPE
       value: api://dev-gcp.nom.nom-api/.default
   gcp:
