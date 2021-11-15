@@ -7,6 +7,9 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
+/**
+ * For Testing
+ */
 @SpringBootApplication
 open class ArenaKafkaProducerApplication(
 	private val tiltakProducer: TiltakProducer,

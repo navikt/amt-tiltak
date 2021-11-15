@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 
 @WireMockTest
 class ArenaOrdsProxyConnectorImplTest {
-
+	var bearerToken = "Bearer TOKEN"
 	@Test
 	fun `hentFnr() skal lage riktig request og parse respons`(wmRuntimeInfo: WireMockRuntimeInfo) {
 		val client = ArenaOrdsProxyConnectorImpl(
@@ -20,7 +20,7 @@ class ArenaOrdsProxyConnectorImplTest {
 
 		givenThat(
 			get(urlEqualTo("/api/ords/fnr?personId=987654"))
-				.withHeader("Authorization", equalTo("Bearer TOKEN"))
+				.withHeader("Authorization", equalTo(bearerToken))
 				.willReturn(
 					aResponse()
 						.withStatus(200)
@@ -62,7 +62,7 @@ class ArenaOrdsProxyConnectorImplTest {
 
 		givenThat(
 			get(urlEqualTo("/api/ords/arbeidsgiver?arbeidsgiverId=1234567"))
-				.withHeader("Authorization", equalTo("Bearer TOKEN"))
+				.withHeader("Authorization", equalTo(bearerToken))
 				.willReturn(
 					aResponse()
 						.withStatus(200)
@@ -95,7 +95,7 @@ class ArenaOrdsProxyConnectorImplTest {
 
 		givenThat(
 			get(urlEqualTo("/api/ords/arbeidsgiver?arbeidsgiverId=1234567"))
-				.withHeader("Authorization", equalTo("Bearer TOKEN"))
+				.withHeader("Authorization", equalTo(bearerToken))
 				.willReturn(aResponse().withStatus(404))
 		)
 

@@ -70,11 +70,11 @@ class KafkaConfigurationTest {
 		)
 
 		val kafkaProducer = KafkaProducerClientImpl<String, String>(kafkaProperties.producer())
-
-		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltak", "1", "some value"))
-		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltaksgjennomforing", "1", "some value"))
-		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltaksgruppe", "1", "some value"))
-		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltak-deltaker", "1", "some value"))
+		val value = "some value"
+		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltak", "1", value))
+		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltaksgjennomforing", "1", value))
+		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltaksgruppe", "1", value))
+		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltak-deltaker", "1", value))
 
 		kafkaProducer.close()
 

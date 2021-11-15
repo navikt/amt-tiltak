@@ -1,11 +1,10 @@
 package no.nav.amt.tiltak.ingestors.arena.processors
-
 import no.nav.amt.tiltak.core.domain.tiltaksleverandor.Tiltaksleverandor
 import no.nav.amt.tiltak.core.port.ArenaOrdsProxyConnector
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.core.port.TiltaksleverandorService
 import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
-import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltaksgjennomforing
+import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltaksgjennomforingDTO
 import no.nav.amt.tiltak.ingestors.arena.exceptions.DependencyNotIngestedException
 import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
 import org.springframework.dao.DataIntegrityViolationException
@@ -20,7 +19,7 @@ open class TiltaksgjennomforingProcessor(
 ) : AbstractArenaProcessor(repository) {
 
 	override fun insert(data: ArenaData) {
-		val newFields = jsonObject(data.after, ArenaTiltaksgjennomforing::class.java)
+		val newFields = jsonObject(data.after, ArenaTiltaksgjennomforingDTO::class.java)
 
 		if (isSupportedTiltak(newFields.TILTAKSKODE)) {
 			val tiltak = tiltakService.getTiltakFromArenaId(newFields.TILTAKSKODE)
@@ -44,7 +43,7 @@ open class TiltaksgjennomforingProcessor(
 	}
 
 	override fun update(data: ArenaData) {
-		val newFields = jsonObject(data.after, ArenaTiltaksgjennomforing::class.java)
+		val newFields = jsonObject(data.after, ArenaTiltaksgjennomforingDTO::class.java)
 
 		if (isSupportedTiltak(newFields.TILTAKSKODE)) {
 			val virksomhetsnummer = ords.hentVirksomhetsnummer(newFields.ARBGIV_ID_ARRANGOR.toString())
@@ -72,10 +71,10 @@ open class TiltaksgjennomforingProcessor(
 	}
 
 	override fun delete(data: ArenaData) {
-		TODO("Not yet implemented")
+		throw NotImplementedError("Delete not yet implemented on TiltaksgjennomforingProcessor")
 	}
 
-	private fun addTiltaksleverandor(fields: ArenaTiltaksgjennomforing): Tiltaksleverandor {
+	private fun addTiltaksleverandor(fields: ArenaTiltaksgjennomforingDTO): Tiltaksleverandor {
 		val virksomhetsnummer = ords.hentVirksomhetsnummer(fields.ARBGIV_ID_ARRANGOR.toString())
 		return tiltaksleverandorService.addTiltaksleverandor(virksomhetsnummer)
 	}

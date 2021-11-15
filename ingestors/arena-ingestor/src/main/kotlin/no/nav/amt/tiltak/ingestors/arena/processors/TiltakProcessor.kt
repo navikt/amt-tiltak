@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.ingestors.arena.processors
 
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
-import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltak
+import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltakDTO
 import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
 import org.springframework.stereotype.Component
 
@@ -26,7 +26,7 @@ open class TiltakProcessor(
 
 
 	private fun insertUpdate(data: ArenaData) {
-		val newFields = jsonObject(data.after, ArenaTiltak::class.java)
+		val newFields = jsonObject(data.after, ArenaTiltakDTO::class.java)
 
 		if (isSupportedTiltak(newFields.TILTAKSKODE)) {
 			tiltakService.upsertTiltak(

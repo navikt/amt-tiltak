@@ -1,6 +1,6 @@
-package no.nav.amt.tiltak.ingestors.arena.dto
-
-data class ArenaTiltakDeltaker(
+package no.nav.amt.tools.arenakafkaproducer.domain.dto
+// @SONAR_START@
+data class ArenaTiltakDeltakerDTO(
 	val TILTAKDELTAKER_ID: Long,
 	val PERSON_ID: Long,
 	val TILTAKGJENNOMFORING_ID: Long,
@@ -34,12 +34,13 @@ data class ArenaTiltakDeltaker(
 	val ANTALL_DAGER_PR_UKE: Int?
 )
 
-data class ArenaTiltakDeltakerKafkaDto(
+data class ArenaTiltakDeltakerKafkaDTO(
 	override val table: String,
 	override val op_type: ArenaOpType,
 	override val op_ts: String,
 	override val current_ts: String,
 	override val pos: String,
-	override val after: ArenaTiltakDeltaker?,
-	override val before: ArenaTiltakDeltaker?,
-) : GenericArenaKafkaDto<ArenaTiltakDeltaker>
+	override val after: ArenaTiltakDeltakerDTO?,
+	override val before: ArenaTiltakDeltakerDTO?,
+) : GenericArenaKafkaDTO<ArenaTiltakDeltakerDTO>
+// @SONAR_STOP@

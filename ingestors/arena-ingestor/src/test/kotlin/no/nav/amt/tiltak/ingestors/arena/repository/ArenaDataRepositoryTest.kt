@@ -20,7 +20,7 @@ import java.time.temporal.ChronoUnit
 @Testcontainers
 class ArenaDataRepositoryTest {
 
-	// TODO: Kopiert fra LocalPostgresDatabase.kt. Hadde det vært bedre med en modul for test-verktøy?
+	//  Kopiert fra LocalPostgresDatabase.kt. Hadde det vært bedre med en modul for test-verktøy?
 	private fun createDataSource(container: PostgreSQLContainer<Nothing>): HikariDataSource {
 		val config = HikariConfig()
 		config.username = container.username
@@ -41,7 +41,7 @@ class ArenaDataRepositoryTest {
 	fun migrate() {
 		val dataSource = createDataSource(postgresContainer)
 
-		// TODO: Kopiert fra LocalPostgresDatabase.kt. Hadde det vært bedre med en modul for test-verktøy?
+		// Kopiert fra LocalPostgresDatabase.kt. Hadde det vært bedre med en modul for test-verktøy?
 		val flyway: Flyway = Flyway.configure()
 			.dataSource(dataSource)
 			.load()

@@ -10,7 +10,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-//TODO @Repository gir feilmelding (template == null), er det ikke dependency injection på @Repository?
+// @Repository gir feilmelding (template == null), er det ikke dependency injection på @Repository?
 @Component
 open class TiltaksinstansRepository(private val template: NamedParameterJdbcTemplate) {
 
