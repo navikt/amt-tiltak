@@ -84,8 +84,10 @@ open class DeltakerService(
 		)
 
 	}
-
+	// @SONAR_START@
 	private fun getVeileder(fodselsnummer: String): NavAnsattDbo? {
 		return null
 	}
+	// @SONAR_STOP@
+
 }
