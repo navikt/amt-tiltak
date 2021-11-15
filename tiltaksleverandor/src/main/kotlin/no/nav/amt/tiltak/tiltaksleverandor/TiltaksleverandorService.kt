@@ -17,18 +17,18 @@ class TiltaksleverandorService(
 ) : TiltaksleverandorService {
 
 	override fun addTiltaksleverandor(virksomhetsnummer: String): Tiltaksleverandor {
-		val tiltaksleverandor = enhetsregisterConnector.virksomhetsinformasjon(virksomhetsnummer)
+		val tiltaksleverandor = enhetsregisterConnector.hentVirksomhet(virksomhetsnummer)
 
 		return tiltaksleverandorRepository.insert(
-			organisasjonsnavn = tiltaksleverandor.organisasjonsnavn,
+			navn = tiltaksleverandor.navn,
 			organisasjonsnummer = tiltaksleverandor.organisasjonsnummer,
-			virksomhetsnavn = tiltaksleverandor.virksomhetsnavn,
-			virksomhetsnummer = tiltaksleverandor.virksomhetsnummer,
+			overordnetEnhetNavn = tiltaksleverandor.overordnetEnhetNavn,
+			overordnetEnhetOrganisasjonsnummer = tiltaksleverandor.overordnetEnhetOrganisasjonsnummer,
 		).toTiltaksleverandor()
 	}
 
 	override fun getTiltaksleverandorByVirksomhetsnummer(virksomhetsnummer: String): Tiltaksleverandor? {
-		return tiltaksleverandorRepository.getByVirksomhetsnummer(virksomhetsnummer)?.toTiltaksleverandor()
+		return tiltaksleverandorRepository.getByOrganisasjonsnummer(virksomhetsnummer)?.toTiltaksleverandor()
 	}
 
 	override fun getAnsatt(ansattId: UUID): Ansatt {

@@ -4,8 +4,8 @@ VALUES (1, '1234', 'Vashnir', 'Veiledersen', '84756', 'vashnir.veiledersen@nav.n
 INSERT INTO bruker (id, fodselsnummer, fornavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id)
 VALUES (1, '1', 'Bruker Fornavn', 'Bruker Etternavn', '384', 'm@2.c', 1);
 
-INSERT INTO tiltaksleverandor(id, external_id, organisasjonsnummer, organisasjonsnavn, virksomhetsnummer,
-                              virksomhetsnavn)
+INSERT INTO tiltaksleverandor(id, external_id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer,
+                              navn)
 VALUES (1, '8a37bce6-3bc1-11ec-8d3d-0242ac130003', '1', 'OrgNavn', '2', 'VirkNavn');
 
 INSERT INTO tiltak(id, external_id, arena_id, navn, type)

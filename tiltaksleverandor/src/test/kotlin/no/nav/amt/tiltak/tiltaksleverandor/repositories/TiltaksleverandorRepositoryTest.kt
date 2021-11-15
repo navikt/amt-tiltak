@@ -18,7 +18,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
 
 @Testcontainers
-internal class VirksomhetServiceRepositoryTest {
+internal class TiltaksleverandorRepositoryTest {
 
 	@Container
 	val postgresContainer: PostgreSQLContainer<Nothing> =
@@ -56,39 +56,39 @@ internal class VirksomhetServiceRepositoryTest {
 		val virksomhetsnummer = "123456798"
 
 		val savedDto = repository.insert(
-			organisasjonsnavn = organisasjonsnavn,
-			organisasjonsnummer = organisasjonsnummer,
-			virksomhetsnavn = virksomhetsnavn,
-			virksomhetsnummer = virksomhetsnummer
+			overordnetEnhetNavn = organisasjonsnavn,
+			overordnetEnhetOrganisasjonsnummer = organisasjonsnummer,
+			navn = virksomhetsnavn,
+			organisasjonsnummer = virksomhetsnummer
 		)
 
 		assertNotNull(savedDto)
 		assertNotNull(savedDto.internalId)
 		assertNotNull(savedDto.externalId)
-		assertEquals(organisasjonsnummer, savedDto.organisasjonsnummer)
-		assertEquals(organisasjonsnavn, savedDto.organisasjonsnavn)
-		assertEquals(virksomhetsnavn, savedDto.virksomhetsnavn)
-		assertEquals(virksomhetsnummer, savedDto.virksomhetsnummer)
+		assertEquals(organisasjonsnummer, savedDto.overordnetEnhetOrganisasjonsnummer)
+		assertEquals(organisasjonsnavn, savedDto.overordnetEnhetNavn)
+		assertEquals(virksomhetsnavn, savedDto.navn)
+		assertEquals(virksomhetsnummer, savedDto.organisasjonsnummer)
 	}
 
 	@Test
 	internal fun `insert() same virksomhet twice will return same object`() {
-		val organisasjonsnavn = "Test Organisasjon"
-		val organisasjonsnummer = "483726374"
-		val virksomhetsnavn = "Test Virksomhet"
-		val virksomhetsnummer = "123456798"
+		val overordnetEnhetNavn = "Test Organisasjon"
+		val overordnetEnhetOrganisasjonsnummer = "483726374"
+		val navn = "Test Virksomhet"
+		val organisasjonsnummer = "123456798"
 
 		val savedOne = repository.insert(
-			organisasjonsnavn = organisasjonsnavn,
-			organisasjonsnummer = organisasjonsnummer,
-			virksomhetsnavn = virksomhetsnavn,
-			virksomhetsnummer = virksomhetsnummer
+			overordnetEnhetNavn = overordnetEnhetNavn,
+			overordnetEnhetOrganisasjonsnummer = overordnetEnhetOrganisasjonsnummer,
+			navn = navn,
+			organisasjonsnummer = organisasjonsnummer
 		)
 		val savedTwo = repository.insert(
-			organisasjonsnavn = organisasjonsnavn,
-			organisasjonsnummer = organisasjonsnummer,
-			virksomhetsnavn = virksomhetsnavn,
-			virksomhetsnummer = virksomhetsnummer
+			overordnetEnhetNavn = overordnetEnhetNavn,
+			overordnetEnhetOrganisasjonsnummer = overordnetEnhetOrganisasjonsnummer,
+			navn = navn,
+			organisasjonsnummer = organisasjonsnummer
 		)
 
 		assertEquals(savedOne.internalId, savedTwo.internalId)

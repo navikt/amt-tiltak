@@ -17,8 +17,8 @@ fun Tiltaksleverandor.toDto(roller: List<AnsattRolle>): VirksomhetDTO {
 
 	return VirksomhetDTO(
 		id = this.id!!,
-		virksomhetsnummer = this.virksomhetsnummer,
-		virksomhetsnavn = this.virksomhetsnavn,
+		virksomhetsnummer = this.organisasjonsnummer,
+		virksomhetsnavn = this.navn,
 		roller = roller
 	)
 }

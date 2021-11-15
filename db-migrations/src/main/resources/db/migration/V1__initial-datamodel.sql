@@ -15,14 +15,14 @@ CREATE TABLE nav_ansatt
 
 CREATE TABLE tiltaksleverandor
 (
-    id                  serial PRIMARY KEY,
-    external_id         uuid                     not null UNIQUE,
-    organisasjonsnummer varchar                  not null,
-    organisasjonsnavn   varchar                  not null,
-    virksomhetsnummer   varchar                  not null UNIQUE,
-    virksomhetsnavn     varchar                  not null,
-    created_at          timestamp with time zone not null default current_timestamp,
-    modified_at         timestamp with time zone not null default current_timestamp
+    id                                   serial PRIMARY KEY,
+    external_id                          uuid                     not null UNIQUE,
+    navn                                 varchar                  not null,
+    organisasjonsnummer                  varchar                  not null UNIQUE,
+    overordnet_enhet_navn                varchar,
+    overordnet_enhet_organisasjonsnummer varchar,
+    created_at                           timestamp with time zone not null default current_timestamp,
+    modified_at                          timestamp with time zone not null default current_timestamp
 );
 
 CREATE TABLE tiltaksleverandor_ansatt
