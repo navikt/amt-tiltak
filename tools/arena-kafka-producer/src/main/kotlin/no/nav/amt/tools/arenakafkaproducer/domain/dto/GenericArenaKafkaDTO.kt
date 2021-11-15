@@ -6,6 +6,7 @@ enum class ArenaOpType(val type: String) {
 	D("D"),	// delete
 }
 
+// @SONAR_START@
 interface GenericArenaKafkaDTO<T> {
 	val table: String // Ex: ARENA_GOLDENGATE.TILTAKSAKTIVITET
 	val op_type: ArenaOpType
@@ -15,3 +16,4 @@ interface GenericArenaKafkaDTO<T> {
 	val after: T?
 	val before: T?
 }
+// @SONAR_STOP@
