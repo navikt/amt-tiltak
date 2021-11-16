@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.ingestors.arena
 
 import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
+import no.nav.amt.tiltak.ingestors.arena.domain.IngestStatus
 import no.nav.amt.tiltak.ingestors.arena.processors.DeltakerProcessor
 import no.nav.amt.tiltak.ingestors.arena.processors.TiltakProcessor
 import no.nav.amt.tiltak.ingestors.arena.processors.TiltaksgjennomforingProcessor
@@ -48,12 +49,28 @@ open class ArenaDataProcessor(
 	private fun processMessage(data: ArenaData) {
 		when (data.tableName.uppercase()) {
 			tiltakTableName -> tiltakProcessor.handle(data)
-			tiltakgjennomforingTableName -> tiltaksgjennomforingProcessor.handle(data)
-			tiltakDeltakerTableName -> deltakerProcessor.handle(data)
+			tiltakgjennomforingTableName -> {
+				if (!hasNewTiltak()) {
+					tiltaksgjennomforingProcessor.handle(data)
+				}
+			}
+			tiltakDeltakerTableName -> {
+				if (!hasNewTiltaksgjennomforinger()) {
+					deltakerProcessor.handle(data)
+				}
+			}
 			else -> {
 				logger.error("Data from table ${data.tableName} if not supported")
 				repository.upsert(data.markAsFailed())
 			}
 		}
+	}
+
+	private fun hasNewTiltak(): Boolean {
+		return repository.getByIngestStatusIn(tiltakTableName, listOf(IngestStatus.NEW), 1, 1).isNotEmpty()
+	}
+
+	private fun hasNewTiltaksgjennomforinger(): Boolean {
+		return repository.getByIngestStatusIn(tiltakgjennomforingTableName, listOf(IngestStatus.NEW), 1, 1).isNotEmpty()
 	}
 }

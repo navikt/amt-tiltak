@@ -16,7 +16,7 @@ open class ArenaTiltakIgnoredRepository(
 	}
 
 	fun contains(tiltakId: Long): Boolean {
-		val rowMapper = RowMapper { rs, _ -> rs.getLong("id") }
+		val rowMapper = RowMapper { rs, _ -> rs.getLong("tiltak_id") }
 
 		val sql = "SELECT * FROM arena_tiltak_ids_ignored WHERE tiltak_id = ?"
 

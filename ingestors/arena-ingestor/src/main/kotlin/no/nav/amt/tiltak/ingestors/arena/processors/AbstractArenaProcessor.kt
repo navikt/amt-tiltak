@@ -32,15 +32,12 @@ abstract class AbstractArenaProcessor(
 			when (data.operationType) {
 				OperationType.INSERT -> {
 					insert(data)
-					repository.upsert(data.markAsIngested())
 				}
 				OperationType.UPDATE -> {
 					update(data)
-					repository.upsert(data.markAsIngested())
 				}
 				OperationType.DELETE -> {
 					delete(data)
-					repository.upsert(data.markAsIngested())
 				}
 			}
 		} catch (e: Exception) {

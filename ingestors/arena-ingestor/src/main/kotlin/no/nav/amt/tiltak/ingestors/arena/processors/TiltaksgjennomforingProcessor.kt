@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltaksgjennomforing
 import no.nav.amt.tiltak.ingestors.arena.exceptions.DependencyNotIngestedException
 import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
 import no.nav.amt.tiltak.ingestors.arena.repository.ArenaTiltakIgnoredRepository
+import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Component
 
@@ -20,6 +21,8 @@ open class TiltaksgjennomforingProcessor(
 	private val tiltakService: TiltakService,
 	private val ords: ArenaOrdsProxyConnector
 ) : AbstractArenaProcessor(repository) {
+
+	private val logger = LoggerFactory.getLogger(javaClass)
 
 	override fun insert(data: ArenaData) {
 		val newFields = jsonObject(data.after, ArenaTiltaksgjennomforing::class.java)
@@ -42,6 +45,9 @@ open class TiltaksgjennomforingProcessor(
 				registrertDato = newFields.REG_DATO.asLocalDateTime(),
 				fremmoteDato = newFields.DATO_FREMMOTE?.asLocalDate() withTime newFields.KLOKKETID_FREMMOTE.asTime()
 			)
+
+			repository.upsert(data.markAsIngested())
+
 		} else {
 			ignoredTiltakRepository.insert(newFields.TILTAKGJENNOMFORING_ID)
 			repository.upsert(data.markAsIgnored())
@@ -73,11 +79,17 @@ open class TiltaksgjennomforingProcessor(
 				registrertDato = newFields.REG_DATO.asLocalDateTime(),
 				fremmoteDato = newFields.DATO_FREMMOTE?.asLocalDate() withTime newFields.KLOKKETID_FREMMOTE.asTime()
 			)
+
+			repository.upsert(data.markAsIngested())
+		} else {
+			ignoredTiltakRepository.insert(newFields.TILTAKGJENNOMFORING_ID)
+			repository.upsert(data.markAsIgnored())
 		}
 	}
 
 	override fun delete(data: ArenaData) {
-		TODO("Not yet implemented")
+		logger.error("Delete is not implemented for TiltaksgjennomforingProcessor")
+		repository.upsert(data.markAsFailed())
 	}
 
 	private fun addTiltaksleverandor(fields: ArenaTiltaksgjennomforing): Tiltaksleverandor {

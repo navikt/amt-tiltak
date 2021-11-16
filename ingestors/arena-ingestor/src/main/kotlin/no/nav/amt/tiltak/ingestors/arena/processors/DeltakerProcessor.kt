@@ -6,47 +6,55 @@ import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
 import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltakDeltaker
 import no.nav.amt.tiltak.ingestors.arena.exceptions.DependencyNotIngestedException
 import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
+import no.nav.amt.tiltak.ingestors.arena.repository.ArenaTiltakIgnoredRepository
+import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Component
 
 @Component
 open class DeltakerProcessor(
 	repository: ArenaDataRepository,
+	private val ignoredTiltakRepository: ArenaTiltakIgnoredRepository,
 	private val tiltakService: TiltakService,
 	private val ords: ArenaOrdsProxyConnector
 ) : AbstractArenaProcessor(repository) {
 
+	private val logger = LoggerFactory.getLogger(javaClass)
+
 	override fun insert(data: ArenaData) {
-		addUpdate(data)
+		upsert(data)
 	}
 
 	override fun update(data: ArenaData) {
-		addUpdate(data)
+		upsert(data)
 	}
 
 	override fun delete(data: ArenaData) {
-		TODO("Not yet implemented")
+		logger.error("Delete is not implemented for DeltakerProcessor")
+		repository.upsert(data.markAsFailed())
 	}
 
-	private fun addUpdate(data: ArenaData) {
+	private fun upsert(data: ArenaData) {
 		val newFields = jsonObject(data.after, ArenaTiltakDeltaker::class.java)
 
-//		if(newFields.TILTAKGJENNOMFORING_ID.inIgnoredTable()) {
-//			// setToNotIngestable(); return TODO
-//		}
+		if (ignoredTiltakRepository.contains(newFields.TILTAKGJENNOMFORING_ID)) {
+			repository.upsert(data.markAsIgnored())
+		} else {
+			val tiltaksgjennomforing = tiltakService.getTiltaksinstansFromArenaId(newFields.TILTAKGJENNOMFORING_ID.toInt())
+				?: throw DependencyNotIngestedException("Tiltaksgjennomføring med ID ${newFields.TILTAKGJENNOMFORING_ID} er ikke ingested.")
 
-		val tiltaksgjennomforing = tiltakService.getTiltaksinstansFromArenaId(newFields.TILTAKGJENNOMFORING_ID.toInt())
-			?: throw DependencyNotIngestedException("Tiltaksgjennomføring med ID ${newFields.TILTAKGJENNOMFORING_ID} er ikke ingested.")
+			val fodselsnummer = ords.hentFnr(newFields.PERSON_ID.toString())
+				?: throw DataIntegrityViolationException("Person med Arena ID ${newFields.PERSON_ID} returnerer ikke fødselsnummer")
 
-		val fodselsnummer = ords.hentFnr(newFields.PERSON_ID.toString())
-			?: throw DataIntegrityViolationException("Person med Arena ID ${newFields.PERSON_ID} returnerer ikke fødselsnummer")
+			tiltakService.upsertDeltaker(
+				tiltaksgjennomforing = tiltaksgjennomforing.id,
+				fodselsnummer = fodselsnummer,
+				oppstartDato = newFields.DATO_FRA?.asLocalDate(),
+				sluttDato = newFields.DATO_TIL?.asLocalDate()
+			)
 
-		tiltakService.upsertDeltaker(
-			tiltaksgjennomforing = tiltaksgjennomforing.id,
-			fodselsnummer = fodselsnummer,
-			oppstartDato = newFields.DATO_FRA?.asLocalDate(),
-			sluttDato = newFields.DATO_TIL?.asLocalDate()
-		)
+			repository.upsert(data.markAsIngested())
+		}
 
 	}
 }

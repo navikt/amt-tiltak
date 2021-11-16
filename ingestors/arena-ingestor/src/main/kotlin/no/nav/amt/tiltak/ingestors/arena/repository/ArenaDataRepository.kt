@@ -41,10 +41,11 @@ open class ArenaDataRepository(
 						:ingestStatus,
 						:before::json,
 						:after::json)
-				ON CONFLICT(table_name, operation_type, operation_pos) DO UPDATE SET ingest_status = :ingestStatus,
-										      ingested_timestamp = :ingestedTimestamp,
-										      ingest_attempts    = :ingestAttempts,
-										      last_retry         = :lastRetry
+				ON CONFLICT(table_name, operation_type, operation_pos) DO UPDATE SET
+						ingest_status = :ingestStatus,
+					  	ingested_timestamp = :ingestedTimestamp,
+						ingest_attempts    = :ingestAttempts,
+						last_retry         = :lastRetry
 			""".trimIndent()
 
 		namedJdbcTemplate.update(
@@ -79,7 +80,7 @@ open class ArenaDataRepository(
 			?: throw IllegalArgumentException("id $id is not found in table")
 	}
 
-	private fun getByIngestStatusIn(
+	fun getByIngestStatusIn(
 		tableName: String,
 		statuses: List<IngestStatus>,
 		offset: Int = 0,
