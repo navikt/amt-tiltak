@@ -1,5 +1,4 @@
 package no.nav.amt.tiltak.ingestors.arena.processors
-
 import no.nav.amt.tiltak.core.domain.tiltaksleverandor.Tiltaksleverandor
 import no.nav.amt.tiltak.core.port.ArenaOrdsProxyConnector
 import no.nav.amt.tiltak.core.port.TiltakService

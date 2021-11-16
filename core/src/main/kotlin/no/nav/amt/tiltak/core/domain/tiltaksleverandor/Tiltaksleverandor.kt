@@ -4,8 +4,8 @@ import java.util.*
 
 data class Tiltaksleverandor(
 	val id: UUID,
+	val navn: String,
 	val organisasjonsnummer: String,
-	val organisasjonsnavn: String,
-	val virksomhetsnummer: String,
-	val virksomhetsnavn: String,
+	val overordnetEnhetOrganisasjonsnummer: String?,
+	val overordnetEnhetNavn: String?,
 )

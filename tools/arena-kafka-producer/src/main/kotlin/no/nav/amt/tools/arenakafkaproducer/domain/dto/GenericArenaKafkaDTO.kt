@@ -1,14 +1,13 @@
 package no.nav.amt.tools.arenakafkaproducer.domain.dto
 
-// NOSONAR
 enum class ArenaOpType(val type: String) {
 	I("I"),	// insert
 	U("U"),	// update
 	D("D"),	// delete
 }
 
-// NOSONAR
-interface GenericArenaKafkaDto<T> {
+// @SONAR_START@
+interface GenericArenaKafkaDTO<T> {
 	val table: String // Ex: ARENA_GOLDENGATE.TILTAKSAKTIVITET
 	val op_type: ArenaOpType
 	val op_ts: String // Ex: 2021-09-08 08:06:21.371796 (Er ikke ISO 8601)
@@ -17,3 +16,4 @@ interface GenericArenaKafkaDto<T> {
 	val after: T?
 	val before: T?
 }
+// @SONAR_STOP@

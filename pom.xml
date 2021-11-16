@@ -110,7 +110,7 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>brreg</artifactId>
+                <artifactId>amt_enhetsregister</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

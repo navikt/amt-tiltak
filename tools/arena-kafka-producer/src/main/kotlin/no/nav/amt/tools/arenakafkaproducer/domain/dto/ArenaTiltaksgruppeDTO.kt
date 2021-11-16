@@ -1,7 +1,7 @@
 package no.nav.amt.tools.arenakafkaproducer.domain.dto
 
-// NOSONAR
-data class ArenaTiltaksgruppe(
+// @SONAR_START@
+data class ArenaTiltaksgruppeDTO(
 	val TILTAKSGRUPPENAVN: String, // Ex: Arbeidsforberedende trening
 	val TILTAKSGRUPPEKODE: String, // Ex: AFT
 	val REG_USER: String?, // Ex: SIAMO
@@ -13,13 +13,13 @@ data class ArenaTiltaksgruppe(
 	val VIS_LEGEOPPLYSNINGER_JN: String, // Ex: J/N
 )
 
-// NOSONAR
-data class ArenaTiltaksgruppeKafkaDto(
+data class ArenaTiltaksgruppeKafkaDTO(
 	override val table: String,
 	override val op_type: ArenaOpType,
 	override val op_ts: String,
 	override val current_ts: String,
 	override val pos: String,
-	override val after: ArenaTiltaksgruppe?,
-	override val before: ArenaTiltaksgruppe?,
-) : GenericArenaKafkaDto<ArenaTiltaksgruppe>
+	override val after: ArenaTiltaksgruppeDTO?,
+	override val before: ArenaTiltaksgruppeDTO?,
+) : GenericArenaKafkaDTO<ArenaTiltaksgruppeDTO>
+// @SONAR_STOP@

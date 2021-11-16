@@ -79,15 +79,15 @@ open class DeltakerService(
 			mellomnavn = newBruker.mellomnavn,
 			etternavn = newBruker.etternavn,
 			telefonnummer = newBruker.telefonnummer,
-			epost = null, //TODO
+			epost = null,
 			ansvarligVeilederId = veileder?.internalId
 		)
 
 	}
-
-
-	// TODO Må legges til når Connectoren er ferdig
+	// @SONAR_START@
 	private fun getVeileder(fodselsnummer: String): NavAnsattDbo? {
 		return null
 	}
+	// @SONAR_STOP@
+
 }

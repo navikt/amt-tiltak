@@ -16,11 +16,12 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 @Testcontainers
 class ArenaDataRepositoryTest {
 
-	// TODO: Kopiert fra LocalPostgresDatabase.kt. Hadde det vært bedre med en modul for test-verktøy?
+	//  Kopiert fra LocalPostgresDatabase.kt. Hadde det vært bedre med en modul for test-verktøy?
 	private fun createDataSource(container: PostgreSQLContainer<Nothing>): HikariDataSource {
 		val config = HikariConfig()
 		config.username = container.username
@@ -43,7 +44,7 @@ class ArenaDataRepositoryTest {
 	fun migrate() {
 		val dataSource = createDataSource(postgresContainer)
 
-		// TODO: Kopiert fra LocalPostgresDatabase.kt. Hadde det vært bedre med en modul for test-verktøy?
+		// Kopiert fra LocalPostgresDatabase.kt. Hadde det vært bedre med en modul for test-verktøy?
 		val flyway: Flyway = Flyway.configure()
 			.dataSource(dataSource)
 			.load()
@@ -82,7 +83,7 @@ class ArenaDataRepositoryTest {
 		assertEquals("TABLE_NAME", arenaData.tableName)
 		assertEquals(OperationType.INSERT, arenaData.operationType)
 		assertEquals(4L, arenaData.operationPosition)
-		assertEquals(now, arenaData.operationTimestamp)
+		assertEquals(now.truncatedTo(ChronoUnit.MILLIS), arenaData.operationTimestamp.truncatedTo(ChronoUnit.MILLIS))
 		assertEquals(IngestStatus.NEW, arenaData.ingestStatus)
 		assertNull(arenaData.ingestedTimestamp)
 		assertEquals(0, arenaData.ingestAttempts)

@@ -16,10 +16,10 @@ open class TiltaksleverandorRepository(
         TiltaksleverandorDbo(
             internalId = rs.getInt("id"),
             externalId = UUID.fromString(rs.getString("external_id")),
+            navn = rs.getString("navn"),
             organisasjonsnummer = rs.getString("organisasjonsnummer"),
-            organisasjonsnavn = rs.getString("organisasjonsnavn"),
-            virksomhetsnummer = rs.getString("virksomhetsnummer"),
-            virksomhetsnavn = rs.getString("virksomhetsnavn"),
+            overordnetEnhetNavn = rs.getString("overordnet_enhet_navn"),
+            overordnetEnhetOrganisasjonsnummer = rs.getString("overordnet_enhet_organisasjonsnummer"),
             createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
             modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
         )
@@ -27,24 +27,24 @@ open class TiltaksleverandorRepository(
 
 
     fun insert(
-        organisasjonsnavn: String,
-        organisasjonsnummer: String,
-        virksomhetsnummer: String,
-        virksomhetsnavn: String
+		navn: String,
+		organisasjonsnummer: String,
+		overordnetEnhetNavn: String?,
+		overordnetEnhetOrganisasjonsnummer: String?,
     ): TiltaksleverandorDbo {
-        val savedTiltaksleverandor = getByVirksomhetsnummer(virksomhetsnummer)
+        val savedTiltaksleverandor = getByOrganisasjonsnummer(organisasjonsnummer)
 
         if (savedTiltaksleverandor != null) {
             return savedTiltaksleverandor
         }
 
         val sql = """
-			INSERT INTO tiltaksleverandor(external_id, organisasjonsnummer, organisasjonsnavn, virksomhetsnummer, virksomhetsnavn)
+			INSERT INTO tiltaksleverandor(external_id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer, navn)
 			VALUES (:externalId,
+					:overordnetEnhetOrganisasjonsnummer,
+					:overordnetEnhetNavn,
 					:organisasjonsnummer,
-					:organisasjonsnavn,
-					:virksomhetsnummer,
-					:virksomhetsnavn)
+					:navn)
 		""".trimIndent()
 
         val externalId = UUID.randomUUID()
@@ -52,36 +52,36 @@ open class TiltaksleverandorRepository(
         val parameters = MapSqlParameterSource().addValues(
             mapOf(
                 "externalId" to externalId,
+                "navn" to navn,
                 "organisasjonsnummer" to organisasjonsnummer,
-                "organisasjonsnavn" to organisasjonsnavn,
-                "virksomhetsnummer" to virksomhetsnummer,
-                "virksomhetsnavn" to virksomhetsnavn
+                "overordnetEnhetOrganisasjonsnummer" to overordnetEnhetOrganisasjonsnummer,
+                "overordnetEnhetNavn" to overordnetEnhetNavn,
             )
         )
 
         template.update(sql, parameters)
 
-        return getByVirksomhetsnummer(virksomhetsnummer)
-            ?: throw NoSuchElementException("Virksomhet med virksomhetsnummer $virksomhetsnummer finnes ikke")
+        return getByOrganisasjonsnummer(organisasjonsnummer)
+            ?: throw NoSuchElementException("Virksomhet med organisasjonsnummer $organisasjonsnummer finnes ikke")
     }
 
-    fun getByVirksomhetsnummer(virksomhetsnummer: String): TiltaksleverandorDbo? {
+    fun getByOrganisasjonsnummer(organisasjonsnummer: String): TiltaksleverandorDbo? {
         val sql = """
 			SELECT id,
 				   external_id,
+				   overordnet_enhet_organisasjonsnummer,
+				   overordnet_enhet_navn,
 				   organisasjonsnummer,
-				   organisasjonsnavn,
-				   virksomhetsnummer,
-				   virksomhetsnavn,
+				   navn,
 				   created_at,
 				   modified_at
 			FROM tiltaksleverandor
-			WHERE virksomhetsnummer = :virksomhetsnummer
+			WHERE organisasjonsnummer = :organisasjonsnummer
 		""".trimIndent()
 
         val parameters = MapSqlParameterSource().addValues(
             mapOf(
-                "virksomhetsnummer" to virksomhetsnummer
+                "organisasjonsnummer" to organisasjonsnummer
             )
         )
 

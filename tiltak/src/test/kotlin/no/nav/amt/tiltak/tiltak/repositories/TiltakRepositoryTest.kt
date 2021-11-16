@@ -106,13 +106,4 @@ internal class TiltakRepositoryTest {
 
 	}
 
-	private fun createDataSource(container: PostgreSQLContainer<Nothing>): HikariDataSource {
-		val config = HikariConfig()
-		config.username = container.username
-		config.password = container.password
-		config.jdbcUrl = container.jdbcUrl
-		config.driverClassName = container.driverClassName
-		return HikariDataSource(config)
-	}
-
 }

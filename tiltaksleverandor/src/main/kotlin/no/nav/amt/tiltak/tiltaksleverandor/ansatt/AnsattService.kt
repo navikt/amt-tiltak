@@ -8,6 +8,6 @@ import java.util.*
 class AnsattService {
 
     fun getAnsatt(ansattId: UUID): Ansatt {
-        TODO("Not yet implemented")
+        throw NotImplementedError("getAnsatt in AnsattService is not yet implemented")
     }
 }

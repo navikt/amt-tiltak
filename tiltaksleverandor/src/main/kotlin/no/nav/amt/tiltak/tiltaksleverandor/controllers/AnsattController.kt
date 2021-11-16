@@ -28,7 +28,7 @@ class AnsattController(
 				virksomhetsnummer = "123456789",
 				virksomhetsnavn = "Muligheter",
 				roller = listOf(AnsattRolle.KOORDINATOR, AnsattRolle.VEILEDER)
-			))) // TODO dummy data
+			)))
     }
 
 }

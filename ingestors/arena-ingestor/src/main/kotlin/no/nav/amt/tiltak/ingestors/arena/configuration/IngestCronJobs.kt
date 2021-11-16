@@ -28,8 +28,6 @@ open class IngestCronJobs(
 		return JdbcTemplateLockProvider(datasource)
 	}
 
-	//TODO Kommenter inn processorene når vi vil ingeste filene
-
 	@Scheduled(cron = "0 * * * * *")
 	@SchedulerLock(
 		name = "arena-ingest",
