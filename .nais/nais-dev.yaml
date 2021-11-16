@@ -53,6 +53,10 @@ spec:
       value: http://amt-enhetsregister.amt.svc.cluster.local
     - name: NOM_SCOPE
       value: api://dev-gcp.nom.nom-api/.default
+    - name: POAO_GCP_PROXY_SCOPE
+      value: api://dev-fss.pto.poao-gcp-proxy/.default
+    - name: POAO_GCP_PROXY_URL
+      value: https://poao-gcp-proxy.dev-fss-pub.nais.io
   gcp:
     sqlInstances:
       - type: POSTGRES_12
