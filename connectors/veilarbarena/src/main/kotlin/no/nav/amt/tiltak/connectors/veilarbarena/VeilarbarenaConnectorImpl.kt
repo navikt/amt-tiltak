@@ -17,7 +17,7 @@ class VeilarbarenaConnectorImpl(
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false),
 ) : VeilarbarenaConnector {
 
-	override fun hentBrukerArenaStatus(fnr: String): BrukerArenaStatus {
+	override fun hentBrukerOppfolgingsenhetId(fnr: String): String? {
 		val request = Request.Builder()
 			.url("$url/veilarbarena/api/arena/status?fnr=$fnr")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
@@ -34,9 +34,7 @@ class VeilarbarenaConnectorImpl(
 
 			val statusDto = objectMapper.readValue(body, BrukerArenaStatusDto::class.java)
 
-			return BrukerArenaStatus(
-				oppfolgingsenhetId = statusDto.oppfolgingsenhet
-			)
+			return statusDto.oppfolgingsenhet
 		}
 	}
 
