@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.connectors.veilarbarena
 
-import no.nav.amt.tiltak.core.port.VeilarbarenaConnector
 import no.nav.amt.tiltak.tools.token_provider.ScopedTokenProvider
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean

@@ -3,8 +3,6 @@ package no.nav.amt.tiltak.connectors.veilarbarena
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import no.nav.amt.tiltak.core.port.BrukerArenaStatus
-import no.nav.amt.tiltak.core.port.VeilarbarenaConnector
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.function.Supplier
