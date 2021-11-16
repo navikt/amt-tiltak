@@ -3,30 +3,22 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>amt-tiltak</artifactId>
+        <artifactId>connectors</artifactId>
         <groupId>no.nav.amt-tiltak</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>connectors</artifactId>
-    <packaging>pom</packaging>
 
-    <modules>
-        <module>arena_ords_proxy</module>
-        <module>amt_enhetsregister</module>
-        <module>nom</module>
-        <module>pdl</module>
-        <module>veilarboppfolging</module>
-        <module>veilarbarena</module>
-        <module>nav_kontor</module>
-        <module>norg</module>
-    </modules>
+    <artifactId>nav_kontor</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>core</artifactId>
+            <artifactId>veilarbarena</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>norg</artifactId>
         </dependency>
     </dependencies>
 

@@ -38,9 +38,9 @@ class VeilarbarenaConnectorImplTest {
 
 		)
 
-		val virksomhet = client.hentBrukerArenaStatus("987654")
+		val oppfolgingsenhetId = client.hentBrukerOppfolgingsenhetId("987654")
 
-		assertEquals("1234", virksomhet.oppfolgingsenhetId)
+		assertEquals("1234", oppfolgingsenhetId)
 	}
 
 }
