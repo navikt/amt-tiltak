@@ -40,6 +40,8 @@ spec:
     inbound:
       rules:
         - application: amt-tiltaksarrangor-flate-auth-proxy
+  kafka:
+    pool: nav-dev
   env:
     - name: PDL_SCOPE
       value: api://dev-fss.pdl.pdl-api/.default
