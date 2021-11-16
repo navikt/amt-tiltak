@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.ingestors.arena.dto
 
 // @SONAR_START@
-data class ArenaTiltakDeltakerDTO(
+data class ArenaTiltakDeltaker(
 	val TILTAKDELTAKER_ID: Long,
 	val PERSON_ID: Long,
 	val TILTAKGJENNOMFORING_ID: Long,
