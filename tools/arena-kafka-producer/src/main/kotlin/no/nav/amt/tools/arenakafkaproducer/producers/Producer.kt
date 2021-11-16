@@ -14,7 +14,7 @@ abstract class Producer<T, W>(
 	val objectMapper = jacksonObjectMapper()
 		.configure(MapperFeature.USE_STD_BEAN_NAMING, true)
 
-	val operationTimestampFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+	val operationTimestampFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")
 
 	fun run() {
 		send(topic, readFile())
