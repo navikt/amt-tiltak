@@ -14,6 +14,7 @@ enum class ArenaOpType(val type: String) {
 }
 
 
+// @SONAR_START@
 data class StringArenaKafkaDto(
 	val table: String, // Ex: ARENA_GOLDENGATE.TILTAKSAKTIVITET
 	val op_type: ArenaOpType,
@@ -41,3 +42,4 @@ data class StringArenaKafkaDto(
 		)
 	}
 }
+// @SONAR_STOP@

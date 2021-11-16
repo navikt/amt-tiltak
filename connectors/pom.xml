@@ -18,6 +18,7 @@
         <module>nom</module>
         <module>pdl</module>
         <module>veilarboppfolging</module>
+        <module>veilarbarena</module>
     </modules>
 
     <dependencies>
