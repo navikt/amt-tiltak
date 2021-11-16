@@ -2,8 +2,9 @@ package no.nav.amt.tiltak.ingestors.arena.processors
 
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
-import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltakDTO
+import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltak
 import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
@@ -12,21 +13,24 @@ open class TiltakProcessor(
 	private val tiltakService: TiltakService
 ) : AbstractArenaProcessor(repository) {
 
+	private val logger = LoggerFactory.getLogger(javaClass)
+
 	override fun insert(data: ArenaData) {
-		insertUpdate(data)
+		upsert(data)
 	}
 
 	override fun update(data: ArenaData) {
-		insertUpdate(data)
+		upsert(data)
 	}
 
 	override fun delete(data: ArenaData) {
-		throw UnsupportedOperationException("Cannot delete Arena Data for table ${data.tableName}")
+		logger.error("Delete is not implemented for TiltakProcessor")
+		repository.upsert(data.markAsFailed())
 	}
 
 
-	private fun insertUpdate(data: ArenaData) {
-		val newFields = jsonObject(data.after, ArenaTiltakDTO::class.java)
+	private fun upsert(data: ArenaData) {
+		val newFields = jsonObject(data.after, ArenaTiltak::class.java)
 
 		if (isSupportedTiltak(newFields.TILTAKSKODE)) {
 			tiltakService.upsertTiltak(
@@ -34,6 +38,10 @@ open class TiltakProcessor(
 				newFields.TILTAKSNAVN,
 				newFields.TILTAKSKODE
 			)
+
+			repository.upsert(data.markAsIngested())
+		} else {
+			repository.upsert(data.markAsIgnored())
 		}
 	}
 }

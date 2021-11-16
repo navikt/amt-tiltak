@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.ingestors.arena.dto
 
 // @SONAR_START@
-data class ArenaTiltaksgjennomforingDTO(
+data class ArenaTiltaksgjennomforing(
 	val TILTAKGJENNOMFORING_ID: Long,
 	val SAK_ID: Long,
 	val TILTAKSKODE: String, // Ex: SPA

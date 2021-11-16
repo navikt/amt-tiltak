@@ -8,7 +8,7 @@ import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
 import org.slf4j.LoggerFactory
 
 abstract class AbstractArenaProcessor(
-	private val repository: ArenaDataRepository
+	protected val repository: ArenaDataRepository
 ) {
 
 	companion object {
@@ -32,26 +32,24 @@ abstract class AbstractArenaProcessor(
 			when (data.operationType) {
 				OperationType.INSERT -> {
 					insert(data)
-					repository.markAsIngested(data.id)
 				}
 				OperationType.UPDATE -> {
 					update(data)
-					repository.markAsIngested(data.id)
 				}
 				OperationType.DELETE -> {
 					delete(data)
-					repository.markAsIngested(data.id)
 				}
 			}
 		} catch (e: Exception) {
 			if (data.ingestAttempts >= MAX_INGEST_ATTEMPTS) {
-				repository.setFailed(data, e.message, e)
+				logger.error(e.message, e)
+				repository.upsert(data.markAsFailed())
 			} else {
 				if (e !is DependencyNotIngestedException) {
 					logger.error(e.message, e)
 				}
 
-				repository.incrementRetry(data.id, data.ingestAttempts)
+				repository.upsert(data.retry())
 			}
 		}
 	}
@@ -71,6 +69,4 @@ abstract class AbstractArenaProcessor(
 	protected fun isSupportedTiltak(tiltakskode: String): Boolean {
 		return SUPPORTED_TILTAK.contains(tiltakskode)
 	}
-
-
 }

@@ -3,165 +3,128 @@ package no.nav.amt.tiltak.ingestors.arena.repository
 import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
 import no.nav.amt.tiltak.ingestors.arena.domain.IngestStatus
 import no.nav.amt.tiltak.ingestors.arena.domain.OperationType
-import org.slf4j.LoggerFactory
-import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
-import java.time.LocalDateTime
-
-data class CreateArenaData(
-	val tableName: String,
-	val operationType: OperationType,
-	val operationPosition: Long,
-	val operationTimestamp: LocalDateTime,
-	val before: String?,
-	val after: String?
-)
 
 @Component
 open class ArenaDataRepository(
-	private val jdbcTemplate: JdbcTemplate
+	private val namedJdbcTemplate: NamedParameterJdbcTemplate
 ) {
-
-	private val logger = LoggerFactory.getLogger(javaClass)
-
-	companion object Table {
-		const val TABLE_NAME = "arena_data"
-
-		const val FIELD_ID = "id"
-		const val FIELD_TABLE_NAME = "table_name"
-		const val FIELD_OPERATION_TYPE = "operation_type"
-		const val FIELD_OPERATION_POS = "operation_pos"
-		const val FIELD_OPERATION_TIMESTAMP = "operation_timestamp"
-		const val FIELD_INGEST_STATUS = "ingest_status"
-		const val FIELD_INGESTED_TIMESTAMP = "ingested_timestamp"
-		const val FIELD_INGEST_ATTEMPTS = "ingest_attempts"
-		const val FIELD_LAST_RETRY = "last_retry"
-		const val FIELD_BEFORE = "before"
-		const val FIELD_AFTER = "after"
-	}
 
 	val rowMapper =
 		RowMapper { rs, _ ->
 			ArenaData(
-				id = rs.getInt(FIELD_ID),
-				tableName = rs.getString(FIELD_TABLE_NAME),
-				operationType = OperationType.valueOf(rs.getString(FIELD_OPERATION_TYPE)),
-				operationPosition = rs.getLong(FIELD_OPERATION_POS),
-				operationTimestamp = rs.getTimestamp(FIELD_OPERATION_TIMESTAMP).toLocalDateTime(),
-				ingestStatus = IngestStatus.valueOf(rs.getString(FIELD_INGEST_STATUS)),
-				ingestedTimestamp = rs.getTimestamp(FIELD_INGESTED_TIMESTAMP)?.toLocalDateTime(),
-				ingestAttempts = rs.getInt(FIELD_INGEST_ATTEMPTS),
-				lastRetry = rs.getTimestamp(FIELD_LAST_RETRY)?.toLocalDateTime(),
-				before = rs.getString(FIELD_BEFORE),
-				after = rs.getString(FIELD_AFTER)
+				id = rs.getInt("id"),
+				tableName = rs.getString("table_name"),
+				operationType = OperationType.valueOf(rs.getString("operation_type")),
+				operationPosition = rs.getLong("operation_pos"),
+				operationTimestamp = rs.getTimestamp("operation_timestamp").toLocalDateTime(),
+				ingestStatus = IngestStatus.valueOf(rs.getString("ingest_status")),
+				ingestedTimestamp = rs.getTimestamp("ingested_timestamp")?.toLocalDateTime(),
+				ingestAttempts = rs.getInt("ingest_attempts"),
+				lastRetry = rs.getTimestamp("last_retry")?.toLocalDateTime(),
+				before = rs.getString("before"),
+				after = rs.getString("after")
 			)
 		}
 
-	fun insert(arenaData: CreateArenaData) {
+	fun upsert(arenaData: ArenaData) {
 		val sql =
 			"""
-				INSERT INTO $TABLE_NAME (
-					$FIELD_TABLE_NAME, $FIELD_OPERATION_TYPE, $FIELD_OPERATION_POS,
-					$FIELD_OPERATION_TIMESTAMP, $FIELD_INGEST_STATUS, $FIELD_BEFORE, $FIELD_AFTER
-				)
-				VALUES (?, ?::arena_operation_type, ?, ?, ?::arena_ingest_status, ?::json, ?::json)
+				INSERT INTO arena_data (table_name, operation_type, operation_pos, operation_timestamp, ingest_status, before, after)
+				VALUES (:tableName,
+						:operationType,
+						:operationPosition,
+						:operationTimestamp,
+						:ingestStatus,
+						:before::json,
+						:after::json)
+				ON CONFLICT(table_name, operation_type, operation_pos) DO UPDATE SET
+						ingest_status = :ingestStatus,
+					  	ingested_timestamp = :ingestedTimestamp,
+						ingest_attempts    = :ingestAttempts,
+						last_retry         = :lastRetry
 			""".trimIndent()
 
-		jdbcTemplate.update(
+		namedJdbcTemplate.update(
 			sql,
-			arenaData.tableName, arenaData.operationType.toString(),
-			arenaData.operationPosition, arenaData.operationTimestamp,
-			IngestStatus.NEW.toString(), arenaData.before, arenaData.after
-		)
-	}
-
-	fun getUningestedData(offset: Int = 0, limit: Int = 100): List<ArenaData> {
-		val sql =
-			"""
-				SELECT * FROM $TABLE_NAME
-				 WHERE $FIELD_INGEST_STATUS = ?::arena_ingest_status
-				 	OR $FIELD_INGEST_STATUS = ?::arena_ingest_status
-				 ORDER BY $FIELD_OPERATION_POS ASC OFFSET ? LIMIT ?
-			""".trimIndent()
-
-		return jdbcTemplate.query(
-			sql,
-			rowMapper,
-			IngestStatus.NEW.toString(),
-			IngestStatus.RETRY.toString(),
-			offset,
-			limit
+			arenaData.asParameterSource()
 		)
 	}
 
 	fun getUningestedData(tableName: String, offset: Int = 0, limit: Int = 100): List<ArenaData> {
-		val sql =
-			"""
-				SELECT * FROM $TABLE_NAME
-				 WHERE table_name = ?
-				 	AND ($FIELD_INGEST_STATUS = ?::arena_ingest_status
-				 	OR $FIELD_INGEST_STATUS = ?::arena_ingest_status)
-				 ORDER BY $FIELD_OPERATION_POS ASC OFFSET ? LIMIT ?
-			""".trimIndent()
-
-		return jdbcTemplate.query(
-			sql,
-			rowMapper,
+		return getByIngestStatusIn(
 			tableName,
-			IngestStatus.NEW.toString(),
-			IngestStatus.RETRY.toString(),
+			listOf(IngestStatus.NEW, IngestStatus.RETRY),
 			offset,
 			limit
 		)
 	}
 
-	fun getFailedData(offset: Int = 0, limit: Int = 100): List<ArenaData> {
-		val sql =
-			"""
-				SELECT * FROM $TABLE_NAME WHERE $FIELD_INGEST_STATUS = ?::arena_ingest_status ORDER BY $FIELD_OPERATION_POS ASC OFFSET ? LIMIT ?
-			""".trimIndent()
-
-		return jdbcTemplate.query(sql, rowMapper, IngestStatus.FAILED.toString(), offset, limit)
+	fun getFailedData(tableName: String, offset: Int = 0, limit: Int = 100): List<ArenaData> {
+		return getByIngestStatusIn(
+			tableName,
+			listOf(IngestStatus.FAILED),
+			offset, limit
+		)
 	}
 
-	fun markAsIngested(id: Int) {
-		val sql =
-			"""
-				UPDATE $TABLE_NAME SET $FIELD_INGEST_STATUS = ?::arena_ingest_status, $FIELD_INGESTED_TIMESTAMP = CURRENT_TIMESTAMP WHERE $FIELD_ID = ?
-			""".trimIndent()
-
-		jdbcTemplate.update(sql, IngestStatus.INGESTED.toString(), id)
+	fun getById(id: Int): ArenaData {
+		return namedJdbcTemplate.query(
+			"SELECT * FROM arena_data WHERE id = :id",
+			MapSqlParameterSource().addValues(mapOf("id" to id)),
+			rowMapper
+		).first()
+			?: throw IllegalArgumentException("id $id is not found in table")
 	}
 
-	fun incrementRetry(id: Int, currentRetries: Int) {
-		val sql =
-			"""
-				UPDATE $TABLE_NAME SET $FIELD_INGEST_STATUS = ?::arena_ingest_status, $FIELD_INGEST_ATTEMPTS = ?, $FIELD_LAST_RETRY = CURRENT_TIMESTAMP WHERE $FIELD_ID = ?
-			""".trimIndent()
+	fun getByIngestStatusIn(
+		tableName: String,
+		statuses: List<IngestStatus>,
+		offset: Int = 0,
+		limit: Int = 100
+	): List<ArenaData> {
+		val sql = """
+			SELECT *
+			FROM arena_data
+			WHERE ingest_status IN (:ingestStatuses)
+			AND table_name = :tableName
+			ORDER BY operation_pos ASC
+			OFFSET :offset LIMIT :limit
+		""".trimIndent()
 
-		jdbcTemplate.update(sql, IngestStatus.RETRY.toString(), currentRetries + 1, id)
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"ingestStatuses" to statuses.map { it.name }.toSet(),
+				"tableName" to tableName,
+				"offset" to offset,
+				"limit" to limit
+			)
+		)
+
+		return namedJdbcTemplate.query(
+			sql,
+			parameters,
+			rowMapper
+		)
 	}
 
-	fun markAsFailed(id: Int) {
-		val sql =
-			"""
-				UPDATE $TABLE_NAME SET $FIELD_INGEST_STATUS = ?::arena_ingest_status WHERE $FIELD_ID = ?
-			""".trimIndent()
-
-		jdbcTemplate.update(sql, IngestStatus.FAILED.toString(), id)
-	}
-
-	fun setFailed(message: ArenaData, reason: String? = null, exception: Exception? = null) {
-		if (reason != null) {
-			if (exception != null) {
-				logger.warn(reason, exception)
-			} else {
-				logger.warn(reason)
-			}
-		}
-
-		markAsFailed(message.id)
-	}
+	private fun ArenaData.asParameterSource() = MapSqlParameterSource().addValues(
+		mapOf(
+			"id" to id,
+			"tableName" to tableName,
+			"operationType" to operationType.name,
+			"operationPosition" to operationPosition,
+			"operationTimestamp" to operationTimestamp,
+			"ingestStatus" to ingestStatus.name,
+			"ingestedTimestamp" to ingestedTimestamp,
+			"ingestAttempts" to ingestAttempts,
+			"lastRetry" to lastRetry,
+			"before" to before,
+			"after" to after
+		)
+	)
 
 }
