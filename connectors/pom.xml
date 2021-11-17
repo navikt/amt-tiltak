@@ -22,13 +22,7 @@
         <module>nav_kontor</module>
         <module>norg</module>
         <module>dkif</module>
+        <module>person</module>
     </modules>
-
-    <dependencies>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>core</artifactId>
-        </dependency>
-    </dependencies>
 
 </project>

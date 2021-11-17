@@ -11,12 +11,11 @@
 
     <artifactId>veilarboppfolging</artifactId>
 
-    <properties>
-        <maven.compiler.source>14</maven.compiler.source>
-        <maven.compiler.target>14</maven.compiler.target>
-    </properties>
-
     <dependencies>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>core</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>

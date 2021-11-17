@@ -2,8 +2,6 @@ package no.nav.amt.tiltak.connectors.pdl
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import no.nav.amt.tiltak.core.port.PdlBruker
-import no.nav.amt.tiltak.core.port.PdlConnector
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request

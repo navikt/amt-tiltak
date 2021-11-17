@@ -1,7 +1,5 @@
-package no.nav.amt.tiltak.connectors.pdl.config
+package no.nav.amt.tiltak.connectors.pdl
 
-import no.nav.amt.tiltak.connectors.pdl.PdlConnectorImpl
-import no.nav.amt.tiltak.core.port.PdlConnector
 import no.nav.amt.tiltak.tools.token_provider.ScopedTokenProvider
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
