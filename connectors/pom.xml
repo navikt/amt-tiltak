@@ -21,6 +21,7 @@
         <module>veilarbarena</module>
         <module>nav_kontor</module>
         <module>norg</module>
+        <module>dkif</module>
     </modules>
 
     <dependencies>
