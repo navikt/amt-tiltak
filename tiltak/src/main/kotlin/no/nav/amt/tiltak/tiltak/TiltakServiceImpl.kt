@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak
+package no.nav.amt.tiltak.tiltak
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
@@ -6,7 +6,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.tiltak.deltaker.DeltakerService
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
-import no.nav.amt.tiltak.tiltak.repositories.TiltaksinstansRepository
+import no.nav.amt.tiltak.tiltak.repositories.TiltakInstansRepository
 import no.nav.amt.tiltak.tiltak.utils.UpdateStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -16,7 +16,7 @@ import java.util.*
 @Service
 class TiltakServiceImpl(
 	private val tiltakRepository: TiltakRepository,
-	private val tiltaksinstansRepository: TiltaksinstansRepository,
+	private val tiltakInstansRepository: TiltakInstansRepository,
 	private val deltakerService: DeltakerService
 ) : TiltakService {
 
@@ -56,7 +56,7 @@ class TiltakServiceImpl(
 		registrertDato: LocalDateTime?,
 		fremmoteDato: LocalDateTime?
 	): TiltakInstans {
-		val storedTiltaksinstans = tiltaksinstansRepository.getByArenaId(arenaId)
+		val storedTiltaksinstans = tiltakInstansRepository.getByArenaId(arenaId)
 
 		if (storedTiltaksinstans != null) {
 			val update = storedTiltaksinstans.update(
@@ -71,13 +71,13 @@ class TiltakServiceImpl(
 			)
 
 			return if (update.status == UpdateStatus.UPDATED) {
-				tiltaksinstansRepository.update(update.updatedObject!!).toTiltaksinstans()
+				tiltakInstansRepository.update(update.updatedObject!!).toTiltakInstans()
 			} else {
-				storedTiltaksinstans.toTiltaksinstans()
+				storedTiltaksinstans.toTiltakInstans()
 			}
 		}
 
-		return tiltaksinstansRepository.insert(
+		return tiltakInstansRepository.insert(
 			arenaId = arenaId,
 			tiltakId = tiltakId,
 			tiltaksleverandorId = tiltaksleverandorId,
@@ -87,11 +87,11 @@ class TiltakServiceImpl(
 			sluttDato = sluttDato,
 			registrertDato = registrertDato,
 			fremmoteDato = fremmoteDato
-		).toTiltaksinstans()
+		).toTiltakInstans()
 	}
 
 	override fun getTiltaksinstansFromArenaId(arenaId: Int): TiltakInstans? {
-		return tiltaksinstansRepository.getByArenaId(arenaId)?.toTiltaksinstans()
+		return tiltakInstansRepository.getByArenaId(arenaId)?.toTiltakInstans()
 	}
 
 	override fun upsertDeltaker(
@@ -114,6 +114,16 @@ class TiltakServiceImpl(
 			dagerPerUke = dagerPerUke,
 			prosentStilling = prosentStilling
 		)
+	}
+
+	override fun getTiltakInstans(id: UUID): TiltakInstans? {
+		val instans = tiltakInstansRepository.get(id)
+		return instans?.toTiltakInstans()
+	}
+
+	override fun getTiltak(id: UUID): Tiltak? {
+		val tiltak = tiltakRepository.get(id)
+		return tiltak?.toTiltak()
 	}
 
 }

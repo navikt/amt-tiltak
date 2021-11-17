@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.tiltak.dbo
 
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
+import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakInstansDto
 import no.nav.amt.tiltak.tiltak.utils.UpdateCheck
 import no.nav.amt.tiltak.tiltak.utils.UpdateStatus
 import java.time.LocalDate
@@ -25,7 +26,7 @@ data class TiltaksinstansDbo(
 	val modifiedAt: LocalDateTime
 ) {
 
-	fun toTiltaksinstans(): TiltakInstans {
+	fun toTiltakInstans(): TiltakInstans {
 		return TiltakInstans(
 			id = externalId,
 			tiltakId = tiltakExternalId,
