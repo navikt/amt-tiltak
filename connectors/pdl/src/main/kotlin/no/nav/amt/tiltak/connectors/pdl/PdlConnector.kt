@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.core.port
+package no.nav.amt.tiltak.connectors.pdl
 
 interface PdlConnector {
 

@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>nav_kontor</artifactId>
+    <artifactId>person</artifactId>
 
     <dependencies>
         <dependency>
@@ -18,11 +18,11 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>veilarbarena</artifactId>
+            <artifactId>pdl</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>norg</artifactId>
+            <artifactId>dkif</artifactId>
         </dependency>
     </dependencies>
 

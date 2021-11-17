@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.tiltak.deltaker
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.port.PdlConnector
+import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.NavAnsattDbo
 import no.nav.amt.tiltak.tiltak.deltaker.repositories.BrukerRepository
@@ -15,7 +15,7 @@ import java.util.*
 open class DeltakerService(
 	private val deltakerRepository: DeltakerRepository,
 	private val brukerRepository: BrukerRepository,
-	private val pdlConnector: PdlConnector
+	private val personService: PersonService
 ) {
 
 	fun addUpdateDeltaker(
@@ -77,7 +77,7 @@ open class DeltakerService(
 		}
 
 		val veileder = getVeileder(fodselsnummer)
-		val newBruker = pdlConnector.hentBruker(fodselsnummer)
+		val newBruker = personService.hentPerson(fodselsnummer)
 
 		return brukerRepository.insert(
 			fodselsnummer = fodselsnummer,
