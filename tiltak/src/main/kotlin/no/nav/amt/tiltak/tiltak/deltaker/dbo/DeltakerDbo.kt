@@ -17,6 +17,9 @@ data class DeltakerDbo(
 	val tiltaksinstansInternalId: Int,
 	val deltakerOppstartsdato: LocalDate?,
 	val deltakerSluttdato: LocalDate?,
+	val arenaStatus: String?,
+	val dagerPerUke: Int?,
+	val prosentStilling: Float?,
 	val status: Deltaker.Status?,
 	val createdAt: LocalDateTime,
 	val modifiedAt: LocalDateTime

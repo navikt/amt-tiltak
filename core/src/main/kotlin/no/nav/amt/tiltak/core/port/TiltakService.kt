@@ -31,6 +31,9 @@ interface TiltakService {
 		fodselsnummer: String,
 		oppstartDato: LocalDate?,
 		sluttDato: LocalDate?,
-		status: Deltaker.Status = Deltaker.Status.NY_BRUKER
+		status: Deltaker.Status = Deltaker.Status.NY_BRUKER,
+		arenaStatus: String?,
+		dagerPerUke: Int?,
+		prosentStilling: Float?
 	): Deltaker
 }

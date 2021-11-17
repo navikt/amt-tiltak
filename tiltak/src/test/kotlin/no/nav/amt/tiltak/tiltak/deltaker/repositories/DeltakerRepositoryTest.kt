@@ -33,8 +33,20 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val oppstartDato = LocalDate.now().plusDays(7)
 		val sluttDato = null
 		val deltakerStatus = Deltaker.Status.NY_BRUKER
+		val arenaStatus = "ARENA_STATUS"
+		val dagerPerUke = 2
+		val prosentStilling = 20.0f
 
-		val dbo = repository.insert(brukerId, tiltaksgjennomforingID, oppstartDato, sluttDato, deltakerStatus)
+		val dbo = repository.insert(
+			brukerId,
+			tiltaksgjennomforingID,
+			oppstartDato,
+			sluttDato,
+			deltakerStatus,
+			arenaStatus,
+			dagerPerUke,
+			prosentStilling
+		)
 
 		dbo shouldNotBe null
 		dbo.internalId shouldNotBe null
@@ -55,8 +67,20 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val oppstartDato = LocalDate.now().plusDays(7)
 		val sluttDato = null
 		val deltakerStatus = Deltaker.Status.NY_BRUKER
+		val arenaStatus = "ARENA_STATUS"
+		val dagerPerUke = 2
+		val prosentStilling = 20.0f
 
-		val dbo = repository.insert(brukerId, tiltaksgjennomforingID, oppstartDato, sluttDato, deltakerStatus)
+		val dbo = repository.insert(
+			brukerId,
+			tiltaksgjennomforingID,
+			oppstartDato,
+			sluttDato,
+			deltakerStatus,
+			arenaStatus,
+			dagerPerUke,
+			prosentStilling
+		)
 
 		val updatedOppstartsdato = LocalDate.now().plusDays(1)
 		val updatedSluttdato = LocalDate.now().plusDays(14)
@@ -80,8 +104,20 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val oppstartDato = LocalDate.now().plusDays(7)
 		val sluttDato = null
 		val deltakerStatus = Deltaker.Status.NY_BRUKER
+		val arenaStatus = "ARENA_STATUS"
+		val dagerPerUke = 2
+		val prosentStilling = 20.0f
 
-		val dbo = repository.insert(brukerId, tiltaksgjennomforingID, oppstartDato, sluttDato, deltakerStatus)
+		val dbo = repository.insert(
+			brukerId,
+			tiltaksgjennomforingID,
+			oppstartDato,
+			sluttDato,
+			deltakerStatus,
+			arenaStatus,
+			dagerPerUke,
+			prosentStilling
+		)
 
 		val gottenDbo = repository.get(dbo.externalId)
 
@@ -93,8 +129,20 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val oppstartDato = LocalDate.now().plusDays(7)
 		val sluttDato = null
 		val deltakerStatus = Deltaker.Status.NY_BRUKER
+		val arenaStatus = "ARENA_STATUS"
+		val dagerPerUke = 2
+		val prosentStilling = 20.0f
 
-		val dbo = repository.insert(brukerId, tiltaksgjennomforingID, oppstartDato, sluttDato, deltakerStatus)
+		val dbo = repository.insert(
+			brukerId,
+			tiltaksgjennomforingID,
+			oppstartDato,
+			sluttDato,
+			deltakerStatus,
+			arenaStatus,
+			dagerPerUke,
+			prosentStilling
+		)
 
 		val gottenDbo = repository.get(dbo.brukerInternalId, tiltaksgjennomforingID)
 
@@ -106,8 +154,20 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val oppstartDato = LocalDate.now().plusDays(7)
 		val sluttDato = null
 		val deltakerStatus = Deltaker.Status.NY_BRUKER
+		val arenaStatus = "ARENA_STATUS"
+		val dagerPerUke = 2
+		val prosentStilling = 20.0f
 
-		val dbo = repository.insert(brukerId, tiltaksgjennomforingID, oppstartDato, sluttDato, deltakerStatus)
+		val dbo = repository.insert(
+			brukerId,
+			tiltaksgjennomforingID,
+			oppstartDato,
+			sluttDato,
+			deltakerStatus,
+			arenaStatus,
+			dagerPerUke,
+			prosentStilling
+		)
 
 		val gottenDbo = repository.get("1", tiltaksgjennomforingID)
 

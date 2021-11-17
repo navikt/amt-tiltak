@@ -23,7 +23,10 @@ open class DeltakerService(
 		fodselsnummer: String,
 		oppstartDato: LocalDate?,
 		sluttDato: LocalDate?,
-		status: Deltaker.Status
+		status: Deltaker.Status,
+		arenaStatus: String?,
+		dagerPerUke: Int?,
+		prosentStilling: Float?
 	): Deltaker {
 		val storedDeltaker = deltakerRepository.get(fodselsnummer, tiltaksinstans)
 
@@ -57,7 +60,10 @@ open class DeltakerService(
 				tiltaksgjennomforing = tiltaksinstans,
 				oppstartDato = oppstartDato,
 				sluttDato = sluttDato,
-				status = status
+				status = status,
+				arenaStatus = arenaStatus,
+				dagerPerUke = dagerPerUke,
+				prosentStilling = prosentStilling
 			).toDeltaker()
 
 		}
@@ -84,6 +90,7 @@ open class DeltakerService(
 		)
 
 	}
+
 	// @SONAR_START@
 	private fun getVeileder(fodselsnummer: String): NavAnsattDbo? {
 		return null

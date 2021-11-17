@@ -40,8 +40,9 @@ open class DeltakerProcessor(
 		if (ignoredTiltakRepository.contains(newFields.TILTAKGJENNOMFORING_ID)) {
 			repository.upsert(data.markAsIgnored())
 		} else {
-			val tiltaksgjennomforing = tiltakService.getTiltaksinstansFromArenaId(newFields.TILTAKGJENNOMFORING_ID.toInt())
-				?: throw DependencyNotIngestedException("Tiltaksgjennomføring med ID ${newFields.TILTAKGJENNOMFORING_ID} er ikke ingested.")
+			val tiltaksgjennomforing =
+				tiltakService.getTiltaksinstansFromArenaId(newFields.TILTAKGJENNOMFORING_ID.toInt())
+					?: throw DependencyNotIngestedException("Tiltaksgjennomføring med ID ${newFields.TILTAKGJENNOMFORING_ID} er ikke ingested.")
 
 			val fodselsnummer = ords.hentFnr(newFields.PERSON_ID.toString())
 				?: throw DataIntegrityViolationException("Person med Arena ID ${newFields.PERSON_ID} returnerer ikke fødselsnummer")
@@ -50,7 +51,10 @@ open class DeltakerProcessor(
 				tiltaksgjennomforing = tiltaksgjennomforing.id,
 				fodselsnummer = fodselsnummer,
 				oppstartDato = newFields.DATO_FRA?.asLocalDate(),
-				sluttDato = newFields.DATO_TIL?.asLocalDate()
+				sluttDato = newFields.DATO_TIL?.asLocalDate(),
+				arenaStatus = newFields.DELTAKERSTATUSKODE,
+				dagerPerUke = newFields.ANTALL_DAGER_PR_UKE,
+				prosentStilling = newFields.PROSENT_DELTID
 			)
 
 			repository.upsert(data.markAsIngested())
