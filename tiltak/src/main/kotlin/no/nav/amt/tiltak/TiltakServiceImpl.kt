@@ -99,14 +99,20 @@ class TiltakServiceImpl(
 		fodselsnummer: String,
 		oppstartDato: LocalDate?,
 		sluttDato: LocalDate?,
-		status: Deltaker.Status
+		status: Deltaker.Status,
+		arenaStatus: String?,
+		dagerPerUke: Int?,
+		prosentStilling: Float?
 	): Deltaker {
 		return deltakerService.addUpdateDeltaker(
 			tiltaksinstans = tiltaksgjennomforing,
 			fodselsnummer = fodselsnummer,
 			oppstartDato = oppstartDato,
 			sluttDato = sluttDato,
-			status = status
+			status = status,
+			arenaStatus = arenaStatus,
+			dagerPerUke = dagerPerUke,
+			prosentStilling = prosentStilling
 		)
 	}
 
