@@ -18,7 +18,7 @@
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <logger name="no.nav.common.kafka.consumer" level="warn" additivity="false">
+    <logger name="no.nav.common.kafka.consumer" level="info" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 
