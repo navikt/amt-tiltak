@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tiltak
+package no.nav.amt.tiltak.tiltak.services
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak

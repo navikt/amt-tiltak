@@ -5,7 +5,7 @@ import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.tiltak.deltaker.DeltakerService
 import no.nav.amt.tiltak.tiltak.repositories.TiltakInstansRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
-import no.nav.amt.tiltak.tiltak.TiltakServiceImpl
+import no.nav.amt.tiltak.tiltak.services.TiltakServiceImpl
 import no.nav.amt.tiltak.tiltak.testutils.DatabaseTestUtils
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
