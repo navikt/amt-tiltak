@@ -9,7 +9,8 @@ import java.util.function.Supplier
 
 class VeilarboppfolgingClient(
 	private val apiUrl: String,
-	private val tokenSupplier : Supplier<String>
+	private val tokenSupplier: Supplier<String>,
+	private val consumerId: String = "amt-tiltak",
 ) : VeilarboppfolgingConnector {
 
 	private val objectMapper = ObjectMapper().registerKotlinModule()
@@ -20,6 +21,7 @@ class VeilarboppfolgingClient(
 			.url("$apiUrl/api/v2/veileder?fnr=$fnr")
 			.header("Accept", "application/json; charset=utf-8")
 			.header("Authorization", "Bearer ${tokenSupplier.get()}")
+			.header("Nav-Consumer-Id", consumerId)
 			.get()
 			.build()
 

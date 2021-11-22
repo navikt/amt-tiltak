@@ -16,7 +16,7 @@ class VeilarboppfolgingClientTest: StringSpec({
     beforeTest {
         server = MockWebServer()
 		val serverUrl = server.url("/api").toString()
-        client = VeilarboppfolgingClient(serverUrl) { token }
+        client = VeilarboppfolgingClient(serverUrl, { token })
 	}
 
     "HentVeilederIdent - Bruker finnes - Returnerer veileder ident" {
