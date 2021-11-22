@@ -1,11 +1,13 @@
 package no.nav.amt.tiltak.tiltak.deltaker
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.veileder.Veileder
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.NavAnsattDbo
 import no.nav.amt.tiltak.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.tiltak.deltaker.repositories.DeltakerRepository
+import no.nav.amt.tiltak.tiltak.deltaker.repositories.NavAnsattRepository
 import no.nav.amt.tiltak.tiltak.utils.UpdateStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -15,7 +17,8 @@ import java.util.*
 open class DeltakerService(
 	private val deltakerRepository: DeltakerRepository,
 	private val brukerRepository: BrukerRepository,
-	private val personService: PersonService
+	private val navAnsattRepository: NavAnsattRepository,
+	private val personService: PersonService,
 ) {
 
 	fun addUpdateDeltaker(
@@ -76,7 +79,7 @@ open class DeltakerService(
 			return storedBruker
 		}
 
-		val veileder = getVeileder(fodselsnummer)
+		val veileder = upsertVeileder(fodselsnummer)
 		val newBruker = personService.hentPerson(fodselsnummer)
 
 		return brukerRepository.insert(
@@ -86,15 +89,26 @@ open class DeltakerService(
 			etternavn = newBruker.etternavn,
 			telefonnummer = newBruker.telefonnummer,
 			epost = null,
-			ansvarligVeilederId = veileder?.internalId
+			ansvarligVeilederId = veileder?.id
 		)
 
 	}
 
-	// @SONAR_START@
-	private fun getVeileder(fodselsnummer: String): NavAnsattDbo? {
-		return null
+	private fun upsertVeileder(fodselsnummer: String): NavAnsattDbo? {
+		return personService.hentVeileder(fodselsnummer)?.let { veileder ->
+			navAnsattRepository.upsert(veileder.toDbo())
+			return navAnsattRepository.getNavAnsattWithIdent(veileder.navIdent)
+		}
 	}
-	// @SONAR_STOP@
+
+	private fun Veileder.toDbo(): NavAnsattDbo {
+		return NavAnsattDbo(
+			personligIdent = navIdent,
+			fornavn = fornavn,
+			etternavn = etternavn,
+			telefonnummer = null,
+			epost = epost
+		)
+	}
 
 }
