@@ -6,6 +6,7 @@ import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakDeltagerDto
 import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakInstansDto
 import no.nav.amt.tiltak.tiltak.controllers.dto.toDto
 import no.nav.security.token.support.core.api.Protected
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -15,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.*
+import kotlin.NoSuchElementException
 
 @RestController
 @RequestMapping("/api/tiltak-instans")
@@ -22,15 +24,20 @@ class TiltakInstansController(
 	private val tiltakService: TiltakService,
 ) {
 
+	companion object {
+		private val log = LoggerFactory.getLogger(TiltakInstansController::class.java)
+	}
+
 	@Protected
 	@GetMapping("/{tiltakInstansId}")
 	fun hentTiltakInstans(@PathVariable("tiltakInstansId") tiltakInstansId: String): TiltakInstansDto {
 		val instansId = UUID.fromString(tiltakInstansId)
-		val instans = tiltakService.getTiltakInstans(instansId)?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Fant ikke tiltakinstans")
-		val tiltak = tiltakService.getTiltak(instans.tiltakId)?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Fant ikke tiltak")
-		//Hvordan sjekke om innlogget bruker har tilgang til tiltaksgjennomføring?
-
-		return instans.toDto(tiltak);
+		try {
+			return tiltakService.getTiltakInstans(instansId).toDto()
+		} catch (e: NoSuchElementException) {
+			log.warn("Fant ikke tiltaksinstans", e)
+			throw ResponseStatusException(HttpStatus.NOT_FOUND, "Fant ikke tiltakinstans")
+		}
 
 	}
 

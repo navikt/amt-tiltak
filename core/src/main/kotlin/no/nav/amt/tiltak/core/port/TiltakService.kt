@@ -12,9 +12,7 @@ interface TiltakService {
 
 	fun getTiltakFromArenaId(arenaId: String): Tiltak?
 
-	fun getTiltak(id: UUID): Tiltak?
-
-	fun getTiltakInstans(id: UUID): TiltakInstans?
+	fun getTiltakInstans(id: UUID): TiltakInstans
 
 	fun upsertTiltaksinstans(
 		arenaId: Int,

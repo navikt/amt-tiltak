@@ -14,11 +14,11 @@ data class TiltakInstansDto(
 	val tiltak: TiltakDto
 )
 
-fun TiltakInstans.toDto(tiltak: Tiltak) = TiltakInstansDto(
+fun TiltakInstans.toDto() = TiltakInstansDto(
 	id = this.id,
 	navn = this.navn,
 	oppstartdato = this.oppstartDato,
 	sluttdato = this.sluttDato,
 	status = this.status,
-	tiltak =  tiltak.toDto()
+	tiltak =  this.tiltak.toDto()
 )

@@ -31,9 +31,14 @@ class TiltakInstansControllerTest {
 	@Autowired
 	private lateinit var mockMvc: MockMvc
 
+	val tiltak = Tiltak(
+		id =UUID.randomUUID(),
+		navn = "tiltaksnavn",
+		kode = "kode"
+	)
 	val tiltakInstans = TiltakInstans(
 		id = UUID.randomUUID(),
-		tiltakId = UUID.randomUUID(),
+		tiltak = tiltak,
 		tiltaksarrangorId = UUID.randomUUID(),
 		navn = "tiltaksnavn",
 		fremmoteDato = LocalDateTime.now(),
@@ -41,11 +46,6 @@ class TiltakInstansControllerTest {
 		registrertDato = LocalDateTime.now(),
 		sluttDato = LocalDate.now(),
 		status = TiltakInstans.Status.GJENNOMFORES,
-	)
-	val tiltak = Tiltak(
-		id = tiltakInstans.tiltakId,
-		navn = "tiltaksnavn",
-		kode = "kode"
 	)
 
 	@BeforeEach
@@ -81,7 +81,6 @@ class TiltakInstansControllerTest {
 	@Test
 	fun `hentTiltakInstans() should return 200 when authenticated`() {
 		Mockito.`when`(tiltakService.getTiltakInstans(tiltakInstansId)).thenReturn(tiltakInstans)
-		Mockito.`when`(tiltakService.getTiltak(tiltakInstans.tiltakId)).thenReturn(tiltak)
 
 		val token = server.issueToken("tokenx", "test", "test").serialize()
 		val response = mockMvc.perform(
