@@ -8,14 +8,14 @@ import no.nav.amt.tiltak.core.domain.veileder.Veileder
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 
-const val token = "DUMMYTOKEN"
-
 class NomGraphqlClientTest : StringSpec({
+
+	val token = "DUMMYTOKEN"
 
 	lateinit var server: MockWebServer
 	lateinit var client: NomClient
 	isolationMode = IsolationMode.InstancePerTest
-	val expectedVeileder = Veileder("H156147", "Blaut", "Slappfisk", "")
+	val expectedVeileder = Veileder(null,"H156147", "Blaut", "Slappfisk", "")
 
 	beforeTest {
 		server = MockWebServer()

@@ -41,7 +41,7 @@ open class DeltakerService(
 
 		val deltaker = deltakerRepository.get(
 			fodselsnummer = fodselsnummer,
-			tiltaksinstans = tiltaksinstans
+			tiltaksinstansId = tiltaksinstans
 		)
 
 
@@ -59,8 +59,8 @@ open class DeltakerService(
 			}
 		} else {
 			return deltakerRepository.insert(
-				brukerId = bruker.internalId,
-				tiltaksgjennomforing = tiltaksinstans,
+				brukerId = bruker.id,
+				tiltaksgjennomforingId = tiltaksinstans,
 				oppstartDato = oppstartDato,
 				sluttDato = sluttDato,
 				status = status,
@@ -103,6 +103,7 @@ open class DeltakerService(
 
 	private fun Veileder.toDbo(): NavAnsattDbo {
 		return NavAnsattDbo(
+			id = id ?: TODO(),
 			personligIdent = navIdent,
 			fornavn = fornavn,
 			etternavn = etternavn,

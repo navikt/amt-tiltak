@@ -5,15 +5,13 @@ import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.tiltak.deltaker.DeltakerService
-import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakInstansRepository
+import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import no.nav.amt.tiltak.tiltak.utils.UpdateStatus
 import org.springframework.stereotype.Service
-import java.lang.IllegalStateException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
-import kotlin.NoSuchElementException
 
 @Service
 class TiltakServiceImpl(
@@ -95,7 +93,7 @@ class TiltakServiceImpl(
 
 	override fun getTiltaksinstansFromArenaId(arenaId: Int): TiltakInstans {
 		return tiltakInstansRepository.getByArenaId(arenaId)?.let { instans ->
-			val tiltak = getTiltakOrElseThrow(instans.tiltakExternalId)
+			val tiltak = getTiltakOrElseThrow(instans.tiltakId)
 			return instans.toTiltakInstans(tiltak)
 		} ?: throw NoSuchElementException("Fant ikke tiltakInstans")
 	}
@@ -124,7 +122,7 @@ class TiltakServiceImpl(
 
 	override fun getTiltakInstans(id: UUID): TiltakInstans {
 		return tiltakInstansRepository.get(id)?.let { instans ->
-			val tiltak = getTiltakOrElseThrow(instans.tiltakExternalId)
+			val tiltak = getTiltakOrElseThrow(instans.tiltakId)
 			return instans.toTiltakInstans(tiltak)
 		} ?: throw NoSuchElementException("Fant ikke tiltakInstans")
 	}

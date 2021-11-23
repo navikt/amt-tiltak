@@ -24,10 +24,7 @@ internal class TiltaksinstansRepositoryTest {
 
 	companion object TestData {
 		val TILTAK_ID = UUID.fromString("9665b0b6-ea7d-44b0-b9c2-8867c2a6c106")
-		val TILTAK_INTERNAL_ID = 1
-
 		val TILTAKSLEVERANDOR_ID = UUID.fromString("0dc9ccec-fd1e-4c4e-b91a-c23e6d89c18e")
-		val TILTAKSLEVERANDOR_INTERNAL_ID = 1
 	}
 
 	@BeforeEach
@@ -62,13 +59,10 @@ internal class TiltaksinstansRepositoryTest {
 		)
 
 		assertNotNull(savedInstans)
-		assertNotNull(savedInstans.internalId)
-		assertNotNull(savedInstans.externalId)
+		assertNotNull(savedInstans.id)
 
-		assertEquals(TILTAK_INTERNAL_ID, savedInstans.tiltakInternalId)
-		assertEquals(TILTAK_ID, savedInstans.tiltakExternalId)
-		assertEquals(TILTAKSLEVERANDOR_INTERNAL_ID, savedInstans.tiltaksleverandorInternalId)
-		assertEquals(TILTAKSLEVERANDOR_ID, savedInstans.tiltaksleverandorExternalId)
+		assertEquals(TILTAK_ID, savedInstans.tiltakId)
+		assertEquals(TILTAKSLEVERANDOR_ID, savedInstans.tiltaksleverandorId)
 		assertEquals(navn, savedInstans.navn)
 		assertEquals(status, savedInstans.status)
 
@@ -83,13 +77,10 @@ internal class TiltaksinstansRepositoryTest {
 		assertThrows<NoSuchElementException> {
 			repository.update(
 				TiltaksinstansDbo(
-					internalId = 999,
-					externalId = UUID.randomUUID(),
+					id = UUID.randomUUID(),
 					arenaId = 9999,
-					tiltaksleverandorInternalId = 9999,
-					tiltaksleverandorExternalId = UUID.randomUUID(),
-					tiltakInternalId = 9999,
-					tiltakExternalId = UUID.randomUUID(),
+					tiltaksleverandorId = UUID.randomUUID(),
+					tiltakId = UUID.randomUUID(),
 					navn = "idosfja",
 					status = null,
 					oppstartDato = null,

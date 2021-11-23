@@ -20,6 +20,7 @@ internal data class VeilederDTO (
 		if(fornavn == null && etternavn == null) log.error("Fikk veileder($navIdent) uten navn fra NOM.")
 
 		return Veileder(
+			id = null,
 			this.navIdent ?: "",
 			this.fornavn ?: "",
 			this.etternavn ?: "",

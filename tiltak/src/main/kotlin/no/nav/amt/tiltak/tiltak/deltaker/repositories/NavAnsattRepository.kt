@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 open class NavAnsattRepository(
@@ -13,7 +14,7 @@ open class NavAnsattRepository(
 
 	private val rowMapper = RowMapper { rs, _ ->
 		NavAnsattDbo(
-			id = rs.getInt("id"),
+			id = UUID.fromString(rs.getString("id")),
 			personligIdent = rs.getString("personlig_ident"),
 			fornavn = rs.getString("fornavn"),
 			etternavn = rs.getString("etternavn"),
@@ -24,8 +25,9 @@ open class NavAnsattRepository(
 
 	fun upsert(navAnsattDbo: NavAnsattDbo) {
 		val sql = """
-			INSERT INTO nav_ansatt(personlig_ident, fornavn, etternavn, telefonnummer, epost)
-			VALUES (:personligIdent,
+			INSERT INTO nav_ansatt(id, personlig_ident, fornavn, etternavn, telefonnummer, epost)
+			VALUES (:id,
+					:personligIdent,
 					:fornavn,
 					:etternavn,
 					:telefonnummer,
@@ -49,6 +51,7 @@ open class NavAnsattRepository(
 
 	private fun NavAnsattDbo.asParameterSource() = MapSqlParameterSource().addValues(
 		mapOf(
+			"id" to id,
 			"personligIdent" to personligIdent,
 			"fornavn" to fornavn,
 			"etternavn" to etternavn,
