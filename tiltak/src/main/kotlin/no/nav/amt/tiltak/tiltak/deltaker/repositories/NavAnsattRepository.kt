@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.tiltak.deltaker.repositories
 
+import no.nav.amt.tiltak.tiltak.deltaker.cmd.UpsertNavAnsattCmd
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.NavAnsattDbo
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -23,7 +24,7 @@ open class NavAnsattRepository(
 		)
 	}
 
-	fun upsert(navAnsattDbo: NavAnsattDbo) {
+	fun upsert(upsertCmd: UpsertNavAnsattCmd) {
 		val sql = """
 			INSERT INTO nav_ansatt(id, personlig_ident, fornavn, etternavn, telefonnummer, epost)
 			VALUES (:id,
@@ -38,7 +39,18 @@ open class NavAnsattRepository(
 														epost         = :epost
 		""".trimIndent()
 
-		template.update(sql, navAnsattDbo.asParameterSource())
+		val parameterSource = MapSqlParameterSource().addValues(
+			mapOf(
+				"id" to UUID.randomUUID(),
+				"personligIdent" to upsertCmd.personligIdent,
+				"fornavn" to upsertCmd.fornavn,
+				"etternavn" to upsertCmd.etternavn,
+				"telefonnummer" to upsertCmd.telefonnummer,
+				"epost" to upsertCmd.epost
+			)
+		)
+
+		template.update(sql, parameterSource)
 	}
 
 	fun getNavAnsattWithIdent(ident: String): NavAnsattDbo? {
@@ -48,16 +60,5 @@ open class NavAnsattRepository(
 			rowMapper
 		).firstOrNull()
 	}
-
-	private fun NavAnsattDbo.asParameterSource() = MapSqlParameterSource().addValues(
-		mapOf(
-			"id" to id,
-			"personligIdent" to personligIdent,
-			"fornavn" to fornavn,
-			"etternavn" to etternavn,
-			"telefonnummer" to telefonnummer,
-			"epost" to epost
-		)
-	)
 
 }

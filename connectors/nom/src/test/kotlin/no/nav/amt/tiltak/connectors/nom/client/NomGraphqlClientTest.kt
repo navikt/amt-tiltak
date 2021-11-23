@@ -15,7 +15,7 @@ class NomGraphqlClientTest : StringSpec({
 	lateinit var server: MockWebServer
 	lateinit var client: NomClient
 	isolationMode = IsolationMode.InstancePerTest
-	val expectedVeileder = Veileder(null,"H156147", "Blaut", "Slappfisk", "")
+	val expectedVeileder = Veileder("H156147", "Blaut", "Slappfisk", "")
 
 	beforeTest {
 		server = MockWebServer()
