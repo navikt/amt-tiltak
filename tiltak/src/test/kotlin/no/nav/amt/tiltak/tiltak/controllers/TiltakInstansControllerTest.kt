@@ -26,7 +26,7 @@ class TiltakInstansControllerTest {
 	private val tiltakInstansId = UUID.fromString("e68d54e2-47b5-11ec-81d3-0242ac130003")
 
 	@MockBean
-	private lateinit var tiltakService: TiltakService;
+	private lateinit var tiltakService: TiltakService
 
 	@Autowired
 	private lateinit var mockMvc: MockMvc
@@ -50,7 +50,7 @@ class TiltakInstansControllerTest {
 
 	@BeforeEach
 	fun before () {
-		MockitoAnnotations.openMocks(this);
+		MockitoAnnotations.openMocks(this)
 	}
 
 	companion object {

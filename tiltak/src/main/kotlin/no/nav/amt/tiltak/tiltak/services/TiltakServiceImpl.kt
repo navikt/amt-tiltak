@@ -8,9 +8,7 @@ import no.nav.amt.tiltak.tiltak.deltaker.DeltakerService
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakInstansRepository
 import no.nav.amt.tiltak.tiltak.utils.UpdateStatus
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
 import java.lang.IllegalStateException
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -61,7 +59,7 @@ class TiltakServiceImpl(
 		fremmoteDato: LocalDateTime?
 	): TiltakInstans {
 		val storedTiltaksinstans = tiltakInstansRepository.getByArenaId(arenaId)
-		val tiltak = tiltakRepository.get(tiltakId)?.toTiltak() ?: throw IllegalStateException("Fant ikke tiltak")
+		val tiltak = getTiltakOrElseThrow(tiltakId)
 
 		if (storedTiltaksinstans != null) {
 			val update = storedTiltaksinstans.update(
@@ -97,8 +95,8 @@ class TiltakServiceImpl(
 
 	override fun getTiltaksinstansFromArenaId(arenaId: Int): TiltakInstans {
 		return tiltakInstansRepository.getByArenaId(arenaId)?.let { instans ->
-			val tiltak = tiltakRepository.get(instans.tiltakExternalId)?: throw IllegalStateException("Fant ikke tiltak")
-			return instans.toTiltakInstans(tiltak.toTiltak())
+			val tiltak = getTiltakOrElseThrow(instans.tiltakExternalId)
+			return instans.toTiltakInstans(tiltak)
 		} ?: throw NoSuchElementException("Fant ikke tiltakInstans")
 	}
 
@@ -126,9 +124,13 @@ class TiltakServiceImpl(
 
 	override fun getTiltakInstans(id: UUID): TiltakInstans {
 		return tiltakInstansRepository.get(id)?.let { instans ->
-			val tiltak = tiltakRepository.get(instans.tiltakExternalId)?: throw IllegalStateException("Fant ikke tiltak")
-			return instans.toTiltakInstans(tiltak.toTiltak())
+			val tiltak = getTiltakOrElseThrow(instans.tiltakExternalId)
+			return instans.toTiltakInstans(tiltak)
 		} ?: throw NoSuchElementException("Fant ikke tiltakInstans")
+	}
+
+	private fun getTiltakOrElseThrow(id: UUID): Tiltak {
+		return tiltakRepository.get(id)?.toTiltak()?: throw IllegalStateException("Fant ikke tiltak")
 	}
 
 }

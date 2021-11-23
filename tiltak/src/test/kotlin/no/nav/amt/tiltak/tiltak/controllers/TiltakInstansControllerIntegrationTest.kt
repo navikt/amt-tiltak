@@ -31,7 +31,7 @@ class TiltakInstansControllerIntegrationTest {
 		tiltakRepository = TiltakRepository(namedJdbcTemplate)
 		deltakerService = Mockito.mock(DeltakerService::class.java)
 		tiltakInstansService = TiltakServiceImpl(tiltakRepository, tiltakInstansRepository, deltakerService)
-		controller = TiltakInstansController(tiltakInstansService);
+		controller = TiltakInstansController(tiltakInstansService)
 	}
 
 	@Test
@@ -85,7 +85,7 @@ class TiltakInstansControllerIntegrationTest {
 		)
 		val resultat = controller.hentTiltakInstans(tiltakInstans.externalId.toString())
 		assertEquals(tiltakInstans.externalId, resultat.id)
-		assertEquals(tiltakInstans.navn, resultat.navn);
+		assertEquals(tiltakInstans.navn, resultat.navn)
 
 
 	}
