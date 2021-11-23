@@ -156,16 +156,6 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>tiltak</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>tiltaksleverandor</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>token_provider</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -197,6 +187,16 @@
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>dkif</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>veilarboppfolging</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>person</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
