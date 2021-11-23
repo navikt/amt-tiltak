@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.connectors.pdl
+package no.nav.amt.tiltak.tools.graphql
 
 object Graphql {
 

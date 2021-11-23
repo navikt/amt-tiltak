@@ -1,5 +1,7 @@
 package no.nav.amt.tiltak.connectors.nom.client
 
+import no.nav.amt.tiltak.tools.graphql.Graphql
+
 
 object NomQueries {
 

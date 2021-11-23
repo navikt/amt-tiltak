@@ -15,6 +15,7 @@
         <module>token_provider</module>
         <module>arena-kafka-producer</module>
         <module>mock-data-generator</module>
+        <module>graphql</module>
     </modules>
 
 </project>
