@@ -19,6 +19,7 @@
         <module>db-migrations</module>
         <module>tools</module>
         <module>mocks</module>
+        <module>common</module>
     </modules>
 
     <name>AMT-Tiltak</name>
