@@ -13,13 +13,13 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @RestController
-@RequestMapping("/api/tiltak-deltager")
-class TiltakDeltagerController {
+@RequestMapping("/api/tiltak-deltaker")
+class TiltakDeltakerController {
 
 	@Protected
-	@GetMapping("/{tiltakDeltagerId}")
-	fun hentTiltakDeltagerDetaljer(@PathVariable("tiltakDeltagerId") tiltakDeltagerId: String): TiltakDeltagerDetaljerDto {
-		return TiltakDeltagerDetaljerDto(
+	@GetMapping("/{tiltakDeltakerId}")
+	fun hentTiltakDeltakerDetaljer(@PathVariable("tiltakDeltakerId") tiltakdeltakerId: String): TiltakDeltakerDetaljerDto {
+		return TiltakDeltakerDetaljerDto(
 			id = UUID.randomUUID(),
 			fornavn = "Stødig",
 			mellomnavn = "Mektig",

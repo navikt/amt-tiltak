@@ -5,7 +5,7 @@ import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.*
 
-data class TiltakDeltagerDetaljerDto(
+data class TiltakDeltakerDetaljerDto(
     val id: UUID,
     val fornavn: String,
     val mellomnavn: String? = null,

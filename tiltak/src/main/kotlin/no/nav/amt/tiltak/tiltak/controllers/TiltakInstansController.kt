@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.tiltak.controllers
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.port.TiltakService
-import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakDeltagerDto
+import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakDeltakerDto
 import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakInstansDto
 import no.nav.amt.tiltak.tiltak.controllers.dto.toDto
 import no.nav.security.token.support.core.api.Protected
@@ -42,10 +42,10 @@ class TiltakInstansController(
 	}
 
 	@Protected
-	@GetMapping("/{tiltakInstansId}/deltagere")
-	fun hentDeltagere(@PathVariable("tiltakInstansId") tiltkInstansId: String): List<TiltakDeltagerDto> {
+	@GetMapping("/{tiltakInstansId}/deltakere")
+	fun hentDeltakere(@PathVariable("tiltakInstansId") tiltakInstansId: String): List<TiltakDeltakerDto> {
 		return listOf(
-			TiltakDeltagerDto(
+			TiltakDeltakerDto(
 				id = UUID.randomUUID(),
 				fornavn = "Stødig",
 				mellomnavn = "Mektig",
@@ -55,7 +55,7 @@ class TiltakInstansController(
 				sluttdato = ZonedDateTime.now().plusDays(1),
 				status = Deltaker.Status.GJENNOMFORES
 			),
-			TiltakDeltagerDto(
+			TiltakDeltakerDto(
 				id = UUID.randomUUID(),
 				fornavn = "Prektig",
 				mellomnavn = "",
