@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak
+package no.nav.amt.tiltak.tiltak.services
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
@@ -6,17 +6,19 @@ import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.tiltak.deltaker.DeltakerService
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
-import no.nav.amt.tiltak.tiltak.repositories.TiltaksinstansRepository
+import no.nav.amt.tiltak.tiltak.repositories.TiltakInstansRepository
 import no.nav.amt.tiltak.tiltak.utils.UpdateStatus
 import org.springframework.stereotype.Service
+import java.lang.IllegalStateException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
+import kotlin.NoSuchElementException
 
 @Service
 class TiltakServiceImpl(
 	private val tiltakRepository: TiltakRepository,
-	private val tiltaksinstansRepository: TiltaksinstansRepository,
+	private val tiltakInstansRepository: TiltakInstansRepository,
 	private val deltakerService: DeltakerService
 ) : TiltakService {
 
@@ -56,7 +58,8 @@ class TiltakServiceImpl(
 		registrertDato: LocalDateTime?,
 		fremmoteDato: LocalDateTime?
 	): TiltakInstans {
-		val storedTiltaksinstans = tiltaksinstansRepository.getByArenaId(arenaId)
+		val storedTiltaksinstans = tiltakInstansRepository.getByArenaId(arenaId)
+		val tiltak = getTiltakOrElseThrow(tiltakId)
 
 		if (storedTiltaksinstans != null) {
 			val update = storedTiltaksinstans.update(
@@ -71,15 +74,15 @@ class TiltakServiceImpl(
 			)
 
 			return if (update.status == UpdateStatus.UPDATED) {
-				tiltaksinstansRepository.update(update.updatedObject!!).toTiltaksinstans()
+				tiltakInstansRepository.update(update.updatedObject!!).toTiltakInstans(tiltak)
 			} else {
-				storedTiltaksinstans.toTiltaksinstans()
+				storedTiltaksinstans.toTiltakInstans(tiltak)
 			}
 		}
 
-		return tiltaksinstansRepository.insert(
+		return tiltakInstansRepository.insert(
 			arenaId = arenaId,
-			tiltakId = tiltakId,
+			tiltakId = tiltak.id,
 			tiltaksleverandorId = tiltaksleverandorId,
 			navn = navn,
 			status = status,
@@ -87,11 +90,14 @@ class TiltakServiceImpl(
 			sluttDato = sluttDato,
 			registrertDato = registrertDato,
 			fremmoteDato = fremmoteDato
-		).toTiltaksinstans()
+		).toTiltakInstans(tiltak)
 	}
 
-	override fun getTiltaksinstansFromArenaId(arenaId: Int): TiltakInstans? {
-		return tiltaksinstansRepository.getByArenaId(arenaId)?.toTiltaksinstans()
+	override fun getTiltaksinstansFromArenaId(arenaId: Int): TiltakInstans {
+		return tiltakInstansRepository.getByArenaId(arenaId)?.let { instans ->
+			val tiltak = getTiltakOrElseThrow(instans.tiltakExternalId)
+			return instans.toTiltakInstans(tiltak)
+		} ?: throw NoSuchElementException("Fant ikke tiltakInstans")
 	}
 
 	override fun upsertDeltaker(
@@ -114,6 +120,17 @@ class TiltakServiceImpl(
 			dagerPerUke = dagerPerUke,
 			prosentStilling = prosentStilling
 		)
+	}
+
+	override fun getTiltakInstans(id: UUID): TiltakInstans {
+		return tiltakInstansRepository.get(id)?.let { instans ->
+			val tiltak = getTiltakOrElseThrow(instans.tiltakExternalId)
+			return instans.toTiltakInstans(tiltak)
+		} ?: throw NoSuchElementException("Fant ikke tiltakInstans")
+	}
+
+	private fun getTiltakOrElseThrow(id: UUID): Tiltak {
+		return tiltakRepository.get(id)?.toTiltak()?: throw IllegalStateException("Fant ikke tiltak")
 	}
 
 }

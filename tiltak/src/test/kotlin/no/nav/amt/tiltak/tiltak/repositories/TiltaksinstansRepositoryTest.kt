@@ -2,8 +2,6 @@ package no.nav.amt.tiltak.tiltak.repositories
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.tiltak.dbo.TiltaksinstansDbo
 import no.nav.amt.tiltak.tiltak.testutils.DatabaseTestUtils
@@ -13,7 +11,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -23,7 +20,7 @@ import java.util.*
 internal class TiltaksinstansRepositoryTest {
 	lateinit var template: NamedParameterJdbcTemplate
 
-	lateinit var repository: TiltaksinstansRepository
+	lateinit var repository: TiltakInstansRepository
 
 	companion object TestData {
 		val TILTAK_ID = UUID.fromString("9665b0b6-ea7d-44b0-b9c2-8867c2a6c106")
@@ -39,7 +36,7 @@ internal class TiltaksinstansRepositoryTest {
 		rootLogger.level = Level.WARN
 
 		template = DatabaseTestUtils.getDatabase("/tiltaksinstans-repository_test-data.sql")
-		repository = TiltaksinstansRepository(template)
+		repository = TiltakInstansRepository(template)
 	}
 
 	@Test

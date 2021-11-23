@@ -12,6 +12,8 @@ interface TiltakService {
 
 	fun getTiltakFromArenaId(arenaId: String): Tiltak?
 
+	fun getTiltakInstans(id: UUID): TiltakInstans
+
 	fun upsertTiltaksinstans(
 		arenaId: Int,
 		tiltakId: UUID,
@@ -36,4 +38,5 @@ interface TiltakService {
 		dagerPerUke: Int?,
 		prosentStilling: Float?
 	): Deltaker
+
 }

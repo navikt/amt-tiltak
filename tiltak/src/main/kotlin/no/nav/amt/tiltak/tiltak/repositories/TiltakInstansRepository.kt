@@ -1,5 +1,4 @@
 package no.nav.amt.tiltak.tiltak.repositories
-
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.tiltak.dbo.TiltaksinstansDbo
 import org.springframework.jdbc.core.RowMapper
@@ -10,9 +9,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-// @Repository gir feilmelding (template == null), er det ikke dependency injection på @Repository?
 @Component
-open class TiltaksinstansRepository(private val template: NamedParameterJdbcTemplate) {
+open class TiltakInstansRepository(private val template: NamedParameterJdbcTemplate) {
 
 	private val rowMapper = RowMapper { rs, _ ->
 		val statusString = rs.getString("status")
