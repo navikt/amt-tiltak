@@ -92,20 +92,20 @@ class TiltakInstansControllerTest {
 	}
 
 	@Test
-	fun `hentDeltagere() should return 401 when not authenticated`() {
+	fun `hentDeltakere() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltak-instans/ID/deltagere")
+			MockMvcRequestBuilders.get("/api/tiltak-instans/ID/deltakere")
 		).andReturn().response
 
 		assertEquals(401, response.status)
 	}
 
 	@Test
-	fun `hentDeltagere() should return 200 when authenticated`() {
+	fun `hentDeltakere() should return 200 when authenticated`() {
 		val token = server.issueToken("tokenx", "test", "test").serialize()
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltak-instans/ID/deltagere")
+			MockMvcRequestBuilders.get("/api/tiltak-instans/ID/deltakere")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 

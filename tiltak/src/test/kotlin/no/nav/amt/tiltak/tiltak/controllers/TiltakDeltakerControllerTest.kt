@@ -11,7 +11,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [TiltakDeltagerController::class])
+@WebMvcTest(controllers = [TiltakDeltakerController::class])
 class TiltakDeltakerControllerTest {
 
 	companion object {
@@ -33,20 +33,20 @@ class TiltakDeltakerControllerTest {
 	private lateinit var mockMvc: MockMvc
 
 	@Test
-	fun `hentTiltakDeltagerDetaljer() should return 401 when not authenticated`() {
+	fun `hentTiltakDeltakerDetaljer() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltak-deltager/ID")
+			MockMvcRequestBuilders.get("/api/tiltak-deltaker/ID")
 		).andReturn().response
 
 		Assertions.assertEquals(401, response.status)
 	}
 
 	@Test
-	fun `hentTiltakDeltagerDetaljer() should return 200 when authenticated`() {
+	fun `hentTiltakDeltakerDetaljer() should return 200 when authenticated`() {
 		val token = server.issueToken("tokenx", "test", "test").serialize()
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltak-deltager/ID")
+			MockMvcRequestBuilders.get("/api/tiltak-deltaker/ID")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
