@@ -1,7 +1,9 @@
 package no.nav.amt.tiltak.tiltak.deltaker.dbo
 
+import java.util.*
+
 data class NavAnsattDbo(
-	val id: Int = -1,
+	val id: UUID,
 	val personligIdent: String,
 	val fornavn: String?,
 	val etternavn: String?,

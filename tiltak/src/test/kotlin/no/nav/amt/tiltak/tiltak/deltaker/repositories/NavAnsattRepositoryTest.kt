@@ -10,6 +10,7 @@ import no.nav.amt.tiltak.tiltak.testutils.DatabaseTestUtils
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.util.*
 
 @Testcontainers
 class NavAnsattRepositoryTest : FunSpec({
@@ -18,6 +19,7 @@ class NavAnsattRepositoryTest : FunSpec({
 	lateinit var repository: NavAnsattRepository
 
 	val baseNavAnsatt = NavAnsattDbo(
+		id = UUID.randomUUID(),
 		personligIdent = "test123",
 		fornavn = "Fornavn",
 		etternavn = "Etternavn",

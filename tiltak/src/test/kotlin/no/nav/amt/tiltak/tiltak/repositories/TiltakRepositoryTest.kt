@@ -2,8 +2,6 @@ package no.nav.amt.tiltak.tiltak.repositories
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import no.nav.amt.tiltak.tiltak.dbo.TiltakDbo
 import no.nav.amt.tiltak.tiltak.testutils.DatabaseTestUtils
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -13,7 +11,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDateTime
 import java.util.*
@@ -43,8 +40,7 @@ internal class TiltakRepositoryTest {
 		val savedDbo = repository.insert(arenaId, navn, kode)
 
 		assertNotNull(savedDbo)
-		assertNotNull(savedDbo.internalId)
-		assertNotNull(savedDbo.externalId)
+		assertNotNull(savedDbo.id)
 
 		assertEquals(arenaId, savedDbo.arenaId)
 		assertEquals(kode, savedDbo.type)
@@ -57,8 +53,7 @@ internal class TiltakRepositoryTest {
 		assertThrows<NoSuchElementException> {
 			repository.update(
 				TiltakDbo(
-					internalId = 999,
-					externalId = UUID.randomUUID(),
+					id = UUID.randomUUID(),
 					arenaId = "sdiofj",
 					navn = "aoisdfj",
 					type = "jdasiofjasf",

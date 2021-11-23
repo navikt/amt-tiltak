@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 open class BrukerRepository(
@@ -13,14 +14,14 @@ open class BrukerRepository(
 
     private val rowMapper = RowMapper { rs, _ ->
         BrukerDbo(
-            internalId = rs.getInt("id"),
+            id = UUID.fromString(rs.getString("id")),
             fodselsnummer = rs.getString("fodselsnummer"),
             fornavn = rs.getString("fornavn"),
 			mellomnavn = rs.getString("mellomnavn"),
             etternavn = rs.getString("etternavn"),
             telefonnummer = rs.getString("telefonnummer"),
             epost = rs.getString("epost"),
-            ansvarligVeilederInternalId = rs.getInt("ansvarlig_veileder_internal_id"),
+            ansvarligVeilederId = UUID.fromString(rs.getString("ansvarlig_veileder_internal_id")),
             createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
             modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
         )
@@ -34,12 +35,13 @@ open class BrukerRepository(
         etternavn: String,
         telefonnummer: String?,
         epost: String?,
-        ansvarligVeilederId: Int?
+        ansvarligVeilederId: UUID?
     ): BrukerDbo {
 
         val sql = """
-			INSERT INTO bruker(fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id)
-			VALUES (:fodselsnummer,
+			INSERT INTO bruker(id, fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id)
+			VALUES (:id,
+					:fodselsnummer,
 					:fornavn,
 					:mellomnavn,
 					:etternavn,
@@ -48,8 +50,9 @@ open class BrukerRepository(
 					:veileder_id)
 		""".trimIndent()
 
-        val parameters = MapSqlParameterSource().addValues(
+		val parameters = MapSqlParameterSource().addValues(
             mapOf(
+				"id" to UUID.randomUUID(),
                 "fodselsnummer" to fodselsnummer,
                 "fornavn" to fornavn,
 				"mellomnavn" to mellomnavn,
