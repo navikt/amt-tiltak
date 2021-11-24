@@ -1,9 +1,6 @@
-package no.nav.amt.tiltak.tiltak.deltaker.dbo
+package no.nav.amt.tiltak.tiltak.deltaker.cmd
 
-import java.util.*
-
-data class NavAnsattDbo(
-	val id: UUID,
+data class UpsertNavAnsattCmd(
 	val personligIdent: String,
 	val fornavn: String?,
 	val etternavn: String?,

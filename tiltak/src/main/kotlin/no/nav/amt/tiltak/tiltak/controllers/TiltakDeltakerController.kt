@@ -13,13 +13,13 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @RestController
-@RequestMapping("/api/tiltak-deltager")
-class TiltakDeltagerController {
+@RequestMapping("/api/tiltak-deltaker")
+class TiltakDeltakerController {
 
 	@Protected
-	@GetMapping("/{tiltakDeltagerId}")
-	fun hentTiltakDeltagerDetaljer(@PathVariable("tiltakDeltagerId") tiltakDeltagerId: String): TiltakDeltagerDetaljerDto {
-		return TiltakDeltagerDetaljerDto(
+	@GetMapping("/{tiltakDeltakerId}")
+	fun hentTiltakDeltakerDetaljer(@PathVariable("tiltakDeltakerId") tiltakdeltakerId: String): TiltakDeltakerDetaljerDto {
+		return TiltakDeltakerDetaljerDto(
 			id = UUID.randomUUID(),
 			fornavn = "Stødig",
 			mellomnavn = "Mektig",
@@ -42,11 +42,9 @@ class TiltakDeltagerController {
 			tiltakInstans = TiltakInstansDto(
 				id = UUID.randomUUID(),
 				navn = "Sveisekurs",
-				startdato = ZonedDateTime.now().minusDays(1),
-				sluttdato = ZonedDateTime.now().plusDays(8),
+				oppstartdato = LocalDate.now().minusDays(1),
+				sluttdato = LocalDate.now().plusDays(8),
 				status = TiltakInstans.Status.GJENNOMFORES,
-				deltagerAntall = 5,
-				deltagerKapasitet = 8,
 				TiltakDto(
 					tiltakskode = "GRUPPEAMO",
 					tiltaksnavn = "Gruppe AMO"

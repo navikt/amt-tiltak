@@ -14,8 +14,7 @@ open class TiltaksleverandorRepository(
 
     private val rowMapper = RowMapper { rs, _ ->
         TiltaksleverandorDbo(
-            internalId = rs.getInt("id"),
-            externalId = UUID.fromString(rs.getString("external_id")),
+            id = UUID.fromString(rs.getString("id")),
             navn = rs.getString("navn"),
             organisasjonsnummer = rs.getString("organisasjonsnummer"),
             overordnetEnhetNavn = rs.getString("overordnet_enhet_navn"),
@@ -39,19 +38,19 @@ open class TiltaksleverandorRepository(
         }
 
         val sql = """
-			INSERT INTO tiltaksleverandor(external_id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer, navn)
-			VALUES (:externalId,
+			INSERT INTO tiltaksleverandor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer, navn)
+			VALUES (:id,
 					:overordnetEnhetOrganisasjonsnummer,
 					:overordnetEnhetNavn,
 					:organisasjonsnummer,
 					:navn)
 		""".trimIndent()
 
-        val externalId = UUID.randomUUID()
+        val id = UUID.randomUUID()
 
         val parameters = MapSqlParameterSource().addValues(
             mapOf(
-                "externalId" to externalId,
+                "id" to id,
                 "navn" to navn,
                 "organisasjonsnummer" to organisasjonsnummer,
                 "overordnetEnhetOrganisasjonsnummer" to overordnetEnhetOrganisasjonsnummer,
@@ -68,7 +67,6 @@ open class TiltaksleverandorRepository(
     fun getByOrganisasjonsnummer(organisasjonsnummer: String): TiltaksleverandorDbo? {
         val sql = """
 			SELECT id,
-				   external_id,
 				   overordnet_enhet_organisasjonsnummer,
 				   overordnet_enhet_navn,
 				   organisasjonsnummer,

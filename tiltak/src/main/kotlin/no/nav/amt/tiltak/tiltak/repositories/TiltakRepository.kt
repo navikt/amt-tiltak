@@ -14,8 +14,7 @@ open class TiltakRepository(
 
 	private val rowMapper = RowMapper { rs, _ ->
 		TiltakDbo(
-			internalId = rs.getInt("id"),
-			externalId = UUID.fromString(rs.getString("external_id")),
+			id = UUID.fromString(rs.getString("id")),
 			arenaId = rs.getString("arena_id"),
 			navn = rs.getString("navn"),
 			type = rs.getString("type"),
@@ -28,18 +27,18 @@ open class TiltakRepository(
 	fun insert(arenaId: String, navn: String, kode: String): TiltakDbo {
 		//language=PostgreSQL
 		val sql = """
-            insert into tiltak(external_id, arena_id, navn, type)
-            values (:externalId,
+            insert into tiltak(id, arena_id, navn, type)
+            values (:id,
                     :arenaId,
                     :navn,
                     :kode)
     """.trimIndent()
 
-		val externalId = UUID.randomUUID()
+		val id = UUID.randomUUID()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"externalId" to externalId,
+				"id" to id,
 				"arenaId" to arenaId,
 				"navn" to navn,
 				"kode" to kode
@@ -48,8 +47,8 @@ open class TiltakRepository(
 
 		template.update(sql, parameters)
 
-		return get(externalId)
-			?: throw NoSuchElementException("Tiltak med id $externalId finnes ikke")
+		return get(id)
+			?: throw NoSuchElementException("Tiltak med id $id finnes ikke")
 	}
 
 	fun update(tiltak: TiltakDbo): TiltakDbo {
@@ -67,33 +66,32 @@ open class TiltakRepository(
 				"navn" to tiltak.navn,
 				"type" to tiltak.type,
 				"modifiedAt" to tiltak.modifiedAt,
-				"id" to tiltak.internalId
+				"id" to tiltak.id
 			)
 		)
 
 		template.update(sql, parameters)
 
-		return get(tiltak.externalId)
-			?: throw NoSuchElementException("Tiltak med id ${tiltak.externalId} finnes ikke")
+		return get(tiltak.id)
+			?: throw NoSuchElementException("Tiltak med id ${tiltak.id} finnes ikke")
 	}
 
 	fun get(id: UUID): TiltakDbo? {
 		//language=PostgreSQL
 		val sql = """
             select id,
-                   external_id,
                    arena_id,
                    navn,
                    type,
                    created_at,
                    modified_at
             from tiltak
-			WHERE external_id = :external_id
+			WHERE id = :id
         """.trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"external_id" to id
+				"id" to id
 			)
 		)
 
@@ -105,7 +103,6 @@ open class TiltakRepository(
 		//language=PostgreSQL
 		val sql = """
             select id,
-                   external_id,
                    arena_id,
                    navn,
                    type,

@@ -18,15 +18,14 @@ open class DeltakerRepository(
 		val statusString = rs.getString("deltaker_status")
 
 		DeltakerDbo(
-			internalId = rs.getInt("deltaker_internal_id"),
-			externalId = UUID.fromString(rs.getString("deltaker_external_id")),
-			brukerInternalId = rs.getInt("bruker_internal_id"),
+			id = UUID.fromString(rs.getString("deltaker_id")),
+			brukerId = UUID.fromString(rs.getString("bruker_id")),
 			brukerFodselsnummer = rs.getString("bruker_fodselsnummer"),
 			brukerFornavn = rs.getString("bruker_fornavn"),
 			brukerEtternavn = rs.getString("bruker_etternavn"),
 			deltakerOppstartsdato = rs.getDate("deltaker_oppstartsdato")?.toLocalDate(),
 			deltakerSluttdato = rs.getDate("deltaker_sluttdato")?.toLocalDate(),
-			tiltaksinstansInternalId = rs.getInt("tiltaksinstans_internal_id"),
+			tiltakInstansId = UUID.fromString(rs.getString("tiltaksinstans_id")),
 			arenaStatus = rs.getString("deltaker_arena_status"),
 			dagerPerUke = rs.getInt("deltaker_dager_per_uke"),
 			prosentStilling = rs.getFloat("deltaker_prosent_stilling"),
@@ -37,8 +36,8 @@ open class DeltakerRepository(
 	}
 
 	fun insert(
-		brukerId: Int,
-		tiltaksgjennomforing: UUID,
+		brukerId: UUID,
+		tiltaksgjennomforingId: UUID,
 		oppstartDato: LocalDate?,
 		sluttDato: LocalDate?,
 		status: Deltaker.Status,
@@ -47,11 +46,11 @@ open class DeltakerRepository(
 		prosentStilling: Float?
 	): DeltakerDbo {
 		val sql = """
-			INSERT INTO deltaker(external_id, bruker_id, tiltaksinstans_id, oppstart_dato, slutt_dato, status, arena_status,
+			INSERT INTO deltaker(id, bruker_id, tiltaksinstans_id, oppstart_dato, slutt_dato, status, arena_status,
 								 dager_per_uke, prosent_stilling)
-			VALUES (:externalId,
+			VALUES (:id,
 					:brukerId,
-					(SELECT id from tiltaksinstans where external_id = :tiltaksinstansExternalId),
+					:tiltaksinstansId,
 					:oppstartsdato,
 					:sluttdato,
 					:status,
@@ -60,13 +59,13 @@ open class DeltakerRepository(
 					:prosentStilling)
 		""".trimIndent()
 
-		val externalId = UUID.randomUUID()
+		val id = UUID.randomUUID()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"externalId" to externalId,
+				"id" to id,
 				"brukerId" to brukerId,
-				"tiltaksinstansExternalId" to tiltaksgjennomforing,
+				"tiltaksinstansId" to tiltaksgjennomforingId,
 				"oppstartsdato" to oppstartDato,
 				"sluttdato" to sluttDato,
 				"status" to status.name,
@@ -78,8 +77,8 @@ open class DeltakerRepository(
 
 		template.update(sql, parameters)
 
-		return get(externalId)
-			?: throw NoSuchElementException("Deltaker $brukerId finnes ikke på tiltaksgjennomføring $tiltaksgjennomforing")
+		return get(id)
+			?: throw NoSuchElementException("Deltaker $brukerId finnes ikke på tiltaksgjennomføring $tiltaksgjennomforingId")
 
 	}
 
@@ -99,29 +98,27 @@ open class DeltakerRepository(
 				"oppstartDato" to deltaker.deltakerOppstartsdato,
 				"sluttDato" to deltaker.deltakerSluttdato,
 				"modifiedAt" to deltaker.modifiedAt,
-				"deltakerInternalId" to deltaker.internalId
+				"deltakerInternalId" to deltaker.id
 			)
 		)
 
 		template.update(sql, parameters)
 
-		return get(deltaker.externalId)
-			?: throw NoSuchElementException("Deltaker ${deltaker.externalId} finnes ikke på tiltaksgjennomføring ${deltaker.tiltaksinstansInternalId}")
+		return get(deltaker.id)
+			?: throw NoSuchElementException("Deltaker ${deltaker.id} finnes ikke på tiltaksgjennomføring ${deltaker.tiltakInstansId}")
 	}
 
 
-	fun get(externalId: UUID): DeltakerDbo? {
+	fun get(id: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.id                as deltaker_internal_id,
-				   deltaker.external_id       as deltaker_external_id,
-				   deltaker.bruker_id         as bruker_internal_id,
+			SELECT deltaker.id                as deltaker_id,
+				   deltaker.bruker_id         as bruker_id,
 				   bruker.fodselsnummer       as bruker_fodselsnummer,
 				   bruker.fornavn             as bruker_fornavn,
 				   bruker.etternavn           as bruker_etternavn,
 				   deltaker.oppstart_dato     as deltaker_oppstartsdato,
 				   deltaker.slutt_dato        as deltaker_sluttdato,
-				   deltaker.tiltaksinstans_id as tiltaksinstans_internal_id,
-				   tiltaksinstans.external_id as tiltaksinstans_external_id,
+				   deltaker.tiltaksinstans_id as tiltaksinstans_id,
 				   deltaker.arena_status      as deltaker_arena_status,
 				   deltaker.dager_per_uke     as deltaker_dager_per_uke,
 				   deltaker.prosent_stilling  as deltaker_prosent_stilling,
@@ -131,12 +128,12 @@ open class DeltakerRepository(
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 					 inner join tiltaksinstans on tiltaksinstans.id = deltaker.tiltaksinstans_id
-			WHERE deltaker.external_id = :deltakerExternalId
+			WHERE deltaker.id = :deltakerId
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"deltakerExternalId" to externalId
+				"deltakerId" to id
 			)
 		)
 
@@ -144,18 +141,16 @@ open class DeltakerRepository(
 			.firstOrNull()
 	}
 
-	fun get(brukerId: Int, tiltaksinstans: UUID): DeltakerDbo? {
+	fun get(brukerId: UUID, tiltaksinstansId: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.id                as deltaker_internal_id,
-				   deltaker.external_id       as deltaker_external_id,
-				   deltaker.bruker_id         as bruker_internal_id,
+			SELECT deltaker.id                as deltaker_id,
+				   deltaker.bruker_id         as bruker_id,
 				   bruker.fodselsnummer       as bruker_fodselsnummer,
 				   bruker.fornavn             as bruker_fornavn,
 				   bruker.etternavn           as bruker_etternavn,
 				   deltaker.oppstart_dato     as deltaker_oppstartsdato,
 				   deltaker.slutt_dato        as deltaker_sluttdato,
-				   deltaker.tiltaksinstans_id as tiltaksinstans_internal_id,
-				   tiltaksinstans.external_id as tiltaksinstans_external_id,
+				   deltaker.tiltaksinstans_id as tiltaksinstans_id,
 				   deltaker.arena_status      as deltaker_arena_status,
 				   deltaker.dager_per_uke     as deltaker_dager_per_uke,
 				   deltaker.prosent_stilling  as deltaker_prosent_stilling,
@@ -164,15 +159,14 @@ open class DeltakerRepository(
 				   deltaker.modified_at       as deltaker_modified_at
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
-					 inner join tiltaksinstans on tiltaksinstans.id = deltaker.tiltaksinstans_id
 			WHERE bruker.id = :brukerId
-				AND tiltaksinstans.external_id = :tiltaksinstansExternalId
+				AND deltaker.tiltaksinstans_id = :tiltaksinstansId
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
 				"brukerId" to brukerId,
-				"tiltaksinstansExternalId" to tiltaksinstans
+				"tiltaksinstansId" to tiltaksinstansId
 			)
 		)
 
@@ -180,18 +174,16 @@ open class DeltakerRepository(
 			.firstOrNull()
 	}
 
-	fun get(fodselsnummer: String, tiltaksinstans: UUID): DeltakerDbo? {
+	fun get(fodselsnummer: String, tiltaksinstansId: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.id                as deltaker_internal_id,
-				   deltaker.external_id       as deltaker_external_id,
-				   deltaker.bruker_id         as bruker_internal_id,
+			SELECT deltaker.id                as deltaker_id,
+				   deltaker.bruker_id         as bruker_id,
 				   bruker.fodselsnummer       as bruker_fodselsnummer,
 				   bruker.fornavn             as bruker_fornavn,
 				   bruker.etternavn           as bruker_etternavn,
 				   deltaker.oppstart_dato     as deltaker_oppstartsdato,
 				   deltaker.slutt_dato        as deltaker_sluttdato,
-				   deltaker.tiltaksinstans_id as tiltaksinstans_internal_id,
-				   tiltaksinstans.external_id as tiltaksinstans_external_id,
+				   deltaker.tiltaksinstans_id as tiltaksinstans_id,
 				   deltaker.arena_status      as deltaker_arena_status,
 				   deltaker.dager_per_uke     as deltaker_dager_per_uke,
 				   deltaker.prosent_stilling  as deltaker_prosent_stilling,
@@ -200,15 +192,14 @@ open class DeltakerRepository(
 				   deltaker.modified_at       as deltaker_modified_at
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
-					 inner join tiltaksinstans on tiltaksinstans.id = deltaker.tiltaksinstans_id
 			WHERE bruker.fodselsnummer = :bruker_fodselsnummer
-				AND tiltaksinstans.external_id = :tiltaksinstansExternalId
+				AND deltaker.tiltaksinstans_id = :tiltaksinstansId
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
 				"bruker_fodselsnummer" to fodselsnummer,
-				"tiltaksinstansExternalId" to tiltaksinstans
+				"tiltaksinstansId" to tiltaksinstansId
 			)
 		)
 

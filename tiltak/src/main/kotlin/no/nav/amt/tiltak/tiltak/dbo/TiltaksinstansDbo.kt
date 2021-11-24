@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.tiltak.dbo
 
+import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.tiltak.utils.UpdateCheck
 import no.nav.amt.tiltak.tiltak.utils.UpdateStatus
@@ -8,13 +9,10 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class TiltaksinstansDbo(
-	val internalId: Int,
-	val externalId: UUID,
+	val id: UUID,
 	val arenaId: Int,
-	val tiltaksleverandorInternalId: Int,
-	val tiltaksleverandorExternalId: UUID,
-	val tiltakInternalId: Int,
-	val tiltakExternalId: UUID,
+	val tiltaksleverandorId: UUID,
+	val tiltakId: UUID,
 	val navn: String,
 	val status: TiltakInstans.Status?,
 	val oppstartDato: LocalDate?,
@@ -25,11 +23,11 @@ data class TiltaksinstansDbo(
 	val modifiedAt: LocalDateTime
 ) {
 
-	fun toTiltaksinstans(): TiltakInstans {
+	fun toTiltakInstans(tiltak: Tiltak): TiltakInstans {
 		return TiltakInstans(
-			id = externalId,
-			tiltakId = tiltakExternalId,
-			tiltaksarrangorId = tiltaksleverandorExternalId,
+			id = id,
+			tiltak = tiltak,
+			tiltaksarrangorId = tiltaksleverandorId,
 			navn = navn,
 			status = status,
 			oppstartDato = oppstartDato,

@@ -1,5 +1,4 @@
 package no.nav.amt.tiltak.tiltak.repositories
-
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.tiltak.dbo.TiltaksinstansDbo
 import org.springframework.jdbc.core.RowMapper
@@ -10,21 +9,17 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-// @Repository gir feilmelding (template == null), er det ikke dependency injection på @Repository?
 @Component
-open class TiltaksinstansRepository(private val template: NamedParameterJdbcTemplate) {
+open class TiltakInstansRepository(private val template: NamedParameterJdbcTemplate) {
 
 	private val rowMapper = RowMapper { rs, _ ->
 		val statusString = rs.getString("status")
 
 		TiltaksinstansDbo(
-			internalId = rs.getInt("tiltaksinstans_internal_id"),
-			externalId = UUID.fromString(rs.getString("tiltaksinstans_external_id")),
+			id = UUID.fromString(rs.getString("tiltaksinstans_id")),
 			arenaId = rs.getInt("tiltaksinstans_arena_id"),
-			tiltaksleverandorInternalId = rs.getInt("tiltaksleverandor_internal_id"),
-			tiltaksleverandorExternalId = UUID.fromString(rs.getString("tiltaksleverandor_external_id")),
-			tiltakInternalId = rs.getInt("tiltak_internal_id"),
-			tiltakExternalId = UUID.fromString(rs.getString("tiltak_external_id")),
+			tiltaksleverandorId = UUID.fromString(rs.getString("tiltaksleverandor_id")),
+			tiltakId = UUID.fromString(rs.getString("tiltak_id")),
 			navn = rs.getString("navn"),
 			status = if (statusString != null) TiltakInstans.Status.valueOf(statusString) else null,
 			oppstartDato = rs.getDate("oppstart_dato")?.toLocalDate(),
@@ -50,12 +45,12 @@ open class TiltaksinstansRepository(private val template: NamedParameterJdbcTemp
 
 		//language=PostgreSQL
 		val sql = """
-		INSERT INTO tiltaksinstans(external_id, arena_id, tiltak_id, tiltaksleverandor_id, navn, status, oppstart_dato,
+		INSERT INTO tiltaksinstans(id, arena_id, tiltak_id, tiltaksleverandor_id, navn, status, oppstart_dato,
                            slutt_dato, registrert_dato, fremmote_dato)
-		VALUES (:externalId,
+		VALUES (:id,
 				:arenaId,
-				(SELECT id FROM tiltak where tiltak.external_id = :tiltakId),
-				(SELECT id FROM tiltaksleverandor where tiltaksleverandor.external_id = :tiltaksleverandorId),
+				:tiltakId,
+				:tiltaksleverandorId,
 				:navn,
 				:status,
 				:oppstartDato,
@@ -64,11 +59,11 @@ open class TiltaksinstansRepository(private val template: NamedParameterJdbcTemp
 				:fremmoteDato)
 	""".trimIndent()
 
-		val externalId = UUID.randomUUID()
+		val id = UUID.randomUUID()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"externalId" to externalId,
+				"id" to id,
 				"arenaId" to arenaId,
 				"tiltakId" to tiltakId,
 				"tiltaksleverandorId" to tiltaksleverandorId,
@@ -83,8 +78,8 @@ open class TiltaksinstansRepository(private val template: NamedParameterJdbcTemp
 
 		template.update(sql, parameters)
 
-		return get(externalId)
-			?: throw NoSuchElementException("Tiltak med id $externalId finnes ikke")
+		return get(id)
+			?: throw NoSuchElementException("Tiltak med id $id finnes ikke")
 	}
 
 	fun update(tiltaksinstans: TiltaksinstansDbo): TiltaksinstansDbo {
@@ -111,14 +106,14 @@ open class TiltaksinstansRepository(private val template: NamedParameterJdbcTemp
 				"registrert_dato" to tiltaksinstans.registrertDato,
 				"fremmote_dato" to tiltaksinstans.fremmoteDato,
 				"modified_at" to tiltaksinstans.modifiedAt,
-				"id" to tiltaksinstans.tiltakInternalId
+				"id" to tiltaksinstans.id
 			)
 		)
 
 		template.update(sql, parameters)
 
-		return get(tiltaksinstans.externalId)
-			?: throw NoSuchElementException("Tiltak med id ${tiltaksinstans.externalId} finnes ikke")
+		return get(tiltaksinstans.id)
+			?: throw NoSuchElementException("Tiltak med id ${tiltaksinstans.id} finnes ikke")
 	}
 
 
@@ -126,15 +121,10 @@ open class TiltaksinstansRepository(private val template: NamedParameterJdbcTemp
 
 		//language=PostgreSQL
 		val sql = """
-			SELECT tiltaksinstans.id                                                           as tiltaksinstans_internal_id,
-			       tiltaksinstans.external_id                                                  as tiltaksinstans_external_id,
+			SELECT tiltaksinstans.id                                                           as tiltaksinstans_id,
 			       tiltaksinstans.arena_id                                                     as tiltaksinstans_arena_id,
-			       tiltaksinstans.tiltaksleverandor_id                                         as tiltaksleverandor_internal_id,
-			       (SELECT external_id
-			        FROM tiltaksleverandor
-			        WHERE tiltaksleverandor.id = tiltaksinstans.tiltaksleverandor_id)          as tiltaksleverandor_external_id,
-			       tiltaksinstans.tiltak_id                                                    as tiltak_internal_id,
-			       (SELECT external_id FROM tiltak WHERE tiltak.id = tiltaksinstans.tiltak_id) as tiltak_external_id,
+			       tiltaksinstans.tiltaksleverandor_id                                         as tiltaksleverandor_id,
+			       tiltaksinstans.tiltak_id                                                    as tiltak_id,
 			       tiltaksinstans.navn                                                         as navn,
 			       tiltaksinstans.status                                                       as status,
 			       tiltaksinstans.oppstart_dato                                                as oppstart_dato,
@@ -143,13 +133,12 @@ open class TiltaksinstansRepository(private val template: NamedParameterJdbcTemp
 			       tiltaksinstans.fremmote_dato                                                as fremmote_dato,
 				   tiltaksinstans.created_at 												   as created_at,
 				   tiltaksinstans.modified_at                                                  as modified_at
-			FROM tiltaksinstans
-			WHERE tiltaksinstans.external_id = :externalId
+			FROM tiltaksinstans WHERE tiltaksinstans.id = :id
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"externalId" to id
+				"id" to id
 			)
 		)
 
@@ -160,15 +149,10 @@ open class TiltaksinstansRepository(private val template: NamedParameterJdbcTemp
 
 		//language=PostgreSQL
 		val sql = """
-			SELECT tiltaksinstans.id                                                           as tiltaksinstans_internal_id,
-			       tiltaksinstans.external_id                                                  as tiltaksinstans_external_id,
+			SELECT tiltaksinstans.id                                                           as tiltaksinstans_id,
 			       tiltaksinstans.arena_id                                                     as tiltaksinstans_arena_id,
-			       tiltaksinstans.tiltaksleverandor_id                                         as tiltaksleverandor_internal_id,
-			       (SELECT external_id
-			        FROM tiltaksleverandor
-			        WHERE tiltaksleverandor.id = tiltaksinstans.tiltaksleverandor_id)          as tiltaksleverandor_external_id,
-			       tiltaksinstans.tiltak_id                                                    as tiltak_internal_id,
-			       (SELECT external_id FROM tiltak WHERE tiltak.id = tiltaksinstans.tiltak_id) as tiltak_external_id,
+			       tiltaksinstans.tiltaksleverandor_id                                         as tiltaksleverandor_id,
+			       tiltaksinstans.tiltak_id                                                    as tiltak_id,
 			       tiltaksinstans.navn                                                         as navn,
 			       tiltaksinstans.status                                                       as status,
 			       tiltaksinstans.oppstart_dato                                                as oppstart_dato,

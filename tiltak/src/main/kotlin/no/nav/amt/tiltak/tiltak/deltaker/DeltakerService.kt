@@ -1,8 +1,8 @@
 package no.nav.amt.tiltak.tiltak.deltaker
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.veileder.Veileder
 import no.nav.amt.tiltak.core.port.PersonService
+import no.nav.amt.tiltak.tiltak.deltaker.cmd.UpsertNavAnsattCmd
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.NavAnsattDbo
 import no.nav.amt.tiltak.tiltak.deltaker.repositories.BrukerRepository
@@ -41,7 +41,7 @@ open class DeltakerService(
 
 		val deltaker = deltakerRepository.get(
 			fodselsnummer = fodselsnummer,
-			tiltaksinstans = tiltaksinstans
+			tiltaksinstansId = tiltaksinstans
 		)
 
 
@@ -59,8 +59,8 @@ open class DeltakerService(
 			}
 		} else {
 			return deltakerRepository.insert(
-				brukerId = bruker.internalId,
-				tiltaksgjennomforing = tiltaksinstans,
+				brukerId = bruker.id,
+				tiltaksgjennomforingId = tiltaksinstans,
 				oppstartDato = oppstartDato,
 				sluttDato = sluttDato,
 				status = status,
@@ -96,19 +96,15 @@ open class DeltakerService(
 
 	private fun upsertVeileder(fodselsnummer: String): NavAnsattDbo? {
 		return personService.hentVeileder(fodselsnummer)?.let { veileder ->
-			navAnsattRepository.upsert(veileder.toDbo())
+			navAnsattRepository.upsert(UpsertNavAnsattCmd(
+				personligIdent = veileder.navIdent,
+				fornavn = veileder.fornavn,
+				etternavn = veileder.etternavn,
+				epost = veileder.epost,
+				telefonnummer = "TODO - Ikke hentet fra NOM enda"
+			))
 			return navAnsattRepository.getNavAnsattWithIdent(veileder.navIdent)
 		}
-	}
-
-	private fun Veileder.toDbo(): NavAnsattDbo {
-		return NavAnsattDbo(
-			personligIdent = navIdent,
-			fornavn = fornavn,
-			etternavn = etternavn,
-			telefonnummer = null,
-			epost = epost
-		)
 	}
 
 }

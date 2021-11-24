@@ -7,8 +7,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class TiltakDbo(
-	val internalId: Int,
-	val externalId: UUID,
+	val id: UUID,
 	val arenaId: String,
 	val navn: String,
 	val type: String,
@@ -18,7 +17,7 @@ data class TiltakDbo(
 
 	fun toTiltak(): Tiltak {
 		return Tiltak(
-			id = externalId,
+			id = id,
 			navn = navn,
 			kode = type
 		)
