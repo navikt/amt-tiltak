@@ -9,13 +9,15 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 open class NomConfig {
 
+	@Value("\${nom.url}")
+	lateinit var url: String
+
+	@Value("\${nom.scope}")
+	lateinit var scope: String
+
 	@Bean
-	open fun nomConnector(
-		@Value("nom.url") nomUrl: String,
-		@Value("nom.scope") nomScope: String,
-		scopedTokenProvider: ScopedTokenProvider,
-	) : NomConnector {
-		return NomClient(url = nomUrl, tokenSupplier = { scopedTokenProvider.getToken(nomScope) })
+	open fun nomConnector(scopedTokenProvider: ScopedTokenProvider, ) : NomConnector {
+		return NomClient(url = url, tokenSupplier = { scopedTokenProvider.getToken(scope) })
 	}
 
 }

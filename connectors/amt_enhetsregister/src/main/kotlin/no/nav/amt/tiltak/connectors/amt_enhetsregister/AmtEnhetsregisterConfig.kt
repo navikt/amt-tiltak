@@ -9,12 +9,14 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 open class AmtEnhetsregisterConfig {
 
+	@Value("\${amt-enhetsregister.url}")
+	lateinit var url: String
+
+	@Value("\${amt-enhetsregister.scope}")
+	lateinit var scope: String
+
 	@Bean
-	open fun enhetsregisterConnector(
-		@Value("amt-enhetsregister.scope") scope: String,
-		@Value("amt-enhetsregister.url") url: String,
-		scopedTokenProvider: ScopedTokenProvider
-	): EnhetsregisterConnector {
+	open fun enhetsregisterConnector(scopedTokenProvider: ScopedTokenProvider): EnhetsregisterConnector {
 		return AmtEnhetsregisterConnector(
 			url = url,
 			tokenProvider = { scopedTokenProvider.getToken(scope) },

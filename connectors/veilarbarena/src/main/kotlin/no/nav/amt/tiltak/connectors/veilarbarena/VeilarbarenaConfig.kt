@@ -8,12 +8,14 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 open class VeilarbarenaConfig {
 
+	@Value("\${poao-gcp-proxy.url}")
+	lateinit var url: String
+
+	@Value("\${poao-gcp-proxy.scope}")
+	lateinit var scope: String
+
 	@Bean
-	open fun veilarbarenaConnector(
-		@Value("poao-gcp-proxy.scope") scope: String,
-		@Value("poao-gcp-proxy.url") url: String,
-		scopedTokenProvider: ScopedTokenProvider
-	): VeilarbarenaConnector {
+	open fun veilarbarenaConnector(scopedTokenProvider: ScopedTokenProvider): VeilarbarenaConnector {
 		return VeilarbarenaConnectorImpl(
 			url = "$url/proxy/veilarbarena",
 			tokenProvider = { scopedTokenProvider.getToken(scope) },
