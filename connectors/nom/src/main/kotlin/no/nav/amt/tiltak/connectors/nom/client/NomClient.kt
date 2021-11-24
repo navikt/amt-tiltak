@@ -4,54 +4,75 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import no.nav.amt.tiltak.core.domain.veileder.Veileder
 import no.nav.amt.tiltak.core.port.NomConnector
-import okhttp3.*
+import no.nav.amt.tiltak.tools.graphql.Graphql
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.slf4j.LoggerFactory
-import java.lang.RuntimeException
-import java.util.concurrent.TimeUnit
 import java.util.function.Supplier
 
 class NomClient(
-	private val nomApiUrl: String,
-	private val tokenSupplier : Supplier<String>
+	private val url: String,
+	private val tokenSupplier : Supplier<String>,
+	private val httpClient: OkHttpClient = OkHttpClient(),
+	private val objectMapper: ObjectMapper = ObjectMapper().registerKotlinModule()
 ) : NomConnector {
 
-	private val objectMapper = ObjectMapper().registerKotlinModule()
 	companion object {
-		private val logger = LoggerFactory.getLogger(NomClient::class.java)
+		private val mediaTypeJson = "application/json".toMediaType()
+
+		private val log = LoggerFactory.getLogger(NomClient::class.java)
 	}
 
-	private val client = OkHttpClient.Builder()
-		.connectTimeout(10, TimeUnit.SECONDS)
-		.readTimeout(15, TimeUnit.SECONDS)
-		.build()
-
-	override fun hentVeileder(ident: String) : Veileder? {
-		return hentVeilederTilIdenter(listOf(ident))
+	override fun hentVeileder(navIdent: String): Veileder? {
+		return hentVeilederTilIdenter(listOf(navIdent))
 			.firstOrNull()
-			.also { if(it == null) logger.info("Fant ikke veileder i NOM med ident $ident") }
+			.also { if(it == null) log.info("Fant ikke veileder i NOM med ident $navIdent") }
 	}
 
 	private fun hentVeilederTilIdenter(navIdenter: List<String>): List<Veileder> {
+		val requestBody = objectMapper.writeValueAsString(
+			Graphql.GraphqlQuery(
+				NomQueries.HentIdenter.query,
+				NomQueries.HentIdenter.Variables(navIdenter)
+			)
+		)
 
 		val request: Request = Request.Builder()
-			.url(nomApiUrl)
-			.header("Accept", "application/json; charset=utf-8")
+			.url("$url/graphql")
+			.header("Accept", mediaTypeJson.toString())
 			.header("Authorization", "Bearer ${tokenSupplier.get()}")
-			.post(HentIdenterRequest(navIdenter).asJson().toRequestBody("application/graphql".toMediaType()))
+			.post(requestBody.toRequestBody(mediaTypeJson))
 			.build()
 
-		client.newCall(request).execute().use { response ->
+		httpClient.newCall(request).execute().use { response ->
 			response.takeUnless { it.isSuccessful }
 				?.let { throw RuntimeException("Uventet status ved kall mot NOM ${it.code}") }
 
 			response.takeUnless { response.body != null }
 				?.let { throw IllegalStateException("Ingen body i response") }
 
-			val nomResponse = objectMapper.readValue(response.body!!.string(), HentIdenterResponse::class.java)
+			val hentIdenterResponse = objectMapper.readValue(response.body!!.string(), NomQueries.HentIdenter.Response::class.java)
 
-			return nomResponse.toVeiledere()
+			return toVeiledere(hentIdenterResponse)
 		}
+	}
+
+	private fun toVeiledere(hentIdenterResponse: NomQueries.HentIdenter.Response): List<Veileder> {
+		return hentIdenterResponse.data?.ressurser?.mapNotNull {
+			if (it.code != NomQueries.HentIdenter.ResultCode.OK || it.ressurs == null) {
+				log.warn("Fant ikke veileder i NOM. statusCode=${it.code}")
+				return@mapNotNull null
+			}
+
+			Veileder(
+				navIdent = it.ressurs.navIdent,
+				visningsNavn = it.ressurs.visningsNavn,
+				fornavn = it.ressurs.fornavn,
+				etternavn = it.ressurs.etternavn,
+				epost = it.ressurs.epost,
+			)
+		} ?: emptyList()
 	}
 }

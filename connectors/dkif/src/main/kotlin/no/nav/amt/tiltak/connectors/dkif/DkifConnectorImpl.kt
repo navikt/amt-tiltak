@@ -7,12 +7,14 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import java.util.*
 import java.util.function.Supplier
 
 class DkifConnectorImpl(
 	private val url: String,
 	private val tokenProvider: Supplier<String>,
 	private val httpClient: OkHttpClient = OkHttpClient(),
+	private val consumerId: String = "amt-tiltak",
 	private val objectMapper: ObjectMapper = ObjectMapper()
 		.registerKotlinModule()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false),
@@ -24,6 +26,8 @@ class DkifConnectorImpl(
 			.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
 			.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenProvider.get())
 			.header("Nav-Personidenter", fnr)
+			.header("Nav-Consumer-Id", consumerId)
+			.header("Nav-Call-Id", UUID.randomUUID().toString()) // Hvis vi skal bruke call-id så kan den propageres inn hit
 			.build()
 
 		httpClient.newCall(request).execute().use { response ->
