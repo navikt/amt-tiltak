@@ -40,6 +40,11 @@ spec:
     inbound:
       rules:
         - application: amt-tiltaksarrangor-flate-auth-proxy
+    outbound:
+      rules:
+        - application: amt-enhetsregister
+          namespace: amt
+          cluster: dev-gcp
   kafka:
     pool: nav-dev
   env:
