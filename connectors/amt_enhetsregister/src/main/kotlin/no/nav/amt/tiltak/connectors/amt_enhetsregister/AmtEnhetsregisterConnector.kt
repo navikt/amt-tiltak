@@ -24,7 +24,7 @@ class AmtEnhetsregisterConnector(
 
 		httpClient.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
-				throw RuntimeException("Klarte ikke å hente enhet fra amt-enhetsregister. Status: ${response.code}")
+				throw RuntimeException("Klarte ikke å hente enhet fra amt-enhetsregister. organisasjonsnummer=${organisasjonsnummer} status=${response.code}")
 			}
 
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
