@@ -14,6 +14,6 @@ open class VeilarboppfolgingConfig {
 		@Value("poao-gcp-proxy.scope") scope: String,
 		scopedTokenProvider: ScopedTokenProvider
 	): VeilarboppfolgingClient {
-		return VeilarboppfolgingClient(url, { scopedTokenProvider.getToken(scope) })
+		return VeilarboppfolgingClient("$url/proxy/veilarboppfolging", { scopedTokenProvider.getToken(scope) })
 	}
 }
