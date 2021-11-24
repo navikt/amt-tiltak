@@ -46,6 +46,10 @@
             <groupId>no.nav.common</groupId>
             <artifactId>types</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>token_provider</artifactId>
+        </dependency>
 
     </dependencies>
 
