@@ -65,9 +65,9 @@ class ArenaOrdsProxyConnectorImpl(
         }
     }
 
-    override fun hentVirksomhetsnummer(virksomhetsnummer: String): String {
-        return hentArbeidsgiver(virksomhetsnummer)?.virksomhetsnummer
-            ?: throw UnsupportedOperationException("Kan ikke hente virksomhetsnummer på en arbeidsgiver som ikke eksisterer.")
+    override fun hentVirksomhetsnummer(arenaArbeidsgiverId: String): String {
+        return hentArbeidsgiver(arenaArbeidsgiverId)?.virksomhetsnummer
+            ?: throw UnsupportedOperationException("Kan ikke hente virksomhetsnummer på en arbeidsgiver som ikke eksisterer. arenaArbeidsgiverId=$arenaArbeidsgiverId")
     }
 
     private data class HentFnrResponse(
