@@ -1,9 +1,9 @@
 package no.nav.amt.tiltak.connectors.veilarboppfolging
 
+import no.nav.amt.tiltak.tools.token_provider.ScopedTokenProvider
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import no.nav.amt.tiltak.tools.token_provider.ScopedTokenProvider
 
 @Configuration
 open class VeilarboppfolgingConfig {
@@ -14,6 +14,6 @@ open class VeilarboppfolgingConfig {
 		@Value("poao-gcp-proxy.scope") scope: String,
 		scopedTokenProvider: ScopedTokenProvider
 	): VeilarboppfolgingClient {
-		return VeilarboppfolgingClient(url) { scopedTokenProvider.getToken(scope) }
+		return VeilarboppfolgingClient(url, { scopedTokenProvider.getToken(scope) })
 	}
 }
