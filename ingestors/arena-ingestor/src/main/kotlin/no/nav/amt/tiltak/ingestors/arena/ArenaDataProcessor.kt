@@ -19,9 +19,9 @@ open class ArenaDataProcessor(
 	private val deltakerProcessor: DeltakerProcessor
 ) {
 
-	val tiltakTableName = "ARENA_GOLDENGATE.TILTAK"
-	val tiltakgjennomforingTableName = "ARENA_GOLDENGATE.TILTAKGJENNOMFORING"
-	val tiltakDeltakerTableName = "ARENA_GOLDENGATE.TILTAKDELTAKER"
+	val tiltakTableName = "SIAMO.TILTAK"
+	val tiltakgjennomforingTableName = "SIAMO.TILTAKGJENNOMFORING"
+	val tiltakDeltakerTableName = "SIAMO.TILTAKDELTAKER"
 
 	private val logger = LoggerFactory.getLogger(javaClass)
 

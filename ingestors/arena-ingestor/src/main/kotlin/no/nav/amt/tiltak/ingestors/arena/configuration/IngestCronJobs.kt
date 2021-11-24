@@ -35,7 +35,7 @@ open class IngestCronJobs(
 	)
 	open fun processUningestedArenaData() {
 		logger.debug("Starting processing job for uningested Arena Data...")
-//		processor.processUningestedMessages()
+		processor.processUningestedMessages()
 		logger.debug("Finished processing job for uningested Arena Data!")
 	}
 
@@ -46,7 +46,7 @@ open class IngestCronJobs(
 	)
 	open fun processFailedArenaData() {
 		logger.debug("Starting processing job for failed Arena Data...")
-//		processor.processFailedMessages()
+		processor.processFailedMessages()
 		logger.debug("Finished processing job for failed Arena Data!")
 	}
 
