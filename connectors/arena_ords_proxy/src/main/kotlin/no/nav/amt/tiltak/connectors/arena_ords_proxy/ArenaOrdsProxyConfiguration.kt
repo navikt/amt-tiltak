@@ -1,23 +1,23 @@
 package no.nav.amt.tiltak.connectors.arena_ords_proxy
 
 import no.nav.amt.tiltak.core.port.ArenaOrdsProxyConnector
+import no.nav.amt.tiltak.tools.token_provider.ScopedTokenProvider
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Profile
-import java.util.*
-import java.util.function.Supplier
 
 @Configuration
 open class ArenaOrdsProxyConfiguration {
 
-    private val tokenProvider: Supplier<String> = Supplier { UUID.randomUUID().toString() }
-    private val arenaOrdsProxyUrl = ""
-
     @Bean
-    open fun arenaOrdsProxyConnector(): ArenaOrdsProxyConnector {
+    open fun arenaOrdsProxyConnector(
+		@Value("poao-gcp-proxy.url") url: String,
+		@Value("poao-gcp-proxy.scope") scope: String,
+		scopedTokenProvider: ScopedTokenProvider
+	): ArenaOrdsProxyConnector {
         return ArenaOrdsProxyConnectorImpl(
-            tokenProvider = tokenProvider,
-            arenaOrdsProxyUrl = arenaOrdsProxyUrl
+            tokenProvider = { scopedTokenProvider.getToken(scope) },
+            arenaOrdsProxyUrl = "$url/proxy/amt-arena-ords-proxy"
         )
     }
 

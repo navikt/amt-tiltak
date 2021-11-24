@@ -17,6 +17,10 @@
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>token_provider</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
