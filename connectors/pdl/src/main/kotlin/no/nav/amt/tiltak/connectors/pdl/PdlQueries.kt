@@ -1,5 +1,7 @@
 package no.nav.amt.tiltak.connectors.pdl
 
+import no.nav.amt.tiltak.tools.graphql.Graphql
+
 
 object PdlQueries {
 

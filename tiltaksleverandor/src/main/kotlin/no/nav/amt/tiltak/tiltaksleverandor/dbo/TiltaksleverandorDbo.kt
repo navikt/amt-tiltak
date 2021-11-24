@@ -7,8 +7,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class TiltaksleverandorDbo(
-	val internalId: Int,
-	val externalId: UUID,
+	val id: UUID,
 	val navn: String,
 	val organisasjonsnummer: String,
 	val overordnetEnhetOrganisasjonsnummer: String?,
@@ -19,7 +18,7 @@ data class TiltaksleverandorDbo(
 
 	fun toTiltaksleverandor(): Tiltaksleverandor {
 		return Tiltaksleverandor(
-			id = externalId,
+			id = id,
 			organisasjonsnummer = organisasjonsnummer,
 			navn = navn,
 			overordnetEnhetOrganisasjonsnummer = overordnetEnhetOrganisasjonsnummer,

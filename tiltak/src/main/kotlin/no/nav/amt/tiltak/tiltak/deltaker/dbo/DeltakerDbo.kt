@@ -8,13 +8,12 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class DeltakerDbo(
-	val internalId: Int,
-	val externalId: UUID,
-	val brukerInternalId: Int,
+	val id: UUID,
+	val brukerId: UUID,
 	val brukerFodselsnummer: String,
 	val brukerFornavn: String,
 	val brukerEtternavn: String,
-	val tiltaksinstansInternalId: Int,
+	val tiltakInstansId: UUID,
 	val deltakerOppstartsdato: LocalDate?,
 	val deltakerSluttdato: LocalDate?,
 	val arenaStatus: String?,

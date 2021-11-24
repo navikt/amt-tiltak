@@ -8,14 +8,14 @@ import no.nav.amt.tiltak.core.domain.veileder.Veileder
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 
-const val token = "DUMMYTOKEN"
-
 class NomGraphqlClientTest : StringSpec({
+
+	val token = "DUMMYTOKEN"
 
 	lateinit var server: MockWebServer
 	lateinit var client: NomClient
 	isolationMode = IsolationMode.InstancePerTest
-	val expectedVeileder = Veileder("H156147", "Blaut", "Slappfisk", "")
+	val expectedVeileder = Veileder("H156147", "Alias", "Blaut", "Slappfisk", "blaut.slappfisk@nav.no")
 
 	beforeTest {
 		server = MockWebServer()
@@ -31,8 +31,10 @@ class NomGraphqlClientTest : StringSpec({
 			  {
 				"ressurs": {
 				  "navIdent": "${expectedVeileder.navIdent}",
+				  "visningsNavn": "${expectedVeileder.visningsNavn}",
 				  "fornavn": "${expectedVeileder.fornavn}",
-				  "etternavn": "${expectedVeileder.etternavn}"
+				  "etternavn": "${expectedVeileder.etternavn}",
+				  "epost": "${expectedVeileder.epost}"
 				},
 				"code": "OK"
 			  }
@@ -40,6 +42,7 @@ class NomGraphqlClientTest : StringSpec({
 		  }
 		}
 		"""
+
 		server.enqueue(MockResponse().setBody(veilederRespons))
 
 		val veileder = client.hentVeileder(expectedVeileder.navIdent)

@@ -1,8 +1,6 @@
 package no.nav.amt.tiltak.connectors.dkif
 
-import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.client.WireMock.equalTo
-import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -19,12 +17,14 @@ class DkifConnectorImplTest {
 			tokenProvider = { "TOKEN" },
 		)
 
-		WireMock.givenThat(
-			WireMock.get(urlEqualTo("/api/v1/personer/kontaktinformasjon?inkluderSikkerDigitalPost=false"))
+		givenThat(
+			get(urlEqualTo("/api/v1/personer/kontaktinformasjon?inkluderSikkerDigitalPost=false"))
 				.withHeader("Authorization", equalTo("Bearer TOKEN"))
 				.withHeader("Nav-Personidenter", equalTo("12345678900"))
+				.withHeader("Nav-Consumer-Id", equalTo("amt-tiltak"))
+				.withHeader("Nav-Call-Id", matching("[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}"))
 				.willReturn(
-					WireMock.aResponse()
+					aResponse()
 						.withStatus(200)
 						.withBody(
 							"""
@@ -58,10 +58,10 @@ class DkifConnectorImplTest {
 			tokenProvider = { "TOKEN" },
 		)
 
-		WireMock.givenThat(
-			WireMock.get(urlEqualTo("/api/v1/personer/kontaktinformasjon?inkluderSikkerDigitalPost=false"))
+		givenThat(
+			get(urlEqualTo("/api/v1/personer/kontaktinformasjon?inkluderSikkerDigitalPost=false"))
 				.willReturn(
-					WireMock.aResponse()
+					aResponse()
 						.withStatus(200)
 						.withBody(
 							"""

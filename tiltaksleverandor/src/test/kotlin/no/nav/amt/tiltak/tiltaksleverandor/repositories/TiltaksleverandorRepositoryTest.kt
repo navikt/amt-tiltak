@@ -63,8 +63,7 @@ internal class TiltaksleverandorRepositoryTest {
 		)
 
 		assertNotNull(savedDto)
-		assertNotNull(savedDto.internalId)
-		assertNotNull(savedDto.externalId)
+		assertNotNull(savedDto.id)
 		assertEquals(organisasjonsnummer, savedDto.overordnetEnhetOrganisasjonsnummer)
 		assertEquals(organisasjonsnavn, savedDto.overordnetEnhetNavn)
 		assertEquals(virksomhetsnavn, savedDto.navn)
@@ -91,8 +90,7 @@ internal class TiltaksleverandorRepositoryTest {
 			organisasjonsnummer = organisasjonsnummer
 		)
 
-		assertEquals(savedOne.internalId, savedTwo.internalId)
-		assertEquals(savedOne.externalId, savedTwo.externalId)
+		assertEquals(savedOne.id, savedTwo.id)
 	}
 
 	private fun createDataSource(container: PostgreSQLContainer<Nothing>): HikariDataSource {

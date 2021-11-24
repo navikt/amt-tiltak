@@ -5,7 +5,7 @@ import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt.tiltak.tiltak.deltaker.dbo.NavAnsattDbo
+import no.nav.amt.tiltak.tiltak.deltaker.cmd.UpsertNavAnsattCmd
 import no.nav.amt.tiltak.tiltak.testutils.DatabaseTestUtils
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -17,7 +17,7 @@ class NavAnsattRepositoryTest : FunSpec({
 	lateinit var template: NamedParameterJdbcTemplate
 	lateinit var repository: NavAnsattRepository
 
-	val baseNavAnsatt = NavAnsattDbo(
+	val upsertCmd = UpsertNavAnsattCmd(
 		personligIdent = "test123",
 		fornavn = "Fornavn",
 		etternavn = "Etternavn",
@@ -38,25 +38,25 @@ class NavAnsattRepositoryTest : FunSpec({
 	}
 
 	test("Insert nav-ansatt så hent bør returnere nav-ansatt") {
-		repository.upsert(baseNavAnsatt)
+		repository.upsert(upsertCmd)
 
-		val storedDbo = repository.getNavAnsattWithIdent(baseNavAnsatt.personligIdent)
+		val storedDbo = repository.getNavAnsattWithIdent(upsertCmd.personligIdent)
 
 		storedDbo shouldNotBe null
 		storedDbo!!.id shouldNotBe -1
-		storedDbo.personligIdent shouldBe baseNavAnsatt.personligIdent
-		storedDbo.fornavn shouldBe baseNavAnsatt.fornavn
-		storedDbo.etternavn shouldBe baseNavAnsatt.etternavn
-		storedDbo.telefonnummer shouldBe baseNavAnsatt.telefonnummer
-		storedDbo.epost shouldBe baseNavAnsatt.epost
+		storedDbo.personligIdent shouldBe upsertCmd.personligIdent
+		storedDbo.fornavn shouldBe upsertCmd.fornavn
+		storedDbo.etternavn shouldBe upsertCmd.etternavn
+		storedDbo.telefonnummer shouldBe upsertCmd.telefonnummer
+		storedDbo.epost shouldBe upsertCmd.epost
 	}
 
 	test("Update nav-ansatt så hent bør returnere oppdatert nav-ansatt") {
-		repository.upsert(baseNavAnsatt)
-		val storedDbo = repository.getNavAnsattWithIdent(baseNavAnsatt.personligIdent)
+		repository.upsert(upsertCmd)
+		val storedDbo = repository.getNavAnsattWithIdent(upsertCmd.personligIdent)
 
-		repository.upsert(baseNavAnsatt.copy(epost = null, telefonnummer = null))
-		val updatedDbo = repository.getNavAnsattWithIdent(baseNavAnsatt.personligIdent)
+		repository.upsert(upsertCmd.copy(epost = null, telefonnummer = null))
+		val updatedDbo = repository.getNavAnsattWithIdent(upsertCmd.personligIdent)
 
 		storedDbo!!.id shouldBe updatedDbo!!.id
 		updatedDbo.epost shouldBe null

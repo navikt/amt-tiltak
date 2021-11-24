@@ -51,7 +51,7 @@ class TiltakInstansControllerIntegrationTest {
 		val instans = tlId.let {
 			tiltakInstansRepository.insert(
 				arenaId = 2,
-				tiltakId = tiltak.externalId,
+				tiltakId = tiltak.id,
 				tiltaksleverandorId = it,
 				navn = "Test",
 				status = null,
@@ -62,9 +62,9 @@ class TiltakInstansControllerIntegrationTest {
 			)
 		}
 
-		val resultat = controller.hentTiltakInstans(instans.externalId.toString())
+		val resultat = controller.hentTiltakInstans(instans.id.toString())
 
-		assertEquals(instans.externalId, resultat.id)
+		assertEquals(instans.id, resultat.id)
 		assertEquals(tiltakNavn, resultat.tiltak.tiltaksnavn)
 	}
 
@@ -74,7 +74,7 @@ class TiltakInstansControllerIntegrationTest {
 		val tiltak = tiltakRepository.insert("4", "Gruppe AMO", "GRUPPEAMO")
 		val tiltakInstans = tiltakInstansRepository.insert(
 			4,
-			tiltakId = tiltak.externalId,
+			tiltakId = tiltak.id,
 			tiltaksleverandorId = leverandorId,
 			navn = "Kaffekurs",
 			status = TiltakInstans.Status.GJENNOMFORES,
@@ -83,8 +83,8 @@ class TiltakInstansControllerIntegrationTest {
 			registrertDato = null,
 			fremmoteDato = null
 		)
-		val resultat = controller.hentTiltakInstans(tiltakInstans.externalId.toString())
-		assertEquals(tiltakInstans.externalId, resultat.id)
+		val resultat = controller.hentTiltakInstans(tiltakInstans.id.toString())
+		assertEquals(tiltakInstans.id, resultat.id)
 		assertEquals(tiltakInstans.navn, resultat.navn)
 
 
@@ -93,13 +93,12 @@ class TiltakInstansControllerIntegrationTest {
 	private fun insertTiltaksleverandor() : UUID {
 		val id = "0dc9ccec-fd1e-4c4e-b91a-c23e6d89c18e"
 		val insert = """
-			INSERT INTO tiltaksleverandor(id, external_id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer,navn)
-			VALUES (1, '$id', '12345678', 'Orgnavn1', '87654321', 'Virksomhetsnavn1');
+			INSERT INTO tiltaksleverandor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer,navn)
+			VALUES ('$id', '12345678', 'Orgnavn1', '87654321', 'Virksomhetsnavn1')
 		""".trimIndent()
 		namedJdbcTemplate.jdbcTemplate.update(insert)
 
 		return UUID.fromString(id)
-
 	}
 
 }
