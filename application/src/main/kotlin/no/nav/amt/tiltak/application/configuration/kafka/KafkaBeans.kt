@@ -16,7 +16,7 @@ open class KafkaBeans {
     open fun kafkaConsumerProperties(): KafkaProperties {
         return object : KafkaProperties {
             override fun consumer(): Properties {
-                return KafkaPropertiesPreset.aivenDefaultConsumerProperties("amt-tiltak-consumer")
+                return KafkaPropertiesPreset.aivenDefaultConsumerProperties("amt-tiltak-consumer.v1")
             }
 
             override fun producer(): Properties {
@@ -33,7 +33,7 @@ open class KafkaBeans {
                 return KafkaPropertiesBuilder.consumerBuilder()
                     .withBrokerUrl("localhost:9092")
                     .withBaseProperties()
-                    .withConsumerGroupId("amt-tiltak-consumer")
+                    .withConsumerGroupId("amt-tiltak-consumer.v1")
                     .withDeserializers(ByteArrayDeserializer::class.java, ByteArrayDeserializer::class.java)
                     .build()
             }
