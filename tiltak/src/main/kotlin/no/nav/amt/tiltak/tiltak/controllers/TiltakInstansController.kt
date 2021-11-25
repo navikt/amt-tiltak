@@ -1,10 +1,9 @@
 package no.nav.amt.tiltak.tiltak.controllers
-
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakDeltakerDto
 import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakInstansDto
 import no.nav.amt.tiltak.tiltak.controllers.dto.toDto
+import no.nav.amt.tiltak.tiltak.deltaker.DeltakerService
 import no.nav.security.token.support.core.api.Protected
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -13,8 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
-import java.time.LocalDate
-import java.time.ZonedDateTime
+
 import java.util.*
 import kotlin.NoSuchElementException
 
@@ -22,6 +20,7 @@ import kotlin.NoSuchElementException
 @RequestMapping("/api/tiltak-instans")
 class TiltakInstansController(
 	private val tiltakService: TiltakService,
+	private val deltakerService: DeltakerService
 ) {
 
 	companion object {
@@ -44,28 +43,9 @@ class TiltakInstansController(
 	@Protected
 	@GetMapping("/{tiltakInstansId}/deltakere")
 	fun hentDeltakere(@PathVariable("tiltakInstansId") tiltakInstansId: String): List<TiltakDeltakerDto> {
-		return listOf(
-			TiltakDeltakerDto(
-				id = UUID.randomUUID(),
-				fornavn = "Stødig",
-				mellomnavn = "Mektig",
-				etternavn = "Bord",
-				fodselsdato = LocalDate.of(2001, 6, 8),
-				startdato = ZonedDateTime.now().minusDays(1),
-				sluttdato = ZonedDateTime.now().plusDays(1),
-				status = Deltaker.Status.GJENNOMFORES
-			),
-			TiltakDeltakerDto(
-				id = UUID.randomUUID(),
-				fornavn = "Prektig",
-				mellomnavn = "",
-				etternavn = "Telefon",
-				fodselsdato = LocalDate.of(2001, 6, 8),
-				startdato = ZonedDateTime.now().plusDays(1),
-				sluttdato = ZonedDateTime.now().plusDays(4),
-				status = Deltaker.Status.GJENNOMFORES
-			),
-		)
+		val id = UUID.fromString(tiltakInstansId)
+		return deltakerService.hentDeltakerePaaTiltak(id)
+			.map { it.toDto() }
 	}
 
 }

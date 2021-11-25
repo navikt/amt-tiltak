@@ -1,6 +1,8 @@
 package no.nav.amt.tiltak.tiltak.deltaker.dbo
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.tiltak.FodselOgPersonNr
+import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakDeltakerDto
 import no.nav.amt.tiltak.tiltak.utils.UpdateCheck
 import no.nav.amt.tiltak.tiltak.utils.UpdateStatus
 import java.time.LocalDate
@@ -10,12 +12,12 @@ import java.util.*
 data class DeltakerDbo(
 	val id: UUID,
 	val brukerId: UUID,
-	val brukerFodselsnummer: String,
+	val brukerFodselOgPersonNr: FodselOgPersonNr,
 	val brukerFornavn: String,
 	val brukerEtternavn: String,
 	val tiltakInstansId: UUID,
-	val deltakerOppstartsdato: LocalDate?,
-	val deltakerSluttdato: LocalDate?,
+	val startDato: LocalDate?,
+	val sluttDato: LocalDate?,
 	val arenaStatus: String?,
 	val dagerPerUke: Int?,
 	val prosentStilling: Float?,
@@ -28,9 +30,21 @@ data class DeltakerDbo(
 		return Deltaker(
 			fornavn = brukerFornavn,
 			etternavn = brukerEtternavn,
-			fodselsdato = brukerFodselsnummer,
-			startdato = deltakerOppstartsdato,
-			sluttdato = deltakerSluttdato,
+			fodselsdato = brukerFodselOgPersonNr.toString(),
+			startdato = startDato,
+			sluttdato = sluttDato,
+			status = status
+		)
+	}
+
+	fun toDto(): TiltakDeltakerDto {
+		return TiltakDeltakerDto(
+			id = id,
+			fornavn = brukerFornavn,
+			etternavn = brukerEtternavn,
+			fodselsdato = brukerFodselOgPersonNr.toDate(),
+			startdato = startDato,
+			sluttdato = sluttDato,
 			status = status
 		)
 	}
@@ -41,14 +55,14 @@ data class DeltakerDbo(
 		newDeltakerSluttDato: LocalDate?
 	): UpdateCheck<DeltakerDbo> {
 		if (status != newStatus
-			|| deltakerOppstartsdato != newDeltakerStartDato
-			|| deltakerSluttdato != newDeltakerSluttDato
+			|| startDato != newDeltakerStartDato
+			|| sluttDato != newDeltakerSluttDato
 		) {
 
 			val updatedDeltaker = this.copy(
 				status = newStatus,
-				deltakerOppstartsdato = newDeltakerStartDato,
-				deltakerSluttdato = newDeltakerSluttDato,
+				startDato = newDeltakerStartDato,
+				sluttDato = newDeltakerSluttDato,
 				modifiedAt = LocalDateTime.now()
 			)
 

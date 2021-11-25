@@ -1,11 +1,12 @@
 package no.nav.amt.tiltak.tiltak.deltaker.dbo
 
+import no.nav.amt.tiltak.tiltak.FodselOgPersonNr
 import java.time.LocalDateTime
 import java.util.*
 
 data class BrukerDbo(
 	val id: UUID,
-	val fodselsnummer: String,
+	val fodselOgPersonNr: FodselOgPersonNr,
 	val fornavn: String,
 	val mellomnavn: String?,
 	val etternavn: String,
