@@ -1,10 +1,14 @@
 package no.nav.amt.tiltak.tiltak.controllers
 
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
+import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tiltak.deltaker.DeltakerService
+import no.nav.amt.tiltak.tiltak.deltaker.repositories.BrukerRepository
+import no.nav.amt.tiltak.tiltak.deltaker.repositories.DeltakerRepository
+import no.nav.amt.tiltak.tiltak.deltaker.repositories.NavAnsattRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakInstansRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import no.nav.amt.tiltak.tiltak.services.TiltakServiceImpl
@@ -12,7 +16,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito
+import org.mockito.Mockito.mock
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
@@ -23,6 +27,8 @@ class TiltakInstansControllerIntegrationTest {
 
 	private lateinit var namedJdbcTemplate: NamedParameterJdbcTemplate
 	private lateinit var tiltakRepository: TiltakRepository
+	private lateinit var deltakerRepository: DeltakerRepository
+	private lateinit var brukerRepository: BrukerRepository
 	private lateinit var tiltakInstansRepository: TiltakInstansRepository
 	private lateinit var tiltakInstansService: TiltakService
 	private lateinit var deltakerService: DeltakerService
@@ -34,9 +40,11 @@ class TiltakInstansControllerIntegrationTest {
 
 		tiltakInstansRepository = TiltakInstansRepository(namedJdbcTemplate)
 		tiltakRepository = TiltakRepository(namedJdbcTemplate)
-		deltakerService = Mockito.mock(DeltakerService::class.java)
+		deltakerRepository = DeltakerRepository(namedJdbcTemplate)
+		brukerRepository = BrukerRepository(namedJdbcTemplate)
+		deltakerService = DeltakerService(deltakerRepository, brukerRepository, mock(NavAnsattRepository::class.java), mock(PersonService::class.java));
 		tiltakInstansService = TiltakServiceImpl(tiltakRepository, tiltakInstansRepository, deltakerService)
-		controller = TiltakInstansController(tiltakInstansService)
+		controller = TiltakInstansController(tiltakInstansService, deltakerService)
 
 		DatabaseTestUtils.cleanDatabase(dataSource)
 	}

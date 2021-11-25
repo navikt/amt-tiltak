@@ -56,10 +56,10 @@ internal class DeltakerRepositoryTest : FunSpec({
 		dbo.brukerId shouldBe brukerId
 		dbo.brukerFornavn shouldBe "Bruker Fornavn"
 		dbo.brukerEtternavn shouldBe "Bruker Etternavn"
-		dbo.brukerFodselsnummer shouldBe "1"
+		dbo.brukerFodselOgPersonNr shouldBe "1"
 		dbo.tiltakInstansId shouldBe tiltakInstansId
-		dbo.deltakerOppstartsdato shouldBe oppstartDato
-		dbo.deltakerSluttdato shouldBe sluttDato
+		dbo.startDato shouldBe oppstartDato
+		dbo.sluttDato shouldBe sluttDato
 		dbo.status shouldBe deltakerStatus
 		dbo.createdAt shouldNotBe null
 		dbo.modifiedAt shouldNotBe null
@@ -95,8 +95,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val updatedDbo = repository.update(updated.updatedObject!!)
 
 		updatedDbo.id shouldBe dbo.id
-		updatedDbo.deltakerOppstartsdato shouldBe updatedOppstartsdato
-		updatedDbo.deltakerSluttdato shouldBe updatedSluttdato
+		updatedDbo.startDato shouldBe updatedOppstartsdato
+		updatedDbo.sluttDato shouldBe updatedSluttdato
 		updatedDbo.status shouldBe updatedStatus
 	}
 

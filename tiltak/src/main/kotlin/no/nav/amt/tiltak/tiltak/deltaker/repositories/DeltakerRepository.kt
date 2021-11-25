@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.tiltak.FodselOgPersonNr
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.DeltakerDbo
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -20,11 +21,11 @@ open class DeltakerRepository(
 		DeltakerDbo(
 			id = UUID.fromString(rs.getString("deltaker_id")),
 			brukerId = UUID.fromString(rs.getString("bruker_id")),
-			brukerFodselsnummer = rs.getString("bruker_fodselsnummer"),
+			brukerFodselOgPersonNr = FodselOgPersonNr(rs.getString("bruker_fodselsnummer")),
 			brukerFornavn = rs.getString("bruker_fornavn"),
 			brukerEtternavn = rs.getString("bruker_etternavn"),
-			deltakerOppstartsdato = rs.getDate("deltaker_oppstartsdato")?.toLocalDate(),
-			deltakerSluttdato = rs.getDate("deltaker_sluttdato")?.toLocalDate(),
+			startDato = rs.getDate("deltaker_oppstartsdato")?.toLocalDate(),
+			sluttDato = rs.getDate("deltaker_sluttdato")?.toLocalDate(),
 			tiltakInstansId = UUID.fromString(rs.getString("tiltaksinstans_id")),
 			arenaStatus = rs.getString("deltaker_arena_status"),
 			dagerPerUke = rs.getInt("deltaker_dager_per_uke"),
@@ -32,6 +33,27 @@ open class DeltakerRepository(
 			status = if (statusString != null) Deltaker.Status.valueOf(statusString) else null,
 			createdAt = rs.getTimestamp("deltaker_created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("deltaker_modified_at").toLocalDateTime()
+		)
+	}
+
+	private val rowMapper2 = RowMapper { rs, _ ->
+		val statusString = rs.getString("status")
+
+		DeltakerDbo(
+			id = UUID.fromString(rs.getString("id")),
+			brukerId = UUID.fromString(rs.getString("bruker_id")),
+			brukerFodselOgPersonNr = FodselOgPersonNr(rs.getString("fodselsnummer")),
+			brukerFornavn = rs.getString("fornavn"),
+			brukerEtternavn = rs.getString("etternavn"),
+			startDato = rs.getDate("oppstart_dato")?.toLocalDate(),
+			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
+			tiltakInstansId = UUID.fromString(rs.getString("tiltaksinstans_id")),
+			arenaStatus = rs.getString("arena_status"),
+			dagerPerUke = rs.getInt("dager_per_uke"),
+			prosentStilling = rs.getFloat("prosent_stilling"),
+			status = if (statusString != null) Deltaker.Status.valueOf(statusString) else null,
+			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
+			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
 		)
 	}
 
@@ -82,6 +104,24 @@ open class DeltakerRepository(
 
 	}
 
+	fun getDeltakerePaaTiltak(id: UUID): List<DeltakerDbo> {
+		val sql = """
+			SELECT deltaker.*,
+				bruker.fodselsnummer,
+				bruker.fornavn,
+				bruker.etternavn
+			FROM deltaker
+					 inner join bruker on bruker.id = deltaker.bruker_id
+			WHERE deltaker.tiltaksinstans_id = :tiltaksinstans_id
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf("tiltaksinstans_id" to id)
+		)
+
+		return template.query(sql, parameters, rowMapper2)
+	}
+
 	fun update(deltaker: DeltakerDbo): DeltakerDbo {
 		val sql = """
 			UPDATE deltaker
@@ -95,8 +135,8 @@ open class DeltakerRepository(
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
 				"deltakerStatus" to deltaker.status?.name,
-				"oppstartDato" to deltaker.deltakerOppstartsdato,
-				"sluttDato" to deltaker.deltakerSluttdato,
+				"oppstartDato" to deltaker.startDato,
+				"sluttDato" to deltaker.sluttDato,
 				"modifiedAt" to deltaker.modifiedAt,
 				"deltakerInternalId" to deltaker.id
 			)
@@ -107,7 +147,6 @@ open class DeltakerRepository(
 		return get(deltaker.id)
 			?: throw NoSuchElementException("Deltaker ${deltaker.id} finnes ikke på tiltaksgjennomføring ${deltaker.tiltakInstansId}")
 	}
-
 
 	fun get(id: UUID): DeltakerDbo? {
 		val sql = """
@@ -127,7 +166,6 @@ open class DeltakerRepository(
 				   deltaker.modified_at       as deltaker_modified_at
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
-					 inner join tiltaksinstans on tiltaksinstans.id = deltaker.tiltaksinstans_id
 			WHERE deltaker.id = :deltakerId
 		""".trimIndent()
 

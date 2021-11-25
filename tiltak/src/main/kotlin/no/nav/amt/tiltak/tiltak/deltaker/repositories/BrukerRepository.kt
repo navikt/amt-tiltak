@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.tiltak.deltaker.repositories
 
+import no.nav.amt.tiltak.tiltak.FodselOgPersonNr
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.tiltak.utils.getNullableUUID
 import no.nav.amt.tiltak.tiltak.utils.getUUID
@@ -17,7 +18,7 @@ open class BrukerRepository(
     private val rowMapper = RowMapper { rs, _ ->
         BrukerDbo(
             id = rs.getUUID("id"),
-            fodselsnummer = rs.getString("fodselsnummer"),
+            fodselOgPersonNr = FodselOgPersonNr(rs.getString("fodselsnummer")),
             fornavn = rs.getString("fornavn"),
 			mellomnavn = rs.getString("mellomnavn"),
             etternavn = rs.getString("etternavn"),

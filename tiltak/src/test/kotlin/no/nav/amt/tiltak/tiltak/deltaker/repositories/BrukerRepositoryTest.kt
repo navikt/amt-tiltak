@@ -41,7 +41,7 @@ class BrukerRepositoryTest : FunSpec({
 
 		dbo shouldNotBe null
 		dbo.id shouldNotBe null
-		dbo.fodselsnummer shouldBe fodselsnummer
+		dbo.fodselOgPersonNr shouldBe fodselsnummer
 		dbo.fornavn shouldBe fornavn
 		dbo.etternavn shouldBe etternavn
 		dbo.telefonnummer shouldBe telefonnummer

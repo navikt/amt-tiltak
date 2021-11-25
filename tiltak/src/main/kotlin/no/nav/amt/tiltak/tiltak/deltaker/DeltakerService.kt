@@ -4,6 +4,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.tiltak.deltaker.cmd.UpsertNavAnsattCmd
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.BrukerDbo
+import no.nav.amt.tiltak.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.NavAnsattDbo
 import no.nav.amt.tiltak.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.tiltak.deltaker.repositories.DeltakerRepository
@@ -105,6 +106,10 @@ open class DeltakerService(
 			))
 			return navAnsattRepository.getNavAnsattWithIdent(veileder.navIdent)
 		}
+	}
+
+	fun hentDeltakerePaaTiltak(id: UUID): List<DeltakerDbo> {
+		return deltakerRepository.getDeltakerePaaTiltak(id)
 	}
 
 }
