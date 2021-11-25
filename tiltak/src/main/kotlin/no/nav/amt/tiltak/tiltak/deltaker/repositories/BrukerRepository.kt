@@ -1,6 +1,8 @@
 package no.nav.amt.tiltak.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.BrukerDbo
+import no.nav.amt.tiltak.tiltak.utils.getNullableUUID
+import no.nav.amt.tiltak.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -14,14 +16,14 @@ open class BrukerRepository(
 
     private val rowMapper = RowMapper { rs, _ ->
         BrukerDbo(
-            id = UUID.fromString(rs.getString("id")),
+            id = rs.getUUID("id"),
             fodselsnummer = rs.getString("fodselsnummer"),
             fornavn = rs.getString("fornavn"),
 			mellomnavn = rs.getString("mellomnavn"),
             etternavn = rs.getString("etternavn"),
             telefonnummer = rs.getString("telefonnummer"),
             epost = rs.getString("epost"),
-            ansvarligVeilederId = UUID.fromString(rs.getString("ansvarlig_veileder_internal_id")),
+            ansvarligVeilederId = rs.getNullableUUID("ansvarlig_veileder_internal_id"),
             createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
             modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
         )
