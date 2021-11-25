@@ -15,12 +15,7 @@ abstract class AbstractArenaProcessor(
 		private const val MAX_INGEST_ATTEMPTS = 10
 
 		private val SUPPORTED_TILTAK = setOf(
-			"ARBFORB",
-			"AVKLARAG",
-			"GRUPPEAMO",
 			"INDOPPFAG",
-			"JOBBK",
-			"VASV"
 		)
 
 	}
@@ -42,11 +37,11 @@ abstract class AbstractArenaProcessor(
 			}
 		} catch (e: Exception) {
 			if (data.ingestAttempts >= MAX_INGEST_ATTEMPTS) {
-				logger.error(e.message, e)
+				logger.error("[arena_data_id ${data.id}]: ${e.message}", e)
 				repository.upsert(data.markAsFailed())
 			} else {
 				if (e !is DependencyNotIngestedException) {
-					logger.error(e.message, e)
+					logger.error("[arena_data_id ${data.id}]: ${e.message}", e)
 				}
 
 				repository.upsert(data.retry())
