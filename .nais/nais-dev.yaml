@@ -79,3 +79,4 @@ spec:
         databases:
           - name: amt-tiltak-db
             envVarPrefix: DB
+        tier: db-custom-1-3840
