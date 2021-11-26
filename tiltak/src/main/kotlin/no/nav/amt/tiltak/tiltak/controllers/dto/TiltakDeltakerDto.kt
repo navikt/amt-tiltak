@@ -14,3 +14,13 @@ data class TiltakDeltakerDto(
 	val sluttdato: LocalDate?,
 	val status: Deltaker.Status?
 )
+
+fun Deltaker.toDto() = TiltakDeltakerDto(
+	id = id,
+	fornavn = fornavn,
+	etternavn = etternavn,
+	fodselsdato = fodselsdato.toFodselDato(),
+	startdato = startdato,
+	sluttdato = sluttdato,
+	status = status
+)

@@ -1,26 +1,31 @@
 package no.nav.amt.tiltak.tiltak.controllers
 
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
+import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.tiltak.deltaker.DeltakerService
+import no.nav.amt.tiltak.tiltak.dbo.TiltaksinstansDbo
+import no.nav.amt.tiltak.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.tiltak.deltaker.repositories.NavAnsattRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakInstansRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
+import no.nav.amt.tiltak.tiltak.services.DeltakerServiceImpl
 import no.nav.amt.tiltak.tiltak.services.TiltakServiceImpl
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
 import org.mockito.Mockito.mock
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.web.server.ResponseStatusException
+import java.time.LocalDate
 import java.util.*
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TiltakInstansControllerIntegrationTest {
 
 	private val dataSource = SingletonPostgresContainer.getDataSource()
@@ -34,7 +39,7 @@ class TiltakInstansControllerIntegrationTest {
 	private lateinit var deltakerService: DeltakerService
 	private lateinit var controller: TiltakInstansController
 
-	@BeforeEach
+	@BeforeAll
 	fun before () {
 		namedJdbcTemplate = NamedParameterJdbcTemplate(dataSource)
 
@@ -42,11 +47,20 @@ class TiltakInstansControllerIntegrationTest {
 		tiltakRepository = TiltakRepository(namedJdbcTemplate)
 		deltakerRepository = DeltakerRepository(namedJdbcTemplate)
 		brukerRepository = BrukerRepository(namedJdbcTemplate)
-		deltakerService = DeltakerService(deltakerRepository, brukerRepository, mock(NavAnsattRepository::class.java), mock(PersonService::class.java));
-		tiltakInstansService = TiltakServiceImpl(tiltakRepository, tiltakInstansRepository, deltakerService)
+		deltakerService = DeltakerServiceImpl(deltakerRepository, brukerRepository, mock(NavAnsattRepository::class.java), mock(PersonService::class.java));
+		tiltakInstansService = TiltakServiceImpl(tiltakRepository, tiltakInstansRepository)
 		controller = TiltakInstansController(tiltakInstansService, deltakerService)
 
 		DatabaseTestUtils.cleanDatabase(dataSource)
+
+	}
+
+	@AfterEach
+	fun after () {
+		namedJdbcTemplate.jdbcTemplate.update("DELETE FROM deltaker")
+		namedJdbcTemplate.jdbcTemplate.update("DELETE FROM bruker")
+		namedJdbcTemplate.jdbcTemplate.update("DELETE FROM tiltaksinstans")
+		namedJdbcTemplate.jdbcTemplate.update("DELETE FROM tiltak")
 	}
 
 	@Test
@@ -63,19 +77,7 @@ class TiltakInstansControllerIntegrationTest {
 		val tiltakNavn ="Gruppe amo"
 		val tlId = insertTiltaksleverandor()
 		val tiltak = tiltakRepository.insert("22", tiltakNavn, "kode")
-		val instans = tlId.let {
-			tiltakInstansRepository.insert(
-				arenaId = 2,
-				tiltakId = tiltak.id,
-				tiltaksleverandorId = it,
-				navn = "Test",
-				status = null,
-				oppstartDato = null,
-				sluttDato = null,
-				registrertDato = null,
-				fremmoteDato = null
-			)
-		}
+		val instans = insertTiltakInstans(tiltak.id, tlId)
 
 		val resultat = controller.hentTiltakInstans(instans.id.toString())
 
@@ -87,9 +89,55 @@ class TiltakInstansControllerIntegrationTest {
 	fun `hentTiltakInstans - tiltak finnes - skal returnere tiltak`() {
 		val leverandorId = insertTiltaksleverandor()
 		val tiltak = tiltakRepository.insert("4", "Gruppe AMO", "GRUPPEAMO")
-		val tiltakInstans = tiltakInstansRepository.insert(
-			4,
-			tiltakId = tiltak.id,
+		val tiltakInstans = insertTiltakInstans(tiltak.id, leverandorId)
+		val resultat = controller.hentTiltakInstans(tiltakInstans.id.toString())
+		assertEquals(tiltakInstans.id, resultat.id)
+		assertEquals(tiltakInstans.navn, resultat.navn)
+
+	}
+
+	@Test
+	fun `hentDeltakere - happy path`() {
+		val leverandorId = insertTiltaksleverandor()
+		val tiltak = tiltakRepository.insert((1000..9999).random().toString(), "Gruppe AMO", "GRUPPEAMO")
+
+		val tiltakInstans = insertTiltakInstans(tiltak.id, leverandorId)
+
+		insertDeltaker(tiltakInstans.id, "12128673847")
+		insertDeltaker(tiltakInstans.id, "12128673846")
+
+		val deltakere = controller.hentDeltakere(tiltakInstans.id.toString())
+
+		assertEquals(deltakere.size, 2)
+	}
+
+	private fun insertDeltaker(instansId: UUID, fnr: String): DeltakerDbo {
+		val bruker = brukerRepository.insert(
+			fodselsnummer = fnr,
+			fornavn = "Fornavn",
+			mellomnavn = "",
+			etternavn = "Etternavn",
+			telefonnummer = "12345678",
+			epost = "epost",
+			ansvarligVeilederId = null
+		)
+		return deltakerRepository.insert(
+			brukerId = bruker.id,
+			tiltaksgjennomforingId = instansId,
+			oppstartDato = LocalDate.now(),
+			sluttDato = LocalDate.now(),
+			status =  Deltaker.Status.GJENNOMFORES,
+			arenaStatus = "arenastatus",
+			dagerPerUke = 5,
+			prosentStilling = 10f
+		)
+	}
+
+	private fun insertTiltakInstans(tiltakId: UUID, leverandorId: UUID) : TiltaksinstansDbo {
+		var arenaId = (1000..9999).random()
+		return tiltakInstansRepository.insert(
+			arenaId = arenaId,
+			tiltakId = tiltakId,
 			tiltaksleverandorId = leverandorId,
 			navn = "Kaffekurs",
 			status = TiltakInstans.Status.GJENNOMFORES,
@@ -98,22 +146,18 @@ class TiltakInstansControllerIntegrationTest {
 			registrertDato = null,
 			fremmoteDato = null
 		)
-		val resultat = controller.hentTiltakInstans(tiltakInstans.id.toString())
-		assertEquals(tiltakInstans.id, resultat.id)
-		assertEquals(tiltakInstans.navn, resultat.navn)
-
-
 	}
 
 	private fun insertTiltaksleverandor() : UUID {
-		val id = "0dc9ccec-fd1e-4c4e-b91a-c23e6d89c18e"
+		val id = UUID.randomUUID()
+		val orgnr = (1000..9999).random()
 		val insert = """
 			INSERT INTO tiltaksleverandor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer,navn)
-			VALUES ('$id', '12345678', 'Orgnavn1', '87654321', 'Virksomhetsnavn1')
+			VALUES ('$id', '12345678', 'Orgnavn1', '$orgnr', 'Virksomhetsnavn1')
 		""".trimIndent()
 		namedJdbcTemplate.jdbcTemplate.update(insert)
 
-		return UUID.fromString(id)
+		return id
 	}
 
 }

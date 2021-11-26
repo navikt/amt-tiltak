@@ -1,10 +1,8 @@
 package no.nav.amt.tiltak.tiltak.services
 
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.core.port.TiltakService
-import no.nav.amt.tiltak.tiltak.deltaker.DeltakerService
 import no.nav.amt.tiltak.tiltak.repositories.TiltakInstansRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import no.nav.amt.tiltak.tiltak.utils.UpdateStatus
@@ -16,8 +14,7 @@ import java.util.*
 @Service
 class TiltakServiceImpl(
 	private val tiltakRepository: TiltakRepository,
-	private val tiltakInstansRepository: TiltakInstansRepository,
-	private val deltakerService: DeltakerService
+	private val tiltakInstansRepository: TiltakInstansRepository
 ) : TiltakService {
 
 	override fun upsertTiltak(arenaId: String, navn: String, kode: String): Tiltak {
@@ -96,28 +93,6 @@ class TiltakServiceImpl(
 			val tiltak = getTiltakOrElseThrow(instans.tiltakId)
 			return instans.toTiltakInstans(tiltak)
 		} ?: throw NoSuchElementException("Fant ikke tiltakInstans")
-	}
-
-	override fun upsertDeltaker(
-		tiltaksgjennomforing: UUID,
-		fodselsnummer: String,
-		oppstartDato: LocalDate?,
-		sluttDato: LocalDate?,
-		status: Deltaker.Status,
-		arenaStatus: String?,
-		dagerPerUke: Int?,
-		prosentStilling: Float?
-	): Deltaker {
-		return deltakerService.addUpdateDeltaker(
-			tiltaksinstans = tiltaksgjennomforing,
-			fodselsnummer = fodselsnummer,
-			oppstartDato = oppstartDato,
-			sluttDato = sluttDato,
-			status = status,
-			arenaStatus = arenaStatus,
-			dagerPerUke = dagerPerUke,
-			prosentStilling = prosentStilling
-		)
 	}
 
 	override fun getTiltakInstans(id: UUID): TiltakInstans {

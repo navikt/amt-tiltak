@@ -1,6 +1,4 @@
 package no.nav.amt.tiltak.core.port
-
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import java.time.LocalDate
@@ -27,16 +25,5 @@ interface TiltakService {
 	): TiltakInstans
 
 	fun getTiltaksinstansFromArenaId(arenaId: Int): TiltakInstans?
-
-	fun upsertDeltaker(
-		tiltaksgjennomforing: UUID,
-		fodselsnummer: String,
-		oppstartDato: LocalDate?,
-		sluttDato: LocalDate?,
-		status: Deltaker.Status = Deltaker.Status.NY_BRUKER,
-		arenaStatus: String?,
-		dagerPerUke: Int?,
-		prosentStilling: Float?
-	): Deltaker
 
 }

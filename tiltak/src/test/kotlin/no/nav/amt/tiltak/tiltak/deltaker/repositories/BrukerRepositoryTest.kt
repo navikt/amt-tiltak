@@ -28,7 +28,7 @@ class BrukerRepositoryTest : FunSpec({
 	}
 
 	test("Insert should insert bruker and return BrukerDbo") {
-		val fodselsnummer = "123"
+		val fodselsnummer = "12345678910"
 		val fornavn = "Per"
 		val mellomnavn = null
 		val etternavn = "Testersen"
@@ -40,7 +40,7 @@ class BrukerRepositoryTest : FunSpec({
 
 		dbo shouldNotBe null
 		dbo.id shouldNotBe null
-		dbo.fodselOgPersonNr shouldBe fodselsnummer
+		dbo.fodselsnummer.toString() shouldBe fodselsnummer
 		dbo.fornavn shouldBe fornavn
 		dbo.etternavn shouldBe etternavn
 		dbo.telefonnummer shouldBe telefonnummer

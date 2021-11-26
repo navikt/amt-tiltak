@@ -1,17 +1,21 @@
 package no.nav.amt.tiltak.tiltak.controllers
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.core.port.TiltakService
+import no.nav.amt.tiltak.core.domain.tiltak.Fodselsnummer
+import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.security.mock.oauth2.MockOAuth2Server
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.beans.factory.annotation.Autowired
 
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
@@ -28,11 +32,14 @@ class TiltakInstansControllerTest {
 	@MockBean
 	private lateinit var tiltakService: TiltakService
 
+	@MockBean
+	private lateinit var deltakerService: DeltakerService
+
 	@Autowired
 	private lateinit var mockMvc: MockMvc
 
 	val tiltak = Tiltak(
-		id =UUID.randomUUID(),
+		id = UUID.randomUUID(),
 		navn = "tiltaksnavn",
 		kode = "kode"
 	)
@@ -81,7 +88,6 @@ class TiltakInstansControllerTest {
 	@Test
 	fun `hentTiltakInstans() should return 200 when authenticated`() {
 		Mockito.`when`(tiltakService.getTiltakInstans(tiltakInstansId)).thenReturn(tiltakInstans)
-
 		val token = server.issueToken("tokenx", "test", "test").serialize()
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.get("/api/tiltak-instans/$tiltakInstansId")
@@ -102,10 +108,27 @@ class TiltakInstansControllerTest {
 
 	@Test
 	fun `hentDeltakere() should return 200 when authenticated`() {
+		val deltaker = DeltakerDbo(
+			id = UUID.randomUUID(),
+			brukerId = UUID.randomUUID(),
+			brukerFodselsnummer = Fodselsnummer("12129312375"),
+			brukerFornavn = "Fornavn",
+			brukerEtternavn = "Etternavn",
+			tiltakInstansId = tiltakInstansId,
+			startDato = LocalDate.now(),
+			sluttDato = LocalDate.now(),
+			arenaStatus = "status",
+			dagerPerUke = 1,
+			prosentStilling = 10.343f,
+			status = Deltaker.Status.GJENNOMFORES,
+			createdAt = LocalDateTime.now(),
+			modifiedAt = LocalDateTime.now()
+		).toDeltaker()
+		Mockito.`when`(deltakerService.hentDeltakerePaaTiltak(tiltakInstansId)).thenReturn(listOf(deltaker))
 		val token = server.issueToken("tokenx", "test", "test").serialize()
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltak-instans/ID/deltakere")
+			MockMvcRequestBuilders.get("/api/tiltak-instans/$tiltakInstansId/deltakere")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 

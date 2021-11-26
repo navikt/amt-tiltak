@@ -21,6 +21,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 	lateinit var repository: DeltakerRepository
 	val tiltakInstansId = UUID.fromString("b3420940-5479-48c8-b2fa-3751c7a33aa2")
 	val brukerId = UUID.fromString("23b04c3a-a36c-451f-b9cf-30b6a6b586b8")
+	val fnr = "12345678910"
 
 	beforeEach {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
@@ -55,7 +56,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		dbo.brukerId shouldBe brukerId
 		dbo.brukerFornavn shouldBe "Bruker Fornavn"
 		dbo.brukerEtternavn shouldBe "Bruker Etternavn"
-		dbo.brukerFodselOgPersonNr shouldBe "1"
+		dbo.brukerFodselsnummer.toString() shouldBe fnr
 		dbo.tiltakInstansId shouldBe tiltakInstansId
 		dbo.startDato shouldBe oppstartDato
 		dbo.sluttDato shouldBe sluttDato
@@ -166,7 +167,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			prosentStilling
 		)
 
-		val gottenDbo = repository.get("1", tiltakInstansId)
+		val gottenDbo = repository.get(fnr, tiltakInstansId)
 
 		gottenDbo shouldBe dbo
 	}
