@@ -16,7 +16,6 @@ open class BrukerRepository(
 ) {
 
     private val rowMapper = RowMapper { rs, _ ->
-		val veileder = rs.getString("ansvarlig_veileder_internal_id")
 
         BrukerDbo(
 			id = rs.getUUID("id"),
