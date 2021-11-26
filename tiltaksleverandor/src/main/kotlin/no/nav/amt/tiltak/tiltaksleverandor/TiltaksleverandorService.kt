@@ -35,6 +35,10 @@ class TiltaksleverandorService(
 		return ansattService.getAnsatt(ansattId)
 	}
 
+	override fun getAnsattByPersonligIdent(personIdent: String): Ansatt {
+		return ansattService.getAnsattByPersonligIdent(personIdent)
+	}
+
 	override fun getVirksomheterForAnsatt(ansattId: UUID): List<Tiltaksleverandor> {
 		throw NotImplementedError("getVirksomheterForAnsatt in TiltaksleverandorService is not yet implemented")
 	}

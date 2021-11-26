@@ -4,8 +4,10 @@ import java.util.*
 
 data class Ansatt (
     val id: UUID,
+	val personligIdent: String,
     val fornavn: String,
-    val mellomnavn: String? = null,
     val etternavn: String,
-    val virksomheter: List<Tiltaksleverandor>?
+	val telefonnummer: String?,
+	val epost: String?,
+    val leverandorer: List<TilknyttetLeverandor>
 )
