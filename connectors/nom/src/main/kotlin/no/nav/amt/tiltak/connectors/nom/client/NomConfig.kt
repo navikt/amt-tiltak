@@ -15,8 +15,15 @@ open class NomConfig {
 	@Value("\${nom.scope}")
 	lateinit var scope: String
 
+	@Value("\${nom.mock:false}")
+	var mock: Boolean = false
+
 	@Bean
 	open fun nomConnector(scopedTokenProvider: ScopedTokenProvider, ) : NomConnector {
+		if (mock) {
+			return NomClientMock()
+		}
+
 		return NomClient(url = url, tokenSupplier = { scopedTokenProvider.getToken(scope) })
 	}
 
