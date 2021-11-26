@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.ingestors.arena.processors
 
 import no.nav.amt.tiltak.core.port.ArenaOrdsProxyConnector
+import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
 import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltakDeltaker
@@ -16,6 +17,7 @@ open class DeltakerProcessor(
 	repository: ArenaDataRepository,
 	private val ignoredTiltakRepository: ArenaTiltakIgnoredRepository,
 	private val tiltakService: TiltakService,
+	private val deltakerService: DeltakerService,
 	private val ords: ArenaOrdsProxyConnector
 ) : AbstractArenaProcessor(repository) {
 
@@ -47,14 +49,14 @@ open class DeltakerProcessor(
 			val fodselsnummer = ords.hentFnr(newFields.PERSON_ID.toString())
 				?: throw DataIntegrityViolationException("Person med Arena ID ${newFields.PERSON_ID} returnerer ikke fødselsnummer")
 
-			tiltakService.upsertDeltaker(
-				tiltaksgjennomforing = tiltaksgjennomforing.id,
+			deltakerService.addUpdateDeltaker(
+				tiltaksinstans = tiltaksgjennomforing.id,
 				fodselsnummer = fodselsnummer,
 				oppstartDato = newFields.DATO_FRA?.asLocalDate(),
 				sluttDato = newFields.DATO_TIL?.asLocalDate(),
 				arenaStatus = newFields.DELTAKERSTATUSKODE,
 				dagerPerUke = newFields.ANTALL_DAGER_PR_UKE,
-				prosentStilling = newFields.PROSENT_DELTID
+				prosentStilling = newFields.PROSENT_DELTID,
 			)
 
 			repository.upsert(data.markAsIngested())

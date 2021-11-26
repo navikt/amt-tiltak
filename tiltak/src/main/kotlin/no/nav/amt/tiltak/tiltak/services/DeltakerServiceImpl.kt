@@ -1,10 +1,10 @@
-package no.nav.amt.tiltak.tiltak.deltaker
+package no.nav.amt.tiltak.tiltak.services
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.tiltak.deltaker.cmd.UpsertNavAnsattCmd
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.BrukerDbo
-import no.nav.amt.tiltak.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.NavAnsattDbo
 import no.nav.amt.tiltak.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.tiltak.deltaker.repositories.DeltakerRepository
@@ -15,14 +15,14 @@ import java.time.LocalDate
 import java.util.*
 
 @Service
-open class DeltakerService(
+open class DeltakerServiceImpl(
 	private val deltakerRepository: DeltakerRepository,
 	private val brukerRepository: BrukerRepository,
 	private val navAnsattRepository: NavAnsattRepository,
 	private val personService: PersonService,
-) {
+): DeltakerService {
 
-	fun addUpdateDeltaker(
+	override fun addUpdateDeltaker(
 		tiltaksinstans: UUID,
 		fodselsnummer: String,
 		oppstartDato: LocalDate?,
@@ -73,6 +73,10 @@ open class DeltakerService(
 		}
 	}
 
+	override fun hentDeltakerePaaTiltak(id: UUID): List<Deltaker> {
+		return deltakerRepository.getDeltakerePaaTiltak(id).map { it.toDeltaker() }
+	}
+
 	private fun getBruker(fodselsnummer: String): BrukerDbo {
 		val storedBruker = brukerRepository.get(fodselsnummer)
 
@@ -108,8 +112,5 @@ open class DeltakerService(
 		}
 	}
 
-	fun hentDeltakerePaaTiltak(id: UUID): List<DeltakerDbo> {
-		return deltakerRepository.getDeltakerePaaTiltak(id)
-	}
 
 }
