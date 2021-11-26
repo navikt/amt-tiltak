@@ -61,7 +61,7 @@ spec:
     - name: NOM_URL
       value: https://nom-api.dev.intern.nav.no
     - name: NOM_MOCK
-      value: true
+      value: "true"
     - name: POAO_GCP_PROXY_SCOPE
       value: api://dev-fss.pto.poao-gcp-proxy/.default
     - name: POAO_GCP_PROXY_URL
