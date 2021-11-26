@@ -18,7 +18,7 @@ data class DeltakerDbo(
 	val tiltakInstansId: UUID,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
-	val arenaStatus: String?, //TODO: Gjøre om til enum
+	val arenaStatus: String?,
 	val dagerPerUke: Int?,
 	val prosentStilling: Float?,
 	val status: Deltaker.Status?,
