@@ -14,29 +14,7 @@ import java.util.*
 open class DeltakerRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
-
 	private val rowMapper = RowMapper { rs, _ ->
-		val statusString = rs.getString("deltaker_status")
-
-		DeltakerDbo(
-			id = UUID.fromString(rs.getString("deltaker_id")),
-			brukerId = UUID.fromString(rs.getString("bruker_id")),
-			brukerFodselsnummer = Fodselsnummer(rs.getString("bruker_fodselsnummer")),
-			brukerFornavn = rs.getString("bruker_fornavn"),
-			brukerEtternavn = rs.getString("bruker_etternavn"),
-			startDato = rs.getDate("deltaker_oppstartsdato")?.toLocalDate(),
-			sluttDato = rs.getDate("deltaker_sluttdato")?.toLocalDate(),
-			tiltakInstansId = UUID.fromString(rs.getString("tiltaksinstans_id")),
-			arenaStatus = rs.getString("deltaker_arena_status"),
-			dagerPerUke = rs.getInt("deltaker_dager_per_uke"),
-			prosentStilling = rs.getFloat("deltaker_prosent_stilling"),
-			status = if (statusString != null) Deltaker.Status.valueOf(statusString) else null,
-			createdAt = rs.getTimestamp("deltaker_created_at").toLocalDateTime(),
-			modifiedAt = rs.getTimestamp("deltaker_modified_at").toLocalDateTime()
-		)
-	}
-
-	private val rowMapper2 = RowMapper { rs, _ ->
 		val statusString = rs.getString("status")
 
 		DeltakerDbo(
@@ -119,7 +97,7 @@ open class DeltakerRepository(
 			mapOf("tiltaksinstans_id" to id)
 		)
 
-		return template.query(sql, parameters, rowMapper2)
+		return template.query(sql, parameters, rowMapper)
 	}
 
 	fun update(deltaker: DeltakerDbo): DeltakerDbo {
@@ -150,20 +128,20 @@ open class DeltakerRepository(
 
 	fun get(id: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.id                as deltaker_id,
-				   deltaker.bruker_id         as bruker_id,
-				   bruker.fodselsnummer       as bruker_fodselsnummer,
-				   bruker.fornavn             as bruker_fornavn,
-				   bruker.etternavn           as bruker_etternavn,
-				   deltaker.oppstart_dato     as deltaker_oppstartsdato,
-				   deltaker.slutt_dato        as deltaker_sluttdato,
-				   deltaker.tiltaksinstans_id as tiltaksinstans_id,
-				   deltaker.arena_status      as deltaker_arena_status,
-				   deltaker.dager_per_uke     as deltaker_dager_per_uke,
-				   deltaker.prosent_stilling  as deltaker_prosent_stilling,
-				   deltaker.status            as deltaker_status,
-				   deltaker.created_at        as deltaker_created_at,
-				   deltaker.modified_at       as deltaker_modified_at
+			SELECT deltaker.id,
+				   deltaker.bruker_id,
+				   bruker.fodselsnummer,
+				   bruker.fornavn,
+				   bruker.etternavn,
+				   deltaker.oppstart_dato,
+				   deltaker.slutt_dato,
+				   deltaker.tiltaksinstans_id,
+				   deltaker.arena_status,
+				   deltaker.dager_per_uke,
+				   deltaker.prosent_stilling,
+				   deltaker.status,
+				   deltaker.created_at,
+				   deltaker.modified_at
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 			WHERE deltaker.id = :deltakerId
@@ -181,20 +159,20 @@ open class DeltakerRepository(
 
 	fun get(brukerId: UUID, tiltaksinstansId: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.id                as deltaker_id,
-				   deltaker.bruker_id         as bruker_id,
-				   bruker.fodselsnummer       as bruker_fodselsnummer,
-				   bruker.fornavn             as bruker_fornavn,
-				   bruker.etternavn           as bruker_etternavn,
-				   deltaker.oppstart_dato     as deltaker_oppstartsdato,
-				   deltaker.slutt_dato        as deltaker_sluttdato,
-				   deltaker.tiltaksinstans_id as tiltaksinstans_id,
-				   deltaker.arena_status      as deltaker_arena_status,
-				   deltaker.dager_per_uke     as deltaker_dager_per_uke,
-				   deltaker.prosent_stilling  as deltaker_prosent_stilling,
-				   deltaker.status            as deltaker_status,
-				   deltaker.created_at        as deltaker_created_at,
-				   deltaker.modified_at       as deltaker_modified_at
+			SELECT deltaker.id,
+				   deltaker.bruker_id,
+				   bruker.fodselsnummer,
+				   bruker.fornavn,
+				   bruker.etternavn,
+				   deltaker.oppstart_dato,
+				   deltaker.slutt_dato,
+				   deltaker.tiltaksinstans_id,
+				   deltaker.arena_status,
+				   deltaker.dager_per_uke,
+				   deltaker.prosent_stilling,
+				   deltaker.status,
+				   deltaker.created_at,
+				   deltaker.modified_at
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 			WHERE bruker.id = :brukerId
@@ -214,20 +192,20 @@ open class DeltakerRepository(
 
 	fun get(fodselsnummer: String, tiltaksinstansId: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.id                as deltaker_id,
-				   deltaker.bruker_id         as bruker_id,
-				   bruker.fodselsnummer       as bruker_fodselsnummer,
-				   bruker.fornavn             as bruker_fornavn,
-				   bruker.etternavn           as bruker_etternavn,
-				   deltaker.oppstart_dato     as deltaker_oppstartsdato,
-				   deltaker.slutt_dato        as deltaker_sluttdato,
-				   deltaker.tiltaksinstans_id as tiltaksinstans_id,
-				   deltaker.arena_status      as deltaker_arena_status,
-				   deltaker.dager_per_uke     as deltaker_dager_per_uke,
-				   deltaker.prosent_stilling  as deltaker_prosent_stilling,
-				   deltaker.status            as deltaker_status,
-				   deltaker.created_at        as deltaker_created_at,
-				   deltaker.modified_at       as deltaker_modified_at
+			SELECT deltaker.id,
+				   deltaker.bruker_id,
+				   bruker.fodselsnummer,
+				   bruker.fornavn,
+				   bruker.etternavn,
+				   deltaker.oppstart_dato,
+				   deltaker.slutt_dato,
+				   deltaker.tiltaksinstans_id,
+				   deltaker.arena_status,
+				   deltaker.dager_per_uke,
+				   deltaker.prosent_stilling,
+				   deltaker.status,
+				   deltaker.created_at,
+				   deltaker.modified_at
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 			WHERE bruker.fodselsnummer = :bruker_fodselsnummer
