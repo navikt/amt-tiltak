@@ -48,7 +48,7 @@ class AnsattControllerTest {
 
 	@Test
 	fun `getInnloggetAnsatt() should return 200 when authenticated`() {
-		val token = server.issueToken("tokenx", "test", "test").serialize()
+		val token = server.issueToken("tokenx", "test", "test", mapOf("pid" to "12345678")).serialize()
 
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.get("/api/tiltaksleverandor/ansatt/meg")

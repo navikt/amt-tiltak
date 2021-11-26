@@ -10,5 +10,6 @@ interface TiltaksleverandorService {
 
 	fun getVirksomheterForAnsatt(ansattId: UUID): List<Tiltaksleverandor>
 	fun getAnsatt(ansattId: UUID): Ansatt
+	fun getAnsattByPersonligIdent(personIdent: String): Ansatt
 	fun getTiltaksleverandorByVirksomhetsnummer(virksomhetsnummer: String): Tiltaksleverandor?
 }
