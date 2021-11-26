@@ -6,17 +6,18 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.tiltak.testutils.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tiltak.utils.UpdateStatus
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate
 import java.util.*
 
-@Testcontainers
 internal class DeltakerRepositoryTest : FunSpec({
-	lateinit var template: NamedParameterJdbcTemplate
+
+	val dataSource = SingletonPostgresContainer.getDataSource()
+
 	lateinit var repository: DeltakerRepository
 	val tiltakInstansId = UUID.fromString("b3420940-5479-48c8-b2fa-3751c7a33aa2")
 	val brukerId = UUID.fromString("23b04c3a-a36c-451f-b9cf-30b6a6b586b8")
@@ -25,8 +26,10 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 		rootLogger.level = Level.WARN
 
-		template = DatabaseTestUtils.getDatabase("/deltaker-repository_test-data.sql")
-		repository = DeltakerRepository(template)
+		repository = DeltakerRepository(NamedParameterJdbcTemplate(dataSource))
+
+		DatabaseTestUtils.cleanDatabase(dataSource)
+		DatabaseTestUtils.runScriptFile("/deltaker-repository_test-data.sql", dataSource)
 	}
 
 	test("Insert should insert Deltaker and return DeltakerDbo") {

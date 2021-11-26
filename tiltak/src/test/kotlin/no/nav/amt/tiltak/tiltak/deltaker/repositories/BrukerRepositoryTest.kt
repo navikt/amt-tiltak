@@ -5,25 +5,27 @@ import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt.tiltak.tiltak.testutils.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.testcontainers.junit.jupiter.Testcontainers
 import java.util.*
 
 
-@Testcontainers
 class BrukerRepositoryTest : FunSpec({
-	lateinit var template: NamedParameterJdbcTemplate
+
+	val dataSource = SingletonPostgresContainer.getDataSource()
+
 	lateinit var repository: BrukerRepository
 
 	beforeEach {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 		rootLogger.level = Level.WARN
 
-		template = DatabaseTestUtils.getDatabase("/bruker-repository_test-data.sql")
+		repository = BrukerRepository(NamedParameterJdbcTemplate(dataSource))
 
-		repository = BrukerRepository(template)
+		DatabaseTestUtils.cleanDatabase(dataSource)
+		DatabaseTestUtils.runScriptFile("/bruker-repository_test-data.sql", dataSource)
 	}
 
 	test("Insert should insert bruker and return BrukerDbo") {
