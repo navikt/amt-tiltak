@@ -5,16 +5,17 @@ import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tiltak.deltaker.cmd.UpsertNavAnsattCmd
-import no.nav.amt.tiltak.tiltak.testutils.DatabaseTestUtils
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.testcontainers.junit.jupiter.Testcontainers
 
-@Testcontainers
+
 class NavAnsattRepositoryTest : FunSpec({
 
-	lateinit var template: NamedParameterJdbcTemplate
+	val dataSource = SingletonPostgresContainer.getDataSource()
+
 	lateinit var repository: NavAnsattRepository
 
 	val upsertCmd = UpsertNavAnsattCmd(
@@ -29,8 +30,9 @@ class NavAnsattRepositoryTest : FunSpec({
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 		rootLogger.level = Level.WARN
 
-		template = DatabaseTestUtils.getDatabase()
-		repository = NavAnsattRepository(template)
+		repository = NavAnsattRepository(NamedParameterJdbcTemplate(dataSource))
+
+		DatabaseTestUtils.cleanDatabase(dataSource)
 	}
 
 	test("Hent nav-ansatt som ikke eksisterer returnerer null") {
@@ -61,7 +63,6 @@ class NavAnsattRepositoryTest : FunSpec({
 		storedDbo!!.id shouldBe updatedDbo!!.id
 		updatedDbo.epost shouldBe null
 		updatedDbo.telefonnummer shouldBe null
-
 	}
 
 

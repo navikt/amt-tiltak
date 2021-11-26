@@ -20,6 +20,7 @@
         <module>tools</module>
         <module>mocks</module>
         <module>common</module>
+        <module>test</module>
     </modules>
 
     <name>AMT-Tiltak</name>
@@ -41,7 +42,6 @@
         <mockito-kotlin.version>3.2.0</mockito-kotlin.version>
         <schedlock.version>4.27.0</schedlock.version>
 
-        <common.version>2.2021.08.16_13.46-d90f8c15f6ff</common.version>
         <wiremock.version>2.31.0</wiremock.version>
         <nimbus.version>9.18</nimbus.version>
         <mockk.version>1.12.0</mockk.version>
@@ -134,27 +134,6 @@
                 <artifactId>db-migrations</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>testcontainers</artifactId>
-                <version>${testcontainers.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>kafka</artifactId>
-                <version>${testcontainers.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>postgresql</artifactId>
-                <version>${testcontainers.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>junit-jupiter</artifactId>
-                <version>${testcontainers.version}</version>
-            </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>token_provider</artifactId>
@@ -207,6 +186,17 @@
             </dependency>
 
             <dependency>
+                <groupId>no.nav.common</groupId>
+                <artifactId>kafka</artifactId>
+                <version>${common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.common</groupId>
+                <artifactId>types</artifactId>
+                <version>${common.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>no.nav.security</groupId>
                 <artifactId>token-validation-spring</artifactId>
                 <version>${token-support.version}</version>
@@ -217,31 +207,71 @@
                 <version>${okhttp.version}</version>
             </dependency>
             <dependency>
-                <!-- Fixes bug with conflicting versions from transitive dependencies -->
-                <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>mockwebserver</artifactId>
-                <version>${okhttp.version}</version>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>oauth2-oidc-sdk</artifactId>
+                <version>${nimbus.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>database</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>mocks</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>kafka</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito.kotlin</groupId>
+                <artifactId>mockito-kotlin</artifactId>
+                <version>${mockito-kotlin.version}</version>
+                <scope>test</scope>
+            </dependency>
             <dependency>
                 <groupId>com.github.tomakehurst</groupId>
                 <artifactId>wiremock-jre8</artifactId>
                 <version>${wiremock.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.nimbusds</groupId>
-                <artifactId>oauth2-oidc-sdk</artifactId>
-                <version>${nimbus.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>io.mockk</groupId>
                 <artifactId>mockk</artifactId>
                 <version>${mockk.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>no.nav.security</groupId>
                 <artifactId>mock-oauth2-server</artifactId>
                 <version>${mock-oauth2-server.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>io.kotest</groupId>
@@ -272,16 +302,6 @@
                 <artifactId>mockwebserver</artifactId>
                 <version>${okhttp.version}</version>
                 <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>mocks</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.common</groupId>
-                <artifactId>types</artifactId>
-                <version>${common.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -3,22 +3,22 @@ package no.nav.amt.tiltak.tiltak.repositories
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
+import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tiltak.dbo.TiltaksinstansDbo
-import no.nav.amt.tiltak.tiltak.testutils.DatabaseTestUtils
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-@Testcontainers
 internal class TiltaksinstansRepositoryTest {
-	lateinit var template: NamedParameterJdbcTemplate
+
+	private val dataSource = SingletonPostgresContainer.getDataSource()
 
 	lateinit var repository: TiltakInstansRepository
 
@@ -32,8 +32,10 @@ internal class TiltaksinstansRepositoryTest {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 		rootLogger.level = Level.WARN
 
-		template = DatabaseTestUtils.getDatabase("/tiltaksinstans-repository_test-data.sql")
-		repository = TiltakInstansRepository(template)
+		repository = TiltakInstansRepository(NamedParameterJdbcTemplate(dataSource))
+
+		DatabaseTestUtils.cleanDatabase(dataSource)
+		DatabaseTestUtils.runScriptFile("/tiltaksinstans-repository_test-data.sql", dataSource)
 	}
 
 	@Test

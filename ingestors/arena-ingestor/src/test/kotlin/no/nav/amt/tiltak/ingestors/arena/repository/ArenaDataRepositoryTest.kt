@@ -1,63 +1,34 @@
 package no.nav.amt.tiltak.ingestors.arena.repository
 
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import junit.framework.Assert.*
 import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
 import no.nav.amt.tiltak.ingestors.arena.domain.IngestStatus
 import no.nav.amt.tiltak.ingestors.arena.domain.OperationType
-import org.flywaydb.core.Flyway
+import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.utility.DockerImageName
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
-@Testcontainers
 class ArenaDataRepositoryTest {
 
-	//  Kopiert fra LocalPostgresDatabase.kt. Hadde det vært bedre med en modul for test-verktøy?
-	private fun createDataSource(container: PostgreSQLContainer<Nothing>): HikariDataSource {
-		val config = HikariConfig()
-		config.username = container.username
-		config.password = container.password
-		config.jdbcUrl = container.jdbcUrl
-		config.driverClassName = container.driverClassName
-		return HikariDataSource(config)
-	}
-
-	@Container
-	val postgresContainer: PostgreSQLContainer<Nothing> =
-		PostgreSQLContainer(DockerImageName.parse("postgres:12-alpine"))
+	val dataSource = SingletonPostgresContainer.getDataSource()
 
 	lateinit var jdbcTemplate: JdbcTemplate
-	lateinit var namedJdbcTemplate: NamedParameterJdbcTemplate
 
 	lateinit var arenaDataRepository: ArenaDataRepository
 
 	@BeforeEach
 	fun migrate() {
-		val dataSource = createDataSource(postgresContainer)
-
-		// Kopiert fra LocalPostgresDatabase.kt. Hadde det vært bedre med en modul for test-verktøy?
-		val flyway: Flyway = Flyway.configure()
-			.dataSource(dataSource)
-			.load()
-
-		flyway.clean()
-		flyway.migrate()
-
 		jdbcTemplate = JdbcTemplate(dataSource)
-		namedJdbcTemplate = NamedParameterJdbcTemplate(dataSource)
 
-		arenaDataRepository = ArenaDataRepository(namedJdbcTemplate)
+		arenaDataRepository = ArenaDataRepository(NamedParameterJdbcTemplate(dataSource))
 
-		jdbcTemplate.update(this::class.java.getResource("/arena-data.sql").readText())
+		DatabaseTestUtils.cleanDatabase(dataSource)
+		DatabaseTestUtils.runScriptFile("/arena-data.sql", dataSource)
 	}
 
 	@Test

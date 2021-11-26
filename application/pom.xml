@@ -74,7 +74,6 @@
         <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>kafka</artifactId>
-            <version>${common.version}</version>
         </dependency>
 
         <dependency>
@@ -144,7 +143,6 @@
         <dependency>
             <groupId>org.mockito.kotlin</groupId>
             <artifactId>mockito-kotlin</artifactId>
-            <version>${mockito-kotlin.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -153,11 +151,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>kafka</artifactId>
@@ -172,7 +165,6 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
