@@ -58,12 +58,14 @@ spec:
       value: http://amt-enhetsregister.amt.svc.cluster.local
     - name: NOM_SCOPE
       value: api://dev-gcp.nom.nom-api/.default
+    - name: NOM_URL
+      value: https://nom-api.dev.intern.nav.no
+    - name: NOM_MOCK
+      value: true
     - name: POAO_GCP_PROXY_SCOPE
       value: api://dev-fss.pto.poao-gcp-proxy/.default
     - name: POAO_GCP_PROXY_URL
       value: https://poao-gcp-proxy.dev-fss-pub.nais.io
-    - name: NOM_URL
-      value: https://nom-api.dev.intern.nav.no
     # Kafka topics
     - name: ARENA_TILTAK_TOPIC
       value: teamarenanais.aapen-arena-tiltakendret-v1-q2
