@@ -47,6 +47,8 @@ class BrukerRepositoryTest : FunSpec({
 		dbo.telefonnummer shouldBe telefonnummer
 		dbo.epost shouldBe epost
 		dbo.ansvarligVeilederId shouldBe ansvarligVeilederId
+		dbo.createdAt shouldNotBe null
+		dbo.modifiedAt shouldNotBe null
 	}
 
 	test("Get user that does not exist should be null") {
