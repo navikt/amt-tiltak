@@ -8,7 +8,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-data class TiltaksinstansDbo(
+data class TiltakInstansDbo(
 	val id: UUID,
 	val arenaId: Int,
 	val tiltaksleverandorId: UUID,
@@ -37,7 +37,7 @@ data class TiltaksinstansDbo(
 		)
 	}
 
-	fun update(other: TiltaksinstansDbo): UpdateCheck<TiltaksinstansDbo> {
+	fun update(other: TiltakInstansDbo): UpdateCheck<TiltakInstansDbo> {
 		if (this != other) {
 			val updated = this.copy(
 				navn = other.navn,

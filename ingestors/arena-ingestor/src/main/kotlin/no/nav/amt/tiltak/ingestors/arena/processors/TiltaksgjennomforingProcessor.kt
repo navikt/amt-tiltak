@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.ingestors.arena.processors
 
 import no.nav.amt.tiltak.core.domain.tiltaksleverandor.Tiltaksleverandor
 import no.nav.amt.tiltak.core.port.ArenaOrdsProxyConnector
+import no.nav.amt.tiltak.core.port.TiltakInstansService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.core.port.TiltaksleverandorService
 import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
@@ -18,6 +19,7 @@ open class TiltaksgjennomforingProcessor(
 	repository: ArenaDataRepository,
 	private val ignoredTiltakRepository: ArenaTiltakIgnoredRepository,
 	private val tiltaksleverandorService: TiltaksleverandorService,
+	private val tiltakInstansService: TiltakInstansService,
 	private val tiltakService: TiltakService,
 	private val ords: ArenaOrdsProxyConnector
 ) : AbstractArenaProcessor(repository) {
@@ -33,7 +35,7 @@ open class TiltaksgjennomforingProcessor(
 
 			val tiltaksleverandor = addTiltaksleverandor(newFields)
 
-			tiltakService.upsertTiltaksinstans(
+			tiltakInstansService.upsertTiltaksinstans(
 				arenaId = newFields.TILTAKGJENNOMFORING_ID.toInt(),
 				tiltakId = tiltak.id,
 				tiltaksleverandorId = tiltaksleverandor.id,
@@ -67,7 +69,7 @@ open class TiltaksgjennomforingProcessor(
 				?: throw DependencyNotIngestedException("Tilktak med ArenaId $virksomhetsnummer er ikke ingested enda.")
 
 
-			tiltakService.upsertTiltaksinstans(
+			tiltakInstansService.upsertTiltaksinstans(
 				arenaId = newFields.TILTAKGJENNOMFORING_ID.toInt(),
 				tiltakId = tiltak.id,
 				tiltaksleverandorId = tiltaksleverandor.id,

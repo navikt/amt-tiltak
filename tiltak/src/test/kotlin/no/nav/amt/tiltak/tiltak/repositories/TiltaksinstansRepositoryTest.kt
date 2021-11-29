@@ -5,7 +5,7 @@ import ch.qos.logback.classic.Logger
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.tiltak.dbo.TiltaksinstansDbo
+import no.nav.amt.tiltak.tiltak.dbo.TiltakInstansDbo
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -77,7 +77,7 @@ internal class TiltaksinstansRepositoryTest {
 	internal fun `update() should throw if tiltaksinstans does not exist`() {
 		assertThrows<NoSuchElementException> {
 			repository.update(
-				TiltaksinstansDbo(
+				TiltakInstansDbo(
 					id = UUID.randomUUID(),
 					arenaId = 9999,
 					tiltaksleverandorId = UUID.randomUUID(),

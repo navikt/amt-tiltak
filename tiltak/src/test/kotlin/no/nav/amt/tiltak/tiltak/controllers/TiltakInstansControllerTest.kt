@@ -4,7 +4,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.TiltakService
+import no.nav.amt.tiltak.core.port.TiltakInstansService
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
@@ -29,7 +29,7 @@ class TiltakInstansControllerTest {
 	private val tiltakInstansId = UUID.fromString("e68d54e2-47b5-11ec-81d3-0242ac130003")
 
 	@MockBean
-	private lateinit var tiltakService: TiltakService
+	private lateinit var tiltakInstansService: TiltakInstansService
 
 	@MockBean
 	private lateinit var deltakerService: DeltakerService
@@ -75,6 +75,29 @@ class TiltakInstansControllerTest {
 	}
 
 	@Test
+	fun `hentTiltakInstanserByArrangorId() should return 401 when not authenticated`() {
+		val response = mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/tiltak-instans")
+				.queryParam("arrangorId", "test")
+		).andReturn().response
+
+		assertEquals(401, response.status)
+	}
+
+	@Test
+	fun `hentTiltakInstanserByArrangorId() should return 200 when authenticated`() {
+		val token = server.issueToken("tokenx", "test", "test").serialize()
+
+		val response = mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/tiltak-instans")
+				.queryParam("arrangorId", UUID.randomUUID().toString())
+				.header("Authorization", "Bearer $token")
+		).andReturn().response
+
+		assertEquals(200, response.status)
+	}
+
+	@Test
 	fun `hentTiltakInstans() should return 401 when not authenticated`() {
 
 		val response = mockMvc.perform(
@@ -86,7 +109,7 @@ class TiltakInstansControllerTest {
 
 	@Test
 	fun `hentTiltakInstans() should return 200 when authenticated`() {
-		Mockito.`when`(tiltakService.getTiltakInstans(tiltakInstansId)).thenReturn(tiltakInstans)
+		Mockito.`when`(tiltakInstansService.getTiltakInstans(tiltakInstansId)).thenReturn(tiltakInstans)
 		val token = server.issueToken("tokenx", "test", "test").serialize()
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.get("/api/tiltak-instans/$tiltakInstansId")

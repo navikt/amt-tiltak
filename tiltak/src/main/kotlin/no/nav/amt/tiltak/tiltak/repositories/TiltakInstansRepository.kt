@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.tiltak.repositories
+
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
-import no.nav.amt.tiltak.tiltak.dbo.TiltaksinstansDbo
+import no.nav.amt.tiltak.tiltak.dbo.TiltakInstansDbo
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -15,7 +16,7 @@ open class TiltakInstansRepository(private val template: NamedParameterJdbcTempl
 	private val rowMapper = RowMapper { rs, _ ->
 		val statusString = rs.getString("status")
 
-		TiltaksinstansDbo(
+		TiltakInstansDbo(
 			id = UUID.fromString(rs.getString("tiltaksinstans_id")),
 			arenaId = rs.getInt("tiltaksinstans_arena_id"),
 			tiltaksleverandorId = UUID.fromString(rs.getString("tiltaksleverandor_id")),
@@ -41,7 +42,7 @@ open class TiltakInstansRepository(private val template: NamedParameterJdbcTempl
 		sluttDato: LocalDate?,
 		registrertDato: LocalDateTime?,
 		fremmoteDato: LocalDateTime?
-	): TiltaksinstansDbo {
+	): TiltakInstansDbo {
 
 		//language=PostgreSQL
 		val sql = """
@@ -82,7 +83,7 @@ open class TiltakInstansRepository(private val template: NamedParameterJdbcTempl
 			?: throw NoSuchElementException("Tiltak med id $id finnes ikke")
 	}
 
-	fun update(tiltaksinstans: TiltaksinstansDbo): TiltaksinstansDbo {
+	fun update(tiltaksinstans: TiltakInstansDbo): TiltakInstansDbo {
 
 		//language=PostgreSQL
 		val sql = """
@@ -117,7 +118,7 @@ open class TiltakInstansRepository(private val template: NamedParameterJdbcTempl
 	}
 
 
-	fun get(id: UUID): TiltaksinstansDbo? {
+	fun get(id: UUID): TiltakInstansDbo? {
 
 		//language=PostgreSQL
 		val sql = """
@@ -145,7 +146,7 @@ open class TiltakInstansRepository(private val template: NamedParameterJdbcTempl
 		return template.query(sql, parameters, rowMapper).firstOrNull()
 	}
 
-	fun getByArenaId(arenaId: Int): TiltaksinstansDbo? {
+	fun getByArenaId(arenaId: Int): TiltakInstansDbo? {
 
 		//language=PostgreSQL
 		val sql = """
@@ -173,4 +174,34 @@ open class TiltakInstansRepository(private val template: NamedParameterJdbcTempl
 
 		return template.query(sql, parameters, rowMapper).firstOrNull()
 	}
+
+	fun getByArrandorId(arrangorId: UUID): List<TiltakInstansDbo> {
+
+		//language=PostgreSQL
+		val sql = """
+			SELECT tiltaksinstans.id                                                           as tiltaksinstans_id,
+			       tiltaksinstans.arena_id                                                     as tiltaksinstans_arena_id,
+			       tiltaksinstans.tiltaksleverandor_id                                         as tiltaksleverandor_id,
+			       tiltaksinstans.tiltak_id                                                    as tiltak_id,
+			       tiltaksinstans.navn                                                         as navn,
+			       tiltaksinstans.status                                                       as status,
+			       tiltaksinstans.oppstart_dato                                                as oppstart_dato,
+			       tiltaksinstans.slutt_dato                                                   as slutt_dato,
+			       tiltaksinstans.registrert_dato                                              as registrert_dato,
+			       tiltaksinstans.fremmote_dato                                                as fremmote_dato,
+				   tiltaksinstans.created_at 												   as created_at,
+				   tiltaksinstans.modified_at                                                  as modified_at
+			FROM tiltaksinstans
+			WHERE tiltaksinstans.tiltaksleverandor_id = :tiltaksleverandorId
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"tiltaksleverandorId" to arrangorId
+			)
+		)
+
+		return template.query(sql, parameters, rowMapper)
+	}
+
 }
