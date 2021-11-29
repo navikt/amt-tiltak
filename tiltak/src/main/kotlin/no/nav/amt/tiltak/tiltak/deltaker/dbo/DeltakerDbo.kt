@@ -1,7 +1,6 @@
 package no.nav.amt.tiltak.tiltak.deltaker.dbo
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.tiltak.Fodselsnummer
 import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakDeltakerDto
 import no.nav.amt.tiltak.tiltak.utils.UpdateCheck
 import no.nav.amt.tiltak.tiltak.utils.UpdateStatus
@@ -12,7 +11,7 @@ import java.util.*
 data class DeltakerDbo(
 	val id: UUID,
 	val brukerId: UUID,
-	val brukerFodselsnummer: Fodselsnummer,
+	val brukerFodselsnummer: String,
 	val brukerFornavn: String,
 	val brukerEtternavn: String,
 	val tiltakInstansId: UUID,
@@ -31,7 +30,7 @@ data class DeltakerDbo(
 			id = id,
 			fornavn = brukerFornavn,
 			etternavn = brukerEtternavn,
-			fodselsdato = brukerFodselsnummer,
+			fodselsnummer = brukerFodselsnummer,
 			startdato = startDato,
 			sluttdato = sluttDato,
 			status = status
@@ -43,7 +42,7 @@ data class DeltakerDbo(
 			id = id,
 			fornavn = brukerFornavn,
 			etternavn = brukerEtternavn,
-			fodselsdato = brukerFodselsnummer.toFodselDato(),
+			fodselsnummer = brukerFodselsnummer,
 			startdato = startDato,
 			sluttdato = sluttDato,
 			status = status

@@ -34,7 +34,7 @@ class TiltakInstansController(
 		try {
 			return tiltakService.getTiltakInstans(instansId).toDto()
 		} catch (e: NoSuchElementException) {
-			log.warn("Fant ikke tiltaksinstans", e)
+			log.error("Fant ikke tiltaksinstans", e)
 			throw ResponseStatusException(HttpStatus.NOT_FOUND, "Fant ikke tiltakinstans")
 		}
 

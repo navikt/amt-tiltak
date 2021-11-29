@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.tiltak.controllers.dto
 
-import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import java.time.LocalDate
 import java.util.*
@@ -20,5 +19,5 @@ fun TiltakInstans.toDto() = TiltakInstansDto(
 	oppstartdato = this.oppstartDato,
 	sluttdato = this.sluttDato,
 	status = this.status,
-	tiltak =  this.tiltak.toDto()
+	tiltak = this.tiltak.toDto()
 )

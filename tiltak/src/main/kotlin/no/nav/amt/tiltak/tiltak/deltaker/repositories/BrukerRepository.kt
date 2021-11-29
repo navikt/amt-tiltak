@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.tiltak.deltaker.repositories
 
-import no.nav.amt.tiltak.core.domain.tiltak.Fodselsnummer
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.tiltak.utils.getNullableUUID
 import no.nav.amt.tiltak.tiltak.utils.getUUID
@@ -19,7 +18,7 @@ open class BrukerRepository(
 
         BrukerDbo(
 			id = rs.getUUID("id"),
-            fodselsnummer = Fodselsnummer(rs.getString("fodselsnummer")),
+            fodselsnummer = rs.getString("fodselsnummer"),
             fornavn = rs.getString("fornavn"),
 			mellomnavn = rs.getString("mellomnavn"),
             etternavn = rs.getString("etternavn"),
