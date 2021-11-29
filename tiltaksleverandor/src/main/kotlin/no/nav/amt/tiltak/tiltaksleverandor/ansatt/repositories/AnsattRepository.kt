@@ -27,13 +27,12 @@ open class AnsattRepository(
 	}
 
 	fun getByPersonligIdent(personligIdent: String): AnsattDbo? {
-
 		val parameters = MapSqlParameterSource().addValues(mapOf(
 			"personligIdent" to personligIdent
 		))
 
 		return template.query(
-			"SELECT * tiltaksleverandor_ansatt WHERE personlig_ident = :personligIdent",
+			"SELECT * FROM tiltaksleverandor_ansatt WHERE personlig_ident = :personligIdent",
 			parameters,
 			rowMapper
 		).firstOrNull()

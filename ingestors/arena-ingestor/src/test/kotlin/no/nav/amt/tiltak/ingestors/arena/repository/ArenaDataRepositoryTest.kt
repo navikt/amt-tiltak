@@ -27,8 +27,7 @@ class ArenaDataRepositoryTest {
 
 		arenaDataRepository = ArenaDataRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanDatabase(dataSource)
-		DatabaseTestUtils.runScriptFile("/arena-data.sql", dataSource)
+		DatabaseTestUtils.cleanAndInitDatabase(dataSource, "/arena-data.sql")
 	}
 
 	@Test

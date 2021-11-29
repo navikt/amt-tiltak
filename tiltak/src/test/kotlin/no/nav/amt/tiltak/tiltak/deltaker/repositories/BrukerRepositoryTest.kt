@@ -24,8 +24,7 @@ class BrukerRepositoryTest : FunSpec({
 
 		repository = BrukerRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanDatabase(dataSource)
-		DatabaseTestUtils.runScriptFile("/bruker-repository_test-data.sql", dataSource)
+		DatabaseTestUtils.cleanAndInitDatabase(dataSource, "/bruker-repository_test-data.sql")
 	}
 
 	test("Insert should insert bruker and return BrukerDbo") {

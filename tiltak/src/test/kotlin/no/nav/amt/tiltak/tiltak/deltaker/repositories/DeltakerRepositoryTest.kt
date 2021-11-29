@@ -28,8 +28,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		repository = DeltakerRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanDatabase(dataSource)
-		DatabaseTestUtils.runScriptFile("/deltaker-repository_test-data.sql", dataSource)
+		DatabaseTestUtils.cleanAndInitDatabase(dataSource, "/deltaker-repository_test-data.sql")
 	}
 
 	test("Insert should insert Deltaker and return DeltakerDbo") {

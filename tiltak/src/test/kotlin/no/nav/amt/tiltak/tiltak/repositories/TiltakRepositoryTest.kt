@@ -28,8 +28,7 @@ internal class TiltakRepositoryTest {
 
 		repository = TiltakRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanDatabase(dataSource)
-		DatabaseTestUtils.runScriptFile("/tiltak-repository_test-data.sql", dataSource)
+		DatabaseTestUtils.cleanAndInitDatabase(dataSource, "/tiltak-repository_test-data.sql")
 	}
 
 	@Test
