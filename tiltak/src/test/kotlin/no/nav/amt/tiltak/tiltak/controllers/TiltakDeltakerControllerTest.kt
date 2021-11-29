@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.tiltak.controllers
 
+import no.nav.amt.tiltak.tiltak.deltaker.controllers.TiltakDeltakerController
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions

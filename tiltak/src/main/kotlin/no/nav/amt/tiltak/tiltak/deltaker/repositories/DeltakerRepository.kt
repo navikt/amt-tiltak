@@ -81,7 +81,7 @@ open class DeltakerRepository(
 
 	}
 
-	fun getDeltakerePaaTiltak(id: UUID): List<DeltakerDbo> {
+	fun getDeltakerePaaTiltakInstans(id: UUID): List<DeltakerDbo> {
 		val sql = """
 			SELECT deltaker.*,
 				bruker.fodselsnummer,

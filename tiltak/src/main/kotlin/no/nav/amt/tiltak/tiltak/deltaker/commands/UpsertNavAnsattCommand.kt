@@ -1,6 +1,6 @@
-package no.nav.amt.tiltak.tiltak.deltaker.cmd
+package no.nav.amt.tiltak.tiltak.deltaker.commands
 
-data class UpsertNavAnsattCmd(
+data class UpsertNavAnsattCommand(
 	val personligIdent: String,
 	val fornavn: String?,
 	val etternavn: String?,

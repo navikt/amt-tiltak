@@ -7,7 +7,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.tiltak.deltaker.cmd.UpsertNavAnsattCmd
+import no.nav.amt.tiltak.tiltak.deltaker.commands.UpsertNavAnsattCommand
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -18,7 +18,7 @@ class NavAnsattRepositoryTest : FunSpec({
 
 	lateinit var repository: NavAnsattRepository
 
-	val upsertCmd = UpsertNavAnsattCmd(
+	val upsertCmd = UpsertNavAnsattCommand(
 		personligIdent = "test123",
 		fornavn = "Fornavn",
 		etternavn = "Etternavn",
