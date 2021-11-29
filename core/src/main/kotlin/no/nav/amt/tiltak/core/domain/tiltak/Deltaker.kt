@@ -7,7 +7,7 @@ class Deltaker(
 	val id: UUID,
 	val fornavn: String,
 	val etternavn: String,
-	val fodselsdato: Fodselsnummer,
+	val fodselsnummer: String,
 	val startdato: LocalDate?,
 	val sluttdato: LocalDate?,
 	val status: Status?

@@ -1,7 +1,6 @@
 package no.nav.amt.tiltak.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.tiltak.Fodselsnummer
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.DeltakerDbo
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -20,7 +19,7 @@ open class DeltakerRepository(
 		DeltakerDbo(
 			id = UUID.fromString(rs.getString("id")),
 			brukerId = UUID.fromString(rs.getString("bruker_id")),
-			brukerFodselsnummer = Fodselsnummer(rs.getString("fodselsnummer")),
+			brukerFodselsnummer = rs.getString("fodselsnummer"),
 			brukerFornavn = rs.getString("fornavn"),
 			brukerEtternavn = rs.getString("etternavn"),
 			startDato = rs.getDate("oppstart_dato")?.toLocalDate(),

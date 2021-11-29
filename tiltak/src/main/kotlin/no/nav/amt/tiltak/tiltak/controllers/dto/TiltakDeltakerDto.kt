@@ -9,7 +9,7 @@ data class TiltakDeltakerDto(
 	val fornavn: String,
 	val mellomnavn: String? = null,
 	val etternavn: String,
-	val fodselsdato: LocalDate?,
+	val fodselsnummer: String,
 	val startdato: LocalDate?,
 	val sluttdato: LocalDate?,
 	val status: Deltaker.Status?
@@ -19,7 +19,7 @@ fun Deltaker.toDto() = TiltakDeltakerDto(
 	id = id,
 	fornavn = fornavn,
 	etternavn = etternavn,
-	fodselsdato = fodselsdato.toFodselDato(),
+	fodselsnummer = fodselsnummer,
 	startdato = startdato,
 	sluttdato = sluttdato,
 	status = status

@@ -1,22 +1,21 @@
 package no.nav.amt.tiltak.tiltak.controllers
+
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
-import no.nav.amt.tiltak.core.port.TiltakService
-import no.nav.amt.tiltak.core.domain.tiltak.Fodselsnummer
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.security.mock.oauth2.MockOAuth2Server
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.beans.factory.annotation.Autowired
-
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
@@ -56,7 +55,7 @@ class TiltakInstansControllerTest {
 	)
 
 	@BeforeEach
-	fun before () {
+	fun before() {
 		MockitoAnnotations.openMocks(this)
 	}
 
@@ -111,7 +110,7 @@ class TiltakInstansControllerTest {
 		val deltaker = DeltakerDbo(
 			id = UUID.randomUUID(),
 			brukerId = UUID.randomUUID(),
-			brukerFodselsnummer = Fodselsnummer("12129312375"),
+			brukerFodselsnummer = "12129312375",
 			brukerFornavn = "Fornavn",
 			brukerEtternavn = "Etternavn",
 			tiltakInstansId = tiltakInstansId,
