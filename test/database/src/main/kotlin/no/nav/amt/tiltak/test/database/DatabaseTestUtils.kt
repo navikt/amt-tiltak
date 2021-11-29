@@ -23,14 +23,14 @@ object DatabaseTestUtils {
 		"arena_data_id_seq"
 	)
 
-	fun runScript(script: String, dataSource: DataSource) {
+	fun runScript(dataSource: DataSource, script: String) {
 		val jdbcTemplate = JdbcTemplate(dataSource)
 		jdbcTemplate.update(script)
 	}
 
-	fun runScriptFile(scriptFilePath: String, dataSource: DataSource) {
+	fun runScriptFile(dataSource: DataSource, scriptFilePath: String) {
 		val script = this::class.java.getResource(scriptFilePath).readText()
-		runScript(script, dataSource)
+		runScript(dataSource, script)
 	}
 
 	fun cleanDatabase(dataSource: DataSource) {
@@ -43,6 +43,11 @@ object DatabaseTestUtils {
 		sequences.forEach {
 			jdbcTemplate.update("ALTER SEQUENCE $it RESTART WITH 1")
 		}
+	}
+
+	fun cleanAndInitDatabase(dataSource: DataSource, scriptFilePath: String) {
+		cleanDatabase(dataSource)
+		runScriptFile(dataSource, scriptFilePath)
 	}
 
 }

@@ -34,8 +34,7 @@ internal class TiltaksinstansRepositoryTest {
 
 		repository = TiltakInstansRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanDatabase(dataSource)
-		DatabaseTestUtils.runScriptFile("/tiltaksinstans-repository_test-data.sql", dataSource)
+		DatabaseTestUtils.cleanAndInitDatabase(dataSource, "/tiltaksinstans-repository_test-data.sql")
 	}
 
 	@Test
