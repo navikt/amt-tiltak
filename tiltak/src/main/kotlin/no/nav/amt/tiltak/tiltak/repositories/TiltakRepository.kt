@@ -76,6 +76,13 @@ open class TiltakRepository(
 			?: throw NoSuchElementException("Tiltak med id ${tiltak.id} finnes ikke")
 	}
 
+	fun getAll(): List<TiltakDbo> {
+		return template.query(
+			"SELECT * FROM tiltak",
+			rowMapper
+		)
+	}
+
 	fun get(id: UUID): TiltakDbo? {
 		//language=PostgreSQL
 		val sql = """

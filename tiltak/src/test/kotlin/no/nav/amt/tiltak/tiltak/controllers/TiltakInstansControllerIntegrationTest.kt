@@ -4,10 +4,10 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.PersonService
-import no.nav.amt.tiltak.core.port.TiltakService
+import no.nav.amt.tiltak.core.port.TiltakInstansService
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.tiltak.dbo.TiltaksinstansDbo
+import no.nav.amt.tiltak.tiltak.dbo.TiltakInstansDbo
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.tiltak.deltaker.repositories.DeltakerRepository
@@ -15,10 +15,13 @@ import no.nav.amt.tiltak.tiltak.deltaker.repositories.NavAnsattRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakInstansRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import no.nav.amt.tiltak.tiltak.services.DeltakerServiceImpl
+import no.nav.amt.tiltak.tiltak.services.TiltakInstansServiceImpl
 import no.nav.amt.tiltak.tiltak.services.TiltakServiceImpl
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito.mock
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.web.server.ResponseStatusException
@@ -35,37 +38,34 @@ class TiltakInstansControllerIntegrationTest {
 	private lateinit var deltakerRepository: DeltakerRepository
 	private lateinit var brukerRepository: BrukerRepository
 	private lateinit var tiltakInstansRepository: TiltakInstansRepository
-	private lateinit var tiltakInstansService: TiltakService
+	private lateinit var tiltakInstansService: TiltakInstansService
 	private lateinit var deltakerService: DeltakerService
 	private lateinit var controller: TiltakInstansController
 
-	@BeforeAll
-	fun before () {
+	@BeforeEach
+	fun before() {
 		namedJdbcTemplate = NamedParameterJdbcTemplate(dataSource)
 
 		tiltakInstansRepository = TiltakInstansRepository(namedJdbcTemplate)
 		tiltakRepository = TiltakRepository(namedJdbcTemplate)
 		deltakerRepository = DeltakerRepository(namedJdbcTemplate)
 		brukerRepository = BrukerRepository(namedJdbcTemplate)
-		deltakerService = DeltakerServiceImpl(deltakerRepository, brukerRepository, mock(NavAnsattRepository::class.java), mock(PersonService::class.java));
-		tiltakInstansService = TiltakServiceImpl(tiltakRepository, tiltakInstansRepository)
+		deltakerService = DeltakerServiceImpl(
+			deltakerRepository,
+			brukerRepository,
+			mock(NavAnsattRepository::class.java),
+			mock(PersonService::class.java)
+		);
+		tiltakInstansService = TiltakInstansServiceImpl(tiltakInstansRepository, TiltakServiceImpl(tiltakRepository))
 		controller = TiltakInstansController(tiltakInstansService, deltakerService)
 
 		DatabaseTestUtils.cleanDatabase(dataSource)
 
 	}
 
-	@AfterEach
-	fun after () {
-		namedJdbcTemplate.jdbcTemplate.update("DELETE FROM deltaker")
-		namedJdbcTemplate.jdbcTemplate.update("DELETE FROM bruker")
-		namedJdbcTemplate.jdbcTemplate.update("DELETE FROM tiltaksinstans")
-		namedJdbcTemplate.jdbcTemplate.update("DELETE FROM tiltak")
-	}
-
 	@Test
 	fun `hentTiltakInstans - tiltaksgjennomføring finnes ikke - skal returnere NOT FOUND`() {
-		val id = UUID.randomUUID().toString()
+		val id = UUID.randomUUID()
 		val exception = assertThrows(ResponseStatusException::class.java) {
 			controller.hentTiltakInstans(id)
 		}
@@ -74,12 +74,12 @@ class TiltakInstansControllerIntegrationTest {
 
 	@Test
 	fun `hentTiltakInstans - tiltak finnes ikke - skal returnere INTERNAL SERVER ERROR`() {
-		val tiltakNavn ="Gruppe amo"
+		val tiltakNavn = "Gruppe amo"
 		val tlId = insertTiltaksleverandor()
 		val tiltak = tiltakRepository.insert("22", tiltakNavn, "kode")
 		val instans = insertTiltakInstans(tiltak.id, tlId)
 
-		val resultat = controller.hentTiltakInstans(instans.id.toString())
+		val resultat = controller.hentTiltakInstans(instans.id)
 
 		assertEquals(instans.id, resultat.id)
 		assertEquals(tiltakNavn, resultat.tiltak.tiltaksnavn)
@@ -90,7 +90,7 @@ class TiltakInstansControllerIntegrationTest {
 		val leverandorId = insertTiltaksleverandor()
 		val tiltak = tiltakRepository.insert("4", "Gruppe AMO", "GRUPPEAMO")
 		val tiltakInstans = insertTiltakInstans(tiltak.id, leverandorId)
-		val resultat = controller.hentTiltakInstans(tiltakInstans.id.toString())
+		val resultat = controller.hentTiltakInstans(tiltakInstans.id)
 		assertEquals(tiltakInstans.id, resultat.id)
 		assertEquals(tiltakInstans.navn, resultat.navn)
 
@@ -106,7 +106,7 @@ class TiltakInstansControllerIntegrationTest {
 		insertDeltaker(tiltakInstans.id, "12128673847")
 		insertDeltaker(tiltakInstans.id, "12128673846")
 
-		val deltakere = controller.hentDeltakere(tiltakInstans.id.toString())
+		val deltakere = controller.hentDeltakere(tiltakInstans.id)
 
 		assertEquals(deltakere.size, 2)
 	}
@@ -126,14 +126,14 @@ class TiltakInstansControllerIntegrationTest {
 			tiltaksgjennomforingId = instansId,
 			oppstartDato = LocalDate.now(),
 			sluttDato = LocalDate.now(),
-			status =  Deltaker.Status.GJENNOMFORES,
+			status = Deltaker.Status.GJENNOMFORES,
 			arenaStatus = "arenastatus",
 			dagerPerUke = 5,
 			prosentStilling = 10f
 		)
 	}
 
-	private fun insertTiltakInstans(tiltakId: UUID, leverandorId: UUID) : TiltaksinstansDbo {
+	private fun insertTiltakInstans(tiltakId: UUID, leverandorId: UUID): TiltakInstansDbo {
 		var arenaId = (1000..9999).random()
 		return tiltakInstansRepository.insert(
 			arenaId = arenaId,
@@ -148,7 +148,7 @@ class TiltakInstansControllerIntegrationTest {
 		)
 	}
 
-	private fun insertTiltaksleverandor() : UUID {
+	private fun insertTiltaksleverandor(): UUID {
 		val id = UUID.randomUUID()
 		val orgnr = (1000..9999).random()
 		val insert = """

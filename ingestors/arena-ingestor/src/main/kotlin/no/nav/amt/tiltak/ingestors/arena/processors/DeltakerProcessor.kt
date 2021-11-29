@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.ingestors.arena.processors
 
 import no.nav.amt.tiltak.core.port.ArenaOrdsProxyConnector
 import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.TiltakService
+import no.nav.amt.tiltak.core.port.TiltakInstansService
 import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
 import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltakDeltaker
 import no.nav.amt.tiltak.ingestors.arena.exceptions.DependencyNotIngestedException
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component
 open class DeltakerProcessor(
 	repository: ArenaDataRepository,
 	private val ignoredTiltakRepository: ArenaTiltakIgnoredRepository,
-	private val tiltakService: TiltakService,
+	private val tiltakInstansService: TiltakInstansService,
 	private val deltakerService: DeltakerService,
 	private val ords: ArenaOrdsProxyConnector
 ) : AbstractArenaProcessor(repository) {
@@ -43,7 +43,7 @@ open class DeltakerProcessor(
 			repository.upsert(data.markAsIgnored())
 		} else {
 			val tiltaksgjennomforing =
-				tiltakService.getTiltaksinstansFromArenaId(newFields.TILTAKGJENNOMFORING_ID.toInt())
+				tiltakInstansService.getTiltaksinstansFromArenaId(newFields.TILTAKGJENNOMFORING_ID.toInt())
 					?: throw DependencyNotIngestedException("Tiltaksgjennomføring med ID ${newFields.TILTAKGJENNOMFORING_ID} er ikke ingested.")
 
 			val fodselsnummer = ords.hentFnr(newFields.PERSON_ID.toString())
