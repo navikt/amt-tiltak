@@ -15,6 +15,7 @@
     <modules>
         <module>token_provider</module>
         <module>graphql</module>
+        <module>auth</module>
     </modules>
 
 </project>
