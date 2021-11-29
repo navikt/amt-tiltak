@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.tiltaksleverandor.ansatt.queries
 
-import no.nav.amt.tiltak.core.domain.tiltaksleverandor.TilknyttetLeverandor
 import no.nav.amt.tiltak.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -8,7 +7,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.util.*
 
 class GetLeverandorerForAnsattQuery(
-	val template: NamedParameterJdbcTemplate
+	private val template: NamedParameterJdbcTemplate
 ) {
 
 	private val rowMapper = RowMapper { rs, _ ->

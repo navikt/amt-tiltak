@@ -146,7 +146,7 @@ class TiltakInstansControllerTest {
 			createdAt = LocalDateTime.now(),
 			modifiedAt = LocalDateTime.now()
 		).toDeltaker()
-		Mockito.`when`(deltakerService.hentDeltakerePaaTiltak(tiltakInstansId)).thenReturn(listOf(deltaker))
+		Mockito.`when`(deltakerService.hentDeltakerePaaTiltakInstans(tiltakInstansId)).thenReturn(listOf(deltaker))
 		val token = server.issueToken("tokenx", "test", "test").serialize()
 
 		val response = mockMvc.perform(

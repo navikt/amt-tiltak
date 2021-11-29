@@ -16,5 +16,7 @@ interface DeltakerService {
 		prosentStilling: Float?
 	): Deltaker
 
-	fun hentDeltakerePaaTiltak(id: UUID): List<Deltaker>
+	fun hentDeltakerePaaTiltakInstans(id: UUID): List<Deltaker>
+
+	fun hentDeltaker(deltakerId: UUID): Deltaker
 }

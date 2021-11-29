@@ -10,14 +10,14 @@ data class TiltakDeltakerDetaljerDto(
     val fornavn: String,
     val mellomnavn: String? = null,
     val etternavn: String,
-    val fodselsdato: LocalDate?,
-    val telefon: String?,
+    val fodselsnummer: String,
+    val telefonnummer: String?,
     val epost: String?,
     val navKontor: NavKontorDTO,
-    val navVeileder: NavVeilederDTO,
-    val startdato: ZonedDateTime,
-    val sluttdato: ZonedDateTime,
-    val status: Deltaker.Status,
+    val navVeileder: NavVeilederDTO?,
+    val startdato: LocalDate?,
+    val sluttdato: LocalDate?,
+    val status: Deltaker.Status?,
     val tiltakInstans: TiltakInstansDto
 )
 
@@ -27,7 +27,8 @@ data class NavKontorDTO(
 )
 
 data class NavVeilederDTO(
-	val navn: String,
-	val telefon: String,
-	val epost: String,
+	val fornavn: String?,
+	val etternavn: String?,
+	val telefon: String?,
+	val epost: String?,
 )

@@ -43,7 +43,7 @@ class TiltakInstansController(
 	@Protected
 	@GetMapping("/{tiltakInstansId}/deltakere")
 	fun hentDeltakere(@PathVariable("tiltakInstansId") tiltakInstansId: UUID): List<TiltakDeltakerDto> {
-		return deltakerService.hentDeltakerePaaTiltak(tiltakInstansId)
+		return deltakerService.hentDeltakerePaaTiltakInstans(tiltakInstansId)
 			.map { it.toDto() }
 	}
 

@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.tiltak.deltaker.repositories
 
-import no.nav.amt.tiltak.tiltak.deltaker.cmd.UpsertNavAnsattCmd
+import no.nav.amt.tiltak.tiltak.deltaker.commands.UpsertNavAnsattCommand
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.NavAnsattDbo
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -24,7 +24,7 @@ open class NavAnsattRepository(
 		)
 	}
 
-	fun upsert(upsertCmd: UpsertNavAnsattCmd) {
+	fun upsert(upsertCmd: UpsertNavAnsattCommand) {
 		val sql = """
 			INSERT INTO nav_ansatt(id, personlig_ident, fornavn, etternavn, telefonnummer, epost)
 			VALUES (:id,

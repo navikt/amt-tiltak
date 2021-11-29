@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.tiltak.services
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.PersonService
-import no.nav.amt.tiltak.tiltak.deltaker.cmd.UpsertNavAnsattCmd
+import no.nav.amt.tiltak.tiltak.deltaker.commands.UpsertNavAnsattCommand
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.tiltak.deltaker.dbo.NavAnsattDbo
 import no.nav.amt.tiltak.tiltak.deltaker.repositories.BrukerRepository
@@ -20,7 +20,7 @@ open class DeltakerServiceImpl(
 	private val brukerRepository: BrukerRepository,
 	private val navAnsattRepository: NavAnsattRepository,
 	private val personService: PersonService,
-): DeltakerService {
+) : DeltakerService {
 
 	override fun addUpdateDeltaker(
 		tiltaksinstans: UUID,
@@ -73,8 +73,13 @@ open class DeltakerServiceImpl(
 		}
 	}
 
-	override fun hentDeltakerePaaTiltak(id: UUID): List<Deltaker> {
-		return deltakerRepository.getDeltakerePaaTiltak(id).map { it.toDeltaker() }
+	override fun hentDeltakerePaaTiltakInstans(id: UUID): List<Deltaker> {
+		return deltakerRepository.getDeltakerePaaTiltakInstans(id).map { it.toDeltaker() }
+	}
+
+	override fun hentDeltaker(deltakerId: UUID): Deltaker {
+		return deltakerRepository.get(deltakerId)?.toDeltaker()
+			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 	}
 
 	private fun getBruker(fodselsnummer: String): BrukerDbo {
@@ -101,13 +106,15 @@ open class DeltakerServiceImpl(
 
 	private fun upsertVeileder(fodselsnummer: String): NavAnsattDbo? {
 		return personService.hentVeileder(fodselsnummer)?.let { veileder ->
-			navAnsattRepository.upsert(UpsertNavAnsattCmd(
-				personligIdent = veileder.navIdent,
-				fornavn = veileder.fornavn,
-				etternavn = veileder.etternavn,
-				epost = veileder.epost,
-				telefonnummer = "TODO - Ikke hentet fra NOM enda"
-			))
+			navAnsattRepository.upsert(
+				UpsertNavAnsattCommand(
+					personligIdent = veileder.navIdent,
+					fornavn = veileder.fornavn,
+					etternavn = veileder.etternavn,
+					epost = veileder.epost,
+					telefonnummer = "TODO - Ikke hentet fra NOM enda"
+				)
+			)
 			return navAnsattRepository.getNavAnsattWithIdent(veileder.navIdent)
 		}
 	}
