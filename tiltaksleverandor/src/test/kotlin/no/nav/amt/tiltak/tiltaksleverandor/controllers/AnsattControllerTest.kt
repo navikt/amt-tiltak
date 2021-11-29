@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.tiltaksleverandor.controllers
 
+import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.tiltaksleverandor.Ansatt
 import no.nav.amt.tiltak.core.port.TiltaksleverandorService
 import no.nav.security.mock.oauth2.MockOAuth2Server
@@ -40,6 +41,9 @@ class AnsattControllerTest {
 	@MockBean
 	private lateinit var tiltaksleverandorService: TiltaksleverandorService
 
+	@MockBean
+	private lateinit var authService: AuthService
+
 	@Test
 	fun `getInnloggetAnsatt() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
@@ -52,6 +56,8 @@ class AnsattControllerTest {
 	@Test
 	fun `getInnloggetAnsatt() should return 200 when authenticated`() {
 		val token = server.issueToken("tokenx", "test", "test", mapOf("pid" to "12345678")).serialize()
+
+		Mockito.`when`(authService.hentPersonligIdentTilInnloggetBruker()).thenReturn("12345678")
 
 		Mockito.`when`(tiltaksleverandorService.getAnsattByPersonligIdent("12345678"))
 			.thenReturn(Ansatt(
