@@ -27,5 +27,5 @@ fun ResultSet.getLocalDate(columnLabel: String): LocalDate {
 }
 
 fun ResultSet.getNullableLocalDate(columnLabel: String): LocalDate? {
-	return this.getDate(columnLabel).toLocalDate()
+	return this.getDate(columnLabel)?.toLocalDate()
 }
