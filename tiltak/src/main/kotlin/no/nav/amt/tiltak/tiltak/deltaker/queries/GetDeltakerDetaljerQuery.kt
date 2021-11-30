@@ -34,7 +34,7 @@ class GetDeltakerDetaljerQuery(
 			tiltakInstansNavn = rs.getString("tiltak_instans_navn"),
 			tiltakInstansOppstartDato = rs.getNullableLocalDate("tiltak_instans_oppstart_dato"),
 			tiltakInstansSluttDato = rs.getNullableLocalDate("tiltak_instans_slutt_dato"),
-			tiltakInstansStatus = rs.getString("tiltak_instans_status").let { TiltakInstans.Status.valueOf(it) },
+			tiltakInstansStatus = rs.getString("tiltak_instans_status")?.let { TiltakInstans.Status.valueOf(it) },
 			tiltakNavn = rs.getString("tiltak_navn"),
 			tiltakKode = rs.getString("tiltak_kode"),
 		)
@@ -104,7 +104,7 @@ data class DeltakerDetaljerDbo(
 	val tiltakInstansNavn: String,
 	val tiltakInstansOppstartDato: LocalDate?,
 	val tiltakInstansSluttDato: LocalDate?,
-	val tiltakInstansStatus: TiltakInstans.Status,
+	val tiltakInstansStatus: TiltakInstans.Status?,
 	val tiltakNavn: String,
 	val tiltakKode: String
 )
