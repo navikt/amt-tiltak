@@ -6,9 +6,9 @@ import no.nav.amt.tiltak.tiltaksleverandor.ansatt.dbo.AnsattDbo
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.stereotype.Repository
+import org.springframework.stereotype.Component
 
-@Repository
+@Component
 open class AnsattRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
