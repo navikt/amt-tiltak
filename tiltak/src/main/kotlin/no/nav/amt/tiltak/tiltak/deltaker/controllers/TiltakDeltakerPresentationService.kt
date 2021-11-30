@@ -10,11 +10,11 @@ import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @Service
-class TiltakDeltakerPresentationService(
+open class TiltakDeltakerPresentationService(
 	private val template: NamedParameterJdbcTemplate
 ) {
 
-	fun getDeltakerDetaljerById(deltakerId: UUID): TiltakDeltakerDetaljerDto {
+	open fun getDeltakerDetaljerById(deltakerId: UUID): TiltakDeltakerDetaljerDto {
 		return GetDeltakerDetaljerQuery(template).query(deltakerId)?.toDto()
 			?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Deltaker med id $deltakerId finnes ikke")
 	}
