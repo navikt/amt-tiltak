@@ -12,7 +12,7 @@ class GetLeverandorerForAnsattQuery(
 
 	private val rowMapper = RowMapper { rs, _ ->
 		LeverandorForAnsattDbo(
-			id = rs.getUUID("levernador_id"),
+			id = rs.getUUID("leverandor_id"),
 			navn = rs.getString("leverandor_navn"),
 			organisasjonsnummer = rs.getString("leverandor_organisasjonsnummer"),
 			overordnetEnhetNavn = rs.getString("leverandor_overordnet_enhet_navn"),
@@ -23,13 +23,13 @@ class GetLeverandorerForAnsattQuery(
 
 	private val sql = """
 		SELECT leverandor.id                                   AS leverandor_id,
-		       leverandor.navn                                 AS leverndor_navn,
+		       leverandor.navn                                 AS leverandor_navn,
 		       leverandor.organisasjonsnummer                  AS leverandor_organisasjonsnummer,
 		       leverandor.overordnet_enhet_navn                AS leverandor_overordnet_enhet_navn,
 		       leverandor.overordnet_enhet_organisasjonsnummer AS leverandor_overordnet_enhet_organisasjonsnummer,
 		       rolle.rolle                                     AS rolle
 		FROM tiltaksleverandor_ansatt ansatt
-		         JOIN tiltaksleverndor_ansatt_rolle rolle ON ansatt.id = rolle.ansatt_id
+		         JOIN tiltaksleverandor_ansatt_rolle rolle ON ansatt.id = rolle.ansatt_id
 		         JOIN tiltaksleverandor leverandor ON rolle.tiltaksleverandor_id = leverandor.id
 		where ansatt.personlig_ident = :personligIdent
 	""".trimIndent()
