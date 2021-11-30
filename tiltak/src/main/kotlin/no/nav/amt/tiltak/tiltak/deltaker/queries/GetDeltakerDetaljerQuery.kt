@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.tiltak.deltaker.queries
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
-import no.nav.amt.tiltak.tiltak.utils.getLocalDate
+import no.nav.amt.tiltak.tiltak.utils.getNullableLocalDate
 import no.nav.amt.tiltak.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -27,13 +27,13 @@ class GetDeltakerDetaljerQuery(
 			veilederEtternavn = rs.getString("veileder_etternavn"),
 			veilederTelefonnummer = rs.getString("veileder_telefonnummer"),
 			veilederEpost = rs.getString("veileder_epost"),
-			oppstartDato = rs.getLocalDate("oppstart_dato"),
-			sluttDato = rs.getLocalDate("slutt_dato"),
+			oppstartDato = rs.getNullableLocalDate("oppstart_dato"),
+			sluttDato = rs.getNullableLocalDate("slutt_dato"),
 			status = rs.getString("status")?.let { Deltaker.Status.valueOf(it) },
 			tiltakInstansId = rs.getUUID("tiltak_instans_id"),
 			tiltakInstansNavn = rs.getString("tiltak_instans_navn"),
-			tiltakInstansOppstartDato = rs.getLocalDate("tiltak_instans_oppstart_dato"),
-			tiltakInstansSluttDato = rs.getLocalDate("tiltak_instans_slutt_dato"),
+			tiltakInstansOppstartDato = rs.getNullableLocalDate("tiltak_instans_oppstart_dato"),
+			tiltakInstansSluttDato = rs.getNullableLocalDate("tiltak_instans_slutt_dato"),
 			tiltakInstansStatus = rs.getString("tiltak_instans_status").let { TiltakInstans.Status.valueOf(it) },
 			tiltakNavn = rs.getString("tiltak_navn"),
 			tiltakKode = rs.getString("tiltak_kode"),
