@@ -5,23 +5,7 @@ import javax.sql.DataSource
 
 object DatabaseTestUtils {
 
-	private val tables = listOf(
-		"nav_ansatt",
-		"tiltaksleverandor",
-		"tiltaksleverandor_ansatt",
-		"tiltaksleverandor_ansatt_rolle",
-		"tiltak",
-		"tiltaksinstans",
-		"bruker",
-		"deltaker",
-		"arena_data",
-		"arena_tiltak_ids_ignored",
-		"shedlock",
-	)
-
-	private val sequences = listOf(
-		"arena_data_id_seq"
-	)
+	private const val SCHEMA = "public"
 
 	fun runScript(dataSource: DataSource, script: String) {
 		val jdbcTemplate = JdbcTemplate(dataSource)
@@ -36,6 +20,9 @@ object DatabaseTestUtils {
 	fun cleanDatabase(dataSource: DataSource) {
 		val jdbcTemplate = JdbcTemplate(dataSource)
 
+		val tables = getAllTables(jdbcTemplate, SCHEMA)
+		val sequences = getAllSequences(jdbcTemplate, SCHEMA)
+
 		tables.forEach {
 			jdbcTemplate.update("TRUNCATE TABLE $it CASCADE")
 		}
@@ -48,6 +35,18 @@ object DatabaseTestUtils {
 	fun cleanAndInitDatabase(dataSource: DataSource, scriptFilePath: String) {
 		cleanDatabase(dataSource)
 		runScriptFile(dataSource, scriptFilePath)
+	}
+
+	private fun getAllTables(jdbcTemplate: JdbcTemplate, schema: String): List<String> {
+		val sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = ?"
+
+		return jdbcTemplate.query(sql, { rs, _ -> rs.getString(1) }, schema)
+	}
+
+	private fun getAllSequences(jdbcTemplate: JdbcTemplate, schema: String): List<String> {
+		val sql = "SELECT sequence_name FROM information_schema.sequences WHERE sequence_schema = ?"
+
+		return jdbcTemplate.query(sql, { rs, _ -> rs.getString(1) }, schema)
 	}
 
 }
