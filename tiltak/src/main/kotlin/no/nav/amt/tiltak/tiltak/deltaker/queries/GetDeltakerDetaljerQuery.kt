@@ -63,10 +63,10 @@ class GetDeltakerDetaljerQuery(
 			   tiltak.navn                  AS tiltak_navn,
 			   tiltak.type                  AS tiltak_kode
 		FROM deltaker
-				 JOIN bruker ON bruker.id = deltaker.bruker_id
-				 JOIN nav_ansatt ON nav_ansatt.id = bruker.ansvarlig_veileder_id
-				 JOIN tiltaksinstans ON tiltaksinstans.id = deltaker.tiltaksinstans_id
-				 JOIN tiltak ON tiltaksinstans.tiltak_id = tiltak.id
+				 LEFT JOIN bruker ON bruker.id = deltaker.bruker_id
+				 LEFT JOIN nav_ansatt ON nav_ansatt.id = bruker.ansvarlig_veileder_id
+				 LEFT JOIN tiltaksinstans ON tiltaksinstans.id = deltaker.tiltaksinstans_id
+				 LEFT JOIN tiltak ON tiltaksinstans.tiltak_id = tiltak.id
 		WHERE deltaker.id = :deltakerId
 	""".trimIndent()
 

@@ -5,6 +5,7 @@ import ch.qos.logback.classic.Logger
 import io.kotest.assertions.fail
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
@@ -17,6 +18,8 @@ class GetDeltakerDetaljerQueryTest : FunSpec({
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 
+	val deltakerId = UUID.fromString("dc600c70-124f-4fe7-a687-b58439beb214")
+
 	lateinit var getDeltakerDetaljerQuery: GetDeltakerDetaljerQuery
 
 	beforeEach {
@@ -24,15 +27,15 @@ class GetDeltakerDetaljerQueryTest : FunSpec({
 		rootLogger.level = Level.WARN
 
 		getDeltakerDetaljerQuery = GetDeltakerDetaljerQuery(NamedParameterJdbcTemplate(dataSource))
-
-		DatabaseTestUtils.cleanAndInitDatabase(dataSource, "/get-deltaker-detaljer-query-data.sql")
 	}
 
 	test("Should get deltaker detaljer") {
-		val deltakerDetaljer = getDeltakerDetaljerQuery.query(UUID.fromString("dc600c70-124f-4fe7-a687-b58439beb214"))
+		DatabaseTestUtils.cleanAndInitDatabase(dataSource, "/get-deltaker-detaljer-query-data.sql")
+
+		val deltakerDetaljer = getDeltakerDetaljerQuery.query(deltakerId)
 			?: fail("deltakerDetaljer should not be null")
 
-		deltakerDetaljer.deltakerId shouldBe UUID.fromString("dc600c70-124f-4fe7-a687-b58439beb214")
+		deltakerDetaljer.deltakerId shouldBe deltakerId
 		deltakerDetaljer.fornavn shouldBe "Bruker Fornavn"
 		deltakerDetaljer.mellomnavn shouldBe null
 		deltakerDetaljer.etternavn shouldBe "Bruker Etternavn"
@@ -51,6 +54,14 @@ class GetDeltakerDetaljerQueryTest : FunSpec({
 		deltakerDetaljer.tiltakInstansSluttDato shouldBe LocalDate.now()
 		deltakerDetaljer.tiltakNavn shouldBe "Tiltak1"
 		deltakerDetaljer.tiltakKode shouldBe "AMO"
+	}
+
+	test("Should get deltaker detaljer if nav ansatt is null") {
+		DatabaseTestUtils.cleanAndInitDatabase(dataSource, "/get-deltaker-detaljer-query-uten-ansatt-data.sql")
+
+		val deltakerDetaljer = getDeltakerDetaljerQuery.query(deltakerId)
+
+		deltakerDetaljer shouldNotBe null
 	}
 
 })
