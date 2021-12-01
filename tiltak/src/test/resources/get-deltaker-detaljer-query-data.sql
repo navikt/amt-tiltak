@@ -1,5 +1,5 @@
-INSERT INTO nav_ansatt (id, personlig_ident, fornavn, etternavn, telefonnummer, epost)
-VALUES ('91e1c2e6-83cf-46f9-b8e0-4a9192c7dcbe', '1234', 'Vashnir', 'Veiledersen', '84756', 'vashnir.veiledersen@nav.no');
+INSERT INTO nav_ansatt (id, personlig_ident, navn, telefonnummer, epost)
+VALUES ('91e1c2e6-83cf-46f9-b8e0-4a9192c7dcbe', '1234', 'Vashnir Veiledersen', '84756', 'vashnir.veiledersen@nav.no');
 
 INSERT INTO bruker (id, fodselsnummer, fornavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id)
 VALUES ('23b04c3a-a36c-451f-b9cf-30b6a6b586b8', '12345678910', 'Bruker Fornavn', 'Bruker Etternavn', '384', 'm@2.c', '91e1c2e6-83cf-46f9-b8e0-4a9192c7dcbe');

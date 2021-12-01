@@ -18,7 +18,7 @@ open class NomConfig {
 	var mock: Boolean = false
 
 	@Bean
-	open fun nomClient(scopedTokenProvider: ScopedTokenProvider, ) : NomClient {
+	open fun nomClient(scopedTokenProvider: ScopedTokenProvider) : NomClient {
 		if (mock) {
 			return NomClientMock()
 		}

@@ -23,6 +23,7 @@
         <module>norg</module>
         <module>dkif</module>
         <module>person</module>
+        <module>veileder</module>
     </modules>
 
 </project>
