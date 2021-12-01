@@ -110,7 +110,7 @@ open class DeltakerServiceImpl(
 					personligIdent = veileder.navIdent,
 					navn = veileder.navn,
 					epost = veileder.epost,
-					telefonnummer = "TODO - Ikke hentet fra NOM enda"
+					telefonnummer = veileder.telefonnummer
 				)
 			)
 			return navAnsattRepository.getNavAnsattWithIdent(veileder.navIdent)

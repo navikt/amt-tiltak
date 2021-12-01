@@ -22,6 +22,7 @@ class VeilederFacade(
 			navIdent = this.navIdent,
 			navn = navn,
 			epost = this.epost,
+			telefonnummer = this.telefonnummer,
 		)
 	}
 

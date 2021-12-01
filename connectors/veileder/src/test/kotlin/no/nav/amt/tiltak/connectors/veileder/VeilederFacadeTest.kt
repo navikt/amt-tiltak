@@ -15,7 +15,8 @@ class VeilederFacadeTest : FunSpec({
 					visningNavn = "visning navn",
 					fornavn = "fornavn",
 					etternavn = "etternavn",
-					epost = null
+					epost = null,
+					telefonnummer = null
 				)
 			}
 		}
@@ -34,7 +35,8 @@ class VeilederFacadeTest : FunSpec({
 					visningNavn = null,
 					fornavn = "fornavn",
 					etternavn = "etternavn",
-					epost = null
+					epost = null,
+					telefonnummer = null
 				)
 			}
 		}

@@ -4,4 +4,5 @@ data class Veileder(
 	val navIdent: String,
 	val navn: String,
 	val epost: String?,
+	val telefonnummer: String?
 )

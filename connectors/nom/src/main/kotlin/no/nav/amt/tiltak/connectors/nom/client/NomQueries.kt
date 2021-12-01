@@ -16,6 +16,10 @@ object NomQueries {
 						fornavn
 						etternavn
 						epost
+						telefon {
+							nummer
+							type
+						}
 					}
 				}
 			}
@@ -51,8 +55,13 @@ object NomQueries {
 			val fornavn: String?,
 			val etternavn: String?,
 			val epost: String?,
+			val telefon: List<Telefon>,
 		)
 
+		data class Telefon(
+			val nummer: String,
+			val type: String // Enten NAV_TJENESTE_TELEFON eller PRIVAT_TELEFON
+		)
 	}
 
 }
