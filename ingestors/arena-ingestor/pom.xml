@@ -25,16 +25,6 @@
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.javacrumbs.shedlock</groupId>
-            <artifactId>shedlock-spring</artifactId>
-            <version>${schedlock.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.javacrumbs.shedlock</groupId>
-            <artifactId>shedlock-provider-jdbc-template</artifactId>
-            <version>${schedlock.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
@@ -49,6 +39,10 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.common</groupId>
+            <artifactId>job</artifactId>
         </dependency>
 
         <dependency>

@@ -75,6 +75,10 @@
             <groupId>no.nav.common</groupId>
             <artifactId>kafka</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.common</groupId>
+            <artifactId>job</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -105,6 +109,10 @@
         <dependency>
             <groupId>no.nav.security</groupId>
             <artifactId>token-validation-spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-provider-jdbc-template</artifactId>
         </dependency>
 
         <dependency>
