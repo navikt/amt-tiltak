@@ -20,8 +20,7 @@ class NavAnsattRepositoryTest : FunSpec({
 
 	val upsertCmd = UpsertNavAnsattCommand(
 		personligIdent = "test123",
-		fornavn = "Fornavn",
-		etternavn = "Etternavn",
+		navn = "Fornavn Etternavn",
 		telefonnummer = "7464635",
 		epost = "fornavn.etternavn@nav.no",
 	)
@@ -47,8 +46,7 @@ class NavAnsattRepositoryTest : FunSpec({
 		storedDbo shouldNotBe null
 		storedDbo!!.id shouldNotBe -1
 		storedDbo.personligIdent shouldBe upsertCmd.personligIdent
-		storedDbo.fornavn shouldBe upsertCmd.fornavn
-		storedDbo.etternavn shouldBe upsertCmd.etternavn
+		storedDbo.navn shouldBe upsertCmd.navn
 		storedDbo.telefonnummer shouldBe upsertCmd.telefonnummer
 		storedDbo.epost shouldBe upsertCmd.epost
 	}

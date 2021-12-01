@@ -11,7 +11,7 @@ class PersonFacade(
 	private val pdlConnector: PdlConnector,
 	private val dkifConnector: DkifConnector,
 	private val veilarboppfolgingConnector: VeilarboppfolgingConnector,
-	private val nomConnector: NomConnector
+	private val veilederService: VeilederService
 ) : PersonService {
 
 	override fun hentPersonKontaktinformasjon(fnr: String): Kontaktinformasjon {
@@ -34,9 +34,9 @@ class PersonFacade(
 		)
 	}
 
-	override fun hentVeileder(fnr: String): Veileder? {
+	override fun hentTildeltVeileder(fnr: String): Veileder? {
 		return veilarboppfolgingConnector.hentVeilederIdent(fnr)?.let { ident ->
-			nomConnector.hentVeileder(ident)
+			veilederService.hentVeileder(ident)
 		}
 	}
 

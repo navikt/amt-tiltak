@@ -20,15 +20,11 @@ open class TiltakDeltakerPresentationService(
 	}
 
 	private fun DeltakerDetaljerDbo.toDto(): TiltakDeltakerDetaljerDto {
-		val hasVeileder = veilederFornavn != null
-			|| veilederEtternavn != null
-			|| veilederEpost != null
-			|| veilederTelefonnummer != null
+		val hasVeileder = veilederNavn != null
 
 		val veileder: NavVeilederDTO? = if (hasVeileder) {
 			NavVeilederDTO(
-				veilederFornavn,
-				veilederEtternavn,
+				veilederNavn!!,
 				veilederTelefonnummer,
 				veilederEpost
 			)

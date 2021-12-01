@@ -101,16 +101,14 @@ open class DeltakerServiceImpl(
 			epost = null,
 			ansvarligVeilederId = veileder?.id
 		)
-
 	}
 
 	private fun upsertVeileder(fodselsnummer: String): NavAnsattDbo? {
-		return personService.hentVeileder(fodselsnummer)?.let { veileder ->
+		return personService.hentTildeltVeileder(fodselsnummer)?.let { veileder ->
 			navAnsattRepository.upsert(
 				UpsertNavAnsattCommand(
 					personligIdent = veileder.navIdent,
-					fornavn = veileder.fornavn,
-					etternavn = veileder.etternavn,
+					navn = veileder.navn,
 					epost = veileder.epost,
 					telefonnummer = "TODO - Ikke hentet fra NOM enda"
 				)

@@ -42,8 +42,7 @@ class GetDeltakerDetaljerQueryTest : FunSpec({
 		deltakerDetaljer.fodselsnummer shouldBe "12345678910"
 		deltakerDetaljer.telefonnummer shouldBe "384"
 		deltakerDetaljer.epost shouldBe "m@2.c"
-		deltakerDetaljer.veilederFornavn shouldBe "Vashnir"
-		deltakerDetaljer.veilederEtternavn shouldBe "Veiledersen"
+		deltakerDetaljer.veilederNavn shouldBe "Vashnir Veiledersen"
 		deltakerDetaljer.veilederTelefonnummer shouldBe "84756"
 		deltakerDetaljer.veilederEpost shouldBe "vashnir.veiledersen@nav.no"
 		deltakerDetaljer.oppstartDato shouldBe LocalDate.now().minusDays(1)

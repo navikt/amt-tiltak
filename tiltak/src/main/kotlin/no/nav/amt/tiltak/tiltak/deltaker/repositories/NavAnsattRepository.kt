@@ -17,8 +17,7 @@ open class NavAnsattRepository(
 		NavAnsattDbo(
 			id = UUID.fromString(rs.getString("id")),
 			personligIdent = rs.getString("personlig_ident"),
-			fornavn = rs.getString("fornavn"),
-			etternavn = rs.getString("etternavn"),
+			navn = rs.getString("navn"),
 			telefonnummer = rs.getString("telefonnummer"),
 			epost = rs.getString("epost")
 		)
@@ -26,15 +25,13 @@ open class NavAnsattRepository(
 
 	fun upsert(upsertCmd: UpsertNavAnsattCommand) {
 		val sql = """
-			INSERT INTO nav_ansatt(id, personlig_ident, fornavn, etternavn, telefonnummer, epost)
+			INSERT INTO nav_ansatt(id, personlig_ident, navn, telefonnummer, epost)
 			VALUES (:id,
 					:personligIdent,
-					:fornavn,
-					:etternavn,
+					:navn,
 					:telefonnummer,
 					:epost)
-			ON CONFLICT (personlig_ident) DO UPDATE SET fornavn       = :fornavn,
-														etternavn     = :etternavn,
+			ON CONFLICT (personlig_ident) DO UPDATE SET navn       	  = :navn,
 														telefonnummer = :telefonnummer,
 														epost         = :epost
 		""".trimIndent()
@@ -43,8 +40,7 @@ open class NavAnsattRepository(
 			mapOf(
 				"id" to UUID.randomUUID(),
 				"personligIdent" to upsertCmd.personligIdent,
-				"fornavn" to upsertCmd.fornavn,
-				"etternavn" to upsertCmd.etternavn,
+				"navn" to upsertCmd.navn,
 				"telefonnummer" to upsertCmd.telefonnummer,
 				"epost" to upsertCmd.epost
 			)

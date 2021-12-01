@@ -2,7 +2,6 @@ package no.nav.amt.tiltak.tiltak.controllers.dto
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import java.time.LocalDate
-import java.time.ZonedDateTime
 import java.util.*
 
 data class TiltakDeltakerDetaljerDto(
@@ -27,8 +26,7 @@ data class NavKontorDTO(
 )
 
 data class NavVeilederDTO(
-	val fornavn: String?,
-	val etternavn: String?,
+	val navn: String,
 	val telefon: String?,
 	val epost: String?,
 )

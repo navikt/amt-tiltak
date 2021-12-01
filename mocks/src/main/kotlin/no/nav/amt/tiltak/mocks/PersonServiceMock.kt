@@ -22,7 +22,7 @@ class PersonServiceMock : PersonService {
 			?: throw RuntimeException("Mock inneholder ikke informasjon om bruker med fødselsnummer $fnr")
 	}
 
-	override fun hentVeileder(fnr: String): Veileder? {
+	override fun hentTildeltVeileder(fnr: String): Veileder? {
 		throw NotImplementedError("Mock does not support getting Veileder")
 	}
 
