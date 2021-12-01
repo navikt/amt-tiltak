@@ -4,7 +4,6 @@ import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt.tiltak.core.domain.veileder.Veileder
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 
@@ -13,14 +12,14 @@ class NomGraphqlClientTest : StringSpec({
 	val token = "DUMMYTOKEN"
 
 	lateinit var server: MockWebServer
-	lateinit var client: NomClient
+	lateinit var client: NomClientImpl
 	isolationMode = IsolationMode.InstancePerTest
-	val expectedVeileder = Veileder("H156147", "Alias", "Blaut", "Slappfisk", "blaut.slappfisk@nav.no")
+	val expectedVeileder = NomVeileder("H156147", "Alias", "Blaut", "Slappfisk", "blaut.slappfisk@nav.no")
 
 	beforeTest {
 		server = MockWebServer()
 
-		client = NomClient(server.url("").toString(), { token })
+		client = NomClientImpl(server.url("").toString(), { token })
 	}
 
 	"hentVeileder - veileder finnes - returnerer veileder" {
@@ -31,7 +30,7 @@ class NomGraphqlClientTest : StringSpec({
 			  {
 				"ressurs": {
 				  "navIdent": "${expectedVeileder.navIdent}",
-				  "visningsNavn": "${expectedVeileder.visningsNavn}",
+				  "visningsNavn": "${expectedVeileder.visningNavn}",
 				  "fornavn": "${expectedVeileder.fornavn}",
 				  "etternavn": "${expectedVeileder.etternavn}",
 				  "epost": "${expectedVeileder.epost}"
