@@ -5,5 +5,6 @@ data class NomVeileder(
 	val visningNavn: String?,
 	val fornavn: String?,
 	val etternavn: String?,
+	val telefonnummer: String?,
 	val epost: String?,
 )

@@ -9,6 +9,7 @@ class NomClientMock : NomClient {
 			etternavn = "E_$navIdent",
 			visningNavn = "F_$navIdent E_$navIdent",
 			epost = "F_$navIdent.E_$navIdent@trygdeetaten.no",
+			telefonnummer = "12345678"
 		)
 	}
 

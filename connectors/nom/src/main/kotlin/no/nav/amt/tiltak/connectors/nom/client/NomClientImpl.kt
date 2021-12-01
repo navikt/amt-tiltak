@@ -64,13 +64,20 @@ class NomClientImpl(
 				return@mapNotNull null
 			}
 
+			val telefonnummer = hentTjenesteTelefonnummer(it.ressurs.telefon)
+
 			NomVeileder(
 				navIdent = it.ressurs.navIdent,
 				visningNavn = it.ressurs.visningsNavn,
 				fornavn = it.ressurs.fornavn,
 				etternavn = it.ressurs.etternavn,
 				epost = it.ressurs.epost,
+				telefonnummer = telefonnummer
 			)
 		} ?: emptyList()
+	}
+
+	private fun hentTjenesteTelefonnummer(telefonnumere: List<NomQueries.HentIdenter.Telefon>): String? {
+		return telefonnumere.find { it.type == "NAV_TJENESTE_TELEFON" }?.nummer
 	}
 }
