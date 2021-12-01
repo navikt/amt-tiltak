@@ -221,6 +221,11 @@
                 <artifactId>oauth2-oidc-sdk</artifactId>
                 <version>${nimbus.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>

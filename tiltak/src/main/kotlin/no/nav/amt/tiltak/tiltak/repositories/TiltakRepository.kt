@@ -83,29 +83,6 @@ open class TiltakRepository(
 		)
 	}
 
-	fun get(id: UUID): TiltakDbo? {
-		//language=PostgreSQL
-		val sql = """
-            select id,
-                   arena_id,
-                   navn,
-                   type,
-                   created_at,
-                   modified_at
-            from tiltak
-			WHERE id = :id
-        """.trimIndent()
-
-		val parameters = MapSqlParameterSource().addValues(
-			mapOf(
-				"id" to id
-			)
-		)
-
-		return template.query(sql, parameters, rowMapper)
-			.firstOrNull()
-	}
-
 	fun getByArenaId(arenaId: String): TiltakDbo? {
 		//language=PostgreSQL
 		val sql = """
@@ -122,6 +99,29 @@ open class TiltakRepository(
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
 				"arena_id" to arenaId
+			)
+		)
+
+		return template.query(sql, parameters, rowMapper)
+			.firstOrNull()
+	}
+
+	private fun get(id: UUID): TiltakDbo? {
+		//language=PostgreSQL
+		val sql = """
+            select id,
+                   arena_id,
+                   navn,
+                   type,
+                   created_at,
+                   modified_at
+            from tiltak
+			WHERE id = :id
+        """.trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"id" to id
 			)
 		)
 
