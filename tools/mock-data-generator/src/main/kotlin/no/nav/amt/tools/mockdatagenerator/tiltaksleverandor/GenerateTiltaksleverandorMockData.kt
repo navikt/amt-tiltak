@@ -37,7 +37,7 @@ class GenerateTiltaksleverandorMockData {
 		val fileReader = FileInputStream("tools/arena-kafka-producer/data/arena_tiltak/TILTAKGJENNOMFORING.json")
 		val data: List<Tiltaksgjennomforing> = objectMapper.readValue(fileReader)
 
-		return data.map { it.arbeidsgiverId }.toSet()
+		return data.map { it.arbeidsgiverId }.filterNotNull().toSet()
 	}
 
 	private fun getEnhet(): Enhet {
@@ -106,7 +106,7 @@ class GenerateTiltaksleverandorMockData {
 	data class Tiltaksgjennomforing(
 
 		@JsonProperty("ARBGIV_ID_ARRANGOR")
-		val arbeidsgiverId: Long
+		val arbeidsgiverId: Long?
 	)
 
 }

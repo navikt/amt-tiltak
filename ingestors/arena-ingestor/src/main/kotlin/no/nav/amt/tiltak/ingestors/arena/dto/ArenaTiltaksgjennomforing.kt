@@ -23,7 +23,7 @@ data class ArenaTiltaksgjennomforing(
 	val TILTAKSTATUSKODE: String, // Ex: AVSLUTT
 	val PROSENT_DELTID: Float,
 	val KOMMENTAR: String?,
-	val ARBGIV_ID_ARRANGOR: Long,
+	val ARBGIV_ID_ARRANGOR: Long?,
 	val PROFILELEMENT_ID_GEOGRAFI: String?, // Might be Int
 	val KLOKKETID_FREMMOTE: String?,
 	val DATO_FREMMOTE: String?, // Ex: 2002-09-26 00:00:00,
