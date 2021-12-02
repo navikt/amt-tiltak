@@ -24,7 +24,7 @@ open class TiltaksgjennomforingProcessor(
 	private val ords: ArenaOrdsProxyConnector
 ) : AbstractArenaProcessor(repository) {
 
-	private val logger = LoggerFactory.getLogger(javaClass)
+	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun insert(data: ArenaData) {
 		val newFields = jsonObject(data.after, ArenaTiltaksgjennomforing::class.java)
@@ -34,6 +34,12 @@ open class TiltaksgjennomforingProcessor(
 				?: throw DependencyNotIngestedException("Tiltak med ID ${newFields.TILTAKSKODE} er ikke ingested.")
 
 			val tiltaksleverandor = addTiltaksleverandor(newFields)
+
+			if (tiltaksleverandor == null) {
+				log.info("Hopper over insert av tiltak instans som mangler ARBGIV_ID_ARRANGOR. arenaTiltakgjennomforingId=${newFields.TILTAKGJENNOMFORING_ID}")
+				repository.upsert(data.markAsIgnored())
+				return
+			}
 
 			tiltakInstansService.upsertTiltaksinstans(
 				arenaId = newFields.TILTAKGJENNOMFORING_ID.toInt(),
@@ -60,7 +66,13 @@ open class TiltaksgjennomforingProcessor(
 		val newFields = jsonObject(data.after, ArenaTiltaksgjennomforing::class.java)
 
 		if (isSupportedTiltak(newFields.TILTAKSKODE)) {
-			val virksomhetsnummer = ords.hentVirksomhetsnummer(newFields.ARBGIV_ID_ARRANGOR.toString())
+			val virksomhetsnummer = hentVirksomhetsnummer(newFields.ARBGIV_ID_ARRANGOR)
+
+			if (virksomhetsnummer == null) {
+				log.info("Hopper over update av tiltak instans som mangler ARBGIV_ID_ARRANGOR. arenaTiltakgjennomforingId=${newFields.TILTAKGJENNOMFORING_ID}")
+				repository.upsert(data.markAsIgnored())
+				return
+			}
 
 			val tiltaksleverandor = tiltaksleverandorService.getTiltaksleverandorByVirksomhetsnummer(virksomhetsnummer)
 				?: throw DependencyNotIngestedException("Tiltaksleverandør med virksomhetsnummer $virksomhetsnummer er ikke ingested enda.")
@@ -90,12 +102,17 @@ open class TiltaksgjennomforingProcessor(
 	}
 
 	override fun delete(data: ArenaData) {
-		logger.error("Delete is not implemented for TiltaksgjennomforingProcessor")
+		log.error("Delete is not implemented for TiltaksgjennomforingProcessor")
 		repository.upsert(data.markAsFailed())
 	}
 
-	private fun addTiltaksleverandor(fields: ArenaTiltaksgjennomforing): Tiltaksleverandor {
-		val virksomhetsnummer = ords.hentVirksomhetsnummer(fields.ARBGIV_ID_ARRANGOR.toString())
+	private fun addTiltaksleverandor(fields: ArenaTiltaksgjennomforing): Tiltaksleverandor? {
+		val virksomhetsnummer = hentVirksomhetsnummer(fields.ARBGIV_ID_ARRANGOR) ?: return null
 		return tiltaksleverandorService.addTiltaksleverandor(virksomhetsnummer)
 	}
+
+	private fun hentVirksomhetsnummer(arenaArrangorId: Long?): String? {
+		return if (arenaArrangorId == null) null else ords.hentVirksomhetsnummer(arenaArrangorId.toString())
+	}
+
 }
