@@ -11,8 +11,8 @@ import org.junit.jupiter.api.assertThrows
 class PdlConnectorImplTest {
 
 	@Test
-	fun `skal lage riktig request og parse pdl bruker`(wmRuntimeInfo: WireMockRuntimeInfo) {
-		val connector = PdlConnectorImpl(
+	fun `hentBruker skal lage riktig request og parse pdl bruker`(wmRuntimeInfo: WireMockRuntimeInfo) {
+		val connector = PdlClientImpl(
 			{ "TOKEN" },
 			wmRuntimeInfo.httpBaseUrl
 		)
@@ -77,8 +77,8 @@ class PdlConnectorImplTest {
 	}
 
 	@Test
-	fun `skal kaste exception hvis data mangler`(wmRuntimeInfo: WireMockRuntimeInfo) {
-		val connector = PdlConnectorImpl(
+	fun `hentBruker skal kaste exception hvis data mangler`(wmRuntimeInfo: WireMockRuntimeInfo) {
+		val connector = PdlClientImpl(
 			{ "TOKEN" },
 			wmRuntimeInfo.httpBaseUrl
 		)
@@ -104,6 +104,85 @@ class PdlConnectorImplTest {
 		}
 
 		assertEquals("PDL respons inneholder ikke data", exception.message)
+	}
+
+	@Test
+	fun `hentFnr skal lage riktig request og parse response`(wmRuntimeInfo: WireMockRuntimeInfo) {
+		val connector = PdlClientImpl(
+			{ "TOKEN" },
+			wmRuntimeInfo.httpBaseUrl
+		)
+
+		givenThat(
+			post(urlEqualTo("/graphql"))
+				.withHeader("Authorization", equalTo("Bearer TOKEN"))
+				.withHeader("Tema", equalTo("GEN"))
+				.withRequestBody(
+					equalToJson(
+						"""
+							{
+								"query": "${PdlQueries.HentGjeldendeIdent.query.replace("\n", "\\n").replace("\t", "\\t")}",
+								"variables": { "ident": "0989776567" }
+							}
+						""".trimIndent()
+					)
+				)
+				.willReturn(
+					aResponse()
+						.withStatus(200)
+						.withBody(
+							"""
+								{
+									"errors": null,
+									"data": {
+										"hentIdenter": {
+											"identer": [
+												{ "ident": "1234567" }
+											]
+										}
+									}
+								}
+							""".trimIndent()
+						)
+				)
+
+		)
+
+		assertEquals("1234567", connector.hentFnr("0989776567"))
+	}
+
+	@Test
+	fun `hentFnr skal kaste exception hvis ident mangler`(wmRuntimeInfo: WireMockRuntimeInfo) {
+		val connector = PdlClientImpl(
+			{ "TOKEN" },
+			wmRuntimeInfo.httpBaseUrl
+		)
+
+		givenThat(
+			post(urlEqualTo("/graphql"))
+				.willReturn(
+					aResponse()
+						.withStatus(200)
+						.withBody(
+							"""
+								{
+									"errors": null,
+									"data": {
+										"hentIdenter": {
+											"identer": []
+										}
+									}
+								}
+							""".trimIndent()
+						)
+				)
+		)
+
+		val exception = assertThrows<IllegalStateException> {
+			connector.hentFnr("FNR")
+		}
+
+		assertEquals("Fant ikke ident til bruker i PDL", exception.message)
 	}
 
 }

@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-open class PdlConnectorConfig {
+open class PdlClientConfig {
 
 	@Value("\${pdl.url}")
 	lateinit var url: String
@@ -15,8 +15,8 @@ open class PdlConnectorConfig {
 	lateinit var scope: String
 
 	@Bean
-	open fun pdlConnector(scopedTokenProvider: ScopedTokenProvider): PdlConnector {
-		return PdlConnectorImpl(
+	open fun pdlConnector(scopedTokenProvider: ScopedTokenProvider): PdlClient {
+		return PdlClientImpl(
 			tokenProvider = { scopedTokenProvider.getToken(scope) },
 			pdlUrl = url
 		)

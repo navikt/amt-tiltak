@@ -6,15 +6,16 @@ import no.nav.amt.tiltak.tools.graphql.Graphql
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.function.Supplier
 
-class PdlConnectorImpl(
+class PdlClientImpl(
 	private val tokenProvider: Supplier<String>,
 	private val pdlUrl: String,
 	private val httpClient: OkHttpClient = OkHttpClient(),
 	private val objectMapper: ObjectMapper = ObjectMapper().registerKotlinModule(),
-) : PdlConnector {
+) : PdlClient {
 
 	private val mediaTypeJson = "application/json".toMediaType()
 
@@ -26,12 +27,7 @@ class PdlConnectorImpl(
 			)
 		)
 
-		val request = Request.Builder()
-			.url("$pdlUrl/graphql")
-			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
-			.addHeader("Tema", "GEN")
-			.post(requestBody.toRequestBody(mediaTypeJson))
-			.build()
+		val request = buildGqlRequest(requestBody.toRequestBody(mediaTypeJson))
 
 		httpClient.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
@@ -50,8 +46,44 @@ class PdlConnectorImpl(
 		}
 	}
 
+	override fun hentFnr(aktorId: String): String {
+		val requestBody = objectMapper.writeValueAsString(
+			Graphql.GraphqlQuery(
+				PdlQueries.HentGjeldendeIdent.query,
+				PdlQueries.HentGjeldendeIdent.Variables(aktorId)
+			)
+		)
+
+		val request = buildGqlRequest(requestBody.toRequestBody(mediaTypeJson))
+
+		httpClient.newCall(request).execute().use { response ->
+			if (!response.isSuccessful) {
+				throw RuntimeException("Klarte ikke å hente gjeldende ident fra PDL. Status: ${response.code}")
+			}
+
+			val body = response.body?.string() ?: throw RuntimeException("Body is missing from PDL request")
+
+			val gqlResponse = objectMapper.readValue(body, PdlQueries.HentGjeldendeIdent.Response::class.java)
+
+			if (gqlResponse.data == null) {
+				throw RuntimeException("PDL respons inneholder ikke data")
+			}
+
+			return toIdent(gqlResponse.data)
+		}
+	}
+
+	private fun buildGqlRequest(requestBody: RequestBody): Request {
+		return Request.Builder()
+			.url("$pdlUrl/graphql")
+			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
+			.addHeader("Tema", "GEN")
+			.post(requestBody)
+			.build()
+	}
+
 	private fun toPdlBruker(response: PdlQueries.HentBruker.ResponseData): PdlBruker {
-		val navn = response.hentPerson.navn.firstOrNull() ?: throw RuntimeException("PDL bruker mangler navn")
+		val navn = response.hentPerson.navn.firstOrNull() ?: throw IllegalStateException("PDL bruker mangler navn")
 		val telefonnummer = getTelefonnummer(response.hentPerson.telefonnummer)
 
 		return PdlBruker(
@@ -66,6 +98,10 @@ class PdlConnectorImpl(
 		val prioritertNummer = telefonnummere.minByOrNull { it.prioritet } ?: return null
 
 		return "${prioritertNummer.landskode} ${prioritertNummer.nummer}"
+	}
+
+	private fun toIdent(response: PdlQueries.HentGjeldendeIdent.ResponseData): String {
+		return response.hentIdenter.identer.firstOrNull()?.ident ?: throw IllegalStateException("Fant ikke ident til bruker i PDL")
 	}
 
 }

@@ -1,8 +1,10 @@
 package no.nav.amt.tiltak.connectors.pdl
 
-interface PdlConnector {
+interface PdlClient {
 
 	fun hentBruker(brukerFnr: String): PdlBruker
+
+	fun hentFnr(aktorId: String): String
 
 }
 
