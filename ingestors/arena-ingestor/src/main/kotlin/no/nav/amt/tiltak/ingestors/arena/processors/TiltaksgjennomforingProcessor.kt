@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.ingestors.arena.processors
 
-import no.nav.amt.tiltak.core.domain.tiltaksleverandor.Tiltaksleverandor
 import no.nav.amt.tiltak.core.port.ArenaOrdsProxyConnector
 import no.nav.amt.tiltak.core.port.TiltakInstansService
 import no.nav.amt.tiltak.core.port.TiltakService
@@ -33,13 +32,15 @@ open class TiltaksgjennomforingProcessor(
 			val tiltak = tiltakService.getTiltakFromArenaId(newFields.TILTAKSKODE)
 				?: throw DependencyNotIngestedException("Tiltak med ID ${newFields.TILTAKSKODE} er ikke ingested.")
 
-			val tiltaksleverandor = addTiltaksleverandor(newFields)
-
-			if (tiltaksleverandor == null) {
+			if (newFields.ARBGIV_ID_ARRANGOR == null) {
 				log.info("Hopper over insert av tiltak instans som mangler ARBGIV_ID_ARRANGOR. arenaTiltakgjennomforingId=${newFields.TILTAKGJENNOMFORING_ID}")
 				repository.upsert(data.markAsIgnored())
 				return
 			}
+
+			val virksomhetsnummer = ords.hentVirksomhetsnummer(newFields.ARBGIV_ID_ARRANGOR.toString())
+
+			val tiltaksleverandor = tiltaksleverandorService.addTiltaksleverandor(virksomhetsnummer)
 
 			tiltakInstansService.upsertTiltaksinstans(
 				arenaId = newFields.TILTAKGJENNOMFORING_ID.toInt(),
@@ -66,20 +67,19 @@ open class TiltaksgjennomforingProcessor(
 		val newFields = jsonObject(data.after, ArenaTiltaksgjennomforing::class.java)
 
 		if (isSupportedTiltak(newFields.TILTAKSKODE)) {
-			val virksomhetsnummer = hentVirksomhetsnummer(newFields.ARBGIV_ID_ARRANGOR)
-
-			if (virksomhetsnummer == null) {
+			if (newFields.ARBGIV_ID_ARRANGOR == null) {
 				log.info("Hopper over update av tiltak instans som mangler ARBGIV_ID_ARRANGOR. arenaTiltakgjennomforingId=${newFields.TILTAKGJENNOMFORING_ID}")
 				repository.upsert(data.markAsIgnored())
 				return
 			}
+
+			val virksomhetsnummer = ords.hentVirksomhetsnummer(newFields.ARBGIV_ID_ARRANGOR.toString())
 
 			val tiltaksleverandor = tiltaksleverandorService.getTiltaksleverandorByVirksomhetsnummer(virksomhetsnummer)
 				?: throw DependencyNotIngestedException("Tiltaksleverandør med virksomhetsnummer $virksomhetsnummer er ikke ingested enda.")
 
 			val tiltak = tiltakService.getTiltakFromArenaId(newFields.TILTAKSKODE)
 				?: throw DependencyNotIngestedException("Tilktak med ArenaId $virksomhetsnummer er ikke ingested enda.")
-
 
 			tiltakInstansService.upsertTiltaksinstans(
 				arenaId = newFields.TILTAKGJENNOMFORING_ID.toInt(),
@@ -104,15 +104,6 @@ open class TiltaksgjennomforingProcessor(
 	override fun delete(data: ArenaData) {
 		log.error("Delete is not implemented for TiltaksgjennomforingProcessor")
 		repository.upsert(data.markAsFailed())
-	}
-
-	private fun addTiltaksleverandor(fields: ArenaTiltaksgjennomforing): Tiltaksleverandor? {
-		val virksomhetsnummer = hentVirksomhetsnummer(fields.ARBGIV_ID_ARRANGOR) ?: return null
-		return tiltaksleverandorService.addTiltaksleverandor(virksomhetsnummer)
-	}
-
-	private fun hentVirksomhetsnummer(arenaArrangorId: Long?): String? {
-		return if (arenaArrangorId == null) null else ords.hentVirksomhetsnummer(arenaArrangorId.toString())
 	}
 
 }
