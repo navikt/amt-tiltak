@@ -1,11 +1,11 @@
 package no.nav.amt.tiltak.tiltak.controllers
 
-import no.nav.amt.tiltak.tiltak.controllers.dto.NavKontorDTO
-import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakDeltakerDetaljerDto
-import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakDto
-import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakInstansDto
-import no.nav.amt.tiltak.tiltak.deltaker.controllers.TiltakDeltakerController
-import no.nav.amt.tiltak.tiltak.deltaker.controllers.TiltakDeltakerPresentationService
+import no.nav.amt.tiltak.tiltak.dto.NavKontorDTO
+import no.nav.amt.tiltak.tiltak.dto.TiltakDeltakerDetaljerDto
+import no.nav.amt.tiltak.tiltak.dto.TiltakDto
+import no.nav.amt.tiltak.tiltak.dto.TiltakInstansDto
+import no.nav.amt.tiltak.deltaker.controllers.TiltakDeltakerController
+import no.nav.amt.tiltak.deltaker.controllers.TiltakDeltakerPresentationService
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions

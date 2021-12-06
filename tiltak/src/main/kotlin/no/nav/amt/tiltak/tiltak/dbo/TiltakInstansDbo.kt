@@ -2,8 +2,8 @@ package no.nav.amt.tiltak.tiltak.dbo
 
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
-import no.nav.amt.tiltak.tiltak.utils.UpdateCheck
-import no.nav.amt.tiltak.tiltak.utils.UpdateStatus
+import no.nav.amt.tiltak.utils.UpdateCheck
+import no.nav.amt.tiltak.utils.UpdateStatus
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
