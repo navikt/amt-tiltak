@@ -76,10 +76,10 @@ open class TiltaksgjennomforingProcessor(
 			val virksomhetsnummer = ords.hentVirksomhetsnummer(newFields.ARBGIV_ID_ARRANGOR.toString())
 
 			val tiltaksarrangor = tiltaksarrangorService.getTiltaksarrangorByVirksomhetsnummer(virksomhetsnummer)
-				?: throw DependencyNotIngestedException("Tiltaksleverandør med virksomhetsnummer $virksomhetsnummer er ikke ingested enda.")
+				?: throw DependencyNotIngestedException("Tiltaksarrangør med virksomhetsnummer $virksomhetsnummer er ikke ingested enda.")
 
 			val tiltak = tiltakService.getTiltakFromArenaId(newFields.TILTAKSKODE)
-				?: throw DependencyNotIngestedException("Tilktak med ArenaId $virksomhetsnummer er ikke ingested enda.")
+				?: throw DependencyNotIngestedException("Tiltak med ArenaId $virksomhetsnummer er ikke ingested enda.")
 
 			tiltakInstansService.upsertTiltaksinstans(
 				arenaId = newFields.TILTAKGJENNOMFORING_ID.toInt(),

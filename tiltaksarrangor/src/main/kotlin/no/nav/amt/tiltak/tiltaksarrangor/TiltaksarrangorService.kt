@@ -39,6 +39,6 @@ class TiltaksarrangorService(
 	}
 
 	override fun getVirksomheterForAnsatt(ansattId: UUID): List<Tiltaksarrangor> {
-		throw NotImplementedError("getVirksomheterForAnsatt in TiltaksleverandorService is not yet implemented")
+		throw NotImplementedError("getVirksomheterForAnsatt in TiltaksarrangorService is not yet implemented")
 	}
 }

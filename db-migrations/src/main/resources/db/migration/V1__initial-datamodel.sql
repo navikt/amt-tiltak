@@ -1,4 +1,4 @@
-CREATE TYPE tiltaksleverandor_rolle AS ENUM (
+CREATE TYPE tiltaksarrangor_rolle AS ENUM (
     'KOORDINATOR',
     'VEILEDER'
     );
@@ -13,7 +13,7 @@ CREATE TABLE nav_ansatt
     epost           varchar
 );
 
-CREATE TABLE tiltaksleverandor
+CREATE TABLE tiltaksarrangor
 (
     id                                   uuid PRIMARY KEY,
     navn                                 varchar                  not null,
@@ -24,7 +24,7 @@ CREATE TABLE tiltaksleverandor
     modified_at                          timestamp with time zone not null default current_timestamp
 );
 
-CREATE TABLE tiltaksleverandor_ansatt
+CREATE TABLE tiltaksarrangor_ansatt
 (
     id              uuid PRIMARY KEY,
     personlig_ident varchar                  NOT NULL UNIQUE,
@@ -36,12 +36,12 @@ CREATE TABLE tiltaksleverandor_ansatt
     modified_at     timestamp with time zone not null default current_timestamp
 );
 
-CREATE TABLE tiltaksleverandor_ansatt_rolle
+CREATE TABLE tiltaksarrangor_ansatt_rolle
 (
     id                   uuid PRIMARY KEY,
-    ansatt_id            uuid                     not null references tiltaksleverandor_ansatt (id),
-    tiltaksleverandor_id uuid                     not null references tiltaksleverandor (id),
-    rolle                tiltaksleverandor_rolle  not null,
+    ansatt_id            uuid                     not null references tiltaksarrangor_ansatt (id),
+    tiltaksarrangor_id uuid                     not null references tiltaksarrangor (id),
+    rolle                tiltaksarrangor_rolle  not null,
     created_at           timestamp with time zone not null default current_timestamp
 
 );
@@ -65,7 +65,7 @@ CREATE TABLE tiltaksinstans
     id                   uuid PRIMARY KEY,
     arena_id             integer                  not null unique,
     tiltak_id            uuid                     not null references tiltak (id),
-    tiltaksleverandor_id uuid                     not null references tiltaksleverandor (id),
+    tiltaksarrangor_id uuid                     not null references tiltaksarrangor (id),
     navn                 varchar,
     status               varchar,
     oppstart_dato        date,

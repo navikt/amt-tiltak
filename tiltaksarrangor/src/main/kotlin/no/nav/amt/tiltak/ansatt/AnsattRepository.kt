@@ -31,7 +31,7 @@ open class AnsattRepository(
 		))
 
 		return template.query(
-			"SELECT * FROM tiltaksleverandor_ansatt WHERE personlig_ident = :personligIdent",
+			"SELECT * FROM tiltaksarrangor_ansatt WHERE personlig_ident = :personligIdent",
 			parameters,
 			rowMapper
 		).firstOrNull()

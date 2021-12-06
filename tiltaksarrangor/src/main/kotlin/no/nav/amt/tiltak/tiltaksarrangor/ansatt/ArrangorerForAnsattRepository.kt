@@ -12,25 +12,25 @@ class ArrangorerForAnsattRepository(
 
 	private val rowMapper = RowMapper { rs, _ ->
 		ArrangorForAnsattDbo(
-			id = rs.getUUID("leverandor_id"),
-			navn = rs.getString("leverandor_navn"),
-			organisasjonsnummer = rs.getString("leverandor_organisasjonsnummer"),
-			overordnetEnhetNavn = rs.getString("leverandor_overordnet_enhet_navn"),
-			overordnetEnhetOrganisasjonsnummer = rs.getString("leverandor_overordnet_enhet_organisasjonsnummer"),
+			id = rs.getUUID("arrangor_id"),
+			navn = rs.getString("arrangor_navn"),
+			organisasjonsnummer = rs.getString("arrangor_organisasjonsnummer"),
+			overordnetEnhetNavn = rs.getString("arrangor_overordnet_enhet_navn"),
+			overordnetEnhetOrganisasjonsnummer = rs.getString("arrangor_overordnet_enhet_organisasjonsnummer"),
 			rolle = rs.getString("rolle")
 		)
 	}
 
 	private val sql = """
-		SELECT leverandor.id                                   AS leverandor_id,
-		       leverandor.navn                                 AS leverandor_navn,
-		       leverandor.organisasjonsnummer                  AS leverandor_organisasjonsnummer,
-		       leverandor.overordnet_enhet_navn                AS leverandor_overordnet_enhet_navn,
-		       leverandor.overordnet_enhet_organisasjonsnummer AS leverandor_overordnet_enhet_organisasjonsnummer,
+		SELECT arrangor.id                                   AS arrangor_id,
+		       arrangor.navn                                 AS arrangor_navn,
+		       arrangor.organisasjonsnummer                  AS arrangor_organisasjonsnummer,
+		       arrangor.overordnet_enhet_navn                AS arrangor_overordnet_enhet_navn,
+		       arrangor.overordnet_enhet_organisasjonsnummer AS arrangor_overordnet_enhet_organisasjonsnummer,
 		       rolle.rolle                                     AS rolle
-		FROM tiltaksleverandor_ansatt ansatt
-		         JOIN tiltaksleverandor_ansatt_rolle rolle ON ansatt.id = rolle.ansatt_id
-		         JOIN tiltaksleverandor leverandor ON rolle.tiltaksleverandor_id = leverandor.id
+		FROM tiltaksarrangor_ansatt ansatt
+		         JOIN tiltaksarrangor_ansatt_rolle rolle ON ansatt.id = rolle.ansatt_id
+		         JOIN tiltaksarrangor arrangor ON rolle.tiltaksarrangor_id = arrangor.id
 		where ansatt.personlig_ident = :personligIdent
 	""".trimIndent()
 

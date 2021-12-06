@@ -19,7 +19,7 @@ open class TiltakInstansRepository(private val template: NamedParameterJdbcTempl
 		TiltakInstansDbo(
 			id = UUID.fromString(rs.getString("tiltaksinstans_id")),
 			arenaId = rs.getInt("tiltaksinstans_arena_id"),
-			tiltaksarrangorId = UUID.fromString(rs.getString("tiltaksleverandor_id")),
+			tiltaksarrangorId = UUID.fromString(rs.getString("tiltaksarrangor_id")),
 			tiltakId = UUID.fromString(rs.getString("tiltak_id")),
 			navn = rs.getString("navn"),
 			status = if (statusString != null) TiltakInstans.Status.valueOf(statusString) else null,
@@ -46,12 +46,12 @@ open class TiltakInstansRepository(private val template: NamedParameterJdbcTempl
 
 		//language=PostgreSQL
 		val sql = """
-		INSERT INTO tiltaksinstans(id, arena_id, tiltak_id, tiltaksleverandor_id, navn, status, oppstart_dato,
+		INSERT INTO tiltaksinstans(id, arena_id, tiltak_id, tiltaksarrangor_id, navn, status, oppstart_dato,
                            slutt_dato, registrert_dato, fremmote_dato)
 		VALUES (:id,
 				:arenaId,
 				:tiltakId,
-				:tiltaksleverandorId,
+				:tiltaksarrangorId,
 				:navn,
 				:status,
 				:oppstartDato,
@@ -67,7 +67,7 @@ open class TiltakInstansRepository(private val template: NamedParameterJdbcTempl
 				"id" to id,
 				"arenaId" to arenaId,
 				"tiltakId" to tiltakId,
-				"tiltaksleverandorId" to tiltaksarrangorId,
+				"tiltaksarrangorId" to tiltaksarrangorId,
 				"navn" to navn,
 				"status" to status?.name,
 				"oppstartDato" to oppstartDato,
@@ -124,7 +124,7 @@ open class TiltakInstansRepository(private val template: NamedParameterJdbcTempl
 		val sql = """
 			SELECT tiltaksinstans.id                                                           as tiltaksinstans_id,
 			       tiltaksinstans.arena_id                                                     as tiltaksinstans_arena_id,
-			       tiltaksinstans.tiltaksleverandor_id                                         as tiltaksleverandor_id,
+			       tiltaksinstans.tiltaksarrangor_id                                         as tiltaksarrangor_id,
 			       tiltaksinstans.tiltak_id                                                    as tiltak_id,
 			       tiltaksinstans.navn                                                         as navn,
 			       tiltaksinstans.status                                                       as status,
@@ -152,7 +152,7 @@ open class TiltakInstansRepository(private val template: NamedParameterJdbcTempl
 		val sql = """
 			SELECT tiltaksinstans.id                                                           as tiltaksinstans_id,
 			       tiltaksinstans.arena_id                                                     as tiltaksinstans_arena_id,
-			       tiltaksinstans.tiltaksleverandor_id                                         as tiltaksleverandor_id,
+			       tiltaksinstans.tiltaksarrangor_id                                         as tiltaksarrangor_id,
 			       tiltaksinstans.tiltak_id                                                    as tiltak_id,
 			       tiltaksinstans.navn                                                         as navn,
 			       tiltaksinstans.status                                                       as status,
@@ -181,7 +181,7 @@ open class TiltakInstansRepository(private val template: NamedParameterJdbcTempl
 		val sql = """
 			SELECT tiltaksinstans.id                                                           as tiltaksinstans_id,
 			       tiltaksinstans.arena_id                                                     as tiltaksinstans_arena_id,
-			       tiltaksinstans.tiltaksleverandor_id                                         as tiltaksleverandor_id,
+			       tiltaksinstans.tiltaksarrangor_id                                         as tiltaksarrangor_id,
 			       tiltaksinstans.tiltak_id                                                    as tiltak_id,
 			       tiltaksinstans.navn                                                         as navn,
 			       tiltaksinstans.status                                                       as status,
@@ -192,12 +192,12 @@ open class TiltakInstansRepository(private val template: NamedParameterJdbcTempl
 				   tiltaksinstans.created_at 												   as created_at,
 				   tiltaksinstans.modified_at                                                  as modified_at
 			FROM tiltaksinstans
-			WHERE tiltaksinstans.tiltaksleverandor_id = :tiltaksleverandorId
+			WHERE tiltaksinstans.tiltaksarrangor_id = :tiltaksarrangorId
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"tiltaksleverandorId" to arrangorId
+				"tiltaksarrangorId" to arrangorId
 			)
 		)
 

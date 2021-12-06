@@ -152,7 +152,7 @@ class TiltakInstansControllerIntegrationTest {
 		val id = UUID.randomUUID()
 		val orgnr = (1000..9999).random()
 		val insert = """
-			INSERT INTO tiltaksleverandor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer,navn)
+			INSERT INTO tiltaksarrangor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer,navn)
 			VALUES ('$id', '12345678', 'Orgnavn1', '$orgnr', 'Virksomhetsnavn1')
 		""".trimIndent()
 		namedJdbcTemplate.jdbcTemplate.update(insert)

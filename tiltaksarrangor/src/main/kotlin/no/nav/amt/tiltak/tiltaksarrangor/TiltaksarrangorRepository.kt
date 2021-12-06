@@ -37,7 +37,7 @@ open class TiltaksarrangorRepository(
         }
 
         val sql = """
-			INSERT INTO tiltaksleverandor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer, navn)
+			INSERT INTO tiltaksarrangor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer, navn)
 			VALUES (:id,
 					:overordnetEnhetOrganisasjonsnummer,
 					:overordnetEnhetNavn,
@@ -72,7 +72,7 @@ open class TiltaksarrangorRepository(
 				   navn,
 				   created_at,
 				   modified_at
-			FROM tiltaksleverandor
+			FROM tiltaksarrangor
 			WHERE organisasjonsnummer = :organisasjonsnummer
 		""".trimIndent()
 
