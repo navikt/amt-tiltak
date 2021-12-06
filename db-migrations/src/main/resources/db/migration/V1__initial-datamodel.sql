@@ -7,10 +7,9 @@ CREATE TABLE nav_ansatt
 (
     id              uuid PRIMARY KEY,
     personlig_ident varchar NOT NULL UNIQUE,
-    fornavn         varchar,
-    etternavn       varchar,
     telefonnummer   varchar,
-    epost           varchar
+    epost           varchar,
+    navn VARCHAR NOT NULL
 );
 
 CREATE TABLE tiltaksarrangor
@@ -99,5 +98,8 @@ CREATE TABLE deltaker
     slutt_dato        date,
     status            varchar,
     created_at        timestamp with time zone default current_timestamp,
-    modified_at       timestamp with time zone default current_timestamp
+    modified_at       timestamp with time zone default current_timestamp,
+    arena_status     varchar,
+    dager_per_uke    integer,
+    prosent_stilling float
 );
