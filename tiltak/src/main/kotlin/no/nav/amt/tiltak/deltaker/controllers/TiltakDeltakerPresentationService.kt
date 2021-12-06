@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.deltaker.controllers
 
-import no.nav.amt.tiltak.deltaker.queries.DeltakerDetaljerDbo
-import no.nav.amt.tiltak.deltaker.queries.GetDeltakerDetaljerQuery
+import no.nav.amt.tiltak.deltaker.repository.DeltakerDetaljerDbo
+import no.nav.amt.tiltak.deltaker.repository.GetDeltakerDetaljerQuery
 import no.nav.amt.tiltak.tiltak.dto.*
 import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate

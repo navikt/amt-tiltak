@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tiltak.controllers
+package no.nav.amt.tiltak.deltaker
 
 import no.nav.amt.tiltak.tiltak.dto.NavKontorDTO
 import no.nav.amt.tiltak.tiltak.dto.TiltakDeltakerDetaljerDto

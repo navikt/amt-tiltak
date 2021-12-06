@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.deltaker.queries
+package no.nav.amt.tiltak.deltaker.repository
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans

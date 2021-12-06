@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.deltaker.queries
+package no.nav.amt.tiltak.deltaker.repositories
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
@@ -7,6 +7,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.deltaker.repository.GetDeltakerDetaljerQuery
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import org.slf4j.LoggerFactory
@@ -14,7 +15,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.util.*
 
-class GetDeltakerDetaljerQueryTest : FunSpec({
+class DeltakerDetaljerRepositoryTest : FunSpec({
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 
