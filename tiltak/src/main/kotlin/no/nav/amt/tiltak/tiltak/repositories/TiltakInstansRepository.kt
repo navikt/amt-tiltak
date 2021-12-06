@@ -19,7 +19,7 @@ open class TiltakInstansRepository(private val template: NamedParameterJdbcTempl
 		TiltakInstansDbo(
 			id = UUID.fromString(rs.getString("tiltaksinstans_id")),
 			arenaId = rs.getInt("tiltaksinstans_arena_id"),
-			tiltaksleverandorId = UUID.fromString(rs.getString("tiltaksleverandor_id")),
+			tiltaksarrangorId = UUID.fromString(rs.getString("tiltaksleverandor_id")),
 			tiltakId = UUID.fromString(rs.getString("tiltak_id")),
 			navn = rs.getString("navn"),
 			status = if (statusString != null) TiltakInstans.Status.valueOf(statusString) else null,
@@ -35,7 +35,7 @@ open class TiltakInstansRepository(private val template: NamedParameterJdbcTempl
 	fun insert(
 		arenaId: Int,
 		tiltakId: UUID,
-		tiltaksleverandorId: UUID,
+		tiltaksarrangorId: UUID,
 		navn: String,
 		status: TiltakInstans.Status?,
 		oppstartDato: LocalDate?,
@@ -67,7 +67,7 @@ open class TiltakInstansRepository(private val template: NamedParameterJdbcTempl
 				"id" to id,
 				"arenaId" to arenaId,
 				"tiltakId" to tiltakId,
-				"tiltaksleverandorId" to tiltaksleverandorId,
+				"tiltaksleverandorId" to tiltaksarrangorId,
 				"navn" to navn,
 				"status" to status?.name,
 				"oppstartDato" to oppstartDato,

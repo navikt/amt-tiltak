@@ -75,7 +75,7 @@ class TiltakInstansControllerIntegrationTest {
 	@Test
 	fun `hentTiltakInstans - tiltak finnes ikke - skal returnere INTERNAL SERVER ERROR`() {
 		val tiltakNavn = "Gruppe amo"
-		val tlId = insertTiltaksleverandor()
+		val tlId = insertTiltaksarrangor()
 		val tiltak = tiltakRepository.insert("22", tiltakNavn, "kode")
 		val instans = insertTiltakInstans(tiltak.id, tlId)
 
@@ -87,9 +87,9 @@ class TiltakInstansControllerIntegrationTest {
 
 	@Test
 	fun `hentTiltakInstans - tiltak finnes - skal returnere tiltak`() {
-		val leverandorId = insertTiltaksleverandor()
+		val arrangorId = insertTiltaksarrangor()
 		val tiltak = tiltakRepository.insert("4", "Gruppe AMO", "GRUPPEAMO")
-		val tiltakInstans = insertTiltakInstans(tiltak.id, leverandorId)
+		val tiltakInstans = insertTiltakInstans(tiltak.id, arrangorId)
 		val resultat = controller.hentTiltakInstans(tiltakInstans.id)
 		assertEquals(tiltakInstans.id, resultat.id)
 		assertEquals(tiltakInstans.navn, resultat.navn)
@@ -98,10 +98,10 @@ class TiltakInstansControllerIntegrationTest {
 
 	@Test
 	fun `hentDeltakere - happy path`() {
-		val leverandorId = insertTiltaksleverandor()
+		val arrangorId = insertTiltaksarrangor()
 		val tiltak = tiltakRepository.insert((1000..9999).random().toString(), "Gruppe AMO", "GRUPPEAMO")
 
-		val tiltakInstans = insertTiltakInstans(tiltak.id, leverandorId)
+		val tiltakInstans = insertTiltakInstans(tiltak.id, arrangorId)
 
 		insertDeltaker(tiltakInstans.id, "12128673847")
 		insertDeltaker(tiltakInstans.id, "12128673846")
@@ -133,12 +133,12 @@ class TiltakInstansControllerIntegrationTest {
 		)
 	}
 
-	private fun insertTiltakInstans(tiltakId: UUID, leverandorId: UUID): TiltakInstansDbo {
+	private fun insertTiltakInstans(tiltakId: UUID, arrangorId: UUID): TiltakInstansDbo {
 		var arenaId = (1000..9999).random()
 		return tiltakInstansRepository.insert(
 			arenaId = arenaId,
 			tiltakId = tiltakId,
-			tiltaksleverandorId = leverandorId,
+			tiltaksarrangorId = arrangorId,
 			navn = "Kaffekurs",
 			status = TiltakInstans.Status.GJENNOMFORES,
 			oppstartDato = null,
@@ -148,7 +148,7 @@ class TiltakInstansControllerIntegrationTest {
 		)
 	}
 
-	private fun insertTiltaksleverandor(): UUID {
+	private fun insertTiltaksarrangor(): UUID {
 		val id = UUID.randomUUID()
 		val orgnr = (1000..9999).random()
 		val insert = """
