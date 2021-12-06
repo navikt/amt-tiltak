@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tiltaksarrangor.ansatt.queries
+package no.nav.amt.tiltak.tiltaksarrangor.ansatt
 
 import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper

@@ -2,8 +2,8 @@ package no.nav.amt.tiltak.ansatt
 
 import no.nav.amt.tiltak.core.domain.tiltaksarrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.tiltaksarrangor.TilknyttetArrangor
-import no.nav.amt.tiltak.tiltaksarrangor.ansatt.queries.ArrangorerForAnsattRepository
-import no.nav.amt.tiltak.tiltaksarrangor.ansatt.queries.ArrangorForAnsattDbo
+import no.nav.amt.tiltak.tiltaksarrangor.ansatt.ArrangorerForAnsattRepository
+import no.nav.amt.tiltak.tiltaksarrangor.ansatt.ArrangorForAnsattDbo
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Service
 import java.util.*

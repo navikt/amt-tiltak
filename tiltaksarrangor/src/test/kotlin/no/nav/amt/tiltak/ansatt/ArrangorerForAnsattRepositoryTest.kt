@@ -6,7 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.tiltaksarrangor.ansatt.queries.ArrangorerForAnsattRepository
+import no.nav.amt.tiltak.tiltaksarrangor.ansatt.ArrangorerForAnsattRepository
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.util.*
