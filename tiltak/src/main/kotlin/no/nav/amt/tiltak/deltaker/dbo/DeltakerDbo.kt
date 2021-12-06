@@ -31,7 +31,7 @@ data class DeltakerDbo(
 			fornavn = brukerFornavn,
 			etternavn = brukerEtternavn,
 			fodselsnummer = brukerFodselsnummer,
-			startdato = startDato,
+			oppstartdato = startDato,
 			sluttdato = sluttDato,
 			status = status
 		)
@@ -43,7 +43,7 @@ data class DeltakerDbo(
 			fornavn = brukerFornavn,
 			etternavn = brukerEtternavn,
 			fodselsnummer = brukerFodselsnummer,
-			startdato = startDato,
+			oppstartdato = startDato,
 			sluttdato = sluttDato,
 			status = status
 		)

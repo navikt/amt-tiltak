@@ -8,7 +8,7 @@ class Deltaker(
 	val fornavn: String,
 	val etternavn: String,
 	val fodselsnummer: String,
-	val startdato: LocalDate?,
+	val oppstartdato: LocalDate?,
 	val sluttdato: LocalDate?,
 	val status: Status?
 ) {
