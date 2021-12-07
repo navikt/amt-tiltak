@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.application.configuration.kafka
 
 import no.nav.amt.tiltak.core.port.ArenaIngestor
+import no.nav.amt.tiltak.ingestors.tildelt_veileder.TilordnetVeilederIngestor
 import no.nav.common.kafka.consumer.KafkaConsumerClient
 import no.nav.common.kafka.consumer.util.KafkaConsumerClientBuilder
 import no.nav.common.kafka.consumer.util.deserializer.Deserializers.stringDeserializer
@@ -14,7 +15,8 @@ import java.util.function.Consumer
 open class KafkaConfiguration(
     kafkaTopicProperties: KafkaTopicProperties,
 	kafkaProperties: KafkaProperties,
-    private val arenaIngestor: ArenaIngestor
+    private val arenaIngestor: ArenaIngestor,
+	private val tilordnetVeilederIngestor: TilordnetVeilederIngestor,
 ) {
     private var client: KafkaConsumerClient
 
@@ -33,11 +35,22 @@ open class KafkaConfiguration(
 					stringDeserializer(),
 					Consumer<ConsumerRecord<String, String>> { arenaIngestor.ingest(it.value()) }
 				)
-		}
+		}.toMutableList()
+
+		topicConfigs.add(
+			KafkaConsumerClientBuilder.TopicConfig<String, String>()
+				.withLogging()
+				.withConsumerConfig(
+					kafkaTopicProperties.sisteTilordnetVeilederTopic,
+					stringDeserializer(),
+					stringDeserializer(),
+					Consumer<ConsumerRecord<String, String>> { tilordnetVeilederIngestor.ingest(it.value()) }
+				)
+		)
 
         client = KafkaConsumerClientBuilder.builder()
             .withProperties(kafkaProperties.consumer())
-            .withTopicConfigs(topicConfigs)
+            .withTopicConfigs(topicConfigs.toList())
             .build()
 
         client.start()

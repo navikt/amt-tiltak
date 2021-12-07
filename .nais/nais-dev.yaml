@@ -75,6 +75,8 @@ spec:
       value: teamarenanais.aapen-arena-tiltakgjennomforingendret-v1-q2
     - name: ARENA_TILTAK_DELTAKER_TOPIC
       value: teamarenanais.aapen-arena-tiltakdeltakerendret-v1-q2
+    - name: SISTE_TILORDNET_VEILEDER_TOPIC
+      value: pto.siste-tilordnet-veileder-v1
   gcp:
     sqlInstances:
       - type: POSTGRES_12

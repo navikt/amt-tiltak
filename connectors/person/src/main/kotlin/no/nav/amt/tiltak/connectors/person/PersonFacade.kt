@@ -1,14 +1,14 @@
 package no.nav.amt.tiltak.connectors.person
 
 import no.nav.amt.tiltak.connectors.dkif.DkifConnector
-import no.nav.amt.tiltak.connectors.pdl.PdlConnector
+import no.nav.amt.tiltak.connectors.pdl.PdlClient
 import no.nav.amt.tiltak.core.domain.veileder.Veileder
 import no.nav.amt.tiltak.core.port.*
 import org.springframework.stereotype.Service
 
 @Service
 class PersonFacade(
-	private val pdlConnector: PdlConnector,
+	private val pdlClient: PdlClient,
 	private val dkifConnector: DkifConnector,
 	private val veilarboppfolgingConnector: VeilarboppfolgingConnector,
 	private val veilederService: VeilederService
@@ -24,7 +24,7 @@ class PersonFacade(
 	}
 
 	override fun hentPerson(fnr: String): Person {
-		val bruker = pdlConnector.hentBruker(fnr)
+		val bruker = pdlClient.hentBruker(fnr)
 
 		return Person(
 			fornavn = bruker.fornavn,
@@ -38,6 +38,10 @@ class PersonFacade(
 		return veilarboppfolgingConnector.hentVeilederIdent(fnr)?.let { ident ->
 			veilederService.hentVeileder(ident)
 		}
+	}
+
+	override fun hentFnr(aktorId: String): String {
+		return pdlClient.hentFnr(aktorId)
 	}
 
 }

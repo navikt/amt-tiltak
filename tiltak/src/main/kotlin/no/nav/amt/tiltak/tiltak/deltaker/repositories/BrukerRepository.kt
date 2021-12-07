@@ -98,4 +98,20 @@ open class BrukerRepository(
             .firstOrNull()
     }
 
+	fun oppdaterTildeltVeileder(fodselsnummer: String, nyTildeltVeilederId: String) {
+		val sql = """
+			UPDATE bruker SET ansvarlig_veileder_id = :ansvarligVeilederId WHERE fodselsnummer = :fodselsnummer
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"fodselsnummer" to fodselsnummer,
+				"ansvarligVeilederId" to nyTildeltVeilederId
+			)
+		)
+
+		template.update(sql, parameters)
+	}
+
+
 }
