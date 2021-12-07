@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.tiltaksleverandor.ansatt.repositories
 
-import no.nav.amt.tiltak.tiltak.utils.getLocalDateTime
-import no.nav.amt.tiltak.tiltak.utils.getUUID
+import no.nav.amt.tiltak.utils.getLocalDateTime
+import no.nav.amt.tiltak.utils.getUUID
 import no.nav.amt.tiltak.tiltaksleverandor.ansatt.dbo.AnsattDbo
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource

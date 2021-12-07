@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.tiltak.dbo
 
-import no.nav.amt.tiltak.tiltak.utils.UpdateStatus
+import no.nav.amt.tiltak.utils.UpdateStatus
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime

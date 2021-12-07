@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.tiltaksleverandor.ansatt.queries
 
-import no.nav.amt.tiltak.tiltak.utils.getUUID
+import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate

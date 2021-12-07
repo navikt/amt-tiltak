@@ -5,7 +5,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.tiltak.dbo.TiltakDbo
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
-import no.nav.amt.tiltak.tiltak.utils.UpdateStatus
+import no.nav.amt.tiltak.utils.UpdateStatus
 import org.springframework.stereotype.Service
 import java.util.*
 import java.util.concurrent.TimeUnit

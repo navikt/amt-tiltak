@@ -4,7 +4,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.core.port.TiltakInstansService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.tiltak.repositories.TiltakInstansRepository
-import no.nav.amt.tiltak.tiltak.utils.UpdateStatus
+import no.nav.amt.tiltak.utils.UpdateStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime

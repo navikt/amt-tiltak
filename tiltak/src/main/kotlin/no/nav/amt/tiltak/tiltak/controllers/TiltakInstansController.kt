@@ -2,9 +2,9 @@ package no.nav.amt.tiltak.tiltak.controllers
 
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.TiltakInstansService
-import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakDeltakerDto
-import no.nav.amt.tiltak.tiltak.controllers.dto.TiltakInstansDto
-import no.nav.amt.tiltak.tiltak.controllers.dto.toDto
+import no.nav.amt.tiltak.tiltak.dto.TiltakDeltakerDto
+import no.nav.amt.tiltak.tiltak.dto.TiltakInstansDto
+import no.nav.amt.tiltak.tiltak.dto.toDto
 import no.nav.security.token.support.core.api.Protected
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus

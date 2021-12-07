@@ -5,7 +5,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.TiltakInstansService
-import no.nav.amt.tiltak.tiltak.deltaker.dbo.DeltakerDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [TiltakInstansController::class])
+@WebMvcTest(controllers = [no.nav.amt.tiltak.tiltak.controllers.TiltakInstansController::class])
 class TiltakInstansControllerTest {
 	private val tiltakInstansId = UUID.fromString("e68d54e2-47b5-11ec-81d3-0242ac130003")
 
