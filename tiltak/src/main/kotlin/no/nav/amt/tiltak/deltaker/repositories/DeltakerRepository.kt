@@ -25,10 +25,9 @@ open class DeltakerRepository(
 			startDato = rs.getDate("oppstart_dato")?.toLocalDate(),
 			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
 			tiltakInstansId = UUID.fromString(rs.getString("tiltaksinstans_id")),
-			arenaStatus = rs.getString("arena_status"),
 			dagerPerUke = rs.getInt("dager_per_uke"),
 			prosentStilling = rs.getFloat("prosent_stilling"),
-			status = if (statusString != null) Deltaker.Status.valueOf(statusString) else null,
+			status = Deltaker.Status.valueOf(statusString),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
 		)
@@ -40,12 +39,11 @@ open class DeltakerRepository(
 		oppstartDato: LocalDate?,
 		sluttDato: LocalDate?,
 		status: Deltaker.Status,
-		arenaStatus: String?,
 		dagerPerUke: Int?,
 		prosentStilling: Float?
 	): DeltakerDbo {
 		val sql = """
-			INSERT INTO deltaker(id, bruker_id, tiltaksinstans_id, oppstart_dato, slutt_dato, status, arena_status,
+			INSERT INTO deltaker(id, bruker_id, tiltaksinstans_id, oppstart_dato, slutt_dato, status,
 								 dager_per_uke, prosent_stilling)
 			VALUES (:id,
 					:brukerId,
@@ -53,7 +51,6 @@ open class DeltakerRepository(
 					:oppstartsdato,
 					:sluttdato,
 					:status,
-					:arenaStatus,
 					:dagerPerUke,
 					:prosentStilling)
 		""".trimIndent()
@@ -68,7 +65,6 @@ open class DeltakerRepository(
 				"oppstartsdato" to oppstartDato,
 				"sluttdato" to sluttDato,
 				"status" to status.name,
-				"arenaStatus" to arenaStatus,
 				"dagerPerUke" to dagerPerUke,
 				"prosentStilling" to prosentStilling
 			)
@@ -135,7 +131,6 @@ open class DeltakerRepository(
 				   deltaker.oppstart_dato,
 				   deltaker.slutt_dato,
 				   deltaker.tiltaksinstans_id,
-				   deltaker.arena_status,
 				   deltaker.dager_per_uke,
 				   deltaker.prosent_stilling,
 				   deltaker.status,
@@ -166,7 +161,6 @@ open class DeltakerRepository(
 				   deltaker.oppstart_dato,
 				   deltaker.slutt_dato,
 				   deltaker.tiltaksinstans_id,
-				   deltaker.arena_status,
 				   deltaker.dager_per_uke,
 				   deltaker.prosent_stilling,
 				   deltaker.status,
@@ -199,7 +193,6 @@ open class DeltakerRepository(
 				   deltaker.oppstart_dato,
 				   deltaker.slutt_dato,
 				   deltaker.tiltaksinstans_id,
-				   deltaker.arena_status,
 				   deltaker.dager_per_uke,
 				   deltaker.prosent_stilling,
 				   deltaker.status,

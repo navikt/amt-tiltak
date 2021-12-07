@@ -17,10 +17,9 @@ data class DeltakerDbo(
 	val tiltakInstansId: UUID,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
-	val arenaStatus: String?,
 	val dagerPerUke: Int?,
 	val prosentStilling: Float?,
-	val status: Deltaker.Status?,
+	val status: Deltaker.Status,
 	val createdAt: LocalDateTime,
 	val modifiedAt: LocalDateTime
 ) {

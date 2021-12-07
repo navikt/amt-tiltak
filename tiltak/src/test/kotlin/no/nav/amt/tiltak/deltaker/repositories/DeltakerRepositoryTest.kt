@@ -35,8 +35,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 	test("Insert should insert Deltaker and return DeltakerDbo") {
 		val oppstartDato = LocalDate.now().plusDays(7)
 		val sluttDato = null
-		val deltakerStatus = Deltaker.Status.NY_BRUKER
-		val arenaStatus = "ARENA_STATUS"
+		val deltakerStatus = Deltaker.Status.VENTER_PA_OPPSTART
 		val dagerPerUke = 2
 		val prosentStilling = 20.0f
 
@@ -46,7 +45,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			oppstartDato,
 			sluttDato,
 			deltakerStatus,
-			arenaStatus,
 			dagerPerUke,
 			prosentStilling
 		)
@@ -68,8 +66,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 	test("Update should update Deltaker and return the updated Deltaker") {
 		val oppstartDato = LocalDate.now().plusDays(7)
 		val sluttDato = null
-		val deltakerStatus = Deltaker.Status.NY_BRUKER
-		val arenaStatus = "ARENA_STATUS"
+		val deltakerStatus = Deltaker.Status.VENTER_PA_OPPSTART
 		val dagerPerUke = 2
 		val prosentStilling = 20.0f
 
@@ -79,7 +76,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			oppstartDato,
 			sluttDato,
 			deltakerStatus,
-			arenaStatus,
 			dagerPerUke,
 			prosentStilling
 		)
@@ -103,8 +99,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 	test("Get by id") {
 		val oppstartDato = LocalDate.now().plusDays(7)
 		val sluttDato = null
-		val deltakerStatus = Deltaker.Status.NY_BRUKER
-		val arenaStatus = "ARENA_STATUS"
+		val deltakerStatus = Deltaker.Status.VENTER_PA_OPPSTART
 		val dagerPerUke = 2
 		val prosentStilling = 20.0f
 
@@ -114,7 +109,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			oppstartDato,
 			sluttDato,
 			deltakerStatus,
-			arenaStatus,
 			dagerPerUke,
 			prosentStilling
 		)
@@ -127,8 +121,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 	test("Get by BrukerId and Tiltaksinstans") {
 		val oppstartDato = LocalDate.now().plusDays(7)
 		val sluttDato = null
-		val deltakerStatus = Deltaker.Status.NY_BRUKER
-		val arenaStatus = "ARENA_STATUS"
+		val deltakerStatus = Deltaker.Status.VENTER_PA_OPPSTART
 		val dagerPerUke = 2
 		val prosentStilling = 20.0f
 
@@ -138,7 +131,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			oppstartDato,
 			sluttDato,
 			deltakerStatus,
-			arenaStatus,
 			dagerPerUke,
 			prosentStilling
 		)
@@ -151,8 +143,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 	test("Get by Fodselsnummer and Tiltaksinstans") {
 		val oppstartDato = LocalDate.now().plusDays(7)
 		val sluttDato = null
-		val deltakerStatus = Deltaker.Status.NY_BRUKER
-		val arenaStatus = "ARENA_STATUS"
+		val deltakerStatus = Deltaker.Status.VENTER_PA_OPPSTART
 		val dagerPerUke = 2
 		val prosentStilling = 20.0f
 
@@ -162,7 +153,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			oppstartDato,
 			sluttDato,
 			deltakerStatus,
-			arenaStatus,
 			dagerPerUke,
 			prosentStilling
 		)

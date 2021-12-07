@@ -127,7 +127,6 @@ class TiltakInstansControllerIntegrationTest {
 			oppstartDato = LocalDate.now(),
 			sluttDato = LocalDate.now(),
 			status = Deltaker.Status.GJENNOMFORES,
-			arenaStatus = "arenastatus",
 			dagerPerUke = 5,
 			prosentStilling = 10f
 		)

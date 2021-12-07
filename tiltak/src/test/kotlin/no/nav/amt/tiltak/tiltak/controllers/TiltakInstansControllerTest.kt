@@ -139,7 +139,6 @@ class TiltakInstansControllerTest {
 			tiltakInstansId = tiltakInstansId,
 			startDato = LocalDate.now(),
 			sluttDato = LocalDate.now(),
-			arenaStatus = "status",
 			dagerPerUke = 1,
 			prosentStilling = 10.343f,
 			status = Deltaker.Status.GJENNOMFORES,

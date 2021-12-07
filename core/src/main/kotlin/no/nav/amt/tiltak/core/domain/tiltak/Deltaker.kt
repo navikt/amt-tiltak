@@ -10,10 +10,12 @@ class Deltaker(
 	val fodselsnummer: String,
 	val oppstartdato: LocalDate?,
 	val sluttdato: LocalDate?,
-	val status: Status?
+	val status: Status
 ) {
 
 	enum class Status {
-		NY_BRUKER, GJENNOMFORES, AVBRUTT, FULLFORT
+		VENTER_PA_OPPSTART, GJENNOMFORES, HAR_SLUTTET, IKKE_AKTUELL
 	}
+
 }
+

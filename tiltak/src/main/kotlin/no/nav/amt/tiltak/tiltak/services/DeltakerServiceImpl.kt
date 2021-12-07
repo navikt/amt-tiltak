@@ -28,25 +28,11 @@ open class DeltakerServiceImpl(
 		oppstartDato: LocalDate?,
 		sluttDato: LocalDate?,
 		status: Deltaker.Status,
-		arenaStatus: String?,
 		dagerPerUke: Int?,
 		prosentStilling: Float?
 	): Deltaker {
-		val storedDeltaker = deltakerRepository.get(fodselsnummer, tiltaksinstans)
 
-		if (storedDeltaker != null) {
-			return storedDeltaker.toDeltaker()
-		}
-
-		val bruker = getBruker(fodselsnummer)
-
-		val deltaker = deltakerRepository.get(
-			fodselsnummer = fodselsnummer,
-			tiltaksinstansId = tiltaksinstans
-		)
-
-
-		if (deltaker != null) {
+		deltakerRepository.get(fodselsnummer, tiltaksinstans)?.also { deltaker ->
 			val updated = deltaker.update(
 				newStatus = status,
 				newDeltakerStartDato = oppstartDato,
@@ -58,19 +44,40 @@ open class DeltakerServiceImpl(
 			} else {
 				deltaker.toDeltaker()
 			}
-		} else {
-			return deltakerRepository.insert(
-				brukerId = bruker.id,
-				tiltaksgjennomforingId = tiltaksinstans,
-				oppstartDato = oppstartDato,
-				sluttDato = sluttDato,
-				status = status,
-				arenaStatus = arenaStatus,
-				dagerPerUke = dagerPerUke,
-				prosentStilling = prosentStilling
-			).toDeltaker()
-
 		}
+
+		return createDeltaker(
+			fodselsnummer,
+			tiltaksinstans,
+			oppstartDato,
+			sluttDato,
+			status,
+			dagerPerUke,
+			prosentStilling
+		)
+
+	}
+
+	private fun createDeltaker(
+		fodselsnummer: String,
+		tiltaksinstans: UUID,
+		oppstartDato: LocalDate?,
+		sluttDato: LocalDate?,
+		status: Deltaker.Status,
+		dagerPerUke: Int?,
+		prosentStilling: Float?
+	): Deltaker {
+		val bruker = brukerRepository.get(fodselsnummer) ?: createBruker(fodselsnummer)
+
+		return deltakerRepository.insert(
+			brukerId = bruker.id,
+			tiltaksgjennomforingId = tiltaksinstans,
+			oppstartDato = oppstartDato,
+			sluttDato = sluttDato,
+			status = status,
+			dagerPerUke = dagerPerUke,
+			prosentStilling = prosentStilling
+		).toDeltaker()
 	}
 
 	override fun hentDeltakerePaaTiltakInstans(id: UUID): List<Deltaker> {
@@ -82,12 +89,7 @@ open class DeltakerServiceImpl(
 			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 	}
 
-	private fun getBruker(fodselsnummer: String): BrukerDbo {
-		val storedBruker = brukerRepository.get(fodselsnummer)
-
-		if (storedBruker != null) {
-			return storedBruker
-		}
+	private fun createBruker(fodselsnummer: String): BrukerDbo {
 
 		val veileder = upsertVeileder(fodselsnummer)
 		val newBruker = personService.hentPerson(fodselsnummer)

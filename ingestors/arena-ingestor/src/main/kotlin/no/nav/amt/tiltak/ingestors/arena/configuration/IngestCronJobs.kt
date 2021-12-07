@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled
 
 @Configuration
 @EnableScheduling
-open class IngestCronJobs(
+internal open class IngestCronJobs(
 	private val leaderElectionClient: LeaderElectionClient,
 	private val processor: ArenaDataProcessor
 ) {
