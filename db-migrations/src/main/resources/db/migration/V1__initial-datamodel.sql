@@ -1,4 +1,4 @@
-CREATE TYPE tiltaksarrangor_rolle AS ENUM (
+CREATE TYPE arrangor_rolle AS ENUM (
     'KOORDINATOR',
     'VEILEDER'
     );
@@ -12,7 +12,7 @@ CREATE TABLE nav_ansatt
     navn VARCHAR NOT NULL
 );
 
-CREATE TABLE tiltaksarrangor
+CREATE TABLE arrangor
 (
     id                                   uuid PRIMARY KEY,
     navn                                 varchar                  not null,
@@ -23,7 +23,7 @@ CREATE TABLE tiltaksarrangor
     modified_at                          timestamp with time zone not null default current_timestamp
 );
 
-CREATE TABLE tiltaksarrangor_ansatt
+CREATE TABLE arrangor_ansatt
 (
     id              uuid PRIMARY KEY,
     personlig_ident varchar                  NOT NULL UNIQUE,
@@ -35,12 +35,12 @@ CREATE TABLE tiltaksarrangor_ansatt
     modified_at     timestamp with time zone not null default current_timestamp
 );
 
-CREATE TABLE tiltaksarrangor_ansatt_rolle
+CREATE TABLE arrangor_ansatt_rolle
 (
     id                   uuid PRIMARY KEY,
-    ansatt_id            uuid                     not null references tiltaksarrangor_ansatt (id),
-    tiltaksarrangor_id uuid                     not null references tiltaksarrangor (id),
-    rolle                tiltaksarrangor_rolle  not null,
+    ansatt_id            uuid                     not null references arrangor_ansatt (id),
+    arrangor_id uuid                     not null references arrangor (id),
+    rolle                arrangor_rolle  not null,
     created_at           timestamp with time zone not null default current_timestamp
 
 );
@@ -64,7 +64,7 @@ CREATE TABLE tiltaksinstans
     id                   uuid PRIMARY KEY,
     arena_id             integer                  not null unique,
     tiltak_id            uuid                     not null references tiltak (id),
-    tiltaksarrangor_id uuid                     not null references tiltaksarrangor (id),
+    arrangor_id uuid                     not null references arrangor (id),
     navn                 varchar,
     status               varchar,
     oppstart_dato        date,

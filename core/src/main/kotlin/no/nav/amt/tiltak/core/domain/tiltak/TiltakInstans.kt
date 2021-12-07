@@ -7,7 +7,7 @@ import java.util.*
 data class TiltakInstans(
 	val id: UUID,
 	val tiltak: Tiltak,
-	val tiltaksarrangorId: UUID,
+	val arrangorId: UUID,
 	val navn: String,
 	val status: Status?,
 	val oppstartDato: LocalDate?,

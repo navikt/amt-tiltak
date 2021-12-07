@@ -75,7 +75,7 @@ class TiltakInstansControllerIntegrationTest {
 	@Test
 	fun `hentTiltakInstans - tiltak finnes ikke - skal returnere INTERNAL SERVER ERROR`() {
 		val tiltakNavn = "Gruppe amo"
-		val tlId = insertTiltaksarrangor()
+		val tlId = insertArrangor()
 		val tiltak = tiltakRepository.insert("22", tiltakNavn, "kode")
 		val instans = insertTiltakInstans(tiltak.id, tlId)
 
@@ -87,7 +87,7 @@ class TiltakInstansControllerIntegrationTest {
 
 	@Test
 	fun `hentTiltakInstans - tiltak finnes - skal returnere tiltak`() {
-		val arrangorId = insertTiltaksarrangor()
+		val arrangorId = insertArrangor()
 		val tiltak = tiltakRepository.insert("4", "Gruppe AMO", "GRUPPEAMO")
 		val tiltakInstans = insertTiltakInstans(tiltak.id, arrangorId)
 		val resultat = controller.hentTiltakInstans(tiltakInstans.id)
@@ -98,7 +98,7 @@ class TiltakInstansControllerIntegrationTest {
 
 	@Test
 	fun `hentDeltakere - happy path`() {
-		val arrangorId = insertTiltaksarrangor()
+		val arrangorId = insertArrangor()
 		val tiltak = tiltakRepository.insert((1000..9999).random().toString(), "Gruppe AMO", "GRUPPEAMO")
 
 		val tiltakInstans = insertTiltakInstans(tiltak.id, arrangorId)
@@ -138,7 +138,7 @@ class TiltakInstansControllerIntegrationTest {
 		return tiltakInstansRepository.insert(
 			arenaId = arenaId,
 			tiltakId = tiltakId,
-			tiltaksarrangorId = arrangorId,
+			arrangorId = arrangorId,
 			navn = "Kaffekurs",
 			status = TiltakInstans.Status.GJENNOMFORES,
 			oppstartDato = null,
@@ -148,11 +148,11 @@ class TiltakInstansControllerIntegrationTest {
 		)
 	}
 
-	private fun insertTiltaksarrangor(): UUID {
+	private fun insertArrangor(): UUID {
 		val id = UUID.randomUUID()
 		val orgnr = (1000..9999).random()
 		val insert = """
-			INSERT INTO tiltaksarrangor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer,navn)
+			INSERT INTO arrangor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer,navn)
 			VALUES ('$id', '12345678', 'Orgnavn1', '$orgnr', 'Virksomhetsnavn1')
 		""".trimIndent()
 		namedJdbcTemplate.jdbcTemplate.update(insert)

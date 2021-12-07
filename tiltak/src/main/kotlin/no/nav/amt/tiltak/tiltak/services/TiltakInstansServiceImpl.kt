@@ -19,7 +19,7 @@ class TiltakInstansServiceImpl(
 	override fun upsertTiltaksinstans(
 		arenaId: Int,
 		tiltakId: UUID,
-		tiltaksarrangorId: UUID,
+		arrangorId: UUID,
 		navn: String,
 		status: TiltakInstans.Status?,
 		oppstartDato: LocalDate?,
@@ -52,7 +52,7 @@ class TiltakInstansServiceImpl(
 		return tiltakInstansRepository.insert(
 			arenaId = arenaId,
 			tiltakId = tiltak.id,
-			tiltaksarrangorId = tiltaksarrangorId,
+			arrangorId = arrangorId,
 			navn = navn,
 			status = status,
 			oppstartDato = oppstartDato,

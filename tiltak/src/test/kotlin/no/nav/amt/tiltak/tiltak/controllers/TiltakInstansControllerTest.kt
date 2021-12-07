@@ -45,7 +45,7 @@ class TiltakInstansControllerTest {
 	val tiltakInstans = TiltakInstans(
 		id = UUID.randomUUID(),
 		tiltak = tiltak,
-		tiltaksarrangorId = UUID.randomUUID(),
+		arrangorId = UUID.randomUUID(),
 		navn = "tiltaksnavn",
 		fremmoteDato = LocalDateTime.now(),
 		oppstartDato = LocalDate.now(),

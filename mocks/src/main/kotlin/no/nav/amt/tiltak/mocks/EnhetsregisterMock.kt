@@ -12,15 +12,15 @@ import org.springframework.stereotype.Component
 class EnhetsregisterMock : EnhetsregisterConnector {
 
 	override fun hentVirksomhet(virksomhetsnummer: String): Virksomhet {
-		val tiltaksarrangor =
-			TiltaksarrangorMockDataProvider.getTiltaksarrangorByVirksomhetsnummer(virksomhetsnummer)
+		val arrangor =
+			ArrangorMockDataProvider.getArrangorByVirksomhetsnummer(virksomhetsnummer)
 				?: throw IllegalArgumentException("Virksomhet med virksomhetsnummer $virksomhetsnummer eksisterer ikke")
 
 		return Virksomhet(
-			overordnetEnhetOrganisasjonsnummer = tiltaksarrangor.organisasjonsnummer,
-			overordnetEnhetNavn = tiltaksarrangor.organisasjonsnavn,
-			organisasjonsnummer = tiltaksarrangor.virksomhetsnummer,
-			navn = tiltaksarrangor.virksomhetsnavn
+			overordnetEnhetOrganisasjonsnummer = arrangor.organisasjonsnummer,
+			overordnetEnhetNavn = arrangor.organisasjonsnavn,
+			organisasjonsnummer = arrangor.virksomhetsnummer,
+			navn = arrangor.virksomhetsnavn
 		)
 	}
 }

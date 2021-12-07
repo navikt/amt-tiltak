@@ -13,7 +13,7 @@
         <module>application</module>
         <module>core</module>
         <module>connectors</module>
-        <module>tiltaksarrangor</module>
+        <module>arrangor</module>
         <module>tiltak</module>
         <module>ingestors</module>
         <module>db-migrations</module>
@@ -121,7 +121,7 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>tiltaksarrangor</artifactId>
+                <artifactId>arrangor</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

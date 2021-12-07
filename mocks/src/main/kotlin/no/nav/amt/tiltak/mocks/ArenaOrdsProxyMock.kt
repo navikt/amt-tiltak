@@ -16,11 +16,11 @@ class ArenaOrdsProxyMock : ArenaOrdsProxyConnector {
     }
 
     override fun hentArbeidsgiver(arenaArbeidsgiverId: String): Arbeidsgiver? {
-        val tiltaksarrangor =
-            TiltaksarrangorMockDataProvider.getTiltaksarrangorByArenaId(arenaArbeidsgiverId.toLong())
+        val arrangor =
+            ArrangorMockDataProvider.getArrangorByArenaId(arenaArbeidsgiverId.toLong())
 
-        return if (tiltaksarrangor != null) {
-            Arbeidsgiver(tiltaksarrangor.virksomhetsnummer, tiltaksarrangor.organisasjonsnummer)
+        return if (arrangor != null) {
+            Arbeidsgiver(arrangor.virksomhetsnummer, arrangor.organisasjonsnummer)
         } else {
             null
         }
@@ -28,7 +28,7 @@ class ArenaOrdsProxyMock : ArenaOrdsProxyConnector {
     }
 
     override fun hentVirksomhetsnummer(virksomhetsnummer: String): String {
-        return TiltaksarrangorMockDataProvider.getTiltaksarrangorByArenaId(virksomhetsnummer.toLong())?.virksomhetsnummer
+        return ArrangorMockDataProvider.getArrangorByArenaId(virksomhetsnummer.toLong())?.virksomhetsnummer
             ?: throw UnsupportedOperationException("Virksomhet med arena id $virksomhetsnummer existerer ikke")
     }
 }

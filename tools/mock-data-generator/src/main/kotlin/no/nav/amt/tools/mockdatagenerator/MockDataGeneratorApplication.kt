@@ -1,12 +1,12 @@
 package no.nav.amt.tools.mockdatagenerator
 
-import no.nav.amt.tools.mockdatagenerator.tiltaksarrangor.GenerateTiltaksarrangorMockData
+import no.nav.amt.tools.mockdatagenerator.arrangor.GenerateArrangorMockData
 
 class MockDataGeneratorApplication {
 
 	fun run() {
 //		GeneratePersonMockData().generate()
-		GenerateTiltaksarrangorMockData().generate()
+		GenerateArrangorMockData().generate()
 	}
 
 }
