@@ -2,13 +2,16 @@ package no.nav.amt.tiltak.tiltak.services
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.NavKontorService
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.deltaker.commands.UpsertNavAnsattCommand
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.deltaker.dbo.NavAnsattDbo
+import no.nav.amt.tiltak.deltaker.dbo.NavKontorDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.NavAnsattRepository
+import no.nav.amt.tiltak.deltaker.repositories.NavKontorRepository
 import no.nav.amt.tiltak.utils.UpdateStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -19,6 +22,8 @@ open class DeltakerServiceImpl(
 	private val deltakerRepository: DeltakerRepository,
 	private val brukerRepository: BrukerRepository,
 	private val navAnsattRepository: NavAnsattRepository,
+	private val navKontorRepository: NavKontorRepository,
+	private val navKontorService: NavKontorService,
 	private val personService: PersonService,
 ) : DeltakerService {
 
@@ -90,6 +95,7 @@ open class DeltakerServiceImpl(
 		}
 
 		val veileder = upsertVeileder(fodselsnummer)
+		val navKontor = getNavKontor(fodselsnummer)
 		val newBruker = personService.hentPerson(fodselsnummer)
 
 		return brukerRepository.insert(
@@ -99,7 +105,8 @@ open class DeltakerServiceImpl(
 			etternavn = newBruker.etternavn,
 			telefonnummer = newBruker.telefonnummer,
 			epost = null,
-			ansvarligVeilederId = veileder?.id
+			ansvarligVeilederId = veileder?.id,
+			navKontorId = navKontor?.id
 		)
 	}
 
@@ -114,6 +121,12 @@ open class DeltakerServiceImpl(
 				)
 			)
 			return navAnsattRepository.getNavAnsattWithIdent(veileder.navIdent)
+		}
+	}
+
+	private fun getNavKontor(fodselsnummer: String): NavKontorDbo? {
+		return navKontorService.hentNavKontorForBruker(fodselsnummer)?.let {
+			navKontorRepository.upsert(it.enhetId, it.navn)
 		}
 	}
 

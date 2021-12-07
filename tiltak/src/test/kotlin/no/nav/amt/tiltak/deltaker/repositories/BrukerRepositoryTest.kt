@@ -36,11 +36,11 @@ class BrukerRepositoryTest : FunSpec({
 		val epost = "per.testersen@test.no"
 		val ansvarligVeilederId = UUID.fromString("4118216f-b46d-44a1-90c5-d0732e861d6e")
 
-		val dbo = repository.insert(fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarligVeilederId)
+		val dbo = repository.insert(fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarligVeilederId, null)
 
 		dbo shouldNotBe null
 		dbo.id shouldNotBe null
-		dbo.fodselsnummer.toString() shouldBe fodselsnummer
+		dbo.fodselsnummer shouldBe fodselsnummer
 		dbo.fornavn shouldBe fornavn
 		dbo.etternavn shouldBe etternavn
 		dbo.telefonnummer shouldBe telefonnummer

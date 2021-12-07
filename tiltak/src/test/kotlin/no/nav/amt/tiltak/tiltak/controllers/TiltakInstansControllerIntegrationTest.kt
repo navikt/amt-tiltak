@@ -3,15 +3,17 @@ package no.nav.amt.tiltak.tiltak.controllers
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.NavKontorService
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.core.port.TiltakInstansService
-import no.nav.amt.tiltak.test.database.DatabaseTestUtils
-import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.tiltak.dbo.TiltakInstansDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.NavAnsattRepository
+import no.nav.amt.tiltak.deltaker.repositories.NavKontorRepository
+import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.tiltak.dbo.TiltakInstansDbo
 import no.nav.amt.tiltak.tiltak.repositories.TiltakInstansRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import no.nav.amt.tiltak.tiltak.services.DeltakerServiceImpl
@@ -40,7 +42,7 @@ class TiltakInstansControllerIntegrationTest {
 	private lateinit var tiltakInstansRepository: TiltakInstansRepository
 	private lateinit var tiltakInstansService: TiltakInstansService
 	private lateinit var deltakerService: DeltakerService
-	private lateinit var controller: no.nav.amt.tiltak.tiltak.controllers.TiltakInstansController
+	private lateinit var controller: TiltakInstansController
 
 	@BeforeEach
 	fun before() {
@@ -54,10 +56,12 @@ class TiltakInstansControllerIntegrationTest {
 			deltakerRepository,
 			brukerRepository,
 			mock(NavAnsattRepository::class.java),
-			mock(PersonService::class.java)
+			mock(NavKontorRepository::class.java),
+			mock(NavKontorService::class.java),
+			mock(PersonService::class.java),
 		);
 		tiltakInstansService = TiltakInstansServiceImpl(tiltakInstansRepository, TiltakServiceImpl(tiltakRepository))
-		controller = no.nav.amt.tiltak.tiltak.controllers.TiltakInstansController(tiltakInstansService, deltakerService)
+		controller = TiltakInstansController(tiltakInstansService, deltakerService)
 
 		DatabaseTestUtils.cleanDatabase(dataSource)
 
@@ -119,7 +123,8 @@ class TiltakInstansControllerIntegrationTest {
 			etternavn = "Etternavn",
 			telefonnummer = "12345678",
 			epost = "epost",
-			ansvarligVeilederId = null
+			ansvarligVeilederId = null,
+			navKontorId = null
 		)
 		return deltakerRepository.insert(
 			brukerId = bruker.id,

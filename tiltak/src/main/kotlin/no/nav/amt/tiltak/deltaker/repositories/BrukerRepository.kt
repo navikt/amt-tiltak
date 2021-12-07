@@ -11,38 +11,39 @@ import java.util.*
 
 @Component
 open class BrukerRepository(
-    private val template: NamedParameterJdbcTemplate
+	private val template: NamedParameterJdbcTemplate
 ) {
 
-    private val rowMapper = RowMapper { rs, _ ->
+	private val rowMapper = RowMapper { rs, _ ->
 
-        BrukerDbo(
+		BrukerDbo(
 			id = rs.getUUID("id"),
-            fodselsnummer = rs.getString("fodselsnummer"),
-            fornavn = rs.getString("fornavn"),
+			fodselsnummer = rs.getString("fodselsnummer"),
+			fornavn = rs.getString("fornavn"),
 			mellomnavn = rs.getString("mellomnavn"),
-            etternavn = rs.getString("etternavn"),
-            telefonnummer = rs.getString("telefonnummer"),
-            epost = rs.getString("epost"),
-            ansvarligVeilederId = rs.getNullableUUID("ansvarlig_veileder_internal_id"),
-            createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
-            modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
-        )
+			etternavn = rs.getString("etternavn"),
+			telefonnummer = rs.getString("telefonnummer"),
+			epost = rs.getString("epost"),
+			ansvarligVeilederId = rs.getNullableUUID("ansvarlig_veileder_internal_id"),
+			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
+			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
+		)
 
-    }
+	}
 
-    fun insert(
-        fodselsnummer: String,
-        fornavn: String,
+	fun insert(
+		fodselsnummer: String,
+		fornavn: String,
 		mellomnavn: String?,
-        etternavn: String,
-        telefonnummer: String?,
-        epost: String?,
-        ansvarligVeilederId: UUID?
-    ): BrukerDbo {
+		etternavn: String,
+		telefonnummer: String?,
+		epost: String?,
+		ansvarligVeilederId: UUID?,
+		navKontorId: UUID?
+	): BrukerDbo {
 
-        val sql = """
-			INSERT INTO bruker(id, fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id)
+		val sql = """
+			INSERT INTO bruker(id, fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_kontor_id)
 			VALUES (:id,
 					:fodselsnummer,
 					:fornavn,
@@ -50,30 +51,32 @@ open class BrukerRepository(
 					:etternavn,
 					:telefonnummer,
 					:epost,
-					:veileder_id)
+					:veileder_id,
+					:nav_kontor_id)
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
-            mapOf(
+			mapOf(
 				"id" to UUID.randomUUID(),
-                "fodselsnummer" to fodselsnummer,
-                "fornavn" to fornavn,
+				"fodselsnummer" to fodselsnummer,
+				"fornavn" to fornavn,
 				"mellomnavn" to mellomnavn,
-                "etternavn" to etternavn,
-                "telefonnummer" to telefonnummer,
-                "epost" to epost,
-                "veileder_id" to ansvarligVeilederId
-            )
-        )
+				"etternavn" to etternavn,
+				"telefonnummer" to telefonnummer,
+				"epost" to epost,
+				"veileder_id" to ansvarligVeilederId,
+				"nav_kontor_id" to navKontorId
+			)
+		)
 
-        template.update(sql, parameters)
+		template.update(sql, parameters)
 
-        return get(fodselsnummer)
-            ?: throw NoSuchElementException("Bruker med id $fodselsnummer finnes ikke")
-    }
+		return get(fodselsnummer)
+			?: throw NoSuchElementException("Bruker med id $fodselsnummer finnes ikke")
+	}
 
-    fun get(fodselsnummer: String): BrukerDbo? {
-        val sql = """
+	fun get(fodselsnummer: String): BrukerDbo? {
+		val sql = """
 			SELECT id                    as id,
 				   fodselsnummer         as fodselsnummer,
 				   fornavn               as fornavn,
@@ -88,14 +91,14 @@ open class BrukerRepository(
 			WHERE fodselsnummer = :fodselsnummer
 		""".trimIndent()
 
-        val parameters = MapSqlParameterSource().addValues(
-            mapOf(
-                "fodselsnummer" to fodselsnummer
-            )
-        )
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"fodselsnummer" to fodselsnummer
+			)
+		)
 
-        return template.query(sql, parameters, rowMapper)
-            .firstOrNull()
-    }
+		return template.query(sql, parameters, rowMapper)
+			.firstOrNull()
+	}
 
 }
