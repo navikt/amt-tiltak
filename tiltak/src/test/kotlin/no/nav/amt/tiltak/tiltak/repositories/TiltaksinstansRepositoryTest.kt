@@ -24,7 +24,7 @@ internal class TiltaksinstansRepositoryTest {
 
 	companion object TestData {
 		val TILTAK_ID = UUID.fromString("9665b0b6-ea7d-44b0-b9c2-8867c2a6c106")
-		val TILTAKSLEVERANDOR_ID = UUID.fromString("0dc9ccec-fd1e-4c4e-b91a-c23e6d89c18e")
+		val ARRANGOR_ID = UUID.fromString("0dc9ccec-fd1e-4c4e-b91a-c23e6d89c18e")
 	}
 
 	@BeforeEach
@@ -50,7 +50,7 @@ internal class TiltaksinstansRepositoryTest {
 		val savedInstans = repository.insert(
 			arenaId = arenaId,
 			tiltakId = TILTAK_ID,
-			tiltaksleverandorId = TILTAKSLEVERANDOR_ID,
+			arrangorId = ARRANGOR_ID,
 			navn = navn,
 			status = status,
 			oppstartDato = oppstartDato,
@@ -63,7 +63,7 @@ internal class TiltaksinstansRepositoryTest {
 		assertNotNull(savedInstans.id)
 
 		assertEquals(TILTAK_ID, savedInstans.tiltakId)
-		assertEquals(TILTAKSLEVERANDOR_ID, savedInstans.tiltaksleverandorId)
+		assertEquals(ARRANGOR_ID, savedInstans.arrangorId)
 		assertEquals(navn, savedInstans.navn)
 		assertEquals(status, savedInstans.status)
 
@@ -80,7 +80,7 @@ internal class TiltaksinstansRepositoryTest {
 				TiltakInstansDbo(
 					id = UUID.randomUUID(),
 					arenaId = 9999,
-					tiltaksleverandorId = UUID.randomUUID(),
+					arrangorId = UUID.randomUUID(),
 					tiltakId = UUID.randomUUID(),
 					navn = "idosfja",
 					status = null,
@@ -106,7 +106,7 @@ internal class TiltaksinstansRepositoryTest {
 		val newTiltakInstans = repository.insert(
 			arenaId = 1,
 			tiltakId = TILTAK_ID,
-			tiltaksleverandorId = TILTAKSLEVERANDOR_ID,
+			arrangorId = ARRANGOR_ID,
 			"Navn",
 			status = null,
 			oppstartDato = null,
@@ -145,7 +145,7 @@ internal class TiltaksinstansRepositoryTest {
 		val savedInstans = repository.insert(
 			arenaId = arenaId,
 			tiltakId = TILTAK_ID,
-			tiltaksleverandorId = TILTAKSLEVERANDOR_ID,
+			arrangorId = ARRANGOR_ID,
 			navn = navn,
 			status = status,
 			oppstartDato = oppstartDato,

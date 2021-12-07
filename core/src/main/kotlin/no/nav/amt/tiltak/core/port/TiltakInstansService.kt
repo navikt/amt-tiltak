@@ -13,7 +13,7 @@ interface TiltakInstansService {
 	fun upsertTiltaksinstans(
 		arenaId: Int,
 		tiltakId: UUID,
-		tiltaksleverandorId: UUID,
+		arrangorId: UUID,
 		navn: String,
 		status: TiltakInstans.Status?,
 		oppstartDato: LocalDate?,

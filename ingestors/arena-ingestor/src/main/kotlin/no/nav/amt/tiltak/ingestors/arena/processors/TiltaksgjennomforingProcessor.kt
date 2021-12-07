@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.ingestors.arena.processors
 import no.nav.amt.tiltak.core.port.ArenaOrdsProxyConnector
 import no.nav.amt.tiltak.core.port.TiltakInstansService
 import no.nav.amt.tiltak.core.port.TiltakService
-import no.nav.amt.tiltak.core.port.TiltaksleverandorService
+import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
 import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltaksgjennomforing
 import no.nav.amt.tiltak.ingestors.arena.exceptions.DependencyNotIngestedException
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component
 open class TiltaksgjennomforingProcessor(
 	repository: ArenaDataRepository,
 	private val ignoredTiltakRepository: ArenaTiltakIgnoredRepository,
-	private val tiltaksleverandorService: TiltaksleverandorService,
+	private val arrangorService: ArrangorService,
 	private val tiltakInstansService: TiltakInstansService,
 	private val tiltakService: TiltakService,
 	private val ords: ArenaOrdsProxyConnector
@@ -40,12 +40,12 @@ open class TiltaksgjennomforingProcessor(
 
 			val virksomhetsnummer = ords.hentVirksomhetsnummer(newFields.ARBGIV_ID_ARRANGOR.toString())
 
-			val tiltaksleverandor = tiltaksleverandorService.addTiltaksleverandor(virksomhetsnummer)
+			val arrangor = arrangorService.addArrangor(virksomhetsnummer)
 
 			tiltakInstansService.upsertTiltaksinstans(
 				arenaId = newFields.TILTAKGJENNOMFORING_ID.toInt(),
 				tiltakId = tiltak.id,
-				tiltaksleverandorId = tiltaksleverandor.id,
+				arrangorId = arrangor.id,
 				navn = newFields.LOKALTNAVN
 					?: throw DataIntegrityViolationException("Forventet at LOKALTNAVN ikke er null"),
 				status = null,
@@ -75,16 +75,16 @@ open class TiltaksgjennomforingProcessor(
 
 			val virksomhetsnummer = ords.hentVirksomhetsnummer(newFields.ARBGIV_ID_ARRANGOR.toString())
 
-			val tiltaksleverandor = tiltaksleverandorService.getTiltaksleverandorByVirksomhetsnummer(virksomhetsnummer)
-				?: throw DependencyNotIngestedException("Tiltaksleverandør med virksomhetsnummer $virksomhetsnummer er ikke ingested enda.")
+			val arrangor = arrangorService.getArrangorByVirksomhetsnummer(virksomhetsnummer)
+				?: throw DependencyNotIngestedException("Tiltaksarrangør med virksomhetsnummer $virksomhetsnummer er ikke ingested enda.")
 
 			val tiltak = tiltakService.getTiltakFromArenaId(newFields.TILTAKSKODE)
-				?: throw DependencyNotIngestedException("Tilktak med ArenaId $virksomhetsnummer er ikke ingested enda.")
+				?: throw DependencyNotIngestedException("Tiltak med ArenaId $virksomhetsnummer er ikke ingested enda.")
 
 			tiltakInstansService.upsertTiltaksinstans(
 				arenaId = newFields.TILTAKGJENNOMFORING_ID.toInt(),
 				tiltakId = tiltak.id,
-				tiltaksleverandorId = tiltaksleverandor.id,
+				arrangorId = arrangor.id,
 				navn = newFields.LOKALTNAVN
 					?: throw DataIntegrityViolationException("Forventet at LOKALTNAVN ikke er null"),
 				status = null,

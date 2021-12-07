@@ -11,7 +11,7 @@ import java.util.*
 data class TiltakInstansDbo(
 	val id: UUID,
 	val arenaId: Int,
-	val tiltaksleverandorId: UUID,
+	val arrangorId: UUID,
 	val tiltakId: UUID,
 	val navn: String,
 	val status: TiltakInstans.Status?,
@@ -27,7 +27,7 @@ data class TiltakInstansDbo(
 		return TiltakInstans(
 			id = id,
 			tiltak = tiltak,
-			tiltaksarrangorId = tiltaksleverandorId,
+			arrangorId = arrangorId,
 			navn = navn,
 			status = status,
 			oppstartDato = oppstartDato,

@@ -1,4 +1,4 @@
-CREATE TYPE tiltaksleverandor_rolle AS ENUM (
+CREATE TYPE arrangor_rolle AS ENUM (
     'KOORDINATOR',
     'VEILEDER'
     );
@@ -7,13 +7,12 @@ CREATE TABLE nav_ansatt
 (
     id              uuid PRIMARY KEY,
     personlig_ident varchar NOT NULL UNIQUE,
-    fornavn         varchar,
-    etternavn       varchar,
     telefonnummer   varchar,
-    epost           varchar
+    epost           varchar,
+    navn VARCHAR NOT NULL
 );
 
-CREATE TABLE tiltaksleverandor
+CREATE TABLE arrangor
 (
     id                                   uuid PRIMARY KEY,
     navn                                 varchar                  not null,
@@ -24,7 +23,7 @@ CREATE TABLE tiltaksleverandor
     modified_at                          timestamp with time zone not null default current_timestamp
 );
 
-CREATE TABLE tiltaksleverandor_ansatt
+CREATE TABLE arrangor_ansatt
 (
     id              uuid PRIMARY KEY,
     personlig_ident varchar                  NOT NULL UNIQUE,
@@ -36,12 +35,12 @@ CREATE TABLE tiltaksleverandor_ansatt
     modified_at     timestamp with time zone not null default current_timestamp
 );
 
-CREATE TABLE tiltaksleverandor_ansatt_rolle
+CREATE TABLE arrangor_ansatt_rolle
 (
     id                   uuid PRIMARY KEY,
-    ansatt_id            uuid                     not null references tiltaksleverandor_ansatt (id),
-    tiltaksleverandor_id uuid                     not null references tiltaksleverandor (id),
-    rolle                tiltaksleverandor_rolle  not null,
+    ansatt_id            uuid                     not null references arrangor_ansatt (id),
+    arrangor_id uuid                     not null references arrangor (id),
+    rolle                arrangor_rolle  not null,
     created_at           timestamp with time zone not null default current_timestamp
 
 );
@@ -65,7 +64,7 @@ CREATE TABLE tiltaksinstans
     id                   uuid PRIMARY KEY,
     arena_id             integer                  not null unique,
     tiltak_id            uuid                     not null references tiltak (id),
-    tiltaksleverandor_id uuid                     not null references tiltaksleverandor (id),
+    arrangor_id uuid                     not null references arrangor (id),
     navn                 varchar,
     status               varchar,
     oppstart_dato        date,
@@ -99,5 +98,8 @@ CREATE TABLE deltaker
     slutt_dato        date,
     status            varchar,
     created_at        timestamp with time zone default current_timestamp,
-    modified_at       timestamp with time zone default current_timestamp
+    modified_at       timestamp with time zone default current_timestamp,
+    arena_status     varchar,
+    dager_per_uke    integer,
+    prosent_stilling float
 );
