@@ -7,7 +7,7 @@ import no.nav.amt.tiltak.ingestors.arena.exceptions.DependencyNotIngestedExcepti
 import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
 import org.slf4j.LoggerFactory
 
-abstract class AbstractArenaProcessor(
+internal abstract class AbstractArenaProcessor(
 	protected val repository: ArenaDataRepository
 ) {
 

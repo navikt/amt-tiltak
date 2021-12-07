@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.ingestors.arena.domain
 
 import no.nav.amt.tiltak.ingestors.arena.dto.ArenaOpType
 
-enum class OperationType {
+internal enum class OperationType {
     INSERT,
     UPDATE,
     DELETE;

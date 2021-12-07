@@ -6,17 +6,17 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-fun String.asLocalDate(): LocalDate {
+internal fun String.asLocalDate(): LocalDate {
 	val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 	return LocalDate.parse(this, formatter)
 }
 
-fun String.asLocalDateTime(): LocalDateTime {
+internal fun String.asLocalDateTime(): LocalDateTime {
 	val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 	return LocalDateTime.parse(this, formatter)
 }
 
-fun String?.asTime(): LocalTime {
+internal fun String?.asTime(): LocalTime {
 	val logger = LoggerFactory.getLogger(String::class.java)
 
 	if (this == null) {
@@ -38,5 +38,5 @@ fun String?.asTime(): LocalTime {
 	return LocalTime.MIDNIGHT
 }
 
-infix fun LocalDate?.withTime(time: LocalTime) =
+internal infix fun LocalDate?.withTime(time: LocalTime) =
 	if (this != null) LocalDateTime.of(this, time) else null

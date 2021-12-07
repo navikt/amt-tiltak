@@ -4,7 +4,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import java.time.LocalTime
 
-class StringUtils : FunSpec({
+internal class StringUtils : FunSpec({
 
 	test("asTime return time") {
 		listOf(

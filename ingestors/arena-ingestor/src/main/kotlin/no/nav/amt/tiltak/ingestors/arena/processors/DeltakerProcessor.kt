@@ -13,7 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Component
 
 @Component
-open class DeltakerProcessor(
+internal open class DeltakerProcessor(
 	repository: ArenaDataRepository,
 	private val ignoredTiltakRepository: ArenaTiltakIgnoredRepository,
 	private val tiltakInstansService: TiltakInstansService,
