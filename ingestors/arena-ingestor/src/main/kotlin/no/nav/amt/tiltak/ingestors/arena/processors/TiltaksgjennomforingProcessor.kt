@@ -14,7 +14,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Component
 
 @Component
-open class TiltaksgjennomforingProcessor(
+internal open class TiltaksgjennomforingProcessor(
 	repository: ArenaDataRepository,
 	private val ignoredTiltakRepository: ArenaTiltakIgnoredRepository,
 	private val arrangorService: ArrangorService,

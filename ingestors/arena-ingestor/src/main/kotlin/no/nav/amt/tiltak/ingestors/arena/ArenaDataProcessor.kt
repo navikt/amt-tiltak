@@ -12,7 +12,7 @@ import java.time.Duration
 import java.time.Instant
 
 @Component
-open class ArenaDataProcessor(
+internal open class ArenaDataProcessor(
 	private val repository: ArenaDataRepository,
 	private val tiltakProcessor: TiltakProcessor,
 	private val tiltaksgjennomforingProcessor: TiltaksgjennomforingProcessor,
