@@ -11,5 +11,5 @@ INSERT INTO tiltaksinstans (id, arena_id, tiltak_id, arrangor_id, navn, status, 
 VALUES ('b3420940-5479-48c8-b2fa-3751c7a33aa2', 1, 'b18fd670-3bc1-11ec-8d3d-0242ac130003', '8a37bce6-3bc1-11ec-8d3d-0242ac130003', 'Tiltaksinstans1', 'GJENNOMFORES', current_date,
         current_date, current_timestamp, current_timestamp);
 
-INSERT INTO deltaker (id, bruker_id, tiltaksinstans_id, oppstart_dato, slutt_dato, status, dager_per_uke, prosent_stilling)
-VALUES ('dc600c70-124f-4fe7-a687-b58439beb214', '23b04c3a-a36c-451f-b9cf-30b6a6b586b8', 'b3420940-5479-48c8-b2fa-3751c7a33aa2', 'yesterday'::DATE , 'tomorrow'::DATE, 'GJENNOMFORES', 5, 100);
+INSERT INTO deltaker (id, bruker_id, tiltaksinstans_id, oppstart_dato, slutt_dato, status, dager_per_uke, prosent_stilling, registrert_dato)
+VALUES ('dc600c70-124f-4fe7-a687-b58439beb214', '23b04c3a-a36c-451f-b9cf-30b6a6b586b8', 'b3420940-5479-48c8-b2fa-3751c7a33aa2', 'yesterday'::DATE , 'tomorrow'::DATE, 'GJENNOMFORES', 5, 100, 'yesterday'::DATE);

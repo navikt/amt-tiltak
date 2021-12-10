@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.deltaker.commands.UpsertNavAnsattCommand
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
+import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.NavAnsattDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
@@ -12,6 +13,7 @@ import no.nav.amt.tiltak.deltaker.repositories.NavAnsattRepository
 import no.nav.amt.tiltak.utils.UpdateStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -29,7 +31,8 @@ open class DeltakerServiceImpl(
 		sluttDato: LocalDate?,
 		status: Deltaker.Status,
 		dagerPerUke: Int?,
-		prosentStilling: Float?
+		prosentStilling: Float?,
+		registrertDato: LocalDateTime
 	): Deltaker {
 
 		deltakerRepository.get(fodselsnummer, tiltaksinstans)?.also { deltaker ->
@@ -53,7 +56,8 @@ open class DeltakerServiceImpl(
 			sluttDato,
 			status,
 			dagerPerUke,
-			prosentStilling
+			prosentStilling,
+			registrertDato
 		)
 
 	}
@@ -65,7 +69,8 @@ open class DeltakerServiceImpl(
 		sluttDato: LocalDate?,
 		status: Deltaker.Status,
 		dagerPerUke: Int?,
-		prosentStilling: Float?
+		prosentStilling: Float?,
+		registrertDato: LocalDateTime
 	): Deltaker {
 		val bruker = brukerRepository.get(fodselsnummer) ?: createBruker(fodselsnummer)
 
@@ -76,7 +81,8 @@ open class DeltakerServiceImpl(
 			sluttDato = sluttDato,
 			status = status,
 			dagerPerUke = dagerPerUke,
-			prosentStilling = prosentStilling
+			prosentStilling = prosentStilling,
+			registrertDato = registrertDato
 		).toDeltaker()
 	}
 
@@ -93,8 +99,7 @@ open class DeltakerServiceImpl(
 
 		val veileder = upsertVeileder(fodselsnummer)
 		val newBruker = personService.hentPerson(fodselsnummer)
-
-		return brukerRepository.insert(
+		val bruker = BrukerInsertDbo(
 			fodselsnummer = fodselsnummer,
 			fornavn = newBruker.fornavn,
 			mellomnavn = newBruker.mellomnavn,
@@ -103,6 +108,7 @@ open class DeltakerServiceImpl(
 			epost = null,
 			ansvarligVeilederId = veileder?.id
 		)
+		return brukerRepository.insert(bruker)
 	}
 
 	private fun upsertVeileder(fodselsnummer: String): NavAnsattDbo? {
