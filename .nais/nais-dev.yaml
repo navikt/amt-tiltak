@@ -39,6 +39,7 @@ spec:
   accessPolicy:
     inbound:
       rules:
+        - application: amt-tiltaksarrangor-flate
         - application: amt-tiltaksarrangor-flate-auth-proxy
     outbound:
       rules:
