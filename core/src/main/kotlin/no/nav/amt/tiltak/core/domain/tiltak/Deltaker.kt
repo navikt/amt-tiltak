@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.core.domain.tiltak
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 class Deltaker(
@@ -10,7 +11,8 @@ class Deltaker(
 	val fodselsnummer: String,
 	val oppstartdato: LocalDate?,
 	val sluttdato: LocalDate?,
-	val status: Status
+	val status: Status,
+	val registrertDato: LocalDateTime
 ) {
 
 	enum class Status {

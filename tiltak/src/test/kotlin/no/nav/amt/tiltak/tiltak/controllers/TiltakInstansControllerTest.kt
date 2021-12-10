@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [no.nav.amt.tiltak.tiltak.controllers.TiltakInstansController::class])
+@WebMvcTest(controllers = [TiltakInstansController::class])
 class TiltakInstansControllerTest {
 	private val tiltakInstansId = UUID.fromString("e68d54e2-47b5-11ec-81d3-0242ac130003")
 
@@ -143,7 +143,8 @@ class TiltakInstansControllerTest {
 			prosentStilling = 10.343f,
 			status = Deltaker.Status.GJENNOMFORES,
 			createdAt = LocalDateTime.now(),
-			modifiedAt = LocalDateTime.now()
+			modifiedAt = LocalDateTime.now(),
+			registrertDato = LocalDateTime.now()
 		).toDeltaker()
 		Mockito.`when`(deltakerService.hentDeltakerePaaTiltakInstans(tiltakInstansId)).thenReturn(listOf(deltaker))
 		val token = server.issueToken("tokenx", "test", "test").serialize()

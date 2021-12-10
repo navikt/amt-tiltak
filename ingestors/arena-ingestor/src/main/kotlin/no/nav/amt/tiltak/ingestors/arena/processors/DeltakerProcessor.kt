@@ -64,6 +64,7 @@ internal open class DeltakerProcessor(
 				),
 				dagerPerUke = newFields.ANTALL_DAGER_PR_UKE,
 				prosentStilling = newFields.PROSENT_DELTID,
+				registrertDato = newFields.REG_DATO.asLocalDateTime()
 			)
 
 			repository.upsert(data.markAsIngested())

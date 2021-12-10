@@ -1,10 +1,12 @@
 package no.nav.amt.tiltak.tiltak.controllers
 
+import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.core.port.TiltakInstansService
+import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tiltak.dbo.TiltakInstansDbo
@@ -26,6 +28,8 @@ import org.mockito.Mockito.mock
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -40,7 +44,9 @@ class TiltakInstansControllerIntegrationTest {
 	private lateinit var tiltakInstansRepository: TiltakInstansRepository
 	private lateinit var tiltakInstansService: TiltakInstansService
 	private lateinit var deltakerService: DeltakerService
-	private lateinit var controller: no.nav.amt.tiltak.tiltak.controllers.TiltakInstansController
+	private lateinit var controller: TiltakInstansController
+	private var tiltakKode = "GRUPPEAMO"
+	private var epost = "bla@bla.com"
 
 	@BeforeEach
 	fun before() {
@@ -57,7 +63,7 @@ class TiltakInstansControllerIntegrationTest {
 			mock(PersonService::class.java)
 		);
 		tiltakInstansService = TiltakInstansServiceImpl(tiltakInstansRepository, TiltakServiceImpl(tiltakRepository))
-		controller = no.nav.amt.tiltak.tiltak.controllers.TiltakInstansController(tiltakInstansService, deltakerService)
+		controller = TiltakInstansController(tiltakInstansService, deltakerService)
 
 		DatabaseTestUtils.cleanDatabase(dataSource)
 
@@ -88,47 +94,73 @@ class TiltakInstansControllerIntegrationTest {
 	@Test
 	fun `hentTiltakInstans - tiltak finnes - skal returnere tiltak`() {
 		val arrangorId = insertArrangor()
-		val tiltak = tiltakRepository.insert("4", "Gruppe AMO", "GRUPPEAMO")
+		val tiltak = tiltakRepository.insert("4", tiltakKode, tiltakKode)
 		val tiltakInstans = insertTiltakInstans(tiltak.id, arrangorId)
 		val resultat = controller.hentTiltakInstans(tiltakInstans.id)
+
 		assertEquals(tiltakInstans.id, resultat.id)
 		assertEquals(tiltakInstans.navn, resultat.navn)
 
 	}
 
 	@Test
-	fun `hentDeltakere - happy path`() {
+	fun `hentDeltakere - En deltaker på tiltak`() {
 		val arrangorId = insertArrangor()
-		val tiltak = tiltakRepository.insert((1000..9999).random().toString(), "Gruppe AMO", "GRUPPEAMO")
+		val tiltak = tiltakRepository.insert((1000..9999).random().toString(), tiltakKode, tiltakKode)
 
 		val tiltakInstans = insertTiltakInstans(tiltak.id, arrangorId)
-
-		insertDeltaker(tiltakInstans.id, "12128673847")
-		insertDeltaker(tiltakInstans.id, "12128673846")
+		val bruker1 = BrukerInsertDbo("12128673847", "Person", "En", "To", "123", epost, null)
+		val startDato = LocalDate.now().minusDays(5)
+		val sluttDato = LocalDate.now().plusDays(3)
+		val regDato = LocalDateTime.now().minusDays(10)
+		insertDeltaker(tiltakInstans.id, bruker1, startDato, sluttDato, regDato)
 
 		val deltakere = controller.hentDeltakere(tiltakInstans.id)
+		val deltaker1 = deltakere.get(0)
 
-		assertEquals(deltakere.size, 2)
+		deltakere.size shouldBe 1
+		deltaker1.fodselsnummer shouldBe bruker1.fodselsnummer
+		deltaker1.fornavn shouldBe bruker1.fornavn
+		deltaker1.etternavn shouldBe bruker1.etternavn
+
+		deltaker1.oppstartdato shouldBe startDato
+		deltaker1.sluttdato shouldBe sluttDato
+		deltaker1.registrertDato.truncatedTo(ChronoUnit.MINUTES) shouldBe regDato.truncatedTo(ChronoUnit.MINUTES)
+
 	}
 
-	private fun insertDeltaker(instansId: UUID, fnr: String): DeltakerDbo {
-		val bruker = brukerRepository.insert(
-			fodselsnummer = fnr,
-			fornavn = "Fornavn",
-			mellomnavn = "",
-			etternavn = "Etternavn",
-			telefonnummer = "12345678",
-			epost = "epost",
-			ansvarligVeilederId = null
-		)
+	@Test
+	fun `hentDeltakere - Flere deltakere finnes`() {
+		val arrangorId = insertArrangor()
+		val tiltak = tiltakRepository.insert((1000..9999).random().toString(), tiltakKode, tiltakKode)
+
+		val tiltakInstans = insertTiltakInstans(tiltak.id, arrangorId)
+		val bruker1 = BrukerInsertDbo("12128673847", "Person", "En", "To", "123", epost, null)
+		val bruker2 = BrukerInsertDbo("12128674909", "Person", "En", "To", "123", epost, null)
+
+		insertDeltaker(tiltakInstans.id, bruker1, LocalDate.now().minusDays(3), LocalDate.now().plusDays(1), LocalDateTime.now().minusDays(10))
+		insertDeltaker(tiltakInstans.id, bruker2, LocalDate.now().minusDays(3), LocalDate.now().plusDays(1), LocalDateTime.now().minusDays(10))
+
+		val deltakere = controller.hentDeltakere(tiltakInstans.id)
+		val deltaker1 = deltakere.get(0)
+		val deltaker2 = deltakere.get(1)
+
+		deltakere.size shouldBe 2
+		deltaker1.fodselsnummer shouldBe bruker1.fodselsnummer
+		deltaker2.fodselsnummer shouldBe bruker2.fodselsnummer
+	}
+
+	private fun insertDeltaker(instansId: UUID, bruker: BrukerInsertDbo, startDato: LocalDate, sluttDato: LocalDate, regDato: LocalDateTime): DeltakerDbo {
+		val bruker = brukerRepository.insert(bruker)
 		return deltakerRepository.insert(
 			brukerId = bruker.id,
 			tiltaksgjennomforingId = instansId,
-			oppstartDato = LocalDate.now(),
-			sluttDato = LocalDate.now(),
+			oppstartDato = startDato,
+			sluttDato = sluttDato,
 			status = Deltaker.Status.GJENNOMFORES,
 			dagerPerUke = 5,
-			prosentStilling = 10f
+			prosentStilling = 10f,
+			registrertDato = regDato
 		)
 	}
 

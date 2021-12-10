@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.core.port
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 interface DeltakerService {
@@ -13,7 +14,8 @@ interface DeltakerService {
 		sluttDato: LocalDate?,
 		status: Deltaker.Status,
 		dagerPerUke: Int?,
-		prosentStilling: Float?
+		prosentStilling: Float?,
+		registrertDato: LocalDateTime
 	): Deltaker
 
 	fun hentDeltakerePaaTiltakInstans(id: UUID): List<Deltaker>
