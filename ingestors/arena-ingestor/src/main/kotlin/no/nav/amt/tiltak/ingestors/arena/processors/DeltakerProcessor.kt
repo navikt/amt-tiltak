@@ -60,7 +60,8 @@ internal open class DeltakerProcessor(
 				status = statusConverter.convert(
 					newFields.DELTAKERSTATUSKODE,
 					newFields.DATO_FRA?.asLocalDate(),
-					newFields.DATO_TIL?.asLocalDate()
+					newFields.DATO_TIL?.asLocalDate(),
+					newFields.DATO_STATUSENDRING?.asLocalDate()
 				),
 				dagerPerUke = newFields.ANTALL_DAGER_PR_UKE,
 				prosentStilling = newFields.PROSENT_DELTID,
