@@ -7,7 +7,7 @@ import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
 import org.springframework.stereotype.Service
 
 @Service
-class ArenaIngestorImpl(
+internal class ArenaIngestorImpl(
 	private val arenaDataRepository: ArenaDataRepository
 ) : ArenaIngestor {
 

@@ -8,14 +8,14 @@ import no.nav.amt.tiltak.ingestors.arena.domain.OperationType
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-enum class ArenaOpType(val type: String) {
+internal enum class ArenaOpType(val type: String) {
 	I("I"),    // insert
 	U("U"),    // update
 	D("D"),    // delete
 }
 
 
-data class StringArenaKafkaDto(
+internal data class StringArenaKafkaDto(
 	val table: String, // Ex: ARENA_GOLDENGATE.TILTAKSAKTIVITET
 	@JsonProperty("op_type") val operationType: ArenaOpType,
 	@JsonProperty("op_ts") val operationTimestamp: String, // Ex: 2021-09-08 08:06:21.371796 (Er ikke ISO 8601)

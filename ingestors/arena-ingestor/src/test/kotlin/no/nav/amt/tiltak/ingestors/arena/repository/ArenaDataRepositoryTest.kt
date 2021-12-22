@@ -13,13 +13,13 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
-class ArenaDataRepositoryTest {
+internal class ArenaDataRepositoryTest {
 
-	val dataSource = SingletonPostgresContainer.getDataSource()
+	private val dataSource = SingletonPostgresContainer.getDataSource()
 
-	lateinit var jdbcTemplate: JdbcTemplate
+	private lateinit var jdbcTemplate: JdbcTemplate
 
-	lateinit var arenaDataRepository: ArenaDataRepository
+	private lateinit var arenaDataRepository: ArenaDataRepository
 
 	@BeforeEach
 	fun migrate() {

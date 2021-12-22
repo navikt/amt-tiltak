@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.ingestors.arena.domain
 
 import java.time.LocalDateTime
 
-data class ArenaData(
+internal data class ArenaData(
 	val id: Int = -1,
 	val tableName: String,
 	val operationType: OperationType,

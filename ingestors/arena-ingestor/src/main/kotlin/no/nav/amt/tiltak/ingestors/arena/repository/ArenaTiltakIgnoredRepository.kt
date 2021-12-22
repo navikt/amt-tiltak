@@ -5,7 +5,7 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Component
 
 @Component
-open class ArenaTiltakIgnoredRepository(
+internal open class ArenaTiltakIgnoredRepository(
 	private val jdbcTemplate: JdbcTemplate
 ) {
 
