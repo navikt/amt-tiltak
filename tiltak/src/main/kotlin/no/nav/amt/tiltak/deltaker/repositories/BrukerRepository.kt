@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
+import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
 import no.nav.amt.tiltak.utils.getNullableUUID
 import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
@@ -31,15 +32,7 @@ open class BrukerRepository(
 
     }
 
-    fun insert(
-        fodselsnummer: String,
-        fornavn: String,
-		mellomnavn: String?,
-        etternavn: String,
-        telefonnummer: String?,
-        epost: String?,
-        ansvarligVeilederId: UUID?
-    ): BrukerDbo {
+    fun insert(bruker: BrukerInsertDbo): BrukerDbo {
 
         val sql = """
 			INSERT INTO bruker(id, fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id)
@@ -56,20 +49,20 @@ open class BrukerRepository(
 		val parameters = MapSqlParameterSource().addValues(
             mapOf(
 				"id" to UUID.randomUUID(),
-                "fodselsnummer" to fodselsnummer,
-                "fornavn" to fornavn,
-				"mellomnavn" to mellomnavn,
-                "etternavn" to etternavn,
-                "telefonnummer" to telefonnummer,
-                "epost" to epost,
-                "veileder_id" to ansvarligVeilederId
+                "fodselsnummer" to bruker.fodselsnummer,
+                "fornavn" to bruker.fornavn,
+				"mellomnavn" to bruker.mellomnavn,
+                "etternavn" to bruker.etternavn,
+                "telefonnummer" to bruker.telefonnummer,
+                "epost" to bruker.epost,
+                "veileder_id" to bruker.ansvarligVeilederId
             )
         )
 
         template.update(sql, parameters)
 
-        return get(fodselsnummer)
-            ?: throw NoSuchElementException("Bruker med id $fodselsnummer finnes ikke")
+        return get(bruker.fodselsnummer)
+            ?: throw NoSuchElementException("Bruker med id ${bruker.fodselsnummer} finnes ikke")
     }
 
     fun get(fodselsnummer: String): BrukerDbo? {

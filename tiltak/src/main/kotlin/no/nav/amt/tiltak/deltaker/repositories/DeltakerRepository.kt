@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 @Component
@@ -25,12 +26,12 @@ open class DeltakerRepository(
 			startDato = rs.getDate("oppstart_dato")?.toLocalDate(),
 			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
 			tiltakInstansId = UUID.fromString(rs.getString("tiltaksinstans_id")),
-			arenaStatus = rs.getString("arena_status"),
 			dagerPerUke = rs.getInt("dager_per_uke"),
 			prosentStilling = rs.getFloat("prosent_stilling"),
-			status = if (statusString != null) Deltaker.Status.valueOf(statusString) else null,
+			status = Deltaker.Status.valueOf(statusString),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
-			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
+			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime(),
+			registrertDato = rs.getTimestamp("registrert_dato").toLocalDateTime()
 		)
 	}
 
@@ -40,22 +41,22 @@ open class DeltakerRepository(
 		oppstartDato: LocalDate?,
 		sluttDato: LocalDate?,
 		status: Deltaker.Status,
-		arenaStatus: String?,
 		dagerPerUke: Int?,
-		prosentStilling: Float?
+		prosentStilling: Float?,
+		registrertDato: LocalDateTime
 	): DeltakerDbo {
 		val sql = """
-			INSERT INTO deltaker(id, bruker_id, tiltaksinstans_id, oppstart_dato, slutt_dato, status, arena_status,
-								 dager_per_uke, prosent_stilling)
+			INSERT INTO deltaker(id, bruker_id, tiltaksinstans_id, oppstart_dato, slutt_dato, status,
+								 dager_per_uke, prosent_stilling, registrert_dato)
 			VALUES (:id,
 					:brukerId,
 					:tiltaksinstansId,
 					:oppstartsdato,
 					:sluttdato,
 					:status,
-					:arenaStatus,
 					:dagerPerUke,
-					:prosentStilling)
+					:prosentStilling,
+					:registrertDato)
 		""".trimIndent()
 
 		val id = UUID.randomUUID()
@@ -68,9 +69,9 @@ open class DeltakerRepository(
 				"oppstartsdato" to oppstartDato,
 				"sluttdato" to sluttDato,
 				"status" to status.name,
-				"arenaStatus" to arenaStatus,
 				"dagerPerUke" to dagerPerUke,
-				"prosentStilling" to prosentStilling
+				"prosentStilling" to prosentStilling,
+				"registrertDato" to registrertDato
 			)
 		)
 
@@ -127,20 +128,10 @@ open class DeltakerRepository(
 
 	fun get(id: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.id,
-				   deltaker.bruker_id,
+			SELECT deltaker.*,
 				   bruker.fodselsnummer,
 				   bruker.fornavn,
-				   bruker.etternavn,
-				   deltaker.oppstart_dato,
-				   deltaker.slutt_dato,
-				   deltaker.tiltaksinstans_id,
-				   deltaker.arena_status,
-				   deltaker.dager_per_uke,
-				   deltaker.prosent_stilling,
-				   deltaker.status,
-				   deltaker.created_at,
-				   deltaker.modified_at
+				   bruker.etternavn
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 			WHERE deltaker.id = :deltakerId
@@ -158,20 +149,10 @@ open class DeltakerRepository(
 
 	fun get(brukerId: UUID, tiltaksinstansId: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.id,
-				   deltaker.bruker_id,
+			SELECT deltaker.*,
 				   bruker.fodselsnummer,
 				   bruker.fornavn,
-				   bruker.etternavn,
-				   deltaker.oppstart_dato,
-				   deltaker.slutt_dato,
-				   deltaker.tiltaksinstans_id,
-				   deltaker.arena_status,
-				   deltaker.dager_per_uke,
-				   deltaker.prosent_stilling,
-				   deltaker.status,
-				   deltaker.created_at,
-				   deltaker.modified_at
+				   bruker.etternavn
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 			WHERE bruker.id = :brukerId
@@ -199,12 +180,12 @@ open class DeltakerRepository(
 				   deltaker.oppstart_dato,
 				   deltaker.slutt_dato,
 				   deltaker.tiltaksinstans_id,
-				   deltaker.arena_status,
 				   deltaker.dager_per_uke,
 				   deltaker.prosent_stilling,
 				   deltaker.status,
 				   deltaker.created_at,
-				   deltaker.modified_at
+				   deltaker.modified_at,
+				   deltaker.registrert_dato
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 			WHERE bruker.fodselsnummer = :bruker_fodselsnummer

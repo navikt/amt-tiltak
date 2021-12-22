@@ -1,7 +1,6 @@
 package no.nav.amt.tiltak.deltaker.dbo
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.tiltak.dto.TiltakDeltakerDto
 import no.nav.amt.tiltak.utils.UpdateCheck
 import no.nav.amt.tiltak.utils.UpdateStatus
 import java.time.LocalDate
@@ -17,12 +16,12 @@ data class DeltakerDbo(
 	val tiltakInstansId: UUID,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
-	val arenaStatus: String?,
 	val dagerPerUke: Int?,
 	val prosentStilling: Float?,
-	val status: Deltaker.Status?,
+	val status: Deltaker.Status,
 	val createdAt: LocalDateTime,
-	val modifiedAt: LocalDateTime
+	val modifiedAt: LocalDateTime,
+	val registrertDato: LocalDateTime
 ) {
 
 	fun toDeltaker(): Deltaker {
@@ -33,19 +32,8 @@ data class DeltakerDbo(
 			fodselsnummer = brukerFodselsnummer,
 			oppstartdato = startDato,
 			sluttdato = sluttDato,
-			status = status
-		)
-	}
-
-	fun toDto(): TiltakDeltakerDto {
-		return TiltakDeltakerDto(
-			id = id,
-			fornavn = brukerFornavn,
-			etternavn = brukerEtternavn,
-			fodselsnummer = brukerFodselsnummer,
-			oppstartdato = startDato,
-			sluttdato = sluttDato,
-			status = status
+			status = status,
+			registrertDato = registrertDato
 		)
 	}
 

@@ -99,7 +99,7 @@ CREATE TABLE deltaker
     status            varchar,
     created_at        timestamp with time zone default current_timestamp,
     modified_at       timestamp with time zone default current_timestamp,
-    arena_status     varchar,
     dager_per_uke    integer,
-    prosent_stilling float
+    prosent_stilling float,
+    registrert_dato timestamp with time zone not null
 );

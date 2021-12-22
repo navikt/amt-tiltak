@@ -18,7 +18,8 @@ internal open class DeltakerProcessor(
 	private val ignoredTiltakRepository: ArenaTiltakIgnoredRepository,
 	private val tiltakInstansService: TiltakInstansService,
 	private val deltakerService: DeltakerService,
-	private val ords: ArenaOrdsProxyConnector
+	private val ords: ArenaOrdsProxyConnector,
+	private val statusConverter: DeltakerStatusConverter
 ) : AbstractArenaProcessor(repository) {
 
 	private val logger = LoggerFactory.getLogger(javaClass)
@@ -49,14 +50,21 @@ internal open class DeltakerProcessor(
 			val fodselsnummer = ords.hentFnr(newFields.PERSON_ID.toString())
 				?: throw DataIntegrityViolationException("Person med Arena ID ${newFields.PERSON_ID} returnerer ikke fødselsnummer")
 
+
+
 			deltakerService.addUpdateDeltaker(
 				tiltaksinstans = tiltaksgjennomforing.id,
 				fodselsnummer = fodselsnummer,
 				oppstartDato = newFields.DATO_FRA?.asLocalDate(),
 				sluttDato = newFields.DATO_TIL?.asLocalDate(),
-				arenaStatus = newFields.DELTAKERSTATUSKODE,
+				status = statusConverter.convert(
+					newFields.DELTAKERSTATUSKODE,
+					newFields.DATO_FRA?.asLocalDate(),
+					newFields.DATO_TIL?.asLocalDate()
+				),
 				dagerPerUke = newFields.ANTALL_DAGER_PR_UKE,
 				prosentStilling = newFields.PROSENT_DELTID,
+				registrertDato = newFields.REG_DATO.asLocalDateTime()
 			)
 
 			repository.upsert(data.markAsIngested())
@@ -64,3 +72,4 @@ internal open class DeltakerProcessor(
 
 	}
 }
+

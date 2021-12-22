@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.deltaker.commands.UpsertNavAnsattCommand
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
+import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.NavAnsattDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
@@ -12,6 +13,7 @@ import no.nav.amt.tiltak.deltaker.repositories.NavAnsattRepository
 import no.nav.amt.tiltak.utils.UpdateStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -28,25 +30,12 @@ open class DeltakerServiceImpl(
 		oppstartDato: LocalDate?,
 		sluttDato: LocalDate?,
 		status: Deltaker.Status,
-		arenaStatus: String?,
 		dagerPerUke: Int?,
-		prosentStilling: Float?
+		prosentStilling: Float?,
+		registrertDato: LocalDateTime
 	): Deltaker {
-		val storedDeltaker = deltakerRepository.get(fodselsnummer, tiltaksinstans)
 
-		if (storedDeltaker != null) {
-			return storedDeltaker.toDeltaker()
-		}
-
-		val bruker = getBruker(fodselsnummer)
-
-		val deltaker = deltakerRepository.get(
-			fodselsnummer = fodselsnummer,
-			tiltaksinstansId = tiltaksinstans
-		)
-
-
-		if (deltaker != null) {
+		deltakerRepository.get(fodselsnummer, tiltaksinstans)?.also { deltaker ->
 			val updated = deltaker.update(
 				newStatus = status,
 				newDeltakerStartDato = oppstartDato,
@@ -58,19 +47,43 @@ open class DeltakerServiceImpl(
 			} else {
 				deltaker.toDeltaker()
 			}
-		} else {
-			return deltakerRepository.insert(
-				brukerId = bruker.id,
-				tiltaksgjennomforingId = tiltaksinstans,
-				oppstartDato = oppstartDato,
-				sluttDato = sluttDato,
-				status = status,
-				arenaStatus = arenaStatus,
-				dagerPerUke = dagerPerUke,
-				prosentStilling = prosentStilling
-			).toDeltaker()
-
 		}
+
+		return createDeltaker(
+			fodselsnummer,
+			tiltaksinstans,
+			oppstartDato,
+			sluttDato,
+			status,
+			dagerPerUke,
+			prosentStilling,
+			registrertDato
+		)
+
+	}
+
+	private fun createDeltaker(
+		fodselsnummer: String,
+		tiltaksinstans: UUID,
+		oppstartDato: LocalDate?,
+		sluttDato: LocalDate?,
+		status: Deltaker.Status,
+		dagerPerUke: Int?,
+		prosentStilling: Float?,
+		registrertDato: LocalDateTime
+	): Deltaker {
+		val bruker = brukerRepository.get(fodselsnummer) ?: createBruker(fodselsnummer)
+
+		return deltakerRepository.insert(
+			brukerId = bruker.id,
+			tiltaksgjennomforingId = tiltaksinstans,
+			oppstartDato = oppstartDato,
+			sluttDato = sluttDato,
+			status = status,
+			dagerPerUke = dagerPerUke,
+			prosentStilling = prosentStilling,
+			registrertDato = registrertDato
+		).toDeltaker()
 	}
 
 	override fun hentDeltakerePaaTiltakInstans(id: UUID): List<Deltaker> {
@@ -82,17 +95,11 @@ open class DeltakerServiceImpl(
 			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 	}
 
-	private fun getBruker(fodselsnummer: String): BrukerDbo {
-		val storedBruker = brukerRepository.get(fodselsnummer)
-
-		if (storedBruker != null) {
-			return storedBruker
-		}
+	private fun createBruker(fodselsnummer: String): BrukerDbo {
 
 		val veileder = upsertVeileder(fodselsnummer)
 		val newBruker = personService.hentPerson(fodselsnummer)
-
-		return brukerRepository.insert(
+		val bruker = BrukerInsertDbo(
 			fodselsnummer = fodselsnummer,
 			fornavn = newBruker.fornavn,
 			mellomnavn = newBruker.mellomnavn,
@@ -101,6 +108,7 @@ open class DeltakerServiceImpl(
 			epost = null,
 			ansvarligVeilederId = veileder?.id
 		)
+		return brukerRepository.insert(bruker)
 	}
 
 	private fun upsertVeileder(fodselsnummer: String): NavAnsattDbo? {
