@@ -5,8 +5,6 @@ import io.micrometer.core.instrument.Tag
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.time.LocalDateTime
-
 
 private typealias ConversionStrategy = (StatusDates) -> Deltaker.Status
 
