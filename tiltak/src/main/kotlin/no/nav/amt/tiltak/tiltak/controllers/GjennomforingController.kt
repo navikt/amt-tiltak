@@ -43,7 +43,7 @@ class GjennomforingController(
 	@Protected
 	@GetMapping("/{gjennomforingId}/deltakere")
 	fun hentDeltakere(@PathVariable("gjennomforingId") gjennomforingId: UUID): List<TiltakDeltakerDto> {
-		return deltakerService.hentDeltakerePaaTiltak(gjennomforingId)
+		return deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
 			.map { it.toDto() }
 	}
 

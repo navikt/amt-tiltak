@@ -86,7 +86,7 @@ open class DeltakerServiceImpl(
 		).toDeltaker()
 	}
 
-	override fun hentDeltakerePaaTiltak(id: UUID): List<Deltaker> {
+	override fun hentDeltakerePaaGjennomforing(id: UUID): List<Deltaker> {
 		return deltakerRepository.getDeltakerePaaTiltak(id).map { it.toDeltaker() }
 	}
 

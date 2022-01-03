@@ -146,7 +146,7 @@ class GjennomforingControllerTest {
 			modifiedAt = LocalDateTime.now(),
 			registrertDato = LocalDateTime.now()
 		).toDeltaker()
-		Mockito.`when`(deltakerService.hentDeltakerePaaTiltak(gjennomforingId)).thenReturn(listOf(deltaker))
+		Mockito.`when`(deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)).thenReturn(listOf(deltaker))
 		val token = server.issueToken("tokenx", "test", "test").serialize()
 
 		val response = mockMvc.perform(

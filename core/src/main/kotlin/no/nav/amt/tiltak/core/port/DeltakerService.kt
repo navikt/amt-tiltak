@@ -18,7 +18,7 @@ interface DeltakerService {
 		registrertDato: LocalDateTime
 	): Deltaker
 
-	fun hentDeltakerePaaTiltak(id: UUID): List<Deltaker>
+	fun hentDeltakerePaaGjennomforing(id: UUID): List<Deltaker>
 
 	fun hentDeltaker(deltakerId: UUID): Deltaker
 
