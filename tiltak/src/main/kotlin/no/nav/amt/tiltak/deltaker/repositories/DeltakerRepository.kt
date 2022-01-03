@@ -172,20 +172,10 @@ open class DeltakerRepository(
 
 	fun get(fodselsnummer: String, gjennomforingId: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.id,
-				   deltaker.bruker_id,
+			SELECT deltaker.*,
 				   bruker.fodselsnummer,
 				   bruker.fornavn,
-				   bruker.etternavn,
-				   deltaker.oppstart_dato,
-				   deltaker.slutt_dato,
-				   deltaker.gjennomforing_id,
-				   deltaker.dager_per_uke,
-				   deltaker.prosent_stilling,
-				   deltaker.status,
-				   deltaker.created_at,
-				   deltaker.modified_at,
-				   deltaker.registrert_dato
+				   bruker.etternavn
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 			WHERE bruker.fodselsnummer = :bruker_fodselsnummer

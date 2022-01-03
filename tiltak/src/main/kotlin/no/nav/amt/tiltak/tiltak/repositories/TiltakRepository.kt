@@ -27,8 +27,8 @@ open class TiltakRepository(
 	fun insert(arenaId: String, navn: String, kode: String): TiltakDbo {
 		//language=PostgreSQL
 		val sql = """
-            insert into tiltak(id, arena_id, navn, type)
-            values (:id,
+            INSERT INTO tiltak(id, arena_id, navn, type)
+            VALUES (:id,
                     :arenaId,
                     :navn,
                     :kode)
@@ -86,13 +86,8 @@ open class TiltakRepository(
 	fun getByArenaId(arenaId: String): TiltakDbo? {
 		//language=PostgreSQL
 		val sql = """
-            select id,
-                   arena_id,
-                   navn,
-                   type,
-                   created_at,
-                   modified_at
-            from tiltak
+            SELECT *
+            FROM tiltak
 			WHERE arena_id = :arena_id
         """.trimIndent()
 
@@ -109,13 +104,8 @@ open class TiltakRepository(
 	private fun get(id: UUID): TiltakDbo? {
 		//language=PostgreSQL
 		val sql = """
-            select id,
-                   arena_id,
-                   navn,
-                   type,
-                   created_at,
-                   modified_at
-            from tiltak
+            SELECT *
+            FROM tiltak
 			WHERE id = :id
         """.trimIndent()
 

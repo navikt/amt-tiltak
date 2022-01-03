@@ -25,7 +25,7 @@ open class BrukerRepository(
             etternavn = rs.getString("etternavn"),
             telefonnummer = rs.getString("telefonnummer"),
             epost = rs.getString("epost"),
-            ansvarligVeilederId = rs.getNullableUUID("ansvarlig_veileder_internal_id"),
+            ansvarligVeilederId = rs.getNullableUUID("ansvarlig_veileder_id"),
             createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
             modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
         )
@@ -67,16 +67,7 @@ open class BrukerRepository(
 
     fun get(fodselsnummer: String): BrukerDbo? {
         val sql = """
-			SELECT id                    as id,
-				   fodselsnummer         as fodselsnummer,
-				   fornavn               as fornavn,
-				   mellomnavn            as mellomnavn,
-				   etternavn             as etternavn,
-				   telefonnummer         as telefonnummer,
-				   epost                 as epost,
-				   ansvarlig_veileder_id as ansvarlig_veileder_internal_id,
-				   created_at            as created_at,
-				   modified_at           as modified_at
+			SELECT *
 			FROM bruker
 			WHERE fodselsnummer = :fodselsnummer
 		""".trimIndent()

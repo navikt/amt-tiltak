@@ -123,7 +123,8 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 		//language=PostgreSQL
 		val sql = """
 			SELECT *
-			FROM gjennomforing WHERE id = :id
+			FROM gjennomforing
+			WHERE id = :id
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
