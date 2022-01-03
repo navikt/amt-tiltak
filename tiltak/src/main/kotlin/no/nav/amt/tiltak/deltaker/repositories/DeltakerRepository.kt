@@ -112,7 +112,7 @@ open class DeltakerRepository(
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"deltakerStatus" to deltaker.status?.name,
+				"deltakerStatus" to deltaker.status.name,
 				"oppstartDato" to deltaker.startDato,
 				"sluttDato" to deltaker.sluttDato,
 				"modifiedAt" to deltaker.modifiedAt,

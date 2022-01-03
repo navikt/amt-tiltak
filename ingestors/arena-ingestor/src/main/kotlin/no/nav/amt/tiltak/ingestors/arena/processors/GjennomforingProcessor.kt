@@ -26,79 +26,50 @@ internal open class GjennomforingProcessor(
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun insert(data: ArenaData) {
-		val newFields = jsonObject(data.after, ArenaTiltaksgjennomforing::class.java)
-
-		if (isSupportedTiltak(newFields.TILTAKSKODE)) {
-			val tiltak = tiltakService.getTiltakFromArenaId(newFields.TILTAKSKODE)
-				?: throw DependencyNotIngestedException("Tiltak med ID ${newFields.TILTAKSKODE} er ikke ingested.")
-
-			if (newFields.ARBGIV_ID_ARRANGOR == null) {
-				log.info("Hopper over insert av tiltakgjennomforing som mangler ARBGIV_ID_ARRANGOR. arenaTiltakgjennomforingId=${newFields.TILTAKGJENNOMFORING_ID}")
-				repository.upsert(data.markAsIgnored())
-				return
-			}
-
-			val virksomhetsnummer = ords.hentVirksomhetsnummer(newFields.ARBGIV_ID_ARRANGOR.toString())
-
-			val arrangor = arrangorService.addArrangor(virksomhetsnummer)
-
-			gjennomforingService.upsertGjennomforing(
-				arenaId = newFields.TILTAKGJENNOMFORING_ID.toInt(),
-				tiltakId = tiltak.id,
-				arrangorId = arrangor.id,
-				navn = newFields.LOKALTNAVN
-					?: throw DataIntegrityViolationException("Forventet at LOKALTNAVN ikke er null"),
-				status = null,
-				oppstartDato = newFields.DATO_FRA?.asLocalDate(),
-				sluttDato = newFields.DATO_TIL?.asLocalDate(),
-				registrertDato = newFields.REG_DATO.asLocalDateTime(),
-				fremmoteDato = newFields.DATO_FREMMOTE?.asLocalDate() withTime newFields.KLOKKETID_FREMMOTE.asTime()
-			)
-
-			repository.upsert(data.markAsIngested())
-
-		} else {
-			ignoredTiltakRepository.insert(newFields.TILTAKGJENNOMFORING_ID)
-			repository.upsert(data.markAsIgnored())
-		}
+		upsert(data)
 	}
 
 	override fun update(data: ArenaData) {
+		upsert(data)
+	}
+
+	private fun upsert(data: ArenaData) {
 		val newFields = jsonObject(data.after, ArenaTiltaksgjennomforing::class.java)
 
-		if (isSupportedTiltak(newFields.TILTAKSKODE)) {
-			if (newFields.ARBGIV_ID_ARRANGOR == null) {
-				log.info("Hopper over update av tiltakgjennomforing som mangler ARBGIV_ID_ARRANGOR. arenaTiltakgjennomforingId=${newFields.TILTAKGJENNOMFORING_ID}")
-				repository.upsert(data.markAsIgnored())
-				return
-			}
-
-			val virksomhetsnummer = ords.hentVirksomhetsnummer(newFields.ARBGIV_ID_ARRANGOR.toString())
-
-			val arrangor = arrangorService.getArrangorByVirksomhetsnummer(virksomhetsnummer)
-				?: throw DependencyNotIngestedException("Tiltaksarrangør med virksomhetsnummer $virksomhetsnummer er ikke ingested enda.")
-
-			val tiltak = tiltakService.getTiltakFromArenaId(newFields.TILTAKSKODE)
-				?: throw DependencyNotIngestedException("Tiltak med ArenaId $virksomhetsnummer er ikke ingested enda.")
-
-			gjennomforingService.upsertGjennomforing(
-				arenaId = newFields.TILTAKGJENNOMFORING_ID.toInt(),
-				tiltakId = tiltak.id,
-				arrangorId = arrangor.id,
-				navn = newFields.LOKALTNAVN
-					?: throw DataIntegrityViolationException("Forventet at LOKALTNAVN ikke er null"),
-				status = null,
-				oppstartDato = newFields.DATO_FRA?.asLocalDate(),
-				sluttDato = newFields.DATO_TIL?.asLocalDate(),
-				registrertDato = newFields.REG_DATO.asLocalDateTime(),
-				fremmoteDato = newFields.DATO_FREMMOTE?.asLocalDate() withTime newFields.KLOKKETID_FREMMOTE.asTime()
-			)
-
-			repository.upsert(data.markAsIngested())
-		} else {
+		if (!isSupportedTiltak(newFields.TILTAKSKODE)) {
 			ignoredTiltakRepository.insert(newFields.TILTAKGJENNOMFORING_ID)
 			repository.upsert(data.markAsIgnored())
+			return
 		}
+
+		if (newFields.ARBGIV_ID_ARRANGOR == null) {
+			log.info("Hopper over upsert av tiltakgjennomforing som mangler ARBGIV_ID_ARRANGOR. arenaTiltakgjennomforingId=${newFields.TILTAKGJENNOMFORING_ID}")
+			repository.upsert(data.markAsIgnored())
+			return
+		}
+
+		val virksomhetsnummer = ords.hentVirksomhetsnummer(newFields.ARBGIV_ID_ARRANGOR.toString())
+
+		val tiltak = tiltakService.getTiltakFromArenaId(newFields.TILTAKSKODE)
+			?: throw DependencyNotIngestedException("Tiltak med ID ${newFields.TILTAKSKODE} er ikke ingested enda.")
+
+		val arrangor = arrangorService.addArrangor(virksomhetsnummer)
+
+		gjennomforingService.upsertGjennomforing(
+			arenaId = newFields.TILTAKGJENNOMFORING_ID.toInt(),
+			tiltakId = tiltak.id,
+			arrangorId = arrangor.id,
+			navn = newFields.LOKALTNAVN
+				?: throw DataIntegrityViolationException("Forventet at LOKALTNAVN ikke er null"),
+			status = null,
+			oppstartDato = newFields.DATO_FRA?.asLocalDate(),
+			sluttDato = newFields.DATO_TIL?.asLocalDate(),
+			registrertDato = newFields.REG_DATO.asLocalDateTime(),
+			fremmoteDato = newFields.DATO_FREMMOTE?.asLocalDate() withTime newFields.KLOKKETID_FREMMOTE.asTime()
+		)
+		repository.upsert(data.markAsIngested())
+
+
 	}
 
 	override fun delete(data: ArenaData) {
