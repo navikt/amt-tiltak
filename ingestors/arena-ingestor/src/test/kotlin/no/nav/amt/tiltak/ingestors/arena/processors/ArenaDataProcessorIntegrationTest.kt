@@ -24,7 +24,7 @@ class ArenaDataProcessorIntegrationTest {
 	private lateinit var tiltakService: TiltakService
 	private lateinit var tiltakProcessor: TiltakProcessor
 
-	private lateinit var tiltaksgjennomforingProcessor: TiltaksgjennomforingProcessor
+	private lateinit var gjennomforingProcessor: GjennomforingProcessor
 	private lateinit var deltakerProcessor: DeltakerProcessor
 
 	private lateinit var arenaDataProcessor: ArenaDataProcessor
@@ -36,9 +36,9 @@ class ArenaDataProcessorIntegrationTest {
 		arenaDataRepository = ArenaDataRepository(NamedParameterJdbcTemplate(jdbcTemplate))
 		tiltakService = mock(TiltakService::class.java)
 		tiltakProcessor = TiltakProcessor(arenaDataRepository, tiltakService)
-		tiltaksgjennomforingProcessor = mock(TiltaksgjennomforingProcessor::class.java)
+		gjennomforingProcessor = mock(GjennomforingProcessor::class.java)
 		deltakerProcessor = mock(DeltakerProcessor::class.java)
-		arenaDataProcessor = ArenaDataProcessor(arenaDataRepository, tiltakProcessor, tiltaksgjennomforingProcessor, deltakerProcessor)
+		arenaDataProcessor = ArenaDataProcessor(arenaDataRepository, tiltakProcessor, gjennomforingProcessor, deltakerProcessor)
 
 	}
 

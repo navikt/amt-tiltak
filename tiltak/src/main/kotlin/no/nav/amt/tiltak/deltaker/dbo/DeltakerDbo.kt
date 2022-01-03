@@ -13,7 +13,7 @@ data class DeltakerDbo(
 	val brukerFodselsnummer: String,
 	val brukerFornavn: String,
 	val brukerEtternavn: String,
-	val tiltakInstansId: UUID,
+	val gjennomforingId: UUID,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val dagerPerUke: Int?,

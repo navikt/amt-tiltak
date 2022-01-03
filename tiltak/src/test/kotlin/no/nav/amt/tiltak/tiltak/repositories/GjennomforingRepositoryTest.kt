@@ -2,10 +2,10 @@ package no.nav.amt.tiltak.tiltak.repositories
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
-import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.tiltak.dbo.TiltakInstansDbo
+import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -16,11 +16,11 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-internal class TiltaksinstansRepositoryTest {
+internal class GjennomforingRepositoryTest {
 
 	private val dataSource = SingletonPostgresContainer.getDataSource()
 
-	lateinit var repository: TiltakInstansRepository
+	lateinit var repository: GjennomforingRepository
 
 	companion object TestData {
 		val TILTAK_ID = UUID.fromString("9665b0b6-ea7d-44b0-b9c2-8867c2a6c106")
@@ -32,22 +32,22 @@ internal class TiltaksinstansRepositoryTest {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 		rootLogger.level = Level.WARN
 
-		repository = TiltakInstansRepository(NamedParameterJdbcTemplate(dataSource))
+		repository = GjennomforingRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanAndInitDatabase(dataSource, "/tiltaksinstans-repository_test-data.sql")
+		DatabaseTestUtils.cleanAndInitDatabase(dataSource, "/gjennomforing-repository_test-data.sql")
 	}
 
 	@Test
-	internal fun `insert() should insert tiltaksinstans and return object`() {
+	internal fun `insert() should insert gjennomforing and return object`() {
 		val arenaId = 1
-		val navn = "TEST Tiltaksinstans"
+		val navn = "TEST Tiltaksgjennomforing"
 		val status = null
 		val oppstartDato = LocalDate.now().plusDays(2)
 		val sluttDato = LocalDate.now().plusDays(10)
 		val registrertDato = LocalDateTime.now()
 		val fremmoteDato = LocalDateTime.now().plusDays(2).minusHours(2)
 
-		val savedInstans = repository.insert(
+		val savedGjennomforing = repository.insert(
 			arenaId = arenaId,
 			tiltakId = TILTAK_ID,
 			arrangorId = ARRANGOR_ID,
@@ -59,25 +59,25 @@ internal class TiltaksinstansRepositoryTest {
 			fremmoteDato = fremmoteDato
 		)
 
-		assertNotNull(savedInstans)
-		assertNotNull(savedInstans.id)
+		assertNotNull(savedGjennomforing)
+		assertNotNull(savedGjennomforing.id)
 
-		assertEquals(TILTAK_ID, savedInstans.tiltakId)
-		assertEquals(ARRANGOR_ID, savedInstans.arrangorId)
-		assertEquals(navn, savedInstans.navn)
-		assertEquals(status, savedInstans.status)
+		assertEquals(TILTAK_ID, savedGjennomforing.tiltakId)
+		assertEquals(ARRANGOR_ID, savedGjennomforing.arrangorId)
+		assertEquals(navn, savedGjennomforing.navn)
+		assertEquals(status, savedGjennomforing.status)
 
-		assertTrue(oppstartDato!!.isEqualTo(savedInstans.oppstartDato!!))
-		assertTrue(sluttDato!!.isEqualTo(savedInstans.sluttDato!!))
-		assertTrue(registrertDato!!.isEqualTo(savedInstans.registrertDato!!))
-		assertTrue(fremmoteDato!!.isEqualTo(savedInstans.fremmoteDato!!))
+		assertTrue(oppstartDato!!.isEqualTo(savedGjennomforing.oppstartDato!!))
+		assertTrue(sluttDato!!.isEqualTo(savedGjennomforing.sluttDato!!))
+		assertTrue(registrertDato!!.isEqualTo(savedGjennomforing.registrertDato!!))
+		assertTrue(fremmoteDato!!.isEqualTo(savedGjennomforing.fremmoteDato!!))
 	}
 
 	@Test
-	internal fun `update() should throw if tiltaksinstans does not exist`() {
+	internal fun `update() should throw if gjennomforing does not exist`() {
 		assertThrows<NoSuchElementException> {
 			repository.update(
-				TiltakInstansDbo(
+				GjennomforingDbo(
 					id = UUID.randomUUID(),
 					arenaId = 9999,
 					arrangorId = UUID.randomUUID(),
@@ -98,12 +98,12 @@ internal class TiltaksinstansRepositoryTest {
 	@Test
 	internal fun `update() should return updated object`() {
 		val updatedNavn = "UpdatedNavn"
-		val updatedStatus = TiltakInstans.Status.GJENNOMFORES
+		val updatedStatus = Gjennomforing.Status.GJENNOMFORES
 		val updatedOppstartsdato = LocalDate.now().plusDays(4)
 		val updatedSluttdato = LocalDate.now().plusDays(14)
 		val updatedFremmotedato = LocalDateTime.now().plusDays(4)
 
-		val newTiltakInstans = repository.insert(
+		val newGjennomforing = repository.insert(
 			arenaId = 1,
 			tiltakId = TILTAK_ID,
 			arrangorId = ARRANGOR_ID,
@@ -115,8 +115,8 @@ internal class TiltaksinstansRepositoryTest {
 			fremmoteDato = null
 		)
 
-		val updatedTiltaksinstans = repository.update(
-			newTiltakInstans.copy(
+		val updatedGjennomforing = repository.update(
+			newGjennomforing.copy(
 				navn = updatedNavn,
 				status = updatedStatus,
 				oppstartDato = updatedOppstartsdato,
@@ -125,24 +125,24 @@ internal class TiltaksinstansRepositoryTest {
 			)
 		)
 
-		assertEquals(updatedNavn, updatedTiltaksinstans.navn)
-		assertEquals(updatedStatus, updatedTiltaksinstans.status)
-		assertTrue(updatedOppstartsdato.isEqualTo(updatedTiltaksinstans.oppstartDato))
-		assertTrue(updatedSluttdato.isEqualTo(updatedTiltaksinstans.sluttDato))
-		assertTrue(updatedFremmotedato.isEqualTo(updatedTiltaksinstans.fremmoteDato))
+		assertEquals(updatedNavn, updatedGjennomforing.navn)
+		assertEquals(updatedStatus, updatedGjennomforing.status)
+		assertTrue(updatedOppstartsdato.isEqualTo(updatedGjennomforing.oppstartDato))
+		assertTrue(updatedSluttdato.isEqualTo(updatedGjennomforing.sluttDato))
+		assertTrue(updatedFremmotedato.isEqualTo(updatedGjennomforing.fremmoteDato))
 	}
 
 	@Test
 	internal fun `getByArenaId returns the correct object`() {
 		val arenaId = 1
-		val navn = "TEST Tiltaksinstans"
+		val navn = "TEST Tiltaksgjennomforing"
 		val status = null
 		val oppstartDato = LocalDate.now().plusDays(2)
 		val sluttDato = LocalDate.now().plusDays(10)
 		val registrertDato = LocalDateTime.now()
 		val fremmoteDato = LocalDateTime.now().plusDays(2).minusHours(2)
 
-		val savedInstans = repository.insert(
+		val savedGjennomforing = repository.insert(
 			arenaId = arenaId,
 			tiltakId = TILTAK_ID,
 			arrangorId = ARRANGOR_ID,
@@ -156,7 +156,7 @@ internal class TiltaksinstansRepositoryTest {
 
 		val gottenObject = repository.getByArenaId(arenaId)
 
-		assertEquals(savedInstans, gottenObject)
+		assertEquals(savedGjennomforing, gottenObject)
 	}
 
 }

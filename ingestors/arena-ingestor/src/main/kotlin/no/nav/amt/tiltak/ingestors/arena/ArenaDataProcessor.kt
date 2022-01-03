@@ -4,7 +4,7 @@ import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
 import no.nav.amt.tiltak.ingestors.arena.domain.IngestStatus
 import no.nav.amt.tiltak.ingestors.arena.processors.DeltakerProcessor
 import no.nav.amt.tiltak.ingestors.arena.processors.TiltakProcessor
-import no.nav.amt.tiltak.ingestors.arena.processors.TiltaksgjennomforingProcessor
+import no.nav.amt.tiltak.ingestors.arena.processors.GjennomforingProcessor
 import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -15,7 +15,7 @@ import java.time.Instant
 internal open class ArenaDataProcessor(
 	private val repository: ArenaDataRepository,
 	private val tiltakProcessor: TiltakProcessor,
-	private val tiltaksgjennomforingProcessor: TiltaksgjennomforingProcessor,
+	private val gjennomforingProcessor: GjennomforingProcessor,
 	private val deltakerProcessor: DeltakerProcessor
 ) {
 
@@ -63,7 +63,7 @@ internal open class ArenaDataProcessor(
 	private fun processMessage(data: ArenaData) {
 		when (data.tableName.uppercase()) {
 			tiltakTableName -> tiltakProcessor.handle(data)
-			tiltakgjennomforingTableName -> tiltaksgjennomforingProcessor.handle(data)
+			tiltakgjennomforingTableName -> gjennomforingProcessor.handle(data)
 			tiltakDeltakerTableName -> deltakerProcessor.handle(data)
 			else -> {
 				logger.error("Data from table ${data.tableName} if not supported")

@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.ingestors.arena.processors
 
 import no.nav.amt.tiltak.core.port.ArenaOrdsProxyConnector
-import no.nav.amt.tiltak.core.port.TiltakInstansService
+import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
@@ -14,11 +14,11 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Component
 
 @Component
-internal open class TiltaksgjennomforingProcessor(
+internal open class GjennomforingProcessor(
 	repository: ArenaDataRepository,
 	private val ignoredTiltakRepository: ArenaTiltakIgnoredRepository,
 	private val arrangorService: ArrangorService,
-	private val tiltakInstansService: TiltakInstansService,
+	private val gjennomforingService: GjennomforingService,
 	private val tiltakService: TiltakService,
 	private val ords: ArenaOrdsProxyConnector
 ) : AbstractArenaProcessor(repository) {
@@ -33,7 +33,7 @@ internal open class TiltaksgjennomforingProcessor(
 				?: throw DependencyNotIngestedException("Tiltak med ID ${newFields.TILTAKSKODE} er ikke ingested.")
 
 			if (newFields.ARBGIV_ID_ARRANGOR == null) {
-				log.info("Hopper over insert av tiltak instans som mangler ARBGIV_ID_ARRANGOR. arenaTiltakgjennomforingId=${newFields.TILTAKGJENNOMFORING_ID}")
+				log.info("Hopper over insert av tiltakgjennomforing som mangler ARBGIV_ID_ARRANGOR. arenaTiltakgjennomforingId=${newFields.TILTAKGJENNOMFORING_ID}")
 				repository.upsert(data.markAsIgnored())
 				return
 			}
@@ -42,7 +42,7 @@ internal open class TiltaksgjennomforingProcessor(
 
 			val arrangor = arrangorService.addArrangor(virksomhetsnummer)
 
-			tiltakInstansService.upsertTiltaksinstans(
+			gjennomforingService.upsertGjennomforing(
 				arenaId = newFields.TILTAKGJENNOMFORING_ID.toInt(),
 				tiltakId = tiltak.id,
 				arrangorId = arrangor.id,
@@ -68,7 +68,7 @@ internal open class TiltaksgjennomforingProcessor(
 
 		if (isSupportedTiltak(newFields.TILTAKSKODE)) {
 			if (newFields.ARBGIV_ID_ARRANGOR == null) {
-				log.info("Hopper over update av tiltak instans som mangler ARBGIV_ID_ARRANGOR. arenaTiltakgjennomforingId=${newFields.TILTAKGJENNOMFORING_ID}")
+				log.info("Hopper over update av tiltakgjennomforing som mangler ARBGIV_ID_ARRANGOR. arenaTiltakgjennomforingId=${newFields.TILTAKGJENNOMFORING_ID}")
 				repository.upsert(data.markAsIgnored())
 				return
 			}
@@ -81,7 +81,7 @@ internal open class TiltaksgjennomforingProcessor(
 			val tiltak = tiltakService.getTiltakFromArenaId(newFields.TILTAKSKODE)
 				?: throw DependencyNotIngestedException("Tiltak med ArenaId $virksomhetsnummer er ikke ingested enda.")
 
-			tiltakInstansService.upsertTiltaksinstans(
+			gjennomforingService.upsertGjennomforing(
 				arenaId = newFields.TILTAKGJENNOMFORING_ID.toInt(),
 				tiltakId = tiltak.id,
 				arrangorId = arrangor.id,

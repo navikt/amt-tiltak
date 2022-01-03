@@ -55,11 +55,11 @@ CREATE TABLE tiltak
     modified_at timestamp with time zone default current_timestamp
 );
 
-CREATE TYPE tiltaksinstans_status AS ENUM (
+CREATE TYPE gjennomforing_status AS ENUM (
     'GJENNOMFORES', 'AVSLUTTET', 'IKKE_STARTET'
     );
 
-CREATE TABLE tiltaksinstans
+CREATE TABLE gjennomforing
 (
     id                   uuid PRIMARY KEY,
     arena_id             integer                  not null unique,
@@ -93,7 +93,7 @@ CREATE TABLE deltaker
 (
     id                uuid PRIMARY KEY,
     bruker_id         uuid not null references bruker (id),
-    tiltaksinstans_id uuid not null references tiltaksinstans (id),
+    gjennomforing_id uuid not null references gjennomforing (id),
     oppstart_dato     date,
     slutt_dato        date,
     status            varchar,

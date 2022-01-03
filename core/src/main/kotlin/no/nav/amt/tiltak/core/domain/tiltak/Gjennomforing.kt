@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-data class TiltakInstans(
+data class Gjennomforing(
 	val id: UUID,
 	val tiltak: Tiltak,
 	val arrangorId: UUID,
