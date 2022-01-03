@@ -7,7 +7,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.deltaker.repository.GetDeltakerDetaljerQuery
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import org.slf4j.LoggerFactory
@@ -49,9 +48,9 @@ class DeltakerDetaljerRepositoryTest : FunSpec({
 		deltakerDetaljer.oppstartDato shouldBe LocalDate.now().minusDays(1)
 		deltakerDetaljer.sluttDato shouldBe LocalDate.now().plusDays(1)
 		deltakerDetaljer.status shouldBe Deltaker.Status.GJENNOMFORES
-		deltakerDetaljer.tiltakInstansId shouldBe UUID.fromString("b3420940-5479-48c8-b2fa-3751c7a33aa2")
-		deltakerDetaljer.tiltakInstansOppstartDato shouldBe LocalDate.now()
-		deltakerDetaljer.tiltakInstansSluttDato shouldBe LocalDate.now()
+		deltakerDetaljer.gjennomforingId shouldBe UUID.fromString("b3420940-5479-48c8-b2fa-3751c7a33aa2")
+		deltakerDetaljer.gjennomforingOppstartDato shouldBe LocalDate.now()
+		deltakerDetaljer.gjennomforingSluttDato shouldBe LocalDate.now()
 		deltakerDetaljer.tiltakNavn shouldBe "Tiltak1"
 		deltakerDetaljer.tiltakKode shouldBe "AMO"
 	}

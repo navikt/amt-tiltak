@@ -1,19 +1,19 @@
 package no.nav.amt.tiltak.tiltak.dto
 
-import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import java.time.LocalDate
 import java.util.*
 
-data class TiltakInstansDto(
+data class GjennomforingDto(
 	val id: UUID,
 	val navn: String,
 	val oppstartdato: LocalDate?,
 	val sluttdato: LocalDate?,
-	val status: TiltakInstans.Status?,
+	val status: Gjennomforing.Status?,
 	val tiltak: TiltakDto
 )
 
-fun TiltakInstans.toDto() = TiltakInstansDto(
+fun Gjennomforing.toDto() = GjennomforingDto(
 	id = this.id,
 	navn = this.navn,
 	oppstartdato = this.oppstartDato,

@@ -25,7 +25,7 @@ open class DeltakerRepository(
 			brukerEtternavn = rs.getString("etternavn"),
 			startDato = rs.getDate("oppstart_dato")?.toLocalDate(),
 			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
-			tiltakInstansId = UUID.fromString(rs.getString("tiltaksinstans_id")),
+			gjennomforingId = UUID.fromString(rs.getString("gjennomforing_id")),
 			dagerPerUke = rs.getInt("dager_per_uke"),
 			prosentStilling = rs.getFloat("prosent_stilling"),
 			status = Deltaker.Status.valueOf(statusString),
@@ -37,7 +37,7 @@ open class DeltakerRepository(
 
 	fun insert(
 		brukerId: UUID,
-		tiltaksgjennomforingId: UUID,
+		gjennomforingId: UUID,
 		oppstartDato: LocalDate?,
 		sluttDato: LocalDate?,
 		status: Deltaker.Status,
@@ -46,11 +46,11 @@ open class DeltakerRepository(
 		registrertDato: LocalDateTime
 	): DeltakerDbo {
 		val sql = """
-			INSERT INTO deltaker(id, bruker_id, tiltaksinstans_id, oppstart_dato, slutt_dato, status,
+			INSERT INTO deltaker(id, bruker_id, gjennomforing_id, oppstart_dato, slutt_dato, status,
 								 dager_per_uke, prosent_stilling, registrert_dato)
 			VALUES (:id,
 					:brukerId,
-					:tiltaksinstansId,
+					:gjennomforingId,
 					:oppstartsdato,
 					:sluttdato,
 					:status,
@@ -65,7 +65,7 @@ open class DeltakerRepository(
 			mapOf(
 				"id" to id,
 				"brukerId" to brukerId,
-				"tiltaksinstansId" to tiltaksgjennomforingId,
+				"gjennomforingId" to gjennomforingId,
 				"oppstartsdato" to oppstartDato,
 				"sluttdato" to sluttDato,
 				"status" to status.name,
@@ -78,11 +78,11 @@ open class DeltakerRepository(
 		template.update(sql, parameters)
 
 		return get(id)
-			?: throw NoSuchElementException("Deltaker $brukerId finnes ikke på tiltaksgjennomføring $tiltaksgjennomforingId")
+			?: throw NoSuchElementException("Deltaker $brukerId finnes ikke på tiltaksgjennomføring $gjennomforingId")
 
 	}
 
-	fun getDeltakerePaaTiltakInstans(id: UUID): List<DeltakerDbo> {
+	fun getDeltakerePaaTiltak(id: UUID): List<DeltakerDbo> {
 		val sql = """
 			SELECT deltaker.*,
 				bruker.fodselsnummer,
@@ -90,11 +90,11 @@ open class DeltakerRepository(
 				bruker.etternavn
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
-			WHERE deltaker.tiltaksinstans_id = :tiltaksinstans_id
+			WHERE deltaker.gjennomforing_id = :gjennomforing_id
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
-			mapOf("tiltaksinstans_id" to id)
+			mapOf("gjennomforing_id" to id)
 		)
 
 		return template.query(sql, parameters, rowMapper)
@@ -123,7 +123,7 @@ open class DeltakerRepository(
 		template.update(sql, parameters)
 
 		return get(deltaker.id)
-			?: throw NoSuchElementException("Deltaker ${deltaker.id} finnes ikke på tiltaksgjennomføring ${deltaker.tiltakInstansId}")
+			?: throw NoSuchElementException("Deltaker ${deltaker.id} finnes ikke på tiltaksgjennomføring ${deltaker.gjennomforingId}")
 	}
 
 	fun get(id: UUID): DeltakerDbo? {
@@ -147,7 +147,7 @@ open class DeltakerRepository(
 			.firstOrNull()
 	}
 
-	fun get(brukerId: UUID, tiltaksinstansId: UUID): DeltakerDbo? {
+	fun get(brukerId: UUID, gjennomforingId: UUID): DeltakerDbo? {
 		val sql = """
 			SELECT deltaker.*,
 				   bruker.fodselsnummer,
@@ -156,13 +156,13 @@ open class DeltakerRepository(
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 			WHERE bruker.id = :brukerId
-				AND deltaker.tiltaksinstans_id = :tiltaksinstansId
+				AND deltaker.gjennomforing_id = :gjennomforingId
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
 				"brukerId" to brukerId,
-				"tiltaksinstansId" to tiltaksinstansId
+				"gjennomforingId" to gjennomforingId
 			)
 		)
 
@@ -170,7 +170,7 @@ open class DeltakerRepository(
 			.firstOrNull()
 	}
 
-	fun get(fodselsnummer: String, tiltaksinstansId: UUID): DeltakerDbo? {
+	fun get(fodselsnummer: String, gjennomforingId: UUID): DeltakerDbo? {
 		val sql = """
 			SELECT deltaker.id,
 				   deltaker.bruker_id,
@@ -179,7 +179,7 @@ open class DeltakerRepository(
 				   bruker.etternavn,
 				   deltaker.oppstart_dato,
 				   deltaker.slutt_dato,
-				   deltaker.tiltaksinstans_id,
+				   deltaker.gjennomforing_id,
 				   deltaker.dager_per_uke,
 				   deltaker.prosent_stilling,
 				   deltaker.status,
@@ -189,13 +189,13 @@ open class DeltakerRepository(
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 			WHERE bruker.fodselsnummer = :bruker_fodselsnummer
-				AND deltaker.tiltaksinstans_id = :tiltaksinstansId
+				AND deltaker.gjennomforing_id = :gjennomforingId
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
 				"bruker_fodselsnummer" to fodselsnummer,
-				"tiltaksinstansId" to tiltaksinstansId
+				"gjennomforingId" to gjennomforingId
 			)
 		)
 

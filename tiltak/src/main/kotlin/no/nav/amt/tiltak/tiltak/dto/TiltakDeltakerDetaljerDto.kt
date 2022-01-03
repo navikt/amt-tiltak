@@ -17,7 +17,7 @@ data class TiltakDeltakerDetaljerDto(
     val startdato: LocalDate?,
     val sluttdato: LocalDate?,
     val status: Deltaker.Status?,
-    val tiltakInstans: TiltakInstansDto
+    val gjennomforing: GjennomforingDto
 )
 
 data class NavKontorDTO(

@@ -8,7 +8,7 @@ import java.util.*
 interface DeltakerService {
 
 	fun addUpdateDeltaker(
-		tiltaksinstans: UUID,
+		gjennomforingId: UUID,
 		fodselsnummer: String,
 		oppstartDato: LocalDate?,
 		sluttDato: LocalDate?,
@@ -18,7 +18,7 @@ interface DeltakerService {
 		registrertDato: LocalDateTime
 	): Deltaker
 
-	fun hentDeltakerePaaTiltakInstans(id: UUID): List<Deltaker>
+	fun hentDeltakerePaaTiltak(id: UUID): List<Deltaker>
 
 	fun hentDeltaker(deltakerId: UUID): Deltaker
 

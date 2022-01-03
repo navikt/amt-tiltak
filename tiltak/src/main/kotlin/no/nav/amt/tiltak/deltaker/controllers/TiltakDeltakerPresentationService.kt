@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.deltaker.controllers
 
-import no.nav.amt.tiltak.deltaker.repository.DeltakerDetaljerDbo
-import no.nav.amt.tiltak.deltaker.repository.GetDeltakerDetaljerQuery
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerDetaljerDbo
+import no.nav.amt.tiltak.deltaker.repositories.GetDeltakerDetaljerQuery
 import no.nav.amt.tiltak.tiltak.dto.*
 import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -46,12 +46,12 @@ open class TiltakDeltakerPresentationService(
 			startdato = oppstartDato,
 			sluttdato = sluttDato,
 			status = status,
-			tiltakInstans = TiltakInstansDto(
-				id = tiltakInstansId,
-				navn = tiltakInstansNavn,
-				oppstartdato = tiltakInstansOppstartDato,
-				sluttdato = tiltakInstansSluttDato,
-				status = tiltakInstansStatus,
+			gjennomforing = GjennomforingDto(
+				id = gjennomforingId,
+				navn = gjennomforingNavn,
+				oppstartdato = gjennomforingOppstartDato,
+				sluttdato = gjennomforingSluttDato,
+				status = gjennomforingStatus,
 				tiltak = TiltakDto(
 					tiltaksnavn = tiltakNavn,
 					tiltakskode = tiltakKode

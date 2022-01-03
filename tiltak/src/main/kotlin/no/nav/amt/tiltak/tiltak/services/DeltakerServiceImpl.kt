@@ -25,7 +25,7 @@ open class DeltakerServiceImpl(
 ) : DeltakerService {
 
 	override fun addUpdateDeltaker(
-		tiltaksinstans: UUID,
+		gjennomforingId: UUID,
 		fodselsnummer: String,
 		oppstartDato: LocalDate?,
 		sluttDato: LocalDate?,
@@ -35,7 +35,7 @@ open class DeltakerServiceImpl(
 		registrertDato: LocalDateTime
 	): Deltaker {
 
-		deltakerRepository.get(fodselsnummer, tiltaksinstans)?.also { deltaker ->
+		deltakerRepository.get(fodselsnummer, gjennomforingId)?.also { deltaker ->
 			val updated = deltaker.update(
 				newStatus = status,
 				newDeltakerStartDato = oppstartDato,
@@ -51,7 +51,7 @@ open class DeltakerServiceImpl(
 
 		return createDeltaker(
 			fodselsnummer,
-			tiltaksinstans,
+			gjennomforingId,
 			oppstartDato,
 			sluttDato,
 			status,
@@ -64,7 +64,7 @@ open class DeltakerServiceImpl(
 
 	private fun createDeltaker(
 		fodselsnummer: String,
-		tiltaksinstans: UUID,
+		gjennomforingId: UUID,
 		oppstartDato: LocalDate?,
 		sluttDato: LocalDate?,
 		status: Deltaker.Status,
@@ -76,7 +76,7 @@ open class DeltakerServiceImpl(
 
 		return deltakerRepository.insert(
 			brukerId = bruker.id,
-			tiltaksgjennomforingId = tiltaksinstans,
+			gjennomforingId = gjennomforingId,
 			oppstartDato = oppstartDato,
 			sluttDato = sluttDato,
 			status = status,
@@ -86,8 +86,8 @@ open class DeltakerServiceImpl(
 		).toDeltaker()
 	}
 
-	override fun hentDeltakerePaaTiltakInstans(id: UUID): List<Deltaker> {
-		return deltakerRepository.getDeltakerePaaTiltakInstans(id).map { it.toDeltaker() }
+	override fun hentDeltakerePaaTiltak(id: UUID): List<Deltaker> {
+		return deltakerRepository.getDeltakerePaaTiltak(id).map { it.toDeltaker() }
 	}
 
 	override fun hentDeltaker(deltakerId: UUID): Deltaker {
