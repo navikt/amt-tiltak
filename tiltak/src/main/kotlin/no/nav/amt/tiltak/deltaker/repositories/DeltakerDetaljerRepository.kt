@@ -41,6 +41,9 @@ class GetDeltakerDetaljerQuery(
 
 	private val sql = """
 		SELECT deltaker.id                  AS deltaker_id,
+			   deltaker.oppstart_dato       AS oppstart_dato,
+			   deltaker.slutt_dato          AS slutt_dato,
+			   deltaker.status              AS status,
 			   bruker.fornavn               AS fornavn,
 			   bruker.mellomnavn            AS mellomnavn,
 			   bruker.etternavn             AS etternavn,
@@ -50,9 +53,6 @@ class GetDeltakerDetaljerQuery(
 			   nav_ansatt.navn           	AS veileder_navn,
 			   nav_ansatt.telefonnummer     AS veileder_telefonnummer,
 			   nav_ansatt.epost             AS veileder_epost,
-			   deltaker.oppstart_dato       AS oppstart_dato,
-			   deltaker.slutt_dato          AS slutt_dato,
-			   deltaker.status              AS status,
 			   gjennomforing.id            AS gjennomforing_id,
 			   gjennomforing.navn          AS gjennomforing_navn,
 			   gjennomforing.oppstart_dato AS gjennomforing_oppstart_dato,
