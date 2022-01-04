@@ -79,6 +79,6 @@ private data class StatusDates(
 
 	fun startDatoPassert() = start?.isBefore(LocalDate.now()) ?: false
 	fun sluttDatoPassert() = end?.isBefore(LocalDate.now()) ?: false
-	fun endretEtterStartDato() = datoStatusEndring?.isAfter(start) ?: false
+	fun endretEtterStartDato() = start != null && datoStatusEndring?.isAfter(start) ?: false
 
 }
