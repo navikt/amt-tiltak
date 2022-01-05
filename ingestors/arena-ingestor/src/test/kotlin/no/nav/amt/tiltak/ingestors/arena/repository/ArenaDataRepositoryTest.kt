@@ -119,14 +119,17 @@ internal class ArenaDataRepositoryTest {
 	fun `markAsFailed() should mark data as failed`() {
 
 		val uningestedArenaData = arenaDataRepository.getById(4)
-
 		assertEquals(IngestStatus.RETRY, uningestedArenaData.ingestStatus)
 
+		val beforeLastRetry = LocalDateTime.now()
 		arenaDataRepository.upsert(uningestedArenaData.markAsFailed())
 
 		val failedArenaData = arenaDataRepository.getById(4)
 
 		assertEquals(IngestStatus.FAILED, failedArenaData.ingestStatus)
+		assertEquals(uningestedArenaData.ingestAttempts + 1, failedArenaData.ingestAttempts)
+		assertTrue(failedArenaData.lastRetry!!.isAfter(beforeLastRetry))
+
 	}
 
 	@Test
