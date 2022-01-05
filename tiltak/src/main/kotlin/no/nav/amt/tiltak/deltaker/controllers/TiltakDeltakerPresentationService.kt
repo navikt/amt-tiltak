@@ -43,8 +43,9 @@ open class TiltakDeltakerPresentationService(
 				"Test gata 1337, 1337 Oslo"
 			),
 			navVeileder = veileder,
-			startdato = oppstartDato,
+			oppstartdato = oppstartDato,
 			sluttdato = sluttDato,
+			registrertDato = registrertDato,
 			status = status,
 			gjennomforing = GjennomforingDto(
 				id = gjennomforingId,

@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.deltaker.dbo
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 data class DeltakerDetaljerDbo(
@@ -18,6 +19,7 @@ data class DeltakerDetaljerDbo(
 	val veilederEpost: String?,
 	val oppstartDato: LocalDate?,
 	val sluttDato: LocalDate?,
+	val registrertDato: LocalDateTime,
 	val status: Deltaker.Status?,
 	val gjennomforingId: UUID,
 	val gjennomforingNavn: String,

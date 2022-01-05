@@ -1,11 +1,11 @@
 package no.nav.amt.tiltak.deltaker
 
+import no.nav.amt.tiltak.deltaker.controllers.TiltakDeltakerController
+import no.nav.amt.tiltak.deltaker.controllers.TiltakDeltakerPresentationService
+import no.nav.amt.tiltak.tiltak.dto.GjennomforingDto
 import no.nav.amt.tiltak.tiltak.dto.NavKontorDTO
 import no.nav.amt.tiltak.tiltak.dto.TiltakDeltakerDetaljerDto
 import no.nav.amt.tiltak.tiltak.dto.TiltakDto
-import no.nav.amt.tiltak.tiltak.dto.GjennomforingDto
-import no.nav.amt.tiltak.deltaker.controllers.TiltakDeltakerController
-import no.nav.amt.tiltak.deltaker.controllers.TiltakDeltakerPresentationService
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import java.time.LocalDateTime
 import java.util.*
 
 @ActiveProfiles("test")
@@ -73,8 +74,9 @@ class TiltakDeltakerControllerTest {
 					adresse = ""
 				),
 				navVeileder = null,
-				startdato = null,
+				oppstartdato = null,
 				sluttdato = null,
+				registrertDato = LocalDateTime.now(),
 				status = null,
 				gjennomforing = GjennomforingDto(
 					id = UUID.randomUUID(),
