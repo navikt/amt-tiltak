@@ -42,8 +42,8 @@ internal open class GjennomforingProcessor(
 			return
 		}
 
-		if (newFields.ARBGIV_ID_ARRANGOR == null) {
-			log.info("Hopper over upsert av tiltakgjennomforing som mangler ARBGIV_ID_ARRANGOR. arenaTiltakgjennomforingId=${newFields.TILTAKGJENNOMFORING_ID}")
+		if (ugyldigGjennomforing(newFields)) {
+			log.info("Hopper over upsert av tiltakgjennomforing som mangler data. arenaTiltakgjennomforingId=${newFields.TILTAKGJENNOMFORING_ID}")
 			repository.upsert(data.markAsIgnored())
 			return
 		}
@@ -59,8 +59,7 @@ internal open class GjennomforingProcessor(
 			arenaId = newFields.TILTAKGJENNOMFORING_ID.toInt(),
 			tiltakId = tiltak.id,
 			arrangorId = arrangor.id,
-			navn = newFields.LOKALTNAVN
-				?: throw DataIntegrityViolationException("Forventet at LOKALTNAVN ikke er null"),
+			navn = newFields.LOKALTNAVN.toString(),
 			status = null,
 			oppstartDato = newFields.DATO_FRA?.asLocalDate(),
 			sluttDato = newFields.DATO_TIL?.asLocalDate(),
@@ -76,5 +75,8 @@ internal open class GjennomforingProcessor(
 		log.error("Delete is not implemented for TiltaksgjennomforingProcessor")
 		repository.upsert(data.markAsFailed())
 	}
+
+	private fun ugyldigGjennomforing(data: ArenaTiltaksgjennomforing) =
+		data.ARBGIV_ID_ARRANGOR == null || data.LOKALTNAVN == null
 
 }
