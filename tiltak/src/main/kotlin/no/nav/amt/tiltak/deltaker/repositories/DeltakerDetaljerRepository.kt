@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.deltaker.repositories
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDetaljerDbo
+import no.nav.amt.tiltak.utils.getLocalDateTime
 import no.nav.amt.tiltak.utils.getNullableLocalDate
 import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
@@ -28,6 +29,7 @@ class GetDeltakerDetaljerQuery(
 			veilederEpost = rs.getString("veileder_epost"),
 			oppstartDato = rs.getNullableLocalDate("oppstart_dato"),
 			sluttDato = rs.getNullableLocalDate("slutt_dato"),
+			registrertDato = rs.getLocalDateTime("registrert_dato"),
 			status = rs.getString("status")?.let { Deltaker.Status.valueOf(it) },
 			gjennomforingId = rs.getUUID("gjennomforing_id"),
 			gjennomforingNavn = rs.getString("gjennomforing_navn"),
@@ -44,6 +46,7 @@ class GetDeltakerDetaljerQuery(
 			   deltaker.oppstart_dato       AS oppstart_dato,
 			   deltaker.slutt_dato          AS slutt_dato,
 			   deltaker.status              AS status,
+			   deltaker.registrert_dato     AS registrert_dato,
 			   bruker.fornavn               AS fornavn,
 			   bruker.mellomnavn            AS mellomnavn,
 			   bruker.etternavn             AS etternavn,
