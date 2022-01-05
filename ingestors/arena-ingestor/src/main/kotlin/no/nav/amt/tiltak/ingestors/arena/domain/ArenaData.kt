@@ -22,7 +22,11 @@ internal data class ArenaData(
 		ingestedTimestamp = LocalDateTime.now()
 	)
 
-	fun markAsFailed() = this.copy(ingestStatus = IngestStatus.FAILED)
+	fun markAsFailed() = this.copy(
+		ingestStatus = IngestStatus.FAILED,
+		ingestAttempts = ingestAttempts + 1,
+		lastRetry = LocalDateTime.now()
+	)
 
 	fun retry() = this.copy(
 		ingestStatus = IngestStatus.RETRY,
