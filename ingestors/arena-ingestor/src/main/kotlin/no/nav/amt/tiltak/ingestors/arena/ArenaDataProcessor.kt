@@ -38,14 +38,10 @@ internal open class ArenaDataProcessor(
 	}
 
 	private fun processMessages(getter: () -> List<ArenaData>) {
-		var messages: List<ArenaData>
-
-		do {
-			val start = Instant.now()
-			messages = getter()
-			messages.forEach { processMessage(it) }
-			log(start, messages)
-		} while (messages.isNotEmpty())
+		val messages = getter()
+		val start = Instant.now()
+		messages.forEach { processMessage(it) }
+		log(start, messages)
 	}
 
 	private fun log(start: Instant, messages: List<ArenaData>) {
