@@ -4,16 +4,18 @@ import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.NavKontorService
+import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
-import no.nav.amt.tiltak.test.database.DatabaseTestUtils
-import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.NavAnsattRepository
+import no.nav.amt.tiltak.deltaker.repositories.NavKontorRepository
+import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import no.nav.amt.tiltak.tiltak.services.DeltakerServiceImpl
@@ -60,6 +62,8 @@ class GjennomforingControllerIntegrationTest {
 			deltakerRepository,
 			brukerRepository,
 			mock(NavAnsattRepository::class.java),
+			mock(NavKontorRepository::class.java),
+			mock(NavKontorService::class.java),
 			mock(PersonService::class.java)
 		);
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, TiltakServiceImpl(tiltakRepository))
@@ -109,7 +113,7 @@ class GjennomforingControllerIntegrationTest {
 		val tiltak = tiltakRepository.insert((1000..9999).random().toString(), tiltakKode, tiltakKode)
 
 		val gjennomforing = insertGjennomforing(tiltak.id, arrangorId)
-		val bruker1 = BrukerInsertDbo("12128673847", "Person", "En", "To", "123", epost, null)
+		val bruker1 = BrukerInsertDbo("12128673847", "Person", "En", "To", "123", epost, null, null)
 		val startDato = LocalDate.now().minusDays(5)
 		val sluttDato = LocalDate.now().plusDays(3)
 		val regDato = LocalDateTime.now().minusDays(10)
@@ -135,11 +139,23 @@ class GjennomforingControllerIntegrationTest {
 		val tiltak = tiltakRepository.insert((1000..9999).random().toString(), tiltakKode, tiltakKode)
 
 		val gjennomforing = insertGjennomforing(tiltak.id, arrangorId)
-		val bruker1 = BrukerInsertDbo("12128673847", "Person", "En", "To", "123", epost, null)
-		val bruker2 = BrukerInsertDbo("12128674909", "Person", "En", "To", "123", epost, null)
+		val bruker1 = BrukerInsertDbo("12128673847", "Person", "En", "To", "123", epost, null, null)
+		val bruker2 = BrukerInsertDbo("12128674909", "Person", "En", "To", "123", epost, null, null)
 
-		insertDeltaker(gjennomforing.id, bruker1, LocalDate.now().minusDays(3), LocalDate.now().plusDays(1), LocalDateTime.now().minusDays(10))
-		insertDeltaker(gjennomforing.id, bruker2, LocalDate.now().minusDays(3), LocalDate.now().plusDays(1), LocalDateTime.now().minusDays(10))
+		insertDeltaker(
+			gjennomforing.id,
+			bruker1,
+			LocalDate.now().minusDays(3),
+			LocalDate.now().plusDays(1),
+			LocalDateTime.now().minusDays(10)
+		)
+		insertDeltaker(
+			gjennomforing.id,
+			bruker2,
+			LocalDate.now().minusDays(3),
+			LocalDate.now().plusDays(1),
+			LocalDateTime.now().minusDays(10)
+		)
 
 		val deltakere = controller.hentDeltakere(gjennomforing.id)
 		val deltaker1 = deltakere.get(0)
@@ -150,7 +166,13 @@ class GjennomforingControllerIntegrationTest {
 		deltaker2.fodselsnummer shouldBe bruker2.fodselsnummer
 	}
 
-	private fun insertDeltaker(gjennomforingId: UUID, bruker: BrukerInsertDbo, startDato: LocalDate, sluttDato: LocalDate, regDato: LocalDateTime): DeltakerDbo {
+	private fun insertDeltaker(
+		gjennomforingId: UUID,
+		bruker: BrukerInsertDbo,
+		startDato: LocalDate,
+		sluttDato: LocalDate,
+		regDato: LocalDateTime
+	): DeltakerDbo {
 		val bruker = brukerRepository.insert(bruker)
 		return deltakerRepository.insert(
 			brukerId = bruker.id,

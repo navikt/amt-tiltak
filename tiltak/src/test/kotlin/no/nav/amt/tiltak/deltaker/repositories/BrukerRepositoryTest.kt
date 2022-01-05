@@ -36,7 +36,7 @@ class BrukerRepositoryTest : FunSpec({
 		val telefonnummer = "74635462"
 		val epost = "per.testersen@test.no"
 		val ansvarligVeilederId = UUID.fromString("4118216f-b46d-44a1-90c5-d0732e861d6e")
-		val bruker = BrukerInsertDbo(fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarligVeilederId)
+		val bruker = BrukerInsertDbo(fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarligVeilederId, null)
 		val dbo = repository.insert(bruker)
 
 		dbo shouldNotBe null
