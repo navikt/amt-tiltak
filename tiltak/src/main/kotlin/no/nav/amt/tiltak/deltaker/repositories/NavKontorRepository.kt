@@ -42,8 +42,7 @@ open class NavKontorRepository(
 		)
 
 		template.update(sql, parameters)
-
-		return get(id)
+		return getByEnhetId(enhetId)
 	}
 
 	fun get(id: UUID): NavKontorDbo {
@@ -51,7 +50,14 @@ open class NavKontorRepository(
 			"SELECT * FROM nav_kontor WHERE id = :id",
 			MapSqlParameterSource().addValues(mapOf("id" to id)),
 			rowMapper
-		).firstOrNull() ?: throw NoSuchElementException("kontor med id $id eksisterer ikke")
+		).firstOrNull() ?: throw NoSuchElementException("Kontor med id $id eksisterer ikke.")
 	}
 
+	private fun getByEnhetId(enhetId: String): NavKontorDbo {
+		return template.query(
+			"SELECT * FROM nav_kontor WHERE enhet_id = :enhetId",
+			MapSqlParameterSource().addValues(mapOf("enhetId" to enhetId)),
+			rowMapper
+		).firstOrNull() ?: throw NoSuchElementException("Kontor med enhetId $enhetId eksisterer ikke.")
+	}
 }
