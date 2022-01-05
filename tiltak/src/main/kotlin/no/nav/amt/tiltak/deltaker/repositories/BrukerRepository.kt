@@ -34,8 +34,8 @@ open class BrukerRepository(
 
     fun insert(bruker: BrukerInsertDbo): BrukerDbo {
 
-        val sql = """
-			INSERT INTO bruker(id, fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id)
+		val sql = """
+			INSERT INTO bruker(id, fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_kontor_id)
 			VALUES (:id,
 					:fodselsnummer,
 					:fornavn,
@@ -43,7 +43,8 @@ open class BrukerRepository(
 					:etternavn,
 					:telefonnummer,
 					:epost,
-					:veileder_id)
+					:veileder_id,
+					:nav_kontor_id)
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
@@ -55,7 +56,8 @@ open class BrukerRepository(
                 "etternavn" to bruker.etternavn,
                 "telefonnummer" to bruker.telefonnummer,
                 "epost" to bruker.epost,
-                "veileder_id" to bruker.ansvarligVeilederId
+                "veileder_id" to bruker.ansvarligVeilederId,
+				"nav_kontor_id" to bruker.navKontorId
             )
         )
 
