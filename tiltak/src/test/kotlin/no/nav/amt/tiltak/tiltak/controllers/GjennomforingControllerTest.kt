@@ -2,9 +2,9 @@ package no.nav.amt.tiltak.tiltak.controllers
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
-import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.TiltakInstansService
+import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
@@ -24,12 +24,12 @@ import java.time.LocalDateTime
 import java.util.*
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [no.nav.amt.tiltak.tiltak.controllers.TiltakInstansController::class])
-class TiltakInstansControllerTest {
-	private val tiltakInstansId = UUID.fromString("e68d54e2-47b5-11ec-81d3-0242ac130003")
+@WebMvcTest(controllers = [GjennomforingController::class])
+class GjennomforingControllerTest {
+	private val gjennomforingId = UUID.fromString("e68d54e2-47b5-11ec-81d3-0242ac130003")
 
 	@MockBean
-	private lateinit var tiltakInstansService: TiltakInstansService
+	private lateinit var gjennomforingService: GjennomforingService
 
 	@MockBean
 	private lateinit var deltakerService: DeltakerService
@@ -42,7 +42,7 @@ class TiltakInstansControllerTest {
 		navn = "tiltaksnavn",
 		kode = "kode"
 	)
-	val tiltakInstans = TiltakInstans(
+	val gjennomforing = Gjennomforing(
 		id = UUID.randomUUID(),
 		tiltak = tiltak,
 		arrangorId = UUID.randomUUID(),
@@ -51,7 +51,7 @@ class TiltakInstansControllerTest {
 		oppstartDato = LocalDate.now(),
 		registrertDato = LocalDateTime.now(),
 		sluttDato = LocalDate.now(),
-		status = TiltakInstans.Status.GJENNOMFORES,
+		status = Gjennomforing.Status.GJENNOMFORES,
 	)
 
 	@BeforeEach
@@ -75,9 +75,9 @@ class TiltakInstansControllerTest {
 	}
 
 	@Test
-	fun `hentTiltakInstanserByArrangorId() should return 401 when not authenticated`() {
+	fun `hentGjennomforingerByArrangorId() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltak-instans")
+			MockMvcRequestBuilders.get("/api/gjennomforing")
 				.queryParam("arrangorId", "test")
 		).andReturn().response
 
@@ -85,11 +85,11 @@ class TiltakInstansControllerTest {
 	}
 
 	@Test
-	fun `hentTiltakInstanserByArrangorId() should return 200 when authenticated`() {
+	fun `hentGjennomforingerByArrangorId() should return 200 when authenticated`() {
 		val token = server.issueToken("tokenx", "test", "test").serialize()
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltak-instans")
+			MockMvcRequestBuilders.get("/api/gjennomforing")
 				.queryParam("arrangorId", UUID.randomUUID().toString())
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
@@ -98,21 +98,21 @@ class TiltakInstansControllerTest {
 	}
 
 	@Test
-	fun `hentTiltakInstans() should return 401 when not authenticated`() {
+	fun `hentGjennomforing() should return 401 when not authenticated`() {
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltak-instans/$tiltakInstansId")
+			MockMvcRequestBuilders.get("/api/gjennomforing/$gjennomforingId")
 		).andReturn().response
 
 		assertEquals(401, response.status)
 	}
 
 	@Test
-	fun `hentTiltakInstans() should return 200 when authenticated`() {
-		Mockito.`when`(tiltakInstansService.getTiltakInstans(tiltakInstansId)).thenReturn(tiltakInstans)
+	fun `hentGjennomforinger() should return 200 when authenticated`() {
+		Mockito.`when`(gjennomforingService.getGjennomforing(gjennomforingId)).thenReturn(gjennomforing)
 		val token = server.issueToken("tokenx", "test", "test").serialize()
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltak-instans/$tiltakInstansId")
+			MockMvcRequestBuilders.get("/api/gjennomforing/$gjennomforingId")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
@@ -122,7 +122,7 @@ class TiltakInstansControllerTest {
 	@Test
 	fun `hentDeltakere() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltak-instans/ID/deltakere")
+			MockMvcRequestBuilders.get("/api/gjennomforing/ID/deltakere")
 		).andReturn().response
 
 		assertEquals(401, response.status)
@@ -136,21 +136,21 @@ class TiltakInstansControllerTest {
 			brukerFodselsnummer = "12129312375",
 			brukerFornavn = "Fornavn",
 			brukerEtternavn = "Etternavn",
-			tiltakInstansId = tiltakInstansId,
+			gjennomforingId = gjennomforingId,
 			startDato = LocalDate.now(),
 			sluttDato = LocalDate.now(),
-			arenaStatus = "status",
 			dagerPerUke = 1,
 			prosentStilling = 10.343f,
 			status = Deltaker.Status.GJENNOMFORES,
 			createdAt = LocalDateTime.now(),
-			modifiedAt = LocalDateTime.now()
+			modifiedAt = LocalDateTime.now(),
+			registrertDato = LocalDateTime.now()
 		).toDeltaker()
-		Mockito.`when`(deltakerService.hentDeltakerePaaTiltakInstans(tiltakInstansId)).thenReturn(listOf(deltaker))
+		Mockito.`when`(deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)).thenReturn(listOf(deltaker))
 		val token = server.issueToken("tokenx", "test", "test").serialize()
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltak-instans/$tiltakInstansId/deltakere")
+			MockMvcRequestBuilders.get("/api/gjennomforing/$gjennomforingId/deltakere")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 

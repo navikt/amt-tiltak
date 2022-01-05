@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.tiltak.dto
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 data class TiltakDeltakerDto(
@@ -12,7 +13,8 @@ data class TiltakDeltakerDto(
 	val fodselsnummer: String,
 	val oppstartdato: LocalDate?,
 	val sluttdato: LocalDate?,
-	val status: Deltaker.Status?
+	val status: Deltaker.Status?,
+	val registrertDato: LocalDateTime
 )
 
 fun Deltaker.toDto() = TiltakDeltakerDto(
@@ -22,5 +24,6 @@ fun Deltaker.toDto() = TiltakDeltakerDto(
 	fodselsnummer = fodselsnummer,
 	oppstartdato = oppstartdato,
 	sluttdato = sluttdato,
-	status = status
+	status = status,
+	registrertDato = registrertDato
 )

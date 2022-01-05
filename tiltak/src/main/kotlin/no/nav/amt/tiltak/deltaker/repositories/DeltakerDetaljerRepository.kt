@@ -1,13 +1,13 @@
-package no.nav.amt.tiltak.deltaker.repository
+package no.nav.amt.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerDetaljerDbo
 import no.nav.amt.tiltak.utils.getNullableLocalDate
 import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.time.LocalDate
 import java.util.*
 
 class GetDeltakerDetaljerQuery(
@@ -29,11 +29,11 @@ class GetDeltakerDetaljerQuery(
 			oppstartDato = rs.getNullableLocalDate("oppstart_dato"),
 			sluttDato = rs.getNullableLocalDate("slutt_dato"),
 			status = rs.getString("status")?.let { Deltaker.Status.valueOf(it) },
-			tiltakInstansId = rs.getUUID("tiltak_instans_id"),
-			tiltakInstansNavn = rs.getString("tiltak_instans_navn"),
-			tiltakInstansOppstartDato = rs.getNullableLocalDate("tiltak_instans_oppstart_dato"),
-			tiltakInstansSluttDato = rs.getNullableLocalDate("tiltak_instans_slutt_dato"),
-			tiltakInstansStatus = rs.getString("tiltak_instans_status")?.let { TiltakInstans.Status.valueOf(it) },
+			gjennomforingId = rs.getUUID("gjennomforing_id"),
+			gjennomforingNavn = rs.getString("gjennomforing_navn"),
+			gjennomforingOppstartDato = rs.getNullableLocalDate("gjennomforing_oppstart_dato"),
+			gjennomforingSluttDato = rs.getNullableLocalDate("gjennomforing_slutt_dato"),
+			gjennomforingStatus = rs.getString("gjennomforing_status")?.let { Gjennomforing.Status.valueOf(it) },
 			tiltakNavn = rs.getString("tiltak_navn"),
 			tiltakKode = rs.getString("tiltak_kode"),
 		)
@@ -41,6 +41,9 @@ class GetDeltakerDetaljerQuery(
 
 	private val sql = """
 		SELECT deltaker.id                  AS deltaker_id,
+			   deltaker.oppstart_dato       AS oppstart_dato,
+			   deltaker.slutt_dato          AS slutt_dato,
+			   deltaker.status              AS status,
 			   bruker.fornavn               AS fornavn,
 			   bruker.mellomnavn            AS mellomnavn,
 			   bruker.etternavn             AS etternavn,
@@ -50,21 +53,18 @@ class GetDeltakerDetaljerQuery(
 			   nav_ansatt.navn           	AS veileder_navn,
 			   nav_ansatt.telefonnummer     AS veileder_telefonnummer,
 			   nav_ansatt.epost             AS veileder_epost,
-			   deltaker.oppstart_dato       AS oppstart_dato,
-			   deltaker.slutt_dato          AS slutt_dato,
-			   deltaker.status              AS status,
-			   tiltaksinstans.id            AS tiltak_instans_id,
-			   tiltaksinstans.navn          AS tiltak_instans_navn,
-			   tiltaksinstans.oppstart_dato AS tiltak_instans_oppstart_dato,
-			   tiltaksinstans.slutt_dato    AS tiltak_instans_slutt_dato,
-			   tiltaksinstans.status        AS tiltak_instans_status,
+			   gjennomforing.id            AS gjennomforing_id,
+			   gjennomforing.navn          AS gjennomforing_navn,
+			   gjennomforing.oppstart_dato AS gjennomforing_oppstart_dato,
+			   gjennomforing.slutt_dato    AS gjennomforing_slutt_dato,
+			   gjennomforing.status        AS gjennomforing_status,
 			   tiltak.navn                  AS tiltak_navn,
 			   tiltak.type                  AS tiltak_kode
 		FROM deltaker
 				 LEFT JOIN bruker ON bruker.id = deltaker.bruker_id
 				 LEFT JOIN nav_ansatt ON nav_ansatt.id = bruker.ansvarlig_veileder_id
-				 LEFT JOIN tiltaksinstans ON tiltaksinstans.id = deltaker.tiltaksinstans_id
-				 LEFT JOIN tiltak ON tiltaksinstans.tiltak_id = tiltak.id
+				 LEFT JOIN gjennomforing ON gjennomforing.id = deltaker.gjennomforing_id
+				 LEFT JOIN tiltak ON gjennomforing.tiltak_id = tiltak.id
 		WHERE deltaker.id = :deltakerId
 	""".trimIndent()
 
@@ -82,27 +82,4 @@ class GetDeltakerDetaljerQuery(
 		).firstOrNull()
 	}
 }
-
-data class DeltakerDetaljerDbo(
-	val deltakerId: UUID,
-	val fornavn: String,
-	val mellomnavn: String?,
-	val etternavn: String,
-	val fodselsnummer: String,
-	val telefonnummer: String?,
-	val epost: String?,
-	val veilederNavn: String?,
-	val veilederTelefonnummer: String?,
-	val veilederEpost: String?,
-	val oppstartDato: LocalDate?,
-	val sluttDato: LocalDate?,
-	val status: Deltaker.Status?,
-	val tiltakInstansId: UUID,
-	val tiltakInstansNavn: String,
-	val tiltakInstansOppstartDato: LocalDate?,
-	val tiltakInstansSluttDato: LocalDate?,
-	val tiltakInstansStatus: TiltakInstans.Status?,
-	val tiltakNavn: String,
-	val tiltakKode: String
-)
 

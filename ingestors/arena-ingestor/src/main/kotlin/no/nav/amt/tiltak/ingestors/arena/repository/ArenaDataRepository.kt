@@ -9,7 +9,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 
 @Component
-open class ArenaDataRepository(
+internal open class ArenaDataRepository(
 	private val namedJdbcTemplate: NamedParameterJdbcTemplate
 ) {
 

@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.ingestors.arena.domain
 
-enum class IngestStatus {
+internal enum class IngestStatus {
     NEW,
     INGESTED,
     RETRY,

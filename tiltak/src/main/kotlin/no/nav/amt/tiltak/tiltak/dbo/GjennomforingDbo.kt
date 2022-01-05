@@ -1,20 +1,20 @@
 package no.nav.amt.tiltak.tiltak.dbo
 
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
-import no.nav.amt.tiltak.core.domain.tiltak.TiltakInstans
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.utils.UpdateCheck
 import no.nav.amt.tiltak.utils.UpdateStatus
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-data class TiltakInstansDbo(
+data class GjennomforingDbo(
 	val id: UUID,
 	val arenaId: Int,
 	val arrangorId: UUID,
 	val tiltakId: UUID,
 	val navn: String,
-	val status: TiltakInstans.Status?,
+	val status: Gjennomforing.Status?,
 	val oppstartDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val registrertDato: LocalDateTime?,
@@ -23,8 +23,8 @@ data class TiltakInstansDbo(
 	val modifiedAt: LocalDateTime
 ) {
 
-	fun toTiltakInstans(tiltak: Tiltak): TiltakInstans {
-		return TiltakInstans(
+	fun toGjennomforing(tiltak: Tiltak): Gjennomforing {
+		return Gjennomforing(
 			id = id,
 			tiltak = tiltak,
 			arrangorId = arrangorId,
@@ -37,7 +37,7 @@ data class TiltakInstansDbo(
 		)
 	}
 
-	fun update(other: TiltakInstansDbo): UpdateCheck<TiltakInstansDbo> {
+	fun update(other: GjennomforingDbo): UpdateCheck<GjennomforingDbo> {
 		if (this != other) {
 			val updated = this.copy(
 				navn = other.navn,

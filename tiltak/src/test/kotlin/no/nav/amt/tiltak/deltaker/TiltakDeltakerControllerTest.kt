@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.deltaker
 import no.nav.amt.tiltak.tiltak.dto.NavKontorDTO
 import no.nav.amt.tiltak.tiltak.dto.TiltakDeltakerDetaljerDto
 import no.nav.amt.tiltak.tiltak.dto.TiltakDto
-import no.nav.amt.tiltak.tiltak.dto.TiltakInstansDto
+import no.nav.amt.tiltak.tiltak.dto.GjennomforingDto
 import no.nav.amt.tiltak.deltaker.controllers.TiltakDeltakerController
 import no.nav.amt.tiltak.deltaker.controllers.TiltakDeltakerPresentationService
 import no.nav.security.mock.oauth2.MockOAuth2Server
@@ -76,7 +76,7 @@ class TiltakDeltakerControllerTest {
 				startdato = null,
 				sluttdato = null,
 				status = null,
-				tiltakInstans = TiltakInstansDto(
+				gjennomforing = GjennomforingDto(
 					id = UUID.randomUUID(),
 					navn = "",
 					oppstartdato = null,

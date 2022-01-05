@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.ingestors.arena.processors
 
 import no.nav.amt.tiltak.core.port.ArenaOrdsProxyConnector
 import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.TiltakInstansService
+import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
 import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltakDeltaker
 import no.nav.amt.tiltak.ingestors.arena.exceptions.DependencyNotIngestedException
@@ -13,12 +13,13 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Component
 
 @Component
-open class DeltakerProcessor(
+internal open class DeltakerProcessor(
 	repository: ArenaDataRepository,
 	private val ignoredTiltakRepository: ArenaTiltakIgnoredRepository,
-	private val tiltakInstansService: TiltakInstansService,
+	private val gjennomforingService: GjennomforingService,
 	private val deltakerService: DeltakerService,
-	private val ords: ArenaOrdsProxyConnector
+	private val ords: ArenaOrdsProxyConnector,
+	private val statusConverter: DeltakerStatusConverter
 ) : AbstractArenaProcessor(repository) {
 
 	private val logger = LoggerFactory.getLogger(javaClass)
@@ -43,20 +44,28 @@ open class DeltakerProcessor(
 			repository.upsert(data.markAsIgnored())
 		} else {
 			val tiltaksgjennomforing =
-				tiltakInstansService.getTiltaksinstansFromArenaId(newFields.TILTAKGJENNOMFORING_ID.toInt())
+				gjennomforingService.getGjennomforingFromArenaId(newFields.TILTAKGJENNOMFORING_ID.toInt())
 					?: throw DependencyNotIngestedException("Tiltaksgjennomføring med ID ${newFields.TILTAKGJENNOMFORING_ID} er ikke ingested.")
 
 			val fodselsnummer = ords.hentFnr(newFields.PERSON_ID.toString())
 				?: throw DataIntegrityViolationException("Person med Arena ID ${newFields.PERSON_ID} returnerer ikke fødselsnummer")
 
+
+
 			deltakerService.addUpdateDeltaker(
-				tiltaksinstans = tiltaksgjennomforing.id,
+				gjennomforingId = tiltaksgjennomforing.id,
 				fodselsnummer = fodselsnummer,
 				oppstartDato = newFields.DATO_FRA?.asLocalDate(),
 				sluttDato = newFields.DATO_TIL?.asLocalDate(),
-				arenaStatus = newFields.DELTAKERSTATUSKODE,
+				status = statusConverter.convert(
+					newFields.DELTAKERSTATUSKODE,
+					newFields.DATO_FRA?.asLocalDate(),
+					newFields.DATO_TIL?.asLocalDate(),
+					newFields.DATO_STATUSENDRING?.asLocalDate()
+				),
 				dagerPerUke = newFields.ANTALL_DAGER_PR_UKE,
 				prosentStilling = newFields.PROSENT_DELTID,
+				registrertDato = newFields.REG_DATO.asLocalDateTime()
 			)
 
 			repository.upsert(data.markAsIngested())
@@ -64,3 +73,4 @@ open class DeltakerProcessor(
 
 	}
 }
+

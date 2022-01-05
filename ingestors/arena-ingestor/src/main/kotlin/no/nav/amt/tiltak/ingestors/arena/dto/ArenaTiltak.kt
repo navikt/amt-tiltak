@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.ingestors.arena.dto
 
 // @SONAR_START@
-data class ArenaTiltak(
+internal data class ArenaTiltak(
 	val TILTAKSNAVN: String, // Ex: Lønnstilskudd av lengre varighet
 	val TILTAKSGRUPPEKODE: String, // Ex: UTFAS
 	val REG_DATO: String, // Ex: 2005-12-17 11:05:03

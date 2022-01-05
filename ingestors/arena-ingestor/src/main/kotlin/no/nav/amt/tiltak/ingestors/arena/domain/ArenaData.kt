@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.ingestors.arena.domain
 
 import java.time.LocalDateTime
 
-data class ArenaData(
+internal data class ArenaData(
 	val id: Int = -1,
 	val tableName: String,
 	val operationType: OperationType,
@@ -22,7 +22,11 @@ data class ArenaData(
 		ingestedTimestamp = LocalDateTime.now()
 	)
 
-	fun markAsFailed() = this.copy(ingestStatus = IngestStatus.FAILED)
+	fun markAsFailed() = this.copy(
+		ingestStatus = IngestStatus.FAILED,
+		ingestAttempts = ingestAttempts + 1,
+		lastRetry = LocalDateTime.now()
+	)
 
 	fun retry() = this.copy(
 		ingestStatus = IngestStatus.RETRY,

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
-open class TiltakProcessor(
+internal open class TiltakProcessor(
 	repository: ArenaDataRepository,
 	private val tiltakService: TiltakService
 ) : AbstractArenaProcessor(repository) {

@@ -6,7 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import javax.sql.DataSource
 
 @Configuration
-open class DatabaseConfiguration {
+internal open class DatabaseConfiguration {
 
     @Bean
     open fun jdbcTemplate(dataSource: DataSource): JdbcTemplate {
