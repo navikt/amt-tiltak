@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.application.configuration.kafka.KafkaConfiguration
 import no.nav.amt.tiltak.application.configuration.kafka.KafkaProperties
 import no.nav.amt.tiltak.application.configuration.kafka.KafkaTopicProperties
 import no.nav.amt.tiltak.core.port.ArenaIngestor
+import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.ArenaAclIngestor
 import no.nav.common.kafka.producer.KafkaProducerClientImpl
 import no.nav.common.kafka.producer.util.ProducerUtils.toJsonProducerRecord
 import no.nav.common.kafka.util.KafkaPropertiesBuilder
@@ -32,6 +33,7 @@ class KafkaConfigurationTest {
 			arenaTiltaksgjennomforingTopic = "arena-tiltaksgjennomforing",
 			arenaTiltaksgruppeTopic = "arena-tiltaksgruppe",
 			arenaTiltakDeltakerTopic = "arena-tiltak-deltaker",
+			amtTiltakTopic = "amt-tiltak"
 		)
 
 		val kafkaProperties = object : KafkaProperties {
@@ -62,11 +64,18 @@ class KafkaConfigurationTest {
 			}
 		}
 
+		val arenaAclIngestor = object : ArenaAclIngestor {
+			override fun ingestKafkaMessageValue(messageValue: String) {
+				counter.incrementAndGet()
+			}
+		}
+
 		// Creating the config will automatically start the consumer
 		KafkaConfiguration(
 			kafkaTopicProperties,
 			kafkaProperties,
-			arenaIngestor
+			arenaIngestor,
+			arenaAclIngestor
 		)
 
 		val kafkaProducer = KafkaProducerClientImpl<String, String>(kafkaProperties.producer())
@@ -75,6 +84,7 @@ class KafkaConfigurationTest {
 		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltaksgjennomforing", "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltaksgruppe", "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltak-deltaker", "1", value))
+		kafkaProducer.sendSync(toJsonProducerRecord("amt-tiltak", "1", value))
 
 		kafkaProducer.close()
 
@@ -82,7 +92,7 @@ class KafkaConfigurationTest {
 
 		Thread.sleep(3000)
 
-		assertEquals(4, counter.get())
+		assertEquals(5, counter.get())
 	}
 
 }
