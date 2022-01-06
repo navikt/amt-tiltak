@@ -6,6 +6,9 @@ import java.util.*
 interface TiltakService {
 
 	fun getTiltakById(id: UUID): Tiltak
+
 	fun getTiltakFromArenaId(arenaId: String): Tiltak?
+
 	fun upsertTiltak(arenaId: String, navn: String, kode: String): Tiltak
+
 }

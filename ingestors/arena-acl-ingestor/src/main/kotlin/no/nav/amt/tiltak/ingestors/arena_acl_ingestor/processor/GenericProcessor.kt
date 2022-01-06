@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processors
+package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.Operation

@@ -1,16 +1,15 @@
 package no.nav.amt.tiltak.ingestors.arena.processors
 
 import no.nav.amt.tiltak.core.port.ArenaOrdsProxyConnector
+import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltakService
-import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.ingestors.arena.domain.ArenaData
 import no.nav.amt.tiltak.ingestors.arena.dto.ArenaTiltaksgjennomforing
 import no.nav.amt.tiltak.ingestors.arena.exceptions.DependencyNotIngestedException
 import no.nav.amt.tiltak.ingestors.arena.repository.ArenaDataRepository
 import no.nav.amt.tiltak.ingestors.arena.repository.ArenaTiltakIgnoredRepository
 import org.slf4j.LoggerFactory
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Component
 
 @Component
@@ -66,9 +65,8 @@ internal open class GjennomforingProcessor(
 			registrertDato = newFields.REG_DATO.asLocalDateTime(),
 			fremmoteDato = newFields.DATO_FREMMOTE?.asLocalDate() withTime newFields.KLOKKETID_FREMMOTE.asTime()
 		)
+
 		repository.upsert(data.markAsIngested())
-
-
 	}
 
 	override fun delete(data: ArenaData) {

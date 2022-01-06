@@ -4,8 +4,8 @@ import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.Deltaker
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.Gjennomforing
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.UnknownMessageWrapper
-import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processors.DeltakerProcessor
-import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processors.GjennomforingProcessor
+import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.DeltakerProcessor
+import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.GjennomforingProcessor
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.utils.JsonUtils.objectMapper
 import org.springframework.stereotype.Service
 
