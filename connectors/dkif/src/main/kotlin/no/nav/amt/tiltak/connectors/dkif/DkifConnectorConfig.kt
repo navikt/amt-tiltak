@@ -15,7 +15,7 @@ open class DkifConnectorConfig {
 	lateinit var scope: String
 
 	@Bean
-	open fun norgConnector(scopedTokenProvider: ScopedTokenProvider): DkifConnector {
+	open fun dkifConnector(scopedTokenProvider: ScopedTokenProvider): DkifConnector {
 		return DkifConnectorImpl(
 			url = "$url/proxy/dkif",
 			tokenProvider = { scopedTokenProvider.getToken(scope) },
