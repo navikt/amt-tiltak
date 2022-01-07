@@ -52,7 +52,7 @@ internal open class GjennomforingProcessor(
 		val tiltak = tiltakService.getTiltakFromArenaId(newFields.TILTAKSKODE)
 			?: throw DependencyNotIngestedException("Tiltak med ID ${newFields.TILTAKSKODE} er ikke ingested enda.")
 
-		val arrangor = arrangorService.addArrangor(virksomhetsnummer)
+		val arrangor = arrangorService.upsertArrangor(virksomhetsnummer)
 
 		gjennomforingService.upsertGjennomforing(
 			arenaId = newFields.TILTAKGJENNOMFORING_ID.toInt(),

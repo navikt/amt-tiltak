@@ -62,6 +62,20 @@ class GjennomforingServiceImpl(
 		).toGjennomforing(tiltak)
 	}
 
+	override fun upsertGjennomforing(
+		id: UUID,
+		tiltakId: UUID,
+		arrangorId: UUID,
+		navn: String,
+		status: Gjennomforing.Status?,
+		oppstartDato: LocalDate?,
+		sluttDato: LocalDate?,
+		registrertDato: LocalDateTime?,
+		fremmoteDato: LocalDateTime?
+	): Gjennomforing {
+		TODO("Not yet implemented")
+	}
+
 	override fun getGjennomforingFromArenaId(arenaId: Int): Gjennomforing {
 		return gjennomforingRepository.getByArenaId(arenaId)?.let { gjennomforingDbo ->
 			val tiltak = tiltakService.getTiltakById(gjennomforingDbo.tiltakId)

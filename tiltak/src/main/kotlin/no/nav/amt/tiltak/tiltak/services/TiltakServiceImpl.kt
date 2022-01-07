@@ -41,6 +41,10 @@ open class TiltakServiceImpl(
 		return tiltakRepository.insert(arenaId, navn, kode).toTiltak()
 	}
 
+	override fun upsertTiltak(id: UUID, navn: String, kode: String): Tiltak {
+		TODO("Not yet implemented")
+	}
+
 	override fun getTiltakFromArenaId(arenaId: String): Tiltak? {
 		return tiltakRepository.getByArenaId(arenaId)?.toTiltak()
 	}

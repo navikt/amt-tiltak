@@ -11,4 +11,6 @@ interface TiltakService {
 
 	fun upsertTiltak(arenaId: String, navn: String, kode: String): Tiltak
 
+	fun upsertTiltak(id: UUID, navn: String, kode: String): Tiltak
+
 }

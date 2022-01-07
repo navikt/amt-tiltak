@@ -52,7 +52,7 @@ internal open class DeltakerProcessor(
 
 
 
-			deltakerService.addUpdateDeltaker(
+			deltakerService.upsertDeltaker(
 				gjennomforingId = tiltaksgjennomforing.id,
 				fodselsnummer = fodselsnummer,
 				oppstartDato = newFields.DATO_FRA?.asLocalDate(),

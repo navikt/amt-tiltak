@@ -34,7 +34,7 @@ internal class ArrangorRepositoryTest {
 		val virksomhetsnavn = "Test Virksomhet"
 		val virksomhetsnummer = "123456798"
 
-		val savedDto = repository.insert(
+		val savedDto = repository.upsert(
 			overordnetEnhetNavn = organisasjonsnavn,
 			overordnetEnhetOrganisasjonsnummer = organisasjonsnummer,
 			navn = virksomhetsnavn,
@@ -56,13 +56,13 @@ internal class ArrangorRepositoryTest {
 		val navn = "Test Virksomhet"
 		val organisasjonsnummer = "123456798"
 
-		val savedOne = repository.insert(
+		val savedOne = repository.upsert(
 			overordnetEnhetNavn = overordnetEnhetNavn,
 			overordnetEnhetOrganisasjonsnummer = overordnetEnhetOrganisasjonsnummer,
 			navn = navn,
 			organisasjonsnummer = organisasjonsnummer
 		)
-		val savedTwo = repository.insert(
+		val savedTwo = repository.upsert(
 			overordnetEnhetNavn = overordnetEnhetNavn,
 			overordnetEnhetOrganisasjonsnummer = overordnetEnhetOrganisasjonsnummer,
 			navn = navn,

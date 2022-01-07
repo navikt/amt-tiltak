@@ -29,7 +29,7 @@ open class DeltakerServiceImpl(
 	private val personService: PersonService,
 ) : DeltakerService {
 
-	override fun addUpdateDeltaker(
+	override fun upsertDeltaker(
 		gjennomforingId: UUID,
 		fodselsnummer: String,
 		oppstartDato: LocalDate?,
@@ -65,6 +65,20 @@ open class DeltakerServiceImpl(
 			registrertDato
 		)
 
+	}
+
+	override fun upsertDeltaker(
+		deltakerId: UUID,
+		gjennomforingId: UUID,
+		fodselsnummer: String,
+		oppstartDato: LocalDate?,
+		sluttDato: LocalDate?,
+		status: Deltaker.Status,
+		dagerPerUke: Int?,
+		prosentStilling: Float?,
+		registrertDato: LocalDateTime
+	): Deltaker {
+		TODO("Not yet implemented")
 	}
 
 	private fun createDeltaker(

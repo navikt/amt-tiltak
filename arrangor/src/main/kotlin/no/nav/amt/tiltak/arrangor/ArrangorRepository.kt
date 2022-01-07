@@ -24,7 +24,7 @@ open class ArrangorRepository(
     }
 
 
-    fun insert(
+    fun upsert(
 		navn: String,
 		organisasjonsnummer: String,
 		overordnetEnhetNavn: String?,

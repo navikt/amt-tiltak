@@ -1,10 +1,10 @@
 package no.nav.amt.tiltak.arrangor
 
+import no.nav.amt.tiltak.ansatt.AnsattService
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
-import no.nav.amt.tiltak.core.port.EnhetsregisterConnector
 import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.ansatt.AnsattService
+import no.nav.amt.tiltak.core.port.EnhetsregisterConnector
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -15,10 +15,10 @@ class ArrangorService(
 	private val arrangorRepository: ArrangorRepository
 ) : ArrangorService {
 
-	override fun addArrangor(virksomhetsnummer: String): Arrangor {
+	override fun upsertArrangor(virksomhetsnummer: String): Arrangor {
 		val arrangor = enhetsregisterConnector.hentVirksomhet(virksomhetsnummer)
 
-		return arrangorRepository.insert(
+		return arrangorRepository.upsert(
 			navn = arrangor.navn,
 			organisasjonsnummer = arrangor.organisasjonsnummer,
 			overordnetEnhetNavn = arrangor.overordnetEnhetNavn,

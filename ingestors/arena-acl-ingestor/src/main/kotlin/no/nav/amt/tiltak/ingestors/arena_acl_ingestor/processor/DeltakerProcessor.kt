@@ -29,8 +29,8 @@ class DeltakerProcessor(
 
 		val tiltaksgjennomforing = gjennomforingService.getGjennomforing(deltaker.gjennomforingId)
 
-		// TODO: Dette vil ikke fungere, vi trenger å inserte med IDen som vi får fra ACLen
-		deltakerService.addUpdateDeltaker(
+		deltakerService.upsertDeltaker(
+			id = deltaker.id,
 			gjennomforingId = tiltaksgjennomforing.id,
 			fodselsnummer = deltaker.personIdent,
 			oppstartDato = deltaker.oppstartDato,

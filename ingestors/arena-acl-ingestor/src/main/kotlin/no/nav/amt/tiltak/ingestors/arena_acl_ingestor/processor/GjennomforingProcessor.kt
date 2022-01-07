@@ -30,14 +30,12 @@ class GjennomforingProcessor(
 		val gjennomforing = message.payload
 		val tiltak = gjennomforing.tiltak
 
-		val arrangor = arrangorService.addArrangor(gjennomforing.virksomhetsnummer)
+		val arrangor = arrangorService.upsertArrangor(gjennomforing.virksomhetsnummer)
 
-		// TODO: Dette vil ikke fungere, vi trenger å inserte med IDen som vi får fra ACLen
-		tiltakService.upsertTiltak(tiltak.kode, tiltak.navn, tiltak.kode)
+		tiltakService.upsertTiltak(tiltak.id, tiltak.navn, tiltak.kode)
 
-		// TODO: Dette vil ikke fungere, vi trenger å inserte med IDen som vi får fra ACLen
 		gjennomforingService.upsertGjennomforing(
-			arenaId = 42,
+			id = gjennomforing.id,
 			tiltakId = gjennomforing.tiltak.id,
 			arrangorId = arrangor.id,
 			navn = gjennomforing.navn,
