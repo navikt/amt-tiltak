@@ -86,7 +86,7 @@ class GjennomforingControllerIntegrationTest {
 	fun `hentGjennomforing - tiltak finnes ikke - skal returnere INTERNAL SERVER ERROR`() {
 		val tiltakNavn = "Gruppe amo"
 		val tlId = insertArrangor()
-		val tiltak = tiltakRepository.insert("22", tiltakNavn, "kode")
+		val tiltak = tiltakRepository.insert(UUID.randomUUID(), tiltakNavn, "kode")
 		val gjennomforing = insertGjennomforing(tiltak.id, tlId)
 
 		val resultat = controller.hentGjennomforing(gjennomforing.id)
@@ -98,7 +98,7 @@ class GjennomforingControllerIntegrationTest {
 	@Test
 	fun `hentGjennomforinger - tiltak finnes - skal returnere tiltak`() {
 		val arrangorId = insertArrangor()
-		val tiltak = tiltakRepository.insert("4", tiltakKode, tiltakKode)
+		val tiltak = tiltakRepository.insert(UUID.randomUUID(), tiltakKode, tiltakKode)
 		val gjennomforing = insertGjennomforing(tiltak.id, arrangorId)
 		val resultat = controller.hentGjennomforing(gjennomforing.id)
 
@@ -110,7 +110,7 @@ class GjennomforingControllerIntegrationTest {
 	@Test
 	fun `hentDeltakere - En deltaker på tiltak`() {
 		val arrangorId = insertArrangor()
-		val tiltak = tiltakRepository.insert((1000..9999).random().toString(), tiltakKode, tiltakKode)
+		val tiltak = tiltakRepository.insert(UUID.randomUUID(), tiltakKode, tiltakKode)
 
 		val gjennomforing = insertGjennomforing(tiltak.id, arrangorId)
 		val bruker1 = BrukerInsertDbo("12128673847", "Person", "En", "To", "123", epost, null, null)
@@ -136,7 +136,7 @@ class GjennomforingControllerIntegrationTest {
 	@Test
 	fun `hentDeltakere - Flere deltakere finnes`() {
 		val arrangorId = insertArrangor()
-		val tiltak = tiltakRepository.insert((1000..9999).random().toString(), tiltakKode, tiltakKode)
+		val tiltak = tiltakRepository.insert(UUID.randomUUID(), tiltakKode, tiltakKode)
 
 		val gjennomforing = insertGjennomforing(tiltak.id, arrangorId)
 		val bruker1 = BrukerInsertDbo("12128673847", "Person", "En", "To", "123", epost, null, null)
@@ -175,6 +175,7 @@ class GjennomforingControllerIntegrationTest {
 	): DeltakerDbo {
 		val bruker = brukerRepository.insert(bruker)
 		return deltakerRepository.insert(
+			id = UUID.randomUUID(),
 			brukerId = bruker.id,
 			gjennomforingId = gjennomforingId,
 			oppstartDato = startDato,
@@ -187,9 +188,9 @@ class GjennomforingControllerIntegrationTest {
 	}
 
 	private fun insertGjennomforing(tiltakId: UUID, arrangorId: UUID): GjennomforingDbo {
-		var arenaId = (1000..9999).random()
+		val id = UUID.randomUUID()
 		return gjennomforingRepository.insert(
-			arenaId = arenaId,
+			id = id,
 			tiltakId = tiltakId,
 			arrangorId = arrangorId,
 			navn = "Kaffekurs",

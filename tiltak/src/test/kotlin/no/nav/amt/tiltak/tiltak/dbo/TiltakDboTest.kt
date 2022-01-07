@@ -12,8 +12,7 @@ internal class TiltakDboTest {
 	internal fun `update() should return NO_CHANGES if the objects are equal`() {
 		val tiltak = TiltakDbo(
 			UUID.randomUUID(),
-			"1",
-			"'Navn",
+			"Navn",
 			"Type",
 			LocalDateTime.now(),
 			LocalDateTime.now()
@@ -29,8 +28,7 @@ internal class TiltakDboTest {
 	internal fun `update() should return UPDATED with updated object if navn has changed`() {
 		val tiltak = TiltakDbo(
 			UUID.randomUUID(),
-			"1",
-			"'Navn",
+			"Navn",
 			"Type",
 			LocalDateTime.now(),
 			LocalDateTime.now()
@@ -54,8 +52,7 @@ internal class TiltakDboTest {
 	internal fun `update() should return UPDATED with updated object if type has changed`() {
 		val tiltak = TiltakDbo(
 			UUID.randomUUID(),
-			"1",
-			"'Navn",
+			"Navn",
 			"Type",
 			LocalDateTime.now(),
 			LocalDateTime.now()
@@ -79,8 +76,7 @@ internal class TiltakDboTest {
 	internal fun `update() should return UPDATED with updated object if all fields has changed`() {
 		val tiltak = TiltakDbo(
 			UUID.randomUUID(),
-			"1",
-			"'Navn",
+			"Navn",
 			"Type",
 			LocalDateTime.now(),
 			LocalDateTime.now()

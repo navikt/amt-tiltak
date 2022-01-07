@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 import java.util.*
 
 @Component
@@ -15,7 +16,6 @@ open class TiltakRepository(
 	private val rowMapper = RowMapper { rs, _ ->
 		TiltakDbo(
 			id = UUID.fromString(rs.getString("id")),
-			arenaId = rs.getString("arena_id"),
 			navn = rs.getString("navn"),
 			type = rs.getString("type"),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
@@ -24,22 +24,15 @@ open class TiltakRepository(
 	}
 
 
-	fun insert(arenaId: String, navn: String, kode: String): TiltakDbo {
+	fun insert(id: UUID, navn: String, kode: String): TiltakDbo {
 		//language=PostgreSQL
 		val sql = """
-            INSERT INTO tiltak(id, arena_id, navn, type)
-            VALUES (:id,
-                    :arenaId,
-                    :navn,
-                    :kode)
-    """.trimIndent()
-
-		val id = UUID.randomUUID()
+            INSERT INTO tiltak(id, navn, type) VALUES (:id, :navn, :kode)
+    	""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
 				"id" to id,
-				"arenaId" to arenaId,
 				"navn" to navn,
 				"kode" to kode
 			)
@@ -51,7 +44,7 @@ open class TiltakRepository(
 			?: throw NoSuchElementException("Tiltak med id $id finnes ikke")
 	}
 
-	fun update(tiltak: TiltakDbo): TiltakDbo {
+	fun update(id: UUID, navn: String, type: String): TiltakDbo {
 		//language=PostgreSQL
 		val sql = """
 			UPDATE tiltak
@@ -63,17 +56,17 @@ open class TiltakRepository(
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"navn" to tiltak.navn,
-				"type" to tiltak.type,
-				"modifiedAt" to tiltak.modifiedAt,
-				"id" to tiltak.id
+				"navn" to navn,
+				"type" to type,
+				"modifiedAt" to LocalDateTime.now(),
+				"id" to id
 			)
 		)
 
 		template.update(sql, parameters)
 
-		return get(tiltak.id)
-			?: throw NoSuchElementException("Tiltak med id ${tiltak.id} finnes ikke")
+		return get(id)
+			?: throw NoSuchElementException("Tiltak med id ${id} finnes ikke")
 	}
 
 	fun getAll(): List<TiltakDbo> {
@@ -81,24 +74,6 @@ open class TiltakRepository(
 			"SELECT * FROM tiltak",
 			rowMapper
 		)
-	}
-
-	fun getByArenaId(arenaId: String): TiltakDbo? {
-		//language=PostgreSQL
-		val sql = """
-            SELECT *
-            FROM tiltak
-			WHERE arena_id = :arena_id
-        """.trimIndent()
-
-		val parameters = MapSqlParameterSource().addValues(
-			mapOf(
-				"arena_id" to arenaId
-			)
-		)
-
-		return template.query(sql, parameters, rowMapper)
-			.firstOrNull()
 	}
 
 	private fun get(id: UUID): TiltakDbo? {

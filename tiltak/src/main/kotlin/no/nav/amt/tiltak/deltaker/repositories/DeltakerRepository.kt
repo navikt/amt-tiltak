@@ -36,6 +36,7 @@ open class DeltakerRepository(
 	}
 
 	fun insert(
+		id: UUID,
 		brukerId: UUID,
 		gjennomforingId: UUID,
 		oppstartDato: LocalDate?,
@@ -58,8 +59,6 @@ open class DeltakerRepository(
 					:prosentStilling,
 					:registrertDato)
 		""".trimIndent()
-
-		val id = UUID.randomUUID()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(

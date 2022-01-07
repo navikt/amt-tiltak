@@ -35,6 +35,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 	}
 
 	test("Insert should insert Deltaker and return DeltakerDbo") {
+		val id = UUID.randomUUID()
 		val oppstartDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
 		val sluttDato = null
@@ -43,6 +44,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val prosentStilling = 20.0f
 
 		val dbo = repository.insert(
+			id,
 			brukerId,
 			gjennomforingId,
 			oppstartDato,
@@ -54,7 +56,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		)
 
 		dbo shouldNotBe null
-		dbo.id shouldNotBe null
+		dbo.id shouldBe id
 		dbo.brukerId shouldBe brukerId
 		dbo.brukerFornavn shouldBe "Bruker Fornavn"
 		dbo.brukerEtternavn shouldBe "Bruker Etternavn"
@@ -78,6 +80,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val prosentStilling = 20.0f
 
 		val dbo = repository.insert(
+			UUID.randomUUID(),
 			brukerId,
 			gjennomforingId,
 			oppstartDato,
@@ -113,6 +116,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val prosentStilling = 20.0f
 
 		val dbo = repository.insert(
+			UUID.randomUUID(),
 			brukerId,
 			gjennomforingId,
 			oppstartDato,
@@ -137,6 +141,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val prosentStilling = 20.0f
 
 		val dbo = repository.insert(
+			UUID.randomUUID(),
 			brukerId,
 			gjennomforingId,
 			oppstartDato,
@@ -161,6 +166,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val prosentStilling = 20.0f
 
 		val dbo = repository.insert(
+			UUID.randomUUID(),
 			brukerId,
 			gjennomforingId,
 			oppstartDato,

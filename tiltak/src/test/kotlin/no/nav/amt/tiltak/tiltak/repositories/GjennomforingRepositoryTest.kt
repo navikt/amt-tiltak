@@ -39,7 +39,7 @@ internal class GjennomforingRepositoryTest {
 
 	@Test
 	internal fun `insert() should insert gjennomforing and return object`() {
-		val arenaId = 1
+		val id = UUID.randomUUID()
 		val navn = "TEST Tiltaksgjennomforing"
 		val status = null
 		val oppstartDato = LocalDate.now().plusDays(2)
@@ -48,7 +48,7 @@ internal class GjennomforingRepositoryTest {
 		val fremmoteDato = LocalDateTime.now().plusDays(2).minusHours(2)
 
 		val savedGjennomforing = repository.insert(
-			arenaId = arenaId,
+			id = id,
 			tiltakId = TILTAK_ID,
 			arrangorId = ARRANGOR_ID,
 			navn = navn,
@@ -79,7 +79,6 @@ internal class GjennomforingRepositoryTest {
 			repository.update(
 				GjennomforingDbo(
 					id = UUID.randomUUID(),
-					arenaId = 9999,
 					arrangorId = UUID.randomUUID(),
 					tiltakId = UUID.randomUUID(),
 					navn = "idosfja",
@@ -97,6 +96,7 @@ internal class GjennomforingRepositoryTest {
 
 	@Test
 	internal fun `update() should return updated object`() {
+		val id = UUID.randomUUID()
 		val updatedNavn = "UpdatedNavn"
 		val updatedStatus = Gjennomforing.Status.GJENNOMFORES
 		val updatedOppstartsdato = LocalDate.now().plusDays(4)
@@ -104,7 +104,7 @@ internal class GjennomforingRepositoryTest {
 		val updatedFremmotedato = LocalDateTime.now().plusDays(4)
 
 		val newGjennomforing = repository.insert(
-			arenaId = 1,
+			id = id,
 			tiltakId = TILTAK_ID,
 			arrangorId = ARRANGOR_ID,
 			"Navn",
@@ -130,33 +130,6 @@ internal class GjennomforingRepositoryTest {
 		assertTrue(updatedOppstartsdato.isEqualTo(updatedGjennomforing.oppstartDato))
 		assertTrue(updatedSluttdato.isEqualTo(updatedGjennomforing.sluttDato))
 		assertTrue(updatedFremmotedato.isEqualTo(updatedGjennomforing.fremmoteDato))
-	}
-
-	@Test
-	internal fun `getByArenaId returns the correct object`() {
-		val arenaId = 1
-		val navn = "TEST Tiltaksgjennomforing"
-		val status = null
-		val oppstartDato = LocalDate.now().plusDays(2)
-		val sluttDato = LocalDate.now().plusDays(10)
-		val registrertDato = LocalDateTime.now()
-		val fremmoteDato = LocalDateTime.now().plusDays(2).minusHours(2)
-
-		val savedGjennomforing = repository.insert(
-			arenaId = arenaId,
-			tiltakId = TILTAK_ID,
-			arrangorId = ARRANGOR_ID,
-			navn = navn,
-			status = status,
-			oppstartDato = oppstartDato,
-			sluttDato = sluttDato,
-			registrertDato = registrertDato,
-			fremmoteDato = fremmoteDato
-		)
-
-		val gottenObject = repository.getByArenaId(arenaId)
-
-		assertEquals(savedGjennomforing, gottenObject)
 	}
 
 }

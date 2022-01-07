@@ -8,17 +8,6 @@ import java.util.*
 interface DeltakerService {
 
 	fun upsertDeltaker(
-		gjennomforingId: UUID,
-		fodselsnummer: String,
-		oppstartDato: LocalDate?,
-		sluttDato: LocalDate?,
-		status: Deltaker.Status,
-		dagerPerUke: Int?,
-		prosentStilling: Float?,
-		registrertDato: LocalDateTime
-	): Deltaker
-
-	fun upsertDeltaker(
 		id: UUID,
 		gjennomforingId: UUID,
 		fodselsnummer: String,

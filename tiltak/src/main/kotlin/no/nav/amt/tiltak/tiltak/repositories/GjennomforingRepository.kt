@@ -18,7 +18,6 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 
 		GjennomforingDbo(
 			id = UUID.fromString(rs.getString("id")),
-			arenaId = rs.getInt("arena_id"),
 			arrangorId = UUID.fromString(rs.getString("arrangor_id")),
 			tiltakId = UUID.fromString(rs.getString("tiltak_id")),
 			navn = rs.getString("navn"),
@@ -33,7 +32,7 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 	}
 
 	fun insert(
-		arenaId: Int,
+		id: UUID,
 		tiltakId: UUID,
 		arrangorId: UUID,
 		navn: String,
@@ -46,10 +45,9 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 
 		//language=PostgreSQL
 		val sql = """
-		INSERT INTO gjennomforing(id, arena_id, tiltak_id, arrangor_id, navn, status, oppstart_dato,
+		INSERT INTO gjennomforing(id, tiltak_id, arrangor_id, navn, status, oppstart_dato,
                            slutt_dato, registrert_dato, fremmote_dato)
 		VALUES (:id,
-				:arenaId,
 				:tiltakId,
 				:arrangorId,
 				:navn,
@@ -60,12 +58,9 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 				:fremmoteDato)
 	""".trimIndent()
 
-		val id = UUID.randomUUID()
-
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
 				"id" to id,
-				"arenaId" to arenaId,
 				"tiltakId" to tiltakId,
 				"arrangorId" to arrangorId,
 				"navn" to navn,
@@ -130,24 +125,6 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
 				"id" to id
-			)
-		)
-
-		return template.query(sql, parameters, rowMapper).firstOrNull()
-	}
-
-	fun getByArenaId(arenaId: Int): GjennomforingDbo? {
-
-		//language=PostgreSQL
-		val sql = """
-			SELECT *
-			FROM gjennomforing
-			WHERE arena_id = :arenaId
-		""".trimIndent()
-
-		val parameters = MapSqlParameterSource().addValues(
-			mapOf(
-				"arenaId" to arenaId
 			)
 		)
 

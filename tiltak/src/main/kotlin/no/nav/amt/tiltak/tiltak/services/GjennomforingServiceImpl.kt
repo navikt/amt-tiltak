@@ -17,7 +17,7 @@ class GjennomforingServiceImpl(
 ) : GjennomforingService {
 
 	override fun upsertGjennomforing(
-		arenaId: Int,
+		id: UUID,
 		tiltakId: UUID,
 		arrangorId: UUID,
 		navn: String,
@@ -27,7 +27,8 @@ class GjennomforingServiceImpl(
 		registrertDato: LocalDateTime?,
 		fremmoteDato: LocalDateTime?
 	): Gjennomforing {
-		val storedGjennomforing = gjennomforingRepository.getByArenaId(arenaId)
+		val storedGjennomforing = gjennomforingRepository.get(id)
+
 		val tiltak = tiltakService.getTiltakById(tiltakId)
 
 		if (storedGjennomforing != null) {
@@ -50,7 +51,7 @@ class GjennomforingServiceImpl(
 		}
 
 		return gjennomforingRepository.insert(
-			arenaId = arenaId,
+			id = id,
 			tiltakId = tiltak.id,
 			arrangorId = arrangorId,
 			navn = navn,
@@ -60,27 +61,6 @@ class GjennomforingServiceImpl(
 			registrertDato = registrertDato,
 			fremmoteDato = fremmoteDato
 		).toGjennomforing(tiltak)
-	}
-
-	override fun upsertGjennomforing(
-		id: UUID,
-		tiltakId: UUID,
-		arrangorId: UUID,
-		navn: String,
-		status: Gjennomforing.Status?,
-		oppstartDato: LocalDate?,
-		sluttDato: LocalDate?,
-		registrertDato: LocalDateTime?,
-		fremmoteDato: LocalDateTime?
-	): Gjennomforing {
-		TODO("Not yet implemented")
-	}
-
-	override fun getGjennomforingFromArenaId(arenaId: Int): Gjennomforing {
-		return gjennomforingRepository.getByArenaId(arenaId)?.let { gjennomforingDbo ->
-			val tiltak = tiltakService.getTiltakById(gjennomforingDbo.tiltakId)
-			return gjennomforingDbo.toGjennomforing(tiltak)
-		} ?: throw NoSuchElementException("Fant ikke gjennomforing")
 	}
 
 	override fun getGjennomforing(id: UUID): Gjennomforing {
