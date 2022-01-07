@@ -63,7 +63,7 @@ internal open class ArenaDataRepository(
 		)
 	}
 
-	fun getFailedData(tableName: String, offset: Int = 0, limit: Int = 100): List<ArenaData> {
+	fun getFailedData(tableName: String, offset: Int = 0, limit: Int = 1000): List<ArenaData> {
 		return getByIngestStatusIn(
 			tableName,
 			listOf(IngestStatus.FAILED),
