@@ -4,7 +4,6 @@ import junit.framework.Assert.assertEquals
 import no.nav.amt.tiltak.application.configuration.kafka.KafkaConfiguration
 import no.nav.amt.tiltak.application.configuration.kafka.KafkaProperties
 import no.nav.amt.tiltak.application.configuration.kafka.KafkaTopicProperties
-import no.nav.amt.tiltak.core.port.ArenaIngestor
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.ArenaAclIngestor
 import no.nav.common.kafka.producer.KafkaProducerClientImpl
 import no.nav.common.kafka.producer.util.ProducerUtils.toJsonProducerRecord
@@ -29,10 +28,6 @@ class KafkaConfigurationTest {
 	fun `should ingest arena records after configuring kafka`() {
 
 		val kafkaTopicProperties = KafkaTopicProperties(
-			arenaTiltakTopic = "arena-tiltak",
-			arenaTiltaksgjennomforingTopic = "arena-tiltaksgjennomforing",
-			arenaTiltaksgruppeTopic = "arena-tiltaksgruppe",
-			arenaTiltakDeltakerTopic = "arena-tiltak-deltaker",
 			amtTiltakTopic = "amt-tiltak"
 		)
 
@@ -58,12 +53,6 @@ class KafkaConfigurationTest {
 
 		val counter = AtomicInteger()
 
-		val arenaIngestor = object : ArenaIngestor {
-			override fun ingest(data: String) {
-				counter.incrementAndGet()
-			}
-		}
-
 		val arenaAclIngestor = object : ArenaAclIngestor {
 			override fun ingestKafkaMessageValue(messageValue: String) {
 				counter.incrementAndGet()
@@ -74,16 +63,12 @@ class KafkaConfigurationTest {
 		KafkaConfiguration(
 			kafkaTopicProperties,
 			kafkaProperties,
-			arenaIngestor,
 			arenaAclIngestor
 		)
 
 		val kafkaProducer = KafkaProducerClientImpl<String, String>(kafkaProperties.producer())
 		val value = "some value"
-		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltak", "1", value))
-		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltaksgjennomforing", "1", value))
-		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltaksgruppe", "1", value))
-		kafkaProducer.sendSync(toJsonProducerRecord("arena-tiltak-deltaker", "1", value))
+		kafkaProducer.sendSync(toJsonProducerRecord("amt-tiltak", "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord("amt-tiltak", "1", value))
 
 		kafkaProducer.close()
@@ -92,7 +77,7 @@ class KafkaConfigurationTest {
 
 		Thread.sleep(3000)
 
-		assertEquals(5, counter.get())
+		assertEquals(2, counter.get())
 	}
 
 }
