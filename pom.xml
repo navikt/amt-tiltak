@@ -126,11 +126,6 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>arena-ingestor</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>arena-acl-ingestor</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -147,11 +142,6 @@
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>pdl</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>arena_ords_proxy</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

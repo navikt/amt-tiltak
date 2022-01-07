@@ -13,7 +13,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>arena-ingestor</module>
         <module>arena-acl-ingestor</module>
     </modules>
 
