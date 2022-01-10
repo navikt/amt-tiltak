@@ -21,6 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger
 @Testcontainers
 class KafkaConfigurationTest {
 
+	val amtTiltakTopic = "amt-tiltak"
+
 	@Container
 	var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.4.3"))
 
@@ -28,7 +30,7 @@ class KafkaConfigurationTest {
 	fun `should ingest arena records after configuring kafka`() {
 
 		val kafkaTopicProperties = KafkaTopicProperties(
-			amtTiltakTopic = "amt-tiltak"
+			amtTiltakTopic = amtTiltakTopic
 		)
 
 		val kafkaProperties = object : KafkaProperties {
@@ -68,8 +70,8 @@ class KafkaConfigurationTest {
 
 		val kafkaProducer = KafkaProducerClientImpl<String, String>(kafkaProperties.producer())
 		val value = "some value"
-		kafkaProducer.sendSync(toJsonProducerRecord("amt-tiltak", "1", value))
-		kafkaProducer.sendSync(toJsonProducerRecord("amt-tiltak", "1", value))
+		kafkaProducer.sendSync(toJsonProducerRecord(amtTiltakTopic, "1", value))
+		kafkaProducer.sendSync(toJsonProducerRecord(amtTiltakTopic, "1", value))
 
 		kafkaProducer.close()
 
