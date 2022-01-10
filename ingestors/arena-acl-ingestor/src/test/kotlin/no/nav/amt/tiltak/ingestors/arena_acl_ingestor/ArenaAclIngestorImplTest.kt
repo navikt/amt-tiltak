@@ -66,8 +66,8 @@ class ArenaAclIngestorImplTest : StringSpec({
 				"navn": "Tiltak hos Muligheter AS",
 				"oppstartDato": "2022-01-10",
 				"sluttDato": "2022-01-12",
-				"registrert": "2022-01-08T11:46:44.799Z",
-				"fremmote": "2022-01-10T11:46:44.799Z"
+				"registrertDato": "2022-01-08T11:46:44.799Z",
+				"fremmoteDato": "2022-01-10T11:46:44.799Z"
 			  }
 			}
 		""".trimIndent()

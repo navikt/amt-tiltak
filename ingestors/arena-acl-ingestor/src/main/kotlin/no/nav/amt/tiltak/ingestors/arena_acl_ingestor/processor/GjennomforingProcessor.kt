@@ -42,8 +42,8 @@ class GjennomforingProcessor(
 			status = null,
 			oppstartDato = gjennomforing.oppstartDato,
 			sluttDato = gjennomforing.sluttDato,
-			registrertDato = gjennomforing.registrert,
-			fremmoteDato = gjennomforing.fremmote
+			registrertDato = gjennomforing.registrertDato,
+			fremmoteDato = gjennomforing.fremmoteDato
 		)
 	}
 

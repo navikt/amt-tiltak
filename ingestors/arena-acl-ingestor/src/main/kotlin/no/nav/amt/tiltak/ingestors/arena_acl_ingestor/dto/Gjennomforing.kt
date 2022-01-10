@@ -11,8 +11,8 @@ data class Gjennomforing(
 	val navn: String,
 	val oppstartDato: LocalDate?,
 	val sluttDato: LocalDate?,
-	val registrert: LocalDateTime,
-	val fremmote: LocalDateTime?
+	val registrertDato: LocalDateTime,
+	val fremmoteDato: LocalDateTime?
 )
 
 data class Tiltak(
