@@ -186,6 +186,11 @@
             <artifactId>mocks</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>database</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

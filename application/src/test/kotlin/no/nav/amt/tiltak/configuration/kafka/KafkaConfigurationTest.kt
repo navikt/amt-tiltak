@@ -5,12 +5,14 @@ import no.nav.amt.tiltak.application.configuration.kafka.KafkaConfiguration
 import no.nav.amt.tiltak.application.configuration.kafka.KafkaProperties
 import no.nav.amt.tiltak.application.configuration.kafka.KafkaTopicProperties
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.ArenaAclIngestor
+import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.common.kafka.producer.KafkaProducerClientImpl
 import no.nav.common.kafka.producer.util.ProducerUtils.toJsonProducerRecord
 import no.nav.common.kafka.util.KafkaPropertiesBuilder
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.junit.jupiter.api.Test
+import org.springframework.jdbc.core.JdbcTemplate
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -25,6 +27,8 @@ class KafkaConfigurationTest {
 
 	@Container
 	var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.4.3"))
+
+	val dataSource = SingletonPostgresContainer.getDataSource()
 
 	@Test
 	fun `should ingest arena records after configuring kafka`() {
@@ -65,6 +69,7 @@ class KafkaConfigurationTest {
 		KafkaConfiguration(
 			kafkaTopicProperties,
 			kafkaProperties,
+			JdbcTemplate(dataSource),
 			arenaAclIngestor
 		)
 
