@@ -40,7 +40,7 @@ class GjennomforingProcessor(
 			arrangorId = arrangor.id,
 			navn = gjennomforing.navn,
 			status = null,
-			oppstartDato = gjennomforing.oppstartDato,
+			oppstartDato = gjennomforing.startDato,
 			sluttDato = gjennomforing.sluttDato,
 			registrertDato = gjennomforing.registrertDato,
 			fremmoteDato = gjennomforing.fremmoteDato

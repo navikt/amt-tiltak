@@ -9,7 +9,7 @@ data class Gjennomforing(
 	val tiltak: Tiltak,
 	val virksomhetsnummer: String,
 	val navn: String,
-	val oppstartDato: LocalDate?,
+	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val registrertDato: LocalDateTime,
 	val fremmoteDato: LocalDateTime?

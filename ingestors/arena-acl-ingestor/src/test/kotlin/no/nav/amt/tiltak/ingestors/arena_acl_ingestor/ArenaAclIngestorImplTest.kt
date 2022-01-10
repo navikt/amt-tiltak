@@ -26,7 +26,7 @@ class ArenaAclIngestorImplTest : StringSpec({
 			    "id": "73dde1e1-78e1-4386-b26f-005b3d32ca6e",
 			    "gjennomforingId": "f8a2a279-1cdc-4984-87d8-27418b9a9f0e",
 			    "personIdent": "12345678900",
-			    "oppstartDato": "2022-01-10",
+			    "startDato": "2022-01-10",
 			    "sluttDato": "2022-01-10",
 			    "status": "GJENNOMFORES",
 			    "dagerPerUke": 5,
@@ -64,7 +64,7 @@ class ArenaAclIngestorImplTest : StringSpec({
 				},
 				"virksomhetsnummer": "1235543432",
 				"navn": "Tiltak hos Muligheter AS",
-				"oppstartDato": "2022-01-10",
+				"startDato": "2022-01-10",
 				"sluttDato": "2022-01-12",
 				"registrertDato": "2022-01-08T11:46:44.799Z",
 				"fremmoteDato": "2022-01-10T11:46:44.799Z"

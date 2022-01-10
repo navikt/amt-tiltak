@@ -8,7 +8,7 @@ data class Deltaker(
 	val id: UUID,
 	val gjennomforingId: UUID,
 	val personIdent: String,
-	val oppstartDato: LocalDate?,
+	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val status: Status,
 	val dagerPerUke: Int?,

@@ -33,7 +33,7 @@ class DeltakerProcessor(
 			id = deltaker.id,
 			gjennomforingId = tiltaksgjennomforing.id,
 			fodselsnummer = deltaker.personIdent,
-			oppstartDato = deltaker.oppstartDato,
+			oppstartDato = deltaker.startDato,
 			sluttDato = deltaker.sluttDato,
 			status = tilDeltakerStatus(deltaker.status),
 			dagerPerUke = deltaker.dagerPerUke,
