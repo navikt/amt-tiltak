@@ -8,4 +8,6 @@ enum class UpdateStatus {
 data class UpdateCheck<T>(
 	val status: UpdateStatus,
 	val updatedObject: T? = null
-)
+) {
+	val isUpdated = status == UpdateStatus.UPDATED
+}

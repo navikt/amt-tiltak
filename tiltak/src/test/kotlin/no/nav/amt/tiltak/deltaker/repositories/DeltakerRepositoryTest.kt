@@ -6,9 +6,9 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.utils.UpdateStatus
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
@@ -95,11 +95,12 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val updatedSluttDato = LocalDate.now().plusDays(14)
 		val updatedStatus = Deltaker.Status.DELTAR
 
-		val updated = dbo.update(updatedStatus, updatedStartDato, updatedSluttDato)
+		val updatedDeltaker = dbo.toDeltaker().updateStatus(updatedStatus, updatedStartDato, updatedSluttDato)
+		val updated = DeltakerDbo(updatedDeltaker)
 
-		updated.status shouldBe UpdateStatus.UPDATED
+		updatedDeltaker shouldNotBe dbo.toDeltaker()
 
-		val updatedDbo = repository.update(updated.updatedObject!!)
+		val updatedDbo = repository.update(updated)
 
 		updatedDbo.id shouldBe dbo.id
 		updatedDbo.startDato shouldBe updatedStartDato

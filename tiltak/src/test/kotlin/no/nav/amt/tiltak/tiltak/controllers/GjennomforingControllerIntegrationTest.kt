@@ -18,6 +18,7 @@ import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
+import no.nav.amt.tiltak.tiltak.services.BrukerService
 import no.nav.amt.tiltak.tiltak.services.DeltakerServiceImpl
 import no.nav.amt.tiltak.tiltak.services.GjennomforingServiceImpl
 import no.nav.amt.tiltak.tiltak.services.TiltakServiceImpl
@@ -43,6 +44,7 @@ class GjennomforingControllerIntegrationTest {
 	private lateinit var tiltakRepository: TiltakRepository
 	private lateinit var deltakerRepository: DeltakerRepository
 	private lateinit var brukerRepository: BrukerRepository
+	private lateinit var brukerService: BrukerService
 	private lateinit var gjennomforingRepository: GjennomforingRepository
 	private lateinit var gjennomforingService: GjennomforingService
 	private lateinit var deltakerService: DeltakerService
@@ -58,14 +60,14 @@ class GjennomforingControllerIntegrationTest {
 		tiltakRepository = TiltakRepository(namedJdbcTemplate)
 		deltakerRepository = DeltakerRepository(namedJdbcTemplate)
 		brukerRepository = BrukerRepository(namedJdbcTemplate)
-		deltakerService = DeltakerServiceImpl(
-			deltakerRepository,
+		brukerService = BrukerService(
 			brukerRepository,
 			mock(NavAnsattRepository::class.java),
 			mock(NavKontorRepository::class.java),
 			mock(NavKontorService::class.java),
 			mock(PersonService::class.java)
-		);
+		)
+		deltakerService = DeltakerServiceImpl(deltakerRepository, brukerService)
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, TiltakServiceImpl(tiltakRepository))
 		controller = GjennomforingController(gjennomforingService, deltakerService)
 
