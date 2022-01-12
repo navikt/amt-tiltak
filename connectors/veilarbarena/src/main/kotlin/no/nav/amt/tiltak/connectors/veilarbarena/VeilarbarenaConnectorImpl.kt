@@ -18,7 +18,7 @@ class VeilarbarenaConnectorImpl(
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false),
 ) : VeilarbarenaConnector {
 
-	private val log = LoggerFactory.getLogger(this::class.java)
+	private val secureLog = LoggerFactory.getLogger("SecureLog")
 
 	override fun hentBrukerOppfolgingsenhetId(fnr: String): String? {
 		val request = Request.Builder()
@@ -30,7 +30,7 @@ class VeilarbarenaConnectorImpl(
 
 		httpClient.newCall(request).execute().use { response ->
 			if (response.code == 404) {
-				log.warn("Bruker finnes ikke i veilarbarena")
+				secureLog.warn("Fant ikke bruker med fnr=$fnr i veilarbarena")
 				return null
 			}
 
