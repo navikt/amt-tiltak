@@ -48,6 +48,8 @@ spec:
           cluster: dev-gcp
   kafka:
     pool: nav-dev
+  secureLogs:
+    enabled: true
   env:
     - name: PDL_SCOPE
       value: api://dev-fss.pdl.pdl-api/.default
