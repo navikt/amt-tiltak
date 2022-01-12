@@ -23,6 +23,15 @@ class AmtEnhetsregisterConnector(
 			.build()
 
 		httpClient.newCall(request).execute().use { response ->
+			if (response.code == 404) {
+				return Virksomhet(
+					navn = "Ukjent virksomhet",
+					organisasjonsnummer = organisasjonsnummer,
+					overordnetEnhetOrganisasjonsnummer = "999999999",
+					overordnetEnhetNavn = "Ukjent virksomhet",
+				)
+			}
+
 			if (!response.isSuccessful) {
 				throw RuntimeException("Klarte ikke å hente enhet fra amt-enhetsregister. organisasjonsnummer=${organisasjonsnummer} status=${response.code}")
 			}

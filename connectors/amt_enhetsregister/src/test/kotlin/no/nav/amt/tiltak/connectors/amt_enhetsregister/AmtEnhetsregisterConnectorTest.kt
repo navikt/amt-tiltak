@@ -44,4 +44,25 @@ class AmtEnhetsregisterConnectorTest {
 		assertEquals("5678", virksomhet.overordnetEnhetOrganisasjonsnummer)
 	}
 
+	@Test
+	fun `hentVirksomhet() skal returnere default virksomhet hvis amt-enhetsregister returnerer 404`(wmRuntimeInfo: WireMockRuntimeInfo) {
+		val client = AmtEnhetsregisterConnector(
+			url = wmRuntimeInfo.httpBaseUrl,
+			tokenProvider = { "TOKEN" },
+		)
+
+		givenThat(
+			get(urlEqualTo("/api/enhet/987654"))
+				.willReturn(aResponse().withStatus(404))
+
+		)
+
+		val virksomhet = client.hentVirksomhet("987654")
+
+		assertEquals("Ukjent virksomhet", virksomhet.navn)
+		assertEquals("987654", virksomhet.organisasjonsnummer)
+		assertEquals("Ukjent virksomhet", virksomhet.overordnetEnhetNavn)
+		assertEquals("999999999", virksomhet.overordnetEnhetOrganisasjonsnummer)
+	}
+
 }
