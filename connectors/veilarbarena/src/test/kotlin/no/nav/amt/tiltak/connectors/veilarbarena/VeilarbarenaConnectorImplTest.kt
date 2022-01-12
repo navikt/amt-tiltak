@@ -4,13 +4,14 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
 @WireMockTest
 class VeilarbarenaConnectorImplTest {
 
 	@Test
-	fun `hentBrukerArenaStatus skal lage riktig request og parse respons`(wmRuntimeInfo: WireMockRuntimeInfo) {
+	fun `hentBrukerOppfolgingsenhetId skal lage riktig request og parse respons`(wmRuntimeInfo: WireMockRuntimeInfo) {
 		val client = VeilarbarenaConnectorImpl(
 			url = wmRuntimeInfo.httpBaseUrl,
 			tokenProvider = { "TOKEN" },
@@ -41,6 +42,21 @@ class VeilarbarenaConnectorImplTest {
 		val oppfolgingsenhetId = client.hentBrukerOppfolgingsenhetId("987654")
 
 		assertEquals("1234", oppfolgingsenhetId)
+	}
+
+	@Test
+	fun `hentBrukerOppfolgingsenhetId skal returnere null hvis veilarbarena returnerer 404`(wmRuntimeInfo: WireMockRuntimeInfo) {
+		val client = VeilarbarenaConnectorImpl(
+			url = wmRuntimeInfo.httpBaseUrl,
+			tokenProvider = { "TOKEN" },
+		)
+
+		givenThat(
+			get(urlEqualTo("/veilarbarena/api/arena/status?fnr=987654"))
+				.willReturn(aResponse().withStatus(404))
+		)
+
+		assertNull(client.hentBrukerOppfolgingsenhetId("987654"))
 	}
 
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.slf4j.LoggerFactory
 import java.util.function.Supplier
 
 class VeilarbarenaConnectorImpl(
@@ -17,6 +18,8 @@ class VeilarbarenaConnectorImpl(
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false),
 ) : VeilarbarenaConnector {
 
+	private val log = LoggerFactory.getLogger(this::class.java)
+
 	override fun hentBrukerOppfolgingsenhetId(fnr: String): String? {
 		val request = Request.Builder()
 			.url("$url/veilarbarena/api/arena/status?fnr=$fnr")
@@ -26,6 +29,11 @@ class VeilarbarenaConnectorImpl(
 			.build()
 
 		httpClient.newCall(request).execute().use { response ->
+			if (response.code == 404) {
+				log.warn("Bruker finnes ikke i veilarbarena")
+				return null
+			}
+
 			if (!response.isSuccessful) {
 				throw RuntimeException("Klarte ikke å hente status fra veilarbarena. Status: ${response.code}")
 			}
