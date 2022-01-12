@@ -20,7 +20,7 @@ class TiltakServiceImplTest : FunSpec({
 
 		every {
 			repository.getAll()
-		} returns listOf(TiltakDbo(id, "", "", "", LocalDateTime.now(), LocalDateTime.now()))
+		} returns listOf(TiltakDbo(id, "", "", LocalDateTime.now(), LocalDateTime.now()))
 
 		service.getTiltakById(id)
 		service.getTiltakById(id)

@@ -6,10 +6,14 @@ import java.util.*
 
 interface ArrangorService {
 
-	fun addArrangor(virksomhetsnummer: String): Arrangor
+	fun upsertArrangor(virksomhetsnummer: String): Arrangor
 
 	fun getVirksomheterForAnsatt(ansattId: UUID): List<Arrangor>
+
 	fun getAnsatt(ansattId: UUID): Ansatt
+
 	fun getAnsattByPersonligIdent(personIdent: String): Ansatt
+
 	fun getArrangorByVirksomhetsnummer(virksomhetsnummer: String): Arrangor?
+
 }

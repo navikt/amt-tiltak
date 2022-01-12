@@ -7,7 +7,8 @@ import java.util.*
 
 interface DeltakerService {
 
-	fun addUpdateDeltaker(
+	fun upsertDeltaker(
+		id: UUID,
 		gjennomforingId: UUID,
 		fodselsnummer: String,
 		oppstartDato: LocalDate?,

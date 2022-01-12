@@ -29,7 +29,8 @@ open class DeltakerServiceImpl(
 	private val personService: PersonService,
 ) : DeltakerService {
 
-	override fun addUpdateDeltaker(
+	override fun upsertDeltaker(
+		id: UUID,
 		gjennomforingId: UUID,
 		fodselsnummer: String,
 		oppstartDato: LocalDate?,
@@ -39,8 +40,7 @@ open class DeltakerServiceImpl(
 		prosentStilling: Float?,
 		registrertDato: LocalDateTime
 	): Deltaker {
-
-		deltakerRepository.get(fodselsnummer, gjennomforingId)?.also { deltaker ->
+		deltakerRepository.get(id)?.also { deltaker ->
 			val updated = deltaker.update(
 				newStatus = status,
 				newDeltakerStartDato = oppstartDato,
@@ -55,6 +55,7 @@ open class DeltakerServiceImpl(
 		}
 
 		return createDeltaker(
+			id,
 			fodselsnummer,
 			gjennomforingId,
 			oppstartDato,
@@ -64,10 +65,10 @@ open class DeltakerServiceImpl(
 			prosentStilling,
 			registrertDato
 		)
-
 	}
 
 	private fun createDeltaker(
+		deltakerId: UUID,
 		fodselsnummer: String,
 		gjennomforingId: UUID,
 		oppstartDato: LocalDate?,
@@ -80,6 +81,7 @@ open class DeltakerServiceImpl(
 		val bruker = brukerRepository.get(fodselsnummer) ?: createBruker(fodselsnummer)
 
 		return deltakerRepository.insert(
+			id = deltakerId,
 			brukerId = bruker.id,
 			gjennomforingId = gjennomforingId,
 			oppstartDato = oppstartDato,

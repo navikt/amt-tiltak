@@ -6,12 +6,13 @@ import java.time.LocalDateTime
 import java.util.*
 
 interface GjennomforingService {
+
 	fun getGjennomforingerForArrangor(arrangorId: UUID): List<Gjennomforing>
 
 	fun getGjennomforing(id: UUID): Gjennomforing
 
 	fun upsertGjennomforing(
-		arenaId: Int,
+		id: UUID,
 		tiltakId: UUID,
 		arrangorId: UUID,
 		navn: String,
@@ -21,7 +22,5 @@ interface GjennomforingService {
 		registrertDato: LocalDateTime?,
 		fremmoteDato: LocalDateTime?
 	): Gjennomforing
-
-	fun getGjennomforingFromArenaId(arenaId: Int): Gjennomforing?
 
 }

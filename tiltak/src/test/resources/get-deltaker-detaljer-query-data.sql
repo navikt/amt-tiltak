@@ -7,11 +7,11 @@ VALUES ('23b04c3a-a36c-451f-b9cf-30b6a6b586b8', '12345678910', 'Bruker Fornavn',
 INSERT INTO arrangor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer, navn)
 VALUES ('8a37bce6-3bc1-11ec-8d3d-0242ac130003', '1', 'OrgNavn', '2', 'VirkNavn');
 
-INSERT INTO tiltak(id, arena_id, navn, type)
-VALUES ('b18fd670-3bc1-11ec-8d3d-0242ac130003', '1', 'Tiltak1', 'AMO');
+INSERT INTO tiltak(id, navn, type)
+VALUES ('b18fd670-3bc1-11ec-8d3d-0242ac130003', 'Tiltak1', 'AMO');
 
-INSERT INTO gjennomforing (id, arena_id, tiltak_id, arrangor_id, navn, status, oppstart_dato, slutt_dato, registrert_dato, fremmote_dato)
-VALUES ('b3420940-5479-48c8-b2fa-3751c7a33aa2', 1, 'b18fd670-3bc1-11ec-8d3d-0242ac130003', '8a37bce6-3bc1-11ec-8d3d-0242ac130003', 'Tiltaksgjennomforing1', 'GJENNOMFORES', current_date,
+INSERT INTO gjennomforing (id, tiltak_id, arrangor_id, navn, status, oppstart_dato, slutt_dato, registrert_dato, fremmote_dato)
+VALUES ('b3420940-5479-48c8-b2fa-3751c7a33aa2', 'b18fd670-3bc1-11ec-8d3d-0242ac130003', '8a37bce6-3bc1-11ec-8d3d-0242ac130003', 'Tiltaksgjennomforing1', 'GJENNOMFORES', current_date,
         current_date, current_timestamp, current_timestamp);
 
 INSERT INTO deltaker (id, bruker_id, gjennomforing_id, oppstart_dato, slutt_dato, status, dager_per_uke, prosent_stilling, registrert_dato)

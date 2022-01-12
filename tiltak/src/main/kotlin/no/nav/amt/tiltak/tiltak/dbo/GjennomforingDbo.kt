@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.tiltak.dbo
 
-import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.utils.UpdateCheck
 import no.nav.amt.tiltak.utils.UpdateStatus
 import java.time.LocalDate
@@ -10,7 +10,6 @@ import java.util.*
 
 data class GjennomforingDbo(
 	val id: UUID,
-	val arenaId: Int,
 	val arrangorId: UUID,
 	val tiltakId: UUID,
 	val navn: String,

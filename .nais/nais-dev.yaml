@@ -68,14 +68,8 @@ spec:
     - name: POAO_GCP_PROXY_URL
       value: https://poao-gcp-proxy.dev-fss-pub.nais.io
     # Kafka topics
-    - name: ARENA_TILTAK_TOPIC
-      value: teamarenanais.aapen-arena-tiltakendret-v1-q2
-    - name: ARENA_TILTAKSGRUPPE_TOPIC
-      value: teamarenanais.aapen-arena-tiltaksgruppeendret-v1-q2
-    - name: ARENA_TILTAKSGJENNOMFORING_TOPIC
-      value: teamarenanais.aapen-arena-tiltakgjennomforingendret-v1-q2
-    - name: ARENA_TILTAK_DELTAKER_TOPIC
-      value: teamarenanais.aapen-arena-tiltakdeltakerendret-v1-q2
+    - name: AMT_TILTAK_TOPIC
+      value: amt.amt-tiltak-v1
   gcp:
     sqlInstances:
       - type: POSTGRES_12

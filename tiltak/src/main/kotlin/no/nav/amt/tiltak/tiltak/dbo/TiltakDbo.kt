@@ -8,7 +8,6 @@ import java.util.*
 
 data class TiltakDbo(
 	val id: UUID,
-	val arenaId: String,
 	val navn: String,
 	val type: String,
 	val createdAt: LocalDateTime,

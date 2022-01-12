@@ -126,7 +126,7 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>arena-ingestor</artifactId>
+                <artifactId>arena-acl-ingestor</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -142,11 +142,6 @@
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>pdl</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>arena_ords_proxy</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -336,7 +331,6 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-jdk8</artifactId>
-            <version>1.5.10</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>
@@ -345,7 +339,6 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
-            <version>${kotlin.version}</version>
         </dependency>
     </dependencies>
 
