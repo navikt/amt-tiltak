@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor
 
-import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.Deltaker
-import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.Gjennomforing
+import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
+import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.GjennomforingPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.UnknownMessageWrapper
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.DeltakerProcessor
@@ -20,12 +20,12 @@ class ArenaAclIngestorImpl(
 
 		when (unknownMessageWrapper.type) {
 			"DELTAKER" -> {
-				val deltakerPayload = getObjectMapper().treeToValue(unknownMessageWrapper.payload, Deltaker::class.java)
+				val deltakerPayload = getObjectMapper().treeToValue(unknownMessageWrapper.payload, DeltakerPayload::class.java)
 				val deltakerMessage = toKnownMessageWrapper(deltakerPayload, unknownMessageWrapper)
 				deltakerProcessor.processMessage(deltakerMessage)
 			}
 			"GJENNOMFORING" -> {
-				val gjennomforingPayload = getObjectMapper().treeToValue(unknownMessageWrapper.payload, Gjennomforing::class.java)
+				val gjennomforingPayload = getObjectMapper().treeToValue(unknownMessageWrapper.payload, GjennomforingPayload::class.java)
 				val gjennomforingMessage = toKnownMessageWrapper(gjennomforingPayload, unknownMessageWrapper)
 				gjennomforingProcessor.processMessage(gjennomforingMessage)
 			}

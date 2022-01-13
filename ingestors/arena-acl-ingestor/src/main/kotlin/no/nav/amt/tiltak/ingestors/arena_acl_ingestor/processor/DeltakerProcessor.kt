@@ -1,8 +1,9 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.Deltaker
+import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
 import org.springframework.stereotype.Service
 
@@ -10,21 +11,21 @@ import org.springframework.stereotype.Service
 class DeltakerProcessor(
 	private val gjennomforingService: GjennomforingService,
 	private val deltakerService: DeltakerService,
-) : GenericProcessor<Deltaker>() {
+) : GenericProcessor<DeltakerPayload>() {
 
-	override fun processInsertMessage(message: MessageWrapper<Deltaker>) {
+	override fun processInsertMessage(message: MessageWrapper<DeltakerPayload>) {
 		upsert(message)
 	}
 
-	override fun processModifyMessage(message: MessageWrapper<Deltaker>) {
+	override fun processModifyMessage(message: MessageWrapper<DeltakerPayload>) {
 		upsert(message)
 	}
 
-	override fun processDeleteMessage(message: MessageWrapper<Deltaker>) {
+	override fun processDeleteMessage(message: MessageWrapper<DeltakerPayload>) {
 		TODO("Not yet implemented")
 	}
 
-	private fun upsert(message: MessageWrapper<Deltaker>) {
+	private fun upsert(message: MessageWrapper<DeltakerPayload>) {
 		val deltaker = message.payload
 
 		val tiltaksgjennomforing = gjennomforingService.getGjennomforing(deltaker.gjennomforingId)
@@ -42,12 +43,12 @@ class DeltakerProcessor(
 		)
 	}
 
-	private fun tilDeltakerStatus(status: Deltaker.Status): no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status {
+	private fun tilDeltakerStatus(status: DeltakerPayload.Status): Deltaker.Status {
 		return when(status){
-			Deltaker.Status.VENTER_PA_OPPSTART -> no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.VENTER_PA_OPPSTART
-			Deltaker.Status.DELTAR -> no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.DELTAR
-			Deltaker.Status.HAR_SLUTTET -> no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.HAR_SLUTTET
-			Deltaker.Status.IKKE_AKTUELL -> no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.IKKE_AKTUELL
+			DeltakerPayload.Status.VENTER_PA_OPPSTART -> Deltaker.Status.VENTER_PA_OPPSTART
+			DeltakerPayload.Status.DELTAR -> Deltaker.Status.DELTAR
+			DeltakerPayload.Status.HAR_SLUTTET -> Deltaker.Status.HAR_SLUTTET
+			DeltakerPayload.Status.IKKE_AKTUELL -> Deltaker.Status.IKKE_AKTUELL
 		}
 	}
 

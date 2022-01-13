@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-data class Gjennomforing(
+data class GjennomforingPayload(
 	val id: UUID,
 	val tiltak: Tiltak,
 	val virksomhetsnummer: String,

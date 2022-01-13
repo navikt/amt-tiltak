@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-data class Deltaker(
+data class DeltakerPayload(
 	val id: UUID,
 	val gjennomforingId: UUID,
 	val personIdent: String,
