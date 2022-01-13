@@ -7,7 +7,5 @@ data class Ansatt (
 	val personligIdent: String,
     val fornavn: String,
     val etternavn: String,
-	val telefonnummer: String?,
-	val epost: String?,
     val arrangorer: List<TilknyttetArrangor>
 )

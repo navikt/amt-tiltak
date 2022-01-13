@@ -23,7 +23,7 @@ open class DeltakerRepository(
 			brukerFodselsnummer = rs.getString("fodselsnummer"),
 			brukerFornavn = rs.getString("fornavn"),
 			brukerEtternavn = rs.getString("etternavn"),
-			startDato = rs.getDate("oppstart_dato")?.toLocalDate(),
+			startDato = rs.getDate("start_dato")?.toLocalDate(),
 			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
 			gjennomforingId = UUID.fromString(rs.getString("gjennomforing_id")),
 			dagerPerUke = rs.getInt("dager_per_uke"),
@@ -39,7 +39,7 @@ open class DeltakerRepository(
 		id: UUID,
 		brukerId: UUID,
 		gjennomforingId: UUID,
-		oppstartDato: LocalDate?,
+		startDato: LocalDate?,
 		sluttDato: LocalDate?,
 		status: Deltaker.Status,
 		dagerPerUke: Int?,
@@ -47,12 +47,12 @@ open class DeltakerRepository(
 		registrertDato: LocalDateTime
 	): DeltakerDbo {
 		val sql = """
-			INSERT INTO deltaker(id, bruker_id, gjennomforing_id, oppstart_dato, slutt_dato, status,
+			INSERT INTO deltaker(id, bruker_id, gjennomforing_id, start_dato, slutt_dato, status,
 								 dager_per_uke, prosent_stilling, registrert_dato)
 			VALUES (:id,
 					:brukerId,
 					:gjennomforingId,
-					:oppstartsdato,
+					:startdato,
 					:sluttdato,
 					:status,
 					:dagerPerUke,
@@ -65,7 +65,7 @@ open class DeltakerRepository(
 				"id" to id,
 				"brukerId" to brukerId,
 				"gjennomforingId" to gjennomforingId,
-				"oppstartsdato" to oppstartDato,
+				"startdato" to startDato,
 				"sluttdato" to sluttDato,
 				"status" to status.name,
 				"dagerPerUke" to dagerPerUke,
@@ -103,7 +103,7 @@ open class DeltakerRepository(
 		val sql = """
 			UPDATE deltaker
 			SET status        = :deltakerStatus,
-				oppstart_dato = :oppstartDato,
+				start_dato    = :startDato,
 				slutt_dato    = :sluttDato,
 				modified_at   = :modifiedAt
 			WHERE id = :deltakerInternalId
@@ -112,7 +112,7 @@ open class DeltakerRepository(
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
 				"deltakerStatus" to deltaker.status.name,
-				"oppstartDato" to deltaker.startDato,
+				"startDato" to deltaker.startDato,
 				"sluttDato" to deltaker.sluttDato,
 				"modifiedAt" to deltaker.modifiedAt,
 				"deltakerInternalId" to deltaker.id

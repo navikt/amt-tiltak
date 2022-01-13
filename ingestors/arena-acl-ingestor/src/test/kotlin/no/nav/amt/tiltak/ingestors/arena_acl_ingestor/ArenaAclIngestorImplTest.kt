@@ -28,7 +28,7 @@ class ArenaAclIngestorImplTest : StringSpec({
 			    "personIdent": "12345678900",
 			    "startDato": "2022-01-10",
 			    "sluttDato": "2022-01-10",
-			    "status": "GJENNOMFORES",
+			    "status": "DELTAR",
 			    "dagerPerUke": 5,
 			    "prosentDeltid": 100.0,
 			    "registrertDato": "2022-01-10T10:45:32.800Z"
@@ -64,6 +64,7 @@ class ArenaAclIngestorImplTest : StringSpec({
 				},
 				"virksomhetsnummer": "1235543432",
 				"navn": "Tiltak hos Muligheter AS",
+				"status": "GJENNOMFORES",
 				"startDato": "2022-01-10",
 				"sluttDato": "2022-01-12",
 				"registrertDato": "2022-01-08T11:46:44.799Z",

@@ -65,8 +65,6 @@ class AnsattControllerTest {
 				personligIdent = "",
 				fornavn = "",
 				etternavn = "",
-				telefonnummer = "",
-				epost = "",
 				arrangorer = emptyList()
 			))
 

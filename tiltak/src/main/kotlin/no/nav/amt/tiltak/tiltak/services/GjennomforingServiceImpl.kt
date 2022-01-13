@@ -21,10 +21,10 @@ class GjennomforingServiceImpl(
 		tiltakId: UUID,
 		arrangorId: UUID,
 		navn: String,
-		status: Gjennomforing.Status?,
-		oppstartDato: LocalDate?,
+		status: Gjennomforing.Status,
+		startDato: LocalDate?,
 		sluttDato: LocalDate?,
-		registrertDato: LocalDateTime?,
+		registrertDato: LocalDateTime,
 		fremmoteDato: LocalDateTime?
 	): Gjennomforing {
 		val storedGjennomforing = gjennomforingRepository.get(id)
@@ -36,7 +36,7 @@ class GjennomforingServiceImpl(
 				storedGjennomforing.copy(
 					navn = navn,
 					status = status,
-					oppstartDato = oppstartDato,
+					startDato = startDato,
 					sluttDato = sluttDato,
 					registrertDato = registrertDato,
 					fremmoteDato = fremmoteDato
@@ -56,7 +56,7 @@ class GjennomforingServiceImpl(
 			arrangorId = arrangorId,
 			navn = navn,
 			status = status,
-			oppstartDato = oppstartDato,
+			startDato = startDato,
 			sluttDato = sluttDato,
 			registrertDato = registrertDato,
 			fremmoteDato = fremmoteDato

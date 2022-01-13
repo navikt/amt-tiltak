@@ -45,11 +45,11 @@ class DeltakerDetaljerRepositoryTest : FunSpec({
 		deltakerDetaljer.veilederNavn shouldBe "Vashnir Veiledersen"
 		deltakerDetaljer.veilederTelefonnummer shouldBe "84756"
 		deltakerDetaljer.veilederEpost shouldBe "vashnir.veiledersen@nav.no"
-		deltakerDetaljer.oppstartDato shouldBe LocalDate.now().minusDays(1)
+		deltakerDetaljer.startDato shouldBe LocalDate.now().minusDays(1)
 		deltakerDetaljer.sluttDato shouldBe LocalDate.now().plusDays(1)
-		deltakerDetaljer.status shouldBe Deltaker.Status.GJENNOMFORES
+		deltakerDetaljer.status shouldBe Deltaker.Status.DELTAR
 		deltakerDetaljer.gjennomforingId shouldBe UUID.fromString("b3420940-5479-48c8-b2fa-3751c7a33aa2")
-		deltakerDetaljer.gjennomforingOppstartDato shouldBe LocalDate.now()
+		deltakerDetaljer.gjennomforingStartDato shouldBe LocalDate.now()
 		deltakerDetaljer.gjennomforingSluttDato shouldBe LocalDate.now()
 		deltakerDetaljer.tiltakNavn shouldBe "Tiltak1"
 		deltakerDetaljer.tiltakKode shouldBe "AMO"

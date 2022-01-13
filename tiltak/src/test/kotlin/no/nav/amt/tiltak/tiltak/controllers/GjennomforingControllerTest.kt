@@ -1,8 +1,8 @@
 package no.nav.amt.tiltak.tiltak.controllers
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
@@ -48,7 +48,7 @@ class GjennomforingControllerTest {
 		arrangorId = UUID.randomUUID(),
 		navn = "tiltaksnavn",
 		fremmoteDato = LocalDateTime.now(),
-		oppstartDato = LocalDate.now(),
+		startDato = LocalDate.now(),
 		registrertDato = LocalDateTime.now(),
 		sluttDato = LocalDate.now(),
 		status = Gjennomforing.Status.GJENNOMFORES,
@@ -141,7 +141,7 @@ class GjennomforingControllerTest {
 			sluttDato = LocalDate.now(),
 			dagerPerUke = 1,
 			prosentStilling = 10.343f,
-			status = Deltaker.Status.GJENNOMFORES,
+			status = Deltaker.Status.DELTAR,
 			createdAt = LocalDateTime.now(),
 			modifiedAt = LocalDateTime.now(),
 			registrertDato = LocalDateTime.now()

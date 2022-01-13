@@ -16,10 +16,10 @@ interface GjennomforingService {
 		tiltakId: UUID,
 		arrangorId: UUID,
 		navn: String,
-		status: Gjennomforing.Status?,
-		oppstartDato: LocalDate?,
+		status: Gjennomforing.Status,
+		startDato: LocalDate?,
 		sluttDato: LocalDate?,
-		registrertDato: LocalDateTime?,
+		registrertDato: LocalDateTime,
 		fremmoteDato: LocalDateTime?
 	): Gjennomforing
 

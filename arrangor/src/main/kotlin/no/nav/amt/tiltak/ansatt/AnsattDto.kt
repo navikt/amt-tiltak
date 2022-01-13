@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.arrangor.controllers.dto
+package no.nav.amt.tiltak.ansatt
 
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.TilknyttetArrangor
@@ -9,8 +9,6 @@ data class AnsattDto(
 	val personligIdent: String,
 	val fornavn: String,
 	val etternavn: String,
-	val telefonnummer: String?,
-	val epost: String?,
 	val arrangorer: List<TilknyttetArrangorDto>
 )
 
@@ -29,8 +27,6 @@ fun Ansatt.toDto(): AnsattDto {
 		personligIdent = this.personligIdent,
 		fornavn = this.fornavn,
 		etternavn = this.etternavn,
-		telefonnummer = this.telefonnummer,
-		epost = this.epost,
 		arrangorer = this.arrangorer.map { it.toDto() }
 	)
 }

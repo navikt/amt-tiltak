@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-data class Deltaker(
+data class DeltakerPayload(
 	val id: UUID,
 	val gjennomforingId: UUID,
 	val personIdent: String,
@@ -15,8 +15,7 @@ data class Deltaker(
 	val prosentDeltid: Float?,
 	val registrertDato: LocalDateTime
 ) {
-
 	enum class Status {
-		VENTER_PA_OPPSTART, GJENNOMFORES, HAR_SLUTTET, IKKE_AKTUELL
+		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL
 	}
 }

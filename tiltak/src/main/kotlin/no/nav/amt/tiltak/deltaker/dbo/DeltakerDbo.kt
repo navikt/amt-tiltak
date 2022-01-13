@@ -30,8 +30,8 @@ data class DeltakerDbo(
 			fornavn = brukerFornavn,
 			etternavn = brukerEtternavn,
 			fodselsnummer = brukerFodselsnummer,
-			oppstartdato = startDato,
-			sluttdato = sluttDato,
+			startDato = startDato,
+			sluttDato = sluttDato,
 			status = status,
 			registrertDato = registrertDato
 		)

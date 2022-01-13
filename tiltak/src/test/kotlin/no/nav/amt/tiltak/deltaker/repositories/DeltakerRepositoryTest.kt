@@ -36,7 +36,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 	test("Insert should insert Deltaker and return DeltakerDbo") {
 		val id = UUID.randomUUID()
-		val oppstartDato = LocalDate.now().plusDays(7)
+		val startDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
 		val sluttDato = null
 		val deltakerStatus = Deltaker.Status.VENTER_PA_OPPSTART
@@ -47,7 +47,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			id,
 			brukerId,
 			gjennomforingId,
-			oppstartDato,
+			startDato,
 			sluttDato,
 			deltakerStatus,
 			dagerPerUke,
@@ -62,7 +62,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		dbo.brukerEtternavn shouldBe "Bruker Etternavn"
 		dbo.brukerFodselsnummer shouldBe fnr
 		dbo.gjennomforingId shouldBe gjennomforingId
-		dbo.startDato shouldBe oppstartDato
+		dbo.startDato shouldBe startDato
 		dbo.sluttDato shouldBe sluttDato
 		dbo.status shouldBe deltakerStatus
 		dbo.createdAt shouldNotBe null
@@ -71,7 +71,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 	}
 
 	test("Update should update Deltaker and return the updated Deltaker") {
-		val oppstartDato = LocalDate.now().plusDays(7)
+		val startDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
 
 		val sluttDato = null
@@ -83,7 +83,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			UUID.randomUUID(),
 			brukerId,
 			gjennomforingId,
-			oppstartDato,
+			startDato,
 			sluttDato,
 			deltakerStatus,
 			dagerPerUke,
@@ -91,24 +91,24 @@ internal class DeltakerRepositoryTest : FunSpec({
 			registrertDato
 		)
 
-		val updatedOppstartsdato = LocalDate.now().plusDays(1)
-		val updatedSluttdato = LocalDate.now().plusDays(14)
-		val updatedStatus = Deltaker.Status.GJENNOMFORES
+		val updatedStartDato = LocalDate.now().plusDays(1)
+		val updatedSluttDato = LocalDate.now().plusDays(14)
+		val updatedStatus = Deltaker.Status.DELTAR
 
-		val updated = dbo.update(updatedStatus, updatedOppstartsdato, updatedSluttdato)
+		val updated = dbo.update(updatedStatus, updatedStartDato, updatedSluttDato)
 
 		updated.status shouldBe UpdateStatus.UPDATED
 
 		val updatedDbo = repository.update(updated.updatedObject!!)
 
 		updatedDbo.id shouldBe dbo.id
-		updatedDbo.startDato shouldBe updatedOppstartsdato
-		updatedDbo.sluttDato shouldBe updatedSluttdato
+		updatedDbo.startDato shouldBe updatedStartDato
+		updatedDbo.sluttDato shouldBe updatedSluttDato
 		updatedDbo.status shouldBe updatedStatus
 	}
 
 	test("Get by id") {
-		val oppstartDato = LocalDate.now().plusDays(7)
+		val startDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
 		val sluttDato = null
 		val deltakerStatus = Deltaker.Status.VENTER_PA_OPPSTART
@@ -119,7 +119,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			UUID.randomUUID(),
 			brukerId,
 			gjennomforingId,
-			oppstartDato,
+			startDato,
 			sluttDato,
 			deltakerStatus,
 			dagerPerUke,
@@ -133,7 +133,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 	}
 
 	test("Get by BrukerId and Gjennomforing") {
-		val oppstartDato = LocalDate.now().plusDays(7)
+		val startDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
 		val sluttDato = null
 		val deltakerStatus = Deltaker.Status.VENTER_PA_OPPSTART
@@ -144,7 +144,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			UUID.randomUUID(),
 			brukerId,
 			gjennomforingId,
-			oppstartDato,
+			startDato,
 			sluttDato,
 			deltakerStatus,
 			dagerPerUke,
@@ -158,7 +158,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 	}
 
 	test("Get by Fodselsnummer and Gjennomforing") {
-		val oppstartDato = LocalDate.now().plusDays(7)
+		val startDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
 		val sluttDato = null
 		val deltakerStatus = Deltaker.Status.VENTER_PA_OPPSTART
@@ -169,7 +169,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			UUID.randomUUID(),
 			brukerId,
 			gjennomforingId,
-			oppstartDato,
+			startDato,
 			sluttDato,
 			deltakerStatus,
 			dagerPerUke,

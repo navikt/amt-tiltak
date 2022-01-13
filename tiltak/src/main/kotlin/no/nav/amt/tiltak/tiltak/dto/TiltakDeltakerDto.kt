@@ -11,8 +11,8 @@ data class TiltakDeltakerDto(
 	val mellomnavn: String? = null,
 	val etternavn: String,
 	val fodselsnummer: String,
-	val oppstartdato: LocalDate?,
-	val sluttdato: LocalDate?,
+	val startDato: LocalDate?,
+	val sluttDato: LocalDate?,
 	val status: Deltaker.Status?,
 	val registrertDato: LocalDateTime
 )
@@ -22,8 +22,8 @@ fun Deltaker.toDto() = TiltakDeltakerDto(
 	fornavn = fornavn,
 	etternavn = etternavn,
 	fodselsnummer = fodselsnummer,
-	oppstartdato = oppstartdato,
-	sluttdato = sluttdato,
+	startDato = startDato,
+	sluttDato = sluttDato,
 	status = status,
 	registrertDato = registrertDato
 )
