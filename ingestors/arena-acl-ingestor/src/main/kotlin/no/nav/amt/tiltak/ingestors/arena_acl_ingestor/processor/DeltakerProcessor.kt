@@ -1,11 +1,13 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatuser
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class DeltakerProcessor(
@@ -30,17 +32,25 @@ class DeltakerProcessor(
 
 		val tiltaksgjennomforing = gjennomforingService.getGjennomforing(deltaker.gjennomforingId)
 
-		deltakerService.upsertDeltaker(
+		val deltaker2 = Deltaker(
 			id = deltaker.id,
-			gjennomforingId = tiltaksgjennomforing.id,
-			fodselsnummer = deltaker.personIdent,
 			startDato = deltaker.startDato,
 			sluttDato = deltaker.sluttDato,
-			status = tilDeltakerStatus(deltaker.status),
+			statuser = DeltakerStatuser.aktivStatus(
+				tilDeltakerStatus(deltaker.status),
+				endretDato = LocalDate.now() // TODO når vi mottar den
+			),
 			dagerPerUke = deltaker.dagerPerUke,
 			prosentStilling = deltaker.prosentDeltid,
 			registrertDato = deltaker.registrertDato
 		)
+
+		deltakerService.upsertDeltaker(
+			fodselsnummer =  deltaker.personIdent,
+			gjennomforingId = tiltaksgjennomforing.id,
+			deltaker = deltaker2,
+		)
+
 	}
 
 	private fun tilDeltakerStatus(status: DeltakerPayload.Status): Deltaker.Status {
