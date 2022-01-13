@@ -9,8 +9,7 @@ data class Deltaker(
 	val bruker: Bruker? = null,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
-	val status: Status,
-	val statusEndret: LocalDate = LocalDate.now(),
+	var statuser: DeltakerStatuser,
 	val registrertDato: LocalDateTime,
 	val dagerPerUke: Int?,
 	val prosentStilling: Float?,
@@ -27,16 +26,15 @@ data class Deltaker(
 		newStatusEndretDato: LocalDate = LocalDate.now()
 	): Deltaker {
 
-		return if (status != newStatus
+		return if (statuser.current.status != newStatus
 			|| startDato != newDeltakerStartDato
 			|| sluttDato != newDeltakerSluttDato
 		) {
 
 			copy(
-				status = newStatus,
 				startDato = newDeltakerStartDato,
 				sluttDato = newDeltakerSluttDato,
-				statusEndret = if (newStatus == status) statusEndret else newStatusEndretDato
+				statuser = if(statuser.current.status == newStatus) statuser else statuser.medNy(newStatus, newStatusEndretDato),
 			)
 
 		} else this
