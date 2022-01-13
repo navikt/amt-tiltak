@@ -34,10 +34,9 @@ CREATE TABLE arrangor_ansatt
 (
     id              uuid PRIMARY KEY,
     personlig_ident varchar                  NOT NULL UNIQUE,
-    fornavn         varchar,
-    etternavn       varchar,
-    telefonnummer   varchar,
-    epost           varchar,
+    fornavn         varchar                  NOT NULL,
+    mellomnavn      varchar,
+    etternavn       varchar                  NOT NULL,
     created_at      timestamp with time zone not null default current_timestamp,
     modified_at     timestamp with time zone not null default current_timestamp
 );
@@ -49,7 +48,6 @@ CREATE TABLE arrangor_ansatt_rolle
     arrangor_id uuid                     not null references arrangor (id),
     rolle       arrangor_rolle           not null,
     created_at  timestamp with time zone not null default current_timestamp
-
 );
 
 CREATE TABLE tiltak
@@ -61,21 +59,17 @@ CREATE TABLE tiltak
     modified_at timestamp with time zone default current_timestamp
 );
 
-CREATE TYPE gjennomforing_status AS ENUM (
-    'GJENNOMFORES', 'AVSLUTTET', 'IKKE_STARTET'
-    );
-
 CREATE TABLE gjennomforing
 (
     id              uuid PRIMARY KEY,
     tiltak_id       uuid                     not null references tiltak (id),
     arrangor_id     uuid                     not null references arrangor (id),
-    navn            varchar,
-    status          varchar,
-    oppstart_dato   date,
+    navn            varchar                  not null,
+    status          varchar                  not null check (status in('IKKE_STARTET', 'GJENNOMFORES', 'AVSLUTTET')),
+    start_dato      date,
     slutt_dato      date,
-    registrert_dato timestamp with time zone,
     fremmote_dato   timestamp with time zone,
+    registrert_dato timestamp with time zone not null,
     created_at      timestamp with time zone not null default current_timestamp,
     modified_at     timestamp with time zone not null default current_timestamp
 );
@@ -100,12 +94,12 @@ CREATE TABLE deltaker
     id               uuid PRIMARY KEY,
     bruker_id        uuid                     not null references bruker (id),
     gjennomforing_id uuid                     not null references gjennomforing (id),
-    oppstart_dato    date,
+    start_dato       date,
     slutt_dato       date,
-    status           varchar,
-    created_at       timestamp with time zone default current_timestamp,
-    modified_at      timestamp with time zone default current_timestamp,
+    status           varchar not null check (status in('VENTER_PA_OPPSTART', 'DELTAR', 'HAR_SLUTTET', 'IKKE_AKTUELL')),
     dager_per_uke    integer,
     prosent_stilling float,
-    registrert_dato  timestamp with time zone not null
+    registrert_dato  timestamp with time zone not null,
+    created_at       timestamp with time zone default current_timestamp,
+    modified_at      timestamp with time zone default current_timestamp
 );

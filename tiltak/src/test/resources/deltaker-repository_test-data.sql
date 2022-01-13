@@ -11,7 +11,7 @@ VALUES ('8a37bce6-3bc1-11ec-8d3d-0242ac130003', '1', 'OrgNavn', '2', 'VirkNavn')
 INSERT INTO tiltak(id, navn, type)
 VALUES ('b18fd670-3bc1-11ec-8d3d-0242ac130003', 'Tiltak1', 'AMO');
 
-INSERT INTO gjennomforing (id, tiltak_id, arrangor_id, navn, status, oppstart_dato,
+INSERT INTO gjennomforing (id, tiltak_id, arrangor_id, navn, status, start_dato,
                             slutt_dato, registrert_dato, fremmote_dato)
 VALUES ('b3420940-5479-48c8-b2fa-3751c7a33aa2', 'b18fd670-3bc1-11ec-8d3d-0242ac130003', '8a37bce6-3bc1-11ec-8d3d-0242ac130003', 'Gjennomforing1', 'GJENNOMFORES', current_date,
         current_date, current_timestamp, current_timestamp);

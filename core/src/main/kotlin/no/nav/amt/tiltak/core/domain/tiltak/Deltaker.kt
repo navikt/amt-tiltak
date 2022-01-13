@@ -9,15 +9,13 @@ class Deltaker(
 	val fornavn: String,
 	val etternavn: String,
 	val fodselsnummer: String,
-	val oppstartdato: LocalDate?,
-	val sluttdato: LocalDate?,
+	val startDato: LocalDate?,
+	val sluttDato: LocalDate?,
 	val status: Status,
 	val registrertDato: LocalDateTime
 ) {
-
 	enum class Status {
-		VENTER_PA_OPPSTART, GJENNOMFORES, HAR_SLUTTET, IKKE_AKTUELL
+		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL
 	}
-
 }
 

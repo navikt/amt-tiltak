@@ -7,8 +7,8 @@ import java.util.*
 data class GjennomforingDto(
 	val id: UUID,
 	val navn: String,
-	val oppstartdato: LocalDate?,
-	val sluttdato: LocalDate?,
+	val startDato: LocalDate?,
+	val sluttDato: LocalDate?,
 	val status: Gjennomforing.Status?,
 	val tiltak: TiltakDto
 )
@@ -16,8 +16,8 @@ data class GjennomforingDto(
 fun Gjennomforing.toDto() = GjennomforingDto(
 	id = this.id,
 	navn = this.navn,
-	oppstartdato = this.oppstartDato,
-	sluttdato = this.sluttDato,
+	startDato = this.startDato,
+	sluttDato = this.sluttDato,
 	status = this.status,
 	tiltak = this.tiltak.toDto()
 )

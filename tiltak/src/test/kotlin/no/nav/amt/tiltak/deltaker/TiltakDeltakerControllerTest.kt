@@ -74,15 +74,15 @@ class TiltakDeltakerControllerTest {
 					adresse = ""
 				),
 				navVeileder = null,
-				oppstartdato = null,
-				sluttdato = null,
+				startDato = null,
+				sluttDato = null,
 				registrertDato = LocalDateTime.now(),
 				status = null,
 				gjennomforing = GjennomforingDto(
 					id = UUID.randomUUID(),
 					navn = "",
-					oppstartdato = null,
-					sluttdato = null,
+					startDato = null,
+					sluttDato = null,
 					status = null,
 					tiltak = TiltakDto(
 						tiltakskode = "",

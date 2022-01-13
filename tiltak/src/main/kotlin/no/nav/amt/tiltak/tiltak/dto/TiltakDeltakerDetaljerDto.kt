@@ -15,8 +15,8 @@ data class TiltakDeltakerDetaljerDto(
 	val epost: String?,
 	val navKontor: NavKontorDTO,
 	val navVeileder: NavVeilederDTO?,
-	val oppstartdato: LocalDate?,
-	val sluttdato: LocalDate?,
+	val startDato: LocalDate?,
+	val sluttDato: LocalDate?,
 	val registrertDato: LocalDateTime,
 	val status: Deltaker.Status?,
 	val gjennomforing: GjennomforingDto

@@ -9,11 +9,16 @@ data class Gjennomforing(
 	val tiltak: Tiltak,
 	val virksomhetsnummer: String,
 	val navn: String,
+	val status: Status,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val registrertDato: LocalDateTime,
 	val fremmoteDato: LocalDateTime?
-)
+) {
+	enum class Status {
+		IKKE_STARTET, GJENNOMFORES, AVSLUTTET
+	}
+}
 
 data class Tiltak(
 	val id: UUID,

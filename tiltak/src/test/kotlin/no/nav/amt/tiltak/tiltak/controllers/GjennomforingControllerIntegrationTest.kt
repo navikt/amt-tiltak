@@ -127,8 +127,8 @@ class GjennomforingControllerIntegrationTest {
 		deltaker1.fornavn shouldBe bruker1.fornavn
 		deltaker1.etternavn shouldBe bruker1.etternavn
 
-		deltaker1.oppstartdato shouldBe startDato
-		deltaker1.sluttdato shouldBe sluttDato
+		deltaker1.startDato shouldBe startDato
+		deltaker1.sluttDato shouldBe sluttDato
 		deltaker1.registrertDato.truncatedTo(ChronoUnit.MINUTES) shouldBe regDato.truncatedTo(ChronoUnit.MINUTES)
 
 	}
@@ -178,9 +178,9 @@ class GjennomforingControllerIntegrationTest {
 			id = UUID.randomUUID(),
 			brukerId = bruker.id,
 			gjennomforingId = gjennomforingId,
-			oppstartDato = startDato,
+			startDato = startDato,
 			sluttDato = sluttDato,
-			status = Deltaker.Status.GJENNOMFORES,
+			status = Deltaker.Status.DELTAR,
 			dagerPerUke = 5,
 			prosentStilling = 10f,
 			registrertDato = regDato
@@ -195,9 +195,9 @@ class GjennomforingControllerIntegrationTest {
 			arrangorId = arrangorId,
 			navn = "Kaffekurs",
 			status = Gjennomforing.Status.GJENNOMFORES,
-			oppstartDato = null,
+			startDato = null,
 			sluttDato = null,
-			registrertDato = null,
+			registrertDato = LocalDateTime.now(),
 			fremmoteDato = null
 		)
 	}

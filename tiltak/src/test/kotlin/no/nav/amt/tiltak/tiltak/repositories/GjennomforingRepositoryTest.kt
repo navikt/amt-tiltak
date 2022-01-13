@@ -41,8 +41,8 @@ internal class GjennomforingRepositoryTest {
 	internal fun `insert() should insert gjennomforing and return object`() {
 		val id = UUID.randomUUID()
 		val navn = "TEST Tiltaksgjennomforing"
-		val status = null
-		val oppstartDato = LocalDate.now().plusDays(2)
+		val status = Gjennomforing.Status.IKKE_STARTET
+		val startDato = LocalDate.now().plusDays(2)
 		val sluttDato = LocalDate.now().plusDays(10)
 		val registrertDato = LocalDateTime.now()
 		val fremmoteDato = LocalDateTime.now().plusDays(2).minusHours(2)
@@ -53,7 +53,7 @@ internal class GjennomforingRepositoryTest {
 			arrangorId = ARRANGOR_ID,
 			navn = navn,
 			status = status,
-			oppstartDato = oppstartDato,
+			startDato = startDato,
 			sluttDato = sluttDato,
 			registrertDato = registrertDato,
 			fremmoteDato = fremmoteDato
@@ -67,7 +67,7 @@ internal class GjennomforingRepositoryTest {
 		assertEquals(navn, savedGjennomforing.navn)
 		assertEquals(status, savedGjennomforing.status)
 
-		assertTrue(oppstartDato!!.isEqualTo(savedGjennomforing.oppstartDato!!))
+		assertTrue(startDato!!.isEqualTo(savedGjennomforing.startDato!!))
 		assertTrue(sluttDato!!.isEqualTo(savedGjennomforing.sluttDato!!))
 		assertTrue(registrertDato!!.isEqualTo(savedGjennomforing.registrertDato!!))
 		assertTrue(fremmoteDato!!.isEqualTo(savedGjennomforing.fremmoteDato!!))
@@ -82,8 +82,8 @@ internal class GjennomforingRepositoryTest {
 					arrangorId = UUID.randomUUID(),
 					tiltakId = UUID.randomUUID(),
 					navn = "idosfja",
-					status = null,
-					oppstartDato = null,
+					status = Gjennomforing.Status.IKKE_STARTET,
+					startDato = null,
 					sluttDato = null,
 					registrertDato = LocalDateTime.now(),
 					fremmoteDato = null,
@@ -99,8 +99,8 @@ internal class GjennomforingRepositoryTest {
 		val id = UUID.randomUUID()
 		val updatedNavn = "UpdatedNavn"
 		val updatedStatus = Gjennomforing.Status.GJENNOMFORES
-		val updatedOppstartsdato = LocalDate.now().plusDays(4)
-		val updatedSluttdato = LocalDate.now().plusDays(14)
+		val updatedStartDato = LocalDate.now().plusDays(4)
+		val updatedSluttDato = LocalDate.now().plusDays(14)
 		val updatedFremmotedato = LocalDateTime.now().plusDays(4)
 
 		val newGjennomforing = repository.insert(
@@ -108,8 +108,8 @@ internal class GjennomforingRepositoryTest {
 			tiltakId = TILTAK_ID,
 			arrangorId = ARRANGOR_ID,
 			"Navn",
-			status = null,
-			oppstartDato = null,
+			status = Gjennomforing.Status.IKKE_STARTET,
+			startDato = null,
 			sluttDato = null,
 			registrertDato = LocalDateTime.now(),
 			fremmoteDato = null
@@ -119,16 +119,16 @@ internal class GjennomforingRepositoryTest {
 			newGjennomforing.copy(
 				navn = updatedNavn,
 				status = updatedStatus,
-				oppstartDato = updatedOppstartsdato,
-				sluttDato = updatedSluttdato,
+				startDato = updatedStartDato,
+				sluttDato = updatedSluttDato,
 				fremmoteDato = updatedFremmotedato
 			)
 		)
 
 		assertEquals(updatedNavn, updatedGjennomforing.navn)
 		assertEquals(updatedStatus, updatedGjennomforing.status)
-		assertTrue(updatedOppstartsdato.isEqualTo(updatedGjennomforing.oppstartDato))
-		assertTrue(updatedSluttdato.isEqualTo(updatedGjennomforing.sluttDato))
+		assertTrue(updatedStartDato.isEqualTo(updatedGjennomforing.startDato))
+		assertTrue(updatedSluttDato.isEqualTo(updatedGjennomforing.sluttDato))
 		assertTrue(updatedFremmotedato.isEqualTo(updatedGjennomforing.fremmoteDato))
 	}
 

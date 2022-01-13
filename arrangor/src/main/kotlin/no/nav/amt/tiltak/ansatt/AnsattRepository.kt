@@ -18,8 +18,6 @@ open class AnsattRepository(
 			personligIdent = rs.getString("personlig_ident"),
 			fornavn = rs.getString("fornavn"),
 			etternavn = rs.getString("etternavn"),
-			telefonnummer = rs.getString("telefonnummer"),
-			epost = rs.getString("epost"),
 			createdAt = rs.getLocalDateTime("created_at"),
 			modifiedAt = rs.getLocalDateTime("modified_at")
 		)

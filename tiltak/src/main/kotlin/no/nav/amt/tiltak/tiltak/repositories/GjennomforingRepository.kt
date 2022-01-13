@@ -14,17 +14,15 @@ import java.util.*
 open class GjennomforingRepository(private val template: NamedParameterJdbcTemplate) {
 
 	private val rowMapper = RowMapper { rs, _ ->
-		val statusString = rs.getString("status")
-
 		GjennomforingDbo(
 			id = UUID.fromString(rs.getString("id")),
 			arrangorId = UUID.fromString(rs.getString("arrangor_id")),
 			tiltakId = UUID.fromString(rs.getString("tiltak_id")),
 			navn = rs.getString("navn"),
-			status = if (statusString != null) Gjennomforing.Status.valueOf(statusString) else null,
-			oppstartDato = rs.getDate("oppstart_dato")?.toLocalDate(),
+			status = Gjennomforing.Status.valueOf(rs.getString("status")),
+			startDato = rs.getDate("start_dato")?.toLocalDate(),
 			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
-			registrertDato = rs.getTimestamp("registrert_dato")?.toLocalDateTime(),
+			registrertDato = rs.getTimestamp("registrert_dato").toLocalDateTime(),
 			fremmoteDato = rs.getTimestamp("fremmote_dato")?.toLocalDateTime(),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
@@ -36,23 +34,23 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 		tiltakId: UUID,
 		arrangorId: UUID,
 		navn: String,
-		status: Gjennomforing.Status?,
-		oppstartDato: LocalDate?,
+		status: Gjennomforing.Status,
+		startDato: LocalDate?,
 		sluttDato: LocalDate?,
-		registrertDato: LocalDateTime?,
+		registrertDato: LocalDateTime,
 		fremmoteDato: LocalDateTime?
 	): GjennomforingDbo {
 
 		//language=PostgreSQL
 		val sql = """
-		INSERT INTO gjennomforing(id, tiltak_id, arrangor_id, navn, status, oppstart_dato,
+		INSERT INTO gjennomforing(id, tiltak_id, arrangor_id, navn, status, start_dato,
                            slutt_dato, registrert_dato, fremmote_dato)
 		VALUES (:id,
 				:tiltakId,
 				:arrangorId,
 				:navn,
 				:status,
-				:oppstartDato,
+				:startDato,
 				:sluttDato,
 				:registrertDato,
 				:fremmoteDato)
@@ -64,8 +62,8 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 				"tiltakId" to tiltakId,
 				"arrangorId" to arrangorId,
 				"navn" to navn,
-				"status" to status?.name,
-				"oppstartDato" to oppstartDato,
+				"status" to status.name,
+				"startDato" to startDato,
 				"sluttDato" to sluttDato,
 				"registrertDato" to registrertDato,
 				"fremmoteDato" to fremmoteDato
@@ -85,7 +83,7 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 			UPDATE gjennomforing
 			SET navn            = :navn,
 				status          = :status,
-				oppstart_dato   = :oppstart_dato,
+				start_dato      = :start_dato,
 				slutt_dato      = :slutt_dato,
 				registrert_dato = :registrert_dato,
 				fremmote_dato   = :fremmote_dato,
@@ -96,8 +94,8 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
 				"navn" to gjennomforing.navn,
-				"status" to gjennomforing.status?.name,
-				"oppstart_dato" to gjennomforing.oppstartDato,
+				"status" to gjennomforing.status.name,
+				"start_dato" to gjennomforing.startDato,
 				"slutt_dato" to gjennomforing.sluttDato,
 				"registrert_dato" to gjennomforing.registrertDato,
 				"fremmote_dato" to gjennomforing.fremmoteDato,

@@ -15,8 +15,7 @@ data class Deltaker(
 	val prosentDeltid: Float?,
 	val registrertDato: LocalDateTime
 ) {
-
 	enum class Status {
-		VENTER_PA_OPPSTART, GJENNOMFORES, HAR_SLUTTET, IKKE_AKTUELL
+		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL
 	}
 }

@@ -2,8 +2,6 @@ package no.nav.amt.tiltak.ansatt
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.arrangor.controllers.dto.AnsattDto
-import no.nav.amt.tiltak.arrangor.controllers.dto.toDto
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping

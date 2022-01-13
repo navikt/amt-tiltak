@@ -41,8 +41,6 @@ class AnsattRepositoryTest {
 		assertEquals("123456789", ansatt.personligIdent)
 		assertEquals("Test", ansatt.fornavn)
 		assertEquals("Testersen", ansatt.etternavn)
-		assertEquals("1234", ansatt.telefonnummer)
-		assertEquals("test@test.no", ansatt.epost)
 	}
 
 

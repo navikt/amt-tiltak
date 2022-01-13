@@ -43,15 +43,15 @@ open class TiltakDeltakerPresentationService(
 				"Test gata 1337, 1337 Oslo"
 			),
 			navVeileder = veileder,
-			oppstartdato = oppstartDato,
-			sluttdato = sluttDato,
+			startDato = startDato,
+			sluttDato = sluttDato,
 			registrertDato = registrertDato,
 			status = status,
 			gjennomforing = GjennomforingDto(
 				id = gjennomforingId,
 				navn = gjennomforingNavn,
-				oppstartdato = gjennomforingOppstartDato,
-				sluttdato = gjennomforingSluttDato,
+				startDato = gjennomforingStartDato,
+				sluttDato = gjennomforingSluttDato,
 				status = gjennomforingStatus,
 				tiltak = TiltakDto(
 					tiltaksnavn = tiltakNavn,

@@ -11,7 +11,7 @@ interface DeltakerService {
 		id: UUID,
 		gjennomforingId: UUID,
 		fodselsnummer: String,
-		oppstartDato: LocalDate?,
+		startDato: LocalDate?,
 		sluttDato: LocalDate?,
 		status: Deltaker.Status,
 		dagerPerUke: Int?,

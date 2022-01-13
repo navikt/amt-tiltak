@@ -10,8 +10,6 @@ data class AnsattDbo(
 	val personligIdent: String,
 	val fornavn: String,
 	val etternavn: String,
-	val telefonnummer: String?,
-	val epost: String?,
 	val createdAt: LocalDateTime,
 	val modifiedAt: LocalDateTime
 ) {
@@ -22,8 +20,6 @@ data class AnsattDbo(
 			personligIdent = personligIdent,
 			fornavn = fornavn,
 			etternavn = etternavn,
-			telefonnummer = telefonnummer,
-			epost = epost,
 			arrangorer = virksomheter
 		)
 	}

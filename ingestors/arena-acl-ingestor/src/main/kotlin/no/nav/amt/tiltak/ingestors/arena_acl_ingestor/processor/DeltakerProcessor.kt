@@ -33,7 +33,7 @@ class DeltakerProcessor(
 			id = deltaker.id,
 			gjennomforingId = tiltaksgjennomforing.id,
 			fodselsnummer = deltaker.personIdent,
-			oppstartDato = deltaker.startDato,
+			startDato = deltaker.startDato,
 			sluttDato = deltaker.sluttDato,
 			status = tilDeltakerStatus(deltaker.status),
 			dagerPerUke = deltaker.dagerPerUke,
@@ -45,7 +45,7 @@ class DeltakerProcessor(
 	private fun tilDeltakerStatus(status: Deltaker.Status): no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status {
 		return when(status){
 			Deltaker.Status.VENTER_PA_OPPSTART -> no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.VENTER_PA_OPPSTART
-			Deltaker.Status.GJENNOMFORES -> no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.GJENNOMFORES
+			Deltaker.Status.DELTAR -> no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.DELTAR
 			Deltaker.Status.HAR_SLUTTET -> no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.HAR_SLUTTET
 			Deltaker.Status.IKKE_AKTUELL -> no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.IKKE_AKTUELL
 		}

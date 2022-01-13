@@ -33,7 +33,7 @@ open class DeltakerServiceImpl(
 		id: UUID,
 		gjennomforingId: UUID,
 		fodselsnummer: String,
-		oppstartDato: LocalDate?,
+		startDato: LocalDate?,
 		sluttDato: LocalDate?,
 		status: Deltaker.Status,
 		dagerPerUke: Int?,
@@ -43,7 +43,7 @@ open class DeltakerServiceImpl(
 		deltakerRepository.get(id)?.also { deltaker ->
 			val updated = deltaker.update(
 				newStatus = status,
-				newDeltakerStartDato = oppstartDato,
+				newDeltakerStartDato = startDato,
 				newDeltakerSluttDato = sluttDato
 			)
 
@@ -58,7 +58,7 @@ open class DeltakerServiceImpl(
 			id,
 			fodselsnummer,
 			gjennomforingId,
-			oppstartDato,
+			startDato,
 			sluttDato,
 			status,
 			dagerPerUke,
@@ -71,7 +71,7 @@ open class DeltakerServiceImpl(
 		deltakerId: UUID,
 		fodselsnummer: String,
 		gjennomforingId: UUID,
-		oppstartDato: LocalDate?,
+		startDato: LocalDate?,
 		sluttDato: LocalDate?,
 		status: Deltaker.Status,
 		dagerPerUke: Int?,
@@ -84,7 +84,7 @@ open class DeltakerServiceImpl(
 			id = deltakerId,
 			brukerId = bruker.id,
 			gjennomforingId = gjennomforingId,
-			oppstartDato = oppstartDato,
+			startDato = startDato,
 			sluttDato = sluttDato,
 			status = status,
 			dagerPerUke = dagerPerUke,

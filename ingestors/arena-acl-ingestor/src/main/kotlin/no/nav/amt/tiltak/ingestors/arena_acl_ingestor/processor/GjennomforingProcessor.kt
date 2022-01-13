@@ -39,12 +39,20 @@ class GjennomforingProcessor(
 			tiltakId = gjennomforing.tiltak.id,
 			arrangorId = arrangor.id,
 			navn = gjennomforing.navn,
-			status = null,
-			oppstartDato = gjennomforing.startDato,
+			status = mapGjennomforingStatus(gjennomforing.status),
+			startDato = gjennomforing.startDato,
 			sluttDato = gjennomforing.sluttDato,
 			registrertDato = gjennomforing.registrertDato,
 			fremmoteDato = gjennomforing.fremmoteDato
 		)
+	}
+
+	private fun mapGjennomforingStatus(status: Gjennomforing.Status): no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing.Status {
+		return when(status) {
+			Gjennomforing.Status.IKKE_STARTET -> no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing.Status.IKKE_STARTET
+			Gjennomforing.Status.GJENNOMFORES -> no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing.Status.GJENNOMFORES
+			Gjennomforing.Status.AVSLUTTET -> no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing.Status.AVSLUTTET
+		}
 	}
 
 }
