@@ -4,14 +4,12 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.NavKontorService
 import no.nav.amt.tiltak.core.port.PersonService
-import no.nav.amt.tiltak.deltaker.commands.UpsertNavAnsattCommand
+import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
-import no.nav.amt.tiltak.deltaker.dbo.NavAnsattDbo
 import no.nav.amt.tiltak.deltaker.dbo.NavKontorDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
-import no.nav.amt.tiltak.deltaker.repositories.NavAnsattRepository
 import no.nav.amt.tiltak.deltaker.repositories.NavKontorRepository
 import no.nav.amt.tiltak.utils.UpdateStatus
 import org.springframework.stereotype.Service
@@ -23,10 +21,10 @@ import java.util.*
 open class DeltakerServiceImpl(
 	private val deltakerRepository: DeltakerRepository,
 	private val brukerRepository: BrukerRepository,
-	private val navAnsattRepository: NavAnsattRepository,
 	private val navKontorRepository: NavKontorRepository,
 	private val navKontorService: NavKontorService,
 	private val personService: PersonService,
+	private val veilederService: VeilederService,
 ) : DeltakerService {
 
 	override fun upsertDeltaker(
@@ -103,7 +101,7 @@ open class DeltakerServiceImpl(
 	}
 
 	private fun createBruker(fodselsnummer: String): BrukerDbo {
-		val veileder = upsertVeileder(fodselsnummer)
+		val veilederId = upsertVeileder(fodselsnummer)
 
 		val navKontor = getNavKontor(fodselsnummer)
 
@@ -118,24 +116,16 @@ open class DeltakerServiceImpl(
 			etternavn = person.etternavn,
 			telefonnummer = person.telefonnummer ?: personKontaktinformasjon.telefonnummer,
 			epost = personKontaktinformasjon.epost,
-			ansvarligVeilederId = veileder?.id,
+			ansvarligVeilederId = veilederId,
 			navKontorId = navKontor?.id
 		)
 
 		return brukerRepository.insert(bruker)
 	}
 
-	private fun upsertVeileder(fodselsnummer: String): NavAnsattDbo? {
+	private fun upsertVeileder(fodselsnummer: String): UUID? {
 		return personService.hentTildeltVeileder(fodselsnummer)?.let { veileder ->
-			navAnsattRepository.upsert(
-				UpsertNavAnsattCommand(
-					personligIdent = veileder.navIdent,
-					navn = veileder.navn,
-					epost = veileder.epost,
-					telefonnummer = veileder.telefonnummer
-				)
-			)
-			return navAnsattRepository.getNavAnsattWithIdent(veileder.navIdent)
+			return veilederService.upsertVeileder(veileder)
 		}
 	}
 
@@ -144,6 +134,5 @@ open class DeltakerServiceImpl(
 			navKontorRepository.upsert(it.enhetId, it.navn)
 		}
 	}
-
 
 }

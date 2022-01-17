@@ -3,15 +3,11 @@ package no.nav.amt.tiltak.tiltak.controllers
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.core.port.NavKontorService
-import no.nav.amt.tiltak.core.port.PersonService
+import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
-import no.nav.amt.tiltak.deltaker.repositories.NavAnsattRepository
 import no.nav.amt.tiltak.deltaker.repositories.NavKontorRepository
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
@@ -61,11 +57,11 @@ class GjennomforingControllerIntegrationTest {
 		deltakerService = DeltakerServiceImpl(
 			deltakerRepository,
 			brukerRepository,
-			mock(NavAnsattRepository::class.java),
 			mock(NavKontorRepository::class.java),
 			mock(NavKontorService::class.java),
-			mock(PersonService::class.java)
-		);
+			mock(PersonService::class.java),
+			mock(VeilederService::class.java),
+		)
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, TiltakServiceImpl(tiltakRepository))
 		controller = GjennomforingController(gjennomforingService, deltakerService)
 

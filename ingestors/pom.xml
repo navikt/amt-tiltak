@@ -14,6 +14,7 @@
 
     <modules>
         <module>arena-acl-ingestor</module>
+        <module>tildelt-veileder-ingestor</module>
     </modules>
 
 </project>
