@@ -6,20 +6,22 @@ import java.util.*
 data class DeltakerStatuser(
 	val statuser: List<DeltakerStatus>
 ) {
+	init {
+	    require(statuser.filter { it.aktiv }.size == 1) { "Kan kun ha en aktiv status"}
+	}
 
 	companion object {
 		fun aktivStatus(status: Deltaker.Status, endretDato: LocalDate = LocalDate.now()) =
-			DeltakerStatuser(listOf(DeltakerStatus(
+			DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(
 				status = status,
-				endretDato = endretDato,
-				aktiv = true
+				endretDato = endretDato
 			)))
 	}
 
-	val current: DeltakerStatus = requireNotNull(statuser.find { it.aktiv }) { "Deltaker må ha minst en aktiv status" }
+	val current: DeltakerStatus = statuser.find { it.aktiv }!!
 
 	fun medNy(status: Deltaker.Status, endretDato: LocalDate) = DeltakerStatuser(
-		statuser.map { it.deaktiver() } + DeltakerStatus(status = status, endretDato = endretDato, aktiv = true)
+		statuser.map { it.deaktiver() } + DeltakerStatus.nyAktiv(status = status, endretDato = endretDato)
 	)
 }
 
@@ -29,5 +31,14 @@ data class DeltakerStatus(
 	val endretDato: LocalDate,
 	val aktiv: Boolean = false
 ) {
+
+	companion object {
+		fun nyAktiv(status: Deltaker.Status, endretDato: LocalDate = LocalDate.now()) =
+			DeltakerStatus(status = status, endretDato = endretDato, aktiv = true)
+
+		fun nyInaktiv(status: Deltaker.Status, endretDato: LocalDate = LocalDate.now()) =
+			DeltakerStatus(status = status, endretDato = endretDato, aktiv = false)
+	}
+
 	fun deaktiver(): DeltakerStatus = copy(aktiv = false)
 }

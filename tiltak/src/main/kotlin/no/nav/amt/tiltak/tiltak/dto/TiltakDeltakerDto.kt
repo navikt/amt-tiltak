@@ -24,6 +24,6 @@ fun Deltaker.toDto() = TiltakDeltakerDto(
 	fodselsnummer = requireNotNull(bruker).fodselsnummer,
 	startDato = startDato,
 	sluttDato = sluttDato,
-	status = statuser.current.status,
+	status = status,
 	registrertDato = registrertDato
 )

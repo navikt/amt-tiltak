@@ -21,7 +21,7 @@ open class DeltakerServiceImpl(
 		return deltakerRepository.get(fodselsnummer, gjennomforingId)
 			?.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker)
 			?.let {
-				val updated = it.updateStatus(deltaker.statuser.current.status, deltaker.startDato, deltaker.sluttDato)
+				val updated = it.updateStatus(deltaker.status, deltaker.startDato, deltaker.sluttDato)
 				if(it != updated) update(updated) else it
 			}
 			?: createDeltaker(fodselsnummer, gjennomforingId, deltaker)

@@ -9,10 +9,10 @@ data class Deltaker(
 	val bruker: Bruker? = null,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
-	var statuser: DeltakerStatuser,
+	val statuser: DeltakerStatuser,
 	val registrertDato: LocalDateTime,
-	val dagerPerUke: Int?,
-	val prosentStilling: Float?,
+	val dagerPerUke: Int? = null,
+	val prosentStilling: Float? = null,
 ) {
 
 	enum class Status {
@@ -39,5 +39,7 @@ data class Deltaker(
 
 		} else this
 	}
+
+	val status = statuser.current.status
 }
 

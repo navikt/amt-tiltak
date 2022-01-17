@@ -116,7 +116,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val startDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
 		val sluttDato = null
-		val deltakerStatus = Deltaker.Status.VENTER_PA_OPPSTART
 		val dagerPerUke = 2
 		val prosentStilling = 20.0f
 
@@ -140,7 +139,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val startDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
 		val sluttDato = null
-		val deltakerStatus = Deltaker.Status.VENTER_PA_OPPSTART
 		val dagerPerUke = 2
 		val prosentStilling = 20.0f
 
@@ -164,7 +162,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val startDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
 		val sluttDato = null
-		val deltakerStatus = Deltaker.Status.VENTER_PA_OPPSTART
 		val dagerPerUke = 2
 		val prosentStilling = 20.0f
 

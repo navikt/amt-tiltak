@@ -26,7 +26,6 @@ class DeltakerStatusRepository(
 
 	}
 
-	// TODO Dette burde nok løses med SQL etter hvert
 	fun upsert(deltakerStatuser: List<DeltakerStatusDbo>) = deltakerStatuser.forEach { upsert(it) }
 
 	fun upsert(dbo: DeltakerStatusDbo) {
@@ -41,8 +40,6 @@ class DeltakerStatusRepository(
 										   status = :status,
 										   active         = :active
 		""".trimIndent()
-
-		val id = UUID.randomUUID()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
