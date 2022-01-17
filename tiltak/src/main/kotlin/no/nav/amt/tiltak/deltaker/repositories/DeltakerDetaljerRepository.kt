@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDetaljerDbo
 import no.nav.amt.tiltak.utils.getLocalDateTime
 import no.nav.amt.tiltak.utils.getNullableLocalDate
+import no.nav.amt.tiltak.utils.getNullableUUID
 import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -31,6 +32,7 @@ class GetDeltakerDetaljerQuery(
 			sluttDato = rs.getNullableLocalDate("slutt_dato"),
 			registrertDato = rs.getLocalDateTime("registrert_dato"),
 			status = rs.getString("status")?.let { Deltaker.Status.valueOf(it) },
+			navKontorId = rs.getNullableUUID("nav_kontor_id"),
 			gjennomforingId = rs.getUUID("gjennomforing_id"),
 			gjennomforingNavn = rs.getString("gjennomforing_navn"),
 			gjennomforingStartDato = rs.getNullableLocalDate("gjennomforing_start_dato"),
@@ -53,6 +55,7 @@ class GetDeltakerDetaljerQuery(
 			   bruker.fodselsnummer         AS fodselsnummer,
 			   bruker.telefonnummer         AS telefonnummer,
 			   bruker.epost                 AS epost,
+			   bruker.nav_kontor_id         AS nav_kontor_id,
 			   nav_ansatt.navn           	AS veileder_navn,
 			   nav_ansatt.telefonnummer     AS veileder_telefonnummer,
 			   nav_ansatt.epost             AS veileder_epost,

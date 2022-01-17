@@ -21,6 +21,7 @@ data class DeltakerDetaljerDbo(
 	val sluttDato: LocalDate?,
 	val registrertDato: LocalDateTime,
 	val status: Deltaker.Status?,
+	val navKontorId: UUID?,
 	val gjennomforingId: UUID,
 	val gjennomforingNavn: String,
 	val gjennomforingStartDato: LocalDate?,

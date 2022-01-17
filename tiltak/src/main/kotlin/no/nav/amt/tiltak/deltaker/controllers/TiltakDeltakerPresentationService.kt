@@ -1,7 +1,9 @@
 package no.nav.amt.tiltak.deltaker.controllers
 
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDetaljerDbo
+import no.nav.amt.tiltak.deltaker.dbo.NavKontorDbo
 import no.nav.amt.tiltak.deltaker.repositories.GetDeltakerDetaljerQuery
+import no.nav.amt.tiltak.deltaker.repositories.NavKontorRepository
 import no.nav.amt.tiltak.tiltak.dto.*
 import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -11,19 +13,25 @@ import java.util.*
 
 @Service
 open class TiltakDeltakerPresentationService(
-	private val template: NamedParameterJdbcTemplate
+	private val template: NamedParameterJdbcTemplate,
+	private val navKontorRepository: NavKontorRepository
 ) {
 
 	open fun getDeltakerDetaljerById(deltakerId: UUID): TiltakDeltakerDetaljerDto {
-		return GetDeltakerDetaljerQuery(template).query(deltakerId)?.toDto()
+		val deltaker = GetDeltakerDetaljerQuery(template).query(deltakerId)
 			?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Deltaker med id $deltakerId finnes ikke")
+
+		val navKontor = deltaker.navKontorId
+			?.let { navKontorRepository.get(it) }
+
+		return deltaker.toDto(navKontor)
 	}
 
-	private fun DeltakerDetaljerDbo.toDto(): TiltakDeltakerDetaljerDto {
+	private fun DeltakerDetaljerDbo.toDto(navKontor: NavKontorDbo?): TiltakDeltakerDetaljerDto {
 		val hasVeileder = veilederNavn != null
 
-		val veileder: NavVeilederDTO? = if (hasVeileder) {
-			NavVeilederDTO(
+		val veileder: NavVeilederDto? = if (hasVeileder) {
+			NavVeilederDto(
 				veilederNavn!!,
 				veilederTelefonnummer,
 				veilederEpost
@@ -38,10 +46,7 @@ open class TiltakDeltakerPresentationService(
 			fodselsnummer = fodselsnummer,
 			telefonnummer = telefonnummer,
 			epost = epost,
-			navKontor = NavKontorDTO(
-				"Test Kontor",
-				"Test gata 1337, 1337 Oslo"
-			),
+			navKontor = navKontor?.let { NavKontorDto(it.navn) },
 			navVeileder = veileder,
 			startDato = startDato,
 			sluttDato = sluttDato,
