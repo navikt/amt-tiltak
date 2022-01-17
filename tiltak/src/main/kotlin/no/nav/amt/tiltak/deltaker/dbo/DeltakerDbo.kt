@@ -2,11 +2,6 @@ package no.nav.amt.tiltak.deltaker.dbo
 
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatuser
-import no.nav.amt.tiltak.utils.UpdateCheck
-import no.nav.amt.tiltak.utils.UpdateStatus
-import org.checkerframework.checker.nullness.qual.RequiresNonNull
-import java.lang.IllegalStateException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -36,7 +31,6 @@ data class DeltakerDbo(
 			brukerFodselsnummer = requireNotNull(deltaker.bruker?.fodselsnummer),
 			brukerFornavn = requireNotNull(deltaker.bruker?.fornavn),
 			brukerEtternavn = requireNotNull(deltaker.bruker?.etternavn),
-			// gjennomforingId = Denne lagrer vi vel aldri på nytt?
 			startDato = deltaker.startDato,
 			sluttDato = deltaker.sluttDato,
 			dagerPerUke = deltaker.dagerPerUke,

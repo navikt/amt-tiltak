@@ -28,27 +28,27 @@ class DeltakerProcessor(
 	}
 
 	private fun upsert(message: MessageWrapper<DeltakerPayload>) {
-		val deltaker = message.payload
+		val deltakerDto = message.payload
 
-		val tiltaksgjennomforing = gjennomforingService.getGjennomforing(deltaker.gjennomforingId)
+		val tiltaksgjennomforing = gjennomforingService.getGjennomforing(deltakerDto.gjennomforingId)
 
-		val deltaker2 = Deltaker(
-			id = deltaker.id,
-			startDato = deltaker.startDato,
-			sluttDato = deltaker.sluttDato,
+		val deltaker = Deltaker(
+			id = deltakerDto.id,
+			startDato = deltakerDto.startDato,
+			sluttDato = deltakerDto.sluttDato,
 			statuser = DeltakerStatuser.aktivStatus(
-				tilDeltakerStatus(deltaker.status),
-				endretDato = LocalDate.now() // TODO når vi mottar den
+				tilDeltakerStatus(deltakerDto.status),
+				endretDato = LocalDate.now()
 			),
-			dagerPerUke = deltaker.dagerPerUke,
-			prosentStilling = deltaker.prosentDeltid,
-			registrertDato = deltaker.registrertDato
+			dagerPerUke = deltakerDto.dagerPerUke,
+			prosentStilling = deltakerDto.prosentDeltid,
+			registrertDato = deltakerDto.registrertDato
 		)
 
 		deltakerService.upsertDeltaker(
-			fodselsnummer =  deltaker.personIdent,
+			fodselsnummer =  deltakerDto.personIdent,
 			gjennomforingId = tiltaksgjennomforing.id,
-			deltaker = deltaker2,
+			deltaker = deltaker,
 		)
 
 	}
