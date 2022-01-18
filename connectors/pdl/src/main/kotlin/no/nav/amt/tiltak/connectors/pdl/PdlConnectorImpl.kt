@@ -40,6 +40,8 @@ class PdlConnectorImpl(
 				throw RuntimeException("PDL respons inneholder ikke data")
 			}
 
+			throwPdlApiErrors(gqlResponse) // respons kan inneholde feil selv om den ikke er tom ref: https://pdldocs-navno.msappproxy.net/ekstern/index.html#appendix-graphql-feilhandtering
+
 			return toPdlBruker(gqlResponse.data)
 		}
 	}
@@ -96,6 +98,14 @@ class PdlConnectorImpl(
 		val prioritertNummer = telefonnummere.minByOrNull { it.prioritet } ?: return null
 
 		return "${prioritertNummer.landskode} ${prioritertNummer.nummer}"
+	}
+
+	private fun throwPdlApiErrors(response: PdlQueries.HentBruker.Response) {
+		response.errors?.let { feilmeldinger ->
+			val melding = feilmeldinger.joinToString(separator = "\nError i respons fra pdl:"){it.message + "(feilkode: " + it.extensions?.code + ")"}
+			throw RuntimeException(melding)
+
+		}
 	}
 
 	private fun hentGjeldendeIdent(response: PdlQueries.HentGjeldendeIdent.ResponseData): String {
