@@ -100,6 +100,10 @@ open class DeltakerServiceImpl(
 			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 	}
 
+	override fun oppdaterDeltakerVeileder(brukerPersonligIdent: String, veilederId: UUID) {
+		brukerRepository.oppdaterVeileder(brukerPersonligIdent, veilederId)
+	}
+
 	private fun createBruker(fodselsnummer: String): BrukerDbo {
 		val veilederId = upsertVeileder(fodselsnummer)
 

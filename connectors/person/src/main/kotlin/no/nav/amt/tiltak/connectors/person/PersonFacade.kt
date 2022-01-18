@@ -40,4 +40,8 @@ class PersonFacade(
 		}
 	}
 
+	override fun hentGjeldendePersonligIdent(ident: String): String {
+		return pdlConnector.hentGjeldendePersonligIdent(ident)
+	}
+
 }

@@ -26,6 +26,10 @@ class PersonServiceMock : PersonService {
 		throw NotImplementedError("Mock does not support getting Veileder")
 	}
 
+	override fun hentGjeldendePersonligIdent(ident: String): String {
+		TODO("Not yet implemented")
+	}
+
 	private fun PersonMockData.toPdlBruker(): Person {
 		return Person(
 			fornavn = this.fornavn,

@@ -23,4 +23,6 @@ interface DeltakerService {
 
 	fun hentDeltaker(deltakerId: UUID): Deltaker
 
+	fun oppdaterDeltakerVeileder(brukerPersonligIdent: String, veilederId: UUID)
+
 }
