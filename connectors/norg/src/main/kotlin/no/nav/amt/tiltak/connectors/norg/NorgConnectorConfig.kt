@@ -17,7 +17,7 @@ open class NorgConnectorConfig {
 	@Bean
 	open fun norgConnector(scopedTokenProvider: ScopedTokenProvider): NorgConnector {
 		return NorgConnectorImpl(
-			url = "$url/proxy/norg",
+			url = "$url/proxy/norg2",
 			tokenProvider = { scopedTokenProvider.getToken(scope) },
 		)
 	}

@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.deltaker
 import no.nav.amt.tiltak.deltaker.controllers.TiltakDeltakerController
 import no.nav.amt.tiltak.deltaker.controllers.TiltakDeltakerPresentationService
 import no.nav.amt.tiltak.tiltak.dto.GjennomforingDto
-import no.nav.amt.tiltak.tiltak.dto.NavKontorDTO
+import no.nav.amt.tiltak.tiltak.dto.NavKontorDto
 import no.nav.amt.tiltak.tiltak.dto.TiltakDeltakerDetaljerDto
 import no.nav.amt.tiltak.tiltak.dto.TiltakDto
 import no.nav.security.mock.oauth2.MockOAuth2Server
@@ -69,9 +69,8 @@ class TiltakDeltakerControllerTest {
 				fodselsnummer = "",
 				telefonnummer = "",
 				epost = "",
-				navKontor = NavKontorDTO(
-					navn = "",
-					adresse = ""
+				navKontor = NavKontorDto(
+					navn = "NAV Testheim",
 				),
 				navVeileder = null,
 				startDato = null,
