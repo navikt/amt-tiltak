@@ -6,6 +6,7 @@ import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -15,6 +16,10 @@ open class DeltakerServiceImpl(
 	private val deltakerStatusRepository: DeltakerStatusRepository,
 	private val brukerService: BrukerService
 ) : DeltakerService {
+
+	companion object {
+		private val log = LoggerFactory.getLogger(DeltakerService::class.java)
+	}
 
 	override fun upsertDeltaker(fodselsnummer: String, gjennomforingId: UUID, deltaker: Deltaker): Deltaker {
 
@@ -49,7 +54,7 @@ open class DeltakerServiceImpl(
 			registrertDato = deltaker.registrertDato
 		)
 
-		return dbo.toDeltaker() { deltakerStatusRepository.getStatuserForDeltaker(dbo.id) }
+		return dbo.toDeltaker { deltakerStatusRepository.getStatuserForDeltaker(dbo.id) }
 	}
 
 	override fun hentDeltakerePaaGjennomforing(id: UUID): List<Deltaker> {
@@ -62,6 +67,16 @@ open class DeltakerServiceImpl(
 			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 	}
 
+	override fun oppdaterStatuser() {
+		progressStatuser(deltakerRepository::potensieltHarSlutta)
+		progressStatuser(deltakerRepository::potensieltDeltar)
+	}
+
+	private fun progressStatuser(kandidatProvider: () -> List<DeltakerDbo>) = kandidatProvider()
+		.also { log.info("Oppdaterer status på ${it.size} deltakere ") }
+		.map { it.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker) }
+		.map { it.progressStatus() }
+		.forEach { deltakerStatusRepository.upsert( DeltakerStatusDbo.fromDeltaker(it)) }
 
 }
 

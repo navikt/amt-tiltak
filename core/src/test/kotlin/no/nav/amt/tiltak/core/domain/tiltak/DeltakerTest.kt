@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.core.domain.tiltak
 
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
@@ -9,8 +10,9 @@ import java.time.LocalDateTime
 
 class DeltakerTest {
 
-	val yesterday = LocalDate.now().minusDays(1)
-	val tomorrow = LocalDate.now().plusDays(1)
+	val today = LocalDate.now()
+	val yesterday = today.minusDays(1)
+	val tomorrow = today.plusDays(1)
 
 	@Test
 	fun `updatestatus - status oppdateres - endres til DELTAR`() {
@@ -18,15 +20,15 @@ class DeltakerTest {
 			startDato = yesterday,
 			sluttDato = tomorrow,
 			statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(
-					status = Deltaker.Status.VENTER_PA_OPPSTART,
+					status = VENTER_PA_OPPSTART,
 					endretDato = LocalDate.now().minusWeeks(1)
 			))),
 			registrertDato = LocalDateTime.now().minusWeeks(1),
 		)
-		val updatedDeltaker = deltaker.updateStatus(Deltaker.Status.DELTAR, yesterday, tomorrow, LocalDate.now())
+		val updatedDeltaker = deltaker.updateStatus(DELTAR, yesterday, tomorrow, LocalDate.now())
 
 		assertNotEquals(updatedDeltaker, deltaker)
-		assertEquals(updatedDeltaker.status, Deltaker.Status.DELTAR)
+		assertEquals(updatedDeltaker.status, DELTAR)
 	}
 
 
@@ -36,13 +38,13 @@ class DeltakerTest {
 			startDato = yesterday,
 			sluttDato = LocalDate.now().plusWeeks(1),
 			statuser = DeltakerStatuser(listOf(DeltakerStatus(
-				status = Deltaker.Status.VENTER_PA_OPPSTART,
+				status = VENTER_PA_OPPSTART,
 				endretDato = LocalDate.now().minusWeeks(1),
 				aktiv = true
 			))),
 			registrertDato = LocalDateTime.now().minusWeeks(1),
 		)
-		val updatedDeltaker = deltaker.updateStatus(Deltaker.Status.VENTER_PA_OPPSTART, tomorrow,  LocalDate.now().plusWeeks(1), LocalDate.now())
+		val updatedDeltaker = deltaker.updateStatus(VENTER_PA_OPPSTART, tomorrow,  LocalDate.now().plusWeeks(1), LocalDate.now())
 
 		assertNotEquals(updatedDeltaker, deltaker)
 		assertEquals(updatedDeltaker.startDato, tomorrow)
@@ -54,12 +56,12 @@ class DeltakerTest {
 			startDato = LocalDate.now().minusWeeks(1),
 			sluttDato = yesterday,
 			statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(
-				status = Deltaker.Status.DELTAR,
+				status = DELTAR,
 				endretDato = LocalDate.now().minusWeeks(1),
 			))),
 			registrertDato = LocalDateTime.now().minusWeeks(1),
 		)
-		val updatedDeltaker = deltaker.updateStatus(Deltaker.Status.DELTAR, LocalDate.now().minusWeeks(1),  tomorrow, LocalDate.now())
+		val updatedDeltaker = deltaker.updateStatus(DELTAR, LocalDate.now().minusWeeks(1),  tomorrow, LocalDate.now())
 
 		assertNotEquals(updatedDeltaker, deltaker)
 		assertEquals(updatedDeltaker.sluttDato, tomorrow)
@@ -71,20 +73,74 @@ class DeltakerTest {
 			startDato = LocalDate.now().minusWeeks(1),
 			sluttDato = yesterday,
 			statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(
-				status = Deltaker.Status.DELTAR,
+				status = DELTAR,
 				endretDato = LocalDate.now().minusWeeks(1),
 			))),
 			registrertDato = LocalDateTime.now().minusWeeks(1),
 		)
 
 		val updatedDeltaker = deltaker.updateStatus(
-			Deltaker.Status.DELTAR,
+			DELTAR,
 			LocalDate.now().minusWeeks(1),
 			yesterday,
 			LocalDate.now()
 		)
 
 		assertEquals(updatedDeltaker, deltaker)
+	}
+
+	@Test
+	fun `progressstatus - status er VENTER_PA_OPPSTART, startdato i dag, sluttdato null - status endres til DELTAR`() {
+		val deltaker = deltaker(status = VENTER_PA_OPPSTART, startDato = today).progressStatus()
+		assertEquals(DELTAR, deltaker.status)
+	}
+
+	@Test
+	fun `progressstatus - status er VENTER_PA_OPPSTART, startdato i dag, sluttdato i morgen - status endres til DELTAR`() {
+		val deltaker = deltaker(status = VENTER_PA_OPPSTART, startDato = today, sluttDato = tomorrow).progressStatus()
+		assertEquals(DELTAR, deltaker.status)
+	}
+
+	@Test
+	fun `progressstatus - status er VENTER_PA_OPPSTART, startdato i morgen - status endres ikke`() {
+		val deltaker = deltaker(status = VENTER_PA_OPPSTART, startDato = tomorrow).progressStatus()
+		assertEquals(VENTER_PA_OPPSTART, deltaker.status)
+	}
+
+	@Test
+	fun `progressstatus - status er VENTER_PA_OPPSTART, startdato i gar, sluttdato i dag - status endres til DELTAR`() {
+		val deltaker = deltaker(status = VENTER_PA_OPPSTART, startDato = yesterday, sluttDato = today).progressStatus()
+		assertEquals(DELTAR, deltaker.status)
+	}
+
+	@Test
+	fun `progressstatus - status er VENTER_PA_OPPSTART, mangler startdato - status blir VENTER_PA_OPPSTART`() {
+		val deltaker = deltaker(status = VENTER_PA_OPPSTART, startDato = null, sluttDato = tomorrow).progressStatus()
+		assertEquals(VENTER_PA_OPPSTART, deltaker.status)
+	}
+
+	@Test
+	fun `progressstatus - status er VENTER_PA_OPPSTART, startdato i gar, sluttdato i gar - status endres til HAR_SLUTTET`() {
+		val deltaker = deltaker(status = VENTER_PA_OPPSTART, startDato = yesterday, sluttDato = yesterday).progressStatus()
+		assertEquals(HAR_SLUTTET, deltaker.status)
+	}
+
+	@Test
+	fun `progressstatus - status er DELTAR, sluttdato i dag - status endres ikke`() {
+		val deltaker = deltaker(status = VENTER_PA_OPPSTART, startDato = yesterday, sluttDato = today).progressStatus()
+		assertEquals(DELTAR, deltaker.status)
+	}
+
+	@Test
+	fun `progressstatus - status er DELTAR, sluttdato i morgen - status endres ikke`() {
+		val deltaker = deltaker(status = VENTER_PA_OPPSTART, startDato = yesterday, sluttDato = tomorrow).progressStatus()
+		assertEquals(DELTAR, deltaker.status)
+	}
+
+	private fun deltaker(status: Deltaker.Status, startDato: LocalDate? = null, sluttDato: LocalDate? = null):Deltaker {
+		val statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(status)))
+		return Deltaker(statuser = statuser, startDato = startDato, sluttDato = sluttDato, registrertDato = LocalDateTime.now())
+
 	}
 
 }
