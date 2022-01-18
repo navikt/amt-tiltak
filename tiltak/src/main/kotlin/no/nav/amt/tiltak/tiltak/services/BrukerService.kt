@@ -26,15 +26,20 @@ class BrukerService(
 	private fun createBruker(fodselsnummer: String): BrukerDbo {
 
 		val veileder = upsertVeileder(fodselsnummer)
+
 		val navKontor = getNavKontor(fodselsnummer)
-		val newBruker = personService.hentPerson(fodselsnummer)
+
+		val personKontaktinformasjon = personService.hentPersonKontaktinformasjon(fodselsnummer)
+
+		val person = personService.hentPerson(fodselsnummer)
+
 		val bruker = BrukerInsertDbo(
 			fodselsnummer = fodselsnummer,
-			fornavn = newBruker.fornavn,
-			mellomnavn = newBruker.mellomnavn,
-			etternavn = newBruker.etternavn,
-			telefonnummer = newBruker.telefonnummer,
-			epost = null,
+			fornavn = person.fornavn,
+			mellomnavn = person.mellomnavn,
+			etternavn = person.etternavn,
+			telefonnummer = person.telefonnummer ?: personKontaktinformasjon.telefonnummer,
+			epost = personKontaktinformasjon.epost,
 			ansvarligVeilederId = veileder?.id,
 			navKontorId = navKontor?.id
 		)
