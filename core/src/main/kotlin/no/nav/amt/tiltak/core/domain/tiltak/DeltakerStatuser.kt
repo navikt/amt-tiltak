@@ -20,7 +20,7 @@ data class DeltakerStatuser(
 
 	val current: DeltakerStatus = statuser.find { it.aktiv }!!
 
-	fun medNy(status: Deltaker.Status, endretDato: LocalDate) = DeltakerStatuser(
+	fun medNy(status: Deltaker.Status, endretDato: LocalDate = LocalDate.now()) = DeltakerStatuser(
 		statuser.map { it.deaktiver() } + DeltakerStatus.nyAktiv(status = status, endretDato = endretDato)
 	)
 }

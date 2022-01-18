@@ -183,4 +183,43 @@ open class DeltakerRepository(
 		return template.query(sql, parameters, rowMapper)
 			.firstOrNull()
 	}
+
+	fun potensieltHarSlutta(): List<DeltakerDbo> {
+		val sql = """
+			SELECT deltaker.*,
+				   bruker.fodselsnummer,
+				   bruker.fornavn,
+				   bruker.etternavn
+			FROM deltaker_status
+					 inner join deltaker on deltaker_status.deltaker_id = deltaker.id
+					 inner join bruker on bruker.id = deltaker.bruker_id
+			WHERE bruker.fodselsnummer = :bruker_fodselsnummer
+				AND deltaker.gjennomforing_id = :gjennomforingId
+				AND deltaker_status.aktiv = TRUE
+				AND deltaker_status IN ('DELTAR', 'VENTER_PA_OPPSTART') --TODO sjekke om det skal var status != HAR_SLUTTA (hva da med IKKE_AKTUELL)
+				AND deltaker.slutt_dato < CURRENT_DATE
+		""".trimIndent()
+		val parameters = MapSqlParameterSource()
+		return template.query(sql, parameters, rowMapper)
+	}
+
+	fun potensieltDeltar(): List<DeltakerDbo> {
+		val sql = """
+			SELECT deltaker.*,
+				   bruker.fodselsnummer,
+				   bruker.fornavn,
+				   bruker.etternavn
+			FROM deltaker_status
+					 inner join deltaker on deltaker_status.deltaker_id = deltaker.id
+					 inner join bruker on bruker.id = deltaker.bruker_id
+			WHERE bruker.fodselsnummer = :bruker_fodselsnummer
+				AND deltaker.gjennomforing_id = :gjennomforingId
+				AND deltaker_status.aktiv = TRUE
+				AND deltaker_status = 'VENTER_PA_OPPSTART'
+				AND deltaker.start_dato =< CURRENT_DATE
+				AND DELTAKER.slutt_dato => CURRENT_DATE
+		""".trimIndent()
+		val parameters = MapSqlParameterSource()
+		return template.query(sql, parameters, rowMapper)
+	}
 }
