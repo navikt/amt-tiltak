@@ -9,15 +9,14 @@ import no.nav.amt.tiltak.core.port.NavKontorService
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
-import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
-import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
-import no.nav.amt.tiltak.deltaker.repositories.NavAnsattRepository
-import no.nav.amt.tiltak.deltaker.repositories.NavKontorRepository
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
+import no.nav.amt.tiltak.deltaker.repositories.*
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
+import no.nav.amt.tiltak.tiltak.services.BrukerService
 import no.nav.amt.tiltak.tiltak.services.DeltakerServiceImpl
 import no.nav.amt.tiltak.tiltak.services.GjennomforingServiceImpl
 import no.nav.amt.tiltak.tiltak.services.TiltakServiceImpl
@@ -43,6 +42,8 @@ class GjennomforingControllerIntegrationTest {
 	private lateinit var tiltakRepository: TiltakRepository
 	private lateinit var deltakerRepository: DeltakerRepository
 	private lateinit var brukerRepository: BrukerRepository
+	private lateinit var brukerService: BrukerService
+	private lateinit var deltakerStatusRepository: DeltakerStatusRepository
 	private lateinit var gjennomforingRepository: GjennomforingRepository
 	private lateinit var gjennomforingService: GjennomforingService
 	private lateinit var deltakerService: DeltakerService
@@ -58,14 +59,15 @@ class GjennomforingControllerIntegrationTest {
 		tiltakRepository = TiltakRepository(namedJdbcTemplate)
 		deltakerRepository = DeltakerRepository(namedJdbcTemplate)
 		brukerRepository = BrukerRepository(namedJdbcTemplate)
-		deltakerService = DeltakerServiceImpl(
-			deltakerRepository,
+		deltakerStatusRepository = DeltakerStatusRepository(namedJdbcTemplate)
+		brukerService = BrukerService(
 			brukerRepository,
 			mock(NavAnsattRepository::class.java),
 			mock(NavKontorRepository::class.java),
 			mock(NavKontorService::class.java),
 			mock(PersonService::class.java)
-		);
+		)
+		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService)
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, TiltakServiceImpl(tiltakRepository))
 		controller = GjennomforingController(gjennomforingService, deltakerService)
 
@@ -174,18 +176,32 @@ class GjennomforingControllerIntegrationTest {
 		regDato: LocalDateTime
 	): DeltakerDbo {
 		val bruker = brukerRepository.insert(bruker)
-		return deltakerRepository.insert(
+		val deltaker = deltakerRepository.insert(
 			id = UUID.randomUUID(),
 			brukerId = bruker.id,
 			gjennomforingId = gjennomforingId,
 			startDato = startDato,
 			sluttDato = sluttDato,
-			status = Deltaker.Status.DELTAR,
 			dagerPerUke = 5,
 			prosentStilling = 10f,
 			registrertDato = regDato
 		)
+		insertStatus(deltaker.id)
+		return deltaker
 	}
+
+	private fun insertStatus(
+		deltakerId: UUID,
+	) {
+		deltakerStatusRepository.upsert(
+			DeltakerStatusDbo(
+			deltakerId = deltakerId,
+			endretDato = LocalDate.now().minusDays(1),
+			status = Deltaker.Status.DELTAR,
+			aktiv = true
+		))
+	}
+
 
 	private fun insertGjennomforing(tiltakId: UUID, arrangorId: UUID): GjennomforingDbo {
 		val id = UUID.randomUUID()

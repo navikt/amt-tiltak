@@ -6,6 +6,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -36,6 +37,15 @@ class GjennomforingControllerTest {
 
 	@Autowired
 	private lateinit var mockMvc: MockMvc
+
+	val statusConverterMock = fun (id: UUID) =
+		listOf(
+			DeltakerStatusDbo(
+				deltakerId = id,
+				status = Deltaker.Status.DELTAR,
+				endretDato = LocalDate.now(),
+				aktiv = true)
+		)
 
 	val tiltak = Tiltak(
 		id = UUID.randomUUID(),
@@ -141,11 +151,10 @@ class GjennomforingControllerTest {
 			sluttDato = LocalDate.now(),
 			dagerPerUke = 1,
 			prosentStilling = 10.343f,
-			status = Deltaker.Status.DELTAR,
 			createdAt = LocalDateTime.now(),
 			modifiedAt = LocalDateTime.now(),
 			registrertDato = LocalDateTime.now()
-		).toDeltaker()
+		).toDeltaker(statusConverterMock)
 		Mockito.`when`(deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)).thenReturn(listOf(deltaker))
 		val token = server.issueToken("tokenx", "test", "test").serialize()
 

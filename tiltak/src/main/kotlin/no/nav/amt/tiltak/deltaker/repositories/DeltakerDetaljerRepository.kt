@@ -46,7 +46,7 @@ class GetDeltakerDetaljerQuery(
 		SELECT deltaker.id                  AS deltaker_id,
 			   deltaker.start_dato          AS start_dato,
 			   deltaker.slutt_dato          AS slutt_dato,
-			   deltaker.status              AS status,
+			   deltaker_status.status       AS status,
 			   deltaker.registrert_dato     AS registrert_dato,
 			   bruker.fornavn               AS fornavn,
 			   bruker.mellomnavn            AS mellomnavn,
@@ -72,7 +72,8 @@ class GetDeltakerDetaljerQuery(
 				 LEFT JOIN nav_kontor ON nav_kontor.id = bruker.nav_kontor_id
 				 LEFT JOIN gjennomforing ON gjennomforing.id = deltaker.gjennomforing_id
 				 LEFT JOIN tiltak ON gjennomforing.tiltak_id = tiltak.id
-		WHERE deltaker.id = :deltakerId
+				 LEFT JOIN deltaker_status ON deltaker_status.deltaker_id = deltaker.id
+		WHERE deltaker.id = :deltakerId AND deltaker_status.active
 	""".trimIndent()
 
 	fun query(deltakerId: UUID): DeltakerDetaljerDbo? {

@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -15,7 +14,6 @@ open class DeltakerRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
 	private val rowMapper = RowMapper { rs, _ ->
-		val statusString = rs.getString("status")
 
 		DeltakerDbo(
 			id = UUID.fromString(rs.getString("id")),
@@ -28,7 +26,6 @@ open class DeltakerRepository(
 			gjennomforingId = UUID.fromString(rs.getString("gjennomforing_id")),
 			dagerPerUke = rs.getInt("dager_per_uke"),
 			prosentStilling = rs.getFloat("prosent_stilling"),
-			status = Deltaker.Status.valueOf(statusString),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime(),
 			registrertDato = rs.getTimestamp("registrert_dato").toLocalDateTime()
@@ -41,20 +38,18 @@ open class DeltakerRepository(
 		gjennomforingId: UUID,
 		startDato: LocalDate?,
 		sluttDato: LocalDate?,
-		status: Deltaker.Status,
 		dagerPerUke: Int?,
 		prosentStilling: Float?,
 		registrertDato: LocalDateTime
 	): DeltakerDbo {
 		val sql = """
-			INSERT INTO deltaker(id, bruker_id, gjennomforing_id, start_dato, slutt_dato, status,
+			INSERT INTO deltaker(id, bruker_id, gjennomforing_id, start_dato, slutt_dato,
 								 dager_per_uke, prosent_stilling, registrert_dato)
 			VALUES (:id,
 					:brukerId,
 					:gjennomforingId,
 					:startdato,
 					:sluttdato,
-					:status,
 					:dagerPerUke,
 					:prosentStilling,
 					:registrertDato)
@@ -67,7 +62,6 @@ open class DeltakerRepository(
 				"gjennomforingId" to gjennomforingId,
 				"startdato" to startDato,
 				"sluttdato" to sluttDato,
-				"status" to status.name,
 				"dagerPerUke" to dagerPerUke,
 				"prosentStilling" to prosentStilling,
 				"registrertDato" to registrertDato
@@ -102,8 +96,7 @@ open class DeltakerRepository(
 	fun update(deltaker: DeltakerDbo): DeltakerDbo {
 		val sql = """
 			UPDATE deltaker
-			SET status        = :deltakerStatus,
-				start_dato    = :startDato,
+			SET start_dato = :startDato,
 				slutt_dato    = :sluttDato,
 				modified_at   = :modifiedAt
 			WHERE id = :deltakerInternalId
@@ -111,7 +104,6 @@ open class DeltakerRepository(
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"deltakerStatus" to deltaker.status.name,
 				"startDato" to deltaker.startDato,
 				"sluttDato" to deltaker.sluttDato,
 				"modifiedAt" to deltaker.modifiedAt,
