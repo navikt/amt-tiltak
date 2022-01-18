@@ -42,7 +42,7 @@ class DeltakerDetaljerRepositoryTest : FunSpec({
 		deltakerDetaljer.fodselsnummer shouldBe "12345678910"
 		deltakerDetaljer.telefonnummer shouldBe "384"
 		deltakerDetaljer.epost shouldBe "m@2.c"
-		deltakerDetaljer.navKontorId shouldBe UUID.fromString("09405517-99c0-49e5-9eb3-31c61b9579cf")
+		deltakerDetaljer.navKontorNavn shouldBe "NAV Testheim"
 		deltakerDetaljer.veilederNavn shouldBe "Vashnir Veiledersen"
 		deltakerDetaljer.veilederTelefonnummer shouldBe "84756"
 		deltakerDetaljer.veilederEpost shouldBe "vashnir.veiledersen@nav.no"

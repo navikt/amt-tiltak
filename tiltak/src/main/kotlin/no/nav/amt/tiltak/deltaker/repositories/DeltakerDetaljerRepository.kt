@@ -5,7 +5,6 @@ import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDetaljerDbo
 import no.nav.amt.tiltak.utils.getLocalDateTime
 import no.nav.amt.tiltak.utils.getNullableLocalDate
-import no.nav.amt.tiltak.utils.getNullableUUID
 import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -32,7 +31,7 @@ class GetDeltakerDetaljerQuery(
 			sluttDato = rs.getNullableLocalDate("slutt_dato"),
 			registrertDato = rs.getLocalDateTime("registrert_dato"),
 			status = rs.getString("status")?.let { Deltaker.Status.valueOf(it) },
-			navKontorId = rs.getNullableUUID("nav_kontor_id"),
+			navKontorNavn = rs.getString("nav_kontor_navn"),
 			gjennomforingId = rs.getUUID("gjennomforing_id"),
 			gjennomforingNavn = rs.getString("gjennomforing_navn"),
 			gjennomforingStartDato = rs.getNullableLocalDate("gjennomforing_start_dato"),
@@ -56,19 +55,21 @@ class GetDeltakerDetaljerQuery(
 			   bruker.telefonnummer         AS telefonnummer,
 			   bruker.epost                 AS epost,
 			   bruker.nav_kontor_id         AS nav_kontor_id,
+			   nav_kontor.navn				AS nav_kontor_navn,
 			   nav_ansatt.navn           	AS veileder_navn,
 			   nav_ansatt.telefonnummer     AS veileder_telefonnummer,
 			   nav_ansatt.epost             AS veileder_epost,
-			   gjennomforing.id            AS gjennomforing_id,
-			   gjennomforing.navn          AS gjennomforing_navn,
-			   gjennomforing.start_dato    AS gjennomforing_start_dato,
-			   gjennomforing.slutt_dato    AS gjennomforing_slutt_dato,
-			   gjennomforing.status        AS gjennomforing_status,
+			   gjennomforing.id             AS gjennomforing_id,
+			   gjennomforing.navn           AS gjennomforing_navn,
+			   gjennomforing.start_dato     AS gjennomforing_start_dato,
+			   gjennomforing.slutt_dato     AS gjennomforing_slutt_dato,
+			   gjennomforing.status         AS gjennomforing_status,
 			   tiltak.navn                  AS tiltak_navn,
 			   tiltak.type                  AS tiltak_kode
 		FROM deltaker
 				 LEFT JOIN bruker ON bruker.id = deltaker.bruker_id
 				 LEFT JOIN nav_ansatt ON nav_ansatt.id = bruker.ansvarlig_veileder_id
+				 LEFT JOIN nav_kontor ON nav_kontor.id = bruker.nav_kontor_id
 				 LEFT JOIN gjennomforing ON gjennomforing.id = deltaker.gjennomforing_id
 				 LEFT JOIN tiltak ON gjennomforing.tiltak_id = tiltak.id
 		WHERE deltaker.id = :deltakerId
