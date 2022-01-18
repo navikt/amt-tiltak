@@ -15,15 +15,17 @@ open class TiltakDeltakerPresentationService(
 ) {
 
 	open fun getDeltakerDetaljerById(deltakerId: UUID): TiltakDeltakerDetaljerDto {
-		return GetDeltakerDetaljerQuery(template).query(deltakerId)?.toDto()
+		val deltaker = GetDeltakerDetaljerQuery(template).query(deltakerId)
 			?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Deltaker med id $deltakerId finnes ikke")
+
+		return deltaker.toDto()
 	}
 
 	private fun DeltakerDetaljerDbo.toDto(): TiltakDeltakerDetaljerDto {
 		val hasVeileder = veilederNavn != null
 
-		val veileder: NavVeilederDTO? = if (hasVeileder) {
-			NavVeilederDTO(
+		val veileder: NavVeilederDto? = if (hasVeileder) {
+			NavVeilederDto(
 				veilederNavn!!,
 				veilederTelefonnummer,
 				veilederEpost
@@ -38,10 +40,7 @@ open class TiltakDeltakerPresentationService(
 			fodselsnummer = fodselsnummer,
 			telefonnummer = telefonnummer,
 			epost = epost,
-			navKontor = NavKontorDTO(
-				"Test Kontor",
-				"Test gata 1337, 1337 Oslo"
-			),
+			navKontor = navKontorNavn?.let { NavKontorDto(it) },
 			navVeileder = veileder,
 			startDato = startDato,
 			sluttDato = sluttDato,
