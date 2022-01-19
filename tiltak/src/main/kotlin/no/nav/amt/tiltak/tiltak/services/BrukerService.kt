@@ -50,7 +50,7 @@ class BrukerService(
 		return personService.hentTildeltVeileder(fodselsnummer)?.let { veileder ->
 			navAnsattRepository.upsert(
 				UpsertNavAnsattCommand(
-					personligIdent = veileder.navIdent,
+					navIdent = veileder.navIdent,
 					navn = veileder.navn,
 					epost = veileder.epost,
 					telefonnummer = veileder.telefonnummer
