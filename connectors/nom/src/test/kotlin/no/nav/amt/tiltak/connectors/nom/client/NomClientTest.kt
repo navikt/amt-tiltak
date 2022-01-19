@@ -82,7 +82,7 @@ class NomGraphqlClientTest : StringSpec({
 		veileder.telefonnummer shouldBe null
 	}
 
-	"hentVeileder - veileder finnes ikke - returnerer NOT_FOUND" {
+	"hentVeileder - veileder finnes ikke - returnerer null" {
 		val veilederRespons = """
 			{
 				"data": {

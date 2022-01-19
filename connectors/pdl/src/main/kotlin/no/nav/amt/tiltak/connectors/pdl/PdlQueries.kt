@@ -28,7 +28,7 @@ object PdlQueries {
 		)
 
 		data class Response(
-			override val errors: List<Graphql.GraphqlError>?,
+			override val errors: List<GraphqlError>?,
 			override val data: ResponseData?
 		) : Graphql.GraphqlResponse<ResponseData>
 
@@ -53,6 +53,24 @@ object PdlQueries {
 			val prioritet: Int,
 		)
 
+		data class GraphqlError(
+			override val message: String? = null,
+			override val locations: List<Graphql.GraphqlErrorLocation>? = null,
+			override val path: List<String>? = null,
+			val extensions: GraphqlErrorExtensions? = null,
+			): Graphql.GraphqlError
+
+		data class GraphqlErrorExtensions(
+			val code: String? = null,
+			val classification: String? = null,
+			val details: GraphqlErrorDetails? = null
+		)
+
+		data class GraphqlErrorDetails(
+			val type: String? = null,
+			val cause: String? = null,
+			val policy: String? = null
+		)
 	}
 
 	object HentGjeldendeIdent {
