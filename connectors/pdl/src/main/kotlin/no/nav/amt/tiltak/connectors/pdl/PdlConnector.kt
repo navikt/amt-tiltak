@@ -11,4 +11,11 @@ data class PdlBruker(
 	val mellomnavn: String?,
 	val etternavn: String,
 	val telefonnummer: String?,
+	val adressebeskyttelseGradering: AdressebeskyttelseGradering?
 )
+
+enum class AdressebeskyttelseGradering {
+	STRENGT_FORTROLIG,
+	FORTROLIG,
+	STRENGT_FORTROLIG_UTLAND,
+}

@@ -58,6 +58,11 @@ class PdlConnectorImplTest {
 													"nummer": "12345678",
 													"prioritet": 1
 												}
+											],
+											"adressebeskyttelse": [
+												{
+													"gradering": "FORTROLIG"
+												}
 											]
 										}
 									}
@@ -74,6 +79,7 @@ class PdlConnectorImplTest {
 		assertEquals("Test", pdlBruker.mellomnavn)
 		assertEquals("Testersen", pdlBruker.etternavn)
 		assertEquals("+47 12345678", pdlBruker.telefonnummer)
+		assertEquals(AdressebeskyttelseGradering.FORTROLIG, pdlBruker.adressebeskyttelseGradering)
 	}
 
 	@Test

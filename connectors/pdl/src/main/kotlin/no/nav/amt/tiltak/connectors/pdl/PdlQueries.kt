@@ -19,6 +19,9 @@ object PdlQueries {
 				  nummer
 				  prioritet
 				}
+				adressebeskyttelse(historikk: false) {
+				  gradering
+				}
 			  }
 			}
 		""".trimIndent()
@@ -39,6 +42,7 @@ object PdlQueries {
 		data class HentPerson(
 			val navn: List<Navn>,
 			val telefonnummer: List<Telefonnummer>,
+			val adressebeskyttelse: List<Adressebeskyttelse>
 		)
 
 		data class Navn(
@@ -53,6 +57,9 @@ object PdlQueries {
 			val prioritet: Int,
 		)
 
+		data class Adressebeskyttelse(
+			val gradering: String
+		)
 	}
 
 }
