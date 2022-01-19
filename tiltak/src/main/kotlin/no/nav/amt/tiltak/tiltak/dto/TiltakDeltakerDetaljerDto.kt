@@ -13,8 +13,8 @@ data class TiltakDeltakerDetaljerDto(
 	val fodselsnummer: String,
 	val telefonnummer: String?,
 	val epost: String?,
-	val navKontor: NavKontorDTO,
-	val navVeileder: NavVeilederDTO?,
+	val navKontor: NavKontorDto?,
+	val navVeileder: NavVeilederDto?,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val registrertDato: LocalDateTime,
@@ -22,12 +22,11 @@ data class TiltakDeltakerDetaljerDto(
 	val gjennomforing: GjennomforingDto
 )
 
-data class NavKontorDTO(
+data class NavKontorDto(
 	val navn: String,
-	val adresse: String
 )
 
-data class NavVeilederDTO(
+data class NavVeilederDto(
 	val navn: String,
 	val telefon: String?,
 	val epost: String?,

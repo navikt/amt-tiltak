@@ -6,9 +6,10 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.utils.UpdateStatus
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
@@ -24,6 +25,14 @@ internal class DeltakerRepositoryTest : FunSpec({
 	val gjennomforingId = UUID.fromString("b3420940-5479-48c8-b2fa-3751c7a33aa2")
 	val brukerId = UUID.fromString("23b04c3a-a36c-451f-b9cf-30b6a6b586b8")
 	val fnr = "12345678910"
+	val statusConverterMock = fun (id: UUID) =
+		listOf(DeltakerStatusDbo(
+			deltakerId = id,
+			status = Deltaker.Status.DELTAR,
+			endretDato = LocalDate.now(),
+			aktiv = true)
+		)
+
 
 	beforeEach {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
@@ -39,7 +48,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val startDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
 		val sluttDato = null
-		val deltakerStatus = Deltaker.Status.VENTER_PA_OPPSTART
 		val dagerPerUke = 2
 		val prosentStilling = 20.0f
 
@@ -49,7 +57,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			gjennomforingId,
 			startDato,
 			sluttDato,
-			deltakerStatus,
 			dagerPerUke,
 			prosentStilling,
 			registrertDato
@@ -64,7 +71,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 		dbo.gjennomforingId shouldBe gjennomforingId
 		dbo.startDato shouldBe startDato
 		dbo.sluttDato shouldBe sluttDato
-		dbo.status shouldBe deltakerStatus
 		dbo.createdAt shouldNotBe null
 		dbo.modifiedAt shouldNotBe null
 		dbo.registrertDato.truncatedTo(ChronoUnit.MINUTES) shouldBe registrertDato.truncatedTo(ChronoUnit.MINUTES)
@@ -75,7 +81,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val registrertDato = LocalDateTime.now().minusDays(3)
 
 		val sluttDato = null
-		val deltakerStatus = Deltaker.Status.VENTER_PA_OPPSTART
 		val dagerPerUke = 2
 		val prosentStilling = 20.0f
 
@@ -85,7 +90,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			gjennomforingId,
 			startDato,
 			sluttDato,
-			deltakerStatus,
 			dagerPerUke,
 			prosentStilling,
 			registrertDato
@@ -95,23 +99,23 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val updatedSluttDato = LocalDate.now().plusDays(14)
 		val updatedStatus = Deltaker.Status.DELTAR
 
-		val updated = dbo.update(updatedStatus, updatedStartDato, updatedSluttDato)
+		val updatedDeltaker = dbo.toDeltaker(statusConverterMock).updateStatus(updatedStatus, updatedStartDato, updatedSluttDato)
+		val updated = DeltakerDbo(updatedDeltaker)
 
-		updated.status shouldBe UpdateStatus.UPDATED
 
-		val updatedDbo = repository.update(updated.updatedObject!!)
+		updatedDeltaker shouldNotBe dbo.toDeltaker(statusConverterMock)
+
+		val updatedDbo = repository.update(updated)
 
 		updatedDbo.id shouldBe dbo.id
 		updatedDbo.startDato shouldBe updatedStartDato
 		updatedDbo.sluttDato shouldBe updatedSluttDato
-		updatedDbo.status shouldBe updatedStatus
 	}
 
 	test("Get by id") {
 		val startDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
 		val sluttDato = null
-		val deltakerStatus = Deltaker.Status.VENTER_PA_OPPSTART
 		val dagerPerUke = 2
 		val prosentStilling = 20.0f
 
@@ -121,7 +125,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			gjennomforingId,
 			startDato,
 			sluttDato,
-			deltakerStatus,
 			dagerPerUke,
 			prosentStilling,
 			registrertDato
@@ -136,7 +139,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val startDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
 		val sluttDato = null
-		val deltakerStatus = Deltaker.Status.VENTER_PA_OPPSTART
 		val dagerPerUke = 2
 		val prosentStilling = 20.0f
 
@@ -146,7 +148,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			gjennomforingId,
 			startDato,
 			sluttDato,
-			deltakerStatus,
 			dagerPerUke,
 			prosentStilling,
 			registrertDato
@@ -161,7 +162,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val startDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
 		val sluttDato = null
-		val deltakerStatus = Deltaker.Status.VENTER_PA_OPPSTART
 		val dagerPerUke = 2
 		val prosentStilling = 20.0f
 
@@ -171,7 +171,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			gjennomforingId,
 			startDato,
 			sluttDato,
-			deltakerStatus,
 			dagerPerUke,
 			prosentStilling,
 			registrertDato

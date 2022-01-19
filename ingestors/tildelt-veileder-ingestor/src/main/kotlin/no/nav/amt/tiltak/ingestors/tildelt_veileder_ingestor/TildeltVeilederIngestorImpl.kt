@@ -1,9 +1,6 @@
 package no.nav.amt.tiltak.ingestors.tildelt_veileder_ingestor
 
-import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.PersonService
-import no.nav.amt.tiltak.core.port.VeilederConnector
-import no.nav.amt.tiltak.core.port.VeilederService
+import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.ingestors.tildelt_veileder_ingestor.dto.SisteTildeltVeilederV1RecordValue
 import no.nav.amt.tiltak.ingestors.tildelt_veileder_ingestor.utils.JsonUtils.getObjectMapper
 import org.slf4j.LoggerFactory
@@ -14,7 +11,7 @@ class TildeltVeilederIngestorImpl(
 	private val veilederConnector: VeilederConnector,
 	private val veilederService: VeilederService,
 	private val personService: PersonService,
-	private val deltakerService: DeltakerService
+	private val brukerService: BrukerService
 ) : TildeltVeilederIngestor {
 
 	private val log = LoggerFactory.getLogger(TildeltVeilederIngestorImpl::class.java)
@@ -24,7 +21,7 @@ class TildeltVeilederIngestorImpl(
 
 		val gjeldendeIdent = personService.hentGjeldendePersonligIdent(sisteTildeltVeileder.aktorId)
 
-		if (!deltakerService.finnesBruker(gjeldendeIdent)) {
+		if (!brukerService.finnesBruker(gjeldendeIdent)) {
 			log.info("Tildelt veileder endret. Bruker finnes ikke, hopper over kafka melding")
 			return
 		}
@@ -34,7 +31,7 @@ class TildeltVeilederIngestorImpl(
 
 		val veilederId = veilederService.upsertVeileder(veileder)
 
-		deltakerService.oppdaterDeltakerVeileder(gjeldendeIdent, veilederId)
+		brukerService.oppdaterAnsvarligVeileder(gjeldendeIdent, veilederId)
 	}
 
 }

@@ -5,10 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.veileder.Veileder
-import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.PersonService
-import no.nav.amt.tiltak.core.port.VeilederConnector
-import no.nav.amt.tiltak.core.port.VeilederService
+import no.nav.amt.tiltak.core.port.*
 import java.util.*
 
 class TildeltveilederIngestorImplTest : StringSpec({
@@ -17,9 +14,9 @@ class TildeltveilederIngestorImplTest : StringSpec({
 		val veilederConnector = mockk<VeilederConnector>()
 		val veilederService = mockk<VeilederService>()
 		val personService = mockk<PersonService>()
-		val deltakerService = mockk<DeltakerService>()
+		val brukerService = mockk<BrukerService>()
 
-		val ingestor = TildeltVeilederIngestorImpl(veilederConnector, veilederService, personService, deltakerService)
+		val ingestor = TildeltVeilederIngestorImpl(veilederConnector, veilederService, personService, brukerService)
 
 		val brukerFnr = "123454364334"
 		val veilederId = UUID.randomUUID()
@@ -38,11 +35,11 @@ class TildeltveilederIngestorImplTest : StringSpec({
 		} returns brukerFnr
 
 		every {
-			deltakerService.oppdaterDeltakerVeileder(brukerFnr, veilederId)
+			brukerService.oppdaterAnsvarligVeileder(brukerFnr, veilederId)
 		} returns Unit
 
 		every {
-			deltakerService.finnesBruker(brukerFnr)
+			brukerService.finnesBruker(brukerFnr)
 		} returns true
 
 		ingestor.ingestKafkaRecord("""
@@ -58,9 +55,9 @@ class TildeltveilederIngestorImplTest : StringSpec({
 		val veilederConnector = mockk<VeilederConnector>()
 		val veilederService = mockk<VeilederService>()
 		val personService = mockk<PersonService>()
-		val deltakerService = mockk<DeltakerService>()
+		val brukerService = mockk<BrukerService>()
 
-		val ingestor = TildeltVeilederIngestorImpl(veilederConnector, veilederService, personService, deltakerService)
+		val ingestor = TildeltVeilederIngestorImpl(veilederConnector, veilederService, personService, brukerService)
 
 		val brukerFnr = "123454364334"
 
@@ -69,7 +66,7 @@ class TildeltveilederIngestorImplTest : StringSpec({
 		} returns brukerFnr
 
 		every {
-			deltakerService.finnesBruker(brukerFnr)
+			brukerService.finnesBruker(brukerFnr)
 		} returns false
 
 		ingestor.ingestKafkaRecord("""
@@ -85,7 +82,7 @@ class TildeltveilederIngestorImplTest : StringSpec({
 		}
 
 		verify(exactly = 0) {
-			deltakerService.oppdaterDeltakerVeileder(any(), any())
+			brukerService.oppdaterAnsvarligVeileder(any(), any())
 		}
 
 		verify(exactly = 0) {

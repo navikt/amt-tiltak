@@ -1,11 +1,13 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatuser
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class DeltakerProcessor(
@@ -26,21 +28,29 @@ class DeltakerProcessor(
 	}
 
 	private fun upsert(message: MessageWrapper<DeltakerPayload>) {
-		val deltaker = message.payload
+		val deltakerDto = message.payload
 
-		val tiltaksgjennomforing = gjennomforingService.getGjennomforing(deltaker.gjennomforingId)
+		val tiltaksgjennomforing = gjennomforingService.getGjennomforing(deltakerDto.gjennomforingId)
+
+		val deltaker = Deltaker(
+			id = deltakerDto.id,
+			startDato = deltakerDto.startDato,
+			sluttDato = deltakerDto.sluttDato,
+			statuser = DeltakerStatuser.aktivStatus(
+				tilDeltakerStatus(deltakerDto.status),
+				endretDato = LocalDate.now()
+			),
+			dagerPerUke = deltakerDto.dagerPerUke,
+			prosentStilling = deltakerDto.prosentDeltid,
+			registrertDato = deltakerDto.registrertDato
+		)
 
 		deltakerService.upsertDeltaker(
-			id = deltaker.id,
+			fodselsnummer =  deltakerDto.personIdent,
 			gjennomforingId = tiltaksgjennomforing.id,
-			fodselsnummer = deltaker.personIdent,
-			startDato = deltaker.startDato,
-			sluttDato = deltaker.sluttDato,
-			status = tilDeltakerStatus(deltaker.status),
-			dagerPerUke = deltaker.dagerPerUke,
-			prosentStilling = deltaker.prosentDeltid,
-			registrertDato = deltaker.registrertDato
+			deltaker = deltaker,
 		)
+
 	}
 
 	private fun tilDeltakerStatus(status: DeltakerPayload.Status): Deltaker.Status {
