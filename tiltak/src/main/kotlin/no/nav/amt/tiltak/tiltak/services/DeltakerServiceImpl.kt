@@ -100,6 +100,10 @@ open class DeltakerServiceImpl(
 			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 	}
 
+	override fun finnesBruker(fodselsnummer: String): Boolean {
+		return brukerRepository.get(fodselsnummer) != null
+	}
+
 	override fun oppdaterDeltakerVeileder(brukerPersonligIdent: String, veilederId: UUID) {
 		brukerRepository.oppdaterVeileder(brukerPersonligIdent, veilederId)
 	}
