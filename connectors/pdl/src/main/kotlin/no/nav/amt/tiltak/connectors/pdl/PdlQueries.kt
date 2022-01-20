@@ -5,6 +5,25 @@ import no.nav.amt.tiltak.tools.graphql.Graphql
 
 object PdlQueries {
 
+	data class PdlError (
+		override val message: String? = null,
+		override val locations: List<Graphql.GraphqlErrorLocation>? = null,
+		override val path: List<String>? = null,
+		override val extensions: PdlErrorExtension? = null,
+	): Graphql.GraphqlError<PdlErrorExtension>
+
+	data class PdlErrorExtension(
+		val code: String? = null,
+		val classification: String? = null,
+		val details: PdlErrorDetails? = null
+	)
+
+	data class PdlErrorDetails(
+		val type: String? = null,
+		val cause: String? = null,
+		val policy: String? = null
+	)
+
 	object HentBruker {
 		val query = """
 			query(${"$"}ident: ID!) {
@@ -28,9 +47,9 @@ object PdlQueries {
 		)
 
 		data class Response(
-			override val errors: List<GraphqlError>?,
+			override val errors: List<PdlError>?,
 			override val data: ResponseData?
-		) : Graphql.GraphqlResponse<ResponseData>
+		) : Graphql.GraphqlResponse<ResponseData, PdlErrorExtension>
 
 		data class ResponseData(
 			val hentPerson: HentPerson,
@@ -52,25 +71,6 @@ object PdlQueries {
 			val nummer: String,
 			val prioritet: Int,
 		)
-
-		data class GraphqlError(
-			override val message: String? = null,
-			override val locations: List<Graphql.GraphqlErrorLocation>? = null,
-			override val path: List<String>? = null,
-			val extensions: GraphqlErrorExtensions? = null,
-			): Graphql.GraphqlError
-
-		data class GraphqlErrorExtensions(
-			val code: String? = null,
-			val classification: String? = null,
-			val details: GraphqlErrorDetails? = null
-		)
-
-		data class GraphqlErrorDetails(
-			val type: String? = null,
-			val cause: String? = null,
-			val policy: String? = null
-		)
 	}
 
 	object HentGjeldendeIdent {
@@ -89,9 +89,9 @@ object PdlQueries {
 		)
 
 		data class Response(
-			override val errors: List<Graphql.GraphqlError>?,
+			override val errors: List<PdlError>?,
 			override val data: ResponseData?
-		) : Graphql.GraphqlResponse<ResponseData>
+		) : Graphql.GraphqlResponse<ResponseData, PdlErrorExtension>
 
 		data class ResponseData(
 			val hentIdenter: HentIdenter?,
