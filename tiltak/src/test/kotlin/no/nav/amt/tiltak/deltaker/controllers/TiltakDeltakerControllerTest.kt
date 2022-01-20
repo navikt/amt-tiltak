@@ -1,7 +1,5 @@
-package no.nav.amt.tiltak.deltaker
+package no.nav.amt.tiltak.deltaker.controllers
 
-import no.nav.amt.tiltak.deltaker.controllers.TiltakDeltakerController
-import no.nav.amt.tiltak.deltaker.controllers.TiltakDeltakerPresentationService
 import no.nav.amt.tiltak.tiltak.dto.GjennomforingDto
 import no.nav.amt.tiltak.tiltak.dto.NavKontorDto
 import no.nav.amt.tiltak.tiltak.dto.TiltakDeltakerDetaljerDto

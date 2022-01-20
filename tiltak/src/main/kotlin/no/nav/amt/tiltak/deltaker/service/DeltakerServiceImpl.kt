@@ -1,6 +1,7 @@
-package no.nav.amt.tiltak.tiltak.services
+package no.nav.amt.tiltak.deltaker.service
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
@@ -13,12 +14,11 @@ import java.util.*
 open class DeltakerServiceImpl(
 	private val deltakerRepository: DeltakerRepository,
 	private val deltakerStatusRepository: DeltakerStatusRepository,
-	private val brukerService: BrukerServiceImpl
+	private val brukerService: BrukerService,
 ) : DeltakerService {
 
-	override fun upsertDeltaker(fodselsnummer: String, gjennomforingId: UUID, deltaker: Deltaker): Deltaker {
-
-		return deltakerRepository.get(fodselsnummer, gjennomforingId)
+	override fun upsertDeltaker(fodselsnummer: String, gjennomforingId: UUID, deltaker: Deltaker) {
+		deltakerRepository.get(fodselsnummer, gjennomforingId)
 			?.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker)
 			?.let {
 				val updated = it.updateStatus(deltaker.status, deltaker.startDato, deltaker.sluttDato)
@@ -28,15 +28,12 @@ open class DeltakerServiceImpl(
 	}
 
 	private fun update(deltaker: Deltaker): Deltaker {
-
 		return deltakerRepository.update(DeltakerDbo(deltaker))
 			.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker)
 	}
 
-	private fun createDeltaker(fodselsnummer: String, gjennomforingId: UUID, deltaker: Deltaker): Deltaker {
+	private fun createDeltaker(fodselsnummer: String, gjennomforingId: UUID, deltaker: Deltaker): DeltakerDbo {
 		val brukerId = brukerService.getOrCreate(fodselsnummer)
-
-		deltakerStatusRepository.upsert(DeltakerStatusDbo.fromDeltaker(deltaker) )
 
 		val dbo = deltakerRepository.insert(
 			id = deltaker.id,
@@ -49,7 +46,9 @@ open class DeltakerServiceImpl(
 			registrertDato = deltaker.registrertDato
 		)
 
-		return dbo.toDeltaker() { deltakerStatusRepository.getStatuserForDeltaker(dbo.id) }
+		deltakerStatusRepository.upsert(DeltakerStatusDbo.fromDeltaker(deltaker) )
+
+		return dbo
 	}
 
 	override fun hentDeltakerePaaGjennomforing(id: UUID): List<Deltaker> {

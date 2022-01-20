@@ -9,7 +9,7 @@ interface DeltakerService {
 		fodselsnummer: String,
 		gjennomforingId: UUID,
 		deltaker: Deltaker,
-	): Deltaker
+	)
 
 	fun hentDeltakerePaaGjennomforing(id: UUID): List<Deltaker>
 
