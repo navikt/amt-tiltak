@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.connectors.nom.client
 
+import com.fasterxml.jackson.databind.JsonNode
 import no.nav.amt.tiltak.tools.graphql.Graphql
 
 
@@ -30,13 +31,20 @@ object NomQueries {
 		)
 
 		data class Response(
-			override val errors: List<Graphql.GraphqlError>?,
+			override val errors: List<NomError>?,
 			override val data: ResponseData?
-		) : Graphql.GraphqlResponse<ResponseData>
+		) : Graphql.GraphqlResponse<ResponseData, JsonNode>
 
 		data class ResponseData(
 			val ressurser: List<RessursResult>,
 		)
+
+		data class NomError (
+			override val message: String? = null,
+			override val locations: List<Graphql.GraphqlErrorLocation>? = null,
+			override val path: List<String>? = null,
+			override val extensions: JsonNode? = null,
+		): Graphql.GraphqlError<JsonNode>
 
 		enum class ResultCode {
 			OK,
