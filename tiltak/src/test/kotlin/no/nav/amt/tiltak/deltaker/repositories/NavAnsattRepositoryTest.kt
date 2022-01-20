@@ -5,9 +5,9 @@ import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import no.nav.amt.tiltak.deltaker.commands.UpsertNavAnsattCommand
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.deltaker.commands.UpsertNavAnsattCommand
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -19,7 +19,7 @@ class NavAnsattRepositoryTest : FunSpec({
 	lateinit var repository: NavAnsattRepository
 
 	val upsertCmd = UpsertNavAnsattCommand(
-		personligIdent = "test123",
+		navIdent = "test123",
 		navn = "Fornavn Etternavn",
 		telefonnummer = "7464635",
 		epost = "fornavn.etternavn@nav.no",
@@ -41,11 +41,11 @@ class NavAnsattRepositoryTest : FunSpec({
 	test("Insert nav-ansatt så hent bør returnere nav-ansatt") {
 		repository.upsert(upsertCmd)
 
-		val storedDbo = repository.getNavAnsattWithIdent(upsertCmd.personligIdent)
+		val storedDbo = repository.getNavAnsattWithIdent(upsertCmd.navIdent)
 
 		storedDbo shouldNotBe null
 		storedDbo!!.id shouldNotBe -1
-		storedDbo.personligIdent shouldBe upsertCmd.personligIdent
+		storedDbo.navIdent shouldBe upsertCmd.navIdent
 		storedDbo.navn shouldBe upsertCmd.navn
 		storedDbo.telefonnummer shouldBe upsertCmd.telefonnummer
 		storedDbo.epost shouldBe upsertCmd.epost
@@ -53,10 +53,10 @@ class NavAnsattRepositoryTest : FunSpec({
 
 	test("Update nav-ansatt så hent bør returnere oppdatert nav-ansatt") {
 		repository.upsert(upsertCmd)
-		val storedDbo = repository.getNavAnsattWithIdent(upsertCmd.personligIdent)
+		val storedDbo = repository.getNavAnsattWithIdent(upsertCmd.navIdent)
 
 		repository.upsert(upsertCmd.copy(epost = null, telefonnummer = null))
-		val updatedDbo = repository.getNavAnsattWithIdent(upsertCmd.personligIdent)
+		val updatedDbo = repository.getNavAnsattWithIdent(upsertCmd.navIdent)
 
 		storedDbo!!.id shouldBe updatedDbo!!.id
 		updatedDbo.epost shouldBe null

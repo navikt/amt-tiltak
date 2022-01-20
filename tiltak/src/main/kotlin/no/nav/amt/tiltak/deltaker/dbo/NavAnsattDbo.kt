@@ -4,7 +4,7 @@ import java.util.*
 
 data class NavAnsattDbo(
 	val id: UUID,
-	val personligIdent: String,
+	val navIdent: String,
 	val navn: String,
 	val telefonnummer: String?,
 	val epost: String?
