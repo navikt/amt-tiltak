@@ -1,12 +1,13 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor
 
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
+import no.nav.amt.tiltak.common.json.JsonUtils.getObjectMapper
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.GjennomforingPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.UnknownMessageWrapper
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.DeltakerProcessor
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.GjennomforingProcessor
-import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.utils.JsonUtils.getObjectMapper
 import org.springframework.stereotype.Service
 
 @Service
@@ -16,7 +17,7 @@ class ArenaAclIngestorImpl(
 ) : ArenaAclIngestor {
 
 	override fun ingestKafkaMessageValue(messageValue: String) {
-		val unknownMessageWrapper = getObjectMapper().readValue(messageValue, UnknownMessageWrapper::class.java)
+		val unknownMessageWrapper = fromJson(messageValue, UnknownMessageWrapper::class.java)
 
 		when (unknownMessageWrapper.type) {
 			"DELTAKER" -> {

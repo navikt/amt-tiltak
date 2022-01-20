@@ -1,8 +1,6 @@
 package no.nav.amt.tiltak.connectors.veilarbarena
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.slf4j.LoggerFactory
@@ -13,9 +11,6 @@ class VeilarbarenaConnectorImpl(
 	private val tokenProvider: Supplier<String>,
 	private val httpClient: OkHttpClient = OkHttpClient(),
 	private val consumerId: String = "amt-tiltak",
-	private val objectMapper: ObjectMapper = ObjectMapper()
-		.registerKotlinModule()
-		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false),
 ) : VeilarbarenaConnector {
 
 	private val secureLog = LoggerFactory.getLogger("SecureLog")
@@ -40,7 +35,7 @@ class VeilarbarenaConnectorImpl(
 
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
 
-			val statusDto = objectMapper.readValue(body, BrukerArenaStatusDto::class.java)
+			val statusDto = fromJson(body, BrukerArenaStatusDto::class.java)
 
 			return statusDto.oppfolgingsenhet
 		}

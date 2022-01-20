@@ -1,7 +1,6 @@
 package no.nav.amt.tiltak.connectors.amt_enhetsregister
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
 import no.nav.amt.tiltak.core.domain.enhetsregister.Virksomhet
 import no.nav.amt.tiltak.core.port.EnhetsregisterConnector
 import okhttp3.OkHttpClient
@@ -12,7 +11,6 @@ class AmtEnhetsregisterConnector(
 	private val url: String,
 	private val tokenProvider: Supplier<String>,
 	private val httpClient: OkHttpClient = OkHttpClient(),
-	private val objectMapper: ObjectMapper = ObjectMapper().registerKotlinModule(),
 ) : EnhetsregisterConnector {
 
 	override fun hentVirksomhet(organisasjonsnummer: String): Virksomhet {
@@ -38,7 +36,7 @@ class AmtEnhetsregisterConnector(
 
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
 
-			val enhetDto = objectMapper.readValue(body, EnhetDto::class.java)
+			val enhetDto = fromJson(body, EnhetDto::class.java)
 
 			return Virksomhet(
 				navn = enhetDto.navn,

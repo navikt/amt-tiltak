@@ -1,8 +1,6 @@
 package no.nav.amt.tiltak.connectors.norg
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.function.Supplier
@@ -11,9 +9,6 @@ class NorgConnectorImpl(
 	private val url: String,
 	private val tokenProvider: Supplier<String>,
 	private val httpClient: OkHttpClient = OkHttpClient(),
-	private val objectMapper: ObjectMapper = ObjectMapper()
-		.registerKotlinModule()
-		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false),
 ) : NorgConnector {
 
 	override fun hentNavKontorNavn(enhetId: String): String {
@@ -30,7 +25,7 @@ class NorgConnectorImpl(
 
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
 
-			val responseDto = objectMapper.readValue(body, NavEnhetDto::class.java)
+			val responseDto = fromJson(body, NavEnhetDto::class.java)
 
 			return responseDto.navn
 		}
