@@ -1,8 +1,6 @@
 package no.nav.amt.tiltak.connectors.dkif
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.springframework.http.HttpHeaders
@@ -15,9 +13,6 @@ class DkifConnectorImpl(
 	private val tokenProvider: Supplier<String>,
 	private val httpClient: OkHttpClient = OkHttpClient(),
 	private val consumerId: String = "amt-tiltak",
-	private val objectMapper: ObjectMapper = ObjectMapper()
-		.registerKotlinModule()
-		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false),
 ) : DkifConnector {
 
 	override fun hentBrukerKontaktinformasjon(fnr: String): Kontaktinformasjon {
@@ -37,7 +32,7 @@ class DkifConnectorImpl(
 
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
 
-			val responseDto = objectMapper.readValue(body, KontaktinformasjonDto::class.java)
+			val responseDto = fromJson(body, KontaktinformasjonDto::class.java)
 
 			val brukerKontaktinfo = responseDto.kontaktinfo.getOrDefault(fnr, null)
 

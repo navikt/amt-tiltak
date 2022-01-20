@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 class PersonServiceMock : PersonService {
 
 	override fun hentPersonKontaktinformasjon(fnr: String): Kontaktinformasjon {
-		TODO("Not yet implemented")
+		throw UnsupportedOperationException()
 	}
 
 	override fun hentPerson(fnr: String): Person {
@@ -23,11 +23,11 @@ class PersonServiceMock : PersonService {
 	}
 
 	override fun hentTildeltVeileder(fnr: String): Veileder? {
-		throw NotImplementedError("Mock does not support getting Veileder")
+		throw UnsupportedOperationException()
 	}
 
 	override fun hentGjeldendePersonligIdent(ident: String): String {
-		TODO("Not yet implemented")
+		throw UnsupportedOperationException()
 	}
 
 	private fun PersonMockData.toPdlBruker(): Person {

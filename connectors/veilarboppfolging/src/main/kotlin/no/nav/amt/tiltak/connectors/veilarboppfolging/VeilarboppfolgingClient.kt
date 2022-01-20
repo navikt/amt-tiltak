@@ -1,7 +1,5 @@
 package no.nav.amt.tiltak.connectors.veilarboppfolging
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
 import no.nav.amt.tiltak.core.port.VeilarboppfolgingConnector
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -13,7 +11,6 @@ class VeilarboppfolgingClient(
 	private val consumerId: String = "amt-tiltak",
 ) : VeilarboppfolgingConnector {
 
-	private val objectMapper = ObjectMapper().registerKotlinModule()
 	private val httpClient = OkHttpClient()
 
 	override fun hentVeilederIdent(fnr: String) : String? {
@@ -35,7 +32,8 @@ class VeilarboppfolgingClient(
 			response.takeIf { it.body == null }
 				?.let { throw RuntimeException("Body mangler i respons fra veilarboppfolging") }
 
-			val veilederRespons = objectMapper.readValue<HentBrukersVeilederRespons>(response.body!!.string())
+			val veilederRespons = fromJson(response.body!!.string(), HentBrukersVeilederRespons::class.java)
+
 			return veilederRespons.veilederIdent.toString()
 		}
 

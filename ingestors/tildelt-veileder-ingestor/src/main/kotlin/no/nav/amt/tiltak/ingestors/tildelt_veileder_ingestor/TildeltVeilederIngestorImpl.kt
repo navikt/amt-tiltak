@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.ingestors.tildelt_veileder_ingestor
 
 import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.ingestors.tildelt_veileder_ingestor.dto.SisteTildeltVeilederV1RecordValue
-import no.nav.amt.tiltak.ingestors.tildelt_veileder_ingestor.utils.JsonUtils.getObjectMapper
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -17,7 +17,7 @@ class TildeltVeilederIngestorImpl(
 	private val log = LoggerFactory.getLogger(TildeltVeilederIngestorImpl::class.java)
 
 	override fun ingestKafkaRecord(recordValue: String) {
-		val sisteTildeltVeileder = getObjectMapper().readValue(recordValue, SisteTildeltVeilederV1RecordValue::class.java)
+		val sisteTildeltVeileder = fromJson(recordValue, SisteTildeltVeilederV1RecordValue::class.java)
 
 		val gjeldendeIdent = personService.hentGjeldendePersonligIdent(sisteTildeltVeileder.aktorId)
 

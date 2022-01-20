@@ -17,6 +17,11 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>token_provider</artifactId>
         </dependency>
@@ -25,16 +30,8 @@
             <artifactId>graphql</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-kotlin</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>json</artifactId>
         </dependency>
 
         <dependency>

@@ -15,7 +15,7 @@ class VeilederServiceImpl(
 	override fun upsertVeileder(veileder: Veileder): UUID {
 		navAnsattRepository.upsert(
 			UpsertNavAnsattCommand(
-				personligIdent = veileder.navIdent,
+				navIdent = veileder.navIdent,
 				navn = veileder.navn,
 				epost = veileder.epost,
 				telefonnummer = veileder.telefonnummer
@@ -30,7 +30,7 @@ class VeilederServiceImpl(
 		val veileder = navAnsattRepository.getNavAnsattWithIdent(navIdent) ?: return null
 
 		return Veileder(
-			navIdent = veileder.personligIdent,
+			navIdent = veileder.navIdent,
 			navn = veileder.navn,
 			epost = veileder.epost,
 			telefonnummer = veileder.telefonnummer

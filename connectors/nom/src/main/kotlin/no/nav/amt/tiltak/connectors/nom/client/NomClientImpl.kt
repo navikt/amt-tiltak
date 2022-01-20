@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.connectors.nom.client
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
+import no.nav.amt.tiltak.common.json.JsonUtils.toJson
 import no.nav.amt.tiltak.tools.graphql.Graphql
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -14,7 +14,6 @@ class NomClientImpl(
 	private val url: String,
 	private val tokenSupplier : Supplier<String>,
 	private val httpClient: OkHttpClient = OkHttpClient(),
-	private val objectMapper: ObjectMapper = ObjectMapper().registerKotlinModule()
 ) : NomClient {
 
 	companion object {
@@ -30,7 +29,7 @@ class NomClientImpl(
 	}
 
 	private fun hentVeilederTilIdenter(navIdenter: List<String>): List<NomVeileder> {
-		val requestBody = objectMapper.writeValueAsString(
+		val requestBody = toJson(
 			Graphql.GraphqlQuery(
 				NomQueries.HentIdenter.query,
 				NomQueries.HentIdenter.Variables(navIdenter)
@@ -51,7 +50,7 @@ class NomClientImpl(
 			response.takeUnless { response.body != null }
 				?.let { throw IllegalStateException("Ingen body i response") }
 
-			val hentIdenterResponse = objectMapper.readValue(response.body!!.string(), NomQueries.HentIdenter.Response::class.java)
+			val hentIdenterResponse = fromJson(response.body!!.string(), NomQueries.HentIdenter.Response::class.java)
 
 			return toVeiledere(hentIdenterResponse)
 		}
