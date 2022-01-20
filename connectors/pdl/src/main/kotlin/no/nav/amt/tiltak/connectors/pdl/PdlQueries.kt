@@ -76,7 +76,7 @@ object PdlQueries {
 		) : Graphql.GraphqlResponse<ResponseData>
 
 		data class ResponseData(
-			val hentIdenter: HentIdenter,
+			val hentIdenter: HentIdenter?,
 		)
 
 		data class HentIdenter(

@@ -99,6 +99,10 @@ class PdlConnectorImpl(
 	}
 
 	private fun hentGjeldendeIdent(response: PdlQueries.HentGjeldendeIdent.ResponseData): String {
+		if (response.hentIdenter == null) {
+			throw IllegalStateException("Bruker finnes ikke i PDL")
+		}
+
 		return response.hentIdenter.identer.firstOrNull()?.ident
 			?: throw RuntimeException("Bruker har ikke en gjeldende ident")
 	}
