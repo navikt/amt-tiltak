@@ -70,6 +70,8 @@ spec:
     - name: POAO_GCP_PROXY_URL
       value: https://poao-gcp-proxy.dev-fss-pub.nais.io
     # Kafka topics
+    - name: SISTE_TILORDNET_VEILEDER_TOPIC
+      value: pto.siste-tilordnet-veileder-v1
     - name: AMT_TILTAK_TOPIC
       value: amt.amt-tiltak-v1
   gcp:

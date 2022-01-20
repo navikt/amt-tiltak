@@ -16,7 +16,6 @@ open class BrukerRepository(
 ) {
 
     private val rowMapper = RowMapper { rs, _ ->
-
         BrukerDbo(
 			id = rs.getUUID("id"),
             fodselsnummer = rs.getString("fodselsnummer"),
@@ -29,7 +28,6 @@ open class BrukerRepository(
             createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
             modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
         )
-
     }
 
     fun insert(bruker: BrukerInsertDbo): BrukerDbo {
@@ -83,5 +81,20 @@ open class BrukerRepository(
         return template.query(sql, parameters, rowMapper)
             .firstOrNull()
     }
+
+	fun oppdaterVeileder(fodselsnummer: String, veilederId: UUID) {
+		val sql = """
+			UPDATE bruker SET ansvarlig_veileder_id = :veilederId WHERE fodselsnummer = :fodselsnummer
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"veilederId" to veilederId,
+				"fodselsnummer" to fodselsnummer,
+			)
+		)
+
+		template.update(sql, parameters)
+	}
 
 }

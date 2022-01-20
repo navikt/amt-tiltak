@@ -13,7 +13,7 @@ import java.util.*
 open class DeltakerServiceImpl(
 	private val deltakerRepository: DeltakerRepository,
 	private val deltakerStatusRepository: DeltakerStatusRepository,
-	private val brukerService: BrukerService
+	private val brukerService: BrukerServiceImpl
 ) : DeltakerService {
 
 	override fun upsertDeltaker(fodselsnummer: String, gjennomforingId: UUID, deltaker: Deltaker): Deltaker {
@@ -34,13 +34,13 @@ open class DeltakerServiceImpl(
 	}
 
 	private fun createDeltaker(fodselsnummer: String, gjennomforingId: UUID, deltaker: Deltaker): Deltaker {
-		val bruker = brukerService.getOrCreate(fodselsnummer)
+		val brukerId = brukerService.getOrCreate(fodselsnummer)
 
 		deltakerStatusRepository.upsert(DeltakerStatusDbo.fromDeltaker(deltaker) )
 
 		val dbo = deltakerRepository.insert(
 			id = deltaker.id,
-			brukerId = bruker.id,
+			brukerId = brukerId,
 			gjennomforingId = gjennomforingId,
 			startDato = deltaker.startDato,
 			sluttDato = deltaker.sluttDato,
@@ -61,7 +61,6 @@ open class DeltakerServiceImpl(
 		return deltakerRepository.get(deltakerId)?.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker)
 			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 	}
-
 
 }
 
