@@ -16,7 +16,7 @@ open class KafkaBeans {
     open fun kafkaConsumerProperties(): KafkaProperties {
         return object : KafkaProperties {
             override fun consumer(): Properties {
-                return KafkaPropertiesPreset.aivenDefaultConsumerProperties("amt-tiltak-consumer.v5")
+                return KafkaPropertiesPreset.aivenDefaultConsumerProperties("amt-tiltak-consumer.v6")
             }
 
             override fun producer(): Properties {
