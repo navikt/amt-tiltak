@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.connectors.pdl
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
+import no.nav.amt.tiltak.common.json.JsonUtils.toJson
 import no.nav.amt.tiltak.tools.graphql.Graphql
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -13,13 +13,12 @@ class PdlConnectorImpl(
 	private val tokenProvider: Supplier<String>,
 	private val pdlUrl: String,
 	private val httpClient: OkHttpClient = OkHttpClient(),
-	private val objectMapper: ObjectMapper = ObjectMapper().registerKotlinModule(),
 ) : PdlConnector {
 
 	private val mediaTypeJson = "application/json".toMediaType()
 
 	override fun hentBruker(brukerFnr: String): PdlBruker {
-		val requestBody = objectMapper.writeValueAsString(
+		val requestBody = toJson(
 			Graphql.GraphqlQuery(
 				PdlQueries.HentBruker.query,
 				PdlQueries.HentBruker.Variables(brukerFnr)
@@ -40,7 +39,7 @@ class PdlConnectorImpl(
 
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing from PDL request")
 
-			val gqlResponse = objectMapper.readValue(body, PdlQueries.HentBruker.Response::class.java)
+			val gqlResponse = fromJson(body, PdlQueries.HentBruker.Response::class.java)
 
 			if (gqlResponse.data == null) {
 				throw RuntimeException("PDL respons inneholder ikke data")
