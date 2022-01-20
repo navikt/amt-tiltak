@@ -141,6 +141,11 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>json</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>pdl</artifactId>
                 <version>${project.version}</version>
             </dependency>
