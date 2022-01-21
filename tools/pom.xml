@@ -11,9 +11,4 @@
     <artifactId>tools</artifactId>
     <packaging>pom</packaging>
 
-    <modules>
-        <module>arena-kafka-producer</module>
-        <module>mock-data-generator</module>
-    </modules>
-
 </project>
