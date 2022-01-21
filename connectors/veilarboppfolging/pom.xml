@@ -34,8 +34,8 @@
             <artifactId>json</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>core</artifactId>
+            <groupId>no.nav.common</groupId>
+            <artifactId>rest</artifactId>
         </dependency>
 
         <dependency>

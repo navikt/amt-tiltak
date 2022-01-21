@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.connectors.veilarbarena
 
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
+import no.nav.common.rest.client.RestClient.baseClient
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.slf4j.LoggerFactory
@@ -9,7 +10,7 @@ import java.util.function.Supplier
 class VeilarbarenaConnectorImpl(
 	private val url: String,
 	private val tokenProvider: Supplier<String>,
-	private val httpClient: OkHttpClient = OkHttpClient(),
+	private val httpClient: OkHttpClient = baseClient(),
 	private val consumerId: String = "amt-tiltak",
 ) : VeilarbarenaConnector {
 

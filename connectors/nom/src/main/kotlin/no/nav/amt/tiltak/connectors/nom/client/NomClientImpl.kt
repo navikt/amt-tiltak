@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.connectors.nom.client
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
 import no.nav.amt.tiltak.common.json.JsonUtils.toJson
 import no.nav.amt.tiltak.tools.graphql.Graphql
+import no.nav.common.rest.client.RestClient.baseClient
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -13,7 +14,7 @@ import java.util.function.Supplier
 class NomClientImpl(
 	private val url: String,
 	private val tokenSupplier : Supplier<String>,
-	private val httpClient: OkHttpClient = OkHttpClient(),
+	private val httpClient: OkHttpClient = baseClient(),
 ) : NomClient {
 
 	companion object {

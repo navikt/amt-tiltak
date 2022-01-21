@@ -15,7 +15,7 @@ open class VeilarboppfolgingConfig {
 	lateinit var scope: String
 
 	@Bean
-	open fun veilarboppfolgingConnector(scopedTokenProvider: ScopedTokenProvider): VeilarboppfolgingClient {
-		return VeilarboppfolgingClient("$url/proxy/veilarboppfolging", { scopedTokenProvider.getToken(scope) })
+	open fun veilarboppfolgingClient(scopedTokenProvider: ScopedTokenProvider): VeilarboppfolgingClient {
+		return VeilarboppfolgingClientImpl("$url/proxy/veilarboppfolging", { scopedTokenProvider.getToken(scope) })
 	}
 }

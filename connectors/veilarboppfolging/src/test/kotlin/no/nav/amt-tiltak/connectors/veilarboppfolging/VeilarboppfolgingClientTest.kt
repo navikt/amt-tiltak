@@ -1,6 +1,6 @@
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import no.nav.amt.tiltak.connectors.veilarboppfolging.VeilarboppfolgingClient
+import no.nav.amt.tiltak.connectors.veilarboppfolging.VeilarboppfolgingClientImpl
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.assertThrows
@@ -9,14 +9,14 @@ const val token = "DUMMYTOKEN"
 
 class VeilarboppfolgingClientTest: StringSpec({
     lateinit var server: MockWebServer
-    lateinit var client: VeilarboppfolgingClient
+    lateinit var client: VeilarboppfolgingClientImpl
 	val veilederIdent = "V123"
 	val fnr = "123"
 
     beforeTest {
         server = MockWebServer()
 		val serverUrl = server.url("/api").toString()
-        client = VeilarboppfolgingClient(serverUrl, { token })
+        client = VeilarboppfolgingClientImpl(serverUrl, { token })
 	}
 
     "HentVeilederIdent - Bruker finnes - Returnerer veileder ident" {
