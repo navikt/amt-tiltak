@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.connectors.person
 
 import no.nav.amt.tiltak.connectors.dkif.DkifConnector
+import no.nav.amt.tiltak.connectors.pdl.AdressebeskyttelseGradering
 import no.nav.amt.tiltak.connectors.pdl.PdlConnector
 import no.nav.amt.tiltak.core.domain.veileder.Veileder
 import no.nav.amt.tiltak.core.port.*
@@ -30,7 +31,13 @@ class PersonFacade(
 			fornavn = bruker.fornavn,
 			mellomnavn = bruker.mellomnavn,
 			etternavn = bruker.etternavn,
-			telefonnummer = bruker.telefonnummer
+			telefonnummer = bruker.telefonnummer,
+			diskresjonskode = when(bruker.adressebeskyttelseGradering) {
+				AdressebeskyttelseGradering.FORTROLIG -> Diskresjonskode.KODE_7
+				AdressebeskyttelseGradering.STRENGT_FORTROLIG -> Diskresjonskode.KODE_6
+				AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND -> Diskresjonskode.KODE_19
+				else -> null
+			}
 		)
 	}
 

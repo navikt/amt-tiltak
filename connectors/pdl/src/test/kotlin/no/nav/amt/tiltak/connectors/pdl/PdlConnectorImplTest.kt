@@ -292,6 +292,11 @@ class PdlConnectorImplTest {
 							"nummer": "12345678",
 							"prioritet": 1
 						}
+					],
+					"adressebeskyttelse": [
+						{
+							"gradering": "FORTROLIG"
+						}
 					]
 				}
 			}

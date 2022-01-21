@@ -85,12 +85,14 @@ class PdlConnectorImpl(
 	private fun toPdlBruker(response: PdlQueries.HentBruker.ResponseData): PdlBruker {
 		val navn = response.hentPerson.navn.firstOrNull() ?: throw RuntimeException("PDL bruker mangler navn")
 		val telefonnummer = getTelefonnummer(response.hentPerson.telefonnummer)
+		val diskresjonskode = getDiskresjonskode(response.hentPerson.adressebeskyttelse)
 
 		return PdlBruker(
 			fornavn = navn.fornavn,
 			mellomnavn = navn.mellomnavn,
 			etternavn = navn.etternavn,
-			telefonnummer = telefonnummer
+			telefonnummer = telefonnummer,
+			adressebeskyttelseGradering = diskresjonskode
 		)
 	}
 
@@ -98,6 +100,16 @@ class PdlConnectorImpl(
 		val prioritertNummer = telefonnummere.minByOrNull { it.prioritet } ?: return null
 
 		return "${prioritertNummer.landskode} ${prioritertNummer.nummer}"
+	}
+
+	private fun getDiskresjonskode(adressebeskyttelse: List<PdlQueries.HentBruker.Adressebeskyttelse>): AdressebeskyttelseGradering? {
+		return when(adressebeskyttelse.firstOrNull()?.gradering) {
+			"STRENGT_FORTROLIG_UTLAND" -> AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
+			"STRENGT_FORTROLIG" -> AdressebeskyttelseGradering.STRENGT_FORTROLIG
+			"FORTROLIG" -> AdressebeskyttelseGradering.FORTROLIG
+			"UGRADERT" -> null
+			else -> null
+		}
 	}
 
 	private fun throwPdlApiErrors(response: PdlQueries.HentBruker.Response) {
