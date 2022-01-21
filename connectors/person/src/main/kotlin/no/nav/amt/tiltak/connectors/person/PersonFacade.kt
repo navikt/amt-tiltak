@@ -5,10 +5,7 @@ import no.nav.amt.tiltak.connectors.pdl.AdressebeskyttelseGradering
 import no.nav.amt.tiltak.connectors.pdl.PdlConnector
 import no.nav.amt.tiltak.connectors.veilarboppfolging.VeilarboppfolgingClient
 import no.nav.amt.tiltak.core.domain.veileder.Veileder
-import no.nav.amt.tiltak.core.port.Kontaktinformasjon
-import no.nav.amt.tiltak.core.port.Person
-import no.nav.amt.tiltak.core.port.PersonService
-import no.nav.amt.tiltak.core.port.VeilederConnector
+import no.nav.amt.tiltak.core.port.*
 import org.springframework.stereotype.Service
 
 @Service
