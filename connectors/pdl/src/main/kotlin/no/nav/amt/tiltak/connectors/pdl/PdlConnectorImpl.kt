@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.connectors.pdl
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
 import no.nav.amt.tiltak.common.json.JsonUtils.toJson
 import no.nav.amt.tiltak.tools.graphql.Graphql
+import no.nav.common.rest.client.RestClient.baseClient
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -12,7 +13,7 @@ import java.util.function.Supplier
 class PdlConnectorImpl(
 	private val tokenProvider: Supplier<String>,
 	private val pdlUrl: String,
-	private val httpClient: OkHttpClient = OkHttpClient(),
+	private val httpClient: OkHttpClient = baseClient(),
 ) : PdlConnector {
 
 	private val mediaTypeJson = "application/json".toMediaType()

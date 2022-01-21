@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.connectors.amt_enhetsregister
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
 import no.nav.amt.tiltak.core.domain.enhetsregister.Virksomhet
 import no.nav.amt.tiltak.core.port.EnhetsregisterConnector
+import no.nav.common.rest.client.RestClient.baseClient
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.function.Supplier
@@ -10,7 +11,7 @@ import java.util.function.Supplier
 class AmtEnhetsregisterConnector(
 	private val url: String,
 	private val tokenProvider: Supplier<String>,
-	private val httpClient: OkHttpClient = OkHttpClient(),
+	private val httpClient: OkHttpClient = baseClient(),
 ) : EnhetsregisterConnector {
 
 	override fun hentVirksomhet(organisasjonsnummer: String): Virksomhet {

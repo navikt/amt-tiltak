@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.connectors.norg
 
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
+import no.nav.common.rest.client.RestClient.baseClient
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.function.Supplier
@@ -8,7 +9,7 @@ import java.util.function.Supplier
 class NorgConnectorImpl(
 	private val url: String,
 	private val tokenProvider: Supplier<String>,
-	private val httpClient: OkHttpClient = OkHttpClient(),
+	private val httpClient: OkHttpClient = baseClient(),
 ) : NorgConnector {
 
 	override fun hentNavKontorNavn(enhetId: String): String {

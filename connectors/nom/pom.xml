@@ -33,6 +33,10 @@
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>json</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.common</groupId>
+            <artifactId>rest</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.kotest</groupId>

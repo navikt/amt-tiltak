@@ -17,12 +17,14 @@ class DkifConnectorImplTest {
 			tokenProvider = { "TOKEN" },
 		)
 
+		System.setProperty("NAIS_APP_NAME", "amt-tiltak")
+
 		givenThat(
 			get(urlEqualTo("/api/v1/personer/kontaktinformasjon?inkluderSikkerDigitalPost=false"))
 				.withHeader("Authorization", equalTo("Bearer TOKEN"))
 				.withHeader("Nav-Personidenter", equalTo("12345678900"))
 				.withHeader("Nav-Consumer-Id", equalTo("amt-tiltak"))
-				.withHeader("Nav-Call-Id", matching("[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}"))
+				.withHeader("Nav-Call-Id", matching("[0-9a-fA-F]{32}"))
 				.willReturn(
 					aResponse()
 						.withStatus(200)
