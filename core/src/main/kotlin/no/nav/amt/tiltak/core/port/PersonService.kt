@@ -9,6 +9,9 @@ interface PersonService {
 	fun hentPerson(fnr: String): Person
 
 	fun hentTildeltVeileder(fnr: String): Veileder?
+
+	fun hentGjeldendePersonligIdent(ident: String): String
+
 }
 
 data class Kontaktinformasjon(

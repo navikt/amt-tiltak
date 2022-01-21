@@ -2,31 +2,26 @@ package no.nav.amt.tiltak.tools.graphql
 
 object Graphql {
 
+	interface GraphqlError<ErrorExtension> {
+		val message: String?
+		val locations: List<GraphqlErrorLocation>?
+		val path: List<String>?
+		val extensions: ErrorExtension?
+	}
+
 	data class GraphqlQuery(
 		val query: String,
 		val variables: Any
 	)
 
-	interface GraphqlResponse<D> {
-		val errors: List<GraphqlError>?
-		val data: D?
+	interface GraphqlResponse<Data, ErrorExtension> {
+		val errors: List<GraphqlError<ErrorExtension>>?
+		val data: Data?
 	}
-
-	data class GraphqlError(
-		val message: String? = null,
-		val locations: List<GraphqlErrorLocation>? = null,
-		val path: List<String>? = null,
-		val extensions: GraphqlErrorExtensions? = null,
-	)
 
 	data class GraphqlErrorLocation(
 		val line: Int?,
 		val column: Int?,
-	)
-
-	data class GraphqlErrorExtensions(
-		val code: String? = null,
-		val classification: String? = null,
 	)
 
 }

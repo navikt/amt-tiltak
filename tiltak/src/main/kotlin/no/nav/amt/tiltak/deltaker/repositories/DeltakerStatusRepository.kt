@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class DeltakerStatusRepository(
+open class DeltakerStatusRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
 

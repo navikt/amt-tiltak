@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.connectors.pdl
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
+import no.nav.amt.tiltak.common.json.JsonUtils.toJson
 import no.nav.amt.tiltak.tools.graphql.Graphql
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -13,25 +13,19 @@ class PdlConnectorImpl(
 	private val tokenProvider: Supplier<String>,
 	private val pdlUrl: String,
 	private val httpClient: OkHttpClient = OkHttpClient(),
-	private val objectMapper: ObjectMapper = ObjectMapper().registerKotlinModule(),
 ) : PdlConnector {
 
 	private val mediaTypeJson = "application/json".toMediaType()
 
 	override fun hentBruker(brukerFnr: String): PdlBruker {
-		val requestBody = objectMapper.writeValueAsString(
+		val requestBody = toJson(
 			Graphql.GraphqlQuery(
 				PdlQueries.HentBruker.query,
 				PdlQueries.HentBruker.Variables(brukerFnr)
 			)
 		)
 
-		val request = Request.Builder()
-			.url("$pdlUrl/graphql")
-			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
-			.addHeader("Tema", "GEN")
-			.post(requestBody.toRequestBody(mediaTypeJson))
-			.build()
+		val request = createGraphqlRequest(requestBody)
 
 		httpClient.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
@@ -40,7 +34,9 @@ class PdlConnectorImpl(
 
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing from PDL request")
 
-			val gqlResponse = objectMapper.readValue(body, PdlQueries.HentBruker.Response::class.java)
+			val gqlResponse = fromJson(body, PdlQueries.HentBruker.Response::class.java)
+
+			throwPdlApiErrors(gqlResponse) // respons kan inneholde feil selv om den ikke er tom ref: https://pdldocs-navno.msappproxy.net/ekstern/index.html#appendix-graphql-feilhandtering
 
 			if (gqlResponse.data == null) {
 				throw RuntimeException("PDL respons inneholder ikke data")
@@ -48,6 +44,42 @@ class PdlConnectorImpl(
 
 			return toPdlBruker(gqlResponse.data)
 		}
+	}
+
+	override fun hentGjeldendePersonligIdent(ident: String): String {
+		val requestBody = toJson(
+			Graphql.GraphqlQuery(
+				PdlQueries.HentGjeldendeIdent.query,
+				PdlQueries.HentGjeldendeIdent.Variables(ident)
+			)
+		)
+
+		val request = createGraphqlRequest(requestBody)
+
+		httpClient.newCall(request).execute().use { response ->
+			if (!response.isSuccessful) {
+				throw RuntimeException("Klarte ikke å hente informasjon fra PDL. Status: ${response.code}")
+			}
+
+			val body = response.body?.string() ?: throw RuntimeException("Body is missing from PDL request")
+
+			val gqlResponse = fromJson(body, PdlQueries.HentGjeldendeIdent.Response::class.java)
+
+			if (gqlResponse.data == null) {
+				throw RuntimeException("PDL respons inneholder ikke data")
+			}
+
+			return hentGjeldendeIdent(gqlResponse.data)
+		}
+	}
+
+	private fun createGraphqlRequest(jsonPayload: String): Request {
+		return Request.Builder()
+			.url("$pdlUrl/graphql")
+			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
+			.addHeader("Tema", "GEN")
+			.post(jsonPayload.toRequestBody(mediaTypeJson))
+			.build()
 	}
 
 	private fun toPdlBruker(response: PdlQueries.HentBruker.ResponseData): PdlBruker {
@@ -78,6 +110,25 @@ class PdlConnectorImpl(
 			"UGRADERT" -> null
 			else -> null
 		}
+	}
+
+	private fun throwPdlApiErrors(response: PdlQueries.HentBruker.Response) {
+		var melding = "Feilmeldinger i respons fra pdl:\n"
+		if(response.data == null) melding = "$melding- data i respons er null \n"
+		response.errors?.let { feilmeldinger ->
+			melding += feilmeldinger.joinToString(separator = "") { "- ${it.message} (code: ${it.extensions?.code} details: ${it.extensions?.details})\n" }
+			throw RuntimeException(melding)
+
+		}
+	}
+
+	private fun hentGjeldendeIdent(response: PdlQueries.HentGjeldendeIdent.ResponseData): String {
+		if (response.hentIdenter == null) {
+			throw IllegalStateException("Bruker finnes ikke i PDL")
+		}
+
+		return response.hentIdenter.identer.firstOrNull()?.ident
+			?: throw RuntimeException("Bruker har ikke en gjeldende ident")
 	}
 
 }

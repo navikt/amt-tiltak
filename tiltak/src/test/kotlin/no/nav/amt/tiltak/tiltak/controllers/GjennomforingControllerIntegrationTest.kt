@@ -3,21 +3,21 @@ package no.nav.amt.tiltak.tiltak.controllers
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.core.port.NavKontorService
-import no.nav.amt.tiltak.core.port.PersonService
+import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
-import no.nav.amt.tiltak.deltaker.repositories.*
+import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
+import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
+import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
+import no.nav.amt.tiltak.deltaker.repositories.NavKontorRepository
+import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
-import no.nav.amt.tiltak.tiltak.services.BrukerService
-import no.nav.amt.tiltak.tiltak.services.DeltakerServiceImpl
+import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
 import no.nav.amt.tiltak.tiltak.services.GjennomforingServiceImpl
 import no.nav.amt.tiltak.tiltak.services.TiltakServiceImpl
 import org.junit.Assert.assertEquals
@@ -42,7 +42,7 @@ class GjennomforingControllerIntegrationTest {
 	private lateinit var tiltakRepository: TiltakRepository
 	private lateinit var deltakerRepository: DeltakerRepository
 	private lateinit var brukerRepository: BrukerRepository
-	private lateinit var brukerService: BrukerService
+	private lateinit var brukerService: BrukerServiceImpl
 	private lateinit var deltakerStatusRepository: DeltakerStatusRepository
 	private lateinit var gjennomforingRepository: GjennomforingRepository
 	private lateinit var gjennomforingService: GjennomforingService
@@ -60,19 +60,22 @@ class GjennomforingControllerIntegrationTest {
 		deltakerRepository = DeltakerRepository(namedJdbcTemplate)
 		brukerRepository = BrukerRepository(namedJdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(namedJdbcTemplate)
-		brukerService = BrukerService(
+		brukerService = BrukerServiceImpl(
 			brukerRepository,
-			mock(NavAnsattRepository::class.java),
 			mock(NavKontorRepository::class.java),
 			mock(NavKontorService::class.java),
-			mock(PersonService::class.java)
+			mock(PersonService::class.java),
+			mock(VeilederService::class.java),
 		)
-		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService)
+		deltakerService = DeltakerServiceImpl(
+			deltakerRepository,
+			deltakerStatusRepository,
+			brukerService
+		)
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, TiltakServiceImpl(tiltakRepository))
 		controller = GjennomforingController(gjennomforingService, deltakerService)
 
 		DatabaseTestUtils.cleanDatabase(dataSource)
-
 	}
 
 	@Test

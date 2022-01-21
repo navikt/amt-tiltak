@@ -4,6 +4,8 @@ interface PdlConnector {
 
 	fun hentBruker(brukerFnr: String): PdlBruker
 
+	fun hentGjeldendePersonligIdent(ident: String): String
+
 }
 
 data class PdlBruker(

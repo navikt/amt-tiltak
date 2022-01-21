@@ -16,7 +16,7 @@ open class NavAnsattRepository(
 	private val rowMapper = RowMapper { rs, _ ->
 		NavAnsattDbo(
 			id = UUID.fromString(rs.getString("id")),
-			personligIdent = rs.getString("personlig_ident"),
+			navIdent = rs.getString("nav_ident"),
 			navn = rs.getString("navn"),
 			telefonnummer = rs.getString("telefonnummer"),
 			epost = rs.getString("epost")
@@ -25,13 +25,13 @@ open class NavAnsattRepository(
 
 	fun upsert(upsertCmd: UpsertNavAnsattCommand) {
 		val sql = """
-			INSERT INTO nav_ansatt(id, personlig_ident, navn, telefonnummer, epost)
+			INSERT INTO nav_ansatt(id, nav_ident, navn, telefonnummer, epost)
 			VALUES (:id,
-					:personligIdent,
+					:navIdent,
 					:navn,
 					:telefonnummer,
 					:epost)
-			ON CONFLICT (personlig_ident) DO UPDATE SET navn       	  = :navn,
+			ON CONFLICT (nav_ident) DO UPDATE SET navn       	  = :navn,
 														telefonnummer = :telefonnummer,
 														epost         = :epost
 		""".trimIndent()
@@ -39,7 +39,7 @@ open class NavAnsattRepository(
 		val parameterSource = MapSqlParameterSource().addValues(
 			mapOf(
 				"id" to UUID.randomUUID(),
-				"personligIdent" to upsertCmd.personligIdent,
+				"navIdent" to upsertCmd.navIdent,
 				"navn" to upsertCmd.navn,
 				"telefonnummer" to upsertCmd.telefonnummer,
 				"epost" to upsertCmd.epost
@@ -49,10 +49,10 @@ open class NavAnsattRepository(
 		template.update(sql, parameterSource)
 	}
 
-	fun getNavAnsattWithIdent(ident: String): NavAnsattDbo? {
+	fun getNavAnsattWithIdent(navIdent: String): NavAnsattDbo? {
 		return template.query(
-			"SELECT * FROM nav_ansatt WHERE personlig_ident = :personligIdent",
-			MapSqlParameterSource().addValues(mapOf("personligIdent" to ident)),
+			"SELECT * FROM nav_ansatt WHERE nav_ident = :navIdent",
+			MapSqlParameterSource().addValues(mapOf("navIdent" to navIdent)),
 			rowMapper
 		).firstOrNull()
 	}

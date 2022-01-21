@@ -54,4 +54,24 @@ class BrukerRepositoryTest : FunSpec({
 	test("Get user that does not exist should be null") {
 		repository.get("234789") shouldBe null
 	}
+
+	test("oppdaterVeileder should update veileder") {
+		val fodselsnummer = "12345678910"
+		val fornavn = "Per"
+		val mellomnavn = null
+		val etternavn = "Testersen"
+		val telefonnummer = "74635462"
+		val epost = "per.testersen@test.no"
+		val ansvarligVeilederId = UUID.fromString("4118216f-b46d-44a1-90c5-d0732e861d6e")
+		val nyAnsvarligVeilederId = UUID.fromString("5e8790a9-7339-4ea2-ae75-54aac33f6c4d")
+		val brukerInsert = BrukerInsertDbo(fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarligVeilederId, null)
+
+		repository.insert(brukerInsert)
+
+		repository.oppdaterVeileder(fodselsnummer, nyAnsvarligVeilederId)
+
+		val bruker = repository.get("12345678910")
+
+		bruker?.ansvarligVeilederId shouldBe nyAnsvarligVeilederId
+	}
 })
