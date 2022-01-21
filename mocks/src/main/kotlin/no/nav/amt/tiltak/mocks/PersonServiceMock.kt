@@ -35,7 +35,8 @@ class PersonServiceMock : PersonService {
 			fornavn = this.fornavn,
 			mellomnavn = this.mellomnavn,
 			etternavn = this.etternavn,
-			telefonnummer = this.telefonnummer
+			telefonnummer = this.telefonnummer,
+			diskresjonskode = null
 		)
 	}
 }

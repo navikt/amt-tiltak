@@ -4,8 +4,10 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatuser
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -13,7 +15,10 @@ import java.time.LocalDate
 class DeltakerProcessor(
 	private val gjennomforingService: GjennomforingService,
 	private val deltakerService: DeltakerService,
+	private val personService: PersonService
 ) : GenericProcessor<DeltakerPayload>() {
+
+	private val secureLog = LoggerFactory.getLogger("SecureLog")
 
 	override fun processInsertMessage(message: MessageWrapper<DeltakerPayload>) {
 		upsert(message)
@@ -29,6 +34,14 @@ class DeltakerProcessor(
 
 	private fun upsert(message: MessageWrapper<DeltakerPayload>) {
 		val deltakerDto = message.payload
+		val deltakerFnr = message.payload.personIdent
+
+		val person = personService.hentPerson(deltakerFnr)
+
+		if (person.diskresjonskode != null) {
+			secureLog.info("Bruker $deltakerFnr har diskresjonskode ${person.diskresjonskode} og skal filtreres ut")
+			return
+		}
 
 		val tiltaksgjennomforing = gjennomforingService.getGjennomforing(deltakerDto.gjennomforingId)
 

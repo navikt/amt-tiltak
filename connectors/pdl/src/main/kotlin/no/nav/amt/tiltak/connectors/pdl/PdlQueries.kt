@@ -5,6 +5,25 @@ import no.nav.amt.tiltak.tools.graphql.Graphql
 
 object PdlQueries {
 
+	data class PdlError (
+		override val message: String? = null,
+		override val locations: List<Graphql.GraphqlErrorLocation>? = null,
+		override val path: List<String>? = null,
+		override val extensions: PdlErrorExtension? = null,
+	): Graphql.GraphqlError<PdlErrorExtension>
+
+	data class PdlErrorExtension(
+		val code: String? = null,
+		val classification: String? = null,
+		val details: PdlErrorDetails? = null
+	)
+
+	data class PdlErrorDetails(
+		val type: String? = null,
+		val cause: String? = null,
+		val policy: String? = null
+	)
+
 	object HentBruker {
 		val query = """
 			query(${"$"}ident: ID!) {
@@ -19,6 +38,9 @@ object PdlQueries {
 				  nummer
 				  prioritet
 				}
+				adressebeskyttelse(historikk: false) {
+				  gradering
+				}
 			  }
 			}
 		""".trimIndent()
@@ -28,9 +50,9 @@ object PdlQueries {
 		)
 
 		data class Response(
-			override val errors: List<Graphql.GraphqlError>?,
+			override val errors: List<PdlError>?,
 			override val data: ResponseData?
-		) : Graphql.GraphqlResponse<ResponseData>
+		) : Graphql.GraphqlResponse<ResponseData, PdlErrorExtension>
 
 		data class ResponseData(
 			val hentPerson: HentPerson,
@@ -39,6 +61,7 @@ object PdlQueries {
 		data class HentPerson(
 			val navn: List<Navn>,
 			val telefonnummer: List<Telefonnummer>,
+			val adressebeskyttelse: List<Adressebeskyttelse>
 		)
 
 		data class Navn(
@@ -53,6 +76,9 @@ object PdlQueries {
 			val prioritet: Int,
 		)
 
+		data class Adressebeskyttelse(
+			val gradering: String
+		)
 	}
 
 	object HentGjeldendeIdent {
@@ -71,9 +97,9 @@ object PdlQueries {
 		)
 
 		data class Response(
-			override val errors: List<Graphql.GraphqlError>?,
+			override val errors: List<PdlError>?,
 			override val data: ResponseData?
-		) : Graphql.GraphqlResponse<ResponseData>
+		) : Graphql.GraphqlResponse<ResponseData, PdlErrorExtension>
 
 		data class ResponseData(
 			val hentIdenter: HentIdenter?,

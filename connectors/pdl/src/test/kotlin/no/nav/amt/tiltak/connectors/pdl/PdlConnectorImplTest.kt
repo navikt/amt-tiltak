@@ -9,9 +9,11 @@ import org.junit.jupiter.api.assertThrows
 
 @WireMockTest
 class PdlConnectorImplTest {
+	val nullError = "- data i respons er null \n"
+	val errorPrefix = "Feilmeldinger i respons fra pdl:\n"
 
 	@Test
-	fun `hentBruker skal lage riktig request og parse pdl bruker`(wmRuntimeInfo: WireMockRuntimeInfo) {
+	fun `hentBruker - gyldig respons - skal lage riktig request og parse pdl bruker`(wmRuntimeInfo: WireMockRuntimeInfo) {
 		val connector = PdlConnectorImpl(
 			{ "TOKEN" },
 			wmRuntimeInfo.httpBaseUrl
@@ -34,36 +36,7 @@ class PdlConnectorImplTest {
 				.willReturn(
 					aResponse()
 						.withStatus(200)
-						.withBody(
-							"""
-								{
-									"errors": null,
-									"data": {
-										"hentPerson": {
-											"navn": [
-												{
-													"fornavn": "Tester",
-													"mellomnavn": "Test",
-													"etternavn": "Testersen"
-												}
-											],
-											"telefonnummer": [
-												{
-													"landskode": "+47",
-													"nummer": "98765432",
-													"prioritet": 2
-												},
-												{
-													"landskode": "+47",
-													"nummer": "12345678",
-													"prioritet": 1
-												}
-											]
-										}
-									}
-								}
-							""".trimIndent()
-						)
+						.withBody(gyldigRespons)
 				)
 
 		)
@@ -77,7 +50,7 @@ class PdlConnectorImplTest {
 	}
 
 	@Test
-	fun `hentBruker skal kaste exception hvis data mangler`(wmRuntimeInfo: WireMockRuntimeInfo) {
+	fun `hentBruker - data mangler - skal kaste exception`(wmRuntimeInfo: WireMockRuntimeInfo) {
 		val connector = PdlConnectorImpl(
 			{ "TOKEN" },
 			wmRuntimeInfo.httpBaseUrl
@@ -91,7 +64,7 @@ class PdlConnectorImplTest {
 						.withBody(
 							"""
 								{
-									"errors": [{"message": "error :("}],
+									"errors": [{"message": "Noe gikk galt"}],
 									"data": null
 								}
 							""".trimIndent()
@@ -103,7 +76,8 @@ class PdlConnectorImplTest {
 			connector.hentBruker("FNR")
 		}
 
-		assertEquals("PDL respons inneholder ikke data", exception.message)
+		assertEquals(errorPrefix + nullError +
+			"- Noe gikk galt (code: null details: null)\n", exception.message)
 	}
 
 	@Test
@@ -184,4 +158,148 @@ class PdlConnectorImplTest {
 		assertEquals("PDL respons inneholder ikke data", exception.message)
 	}
 
+	@Test
+	fun `hentBruker - Detaljert respons - skal kaste exception med noe detaljert informasjon`(wmRuntimeInfo: WireMockRuntimeInfo) {
+		val connector = PdlConnectorImpl(
+			{ "TOKEN" },
+			wmRuntimeInfo.httpBaseUrl
+		)
+
+		givenThat(
+			post(urlEqualTo("/graphql"))
+				.willReturn(
+					aResponse()
+						.withStatus(200)
+						.withBody(minimalFeilRespons)
+				)
+		)
+		val exception = assertThrows<RuntimeException> {
+			connector.hentBruker("FNR")
+		}
+
+		assertEquals(
+			errorPrefix + nullError +
+				"- Ikke tilgang til å se person (code: unauthorized details: PdlErrorDetails(type=abac-deny, cause=cause-0001-manglerrolle, policy=adressebeskyttelse_strengt_fortrolig_adresse))\n",
+			exception.message
+		)
+	}
+
+	@Test
+	fun `hentBruker - Flere feil i respons - skal kaste exception med noe detaljert informasjon`(wmRuntimeInfo: WireMockRuntimeInfo) {
+		val connector = PdlConnectorImpl(
+			{ "TOKEN" },
+			wmRuntimeInfo.httpBaseUrl
+		)
+
+		givenThat(
+			post(urlEqualTo("/graphql"))
+				.willReturn(
+					aResponse()
+						.withStatus(200)
+						.withBody(flereFeilRespons)
+				)
+		)
+		val exception = assertThrows<RuntimeException> {
+			connector.hentBruker("FNR")
+		}
+
+		assertEquals(
+			errorPrefix + nullError +
+				"- Ikke tilgang til å se person (code: unauthorized details: PdlErrorDetails(type=abac-deny, cause=cause-0001-manglerrolle, policy=adressebeskyttelse_strengt_fortrolig_adresse))\n" +
+				"- Test (code: unauthorized details: PdlErrorDetails(type=abac-deny, cause=cause-0001-manglerrolle, policy=adressebeskyttelse_strengt_fortrolig_adresse))\n",
+			exception.message
+		)
+	}
+
+	val minimalFeilRespons = """
+				{
+					"errors": [
+						{
+						  "message": "Ikke tilgang til å se person",
+						  "locations": [
+							{
+							  "line": 2,
+							  "column": 5
+							}
+						  ],
+						  "path": [
+							"hentPerson"
+						  ],
+						  "extensions": {
+							"code": "unauthorized",
+							"details": {
+							  "type": "abac-deny",
+							  "cause": "cause-0001-manglerrolle",
+							  "policy": "adressebeskyttelse_strengt_fortrolig_adresse"
+							},
+							"classification": "ExecutionAborted"
+						  }
+						}
+  					]
+				}
+			""".trimIndent()
+
+	var flereFeilRespons = """
+				{
+					"errors": [
+						{
+						  "message": "Ikke tilgang til å se person",
+						  "extensions": {
+							"code": "unauthorized",
+							"details": {
+							  "type": "abac-deny",
+							  "cause": "cause-0001-manglerrolle",
+							  "policy": "adressebeskyttelse_strengt_fortrolig_adresse"
+							}
+						  }
+						},
+
+						{
+						  "message": "Test",
+						  "extensions": {
+							"code": "unauthorized",
+							"details": {
+							  "type": "abac-deny",
+							  "cause": "cause-0001-manglerrolle",
+							  "policy": "adressebeskyttelse_strengt_fortrolig_adresse"
+							}
+						  }
+						}
+  					]
+				}
+			""".trimIndent()
+
+	var gyldigRespons = """
+		{
+			"errors": null,
+			"data": {
+				"hentPerson": {
+					"navn": [
+						{
+							"fornavn": "Tester",
+							"mellomnavn": "Test",
+							"etternavn": "Testersen"
+						}
+					],
+					"telefonnummer": [
+						{
+							"landskode": "+47",
+							"nummer": "98765432",
+							"prioritet": 2
+						},
+						{
+							"landskode": "+47",
+							"nummer": "12345678",
+							"prioritet": 1
+						}
+					],
+					"adressebeskyttelse": [
+						{
+							"gradering": "FORTROLIG"
+						}
+					]
+				}
+			}
+		}
+	""".trimIndent()
 }

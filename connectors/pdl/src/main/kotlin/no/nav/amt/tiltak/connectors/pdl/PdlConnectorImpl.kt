@@ -37,6 +37,8 @@ class PdlConnectorImpl(
 
 			val gqlResponse = fromJson(body, PdlQueries.HentBruker.Response::class.java)
 
+			throwPdlApiErrors(gqlResponse) // respons kan inneholde feil selv om den ikke er tom ref: https://pdldocs-navno.msappproxy.net/ekstern/index.html#appendix-graphql-feilhandtering
+
 			if (gqlResponse.data == null) {
 				throw RuntimeException("PDL respons inneholder ikke data")
 			}
@@ -84,12 +86,14 @@ class PdlConnectorImpl(
 	private fun toPdlBruker(response: PdlQueries.HentBruker.ResponseData): PdlBruker {
 		val navn = response.hentPerson.navn.firstOrNull() ?: throw RuntimeException("PDL bruker mangler navn")
 		val telefonnummer = getTelefonnummer(response.hentPerson.telefonnummer)
+		val diskresjonskode = getDiskresjonskode(response.hentPerson.adressebeskyttelse)
 
 		return PdlBruker(
 			fornavn = navn.fornavn,
 			mellomnavn = navn.mellomnavn,
 			etternavn = navn.etternavn,
-			telefonnummer = telefonnummer
+			telefonnummer = telefonnummer,
+			adressebeskyttelseGradering = diskresjonskode
 		)
 	}
 
@@ -97,6 +101,26 @@ class PdlConnectorImpl(
 		val prioritertNummer = telefonnummere.minByOrNull { it.prioritet } ?: return null
 
 		return "${prioritertNummer.landskode} ${prioritertNummer.nummer}"
+	}
+
+	private fun getDiskresjonskode(adressebeskyttelse: List<PdlQueries.HentBruker.Adressebeskyttelse>): AdressebeskyttelseGradering? {
+		return when(adressebeskyttelse.firstOrNull()?.gradering) {
+			"STRENGT_FORTROLIG_UTLAND" -> AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
+			"STRENGT_FORTROLIG" -> AdressebeskyttelseGradering.STRENGT_FORTROLIG
+			"FORTROLIG" -> AdressebeskyttelseGradering.FORTROLIG
+			"UGRADERT" -> null
+			else -> null
+		}
+	}
+
+	private fun throwPdlApiErrors(response: PdlQueries.HentBruker.Response) {
+		var melding = "Feilmeldinger i respons fra pdl:\n"
+		if(response.data == null) melding = "$melding- data i respons er null \n"
+		response.errors?.let { feilmeldinger ->
+			melding += feilmeldinger.joinToString(separator = "") { "- ${it.message} (code: ${it.extensions?.code} details: ${it.extensions?.details})\n" }
+			throw RuntimeException(melding)
+
+		}
 	}
 
 	private fun hentGjeldendeIdent(response: PdlQueries.HentGjeldendeIdent.ResponseData): String {
