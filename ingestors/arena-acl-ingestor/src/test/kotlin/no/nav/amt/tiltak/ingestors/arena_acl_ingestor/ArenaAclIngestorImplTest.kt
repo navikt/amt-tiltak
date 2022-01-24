@@ -31,7 +31,8 @@ class ArenaAclIngestorImplTest : StringSpec({
 			    "status": "DELTAR",
 			    "dagerPerUke": 5,
 			    "prosentDeltid": 100.0,
-			    "registrertDato": "2022-01-10T10:45:32.800Z"
+			    "registrertDato": "2022-01-10T10:45:32.800Z",
+				"statusEndretDato": "2022-01-10T10:45:32.800Z"
 			  }
 			}
 		""".trimIndent()

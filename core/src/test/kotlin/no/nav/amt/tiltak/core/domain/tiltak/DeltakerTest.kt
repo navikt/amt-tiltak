@@ -17,7 +17,7 @@ class DeltakerTest {
 		val deltaker = Deltaker(
 			startDato = yesterday,
 			sluttDato = tomorrow,
-			statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(
+			statuser = DeltakerStatuser(listOf(DeltakerStatus.settAktiv(
 					status = Deltaker.Status.VENTER_PA_OPPSTART,
 					endretDato = LocalDate.now().minusWeeks(1)
 			))),
@@ -53,7 +53,7 @@ class DeltakerTest {
 		val deltaker = Deltaker(
 			startDato = LocalDate.now().minusWeeks(1),
 			sluttDato = yesterday,
-			statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(
+			statuser = DeltakerStatuser(listOf(DeltakerStatus.settAktiv(
 				status = Deltaker.Status.DELTAR,
 				endretDato = LocalDate.now().minusWeeks(1),
 			))),
@@ -70,7 +70,7 @@ class DeltakerTest {
 		val deltaker = Deltaker(
 			startDato = LocalDate.now().minusWeeks(1),
 			sluttDato = yesterday,
-			statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(
+			statuser = DeltakerStatuser(listOf(DeltakerStatus.settAktiv(
 				status = Deltaker.Status.DELTAR,
 				endretDato = LocalDate.now().minusWeeks(1),
 			))),
