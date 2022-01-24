@@ -9,7 +9,6 @@ import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class DeltakerProcessor(
@@ -49,9 +48,9 @@ class DeltakerProcessor(
 			id = deltakerDto.id,
 			startDato = deltakerDto.startDato,
 			sluttDato = deltakerDto.sluttDato,
-			statuser = DeltakerStatuser.aktivStatus(
+			statuser = DeltakerStatuser.settAktivStatus(
 				tilDeltakerStatus(deltakerDto.status),
-				endretDato = LocalDate.now()
+				endretDato = deltakerDto.statusEndretDato
 			),
 			dagerPerUke = deltakerDto.dagerPerUke,
 			prosentStilling = deltakerDto.prosentDeltid,

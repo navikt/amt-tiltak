@@ -8,6 +8,7 @@ import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.Operation
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -44,7 +45,8 @@ class DeltakerProcessorTest : StringSpec({
 				status = DeltakerPayload.Status.DELTAR,
 				dagerPerUke = null,
 				prosentDeltid = null,
-				registrertDato = LocalDateTime.now()
+				registrertDato = LocalDateTime.now(),
+				statusEndretDato = LocalDate.now()
 			)
 		))
 
