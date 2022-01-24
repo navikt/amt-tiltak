@@ -18,18 +18,23 @@ open class DeltakerServiceImpl(
 ) : DeltakerService {
 
 	override fun upsertDeltaker(fodselsnummer: String, gjennomforingId: UUID, deltaker: Deltaker) {
-		deltakerRepository.get(fodselsnummer, gjennomforingId)
-			?.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker)
-			?.let {
-				val updated = it.updateStatus(deltaker.status, deltaker.startDato, deltaker.sluttDato)
-				if(it != updated) update(updated) else it
+		val lagretDeltakerDbo = deltakerRepository.get(fodselsnummer, gjennomforingId)
+
+		if (lagretDeltakerDbo == null) {
+			createDeltaker(fodselsnummer, gjennomforingId, deltaker)
+		} else {
+			val lagretDeltaker = lagretDeltakerDbo.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker)
+			val oppdatertDeltaker = lagretDeltaker.updateStatus(deltaker.status, deltaker.startDato, deltaker.sluttDato)
+
+			if (lagretDeltaker != oppdatertDeltaker) {
+				update(oppdatertDeltaker)
 			}
-			?: createDeltaker(fodselsnummer, gjennomforingId, deltaker)
+		}
 	}
 
-	private fun update(deltaker: Deltaker): Deltaker {
-		return deltakerRepository.update(DeltakerDbo(deltaker))
-			.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker)
+	private fun update(deltaker: Deltaker) {
+		deltakerRepository.update(DeltakerDbo(deltaker))
+		deltakerStatusRepository.upsert(DeltakerStatusDbo.fromDeltaker(deltaker))
 	}
 
 	private fun createDeltaker(fodselsnummer: String, gjennomforingId: UUID, deltaker: Deltaker): DeltakerDbo {
