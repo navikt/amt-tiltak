@@ -29,7 +29,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		listOf(DeltakerStatusDbo(
 			deltakerId = id,
 			status = Deltaker.Status.DELTAR,
-			endretDato = LocalDate.now(),
+			endretDato = LocalDateTime.now(),
 			aktiv = true)
 		)
 
@@ -99,7 +99,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val updatedSluttDato = LocalDate.now().plusDays(14)
 		val updatedStatus = Deltaker.Status.DELTAR
 
-		val updatedDeltaker = dbo.toDeltaker(statusConverterMock).updateStatus(updatedStatus, updatedStartDato, updatedSluttDato)
+		val updatedDeltaker = dbo.toDeltaker(statusConverterMock).update(updatedStatus, updatedStartDato, updatedSluttDato)
 		val updated = DeltakerDbo(updatedDeltaker)
 
 

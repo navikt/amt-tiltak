@@ -19,7 +19,7 @@ open class DeltakerStatusRepository(
 		DeltakerStatusDbo(
 			id = rs.getUUID("id"),
 			deltakerId = rs.getUUID("deltaker_id"),
-			endretDato = rs.getTimestamp("endret_dato").toLocalDateTime().toLocalDate(),
+			endretDato = rs.getTimestamp("endret_dato").toLocalDateTime(),
 			status = Deltaker.Status.valueOf(rs.getString("status")),
 			aktiv = rs.getBoolean("active"),
 		)

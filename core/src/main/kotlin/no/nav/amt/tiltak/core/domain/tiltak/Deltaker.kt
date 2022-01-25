@@ -19,11 +19,11 @@ data class Deltaker(
 		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL
 	}
 
-	fun updateStatus(
+	fun update(
 		newStatus: Status,
 		newDeltakerStartDato: LocalDate?,
 		newDeltakerSluttDato: LocalDate?,
-		newStatusEndretDato: LocalDate = LocalDate.now()
+		newStatusEndretDato: LocalDateTime = LocalDateTime.now()
 	): Deltaker {
 
 		return if (statuser.current.status != newStatus

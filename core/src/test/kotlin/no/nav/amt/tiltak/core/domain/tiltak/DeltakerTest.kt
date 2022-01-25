@@ -19,11 +19,11 @@ class DeltakerTest {
 			sluttDato = tomorrow,
 			statuser = DeltakerStatuser(listOf(DeltakerStatus.settAktiv(
 					status = Deltaker.Status.VENTER_PA_OPPSTART,
-					endretDato = LocalDate.now().minusWeeks(1)
+					endretDato = LocalDateTime.now().minusWeeks(1)
 			))),
 			registrertDato = LocalDateTime.now().minusWeeks(1),
 		)
-		val updatedDeltaker = deltaker.updateStatus(Deltaker.Status.DELTAR, yesterday, tomorrow, LocalDate.now())
+		val updatedDeltaker = deltaker.update(Deltaker.Status.DELTAR, yesterday, tomorrow, LocalDateTime.now())
 
 		assertNotEquals(updatedDeltaker, deltaker)
 		assertEquals(updatedDeltaker.status, Deltaker.Status.DELTAR)
@@ -37,12 +37,12 @@ class DeltakerTest {
 			sluttDato = LocalDate.now().plusWeeks(1),
 			statuser = DeltakerStatuser(listOf(DeltakerStatus(
 				status = Deltaker.Status.VENTER_PA_OPPSTART,
-				endretDato = LocalDate.now().minusWeeks(1),
+				endretDato = LocalDateTime.now().minusWeeks(1),
 				aktiv = true
 			))),
 			registrertDato = LocalDateTime.now().minusWeeks(1),
 		)
-		val updatedDeltaker = deltaker.updateStatus(Deltaker.Status.VENTER_PA_OPPSTART, tomorrow,  LocalDate.now().plusWeeks(1), LocalDate.now())
+		val updatedDeltaker = deltaker.update(Deltaker.Status.VENTER_PA_OPPSTART, tomorrow,  LocalDate.now().plusWeeks(1), LocalDateTime.now())
 
 		assertNotEquals(updatedDeltaker, deltaker)
 		assertEquals(updatedDeltaker.startDato, tomorrow)
@@ -55,11 +55,11 @@ class DeltakerTest {
 			sluttDato = yesterday,
 			statuser = DeltakerStatuser(listOf(DeltakerStatus.settAktiv(
 				status = Deltaker.Status.DELTAR,
-				endretDato = LocalDate.now().minusWeeks(1),
+				endretDato = LocalDateTime.now().minusWeeks(1),
 			))),
 			registrertDato = LocalDateTime.now().minusWeeks(1),
 		)
-		val updatedDeltaker = deltaker.updateStatus(Deltaker.Status.DELTAR, LocalDate.now().minusWeeks(1),  tomorrow, LocalDate.now())
+		val updatedDeltaker = deltaker.update(Deltaker.Status.DELTAR, LocalDate.now().minusWeeks(1),  tomorrow, LocalDateTime.now())
 
 		assertNotEquals(updatedDeltaker, deltaker)
 		assertEquals(updatedDeltaker.sluttDato, tomorrow)
@@ -72,16 +72,16 @@ class DeltakerTest {
 			sluttDato = yesterday,
 			statuser = DeltakerStatuser(listOf(DeltakerStatus.settAktiv(
 				status = Deltaker.Status.DELTAR,
-				endretDato = LocalDate.now().minusWeeks(1),
+				endretDato = LocalDateTime.now().minusWeeks(1),
 			))),
 			registrertDato = LocalDateTime.now().minusWeeks(1),
 		)
 
-		val updatedDeltaker = deltaker.updateStatus(
+		val updatedDeltaker = deltaker.update(
 			Deltaker.Status.DELTAR,
 			LocalDate.now().minusWeeks(1),
 			yesterday,
-			LocalDate.now()
+			LocalDateTime.now()
 		)
 
 		assertEquals(updatedDeltaker, deltaker)

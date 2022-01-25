@@ -4,11 +4,11 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 class DeltakerStatuserTest {
 
-	val now: LocalDate = LocalDate.now()
+	val now: LocalDateTime = LocalDateTime.now()
 
 	@Test
 	fun `current - inneholder gjeldende status`() {
