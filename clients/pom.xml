@@ -9,13 +9,17 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>connectors</artifactId>
+    <artifactId>clients</artifactId>
     <packaging>pom</packaging>
 
     <modules>
-        <module>nav_kontor</module>
-        <module>person</module>
-        <module>veileder</module>
+        <module>amt_enhetsregister</module>
+        <module>dkif</module>
+        <module>nom</module>
+        <module>norg</module>
+        <module>pdl</module>
+        <module>veilarbarena</module>
+        <module>veilarboppfolging</module>
     </modules>
 
 </project>
