@@ -4,9 +4,10 @@ CREATE TABLE deltaker_status
 (
     id          uuid PRIMARY KEY NOT NULL,
     deltaker_id uuid references deltaker (id),
-    endret_dato date,
+    endret_dato timestamp with time zone,
     status      varchar          NOT NULL,
     active      boolean,
+    created_at timestamp with time zone not null default current_timestamp,
 
     UNIQUE (deltaker_id, endret_dato, status)
 );

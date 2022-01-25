@@ -43,7 +43,7 @@ class GjennomforingControllerTest {
 			DeltakerStatusDbo(
 				deltakerId = id,
 				status = Deltaker.Status.DELTAR,
-				endretDato = LocalDate.now(),
+				endretDato = LocalDateTime.now(),
 				aktiv = true)
 		)
 
