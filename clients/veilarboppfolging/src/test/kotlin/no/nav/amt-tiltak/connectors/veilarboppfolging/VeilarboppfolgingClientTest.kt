@@ -1,6 +1,6 @@
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import no.nav.amt.tiltak.connectors.veilarboppfolging.VeilarboppfolgingClientImpl
+import no.nav.amt.tiltak.clients.veilarboppfolging.VeilarboppfolgingClientImpl
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.assertThrows

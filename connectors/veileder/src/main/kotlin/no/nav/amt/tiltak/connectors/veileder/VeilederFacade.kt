@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.connectors.veileder
 
-import no.nav.amt.tiltak.connectors.nom.client.NomClient
-import no.nav.amt.tiltak.connectors.nom.client.NomVeileder
+import no.nav.amt.tiltak.clients.nom.NomClient
+import no.nav.amt.tiltak.clients.nom.NomVeileder
 import no.nav.amt.tiltak.core.domain.veileder.Veileder
 import no.nav.amt.tiltak.core.port.VeilederConnector
 import org.springframework.stereotype.Service
