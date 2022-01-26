@@ -21,6 +21,7 @@
         <module>mocks</module>
         <module>common</module>
         <module>test</module>
+        <module>clients</module>
     </modules>
 
     <name>AMT-Tiltak</name>

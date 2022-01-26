@@ -1,23 +1,23 @@
 package no.nav.amt.tiltak.connectors.person
 
-import no.nav.amt.tiltak.connectors.dkif.DkifConnector
-import no.nav.amt.tiltak.connectors.pdl.AdressebeskyttelseGradering
-import no.nav.amt.tiltak.connectors.pdl.PdlConnector
-import no.nav.amt.tiltak.connectors.veilarboppfolging.VeilarboppfolgingClient
+import no.nav.amt.tiltak.clients.dkif.DkifClient
+import no.nav.amt.tiltak.clients.pdl.AdressebeskyttelseGradering
+import no.nav.amt.tiltak.clients.pdl.PdlClient
+import no.nav.amt.tiltak.clients.veilarboppfolging.VeilarboppfolgingClient
 import no.nav.amt.tiltak.core.domain.veileder.Veileder
 import no.nav.amt.tiltak.core.port.*
 import org.springframework.stereotype.Service
 
 @Service
 class PersonFacade(
-	private val pdlConnector: PdlConnector,
-	private val dkifConnector: DkifConnector,
+	private val pdlClient: PdlClient,
+	private val dkifClient: DkifClient,
 	private val veilarboppfolgingClient: VeilarboppfolgingClient,
 	private val veilederConnector: VeilederConnector
 ) : PersonService {
 
 	override fun hentPersonKontaktinformasjon(fnr: String): Kontaktinformasjon {
-		val kontaktinformasjon = dkifConnector.hentBrukerKontaktinformasjon(fnr)
+		val kontaktinformasjon = dkifClient.hentBrukerKontaktinformasjon(fnr)
 
 		return Kontaktinformasjon(
 			epost = kontaktinformasjon.epost,
@@ -26,7 +26,7 @@ class PersonFacade(
 	}
 
 	override fun hentPerson(fnr: String): Person {
-		val bruker = pdlConnector.hentBruker(fnr)
+		val bruker = pdlClient.hentBruker(fnr)
 
 		return Person(
 			fornavn = bruker.fornavn,
@@ -49,7 +49,7 @@ class PersonFacade(
 	}
 
 	override fun hentGjeldendePersonligIdent(ident: String): String {
-		return pdlConnector.hentGjeldendePersonligIdent(ident)
+		return pdlClient.hentGjeldendePersonligIdent(ident)
 	}
 
 }

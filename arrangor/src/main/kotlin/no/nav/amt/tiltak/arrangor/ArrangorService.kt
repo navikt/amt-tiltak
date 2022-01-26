@@ -1,22 +1,22 @@
 package no.nav.amt.tiltak.arrangor
 
 import no.nav.amt.tiltak.ansatt.AnsattService
+import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.core.port.EnhetsregisterConnector
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
 class ArrangorService(
 	private val ansattService: AnsattService, // Trenger ikke dette enda
-	private val enhetsregisterConnector: EnhetsregisterConnector,
+	private val enhetsregisterClient: EnhetsregisterClient,
 	private val arrangorRepository: ArrangorRepository
 ) : ArrangorService {
 
 	override fun upsertArrangor(virksomhetsnummer: String): Arrangor {
-		val arrangor = enhetsregisterConnector.hentVirksomhet(virksomhetsnummer)
+		val arrangor = enhetsregisterClient.hentVirksomhet(virksomhetsnummer)
 
 		return arrangorRepository.upsert(
 			navn = arrangor.navn,
