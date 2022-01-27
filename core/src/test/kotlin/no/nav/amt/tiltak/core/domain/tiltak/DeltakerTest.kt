@@ -127,7 +127,7 @@ class DeltakerTest {
 
 	@Test
 	fun `progressstatus - status er DELTAR, sluttdato i dag - status endres ikke`() {
-		val deltaker = deltaker(status = VENTER_PA_OPPSTART, startDato = yesterday, sluttDato = today).progressStatus()
+		val deltaker = deltaker(status = DELTAR, startDato = yesterday, sluttDato = today).progressStatus()
 		assertEquals(DELTAR, deltaker.status)
 	}
 
