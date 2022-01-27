@@ -65,6 +65,10 @@ spec:
       value: https://nom-api.dev.intern.nav.no
     - name: NOM_MOCK
       value: "true"
+    - name: VEILARBARENA_SCOPE
+      value: api://dev-fss.pto.veilarbarena/.default
+    - name: VEILARBOPPFOLGING_SCOPE
+      value: api://dev-fss.pto.veilarboppfolging/.default
     - name: POAO_GCP_PROXY_SCOPE
       value: api://dev-fss.pto.poao-gcp-proxy/.default
     - name: POAO_GCP_PROXY_URL

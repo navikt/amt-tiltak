@@ -12,13 +12,17 @@ open class VeilarbarenaConfig {
 	lateinit var url: String
 
 	@Value("\${poao-gcp-proxy.scope}")
-	lateinit var scope: String
+	lateinit var poaoGcpProxyScope: String
+
+	@Value("\${veilarbarena.scope}")
+	lateinit var veilarbarenaScope: String
 
 	@Bean
 	open fun veilarbarenaClient(scopedTokenProvider: ScopedTokenProvider): VeilarbarenaClient {
 		return VeilarbarenaClientImpl(
 			url = "$url/proxy/veilarbarena",
-			tokenProvider = { scopedTokenProvider.getToken(scope) },
+			proxyTokenProvider = { scopedTokenProvider.getToken(poaoGcpProxyScope) },
+			veilarbarenaTokenProvider = { scopedTokenProvider.getToken(veilarbarenaScope) },
 		)
 	}
 
