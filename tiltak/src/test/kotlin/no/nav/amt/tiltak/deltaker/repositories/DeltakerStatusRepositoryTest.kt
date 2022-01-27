@@ -9,14 +9,14 @@ import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 internal class DeltakerStatusRepositoryTest : FunSpec({
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
-	val lastweek = LocalDate.now().minusWeeks(1)
-	val yesterday = LocalDate.now().minusDays(1)
+	val lastweek = LocalDateTime.now().minusWeeks(1)
+	val yesterday = LocalDateTime.now().minusDays(1)
 	val deltakerUUID = UUID.fromString("dc600c70-124f-4fe7-a687-b58439beb214")
 
 	lateinit var repository: DeltakerStatusRepository

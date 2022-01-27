@@ -199,7 +199,7 @@ class GjennomforingControllerIntegrationTest {
 		deltakerStatusRepository.upsert(
 			DeltakerStatusDbo(
 			deltakerId = deltakerId,
-			endretDato = LocalDate.now().minusDays(1),
+			endretDato = LocalDateTime.now().minusDays(1),
 			status = Deltaker.Status.DELTAR,
 			aktiv = true
 		))

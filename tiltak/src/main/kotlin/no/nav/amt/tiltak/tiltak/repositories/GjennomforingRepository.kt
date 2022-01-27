@@ -73,7 +73,7 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 		template.update(sql, parameters)
 
 		return get(id)
-			?: throw NoSuchElementException("Tiltak med id $id finnes ikke")
+			?: throw NoSuchElementException("Gjennomføring med id $id finnes ikke")
 	}
 
 	fun update(gjennomforing: GjennomforingDbo): GjennomforingDbo {

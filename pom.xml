@@ -21,6 +21,7 @@
         <module>mocks</module>
         <module>common</module>
         <module>test</module>
+        <module>clients</module>
     </modules>
 
     <name>AMT-Tiltak</name>
@@ -40,7 +41,7 @@
 
         <testcontainers.version>1.16.0</testcontainers.version>
         <mockito-kotlin.version>3.2.0</mockito-kotlin.version>
-        <schedlock.version>4.29.0</schedlock.version>
+        <schedlock.version>4.32.0</schedlock.version>
 
         <wiremock.version>2.31.0</wiremock.version>
         <nimbus.version>9.18</nimbus.version>
@@ -201,6 +202,11 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>net.javacrumbs.shedlock</groupId>
+                <artifactId>shedlock-spring</artifactId>
+                <version>${schedlock.version}</version>
+            </dependency>
             <dependency>
                 <groupId>net.javacrumbs.shedlock</groupId>
                 <artifactId>shedlock-provider-jdbc-template</artifactId>

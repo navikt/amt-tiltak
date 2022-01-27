@@ -44,7 +44,8 @@ class DeltakerProcessorTest : StringSpec({
 				status = DeltakerPayload.Status.DELTAR,
 				dagerPerUke = null,
 				prosentDeltid = null,
-				registrertDato = LocalDateTime.now()
+				registrertDato = LocalDateTime.now(),
+				statusEndretDato = LocalDateTime.now()
 			)
 		))
 

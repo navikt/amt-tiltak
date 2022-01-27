@@ -2,8 +2,8 @@ package no.nav.amt.tiltak.connectors.veileder
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import no.nav.amt.tiltak.connectors.nom.client.NomClient
-import no.nav.amt.tiltak.connectors.nom.client.NomVeileder
+import no.nav.amt.tiltak.clients.nom.NomClient
+import no.nav.amt.tiltak.clients.nom.NomVeileder
 
 class VeilederFacadeTest : FunSpec({
 

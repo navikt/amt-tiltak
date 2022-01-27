@@ -33,7 +33,7 @@ class DeltakerServiceTest: StringSpec ({
 		bruker = defaultBruker,
 		startDato = LocalDate.now(),
 		sluttDato = LocalDate.now(),
-		statuser = DeltakerStatuser.aktivStatus(Deltaker.Status.VENTER_PA_OPPSTART),
+		statuser = DeltakerStatuser.settAktivStatus(Deltaker.Status.VENTER_PA_OPPSTART),
 		registrertDato = LocalDateTime.now(),
 		dagerPerUke = 4,
 		prosentStilling = 0.8F
