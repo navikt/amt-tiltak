@@ -1,4 +1,4 @@
-INSERT INTO nav_ansatt (id, personlig_ident, navn, telefonnummer, epost)
+INSERT INTO nav_ansatt (id, nav_ident, navn, telefonnummer, epost)
 VALUES ('91e1c2e6-83cf-46f9-b8e0-4a9192c7dcbe', '1234', 'Vashnir Veiledersen', '84756', 'vashnir.veiledersen@nav.no');
 
 INSERT INTO nav_kontor (id, enhet_id, navn)
