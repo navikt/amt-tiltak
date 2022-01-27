@@ -8,16 +8,16 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 open class DkifConnectorConfig {
 
-	@Value("\${poao-gcp-proxy.url}")
+	@Value("\${digdir-krr-proxy.url}")
 	lateinit var url: String
 
-	@Value("\${poao-gcp-proxy.scope}")
+	@Value("\${digdir-krr-proxy.scope}")
 	lateinit var scope: String
 
 	@Bean
 	open fun dkifClient(scopedTokenProvider: ScopedTokenProvider): DkifClient {
 		return DkifClientImpl(
-			url = "$url/proxy/dkif",
+			url = url,
 			tokenProvider = { scopedTokenProvider.getToken(scope) },
 		)
 	}
