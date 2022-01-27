@@ -9,7 +9,8 @@ import java.util.function.Supplier
 
 class VeilarbarenaClientImpl(
 	private val url: String,
-	private val tokenProvider: Supplier<String>,
+	private val proxyTokenProvider: Supplier<String>,
+	private val veilarbarenaTokenProvider: Supplier<String>,
 	private val httpClient: OkHttpClient = baseClient(),
 	private val consumerId: String = "amt-tiltak",
 ) : VeilarbarenaClient {
@@ -19,7 +20,8 @@ class VeilarbarenaClientImpl(
 	override fun hentBrukerOppfolgingsenhetId(fnr: String): String? {
 		val request = Request.Builder()
 			.url("$url/veilarbarena/api/arena/status?fnr=$fnr")
-			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
+			.addHeader("Downstream-Authorization", "Bearer ${veilarbarenaTokenProvider.get()}")
+			.addHeader("Authorization", "Bearer ${proxyTokenProvider.get()}")
 			.addHeader("Nav-Consumer-Id", consumerId)
 			.get()
 			.build()

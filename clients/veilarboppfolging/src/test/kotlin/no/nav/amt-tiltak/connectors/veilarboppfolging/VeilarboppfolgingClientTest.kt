@@ -5,7 +5,8 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.assertThrows
 
-const val token = "DUMMYTOKEN"
+const val proxyToken = "PROXY_TOKEN"
+const val veilarboppfolgingToken = "VEILARBOPPFOLGING_TOKEN"
 
 class VeilarboppfolgingClientTest: StringSpec({
     lateinit var server: MockWebServer
@@ -16,11 +17,14 @@ class VeilarboppfolgingClientTest: StringSpec({
     beforeTest {
         server = MockWebServer()
 		val serverUrl = server.url("/api").toString()
-        client = VeilarboppfolgingClientImpl(serverUrl, { token })
+        client = VeilarboppfolgingClientImpl(
+			apiUrl = serverUrl,
+			proxyTokenProvider = { proxyToken },
+			veilarboppfolgingTokenProvider = { veilarboppfolgingToken }
+		)
 	}
 
     "HentVeilederIdent - Bruker finnes - Returnerer veileder ident" {
-
 		val jsonRepons = """{"veilederIdent":"V123"}""".trimIndent()
 		server.enqueue(MockResponse().setBody(jsonRepons))
 

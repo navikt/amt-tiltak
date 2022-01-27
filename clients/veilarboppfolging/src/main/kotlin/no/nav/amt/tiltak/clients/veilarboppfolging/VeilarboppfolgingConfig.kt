@@ -12,10 +12,17 @@ open class VeilarboppfolgingConfig {
 	lateinit var url: String
 
 	@Value("\${poao-gcp-proxy.scope}")
-	lateinit var scope: String
+	lateinit var poaoGcpProxyScope: String
+
+	@Value("\${veilarboppfolging.scope}")
+	lateinit var veilarboppfolgingScope: String
 
 	@Bean
 	open fun veilarboppfolgingClient(scopedTokenProvider: ScopedTokenProvider): VeilarboppfolgingClient {
-		return VeilarboppfolgingClientImpl("$url/proxy/veilarboppfolging", { scopedTokenProvider.getToken(scope) })
+		return VeilarboppfolgingClientImpl(
+			apiUrl = "$url/proxy/veilarboppfolging",
+			proxyTokenProvider = { scopedTokenProvider.getToken(poaoGcpProxyScope) },
+			veilarboppfolgingTokenProvider = { scopedTokenProvider.getToken(veilarboppfolgingScope) }
+		)
 	}
 }
