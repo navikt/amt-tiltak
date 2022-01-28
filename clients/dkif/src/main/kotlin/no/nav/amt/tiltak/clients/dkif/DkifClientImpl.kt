@@ -19,7 +19,7 @@ class DkifClientImpl(
 			.url("$url/rest/v1/person?inkluderSikkerDigitalPost=false")
 			.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
 			.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenProvider.get())
-			.header("Nav-Personidenter", fnr)
+			.header("Nav-Personident", fnr)
 			.build()
 
 		httpClient.newCall(request).execute().use { response ->
