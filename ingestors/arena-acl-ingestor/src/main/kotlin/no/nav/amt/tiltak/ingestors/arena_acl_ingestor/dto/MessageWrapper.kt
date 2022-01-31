@@ -6,7 +6,6 @@ import java.time.LocalDateTime
 enum class Operation {
 	CREATED,
 	MODIFIED,
-	DELETED
 }
 
 data class MessageWrapper<T>(
