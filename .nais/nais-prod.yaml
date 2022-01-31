@@ -10,7 +10,7 @@ spec:
   port: 8080
   webproxy: true
   ingresses:
-    - https://amt-tiltak.dev.intern.nav.no
+    - https://amt-tiltak.intern.nav.no
   prometheus:
     enabled: true
     path: /internal/prometheus
@@ -44,38 +44,38 @@ spec:
       rules:
         - application: amt-enhetsregister
           namespace: amt
-          cluster: dev-gcp
+          cluster: prod-gcp
   kafka:
-    pool: nav-dev
+    pool: nav-prod
   secureLogs:
     enabled: true
   env:
     - name: PDL_SCOPE
-      value: api://dev-fss.pdl.pdl-api/.default
+      value: api://prod-fss.pdl.pdl-api/.default
     - name: PDL_URL
-      value: https://pdl-api.dev-fss-pub.nais.io
+      value: https://pdl-api.prod-fss-pub.nais.io
     - name: AMT_ENHETSREGISTER_SCOPE
-      value: api://dev-gcp.amt.amt-enhetsregister/.default
+      value: api://prod-gcp.amt.amt-enhetsregister/.default
     - name: AMT_ENHETSREGISTER_URL
       value: http://amt-enhetsregister.amt.svc.cluster.local
     - name: NOM_SCOPE
-      value: api://dev-gcp.nom.nom-api/.default
+      value: api://prod-gcp.nom.nom-api/.default
     - name: NOM_URL
-      value: https://nom-api.dev.intern.nav.no
+      value: https://nom-api.intern.nav.no
     - name: NOM_MOCK
-      value: "true"
+      value: "false"
     - name: VEILARBARENA_SCOPE
-      value: api://dev-fss.pto.veilarbarena/.default
+      value: api://prod-fss.pto.veilarbarena/.default
     - name: VEILARBOPPFOLGING_SCOPE
-      value: api://dev-fss.pto.veilarboppfolging/.default
+      value: api://prod-fss.pto.veilarboppfolging/.default
     - name: DIGDIR_KRR_PROXY_SCOPE
-      value: api://dev-gcp.team-rocket.digdir-krr-proxy/.default
+      value: api://prod-gcp.team-rocket.digdir-krr-proxy/.default
     - name: DIGDIR_KRR_PROXY_URL
-      value: https://digdir-krr-proxy.dev.intern.nav.no
+      value: https://digdir-krr-proxy.intern.nav.no
     - name: POAO_GCP_PROXY_SCOPE
-      value: api://dev-fss.pto.poao-gcp-proxy/.default
+      value: api://prod-fss.pto.poao-gcp-proxy/.default
     - name: POAO_GCP_PROXY_URL
-      value: https://poao-gcp-proxy.dev-fss-pub.nais.io
+      value: https://poao-gcp-proxy.prod-fss-pub.nais.io
     # Kafka topics
     - name: SISTE_TILORDNET_VEILEDER_TOPIC
       value: pto.siste-tilordnet-veileder-v1
@@ -84,6 +84,8 @@ spec:
   gcp:
     sqlInstances:
       - type: POSTGRES_12
+        diskAutoresize: true
+        highAvailability: true
         tier: db-custom-1-3840
         databases:
           - name: amt-tiltak-db
