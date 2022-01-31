@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy
 import org.testcontainers.utility.DockerImageName
 import javax.sql.DataSource
 
@@ -47,6 +48,7 @@ object SingletonPostgresContainer {
 	private fun applyMigrations(dataSource: DataSource) {
 		val flyway: Flyway = Flyway.configure()
 			.dataSource(dataSource)
+			.connectRetries(10)
 			.load()
 
 		flyway.clean()
@@ -54,7 +56,8 @@ object SingletonPostgresContainer {
 	}
 
 	private fun createContainer(): PostgreSQLContainer<Nothing> {
-		return PostgreSQLContainer(DockerImageName.parse(postgresDockerImageName))
+		return PostgreSQLContainer<Nothing>(DockerImageName.parse(postgresDockerImageName))
+			.waitingFor(HostPortWaitStrategy())
 	}
 
 	private fun createDataSource(container: PostgreSQLContainer<Nothing>): DataSource {
