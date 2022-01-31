@@ -183,4 +183,39 @@ open class DeltakerRepository(
 		return template.query(sql, parameters, rowMapper)
 			.firstOrNull()
 	}
+
+	fun potensieltHarSlutta(): List<DeltakerDbo> {
+		val sql = """
+			SELECT deltaker.*,
+				   bruker.fodselsnummer,
+				   bruker.fornavn,
+				   bruker.etternavn
+			FROM deltaker_status
+					 inner join deltaker on deltaker_status.deltaker_id = deltaker.id
+					 inner join bruker on bruker.id = deltaker.bruker_id
+			WHERE deltaker_status.active = TRUE
+				AND deltaker_status.status IN ('DELTAR', 'VENTER_PA_OPPSTART')
+				AND deltaker.slutt_dato < CURRENT_DATE
+		""".trimIndent()
+		val parameters = MapSqlParameterSource()
+		return template.query(sql, parameters, rowMapper)
+	}
+
+	fun potensieltDeltar(): List<DeltakerDbo> {
+		val sql = """
+			SELECT deltaker.*,
+				   bruker.fodselsnummer,
+				   bruker.fornavn,
+				   bruker.etternavn
+			FROM deltaker_status
+					 inner join deltaker on deltaker_status.deltaker_id = deltaker.id
+					 inner join bruker on bruker.id = deltaker.bruker_id
+			WHERE deltaker_status.active = TRUE
+				AND deltaker_status.status = 'VENTER_PA_OPPSTART'
+				AND deltaker.start_dato <= CURRENT_DATE
+				AND deltaker.slutt_dato >= CURRENT_DATE
+		""".trimIndent()
+		val parameters = MapSqlParameterSource()
+		return template.query(sql, parameters, rowMapper)
+	}
 }

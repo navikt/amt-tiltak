@@ -7,6 +7,7 @@ import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -16,6 +17,10 @@ open class DeltakerServiceImpl(
 	private val deltakerStatusRepository: DeltakerStatusRepository,
 	private val brukerService: BrukerService,
 ) : DeltakerService {
+
+	companion object {
+		private val log = LoggerFactory.getLogger(DeltakerService::class.java)
+	}
 
 	override fun upsertDeltaker(fodselsnummer: String, gjennomforingId: UUID, deltaker: Deltaker) {
 		val lagretDeltakerDbo = deltakerRepository.get(fodselsnummer, gjennomforingId)
@@ -27,14 +32,17 @@ open class DeltakerServiceImpl(
 			val oppdatertDeltaker = lagretDeltaker.update(deltaker.status, deltaker.startDato, deltaker.sluttDato, deltaker.statuser.current.endretDato)
 
 			if (lagretDeltaker != oppdatertDeltaker) {
+				deltakerStatusRepository.upsert(DeltakerStatusDbo.fromDeltaker(oppdatertDeltaker))
 				update(oppdatertDeltaker)
 			}
 		}
 	}
 
-	private fun update(deltaker: Deltaker) {
-		deltakerRepository.update(DeltakerDbo(deltaker))
-		deltakerStatusRepository.upsert(DeltakerStatusDbo.fromDeltaker(deltaker))
+
+	private fun update(deltaker: Deltaker): Deltaker {
+
+		return deltakerRepository.update(DeltakerDbo(deltaker))
+			.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker)
 	}
 
 	private fun createDeltaker(fodselsnummer: String, gjennomforingId: UUID, deltaker: Deltaker): DeltakerDbo {
@@ -65,6 +73,17 @@ open class DeltakerServiceImpl(
 		return deltakerRepository.get(deltakerId)?.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker)
 			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 	}
+
+	override fun oppdaterStatuser() {
+		progressStatuser(deltakerRepository::potensieltHarSlutta)
+		progressStatuser(deltakerRepository::potensieltDeltar)
+	}
+
+	private fun progressStatuser(kandidatProvider: () -> List<DeltakerDbo>) = kandidatProvider()
+		.also { log.info("Oppdaterer status på ${it.size} deltakere ") }
+		.map { it.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker) }
+		.map { it.progressStatus() }
+		.forEach { deltakerStatusRepository.upsert( DeltakerStatusDbo.fromDeltaker(it)) }
 
 }
 
