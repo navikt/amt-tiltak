@@ -14,12 +14,14 @@ class VeilarbarenaClientImplTest {
 	fun `hentBrukerOppfolgingsenhetId skal lage riktig request og parse respons`(wmRuntimeInfo: WireMockRuntimeInfo) {
 		val client = VeilarbarenaClientImpl(
 			url = wmRuntimeInfo.httpBaseUrl,
-			tokenProvider = { "TOKEN" },
+			proxyTokenProvider = { "PROXY_TOKEN" },
+			veilarbarenaTokenProvider = { "VEILARBARENA_TOKEN" },
 		)
 
 		givenThat(
 			get(urlEqualTo("/veilarbarena/api/arena/status?fnr=987654"))
-				.withHeader("Authorization", equalTo("Bearer TOKEN"))
+				.withHeader("Downstream-Authorization", equalTo("Bearer VEILARBARENA_TOKEN"))
+				.withHeader("Authorization", equalTo("Bearer PROXY_TOKEN"))
 				.withHeader("Nav-Consumer-Id", equalTo("amt-tiltak"))
 				.willReturn(
 					aResponse()
@@ -48,7 +50,8 @@ class VeilarbarenaClientImplTest {
 	fun `hentBrukerOppfolgingsenhetId skal returnere null hvis veilarbarena returnerer 404`(wmRuntimeInfo: WireMockRuntimeInfo) {
 		val client = VeilarbarenaClientImpl(
 			url = wmRuntimeInfo.httpBaseUrl,
-			tokenProvider = { "TOKEN" },
+			proxyTokenProvider = { "PROXY_TOKEN" },
+			veilarbarenaTokenProvider = { "VEILARBARENA_TOKEN" },
 		)
 
 		givenThat(

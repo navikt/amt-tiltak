@@ -16,10 +16,10 @@ class DkifClientImpl(
 
 	override fun hentBrukerKontaktinformasjon(fnr: String): Kontaktinformasjon {
 		val request: Request = Request.Builder()
-			.url("$url/api/v1/personer/kontaktinformasjon?inkluderSikkerDigitalPost=false")
+			.url("$url/rest/v1/person?inkluderSikkerDigitalPost=false")
 			.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
 			.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenProvider.get())
-			.header("Nav-Personidenter", fnr)
+			.header("Nav-Personident", fnr)
 			.build()
 
 		httpClient.newCall(request).execute().use { response ->
@@ -31,23 +31,16 @@ class DkifClientImpl(
 
 			val responseDto = fromJson(body, KontaktinformasjonDto::class.java)
 
-			val brukerKontaktinfo = responseDto.kontaktinfo.getOrDefault(fnr, null)
-
 			return Kontaktinformasjon(
-				epost = brukerKontaktinfo?.epostadresse,
-				telefonnummer = brukerKontaktinfo?.mobiltelefonnummer,
+				epost = responseDto.epostadresse,
+				telefonnummer = responseDto.mobiltelefonnummer,
 			)
 		}
 	}
 
 	private data class KontaktinformasjonDto(
-		val kontaktinfo: Map<String, BrukerKontaktinfo>
-	) {
-		data class BrukerKontaktinfo(
-			val personident: String,
-			val epostadresse: String?,
-			val mobiltelefonnummer: String?,
-		)
-	}
+		val epostadresse: String?,
+		val mobiltelefonnummer: String?,
+	)
 
 }
