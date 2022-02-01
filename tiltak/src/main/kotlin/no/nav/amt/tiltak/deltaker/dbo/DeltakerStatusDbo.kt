@@ -18,9 +18,11 @@ data class DeltakerStatusDbo(
 
 	companion object {
 
-		fun fromDeltaker(deltaker: Deltaker) = deltaker.statuser.statuser.map {
-			DeltakerStatusDbo(it.id, deltaker.id, it.status, it.endretDato, it.aktiv)
+		fun fromDeltakerStatuser(statuser: List<DeltakerStatus>, deltakerId: UUID) = statuser.map {
+			DeltakerStatusDbo(it.id, deltakerId, it.status, it.endretDato, it.aktiv)
 		}
+
+		fun fromDeltaker(deltaker: Deltaker) = fromDeltakerStatuser(deltaker.statuser.statuser, deltaker.id)
 	}
 }
 

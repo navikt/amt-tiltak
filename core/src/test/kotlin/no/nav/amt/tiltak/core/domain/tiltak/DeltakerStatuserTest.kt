@@ -15,7 +15,7 @@ class DeltakerStatuserTest {
 		val statuser = DeltakerStatuser(
 			listOf(
 				DeltakerStatus.nyInaktiv(VENTER_PA_OPPSTART, now.minusWeeks(1)),
-				DeltakerStatus.settAktiv(DELTAR, now)
+				DeltakerStatus.nyAktiv(DELTAR, now)
 			)
 		)
 
@@ -28,8 +28,8 @@ class DeltakerStatuserTest {
 		assertThrows<IllegalArgumentException> {
 			DeltakerStatuser(
 				listOf(
-					DeltakerStatus.settAktiv(VENTER_PA_OPPSTART, now.minusWeeks(1)),
-					DeltakerStatus.settAktiv(DELTAR, now)
+					DeltakerStatus.nyAktiv(VENTER_PA_OPPSTART, now.minusWeeks(1)),
+					DeltakerStatus.nyAktiv(DELTAR, now)
 				)
 			)
 		}
@@ -39,7 +39,7 @@ class DeltakerStatuserTest {
 	@Test
 	fun `medNy - legg til status - returnerer ny DeltagerStatuser med ny aktiv status`() {
 		val venterPaOppstartInaktiv = DeltakerStatus.nyInaktiv(VENTER_PA_OPPSTART, now.minusWeeks(2))
-		val deltarAktiv = DeltakerStatus.settAktiv(DELTAR, now.minusWeeks(1))
+		val deltarAktiv = DeltakerStatus.nyAktiv(DELTAR, now.minusWeeks(1))
 		val deltarInktiv = deltarAktiv.deaktiver()
 		val statuser = DeltakerStatuser(listOf(venterPaOppstartInaktiv, deltarAktiv))
 
@@ -64,7 +64,7 @@ class DeltakerStatuserTest {
 
 	@Test
 	fun `deaktiver - deaktiverer en status - sammme status, men deaktivert`() {
-		val status = DeltakerStatus.settAktiv(status = DELTAR)
+		val status = DeltakerStatus.nyAktiv(status = DELTAR)
 		val deaktivert = status.deaktiver()
 		assertTrue(status.aktiv)
 		assertFalse(deaktivert.aktiv)
