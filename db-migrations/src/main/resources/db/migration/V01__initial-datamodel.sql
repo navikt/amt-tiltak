@@ -109,9 +109,8 @@ CREATE TABLE deltaker_status
     deltaker_id uuid references deltaker (id),
     endret_dato timestamp with time zone,
     status      varchar                  NOT NULL,
-    active      boolean,
+    aktiv       boolean                  NOT NULL DEFAULT FALSE,
     created_at  timestamp with time zone not null default current_timestamp,
-
     UNIQUE (deltaker_id, endret_dato, status)
 );
 

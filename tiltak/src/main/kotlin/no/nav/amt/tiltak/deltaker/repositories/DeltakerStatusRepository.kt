@@ -21,7 +21,7 @@ open class DeltakerStatusRepository(
 			deltakerId = rs.getUUID("deltaker_id"),
 			endretDato = rs.getTimestamp("endret_dato").toLocalDateTime(),
 			status = Deltaker.Status.valueOf(rs.getString("status")),
-			aktiv = rs.getBoolean("active"),
+			aktiv = rs.getBoolean("aktiv"),
 		)
 
 	}
@@ -30,15 +30,15 @@ open class DeltakerStatusRepository(
 
 	fun upsert(dbo: DeltakerStatusDbo) {
 		val sql = """
-			INSERT INTO deltaker_status(id, deltaker_id, endret_dato, status, active)
+			INSERT INTO deltaker_status(id, deltaker_id, endret_dato, status, aktiv)
 			VALUES (:id,
 					:deltakerId,
 					:endretDato,
 					:status,
-					:active)
+					:aktiv)
 			ON CONFLICT (id) DO UPDATE SET endret_dato  = :endretDato,
 										   status = :status,
-										   active         = :active
+										   aktiv  = :aktiv
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
@@ -47,7 +47,7 @@ open class DeltakerStatusRepository(
 				"deltakerId" to dbo.deltakerId,
 				"endretDato" to dbo.endretDato,
 				"status" to dbo.status.name,
-				"active" to dbo.aktiv,
+				"aktiv" to dbo.aktiv,
 			)
 		)
 
@@ -56,7 +56,7 @@ open class DeltakerStatusRepository(
 
 	fun getStatuserForDeltaker(deltakerId: UUID): List<DeltakerStatusDbo> {
 		val sql = """
-			SELECT id, deltaker_id, endret_dato, status, active
+			SELECT id, deltaker_id, endret_dato, status, aktiv
 			FROM deltaker_status
 			WHERE deltaker_id = :deltakerId;
 		""".trimIndent()
