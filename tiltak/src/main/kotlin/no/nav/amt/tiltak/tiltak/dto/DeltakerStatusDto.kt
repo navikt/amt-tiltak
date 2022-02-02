@@ -4,6 +4,6 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import java.time.LocalDateTime
 
 data class DeltakerStatusDto(
-	val status: Deltaker.Status,
+	val type: Deltaker.Status,
 	val endretDato: LocalDateTime
 )
