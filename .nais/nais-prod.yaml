@@ -86,6 +86,7 @@ spec:
       - type: POSTGRES_12
         diskAutoresize: true
         highAvailability: true
+        pointInTimeRecovery: true
         tier: db-custom-1-3840
         databases:
           - name: amt-tiltak-db
