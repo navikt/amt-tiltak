@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.tiltak.dto
 
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -18,7 +17,7 @@ data class TiltakDeltakerDetaljerDto(
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val registrertDato: LocalDateTime,
-	val status: Deltaker.Status?,
+	val status: DeltakerStatusDto,
 	val gjennomforing: GjennomforingDto
 )
 
