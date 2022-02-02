@@ -15,6 +15,7 @@ import org.apache.kafka.common.serialization.StringSerializer
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.JdbcTemplate
 import org.testcontainers.containers.KafkaContainer
+import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
@@ -29,12 +30,12 @@ class KafkaConfigurationTest {
 
 	@Container
 	var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.4.3"))
+		.waitingFor(HostPortWaitStrategy())
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 
 	@Test
 	fun `should ingest arena records after configuring kafka`() {
-
 		val kafkaTopicProperties = KafkaTopicProperties(
 			amtTiltakTopic = amtTiltakTopic,
 			sisteTilordnetVeilederTopic = sisteTilordnetVeilederTopic

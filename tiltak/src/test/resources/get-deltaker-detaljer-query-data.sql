@@ -27,5 +27,5 @@ VALUES ('dc600c70-124f-4fe7-a687-b58439beb214', '23b04c3a-a36c-451f-b9cf-30b6a6b
         'b3420940-5479-48c8-b2fa-3751c7a33aa2', 'yesterday'::DATE, 'tomorrow'::DATE, 5, 100,
         'yesterday'::DATE);
 
-INSERT INTO deltaker_status (id, deltaker_id, endret_dato, status, active)
+INSERT INTO deltaker_status (id, deltaker_id, endret_dato, status, aktiv)
 VALUES ('1264f224-7492-11ec-90d6-0242ac120003', 'dc600c70-124f-4fe7-a687-b58439beb214', 'yesterday'::DATE , 'DELTAR', TRUE);
