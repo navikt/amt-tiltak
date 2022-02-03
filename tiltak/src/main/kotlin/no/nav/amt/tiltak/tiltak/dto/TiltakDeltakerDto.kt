@@ -13,7 +13,7 @@ data class TiltakDeltakerDto(
 	val fodselsnummer: String,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
-	val status: Deltaker.Status?,
+	val status: DeltakerStatusDto,
 	val registrertDato: LocalDateTime
 )
 
@@ -24,6 +24,6 @@ fun Deltaker.toDto() = TiltakDeltakerDto(
 	fodselsnummer = requireNotNull(bruker).fodselsnummer,
 	startDato = startDato,
 	sluttDato = sluttDato,
-	status = status,
+	status = DeltakerStatusDto(statuser.current.status, statuser.current.endretDato),
 	registrertDato = registrertDato
 )
