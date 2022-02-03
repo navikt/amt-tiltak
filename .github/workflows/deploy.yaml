@@ -1,4 +1,4 @@
-name: Deploy to dev
+name: Deploy application
 on:
   workflow_dispatch:
   push:
@@ -16,10 +16,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-      - name: Set up JDK 15
+      - name: Set up JDK 17
         uses: actions/setup-java@v1
         with:
-          java-version: 15
+          java-version: 17
       - name: Set up cache
         uses: actions/cache@v1
         with:
@@ -35,7 +35,8 @@ jobs:
           echo ${GITHUB_TOKEN} | docker login ghcr.io -u ${GITHUB_REPOSITORY} --password-stdin
           docker build -t ${IMAGE}:${IMAGE_TAG} .
           docker push ${IMAGE}:${IMAGE_TAG}
-  deploy:
+
+  deploy-dev:
     name: Deploy application to dev
     needs: test-build-and-push
     runs-on: ubuntu-latest
@@ -57,3 +58,27 @@ jobs:
           tag_name: release/dev@${{ env.IMAGE_TAG }}
           release_name: Release to dev
           prerelease: true
+
+  deploy-prod:
+    name: Deploy application to prod
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Deploy application
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: .nais/nais-prod.yaml
+          VAR: version=${{ env.IMAGE_TAG }}
+      - name: Create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: release/dev@${{ env.IMAGE_TAG }}
+          release_name: Release to prod
+          prerelease: false

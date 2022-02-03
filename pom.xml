@@ -35,13 +35,13 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.code.style>official</kotlin.code.style>
-        <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
-        <maven.compiler.source>15</maven.compiler.source>
-        <maven.compiler.target>15</maven.compiler.target>
+        <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
 
         <testcontainers.version>1.16.0</testcontainers.version>
         <mockito-kotlin.version>3.2.0</mockito-kotlin.version>
-        <schedlock.version>4.29.0</schedlock.version>
+        <schedlock.version>4.33.0</schedlock.version>
 
         <wiremock.version>2.31.0</wiremock.version>
         <nimbus.version>9.18</nimbus.version>
@@ -202,6 +202,11 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>net.javacrumbs.shedlock</groupId>
+                <artifactId>shedlock-spring</artifactId>
+                <version>${schedlock.version}</version>
+            </dependency>
             <dependency>
                 <groupId>net.javacrumbs.shedlock</groupId>
                 <artifactId>shedlock-provider-jdbc-template</artifactId>

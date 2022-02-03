@@ -11,7 +11,7 @@ data class DeltakerStatuser(
 
 	companion object {
 		fun settAktivStatus(status: Deltaker.Status, endretDato: LocalDateTime = LocalDateTime.now()) =
-			DeltakerStatuser(listOf(DeltakerStatus.settAktiv(
+			DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(
 				status = status,
 				endretDato = endretDato
 			)))
@@ -19,8 +19,8 @@ data class DeltakerStatuser(
 
 	val current: DeltakerStatus = statuser.find { it.aktiv }!!
 
-	fun medNy(status: Deltaker.Status, endretDato: LocalDateTime) = DeltakerStatuser(
-		statuser.map { it.deaktiver() } + DeltakerStatus.settAktiv(status = status, endretDato = endretDato)
+	fun medNy(status: Deltaker.Status, endretDato: LocalDateTime = LocalDateTime.now()) = DeltakerStatuser(
+		statuser.map { it.deaktiver() } + DeltakerStatus.nyAktiv(status = status, endretDato = endretDato)
 	)
 }
 
@@ -32,7 +32,7 @@ data class DeltakerStatus(
 ) {
 
 	companion object {
-		fun settAktiv(status: Deltaker.Status, endretDato: LocalDateTime = LocalDateTime.now()) =
+		fun nyAktiv(status: Deltaker.Status, endretDato: LocalDateTime = LocalDateTime.now()) =
 			DeltakerStatus(status = status, endretDato = endretDato, aktiv = true)
 
 		fun nyInaktiv(status: Deltaker.Status, endretDato: LocalDateTime = LocalDateTime.now()) =
