@@ -98,6 +98,8 @@ open class DeltakerRepository(
 			UPDATE deltaker
 			SET start_dato = :startDato,
 				slutt_dato    = :sluttDato,
+				dager_per_uke = :dagerPerUke,
+				prosent_stilling = :prosentStilling,
 				modified_at   = :modifiedAt
 			WHERE id = :deltakerInternalId
 	""".trimIndent()
@@ -106,6 +108,8 @@ open class DeltakerRepository(
 			mapOf(
 				"startDato" to deltaker.startDato,
 				"sluttDato" to deltaker.sluttDato,
+				"dagerPerUke" to deltaker.dagerPerUke,
+				"prosentStilling" to deltaker.prosentStilling,
 				"modifiedAt" to deltaker.modifiedAt,
 				"deltakerInternalId" to deltaker.id
 			)

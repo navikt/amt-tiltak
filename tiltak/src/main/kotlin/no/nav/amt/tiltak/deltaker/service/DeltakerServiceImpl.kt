@@ -29,7 +29,7 @@ open class DeltakerServiceImpl(
 			createDeltaker(fodselsnummer, gjennomforingId, deltaker)
 		} else {
 			val lagretDeltaker = lagretDeltakerDbo.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker)
-			val oppdatertDeltaker = lagretDeltaker.update(deltaker.status, deltaker.startDato, deltaker.sluttDato, deltaker.statuser.current.endretDato)
+			val oppdatertDeltaker = lagretDeltaker.oppdater(deltaker)
 
 			if (lagretDeltaker != oppdatertDeltaker) {
 				deltakerStatusRepository.upsert(DeltakerStatusDbo.fromDeltaker(oppdatertDeltaker))

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 
 
 class DeltakerTest {
@@ -15,7 +16,7 @@ class DeltakerTest {
 	val tomorrow = today.plusDays(1)
 
 	@Test
-	fun `updatestatus - status oppdateres - endres til DELTAR`() {
+	fun `oppdaterStatus - status oppdateres - endres til DELTAR`() {
 		val deltaker = Deltaker(
 			startDato = yesterday,
 			sluttDato = tomorrow,
@@ -25,50 +26,14 @@ class DeltakerTest {
 			))),
 			registrertDato = LocalDateTime.now().minusWeeks(1),
 		)
-		val updatedDeltaker = deltaker.update(DELTAR, yesterday, tomorrow, LocalDateTime.now())
+		val oppdatertStatus = deltaker.oppdaterStatus(DELTAR, LocalDateTime.now())
 
-		assertNotEquals(updatedDeltaker, deltaker)
-		assertEquals(updatedDeltaker.status, DELTAR)
-	}
-
-
-	@Test
-	fun `updatestatus - startdato endres - endres til tomorrow`() {
-		val deltaker = Deltaker(
-			startDato = yesterday,
-			sluttDato = LocalDate.now().plusWeeks(1),
-			statuser = DeltakerStatuser(listOf(DeltakerStatus(
-				status = VENTER_PA_OPPSTART,
-				endretDato = LocalDateTime.now().minusWeeks(1),
-				aktiv = true
-			))),
-			registrertDato = LocalDateTime.now().minusWeeks(1),
-		)
-		val updatedDeltaker = deltaker.update(VENTER_PA_OPPSTART, tomorrow,  LocalDate.now().plusWeeks(1), LocalDateTime.now())
-
-		assertNotEquals(updatedDeltaker, deltaker)
-		assertEquals(updatedDeltaker.startDato, tomorrow)
+		assertNotEquals(oppdatertStatus.statuser, deltaker.statuser)
+		assertEquals(oppdatertStatus.current.status, DELTAR)
 	}
 
 	@Test
-	fun `updatestatus - sluttdatodato endres - endres til tomorrow`() {
-		val deltaker = Deltaker(
-			startDato = LocalDate.now().minusWeeks(1),
-			sluttDato = yesterday,
-			statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(
-				status = Deltaker.Status.DELTAR,
-				endretDato = LocalDateTime.now().minusWeeks(1),
-			))),
-			registrertDato = LocalDateTime.now().minusWeeks(1),
-		)
-		val updatedDeltaker = deltaker.update(DELTAR, LocalDate.now().minusWeeks(1),  tomorrow, LocalDateTime.now())
-
-		assertNotEquals(updatedDeltaker, deltaker)
-		assertEquals(updatedDeltaker.sluttDato, tomorrow)
-	}
-
-	@Test
-	fun `updatestatus - status, startdato og sluttdato ikke uendret - forblir uendret`() {
+	fun `oppdaterStatus - status, startdato og sluttdato ikke uendret - forblir uendret`() {
 		val deltaker = Deltaker(
 			startDato = LocalDate.now().minusWeeks(1),
 			sluttDato = yesterday,
@@ -79,14 +44,50 @@ class DeltakerTest {
 			registrertDato = LocalDateTime.now().minusWeeks(1),
 		)
 
-		val updatedDeltaker = deltaker.update(
+		val updatedDeltaker = deltaker.oppdaterStatus(
 			DELTAR,
-			LocalDate.now().minusWeeks(1),
-			yesterday,
 			LocalDateTime.now()
 		)
 
-		assertEquals(updatedDeltaker, deltaker)
+		assertEquals(updatedDeltaker, deltaker.statuser)
+	}
+
+	@Test
+	fun `oppdater - status oppdateres - endres til DELTAR`() {
+		val deltaker = Deltaker(
+			id = UUID.randomUUID(),
+			startDato = yesterday,
+			sluttDato = tomorrow,
+			statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(
+				status = VENTER_PA_OPPSTART,
+				endretDato = LocalDateTime.now().minusWeeks(1)
+			))),
+			registrertDato = LocalDateTime.now().minusWeeks(1),
+		)
+		val nyDeltaker = Deltaker(
+			id = deltaker.id,
+			startDato = tomorrow,
+			sluttDato = LocalDate.now().plusWeeks(1),
+			statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(
+				status = DELTAR,
+				endretDato = LocalDateTime.now().minusHours(3)
+			))),
+			registrertDato = LocalDateTime.now().minusWeeks(1),
+			dagerPerUke = 3,
+			prosentStilling = 100F
+
+		)
+		val uuid = UUID.randomUUID()
+		val deltakerInserted = deltaker.oppdater(nyDeltaker)
+		val expectedStatus = deltaker.statuser.medNy(nyDeltaker.status, nyDeltaker.statuser.current.endretDato)
+		val actual = deltakerInserted.copy(
+			statuser = DeltakerStatuser(deltakerInserted.statuser.statuser.map { it.copy(id = uuid) })
+		)
+		val expected = nyDeltaker.copy(
+			statuser = DeltakerStatuser(expectedStatus.statuser.map { it.copy(id = uuid) })
+		)
+
+		assertEquals(expected, actual)
 	}
 
 	@Test
