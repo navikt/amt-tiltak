@@ -136,25 +136,21 @@ class IntegrationTest {
 		ingestor.ingestKafkaMessageValue(deltakerJson)
 		ingestor.ingestKafkaMessageValue(deltakerOppdatertJson)
 
-		val inserted = deltakerService.hentDeltaker(deltakerToInsert.id)
+		val inserted = deltakerService.hentDeltaker(deltakerOppdatert.id)
 
 		inserted shouldNotBe null
 		inserted.bruker shouldNotBe null
 
-		inserted.statuser.statuser.size shouldBe 2
-		inserted.statuser.current.status shouldBe Deltaker.Status.DELTAR
-
-		val statuserStub = DeltakerStatuser.settAktivStatus(Deltaker.Status.DELTAR, now) //Skal ikke validere flere ting på status
-		val expected = deltakerToInsert.copy(
-			bruker = deltakerToInsert.bruker?.copy(id= inserted.bruker!!.id),
-			statuser = statuserStub,
-			startDato = now.toLocalDate()
+		val uuid = UUID.randomUUID()
+		val expected = deltakerOppdatert.copy(
+			bruker = deltakerOppdatert.bruker?.copy(id= inserted.bruker!!.id),
+			statuser = DeltakerStatuser(deltakerOppdatert.statuser.statuser.map { it.copy(id = uuid) })
 		)
-		val actual = inserted.copy(statuser = statuserStub)
+		val actual = inserted.copy(statuser = DeltakerStatuser(inserted.statuser.statuser.map { it.copy(id = uuid) }))
+		actual.statuser shouldBe expected.statuser
 		actual shouldBe expected
 
 	}
-
 
 	val toInsertGjennomforing = GjennomforingDbo(
 		id =  gjennomforingId,
@@ -222,12 +218,23 @@ class IntegrationTest {
 			DeltakerStatus(
 				id = UUID.randomUUID(),
 				status =  Deltaker.Status.VENTER_PA_OPPSTART,
-				endretDato =  now,
+				endretDato =  now.minusHours(1),
 				aktiv = true
 			))),
 		registrertDato = now,
 		dagerPerUke = 5,
 		prosentStilling = 100F,
+	)
+
+	val deltakerOppdatert = Deltaker(
+		id = deltakerToInsert.id,
+		bruker = deltakerToInsert.bruker,
+		startDato = LocalDate.now().minusDays(1),
+		sluttDato = LocalDate.now().plusDays(1),
+		statuser = deltakerToInsert.statuser.medNy(Deltaker.Status.DELTAR, now),
+		registrertDato = now,
+		dagerPerUke = 3,
+		prosentStilling = 50F,
 	)
 
 	val deltakerOppdatertJson = """
@@ -237,15 +244,16 @@ class IntegrationTest {
 			  "timestamp": "2022-01-10T11:46:44.799Z",
 			  "operation": "CREATED",
 			  "payload": {
-			    "id": "${deltakerToInsert.id}",
+			    "id": "${deltakerOppdatert.id}",
 			    "gjennomforingId": "${gjennomforingId}",
 			    "personIdent": "$personIdent",
-			    "status": "DELTAR",
-				"startDato": "${now.toLocalDate()}",
-			    "dagerPerUke": ${deltakerToInsert.dagerPerUke},
-			    "prosentDeltid": ${deltakerToInsert.prosentStilling},
-			    "registrertDato": "${deltakerToInsert.registrertDato}",
-				"statusEndretDato": "${deltakerToInsert.statuser.statuser.get(0).endretDato.plusMinutes(2)}"
+			    "status": "${deltakerOppdatert.status}",
+				"startDato": "${deltakerOppdatert.startDato}",
+				"sluttDato": "${deltakerOppdatert.sluttDato}",
+			    "dagerPerUke": "${deltakerOppdatert.dagerPerUke}",
+			    "prosentDeltid": ${deltakerOppdatert.prosentStilling},
+			    "registrertDato": "${deltakerOppdatert.registrertDato}",
+				"statusEndretDato": "${deltakerOppdatert.statuser.statuser.last().endretDato}"
 			  }
 			}
 		""".trimIndent()
@@ -264,7 +272,7 @@ class IntegrationTest {
 			    "dagerPerUke": ${deltakerToInsert.dagerPerUke},
 			    "prosentDeltid": ${deltakerToInsert.prosentStilling},
 			    "registrertDato": "${deltakerToInsert.registrertDato}",
-				"statusEndretDato": "${deltakerToInsert.statuser.statuser.get(0).endretDato}"
+				"statusEndretDato": "${deltakerToInsert.statuser.statuser.last().endretDato}"
 			  }
 			}
 		""".trimIndent()

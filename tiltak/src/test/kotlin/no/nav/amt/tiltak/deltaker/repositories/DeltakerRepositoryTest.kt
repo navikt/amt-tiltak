@@ -98,21 +98,22 @@ internal class DeltakerRepositoryTest : FunSpec({
 			registrertDato
 		)
 
-		val updatedStartDato = LocalDate.now().plusDays(1)
-		val updatedSluttDato = LocalDate.now().plusDays(14)
-		val updatedStatus = Deltaker.Status.DELTAR
+		val nyStartdato = LocalDate.now().plusDays(1)
+		val nySluttdato = LocalDate.now().plusDays(14)
 
-		val updatedDeltaker = dbo.toDeltaker(statusConverterMock).update(updatedStatus, updatedStartDato, updatedSluttDato)
-		val updated = DeltakerDbo(updatedDeltaker)
+		val deltakerMedStatus = dbo.toDeltaker(statusConverterMock).let {
+			it.oppdater(it.copy(startDato = nyStartdato, sluttDato = nySluttdato))
+		}
+		val deltakerToInsert = DeltakerDbo(deltakerMedStatus)
 
 
-		updatedDeltaker shouldNotBe dbo.toDeltaker(statusConverterMock)
+		deltakerMedStatus shouldNotBe dbo.toDeltaker(statusConverterMock)
 
-		val updatedDbo = repository.update(updated)
+		val insertedDeltaker = repository.update(deltakerToInsert)
 
-		updatedDbo.id shouldBe dbo.id
-		updatedDbo.startDato shouldBe updatedStartDato
-		updatedDbo.sluttDato shouldBe updatedSluttDato
+		insertedDeltaker.id shouldBe dbo.id
+		insertedDeltaker.startDato shouldBe nyStartdato
+		insertedDeltaker.sluttDato shouldBe nySluttdato
 	}
 
 	test("Get by id") {
