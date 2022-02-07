@@ -6,7 +6,9 @@ data class DeltakerStatuser(
 	val statuser: List<DeltakerStatus>
 ) {
 	init {
-	    require(statuser.filter { it.aktiv }.size == 1) { "Kan kun ha en aktiv status"}
+	    require(statuser.filter { it.aktiv }.size == 1) {
+			"Kan kun ha en aktiv status, deltakerstatuser med id ${statuser.map { it.id }.joinToString(",")}"
+		}
 	}
 
 	companion object {
