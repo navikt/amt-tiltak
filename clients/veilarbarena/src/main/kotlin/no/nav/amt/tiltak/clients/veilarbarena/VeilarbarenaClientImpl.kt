@@ -19,7 +19,7 @@ class VeilarbarenaClientImpl(
 
 	override fun hentBrukerOppfolgingsenhetId(fnr: String): String? {
 		val request = Request.Builder()
-			.url("$url/veilarbarena/api/arena/status?fnr=$fnr")
+			.url("$url/api/arena/status?fnr=$fnr")
 			.addHeader("Downstream-Authorization", "Bearer ${veilarbarenaTokenProvider.get()}")
 			.addHeader("Authorization", "Bearer ${proxyTokenProvider.get()}")
 			.addHeader("Nav-Consumer-Id", consumerId)

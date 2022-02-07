@@ -19,7 +19,7 @@ class VeilarbarenaClientImplTest {
 		)
 
 		givenThat(
-			get(urlEqualTo("/veilarbarena/api/arena/status?fnr=987654"))
+			get(urlEqualTo("/api/arena/status?fnr=987654"))
 				.withHeader("Downstream-Authorization", equalTo("Bearer VEILARBARENA_TOKEN"))
 				.withHeader("Authorization", equalTo("Bearer PROXY_TOKEN"))
 				.withHeader("Nav-Consumer-Id", equalTo("amt-tiltak"))
@@ -55,7 +55,7 @@ class VeilarbarenaClientImplTest {
 		)
 
 		givenThat(
-			get(urlEqualTo("/veilarbarena/api/arena/status?fnr=987654"))
+			get(urlEqualTo("/api/arena/status?fnr=987654"))
 				.willReturn(aResponse().withStatus(404))
 		)
 
