@@ -1,9 +1,7 @@
 package no.nav.amt.tiltak.deltaker.controllers
 
-import no.nav.amt.tiltak.tiltak.dto.GjennomforingDto
-import no.nav.amt.tiltak.tiltak.dto.NavKontorDto
-import no.nav.amt.tiltak.tiltak.dto.TiltakDeltakerDetaljerDto
-import no.nav.amt.tiltak.tiltak.dto.TiltakDto
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.tiltak.dto.*
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
@@ -74,7 +72,7 @@ class TiltakDeltakerControllerTest {
 				startDato = null,
 				sluttDato = null,
 				registrertDato = LocalDateTime.now(),
-				status = null,
+				status = DeltakerStatusDto(Deltaker.Status.DELTAR, LocalDateTime.now()),
 				gjennomforing = GjennomforingDto(
 					id = UUID.randomUUID(),
 					navn = "",

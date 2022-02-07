@@ -30,7 +30,8 @@ class GetDeltakerDetaljerQuery(
 			startDato = rs.getNullableLocalDate("start_dato"),
 			sluttDato = rs.getNullableLocalDate("slutt_dato"),
 			registrertDato = rs.getLocalDateTime("registrert_dato"),
-			status = rs.getString("status")?.let { Deltaker.Status.valueOf(it) },
+			status = Deltaker.Status.valueOf(rs.getString("status")),
+			statusEndretDato = rs.getLocalDateTime("status_endret_dato"),
 			navKontorNavn = rs.getString("nav_kontor_navn"),
 			gjennomforingId = rs.getUUID("gjennomforing_id"),
 			gjennomforingNavn = rs.getString("gjennomforing_navn"),
@@ -47,6 +48,7 @@ class GetDeltakerDetaljerQuery(
 			   deltaker.start_dato          AS start_dato,
 			   deltaker.slutt_dato          AS slutt_dato,
 			   deltaker_status.status       AS status,
+			   deltaker_status.endret_dato 	AS status_endret_dato,
 			   deltaker.registrert_dato     AS registrert_dato,
 			   bruker.fornavn               AS fornavn,
 			   bruker.mellomnavn            AS mellomnavn,
@@ -73,7 +75,7 @@ class GetDeltakerDetaljerQuery(
 				 LEFT JOIN gjennomforing ON gjennomforing.id = deltaker.gjennomforing_id
 				 LEFT JOIN tiltak ON gjennomforing.tiltak_id = tiltak.id
 				 LEFT JOIN deltaker_status ON deltaker_status.deltaker_id = deltaker.id
-		WHERE deltaker.id = :deltakerId AND deltaker_status.active
+		WHERE deltaker.id = :deltakerId AND deltaker_status.aktiv
 	""".trimIndent()
 
 	fun query(deltakerId: UUID): DeltakerDetaljerDbo? {

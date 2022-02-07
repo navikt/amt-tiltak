@@ -5,11 +5,11 @@ CREATE TYPE arrangor_rolle AS ENUM (
 
 CREATE TABLE nav_ansatt
 (
-    id              uuid PRIMARY KEY,
-    personlig_ident varchar NOT NULL UNIQUE,
-    telefonnummer   varchar,
-    epost           varchar,
-    navn            VARCHAR NOT NULL
+    id            uuid PRIMARY KEY,
+    nav_ident     varchar NOT NULL UNIQUE,
+    telefonnummer varchar,
+    epost         varchar,
+    navn          VARCHAR NOT NULL
 );
 
 CREATE TABLE nav_kontor
@@ -65,7 +65,7 @@ CREATE TABLE gjennomforing
     tiltak_id       uuid                     not null references tiltak (id),
     arrangor_id     uuid                     not null references arrangor (id),
     navn            varchar                  not null,
-    status          varchar                  not null check (status in('IKKE_STARTET', 'GJENNOMFORES', 'AVSLUTTET')),
+    status          varchar                  not null check (status in ('IKKE_STARTET', 'GJENNOMFORES', 'AVSLUTTET')),
     start_dato      date,
     slutt_dato      date,
     fremmote_dato   timestamp with time zone,
@@ -96,10 +96,22 @@ CREATE TABLE deltaker
     gjennomforing_id uuid                     not null references gjennomforing (id),
     start_dato       date,
     slutt_dato       date,
-    status           varchar not null check (status in('VENTER_PA_OPPSTART', 'DELTAR', 'HAR_SLUTTET', 'IKKE_AKTUELL')),
     dager_per_uke    integer,
     prosent_stilling float,
     registrert_dato  timestamp with time zone not null,
     created_at       timestamp with time zone default current_timestamp,
     modified_at      timestamp with time zone default current_timestamp
 );
+
+CREATE TABLE deltaker_status
+(
+    id          uuid PRIMARY KEY         NOT NULL,
+    deltaker_id uuid references deltaker (id),
+    endret_dato timestamp with time zone,
+    status      varchar                  NOT NULL,
+    aktiv       boolean                  NOT NULL DEFAULT FALSE,
+    created_at  timestamp with time zone not null default current_timestamp,
+    UNIQUE (deltaker_id, endret_dato, status)
+);
+
+CREATE INDEX deltaker_status_deltaker_id_idx ON deltaker_status (deltaker_id);

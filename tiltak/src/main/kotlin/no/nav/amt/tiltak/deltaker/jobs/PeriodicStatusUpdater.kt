@@ -4,10 +4,10 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.amt.tiltak.core.port.DeltakerService
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 
-@Service
-class PeriodicStatusUpdater(
+@Component
+open class PeriodicStatusUpdater(
 	private val deltakerService: DeltakerService,
 ) {
 
@@ -15,12 +15,14 @@ class PeriodicStatusUpdater(
 		private val log = LoggerFactory.getLogger(PeriodicStatusUpdater::class.java)
 	}
 
-	/* Klokken 2 hver natt */
-	@Scheduled(cron = "0 0 2 * * *")
+	/* En time etter forrige kjøring */
+	@Scheduled(fixedDelay = 60 * 60 * 1000L)
 	@SchedulerLock(name = "statusUpdater", lockAtMostFor = "120m")
 	fun update() {
 		try {
+			log.info("Oppdaterer statuser")
 			deltakerService.oppdaterStatuser()
+			log.info("Statuser oppdatert")
 		} catch (e: Exception) {
 			log.error("Feil under oppdatering av statuser", e)
 		}

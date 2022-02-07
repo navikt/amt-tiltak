@@ -22,25 +22,16 @@ data class Deltaker(
 		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL
 	}
 
-	fun update(
-		newStatus: Status,
-		newDeltakerStartDato: LocalDate?,
-		newDeltakerSluttDato: LocalDate?,
-		newStatusEndretDato: LocalDateTime = LocalDateTime.now()
-	): Deltaker {
+	fun oppdater(nyDeltaker: Deltaker) : Deltaker {
+		if (nyDeltaker.id != id) throw IllegalStateException("Kan ikke oppdatere deltaker id ${id} med en annen deltaker id")
+		return nyDeltaker.copy(
+			statuser = oppdaterStatus(nyDeltaker.status, nyDeltaker.statuser.current.endretDato),
+			bruker = bruker
+		)
+	}
 
-		return if (statuser.current.status != newStatus
-			|| startDato != newDeltakerStartDato
-			|| sluttDato != newDeltakerSluttDato
-		) {
-
-			copy(
-				startDato = newDeltakerStartDato,
-				sluttDato = newDeltakerSluttDato,
-				statuser = if(statuser.current.status == newStatus) statuser else statuser.medNy(newStatus, newStatusEndretDato),
-			)
-
-		} else this
+	fun oppdaterStatus(newStatus: Status, newStatusEndretDato: LocalDateTime = LocalDateTime.now()): DeltakerStatuser {
+		return if (statuser.current.status != newStatus) statuser.medNy(newStatus, newStatusEndretDato) else statuser
 	}
 
 	fun progressStatus(): Deltaker {

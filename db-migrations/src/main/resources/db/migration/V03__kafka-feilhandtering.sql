@@ -15,6 +15,3 @@ CREATE TABLE kafka_consumer_record
     created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (topic, partition, record_offset)
 );
-
-
-
