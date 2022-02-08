@@ -27,10 +27,6 @@ class DeltakerProcessor(
 		upsert(message)
 	}
 
-	override fun processDeleteMessage(message: MessageWrapper<DeltakerPayload>) {
-		TODO("Not yet implemented")
-	}
-
 	private fun upsert(message: MessageWrapper<DeltakerPayload>) {
 		val deltakerDto = message.payload
 		val deltakerFnr = message.payload.personIdent

@@ -23,10 +23,6 @@ class GjennomforingProcessor(
 		upsert(message)
 	}
 
-	override fun processDeleteMessage(message: MessageWrapper<GjennomforingPayload>) {
-		TODO("Not yet implemented")
-	}
-
 	private fun upsert(message: MessageWrapper<GjennomforingPayload>) {
 		val gjennomforing = message.payload
 		val tiltak = gjennomforing.tiltak
