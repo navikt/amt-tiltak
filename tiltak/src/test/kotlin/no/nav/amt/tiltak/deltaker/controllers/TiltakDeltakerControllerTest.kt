@@ -1,6 +1,8 @@
 package no.nav.amt.tiltak.deltaker.controllers
 
+import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.tiltak.dto.*
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
@@ -42,6 +44,12 @@ class TiltakDeltakerControllerTest {
 
 	@MockBean
 	private lateinit var tiltakDeltakerPresentationService: TiltakDeltakerPresentationService
+
+	@MockBean
+	private lateinit var authService: AuthService
+
+	@MockBean
+	private lateinit var arrangorAnsattTilgangService: ArrangorAnsattTilgangService
 
 	@Test
 	fun `hentTiltakDeltakerDetaljer() should return 401 when not authenticated`() {

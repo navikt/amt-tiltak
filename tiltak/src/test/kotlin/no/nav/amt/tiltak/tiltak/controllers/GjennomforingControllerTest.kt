@@ -1,8 +1,10 @@
 package no.nav.amt.tiltak.tiltak.controllers
 
+import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
+import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
@@ -34,6 +36,12 @@ class GjennomforingControllerTest {
 
 	@MockBean
 	private lateinit var deltakerService: DeltakerService
+
+	@MockBean
+	private lateinit var authService: AuthService
+
+	@MockBean
+	private lateinit var arrangorAnsattTilgangService: ArrangorAnsattTilgangService
 
 	@Autowired
 	private lateinit var mockMvc: MockMvc
