@@ -24,6 +24,10 @@
             <artifactId>nav_kontor</artifactId>
         </dependency>
         <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>auth</artifactId>
+        </dependency>
+        <dependency>
             <groupId>no.nav.security</groupId>
             <artifactId>token-validation-spring</artifactId>
         </dependency>
