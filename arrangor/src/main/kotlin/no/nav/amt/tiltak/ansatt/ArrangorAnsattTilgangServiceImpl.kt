@@ -1,9 +1,10 @@
 package no.nav.amt.tiltak.ansatt
 
-import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.utils.CacheUtils.tryCacheFirstNotNull
+import no.nav.amt.tiltak.utils.CacheUtils.tryCacheFirstNullable
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -60,13 +61,9 @@ class ArrangorAnsattTilgangServiceImpl(
 	private fun harTilgangTilGjennomforing(ansattId: UUID, gjennomforingId: UUID): Boolean {
 		val arrangorIder = hentArrangorIderForAnsatt(ansattId)
 
-		arrangorIder.forEach {
-			if (hentGjennomforingIderForArrangor(it).contains(gjennomforingId)) {
-				return true
-			}
+		return arrangorIder.any {
+			hentGjennomforingIderForArrangor(it).contains(gjennomforingId)
 		}
-
-		return false
 	}
 
 	private fun hentAnsattId(ansattPersonligIdent: String): UUID {
@@ -94,30 +91,6 @@ class ArrangorAnsattTilgangServiceImpl(
 		return tryCacheFirstNotNull(arrangorIdToGjennomforingIdListCache, arrangorId) {
 			gjennomforingService.getGjennomforingerForArrangor(arrangorId).map { it.id }
 		}
-	}
-
-	private fun <K, V> tryCacheFirstNullable(cache: Cache<K, V>, key: K, valueSupplier: () -> V?): V? {
-		val value = cache.getIfPresent(key!!)
-
-		if (value == null) {
-			val newValue: V = valueSupplier.invoke() ?: return null
-			cache.put(key, newValue)
-			return newValue
-		}
-
-		return value
-	}
-
-	private fun <K, V> tryCacheFirstNotNull(cache: Cache<K, V>, key: K, valueSupplier: () -> V): V {
-		val value = cache.getIfPresent(key!!)
-
-		if (value == null) {
-			val newValue: V = valueSupplier.invoke()
-			cache.put(key, newValue)
-			return newValue
-		}
-
-		return value
 	}
 
 }
