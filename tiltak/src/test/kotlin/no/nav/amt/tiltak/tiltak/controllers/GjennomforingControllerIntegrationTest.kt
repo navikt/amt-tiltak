@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.tiltak.controllers
 
 import io.kotest.matchers.shouldBe
+import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.*
@@ -47,6 +48,7 @@ class GjennomforingControllerIntegrationTest {
 	private lateinit var gjennomforingRepository: GjennomforingRepository
 	private lateinit var gjennomforingService: GjennomforingService
 	private lateinit var deltakerService: DeltakerService
+	private lateinit var authService: AuthService
 	private lateinit var controller: GjennomforingController
 	private var tiltakKode = "GRUPPEAMO"
 	private var epost = "bla@bla.com"
@@ -60,6 +62,7 @@ class GjennomforingControllerIntegrationTest {
 		deltakerRepository = DeltakerRepository(namedJdbcTemplate)
 		brukerRepository = BrukerRepository(namedJdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(namedJdbcTemplate)
+		authService = mock(AuthService::class.java)
 		brukerService = BrukerServiceImpl(
 			brukerRepository,
 			mock(NavKontorRepository::class.java),
@@ -73,7 +76,10 @@ class GjennomforingControllerIntegrationTest {
 			brukerService
 		)
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, TiltakServiceImpl(tiltakRepository))
-		controller = GjennomforingController(gjennomforingService, deltakerService)
+		controller = GjennomforingController(
+			gjennomforingService, deltakerService,
+			authService, mock(ArrangorAnsattTilgangService::class.java)
+		)
 
 		DatabaseTestUtils.cleanDatabase(dataSource)
 	}

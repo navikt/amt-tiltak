@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tools.token_provider.azure_ad
+package no.nav.amt.tiltak.tools.token_provider
 
 import com.nimbusds.jwt.JWT
 import org.slf4j.LoggerFactory
