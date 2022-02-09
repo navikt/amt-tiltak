@@ -16,6 +16,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.verify
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -30,6 +32,8 @@ import java.util.*
 @WebMvcTest(controllers = [GjennomforingController::class])
 class GjennomforingControllerTest {
 	private val gjennomforingId = UUID.fromString("e68d54e2-47b5-11ec-81d3-0242ac130003")
+
+	private val fnr = "fnr"
 
 	@MockBean
 	private lateinit var gjennomforingService: GjennomforingService
@@ -55,6 +59,22 @@ class GjennomforingControllerTest {
 				aktiv = true)
 		)
 
+	val deltakerDbo = DeltakerDbo(
+		id = UUID.randomUUID(),
+		brukerId = UUID.randomUUID(),
+		brukerFodselsnummer = "12129312375",
+		brukerFornavn = "Fornavn",
+		brukerEtternavn = "Etternavn",
+		gjennomforingId = gjennomforingId,
+		startDato = LocalDate.now(),
+		sluttDato = LocalDate.now(),
+		dagerPerUke = 1,
+		prosentStilling = 10.343f,
+		createdAt = LocalDateTime.now(),
+		modifiedAt = LocalDateTime.now(),
+		registrertDato = LocalDateTime.now()
+	)
+
 	val tiltak = Tiltak(
 		id = UUID.randomUUID(),
 		navn = "tiltaksnavn",
@@ -75,6 +95,9 @@ class GjennomforingControllerTest {
 	@BeforeEach
 	fun before() {
 		MockitoAnnotations.openMocks(this)
+
+		Mockito.`when`(authService.hentPersonligIdentTilInnloggetBruker())
+			.thenReturn(fnr)
 	}
 
 	companion object {
@@ -116,6 +139,23 @@ class GjennomforingControllerTest {
 	}
 
 	@Test
+	fun `hentGjennomforingerByArrangorId() should perform authorization check`() {
+		val token = server.issueToken("tokenx", "test", "test").serialize()
+
+		val arrangorId = UUID.randomUUID()
+
+		mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/gjennomforing")
+				.queryParam("arrangorId", arrangorId.toString())
+				.header("Authorization", "Bearer $token")
+		).andReturn().response
+
+		verify(arrangorAnsattTilgangService).verifiserTilgangTilArrangor(
+			eq(fnr), eq(arrangorId)
+		)
+	}
+
+	@Test
 	fun `hentGjennomforing() should return 401 when not authenticated`() {
 
 		val response = mockMvc.perform(
@@ -126,15 +166,33 @@ class GjennomforingControllerTest {
 	}
 
 	@Test
-	fun `hentGjennomforinger() should return 200 when authenticated`() {
-		Mockito.`when`(gjennomforingService.getGjennomforing(gjennomforingId)).thenReturn(gjennomforing)
+	fun `hentGjennomforing() should return 200 when authenticated`() {
 		val token = server.issueToken("tokenx", "test", "test").serialize()
+
+		Mockito.`when`(gjennomforingService.getGjennomforing(gjennomforingId)).thenReturn(gjennomforing)
+
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.get("/api/gjennomforing/$gjennomforingId")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
 		assertEquals(200, response.status)
+	}
+
+	@Test
+	fun `hentGjennomforing() should perform authorization check`() {
+		val token = server.issueToken("tokenx", "test", "test").serialize()
+
+		Mockito.`when`(gjennomforingService.getGjennomforing(gjennomforingId)).thenReturn(gjennomforing)
+
+		mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/gjennomforing/$gjennomforingId")
+				.header("Authorization", "Bearer $token")
+		).andReturn().response
+
+		verify(arrangorAnsattTilgangService).verifiserTilgangTilGjennomforing(
+			eq(fnr), eq(gjennomforingId)
+		)
 	}
 
 	@Test
@@ -148,23 +206,11 @@ class GjennomforingControllerTest {
 
 	@Test
 	fun `hentDeltakere() should return 200 when authenticated`() {
-		val deltaker = DeltakerDbo(
-			id = UUID.randomUUID(),
-			brukerId = UUID.randomUUID(),
-			brukerFodselsnummer = "12129312375",
-			brukerFornavn = "Fornavn",
-			brukerEtternavn = "Etternavn",
-			gjennomforingId = gjennomforingId,
-			startDato = LocalDate.now(),
-			sluttDato = LocalDate.now(),
-			dagerPerUke = 1,
-			prosentStilling = 10.343f,
-			createdAt = LocalDateTime.now(),
-			modifiedAt = LocalDateTime.now(),
-			registrertDato = LocalDateTime.now()
-		).toDeltaker(statusConverterMock)
-		Mockito.`when`(deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)).thenReturn(listOf(deltaker))
+		val deltaker = deltakerDbo.toDeltaker(statusConverterMock)
+
 		val token = server.issueToken("tokenx", "test", "test").serialize()
+
+		Mockito.`when`(deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)).thenReturn(listOf(deltaker))
 
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.get("/api/gjennomforing/$gjennomforingId/deltakere")
@@ -172,5 +218,23 @@ class GjennomforingControllerTest {
 		).andReturn().response
 
 		assertEquals(200, response.status)
+	}
+
+	@Test
+	fun `hentDeltakere() should perform authorization check`() {
+		val deltaker = deltakerDbo.toDeltaker(statusConverterMock)
+
+		val token = server.issueToken("tokenx", "test", "test").serialize()
+
+		Mockito.`when`(deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)).thenReturn(listOf(deltaker))
+
+		mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/gjennomforing/$gjennomforingId/deltakere")
+				.header("Authorization", "Bearer $token")
+		).andReturn().response
+
+		verify(arrangorAnsattTilgangService).verifiserTilgangTilGjennomforing(
+			eq(fnr), eq(gjennomforingId)
+		)
 	}
 }
