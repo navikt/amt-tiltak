@@ -19,7 +19,7 @@ data class Deltaker(
 	val status = statuser.current.status
 
 	enum class Status {
-		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL
+		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, FEILREGISTRERT
 	}
 
 	fun oppdater(nyDeltaker: Deltaker) : Deltaker {

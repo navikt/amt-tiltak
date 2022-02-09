@@ -79,6 +79,10 @@ open class DeltakerServiceImpl(
 		progressStatuser(deltakerRepository::potensieltDeltar)
 	}
 
+	override fun slettDeltaker(deltakerId: UUID) {
+		deltakerRepository.slettDeltaker(deltakerId)
+	}
+
 	private fun progressStatuser(kandidatProvider: () -> List<DeltakerDbo>) = kandidatProvider()
 		.also { log.info("Oppdaterer status på ${it.size} deltakere ") }
 		.map { it.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker) }

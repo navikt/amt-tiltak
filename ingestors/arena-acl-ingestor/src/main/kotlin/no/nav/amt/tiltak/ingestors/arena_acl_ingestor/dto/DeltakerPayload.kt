@@ -17,6 +17,6 @@ data class DeltakerPayload(
 	val statusEndretDato: LocalDateTime
 ) {
 	enum class Status {
-		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL
+		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, FEILREGISTRERT
 	}
 }

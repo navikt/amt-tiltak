@@ -313,4 +313,30 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		list shouldHaveSize 0
 	}
+
+	test("slettDeltaker skal slette deltaker") {
+		val id = UUID.randomUUID()
+		val startDato = LocalDate.now().plusDays(7)
+		val registrertDato = LocalDateTime.now().minusDays(3)
+		val sluttDato = null
+		val dagerPerUke = 2
+		val prosentStilling = 20.0f
+
+		repository.insert(
+			id,
+			brukerId,
+			gjennomforingId,
+			startDato,
+			sluttDato,
+			dagerPerUke,
+			prosentStilling,
+			registrertDato
+		)
+
+		repository.get(id) shouldNotBe null
+
+		repository.slettDeltaker(id)
+
+		repository.get(id) shouldBe null
+	}
 })
