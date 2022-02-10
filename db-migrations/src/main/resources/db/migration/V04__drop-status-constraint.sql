@@ -1,0 +1,1 @@
+ALTER TABLE deltaker_status DROP CONSTRAINT deltaker_status_deltaker_id_endret_dato_status_key
