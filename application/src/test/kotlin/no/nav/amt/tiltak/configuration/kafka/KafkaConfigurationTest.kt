@@ -13,6 +13,7 @@ import no.nav.common.kafka.util.KafkaPropertiesBuilder
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.junit.jupiter.api.Test
+import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.jdbc.core.JdbcTemplate
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy
@@ -75,14 +76,15 @@ class KafkaConfigurationTest {
 			}
 		}
 
-		// Creating the config will automatically start the consumer
-		KafkaConfiguration(
+		val config = KafkaConfiguration(
 			kafkaTopicProperties,
 			kafkaProperties,
 			JdbcTemplate(dataSource),
 			arenaAclIngestor,
 			tildeltVeilederIngestor,
 		)
+
+		config.onApplicationEvent(null)
 
 		val kafkaProducer = KafkaProducerClientImpl<String, String>(kafkaProperties.producer())
 		val value = "some value"
