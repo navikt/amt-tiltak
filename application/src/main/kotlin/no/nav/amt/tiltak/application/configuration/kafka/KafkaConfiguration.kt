@@ -11,10 +11,14 @@ import no.nav.common.kafka.consumer.util.deserializer.Deserializers.stringDeseri
 import no.nav.common.kafka.spring.PostgresJdbcTemplateConsumerRepository
 import okhttp3.internal.toImmutableList
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.slf4j.LoggerFactory
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.event.ContextRefreshedEvent
+import org.springframework.context.event.EventListener
 import org.springframework.jdbc.core.JdbcTemplate
 import java.util.function.Consumer
+
 
 @Configuration
 @EnableConfigurationProperties(KafkaTopicProperties::class)
@@ -25,6 +29,7 @@ open class KafkaConfiguration(
 	arenaAclIngestor: ArenaAclIngestor,
 	tildeltVeilederIngestor: TildeltVeilederIngestor
 ) {
+	private val log = LoggerFactory.getLogger(this::class.java)
     private var client: KafkaConsumerClient
 	private var consumerRepository = PostgresJdbcTemplateConsumerRepository(jdbcTemplate)
 	private var consumerRecordProcessor: KafkaConsumerRecordProcessor
@@ -69,9 +74,13 @@ open class KafkaConfiguration(
             .withProperties(kafkaProperties.consumer())
             .withTopicConfigs(topicConfigs.toImmutableList())
             .build()
-
-        client.start()
-		consumerRecordProcessor.start()
     }
+
+	@EventListener
+	open fun onApplicationEvent(_event: ContextRefreshedEvent?) {
+		log.info("Starting kafka consumer and stored record processor...")
+		client.start()
+		consumerRecordProcessor.start()
+	}
 
 }
