@@ -203,12 +203,13 @@ class GjennomforingControllerIntegrationTest {
 		deltakerId: UUID,
 	) {
 		deltakerStatusRepository.upsert(
-			DeltakerStatusDbo(
-			deltakerId = deltakerId,
-			endretDato = LocalDateTime.now().minusDays(1),
-			status = Deltaker.Status.DELTAR,
-			aktiv = true
-		))
+			listOf(
+				DeltakerStatusDbo(
+				deltakerId = deltakerId,
+				endretDato = LocalDateTime.now().minusDays(1),
+				status = Deltaker.Status.DELTAR,
+				aktiv = true
+		)))
 	}
 
 
