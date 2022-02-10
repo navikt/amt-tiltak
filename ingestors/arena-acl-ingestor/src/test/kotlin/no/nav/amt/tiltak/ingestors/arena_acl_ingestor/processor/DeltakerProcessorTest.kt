@@ -100,4 +100,40 @@ class DeltakerProcessorTest : StringSpec({
 		}
 	}
 
+	"Skal slette deltaker for delete melding" {
+		val deltakerId = UUID.randomUUID()
+		val gjennomforingService: GjennomforingService = mockk()
+		val deltakerService: DeltakerService = mockk()
+		val personService: PersonService = mockk()
+
+		val processor = DeltakerProcessor(gjennomforingService, deltakerService, personService)
+
+		every {
+			deltakerService.slettDeltaker(any())
+		} returns Unit
+
+		processor.processMessage(MessageWrapper(
+			transactionId = "",
+			type = "",
+			timestamp = LocalDateTime.now(),
+			operation = Operation.DELETED,
+			payload = DeltakerPayload(
+				id = deltakerId,
+				gjennomforingId = UUID.randomUUID(),
+				personIdent = "1234",
+				startDato = null,
+				sluttDato = null,
+				status = DeltakerPayload.Status.FEILREGISTRERT,
+				dagerPerUke = null,
+				prosentDeltid = null,
+				registrertDato = LocalDateTime.now(),
+				statusEndretDato = LocalDateTime.now()
+			)
+		))
+
+		verify(exactly = 1) {
+			deltakerService.slettDeltaker(deltakerId)
+		}
+	}
+
 })

@@ -52,4 +52,8 @@ class GjennomforingProcessor(
 		}
 	}
 
+	override fun processDeleteMessage(message: MessageWrapper<GjennomforingPayload>) {
+		throw NotImplementedError("Håntering av delete-meldinger for tiltakgjennomføring er ikke implementert")
+	}
+
 }

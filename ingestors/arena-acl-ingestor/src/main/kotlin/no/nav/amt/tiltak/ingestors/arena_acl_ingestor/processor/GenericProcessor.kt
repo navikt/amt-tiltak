@@ -9,11 +9,14 @@ abstract class GenericProcessor<T> {
 		when (message.operation) {
 			Operation.CREATED -> processInsertMessage(message)
 			Operation.MODIFIED -> processModifyMessage(message)
+			Operation.DELETED -> processDeleteMessage(message)
 		}
 	}
 
 	protected abstract fun processInsertMessage(message: MessageWrapper<T>)
 
 	protected abstract fun processModifyMessage(message: MessageWrapper<T>)
+
+	protected abstract fun processDeleteMessage(message: MessageWrapper<T>)
 
 }
