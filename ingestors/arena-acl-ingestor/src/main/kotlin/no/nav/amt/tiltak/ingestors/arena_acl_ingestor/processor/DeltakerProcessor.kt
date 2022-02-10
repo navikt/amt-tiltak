@@ -17,6 +17,8 @@ class DeltakerProcessor(
 	private val personService: PersonService
 ) : GenericProcessor<DeltakerPayload>() {
 
+	private val log = LoggerFactory.getLogger(this::class.java)
+
 	private val secureLog = LoggerFactory.getLogger("SecureLog")
 
 	override fun processInsertMessage(message: MessageWrapper<DeltakerPayload>) {
@@ -30,6 +32,12 @@ class DeltakerProcessor(
 	private fun upsert(message: MessageWrapper<DeltakerPayload>) {
 		val deltakerDto = message.payload
 		val deltakerFnr = message.payload.personIdent
+
+		if (deltakerDto.status == DeltakerPayload.Status.FEILREGISTRERT) {
+			log.info("Sletter deltaker med id=${deltakerDto.id} som er feilregistrert")
+			deltakerService.slettDeltaker(deltakerDto.id)
+			return
+		}
 
 		val person = personService.hentPerson(deltakerFnr)
 
@@ -58,7 +66,6 @@ class DeltakerProcessor(
 			gjennomforingId = tiltaksgjennomforing.id,
 			deltaker = deltaker,
 		)
-
 	}
 
 	private fun tilDeltakerStatus(status: DeltakerPayload.Status): Deltaker.Status {
@@ -67,6 +74,7 @@ class DeltakerProcessor(
 			DeltakerPayload.Status.DELTAR -> Deltaker.Status.DELTAR
 			DeltakerPayload.Status.HAR_SLUTTET -> Deltaker.Status.HAR_SLUTTET
 			DeltakerPayload.Status.IKKE_AKTUELL -> Deltaker.Status.IKKE_AKTUELL
+			DeltakerPayload.Status.FEILREGISTRERT -> Deltaker.Status.FEILREGISTRERT
 		}
 	}
 

@@ -17,4 +17,6 @@ interface DeltakerService {
 
 	fun oppdaterStatuser()
 
+	fun slettDeltaker(deltakerId: UUID)
+
 }
