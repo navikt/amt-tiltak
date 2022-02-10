@@ -19,8 +19,6 @@ class DeltakerProcessor(
 
 	private val log = LoggerFactory.getLogger(this::class.java)
 
-	private val secureLog = LoggerFactory.getLogger("SecureLog")
-
 	override fun processInsertMessage(message: MessageWrapper<DeltakerPayload>) {
 		upsert(message)
 	}
@@ -42,7 +40,7 @@ class DeltakerProcessor(
 		val person = personService.hentPerson(deltakerFnr)
 
 		if (person.diskresjonskode != null) {
-			secureLog.info("Bruker $deltakerFnr har diskresjonskode ${person.diskresjonskode} og skal filtreres ut")
+			log.info("Bruker ${deltakerDto.id} har diskresjonskode ${person.diskresjonskode} og skal filtreres ut")
 			return
 		}
 
@@ -76,6 +74,13 @@ class DeltakerProcessor(
 			DeltakerPayload.Status.IKKE_AKTUELL -> Deltaker.Status.IKKE_AKTUELL
 			DeltakerPayload.Status.FEILREGISTRERT -> Deltaker.Status.FEILREGISTRERT
 		}
+	}
+
+	override fun processDeleteMessage(message: MessageWrapper<DeltakerPayload>) {
+		val deltakerId = message.payload.id
+
+		log.info("Motatt delete-melding, sletter deltaker med id=$deltakerId")
+		deltakerService.slettDeltaker(deltakerId)
 	}
 
 }
