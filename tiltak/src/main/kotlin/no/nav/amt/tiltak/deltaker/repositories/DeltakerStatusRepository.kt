@@ -7,10 +7,12 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.EnableTransactionManagement
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Component
+@EnableTransactionManagement
 open class DeltakerStatusRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
