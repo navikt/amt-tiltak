@@ -3,7 +3,6 @@ package no.nav.amt.tiltak.tiltak.services
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.inspectors.forOne
-import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.mockk.*
@@ -58,7 +57,8 @@ class DeltakerServiceTest: StringSpec ({
 		service = DeltakerServiceImpl(
 			deltakerRepository,
 			deltakerStatusRepository,
-			brukerService
+			brukerService,
+			mockk()
 		)
 	}
 

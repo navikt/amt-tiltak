@@ -26,6 +26,9 @@ import no.nav.amt.tiltak.tiltak.services.TiltakServiceImpl
 import org.junit.Ignore
 import org.junit.jupiter.api.*
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.jdbc.datasource.DataSourceTransactionManager
+import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -79,7 +82,7 @@ class IntegrationTest {
 		personService = mockk()
 		brukerRepository = BrukerRepository(jdbcTemplate)
 		brukerService = BrukerServiceImpl(brukerRepository, navKontorRepository, navKontorService, personService, mockk())
-		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService)
+		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, TransactionTemplate(DataSourceTransactionManager(datasource)))
 		deltakerProcessor = DeltakerProcessor(gjennomforingService, deltakerService, personService)
 		enhetsregisterClient = mockk()
 		arrangorRepository = ArrangorRepository(jdbcTemplate)

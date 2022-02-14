@@ -75,5 +75,20 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 
 	}
 
+	test("slettDeltakerStatus - skal slette status") {
+		val statusesToPersist = listOf(
+			DeltakerStatusDbo(deltakerId = deltakerUUID, status = VENTER_PA_OPPSTART, endretDato = lastweek, aktiv = false),
+			DeltakerStatusDbo(deltakerId = deltakerUUID, status = DELTAR, endretDato = yesterday, aktiv = true)
+		)
+
+		repository.upsert(statusesToPersist)
+
+		repository.getStatuserForDeltaker(deltakerUUID) shouldHaveSize 2
+
+		repository.slettDeltakerStatus(deltakerUUID)
+
+		repository.getStatuserForDeltaker(deltakerUUID) shouldHaveSize 0
+	}
+
 })
 

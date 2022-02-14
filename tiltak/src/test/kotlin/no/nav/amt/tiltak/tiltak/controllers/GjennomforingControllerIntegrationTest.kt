@@ -28,6 +28,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito.mock
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.jdbc.datasource.DataSourceTransactionManager
+import org.springframework.transaction.support.TransactionTemplate
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -73,7 +75,8 @@ class GjennomforingControllerIntegrationTest {
 		deltakerService = DeltakerServiceImpl(
 			deltakerRepository,
 			deltakerStatusRepository,
-			brukerService
+			brukerService,
+			TransactionTemplate(DataSourceTransactionManager(dataSource))
 		)
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, TiltakServiceImpl(tiltakRepository))
 		controller = GjennomforingController(
