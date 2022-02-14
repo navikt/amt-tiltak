@@ -67,4 +67,15 @@ open class DeltakerStatusRepository(
 
 		return template.query(sql, parameters, rowMapper)
 	}
+
+	fun slettDeltakerStatus(deltakerId: UUID) {
+		val sql = "DELETE FROM deltaker_status where deltaker_id = :deltakerId"
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf("deltakerId" to deltakerId)
+		)
+
+		template.update(sql, parameters)
+	}
+
 }
