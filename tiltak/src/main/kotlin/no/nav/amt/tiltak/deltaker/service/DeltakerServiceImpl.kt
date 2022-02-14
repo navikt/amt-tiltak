@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.support.TransactionTemplate
 import java.util.*
 
 @Service
@@ -16,6 +17,7 @@ open class DeltakerServiceImpl(
 	private val deltakerRepository: DeltakerRepository,
 	private val deltakerStatusRepository: DeltakerStatusRepository,
 	private val brukerService: BrukerService,
+	private val transactionTemplate: TransactionTemplate
 ) : DeltakerService {
 
 	companion object {
@@ -80,7 +82,10 @@ open class DeltakerServiceImpl(
 	}
 
 	override fun slettDeltaker(deltakerId: UUID) {
-		deltakerRepository.slettDeltaker(deltakerId)
+		transactionTemplate.execute {
+			deltakerStatusRepository.slettDeltakerStatus(deltakerId)
+			deltakerRepository.slettDeltaker(deltakerId)
+		}
 	}
 
 	private fun progressStatuser(kandidatProvider: () -> List<DeltakerDbo>) = kandidatProvider()

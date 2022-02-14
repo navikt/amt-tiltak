@@ -18,6 +18,8 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.jdbc.datasource.DataSourceTransactionManager
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -28,8 +30,8 @@ class DeltakerServiceImplTest {
 	lateinit var brukerRepository: BrukerRepository
 	lateinit var brukerService: BrukerService
 
-	val datasource = SingletonPostgresContainer.getDataSource()
-	val jdbcTemplate = NamedParameterJdbcTemplate(datasource)
+	val dataSource = SingletonPostgresContainer.getDataSource()
+	val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
 	val fnr = "12345678910"
 	val deltakerId = UUID.randomUUID()
 	val gjennomforingId = UUID.fromString("b3420940-5479-48c8-b2fa-3751c7a33aa2")
@@ -41,14 +43,17 @@ class DeltakerServiceImplTest {
 		brukerService = BrukerServiceImpl(brukerRepository, mockk(), mockk(), mockk(), mockk())
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
-		deltakerServiceImpl = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService)
+		deltakerServiceImpl = DeltakerServiceImpl(
+			deltakerRepository, deltakerStatusRepository,
+			brukerService, TransactionTemplate(DataSourceTransactionManager(dataSource))
+		)
 
-		DatabaseTestUtils.runScriptFile(datasource, "/deltaker-repository_test-data.sql")
+		DatabaseTestUtils.runScriptFile(dataSource, "/deltaker-repository_test-data.sql")
 	}
 
 	@AfterEach
 	fun afterEach() {
-		DatabaseTestUtils.cleanDatabase(datasource)
+		DatabaseTestUtils.cleanDatabase(dataSource)
 	}
 
 	@Test
@@ -140,6 +145,19 @@ class DeltakerServiceImplTest {
 
 		deltakerServiceImpl.upsertDeltaker(fnr, gjennomforingId, deltaker.copy(statuser = DeltakerStatuser.settAktivStatus(Deltaker.Status.DELTAR)))
 
+	}
+
+	@Test
+	fun `slettDeltaker - skal slette deltaker og status`() {
+		deltakerServiceImpl.upsertDeltaker(fnr, gjennomforingId = gjennomforingId, deltaker)
+
+		deltakerStatusRepository.getStatuserForDeltaker(deltakerId) shouldHaveSize 1
+
+		deltakerServiceImpl.slettDeltaker(deltakerId)
+
+		deltakerRepository.get(deltakerId) shouldBe null
+
+		deltakerStatusRepository.getStatuserForDeltaker(deltakerId) shouldHaveSize 0
 	}
 
 	val status = DeltakerStatuser.settAktivStatus(Deltaker.Status.DELTAR)
