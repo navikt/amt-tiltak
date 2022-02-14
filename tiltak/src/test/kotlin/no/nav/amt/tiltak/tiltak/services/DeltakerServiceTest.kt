@@ -72,7 +72,7 @@ class DeltakerServiceTest: StringSpec ({
 		val deltaker = defaultDeltaker
 		val deltakerDbo = defaultDeltakerDbo
 
-		every { deltakerRepository.get(fodselsnummer, gjennomforingId) } returns null
+		every { deltakerRepository.get(deltaker.id) } returns null
 		every { brukerService.getOrCreate(fodselsnummer) } returns defaultBruker.id
 		every { deltakerRepository.insert(any(), any(), any(), any(), any(), any(), any(), any()) } returns deltakerDbo
 		every { deltakerStatusRepository.upsert(any<List<DeltakerStatusDbo>>()) } returns Unit
@@ -106,7 +106,7 @@ class DeltakerServiceTest: StringSpec ({
 		val deltaker = defaultDeltaker.copy(statuser = DeltakerStatuser(nyStatus))
 		val deltakerDbo = defaultDeltakerDbo
 
-		every { deltakerRepository.get(fodselsnummer, gjennomforingId) } returns defaultDeltakerDbo
+		every { deltakerRepository.get(deltaker.id) } returns defaultDeltakerDbo
 		every { deltakerStatusRepository.getStatuserForDeltaker(defaultDeltakerDbo.id) } returns
 			deltakerStatusDboer(eksisterendeStatuser, deltaker.id)
 

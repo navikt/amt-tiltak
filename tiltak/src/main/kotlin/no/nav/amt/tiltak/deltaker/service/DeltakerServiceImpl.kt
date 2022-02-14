@@ -25,7 +25,7 @@ open class DeltakerServiceImpl(
 	}
 
 	override fun upsertDeltaker(fodselsnummer: String, gjennomforingId: UUID, deltaker: Deltaker) {
-		val lagretDeltakerDbo = deltakerRepository.get(fodselsnummer, gjennomforingId)
+		val lagretDeltakerDbo = deltakerRepository.get(deltaker.id)
 
 		if (lagretDeltakerDbo == null) {
 			createDeltaker(fodselsnummer, gjennomforingId, deltaker)
