@@ -12,7 +12,7 @@ open class PeriodicStatusUpdater(
 ) {
 
 	/* En time etter forrige kjøring, start 1 minutt etter applikasjonen har startet */
-	@Scheduled(fixedDelay = 60 * 60 * 1000L, initialDelay = 60 * 1000)
+	@Scheduled(fixedDelay = 60 * 60 * 1000L, initialDelay = 60 * 1000L)
 	@SchedulerLock(name = "statusUpdater", lockAtMostFor = "120m")
 	open fun update() {
 		JobRunner.run("oppdater_deltaker_statuser", deltakerService::oppdaterStatuser)
