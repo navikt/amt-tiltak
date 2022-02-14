@@ -4,6 +4,8 @@ import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.TestData.ARRANGOR_ANSATT_1_FNR
+import no.nav.amt.tiltak.test.database.TestData.ARRANGOR_ANSATT_1_ID
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
@@ -25,7 +27,7 @@ class AnsattRepositoryTest {
 
 		repository = AnsattRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanAndInitDatabase(dataSource, "/arrangor-ansatt.sql")
+		DatabaseTestUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
 	@Test
@@ -35,12 +37,12 @@ class AnsattRepositoryTest {
 
 	@Test
 	internal fun `getByPersonligIdent skal returnere ansatt hvis ident finnes`() {
-		val ansatt = repository.getByPersonligIdent("123456789") ?: fail("Ansatt er null")
+		val ansatt = repository.getByPersonligIdent(ARRANGOR_ANSATT_1_FNR) ?: fail("Ansatt er null")
 
-		assertEquals("6321c7dc-6cfb-47b0-b566-32979be5041f", ansatt.id.toString())
-		assertEquals("123456789", ansatt.personligIdent)
-		assertEquals("Test", ansatt.fornavn)
-		assertEquals("Testersen", ansatt.etternavn)
+		assertEquals(ARRANGOR_ANSATT_1_ID, ansatt.id)
+		assertEquals(ARRANGOR_ANSATT_1_FNR, ansatt.personligIdent)
+		assertEquals("Ansatt 1 fornavn", ansatt.fornavn)
+		assertEquals("Ansatt 1 etternavn", ansatt.etternavn)
 	}
 
 
