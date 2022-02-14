@@ -8,6 +8,7 @@ import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.deltaker.commands.UpsertNavAnsattCommand
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.TestData.VEILEDER_1_NAV_IDENT
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -31,7 +32,7 @@ class NavAnsattRepositoryTest : FunSpec({
 
 		repository = NavAnsattRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanDatabase(dataSource)
+		DatabaseTestUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
 	test("Hent nav-ansatt som ikke eksisterer returnerer null") {
@@ -52,15 +53,18 @@ class NavAnsattRepositoryTest : FunSpec({
 	}
 
 	test("Update nav-ansatt så hent bør returnere oppdatert nav-ansatt") {
-		repository.upsert(upsertCmd)
-		val storedDbo = repository.getNavAnsattWithIdent(upsertCmd.navIdent)
+		repository.upsert(UpsertNavAnsattCommand(
+			navIdent = VEILEDER_1_NAV_IDENT,
+			navn = "Nytt navn",
+			epost = "Ny epost",
+			telefonnummer = "Nytt telefonnummer",
+		))
 
-		repository.upsert(upsertCmd.copy(epost = null, telefonnummer = null))
-		val updatedDbo = repository.getNavAnsattWithIdent(upsertCmd.navIdent)
+		val updatedDbo = repository.getNavAnsattWithIdent(VEILEDER_1_NAV_IDENT)
 
-		storedDbo!!.id shouldBe updatedDbo!!.id
-		updatedDbo.epost shouldBe null
-		updatedDbo.telefonnummer shouldBe null
+		updatedDbo!!.navn shouldBe "Nytt navn"
+		updatedDbo.epost shouldBe "Ny epost"
+		updatedDbo.telefonnummer shouldBe "Nytt telefonnummer"
 	}
 
 

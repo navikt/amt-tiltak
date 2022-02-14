@@ -7,6 +7,8 @@ object DatabaseTestUtils {
 
 	private const val SCHEMA = "public"
 
+	private const val TEST_DATA_SQL_PATH = "/test-data.sql"
+
 	fun runScript(dataSource: DataSource, script: String) {
 		val jdbcTemplate = JdbcTemplate(dataSource)
 		jdbcTemplate.update(script)
@@ -35,6 +37,10 @@ object DatabaseTestUtils {
 	fun cleanAndInitDatabase(dataSource: DataSource, scriptFilePath: String) {
 		cleanDatabase(dataSource)
 		runScriptFile(dataSource, scriptFilePath)
+	}
+
+	fun cleanAndInitDatabaseWithTestData(dataSource: DataSource) {
+		cleanAndInitDatabase(dataSource, TEST_DATA_SQL_PATH)
 	}
 
 	private fun getAllTables(jdbcTemplate: JdbcTemplate, schema: String): List<String> {

@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.TestData.TILTAK_1_ID
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -26,7 +27,7 @@ internal class TiltakRepositoryTest {
 
 		repository = TiltakRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanAndInitDatabase(dataSource, "/tiltak-repository_test-data.sql")
+		DatabaseTestUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
 	@Test
@@ -59,17 +60,11 @@ internal class TiltakRepositoryTest {
 
 	@Test
 	internal fun `update() should return updatedObject`() {
-		val id = UUID.randomUUID()
-		val navn = "Navn"
-		val kode = "Kode"
-
 		val updatedNavn = "UpdatedNavn"
 		val updatedKode = "UpdatedKode"
 
-		repository.insert(id, navn, kode)
-
 		val updatedTiltak = repository.update(
-			id  = id,
+			id  = TILTAK_1_ID,
 			navn = updatedNavn,
 			type = updatedKode
 		)

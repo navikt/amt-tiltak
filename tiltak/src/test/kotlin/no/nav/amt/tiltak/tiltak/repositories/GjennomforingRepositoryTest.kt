@@ -5,6 +5,9 @@ import ch.qos.logback.classic.Logger
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.TestData.ARRANGOR_1_ID
+import no.nav.amt.tiltak.test.database.TestData.GJENNOMFORING_1_ID
+import no.nav.amt.tiltak.test.database.TestData.TILTAK_1_ID
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -22,11 +25,6 @@ internal class GjennomforingRepositoryTest {
 
 	lateinit var repository: GjennomforingRepository
 
-	companion object TestData {
-		val TILTAK_ID = UUID.fromString("9665b0b6-ea7d-44b0-b9c2-8867c2a6c106")
-		val ARRANGOR_ID = UUID.fromString("0dc9ccec-fd1e-4c4e-b91a-c23e6d89c18e")
-	}
-
 	@BeforeEach
 	fun migrate() {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
@@ -34,7 +32,7 @@ internal class GjennomforingRepositoryTest {
 
 		repository = GjennomforingRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanAndInitDatabase(dataSource, "/gjennomforing-repository_test-data.sql")
+		DatabaseTestUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
 	@Test
@@ -49,8 +47,8 @@ internal class GjennomforingRepositoryTest {
 
 		val savedGjennomforing = repository.insert(
 			id = id,
-			tiltakId = TILTAK_ID,
-			arrangorId = ARRANGOR_ID,
+			tiltakId = TILTAK_1_ID,
+			arrangorId = ARRANGOR_1_ID,
 			navn = navn,
 			status = status,
 			startDato = startDato,
@@ -62,15 +60,15 @@ internal class GjennomforingRepositoryTest {
 		assertNotNull(savedGjennomforing)
 		assertNotNull(savedGjennomforing.id)
 
-		assertEquals(TILTAK_ID, savedGjennomforing.tiltakId)
-		assertEquals(ARRANGOR_ID, savedGjennomforing.arrangorId)
+		assertEquals(TILTAK_1_ID, savedGjennomforing.tiltakId)
+		assertEquals(ARRANGOR_1_ID, savedGjennomforing.arrangorId)
 		assertEquals(navn, savedGjennomforing.navn)
 		assertEquals(status, savedGjennomforing.status)
 
-		assertTrue(startDato!!.isEqualTo(savedGjennomforing.startDato!!))
-		assertTrue(sluttDato!!.isEqualTo(savedGjennomforing.sluttDato!!))
-		assertTrue(registrertDato!!.isEqualTo(savedGjennomforing.registrertDato!!))
-		assertTrue(fremmoteDato!!.isEqualTo(savedGjennomforing.fremmoteDato!!))
+		assertTrue(startDato.isEqualTo(savedGjennomforing.startDato!!))
+		assertTrue(sluttDato.isEqualTo(savedGjennomforing.sluttDato!!))
+		assertTrue(registrertDato.isEqualTo(savedGjennomforing.registrertDato))
+		assertTrue(fremmoteDato.isEqualTo(savedGjennomforing.fremmoteDato!!))
 	}
 
 	@Test
@@ -96,32 +94,25 @@ internal class GjennomforingRepositoryTest {
 
 	@Test
 	internal fun `update() should return updated object`() {
-		val id = UUID.randomUUID()
 		val updatedNavn = "UpdatedNavn"
 		val updatedStatus = Gjennomforing.Status.GJENNOMFORES
 		val updatedStartDato = LocalDate.now().plusDays(4)
 		val updatedSluttDato = LocalDate.now().plusDays(14)
 		val updatedFremmotedato = LocalDateTime.now().plusDays(4)
 
-		val newGjennomforing = repository.insert(
-			id = id,
-			tiltakId = TILTAK_ID,
-			arrangorId = ARRANGOR_ID,
-			"Navn",
-			status = Gjennomforing.Status.IKKE_STARTET,
-			startDato = null,
-			sluttDato = null,
-			registrertDato = LocalDateTime.now(),
-			fremmoteDato = null
-		)
-
 		val updatedGjennomforing = repository.update(
-			newGjennomforing.copy(
+			GjennomforingDbo(
+				id = GJENNOMFORING_1_ID,
+				arrangorId = ARRANGOR_1_ID,
+				tiltakId = TILTAK_1_ID,
 				navn = updatedNavn,
 				status = updatedStatus,
 				startDato = updatedStartDato,
 				sluttDato = updatedSluttDato,
-				fremmoteDato = updatedFremmotedato
+				fremmoteDato = updatedFremmotedato,
+				createdAt = LocalDateTime.now(),
+				modifiedAt = LocalDateTime.now(),
+				registrertDato = LocalDateTime.now()
 			)
 		)
 
