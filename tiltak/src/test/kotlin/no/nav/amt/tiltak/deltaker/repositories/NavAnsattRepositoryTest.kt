@@ -8,7 +8,7 @@ import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.deltaker.commands.UpsertNavAnsattCommand
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.data.TestData.VEILEDER_1_NAV_IDENT
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -54,13 +54,13 @@ class NavAnsattRepositoryTest : FunSpec({
 
 	test("Update nav-ansatt så hent bør returnere oppdatert nav-ansatt") {
 		repository.upsert(UpsertNavAnsattCommand(
-			navIdent = VEILEDER_1_NAV_IDENT,
+			navIdent = NAV_ANSATT_1.nav_ident,
 			navn = "Nytt navn",
 			epost = "Ny epost",
 			telefonnummer = "Nytt telefonnummer",
 		))
 
-		val updatedDbo = repository.getNavAnsattWithIdent(VEILEDER_1_NAV_IDENT)
+		val updatedDbo = repository.getNavAnsattWithIdent(NAV_ANSATT_1.nav_ident)
 
 		updatedDbo!!.navn shouldBe "Nytt navn"
 		updatedDbo.epost shouldBe "Ny epost"

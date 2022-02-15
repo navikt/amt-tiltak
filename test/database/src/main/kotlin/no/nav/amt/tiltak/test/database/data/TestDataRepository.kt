@@ -27,16 +27,15 @@ class TestDataRepository(
 	fun insertArrangorAnsattRolle(cmd: InsertArrangorAnsattRolleCommand) {
 		val sql = """
 			INSERT INTO arrangor_ansatt_rolle(id, arrangor_id, ansatt_id, rolle)
-			VALUES(:id, :arrangor_id, :ansatt_id, :rolle)
+			VALUES(?, ?, ?, ?::arrangor_rolle)
 		""".trimIndent()
 
-		template.update(
-			sql, parameters(
-				"id" to cmd.id,
-				"arrangor_id" to cmd.arrangor_id,
-				"ansatt_id" to cmd.ansatt_id,
-				"rolle" to cmd.rolle
-			)
+		template.jdbcTemplate.update(
+			sql,
+			cmd.id,
+			cmd.arrangor_id,
+			cmd.ansatt_id,
+			cmd.rolle
 		)
 	}
 
@@ -107,7 +106,7 @@ class TestDataRepository(
 			sql, parameters(
 				"id" to cmd.id,
 				"deltaker_id" to cmd.deltaker_id,
-				"endret_dato" to cmd.endret_dato,
+				"endret_dato" to cmd.endret_dato.toOffsetDateTime(),
 				"status" to cmd.status,
 				"aktiv" to cmd.aktiv
 			)

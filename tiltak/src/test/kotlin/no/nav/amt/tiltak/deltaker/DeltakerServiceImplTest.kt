@@ -13,8 +13,8 @@ import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_3_FNR
-import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1_ID
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_3
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -58,9 +58,9 @@ class DeltakerServiceImplTest {
 
 	@Test
 	fun `upsertDeltaker - inserter ny deltaker`() {
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3_FNR, GJENNOMFORING_1_ID, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, deltaker)
 
-		val nyDeltaker = deltakerRepository.get(BRUKER_3_FNR, GJENNOMFORING_1_ID)
+		val nyDeltaker = deltakerRepository.get(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id)
 
 		nyDeltaker shouldNotBe null
 
@@ -74,9 +74,9 @@ class DeltakerServiceImplTest {
 	@Test
 	fun `upsertDeltaker - deltaker får ny status - oppdaterer status på deltaker`() {
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3_FNR, GJENNOMFORING_1_ID, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, deltaker)
 
-		var nyDeltaker = deltakerRepository.get(BRUKER_3_FNR, GJENNOMFORING_1_ID)
+		var nyDeltaker = deltakerRepository.get(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id)
 		var statuser = deltakerStatusRepository.getStatuserForDeltaker(deltakerId)
 
 		nyDeltaker shouldNotBe null
@@ -85,9 +85,9 @@ class DeltakerServiceImplTest {
 		val endretStatus = status.medNy(Deltaker.Status.HAR_SLUTTET, LocalDateTime.now())
 		val endretDeltaker = deltaker.copy(statuser = endretStatus)
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3_FNR, GJENNOMFORING_1_ID, endretDeltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, endretDeltaker)
 
-		nyDeltaker = deltakerRepository.get(BRUKER_3_FNR, GJENNOMFORING_1_ID)
+		nyDeltaker = deltakerRepository.get(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id)
 		statuser = deltakerStatusRepository.getStatuserForDeltaker(deltakerId)
 		val aktivStatus = statuser.first{ it.aktiv }
 
@@ -101,16 +101,16 @@ class DeltakerServiceImplTest {
 	@Test
 	fun `upsertDeltaker - deltaker får samme status igjen - oppdaterer ikke status`() {
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3_FNR, GJENNOMFORING_1_ID, deltaker)
-		var nyDeltaker = deltakerRepository.get(BRUKER_3_FNR, GJENNOMFORING_1_ID)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, deltaker)
+		var nyDeltaker = deltakerRepository.get(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id)
 		var statuser = deltakerStatusRepository.getStatuserForDeltaker(deltakerId)
 
 		nyDeltaker shouldNotBe null
 		statuser shouldHaveSize 1
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3_FNR, GJENNOMFORING_1_ID, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, deltaker)
 
-		nyDeltaker = deltakerRepository.get(BRUKER_3_FNR, GJENNOMFORING_1_ID)
+		nyDeltaker = deltakerRepository.get(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id)
 		statuser = deltakerStatusRepository.getStatuserForDeltaker(deltakerId)
 		val aktivStatus = statuser.first{ it.aktiv }
 
@@ -123,9 +123,9 @@ class DeltakerServiceImplTest {
 	@Test
 	fun `upsertDeltaker - deltaker får samme status på nytt etter opphold - oppdaterer status`() {
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3_FNR, GJENNOMFORING_1_ID, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, deltaker)
 
-		var nyDeltaker = deltakerRepository.get(BRUKER_3_FNR, GJENNOMFORING_1_ID)
+		var nyDeltaker = deltakerRepository.get(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id)
 		var statuser = deltakerStatusRepository.getStatuserForDeltaker(deltakerId)
 
 		nyDeltaker shouldNotBe null
@@ -133,9 +133,9 @@ class DeltakerServiceImplTest {
 
 		val endretDeltaker = deltaker.copy(statuser = DeltakerStatuser.settAktivStatus(Deltaker.Status.HAR_SLUTTET))
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3_FNR, GJENNOMFORING_1_ID, endretDeltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, endretDeltaker)
 
-		nyDeltaker = deltakerRepository.get(BRUKER_3_FNR, GJENNOMFORING_1_ID)
+		nyDeltaker = deltakerRepository.get(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id)
 		statuser = deltakerStatusRepository.getStatuserForDeltaker(deltakerId)
 		val aktivStatus = statuser.first{ it.aktiv }
 
@@ -143,13 +143,13 @@ class DeltakerServiceImplTest {
 		statuser shouldHaveSize 2
 		aktivStatus.status shouldBe Deltaker.Status.HAR_SLUTTET
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3_FNR, GJENNOMFORING_1_ID, deltaker.copy(statuser = DeltakerStatuser.settAktivStatus(Deltaker.Status.DELTAR)))
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, deltaker.copy(statuser = DeltakerStatuser.settAktivStatus(Deltaker.Status.DELTAR)))
 
 	}
 
 	@Test
 	fun `slettDeltaker - skal slette deltaker og status`() {
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3_FNR, GJENNOMFORING_1_ID, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, deltaker)
 
 		deltakerStatusRepository.getStatuserForDeltaker(deltakerId) shouldHaveSize 1
 

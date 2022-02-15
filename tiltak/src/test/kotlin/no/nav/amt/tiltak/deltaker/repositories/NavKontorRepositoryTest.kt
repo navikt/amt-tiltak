@@ -8,8 +8,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_KONTOR_1_ENHET_ID
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_KONTOR_1_ID
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_KONTOR_1
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.util.*
@@ -52,10 +51,10 @@ class NavKontorRepositoryTest : FunSpec({
 	}
 
 	test("Endring av navn fører til endring av navn") {
-		val oppdatertKontor = repository.upsert(NAV_KONTOR_1_ENHET_ID, "Nytt navn")
+		val oppdatertKontor = repository.upsert(NAV_KONTOR_1.enhet_id, "Nytt navn")
 
-		oppdatertKontor.id shouldBe NAV_KONTOR_1_ID
-		oppdatertKontor.enhetId shouldBe NAV_KONTOR_1_ENHET_ID
+		oppdatertKontor.id shouldBe NAV_KONTOR_1.id
+		oppdatertKontor.enhetId shouldBe NAV_KONTOR_1.enhet_id
 		oppdatertKontor.navn shouldBe "Nytt navn"
 	}
 

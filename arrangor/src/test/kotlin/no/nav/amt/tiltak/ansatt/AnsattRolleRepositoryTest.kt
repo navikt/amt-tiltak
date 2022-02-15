@@ -6,9 +6,9 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1_ID
-import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2_ID
-import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_ID
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.util.*
@@ -29,11 +29,11 @@ class AnsattRolleRepositoryTest : FunSpec({
 	}
 
 	test("hentArrangorIderForAnsatt skal returnere ider") {
-		val ider = repository.hentArrangorIderForAnsatt(ARRANGOR_ANSATT_1_ID)
+		val ider = repository.hentArrangorIderForAnsatt(ARRANGOR_ANSATT_1.id)
 
 		ider.size shouldBe 2
-		ider.contains(ARRANGOR_1_ID) shouldBe true
-		ider.contains(ARRANGOR_2_ID) shouldBe true
+		ider.contains(ARRANGOR_1.id) shouldBe true
+		ider.contains(ARRANGOR_2.id) shouldBe true
 	}
 
 	test("hentArrangorIderForAnsatt skal returnere tom liste hvis ansatt ikke finnes") {

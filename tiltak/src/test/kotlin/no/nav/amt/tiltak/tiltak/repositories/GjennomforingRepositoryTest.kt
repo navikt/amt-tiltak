@@ -5,9 +5,9 @@ import ch.qos.logback.classic.Logger
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1_ID
-import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1_ID
-import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1_ID
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
+import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -47,8 +47,8 @@ internal class GjennomforingRepositoryTest {
 
 		val savedGjennomforing = repository.insert(
 			id = id,
-			tiltakId = TILTAK_1_ID,
-			arrangorId = ARRANGOR_1_ID,
+			tiltakId = TILTAK_1.id,
+			arrangorId = ARRANGOR_1.id,
 			navn = navn,
 			status = status,
 			startDato = startDato,
@@ -60,8 +60,8 @@ internal class GjennomforingRepositoryTest {
 		assertNotNull(savedGjennomforing)
 		assertNotNull(savedGjennomforing.id)
 
-		assertEquals(TILTAK_1_ID, savedGjennomforing.tiltakId)
-		assertEquals(ARRANGOR_1_ID, savedGjennomforing.arrangorId)
+		assertEquals(TILTAK_1.id, savedGjennomforing.tiltakId)
+		assertEquals(ARRANGOR_1.id, savedGjennomforing.arrangorId)
 		assertEquals(navn, savedGjennomforing.navn)
 		assertEquals(status, savedGjennomforing.status)
 
@@ -102,9 +102,9 @@ internal class GjennomforingRepositoryTest {
 
 		val updatedGjennomforing = repository.update(
 			GjennomforingDbo(
-				id = GJENNOMFORING_1_ID,
-				arrangorId = ARRANGOR_1_ID,
-				tiltakId = TILTAK_1_ID,
+				id = GJENNOMFORING_1.id,
+				arrangorId = ARRANGOR_1.id,
+				tiltakId = TILTAK_1.id,
 				navn = updatedNavn,
 				status = updatedStatus,
 				startDato = updatedStartDato,

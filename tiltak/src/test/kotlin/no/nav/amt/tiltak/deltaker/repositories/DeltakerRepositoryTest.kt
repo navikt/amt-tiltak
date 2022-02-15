@@ -14,11 +14,10 @@ import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1_ID
-import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_3_FNR
-import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_3_ID
-import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_ID
-import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1_ID
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_3
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
@@ -54,8 +53,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		val dbo = repository.insert(
 			id,
-			BRUKER_3_ID,
-			GJENNOMFORING_1_ID,
+			BRUKER_3.id,
+			GJENNOMFORING_1.id,
 			startDato,
 			sluttDato,
 			dagerPerUke,
@@ -65,11 +64,11 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		dbo shouldNotBe null
 		dbo.id shouldBe id
-		dbo.brukerId shouldBe BRUKER_3_ID
-		dbo.brukerFornavn shouldBe "Bruker 3 fornavn"
-		dbo.brukerEtternavn shouldBe "Bruker 3 etternavn"
-		dbo.brukerFodselsnummer shouldBe BRUKER_3_FNR
-		dbo.gjennomforingId shouldBe GJENNOMFORING_1_ID
+		dbo.brukerId shouldBe BRUKER_3.id
+		dbo.brukerFornavn shouldBe BRUKER_3.fornavn
+		dbo.brukerEtternavn shouldBe BRUKER_3.etternavn
+		dbo.brukerFodselsnummer shouldBe BRUKER_3.fodselsnummer
+		dbo.gjennomforingId shouldBe GJENNOMFORING_1.id
 		dbo.startDato shouldBe startDato
 		dbo.sluttDato shouldBe sluttDato
 		dbo.createdAt shouldNotBe null
@@ -83,9 +82,9 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		val updatedDeltaker = repository.update(DeltakerDbo(
 			Deltaker(
-				id = DELTAKER_1_ID,
+				id = DELTAKER_1.id,
 				bruker = Bruker(
-					id = BRUKER_1_ID,
+					id = BRUKER_1.id,
 					fornavn = "",
 					etternavn = "",
 					fodselsnummer = ""
@@ -97,7 +96,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			)
 		))
 
-		updatedDeltaker.id shouldBe DELTAKER_1_ID
+		updatedDeltaker.id shouldBe DELTAKER_1.id
 		updatedDeltaker.startDato shouldBe nyStartdato
 		updatedDeltaker.sluttDato shouldBe nySluttdato
 	}
@@ -112,8 +111,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		val dbo = repository.insert(
 			deltakerId,
-			BRUKER_3_ID,
-			GJENNOMFORING_1_ID,
+			BRUKER_3.id,
+			GJENNOMFORING_1.id,
 			startDato,
 			sluttDato,
 			dagerPerUke,
@@ -135,8 +134,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		val dbo = repository.insert(
 			UUID.randomUUID(),
-			BRUKER_3_ID,
-			GJENNOMFORING_1_ID,
+			BRUKER_3.id,
+			GJENNOMFORING_1.id,
 			startDato,
 			sluttDato,
 			dagerPerUke,
@@ -144,7 +143,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			registrertDato
 		)
 
-		val gottenDbo = repository.get(dbo.brukerId, GJENNOMFORING_1_ID)
+		val gottenDbo = repository.get(dbo.brukerId, GJENNOMFORING_1.id)
 
 		gottenDbo shouldBe dbo
 	}
@@ -158,8 +157,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		val dbo = repository.insert(
 			UUID.randomUUID(),
-			BRUKER_3_ID,
-			GJENNOMFORING_1_ID,
+			BRUKER_3.id,
+			GJENNOMFORING_1.id,
 			startDato,
 			sluttDato,
 			dagerPerUke,
@@ -167,7 +166,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			registrertDato
 		)
 
-		val gottenDbo = repository.get(BRUKER_3_FNR, GJENNOMFORING_1_ID)
+		val gottenDbo = repository.get(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id)
 
 		gottenDbo shouldBe dbo
 	}
@@ -182,8 +181,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		val dbo = repository.insert(
 			deltakerId,
-			BRUKER_3_ID,
-			GJENNOMFORING_1_ID,
+			BRUKER_3.id,
+			GJENNOMFORING_1.id,
 			startDato,
 			sluttDato,
 			dagerPerUke,
@@ -216,8 +215,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		val dbo = repository.insert(
 			UUID.randomUUID(),
-			BRUKER_3_ID,
-			GJENNOMFORING_1_ID,
+			BRUKER_3.id,
+			GJENNOMFORING_1.id,
 			startDato,
 			sluttDato,
 			dagerPerUke,
@@ -233,7 +232,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			)
 			))
 
-		val list = repository.potensieltHarSlutta().filter { it.id == BRUKER_3_ID }
+		val list = repository.potensieltHarSlutta().filter { it.id == BRUKER_3.id }
 
 		list shouldHaveSize 0
 	}
@@ -248,8 +247,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		val dbo = repository.insert(
 			UUID.randomUUID(),
-			BRUKER_3_ID,
-			GJENNOMFORING_1_ID,
+			BRUKER_3.id,
+			GJENNOMFORING_1.id,
 			startDato,
 			sluttDato,
 			dagerPerUke,
@@ -281,8 +280,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		val dbo = repository.insert(
 			UUID.randomUUID(),
-			BRUKER_3_ID,
-			GJENNOMFORING_1_ID,
+			BRUKER_3.id,
+			GJENNOMFORING_1.id,
 			startDato,
 			sluttDato,
 			dagerPerUke,
@@ -313,8 +312,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		repository.insert(
 			id,
-			BRUKER_3_ID,
-			GJENNOMFORING_1_ID,
+			BRUKER_3.id,
+			GJENNOMFORING_1.id,
 			startDato,
 			sluttDato,
 			dagerPerUke,

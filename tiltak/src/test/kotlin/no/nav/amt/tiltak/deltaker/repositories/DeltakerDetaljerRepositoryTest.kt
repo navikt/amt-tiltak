@@ -9,12 +9,15 @@ import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_ID
-import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2_ID
-import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1_ID
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_KONTOR_1
+import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.time.LocalDate
 
 class DeltakerDetaljerRepositoryTest : FunSpec({
 
@@ -32,32 +35,32 @@ class DeltakerDetaljerRepositoryTest : FunSpec({
 	}
 
 	test("Should get deltaker detaljer") {
-		val deltakerDetaljer = getDeltakerDetaljerQuery.query(DELTAKER_1_ID)
+		val deltakerDetaljer = getDeltakerDetaljerQuery.query(DELTAKER_1.id)
 			?: fail("deltakerDetaljer should not be null")
 
-		deltakerDetaljer.deltakerId shouldBe DELTAKER_1_ID
-		deltakerDetaljer.fornavn shouldBe "Bruker 1 fornavn"
+		deltakerDetaljer.deltakerId shouldBe DELTAKER_1.id
+		deltakerDetaljer.fornavn shouldBe BRUKER_1.fornavn
 		deltakerDetaljer.mellomnavn shouldBe null
-		deltakerDetaljer.etternavn shouldBe "Bruker 1 etternavn"
-		deltakerDetaljer.fodselsnummer shouldBe "12345678910"
-		deltakerDetaljer.telefonnummer shouldBe "73404782"
-		deltakerDetaljer.epost shouldBe "bruker1@example.com"
-		deltakerDetaljer.navKontorNavn shouldBe "NAV Testheim"
-		deltakerDetaljer.veilederNavn shouldBe "Vashnir Veiledersen"
-		deltakerDetaljer.veilederTelefonnummer shouldBe "88776655"
-		deltakerDetaljer.veilederEpost shouldBe "vashnir.veiledersen@nav.no"
-		deltakerDetaljer.startDato shouldBe LocalDate.of(2022, 2, 13)
-		deltakerDetaljer.sluttDato shouldBe LocalDate.of(2030, 2, 14)
+		deltakerDetaljer.etternavn shouldBe BRUKER_1.etternavn
+		deltakerDetaljer.fodselsnummer shouldBe BRUKER_1.fodselsnummer
+		deltakerDetaljer.telefonnummer shouldBe BRUKER_1.telefonnummer
+		deltakerDetaljer.epost shouldBe BRUKER_1.epost
+		deltakerDetaljer.navKontorNavn shouldBe NAV_KONTOR_1.navn
+		deltakerDetaljer.veilederNavn shouldBe NAV_ANSATT_1.navn
+		deltakerDetaljer.veilederTelefonnummer shouldBe NAV_ANSATT_1.telefonnummer
+		deltakerDetaljer.veilederEpost shouldBe NAV_ANSATT_1.epost
+		deltakerDetaljer.startDato shouldBe DELTAKER_1.start_dato
+		deltakerDetaljer.sluttDato shouldBe DELTAKER_1.slutt_dato
 		deltakerDetaljer.status shouldBe Deltaker.Status.DELTAR
-		deltakerDetaljer.gjennomforingId shouldBe GJENNOMFORING_1_ID
-		deltakerDetaljer.gjennomforingStartDato shouldBe LocalDate.of(2022,2, 1)
-		deltakerDetaljer.gjennomforingSluttDato shouldBe LocalDate.of(2050, 12, 30)
-		deltakerDetaljer.tiltakNavn shouldBe "Tiltak1"
-		deltakerDetaljer.tiltakKode shouldBe "AMO"
+		deltakerDetaljer.gjennomforingId shouldBe GJENNOMFORING_1.id
+		deltakerDetaljer.gjennomforingStartDato shouldBe GJENNOMFORING_1.start_dato
+		deltakerDetaljer.gjennomforingSluttDato shouldBe GJENNOMFORING_1.slutt_dato
+		deltakerDetaljer.tiltakNavn shouldBe TILTAK_1.navn
+		deltakerDetaljer.tiltakKode shouldBe TILTAK_1.type
 	}
 
 	test("Should get deltaker detaljer if nav ansatt is null") {
-		val deltakerDetaljer = getDeltakerDetaljerQuery.query(DELTAKER_2_ID)
+		val deltakerDetaljer = getDeltakerDetaljerQuery.query(DELTAKER_2.id)
 
 		deltakerDetaljer shouldNotBe null
 	}

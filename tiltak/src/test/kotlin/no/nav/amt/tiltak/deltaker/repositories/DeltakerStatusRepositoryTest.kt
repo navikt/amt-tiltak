@@ -8,7 +8,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.*
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_ID
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDateTime
 
@@ -29,13 +29,13 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 
 	test("upsert - 2 statuser knyttet til deltaker - begge hentes") {
 		val statusesToPersist = listOf(
-			DeltakerStatusDbo(deltakerId = DELTAKER_1_ID, status = VENTER_PA_OPPSTART, endretDato = lastweek, aktiv = false),
-			DeltakerStatusDbo(deltakerId = DELTAKER_1_ID, status = DELTAR, endretDato = yesterday, aktiv = false)
+			DeltakerStatusDbo(deltakerId = DELTAKER_1.id, status = VENTER_PA_OPPSTART, endretDato = lastweek, aktiv = false),
+			DeltakerStatusDbo(deltakerId = DELTAKER_1.id, status = DELTAR, endretDato = yesterday, aktiv = false)
 		)
 
 		repository.upsert(statusesToPersist)
 
-		val peristedStatuses = repository.getStatuserForDeltaker(DELTAKER_1_ID)
+		val peristedStatuses = repository.getStatuserForDeltaker(DELTAKER_1.id)
 		peristedStatuses shouldHaveSize 3
 		peristedStatuses shouldBe peristedStatuses
 
@@ -44,15 +44,15 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 	test("upsert - aktiv flagg endres - aktivflagg oppdatert") {
 
 		val statusesToPersist = listOf(
-			DeltakerStatusDbo(deltakerId = DELTAKER_1_ID, status = VENTER_PA_OPPSTART, endretDato = lastweek, aktiv = false),
-			DeltakerStatusDbo(deltakerId = DELTAKER_1_ID, status = DELTAR, endretDato = yesterday, aktiv = true)
+			DeltakerStatusDbo(deltakerId = DELTAKER_1.id, status = VENTER_PA_OPPSTART, endretDato = lastweek, aktiv = false),
+			DeltakerStatusDbo(deltakerId = DELTAKER_1.id, status = DELTAR, endretDato = yesterday, aktiv = true)
 		)
 
 		repository.upsert(statusesToPersist)
-		val deaktiverte = repository.getStatuserForDeltaker(DELTAKER_1_ID).map { it.copy(aktiv = false) }
+		val deaktiverte = repository.getStatuserForDeltaker(DELTAKER_1.id).map { it.copy(aktiv = false) }
 		repository.upsert(deaktiverte)
 
-		repository.getStatuserForDeltaker(DELTAKER_1_ID).map { it.aktiv } shouldNotContain true
+		repository.getStatuserForDeltaker(DELTAKER_1.id).map { it.aktiv } shouldNotContain true
 
 	}
 
@@ -60,32 +60,32 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 	test("upsert - ny status - legges til i listen") {
 
 		val statusesToPersist = listOf(
-			DeltakerStatusDbo(deltakerId = DELTAKER_1_ID, status = VENTER_PA_OPPSTART, endretDato = lastweek, aktiv = false),
-			DeltakerStatusDbo(deltakerId = DELTAKER_1_ID, status = DELTAR, endretDato = yesterday, aktiv = true)
+			DeltakerStatusDbo(deltakerId = DELTAKER_1.id, status = VENTER_PA_OPPSTART, endretDato = lastweek, aktiv = false),
+			DeltakerStatusDbo(deltakerId = DELTAKER_1.id, status = DELTAR, endretDato = yesterday, aktiv = true)
 		)
 
 		repository.upsert(statusesToPersist)
-		val utvidet = repository.getStatuserForDeltaker(DELTAKER_1_ID) +
-			DeltakerStatusDbo(deltakerId = DELTAKER_1_ID, status = HAR_SLUTTET, endretDato = yesterday, aktiv = true)
+		val utvidet = repository.getStatuserForDeltaker(DELTAKER_1.id) +
+			DeltakerStatusDbo(deltakerId = DELTAKER_1.id, status = HAR_SLUTTET, endretDato = yesterday, aktiv = true)
 		repository.upsert(utvidet)
 
-		repository.getStatuserForDeltaker(DELTAKER_1_ID) shouldHaveSize 4
+		repository.getStatuserForDeltaker(DELTAKER_1.id) shouldHaveSize 4
 
 	}
 
 	test("slettDeltakerStatus - skal slette status") {
 		val statusesToPersist = listOf(
-			DeltakerStatusDbo(deltakerId = DELTAKER_1_ID, status = VENTER_PA_OPPSTART, endretDato = lastweek, aktiv = false),
-			DeltakerStatusDbo(deltakerId = DELTAKER_1_ID, status = DELTAR, endretDato = yesterday, aktiv = true)
+			DeltakerStatusDbo(deltakerId = DELTAKER_1.id, status = VENTER_PA_OPPSTART, endretDato = lastweek, aktiv = false),
+			DeltakerStatusDbo(deltakerId = DELTAKER_1.id, status = DELTAR, endretDato = yesterday, aktiv = true)
 		)
 
 		repository.upsert(statusesToPersist)
 
-		repository.getStatuserForDeltaker(DELTAKER_1_ID) shouldHaveSize 3
+		repository.getStatuserForDeltaker(DELTAKER_1.id) shouldHaveSize 3
 
-		repository.slettDeltakerStatus(DELTAKER_1_ID)
+		repository.slettDeltakerStatus(DELTAKER_1.id)
 
-		repository.getStatuserForDeltaker(DELTAKER_1_ID) shouldHaveSize 0
+		repository.getStatuserForDeltaker(DELTAKER_1.id) shouldHaveSize 0
 	}
 
 })

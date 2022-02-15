@@ -4,7 +4,7 @@ import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1_ID
+import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -64,7 +64,7 @@ internal class TiltakRepositoryTest {
 		val updatedKode = "UpdatedKode"
 
 		val updatedTiltak = repository.update(
-			id  = TILTAK_1_ID,
+			id  = TILTAK_1.id,
 			navn = updatedNavn,
 			type = updatedKode
 		)

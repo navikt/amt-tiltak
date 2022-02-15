@@ -5,7 +5,7 @@ import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.*
 
-object TestData1 {
+object TestData {
 
 	val ARRANGOR_1 = InsertArrangorCommand(
 		id = UUID.fromString("8a37bce6-3bc1-11ec-8d3d-0242ac130003"),
@@ -40,17 +40,17 @@ object TestData1 {
 
 	val ARRANGOR_ANSATT_1_ROLLE_2 = InsertArrangorAnsattRolleCommand(
 		id = UUID.fromString("9c7db3c9-bb61-460b-be2a-0fdbcae912ab"),
-		arrangor_id = ARRANGOR_1.id,
+		arrangor_id = ARRANGOR_2.id,
 		ansatt_id = ARRANGOR_ANSATT_1.id,
 		rolle = "VEILEDER"
 	)
 
 
 	val ARRANGOR_ANSATT_2 = InsertArrangorAnsattCommand(
-		id = UUID.fromString("6321c7dc-6cfb-47b0-b566-32979be5041f"),
-		personlig_ident = "123456789",
-		fornavn = "Ansatt 1 fornavn",
-		etternavn = "Ansatt 1 etternavn"
+		id = UUID.fromString("a24e659c-2651-4fbb-baad-01cacb2412f0"),
+		personlig_ident = "326749823",
+		fornavn = "Ansatt 2 fornavn",
+		etternavn = "Ansatt 2 etternavn"
 	)
 
 	val ARRANGOR_ANSATT_2_ROLLE_1 = InsertArrangorAnsattRolleCommand(
@@ -138,7 +138,7 @@ object TestData1 {
 
 
 	val BRUKER_2 = InsertBrukerCommand(
-		id = UUID.fromString("23b04c3a-a36c-451f-b9cf-30b6a6b586b8"),
+		id = UUID.fromString("170a1323-03d8-4580-a1f8-bc14a0422da6"),
 		fodselsnummer = "7908432423",
 		fornavn = "Bruker 2 fornavn",
 		etternavn = "Bruker 2 etternavn",
@@ -149,7 +149,7 @@ object TestData1 {
 	)
 
 	val DELTAKER_2 = InsertDeltakerCommand(
-		id = UUID.fromString("dc600c70-124f-4fe7-a687-b58439beb214"),
+		id = UUID.fromString("8a0b7158-4d5e-4563-88be-b9bce5662879"),
 		bruker_id = BRUKER_2.id,
 		gjennomforing_id = GJENNOMFORING_1.id,
 		start_dato = LocalDate.of(2022, 2, 10),
@@ -160,7 +160,7 @@ object TestData1 {
 	)
 
 	val DELTAKER_2_STATUS_1 = InsertDeltakerStatusCommand(
-		id = UUID.fromString("d6770809-29e3-47e0-8cc2-4fa667d1a756"),
+		id = UUID.fromString("227b67ea-92ca-4b94-9588-89209b01c0e5"),
 		deltaker_id = DELTAKER_2.id,
 		endret_dato = ZonedDateTime.now(),
 		status = "DELTAR",
@@ -179,56 +179,5 @@ object TestData1 {
 		ansvarlig_veileder_id = null,
 		nav_kontor_id = NAV_KONTOR_1.id
 	)
-
-}
-
-object TestData {
-
-	val ARRANGOR_1_ID: UUID = UUID.fromString("8a37bce6-3bc1-11ec-8d3d-0242ac130003")
-
-	val ARRANGOR_2_ID: UUID = UUID.fromString("bd9ea032-03a3-4dbf-96ec-8a2a69b5c92a")
-
-
-	val ARRANGOR_ANSATT_1_FNR = "123456789"
-
-	val ARRANGOR_ANSATT_1_ID: UUID = UUID.fromString("6321c7dc-6cfb-47b0-b566-32979be5041f")
-
-
-	val ARRANGOR_ANSATT_2_FNR = "732098472"
-
-
-	val TILTAK_1_ID: UUID = UUID.fromString("b18fd670-3bc1-11ec-8d3d-0242ac130003")
-
-
-	val NAV_KONTOR_1_ID: UUID = UUID.fromString("09405517-99c0-49e5-9eb3-31c61b9579cf")
-
-	val NAV_KONTOR_1_ENHET_ID = "1234"
-
-
-	val VEILEDER_1_ID: UUID = UUID.fromString("91e1c2e6-83cf-46f9-b8e0-4a9192c7dcbe")
-
-	val VEILEDER_1_NAV_IDENT = "Z4321"
-
-
-	val VEILEDER_2_ID: UUID = UUID.fromString("5e8790a9-7339-4ea2-ae75-54aac33f6c4d")
-
-
-	val BRUKER_1_FNR = "12345678910"
-
-	val BRUKER_1_ID: UUID = UUID.fromString("23b04c3a-a36c-451f-b9cf-30b6a6b586b8")
-
-
-	val BRUKER_3_ID: UUID = UUID.fromString("c74abcdd-53a7-4e22-86f3-97de9094029f")
-
-	val BRUKER_3_FNR = "3792473283"
-
-
-	val DELTAKER_1_ID: UUID = UUID.fromString("dc600c70-124f-4fe7-a687-b58439beb214")
-
-
-	val DELTAKER_2_ID: UUID = UUID.fromString("daaac46f-c7af-4028-96c3-8fa81ec2b93c")
-
-
-	val GJENNOMFORING_1_ID: UUID = UUID.fromString("b3420940-5479-48c8-b2fa-3751c7a33aa2")
 
 }

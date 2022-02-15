@@ -8,9 +8,9 @@ import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1_FNR
-import no.nav.amt.tiltak.test.database.data.TestData.VEILEDER_1_ID
-import no.nav.amt.tiltak.test.database.data.TestData.VEILEDER_2_ID
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_2
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -37,7 +37,7 @@ class BrukerRepositoryTest : FunSpec({
 		val etternavn = "Testersen"
 		val telefonnummer = "74635462"
 		val epost = "per.testersen@test.no"
-		val ansvarligVeilederId = VEILEDER_1_ID
+		val ansvarligVeilederId = NAV_ANSATT_1.id
 		val bruker = BrukerInsertDbo(fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarligVeilederId, null)
 		val dbo = repository.insert(bruker)
 
@@ -58,10 +58,10 @@ class BrukerRepositoryTest : FunSpec({
 	}
 
 	test("oppdaterVeileder should update veileder") {
-		repository.get(BRUKER_1_FNR)?.ansvarligVeilederId shouldBe VEILEDER_1_ID
+		repository.get(BRUKER_1.fodselsnummer)?.ansvarligVeilederId shouldBe NAV_ANSATT_1.id
 
-		repository.oppdaterVeileder(BRUKER_1_FNR, VEILEDER_2_ID)
+		repository.oppdaterVeileder(BRUKER_1.fodselsnummer, NAV_ANSATT_2.id)
 
-		repository.get(BRUKER_1_FNR)?.ansvarligVeilederId shouldBe VEILEDER_2_ID
+		repository.get(BRUKER_1.fodselsnummer)?.ansvarligVeilederId shouldBe NAV_ANSATT_2.id
 	}
 })
