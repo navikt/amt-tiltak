@@ -8,7 +8,7 @@ import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.deltaker.commands.UpsertNavAnsattCommand
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.TestData.VEILEDER_1_NAV_IDENT
+import no.nav.amt.tiltak.test.database.data.TestData.VEILEDER_1_NAV_IDENT
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 

@@ -4,8 +4,8 @@ import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.TestData.ARRANGOR_ANSATT_1_FNR
-import no.nav.amt.tiltak.test.database.TestData.ARRANGOR_ANSATT_1_ID
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_FNR
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_ID
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach

@@ -5,9 +5,9 @@ import ch.qos.logback.classic.Logger
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.TestData.ARRANGOR_1_ID
-import no.nav.amt.tiltak.test.database.TestData.GJENNOMFORING_1_ID
-import no.nav.amt.tiltak.test.database.TestData.TILTAK_1_ID
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1_ID
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1_ID
+import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1_ID
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach

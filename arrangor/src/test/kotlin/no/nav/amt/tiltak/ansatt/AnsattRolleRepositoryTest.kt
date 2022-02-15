@@ -6,9 +6,9 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.TestData.ARRANGOR_1_ID
-import no.nav.amt.tiltak.test.database.TestData.ARRANGOR_2_ID
-import no.nav.amt.tiltak.test.database.TestData.ARRANGOR_ANSATT_1_ID
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1_ID
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2_ID
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_ID
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.util.*

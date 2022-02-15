@@ -8,7 +8,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.*
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.TestData.DELTAKER_1_ID
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_ID
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDateTime
 

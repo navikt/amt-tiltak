@@ -13,8 +13,8 @@ import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.TestData.BRUKER_3_FNR
-import no.nav.amt.tiltak.test.database.TestData.GJENNOMFORING_1_ID
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_3_FNR
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1_ID
 import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

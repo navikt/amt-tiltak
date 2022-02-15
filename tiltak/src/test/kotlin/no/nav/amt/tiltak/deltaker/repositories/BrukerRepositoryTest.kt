@@ -8,9 +8,9 @@ import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.TestData.BRUKER_1_FNR
-import no.nav.amt.tiltak.test.database.TestData.VEILEDER_1_ID
-import no.nav.amt.tiltak.test.database.TestData.VEILEDER_2_ID
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1_FNR
+import no.nav.amt.tiltak.test.database.data.TestData.VEILEDER_1_ID
+import no.nav.amt.tiltak.test.database.data.TestData.VEILEDER_2_ID
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
