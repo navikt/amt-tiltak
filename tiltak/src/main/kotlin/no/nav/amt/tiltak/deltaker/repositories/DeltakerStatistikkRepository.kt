@@ -28,7 +28,7 @@ class DeltakerStatistikkRepository(
 		Int::class.java)
 
 	fun antallArrangorerMedBrukere() = template.queryForObject(
-		"SELECT count(*) FROM arrangor a join arrangor_ansatt_rolle aar on a.id = aar.arrangor_id;",
+		"SELECT count(distinct arrangor_id) FROM arrangor a join arrangor_ansatt_rolle aar on a.id = aar.arrangor_id;",
 		MapSqlParameterSource(),
 		Int::class.java)
 

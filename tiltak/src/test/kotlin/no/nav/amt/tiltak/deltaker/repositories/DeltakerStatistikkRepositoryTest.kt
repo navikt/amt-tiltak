@@ -9,13 +9,12 @@ import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.DELTAR
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.VENTER_PA_OPPSTART
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestData
+import no.nav.amt.tiltak.test.database.data.TestDataSeeder
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.time.LocalDateTime
-import java.util.*
 
 class DeltakerStatistikkRepositoryTest : FunSpec({
 
@@ -29,7 +28,14 @@ class DeltakerStatistikkRepositoryTest : FunSpec({
 
 		repository = DeltakerStatistikkRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanAndInitDatabase(dataSource, "/deltaker-statistikk-repository_test-data.sql")
+		DatabaseTestUtils.cleanAndInitDatabaseWithTestData(dataSource) { testDataRepository ->
+			TestDataSeeder.insertDefaultTestData(testDataRepository)
+
+			testDataRepository.insertArrangor(TestData.ARRANGOR_3)
+			testDataRepository.insertBruker(TestData.BRUKER_4)
+			testDataRepository.insertDeltaker(TestData.DELTAKER_4)
+			testDataRepository.insertDeltakerStatus(TestData.DELTAKER_4_STATUS_1)
+		}
 	}
 
 
@@ -44,12 +50,12 @@ class DeltakerStatistikkRepositoryTest : FunSpec({
 	}
 
 
-	test("antallArrangorer - returnerer 2") {
-		repository.antallArrangorer() shouldBe 2
+	test("antallArrangorer - returnerer 3") {
+		repository.antallArrangorer() shouldBe 3
 	}
 
-	test("antallArrangorerMedBrukere - returnerer 1") {
-		repository.antallArrangorerMedBrukere() shouldBe 1
+	test("antallArrangorerMedBrukere - returnerer 2") {
+		repository.antallArrangorerMedBrukere() shouldBe 2
 	}
 
 

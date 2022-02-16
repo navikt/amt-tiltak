@@ -23,6 +23,14 @@ object TestData {
 		navn = "Tiltaksarrangør 2"
 	)
 
+	val ARRANGOR_3 = InsertArrangorCommand(
+		id = UUID.fromString("96d12a44-7db2-49fb-bbac-64da5e7536c0"),
+		overordnet_enhet_organisasjonsnummer = "933333333",
+		overordnet_enhet_navn = "Org Tiltaksarrangør 3",
+		organisasjonsnummer = "333333333",
+		navn = "Tiltaksarrangør 3"
+	)
+
 
 	val ARRANGOR_ANSATT_1 = InsertArrangorAnsattCommand(
 		id = UUID.fromString("6321c7dc-6cfb-47b0-b566-32979be5041f"),
@@ -178,6 +186,39 @@ object TestData {
 		epost = "bruker3@example.com",
 		ansvarlig_veileder_id = null,
 		nav_kontor_id = NAV_KONTOR_1.id
+	)
+
+	// Bruker 4
+
+	val BRUKER_4 = InsertBrukerCommand(
+		id = UUID.fromString("6b5d7600-a9a6-4918-8e8a-068d1c1f5a65"),
+		fodselsnummer = "10028029182",
+		fornavn = "Bruker 4 fornavn",
+		etternavn = "Bruker 4 etternavn",
+		telefonnummer = "11223344",
+		epost = "bruker4@example.com",
+		ansvarlig_veileder_id = null,
+		nav_kontor_id = NAV_KONTOR_1.id
+	)
+
+
+	val DELTAKER_4 = InsertDeltakerCommand(
+		id = UUID.fromString("65ea8f52-6140-4fbd-810e-4fe1908fd6e7"),
+		bruker_id = BRUKER_4.id,
+		gjennomforing_id = GJENNOMFORING_1.id,
+		start_dato = LocalDate.of(2022, 2, 10),
+		slutt_dato = LocalDate.of(2022, 2, 12),
+		dager_per_uke = 5,
+		prosent_stilling = 100,
+		registrert_dato = LocalDate.of(2022, 2, 10)
+	)
+
+	val DELTAKER_4_STATUS_1 = InsertDeltakerStatusCommand(
+		id = UUID.fromString("b9cb7403-fda6-42d9-a011-8712f4a37801"),
+		deltaker_id = DELTAKER_4.id,
+		endret_dato = ZonedDateTime.now(),
+		status = "VENTER_PA_OPPSTART",
+		aktiv = true
 	)
 
 }
