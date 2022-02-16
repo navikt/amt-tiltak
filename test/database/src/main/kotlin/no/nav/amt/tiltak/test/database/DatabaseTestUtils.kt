@@ -9,6 +9,8 @@ object DatabaseTestUtils {
 
 	private const val SCHEMA = "public"
 
+	private const val FLYWAY_SCHEMA_HISTORY_TABLE_NAME = "flyway_schema_history"
+
 	fun runScript(dataSource: DataSource, script: String) {
 		val jdbcTemplate = JdbcTemplate(dataSource)
 		jdbcTemplate.update(script)
@@ -22,7 +24,7 @@ object DatabaseTestUtils {
 	fun cleanDatabase(dataSource: DataSource) {
 		val jdbcTemplate = JdbcTemplate(dataSource)
 
-		val tables = getAllTables(jdbcTemplate, SCHEMA)
+		val tables = getAllTables(jdbcTemplate, SCHEMA).filter { it != FLYWAY_SCHEMA_HISTORY_TABLE_NAME }
 		val sequences = getAllSequences(jdbcTemplate, SCHEMA)
 
 		tables.forEach {

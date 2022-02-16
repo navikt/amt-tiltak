@@ -29,7 +29,7 @@ Etter å ha kjørt opp mock OAuth2 serveren med `docker-compose up -d` så gå t
 
 Trykk på "Get a token"-knappen, fyll inn vilkårlig "user/subject" og "acr" og trykk på "Sign in"-knappen.
 
-Kopier verdien i feltet "access_token" fra "Token Response" og legg til headeren `Authorization: Bearer <TOKEN>` med access tokenet.
+Kopier verdien i feltet "access_token" fra "Token Response" og legg til headeren `Authorization: Bearer <TOKEN>` med access tokenet. Tokenet har en levetid på 1 år.
 
 ## Slett data i lokal database
 1. Stopp postgres med `docker-compose down`.
