@@ -1,6 +1,8 @@
 package no.nav.amt.tiltak.test.database
 
+import no.nav.amt.tiltak.test.database.data.TestDataSeeder
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import javax.sql.DataSource
 
 object DatabaseTestUtils {
@@ -32,9 +34,13 @@ object DatabaseTestUtils {
 		}
 	}
 
-	fun cleanAndInitDatabase(dataSource: DataSource, scriptFilePath: String) {
+	fun <V> parameters(vararg pairs: Pair<String, V>): MapSqlParameterSource {
+		return MapSqlParameterSource().addValues(pairs.toMap())
+	}
+
+	fun cleanAndInitDatabaseWithTestData(dataSource: DataSource) {
 		cleanDatabase(dataSource)
-		runScriptFile(dataSource, scriptFilePath)
+		TestDataSeeder.seed(dataSource)
 	}
 
 	private fun getAllTables(jdbcTemplate: JdbcTemplate, schema: String): List<String> {

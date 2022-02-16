@@ -8,6 +8,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_KONTOR_1
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.util.*
@@ -23,7 +24,7 @@ class NavKontorRepositoryTest : FunSpec({
 
 		repository = NavKontorRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanDatabase(dataSource)
+		DatabaseTestUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
 	test("Get NAV-kontor med id bør kaste NoSuchElementException om det ikke eksisterer") {
@@ -50,20 +51,11 @@ class NavKontorRepositoryTest : FunSpec({
 	}
 
 	test("Endring av navn fører til endring av navn") {
-		val enhetId = "ENHET_001"
-		val navn = "ENHET_001_NAVN"
-		val endretNavn = "ENHET_001_NAVN_ENDRET"
+		val oppdatertKontor = repository.upsert(NAV_KONTOR_1.enhet_id, "Nytt navn")
 
-		val lagretKontor = repository.upsert(enhetId, navn)
-
-		lagretKontor.navn shouldBe navn
-
-		val oppdatertKontor = repository.upsert(enhetId, endretNavn)
-
-		lagretKontor.id shouldBe oppdatertKontor.id
-		lagretKontor.enhetId shouldBe oppdatertKontor.enhetId
-
-		oppdatertKontor.navn shouldBe endretNavn
+		oppdatertKontor.id shouldBe NAV_KONTOR_1.id
+		oppdatertKontor.enhetId shouldBe NAV_KONTOR_1.enhet_id
+		oppdatertKontor.navn shouldBe "Nytt navn"
 	}
 
 })
