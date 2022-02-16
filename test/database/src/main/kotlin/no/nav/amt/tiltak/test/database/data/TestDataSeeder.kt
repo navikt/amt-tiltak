@@ -24,8 +24,7 @@ import javax.sql.DataSource
 
 object TestDataSeeder {
 
-	fun seed(dataSource: DataSource) {
-		val repository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
+	fun insertDefaultTestData(repository: TestDataRepository) {
 
 		repository.insertArrangor(ARRANGOR_1)
 		repository.insertArrangor(ARRANGOR_2)
@@ -55,5 +54,8 @@ object TestDataSeeder {
 
 		repository.insertBruker(BRUKER_3)
 	}
+
+	fun seed(dataSource: DataSource, testDataInserter: (TestDataRepository) -> Unit = {}) =
+		testDataInserter(TestDataRepository(NamedParameterJdbcTemplate(dataSource)))
 
 }
