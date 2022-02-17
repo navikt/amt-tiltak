@@ -44,7 +44,7 @@
         <schedlock.version>4.33.0</schedlock.version>
 
         <wiremock.version>2.31.0</wiremock.version>
-        <nimbus.version>9.22.1</nimbus.version>
+        <nimbus.version>9.22.2</nimbus.version>
         <mockk.version>1.12.0</mockk.version>
         <kotest.version>5.1.0</kotest.version>
         <okhttp.version>4.9.3</okhttp.version>
