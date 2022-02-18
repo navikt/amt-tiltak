@@ -57,6 +57,8 @@ class GjennomforingControllerIntegrationTest {
 
 	@BeforeEach
 	fun before() {
+		val transactionTemplate = TransactionTemplate(DataSourceTransactionManager(dataSource))
+
 		namedJdbcTemplate = NamedParameterJdbcTemplate(dataSource)
 
 		gjennomforingRepository = GjennomforingRepository(namedJdbcTemplate)
@@ -76,9 +78,14 @@ class GjennomforingControllerIntegrationTest {
 			deltakerRepository,
 			deltakerStatusRepository,
 			brukerService,
-			TransactionTemplate(DataSourceTransactionManager(dataSource))
+			transactionTemplate
 		)
-		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, TiltakServiceImpl(tiltakRepository))
+		gjennomforingService = GjennomforingServiceImpl(
+			gjennomforingRepository,
+			TiltakServiceImpl(tiltakRepository),
+			deltakerService,
+			transactionTemplate
+		)
 		controller = GjennomforingController(
 			gjennomforingService, deltakerService,
 			authService, mock(ArrangorAnsattTilgangService::class.java)

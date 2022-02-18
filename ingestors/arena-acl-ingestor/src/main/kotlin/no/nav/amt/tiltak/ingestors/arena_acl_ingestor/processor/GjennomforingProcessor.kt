@@ -6,6 +6,7 @@ import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.GjennomforingPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
@@ -14,6 +15,8 @@ class GjennomforingProcessor(
 	private val gjennomforingService: GjennomforingService,
 	private val tiltakService: TiltakService,
 ) : GenericProcessor<GjennomforingPayload>() {
+
+	private val log = LoggerFactory.getLogger(this::class.java)
 
 	override fun processInsertMessage(message: MessageWrapper<GjennomforingPayload>) {
 		upsert(message)
@@ -53,7 +56,11 @@ class GjennomforingProcessor(
 	}
 
 	override fun processDeleteMessage(message: MessageWrapper<GjennomforingPayload>) {
-		throw NotImplementedError("Håntering av delete-meldinger for tiltakgjennomføring er ikke implementert")
+		val gjennomforingId = message.payload.id
+
+		log.info("Motatt delete-melding, sletter gjennomføring med id=$gjennomforingId")
+
+		gjennomforingService.slettGjennomforing(gjennomforingId)
 	}
 
 }

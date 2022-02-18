@@ -80,6 +80,7 @@ class DeltakerProcessor(
 		val deltakerId = message.payload.id
 
 		log.info("Motatt delete-melding, sletter deltaker med id=$deltakerId")
+
 		deltakerService.slettDeltaker(deltakerId)
 	}
 

@@ -23,4 +23,6 @@ interface GjennomforingService {
 		fremmoteDato: LocalDateTime?
 	): Gjennomforing
 
+	fun slettGjennomforing(gjennomforingId: UUID)
+
 }

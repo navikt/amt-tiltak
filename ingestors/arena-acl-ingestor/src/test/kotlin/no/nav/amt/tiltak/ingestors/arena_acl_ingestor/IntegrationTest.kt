@@ -24,10 +24,11 @@ import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
 import no.nav.amt.tiltak.tiltak.services.GjennomforingServiceImpl
 import no.nav.amt.tiltak.tiltak.services.TiltakServiceImpl
 import org.junit.Ignore
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
-import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -70,22 +71,26 @@ class IntegrationTest {
 
 	@BeforeAll
 	fun beforeAll() {
+		val transactionTemplate = TransactionTemplate(DataSourceTransactionManager(datasource))
+
 		jdbcTemplate = NamedParameterJdbcTemplate(datasource)
 		tiltakRepository = TiltakRepository(jdbcTemplate)
-		tiltakService = TiltakServiceImpl(tiltakRepository)
 		gjennomforingRepository = GjennomforingRepository(jdbcTemplate)
-		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService)
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
-		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		navKontorRepository = NavKontorRepository(jdbcTemplate)
+		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
+		arrangorRepository = ArrangorRepository(jdbcTemplate)
+		brukerRepository = BrukerRepository(jdbcTemplate)
+
 		navKontorService = mockk()
 		personService = mockk()
-		brukerRepository = BrukerRepository(jdbcTemplate)
-		brukerService = BrukerServiceImpl(brukerRepository, navKontorRepository, navKontorService, personService, mockk())
-		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, TransactionTemplate(DataSourceTransactionManager(datasource)))
-		deltakerProcessor = DeltakerProcessor(gjennomforingService, deltakerService, personService)
 		enhetsregisterClient = mockk()
-		arrangorRepository = ArrangorRepository(jdbcTemplate)
+
+		tiltakService = TiltakServiceImpl(tiltakRepository)
+		brukerService = BrukerServiceImpl(brukerRepository, navKontorRepository, navKontorService, personService, mockk())
+		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, transactionTemplate)
+		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, transactionTemplate)
+		deltakerProcessor = DeltakerProcessor(gjennomforingService, deltakerService, personService)
 		arrangorService = no.nav.amt.tiltak.arrangor.ArrangorService(mockk(), enhetsregisterClient, arrangorRepository)
 
 		gjennomforingProcessor = GjennomforingProcessor(arrangorService, gjennomforingService, tiltakService)

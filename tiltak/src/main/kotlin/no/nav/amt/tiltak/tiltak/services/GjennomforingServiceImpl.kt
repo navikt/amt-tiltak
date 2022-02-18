@@ -1,11 +1,14 @@
 package no.nav.amt.tiltak.tiltak.services
 
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.utils.UpdateStatus
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -13,8 +16,12 @@ import java.util.*
 @Service
 class GjennomforingServiceImpl(
 	private val gjennomforingRepository: GjennomforingRepository,
-	private val tiltakService: TiltakService
+	private val tiltakService: TiltakService,
+	private val deltakerService: DeltakerService,
+	private val transactionTemplate: TransactionTemplate
 ) : GjennomforingService {
+
+	private val log = LoggerFactory.getLogger(this::class.java)
 
 	override fun upsertGjennomforing(
 		id: UUID,
@@ -61,6 +68,18 @@ class GjennomforingServiceImpl(
 			registrertDato = registrertDato,
 			fremmoteDato = fremmoteDato
 		).toGjennomforing(tiltak)
+	}
+
+	override fun slettGjennomforing(gjennomforingId: UUID) {
+		transactionTemplate.execute {
+			deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId).forEach {
+				deltakerService.slettDeltaker(it.id)
+			}
+
+			gjennomforingRepository.delete(gjennomforingId)
+		}
+
+		log.info("Gjennomføring med id=$gjennomforingId er slettet")
 	}
 
 	override fun getGjennomforing(id: UUID): Gjennomforing {
