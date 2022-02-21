@@ -2,12 +2,16 @@ package no.nav.amt.tiltak.tiltak.repositories
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.test.database.DatabaseTestUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
+import no.nav.amt.tiltak.test.database.data.TestDataRepository
+import no.nav.amt.tiltak.test.database.data.commands.InsertGjennomforingCommand
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -121,6 +125,32 @@ internal class GjennomforingRepositoryTest {
 		assertTrue(updatedStartDato.isEqualTo(updatedGjennomforing.startDato))
 		assertTrue(updatedSluttDato.isEqualTo(updatedGjennomforing.sluttDato))
 		assertTrue(updatedFremmotedato.isEqualTo(updatedGjennomforing.fremmoteDato))
+	}
+
+	@Test
+	internal fun `delete should delete gjennomføring`() {
+		val id = UUID.randomUUID()
+
+		val gjennomforing = InsertGjennomforingCommand(
+			id = id,
+			tiltak_id = TILTAK_1.id,
+			arrangor_id = ARRANGOR_1.id,
+			navn = "Tiltaksgjennomforing",
+			status = "GJENNOMFORES",
+			start_dato = LocalDate.of(2022, 2, 1),
+			slutt_dato = LocalDate.of(2050, 12, 30),
+			registrert_dato = LocalDate.of(2022, 1, 1),
+			fremmote_dato = LocalDate.of(2022, 2, 1)
+		)
+
+		TestDataRepository(NamedParameterJdbcTemplate(dataSource))
+			.insertGjennomforing(gjennomforing)
+
+		repository.get(id) shouldNotBe null
+
+		repository.delete(id)
+
+		repository.get(id) shouldBe null
 	}
 
 }
