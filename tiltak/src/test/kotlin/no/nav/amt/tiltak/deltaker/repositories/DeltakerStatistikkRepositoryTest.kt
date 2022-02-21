@@ -68,4 +68,8 @@ class DeltakerStatistikkRepositoryTest : FunSpec({
 		repository.antallGjennomforingerPrStatus() shouldContain
 			StatusStatistikk(Gjennomforing.Status.GJENNOMFORES.name, 1)
 	}
+
+	test("eksponerteBrukere - returnerer 3") {
+		repository.eksponerteBrukere() shouldBe 3
+	}
 })

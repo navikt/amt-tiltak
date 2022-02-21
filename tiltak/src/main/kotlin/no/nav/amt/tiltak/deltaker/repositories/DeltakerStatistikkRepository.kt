@@ -43,6 +43,18 @@ class DeltakerStatistikkRepository(
 			rs, _ -> StatusStatistikk(rs.getString("status"), rs.getInt("antall"))
 	}
 
+	fun eksponerteBrukere(): Int {
+		val query = """
+			SELECT count(distinct d.bruker_id) FROM
+				gjennomforing g JOIN
+				deltaker d ON d.gjennomforing_id = g.id
+			WHERE g.arrangor_id IN (
+				SELECT distinct arrangor_id FROM arrangor a join arrangor_ansatt_rolle aar on a.id = aar.arrangor_id
+			);
+		""".trimIndent()
+		return template.queryForObject(query, MapSqlParameterSource(), Int::class.java)!!
+	}
+
 }
 
 
