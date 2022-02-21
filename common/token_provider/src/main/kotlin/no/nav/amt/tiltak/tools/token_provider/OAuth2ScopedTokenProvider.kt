@@ -33,17 +33,17 @@ class OAuth2ScopedTokenProvider(clientId: String, clientSecret: String, tokenEnd
 		try {
 			response = TokenResponse.parse(request.toHTTPRequest().send())
 		} catch (e: ParseException) {
-			log.error("Failed to parse JWT token", e)
+			log.error("Failed to parse JWT token for scope=$scope", e)
 		} catch (e: IOException) {
-			log.error("Failed to send token request", e)
+			log.error("Failed to send token request for scope=$scope", e)
 		}
 
-		checkNotNull(response) { "Failed to get token" }
+		checkNotNull(response) { "Failed to get token for scope=$scope" }
 
 		if (!response.indicatesSuccess()) {
 			val tokenErrorResponse = response.toErrorResponse()
-			log.error("Token request was not successful", tokenErrorResponse.toJSONObject().toString())
-			throw RuntimeException("Failed to fetch service token for $scope")
+			log.error("Token request for scope=$scope was not successful: " + tokenErrorResponse.toJSONObject().toString())
+			throw RuntimeException("Failed to fetch service token for scope=$scope")
 		}
 
 		val successResponse = response.toSuccessResponse()
