@@ -21,7 +21,7 @@ class GjennomforingServiceImpl(
 	private val transactionTemplate: TransactionTemplate
 ) : GjennomforingService {
 
-	private val log = LoggerFactory.getLogger(this::class.java)
+	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun upsertGjennomforing(
 		id: UUID,
