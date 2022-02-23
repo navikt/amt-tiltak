@@ -156,8 +156,33 @@ class GjennomforingControllerTest {
 	}
 
 	@Test
-	fun `hentGjennomforing() should return 401 when not authenticated`() {
+	fun `hentGjennomforingerByArrangorId() should filter out unauthorized gjennomføringer`() {
+		val token = server.issueToken("tokenx", "test", "test").serialize()
 
+		val arrangorId = UUID.randomUUID()
+
+		Mockito.`when`(authService.hentPersonligIdentTilInnloggetBruker())
+			.thenReturn("ANSATT_FNR")
+
+		Mockito.`when`(
+			arrangorAnsattTilgangService.hentGjennomforingIderForAnsattHosArrangor("ANSATT_FNR", arrangorId)
+		).thenReturn(listOf(UUID.randomUUID()))
+
+		Mockito.`when`(gjennomforingService.getGjennomforingerForArrangor(arrangorId))
+			.thenReturn(listOf(gjennomforing))
+
+		val response = mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/gjennomforing")
+				.queryParam("arrangorId", arrangorId.toString())
+				.header("Authorization", "Bearer $token")
+		).andReturn().response
+
+		assertEquals(200, response.status)
+		assertEquals("[]", response.contentAsString)
+	}
+
+	@Test
+	fun `hentGjennomforing() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.get("/api/gjennomforing/$gjennomforingId")
 		).andReturn().response

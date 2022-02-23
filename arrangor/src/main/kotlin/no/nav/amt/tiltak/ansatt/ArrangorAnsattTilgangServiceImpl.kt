@@ -2,7 +2,6 @@ package no.nav.amt.tiltak.ansatt
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
-import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.utils.CacheUtils.tryCacheFirstNotNull
 import no.nav.amt.tiltak.utils.CacheUtils.tryCacheFirstNullable
 import org.slf4j.LoggerFactory
@@ -16,7 +15,7 @@ import java.util.*
 class ArrangorAnsattTilgangServiceImpl(
 	private val ansattRepository: AnsattRepository,
 	private val ansattRolleRepository: AnsattRolleRepository,
-	private val gjennomforingService: GjennomforingService
+	private val gjennomforingTilgangRepository: GjennomforingTilgangRepository,
 ) : ArrangorAnsattTilgangService {
 
 	private val secureLog = LoggerFactory.getLogger("SecureLog")
@@ -26,20 +25,22 @@ class ArrangorAnsattTilgangServiceImpl(
 		.maximumSize(100_000)
 		.build<String, UUID>()
 
-	private val gjennomforingIdToArrangorIdCache = Caffeine.newBuilder()
-		.expireAfterWrite(Duration.ofHours(12))
-		.maximumSize(100_000)
-		.build<UUID, UUID>()
-
 	private val ansattIdToArrangorIdListCache = Caffeine.newBuilder()
 		.expireAfterWrite(Duration.ofMinutes(15))
+		.maximumSize(100_000)
+		.build<UUID, List<UUID>>()
+
+	private val ansattIdToGjennomforingIdListCache = Caffeine.newBuilder()
+		.expireAfterWrite(Duration.ofMinutes(5))
 		.maximumSize(100_000)
 		.build<UUID, List<UUID>>()
 
 	override fun verifiserTilgangTilGjennomforing(ansattPersonligIdent: String, gjennomforingId: UUID) {
 		val ansattId = hentAnsattId(ansattPersonligIdent)
 
-		val harTilgang = harTilgangTilGjennomforing(ansattId, gjennomforingId)
+		val gjennomforinger = hentGjennomforingerForAnsatt(ansattId)
+
+		val harTilgang = gjennomforinger.contains(gjennomforingId)
 
 		if (!harTilgang) {
 			secureLog.warn("Ansatt med id=$ansattId har ikke tilgang til gjennomføring med id=$gjennomforingId")
@@ -58,20 +59,10 @@ class ArrangorAnsattTilgangServiceImpl(
 		}
 	}
 
-	private fun harTilgangTilGjennomforing(ansattId: UUID, gjennomforingId: UUID): Boolean {
-		val arrangorIder = hentArrangorIderForAnsatt(ansattId)
+	override fun hentGjennomforingIderForAnsattHosArrangor(ansattPersonligIdent: String, arrangorId: UUID): List<UUID> {
+		val ansattId = hentAnsattId(ansattPersonligIdent)
 
-		val arrangorId = gjennomforingIdToArrangorIdCache.getIfPresent(gjennomforingId)
-
-		if (arrangorId != null) {
-			return arrangorIder.contains(arrangorId)
-		}
-
-		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
-
-		gjennomforingIdToArrangorIdCache.put(gjennomforing.id, gjennomforing.arrangorId)
-
-		return arrangorIder.contains(gjennomforing.arrangorId)
+		return hentGjennomforingerForAnsatt(ansattId)
 	}
 
 	private fun hentAnsattId(ansattPersonligIdent: String): UUID {
@@ -92,6 +83,12 @@ class ArrangorAnsattTilgangServiceImpl(
 	private fun hentArrangorIderForAnsatt(ansattId: UUID): List<UUID> {
 		return tryCacheFirstNotNull(ansattIdToArrangorIdListCache, ansattId) {
 			ansattRolleRepository.hentArrangorIderForAnsatt(ansattId)
+		}
+	}
+
+	private fun hentGjennomforingerForAnsatt(ansattId: UUID): List<UUID> {
+		return tryCacheFirstNotNull(ansattIdToGjennomforingIdListCache, ansattId) {
+			gjennomforingTilgangRepository.hentGjennomforingerForAnsatt(ansattId)
 		}
 	}
 

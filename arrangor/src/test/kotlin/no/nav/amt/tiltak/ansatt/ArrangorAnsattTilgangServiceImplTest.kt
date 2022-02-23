@@ -6,9 +6,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
-import no.nav.amt.tiltak.core.port.GjennomforingService
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
@@ -20,9 +17,9 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	lateinit var ansattRolleRepository: AnsattRolleRepository
 
-	lateinit var gjennomforingService: GjennomforingService
-
 	lateinit var arrangorAnsattTilgangServiceImpl: ArrangorAnsattTilgangServiceImpl
+
+	lateinit var gjennomforingTilgangRepository: GjennomforingTilgangRepository
 
 	val personligIdent = "fnr"
 
@@ -32,29 +29,15 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	val arrangorId = UUID.randomUUID()
 
-	fun gjennomforing(gjennomforingId: UUID, arrangorId: UUID): Gjennomforing {
-		return Gjennomforing(
-			id = gjennomforingId,
-			tiltak = Tiltak(UUID.randomUUID(), "", ""),
-			arrangorId = arrangorId,
-			navn = "",
-			status = Gjennomforing.Status.GJENNOMFORES,
-			startDato = null,
-			sluttDato = null,
-			registrertDato = LocalDateTime.now(),
-			fremmoteDato = null
-		)
-	}
-
 	beforeEach {
 		ansattRepository = mockk()
 
 		ansattRolleRepository = mockk()
 
-		gjennomforingService = mockk()
+		gjennomforingTilgangRepository = mockk()
 
 		arrangorAnsattTilgangServiceImpl = ArrangorAnsattTilgangServiceImpl(
-			ansattRepository, ansattRolleRepository, gjennomforingService
+			ansattRepository, ansattRolleRepository, gjennomforingTilgangRepository
 		)
 
 		every {
@@ -71,12 +54,8 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	test("verifiserTilgangTilGjennomforing skal kaste exception hvis ikke tilgang") {
 		every {
-			ansattRolleRepository.hentArrangorIderForAnsatt(ansattId)
-		} returns listOf(arrangorId)
-
-		every {
-			gjennomforingService.getGjennomforing(gjennomforingId)
-		} returns gjennomforing(gjennomforingId, UUID.randomUUID())
+			gjennomforingTilgangRepository.hentGjennomforingerForAnsatt(ansattId)
+		} returns listOf(UUID.randomUUID())
 
 		val exception = shouldThrowExactly<ResponseStatusException> {
 			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(personligIdent, gjennomforingId)
@@ -87,12 +66,8 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	test("verifiserTilgangTilGjennomforing skal ikke kaste exception hvis tilgang") {
 		every {
-			ansattRolleRepository.hentArrangorIderForAnsatt(ansattId)
-		} returns listOf(arrangorId)
-
-		every {
-			gjennomforingService.getGjennomforing(gjennomforingId)
-		} returns gjennomforing(gjennomforingId, arrangorId)
+			gjennomforingTilgangRepository.hentGjennomforingerForAnsatt(ansattId)
+		} returns listOf(gjennomforingId)
 
 		shouldNotThrow<Throwable> {
 			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(personligIdent, gjennomforingId)

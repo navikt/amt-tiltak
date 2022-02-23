@@ -24,6 +24,21 @@ class TestDataRepository(
 		)
 	}
 
+	fun insertArrangorAnsattGjennomforingTilgang(cmd: InsertArrangorAnsattGjennomforingTilgang) {
+		val sql = """
+			INSERT INTO arrangor_ansatt_gjennomforing_tilgang(id, ansatt_id, gjennomforing_id)
+			VALUES(:id, :ansatt_id, :gjennomforing_id)
+		""".trimIndent()
+
+		template.update(
+			sql, parameters(
+				"id" to cmd.id,
+				"ansatt_id" to cmd.ansatt_id,
+				"gjennomforing_id" to cmd.gjennomforing_id,
+			)
+		)
+	}
+
 	fun insertArrangorAnsattRolle(cmd: InsertArrangorAnsattRolleCommand) {
 		val sql = """
 			INSERT INTO arrangor_ansatt_rolle(id, arrangor_id, ansatt_id, rolle)
