@@ -75,10 +75,8 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		} returns listOf(arrangorId)
 
 		every {
-			gjennomforingService.getGjennomforingerForArrangor(arrangorId)
-		} returns listOf(
-			gjennomforing(UUID.randomUUID(), arrangorId)
-		)
+			gjennomforingService.getGjennomforing(gjennomforingId)
+		} returns gjennomforing(gjennomforingId, UUID.randomUUID())
 
 		val exception = shouldThrowExactly<ResponseStatusException> {
 			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(personligIdent, gjennomforingId)
@@ -93,10 +91,8 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		} returns listOf(arrangorId)
 
 		every {
-			gjennomforingService.getGjennomforingerForArrangor(arrangorId)
-		} returns listOf(
-			gjennomforing(gjennomforingId, arrangorId)
-		)
+			gjennomforingService.getGjennomforing(gjennomforingId)
+		} returns gjennomforing(gjennomforingId, arrangorId)
 
 		shouldNotThrow<Throwable> {
 			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(personligIdent, gjennomforingId)

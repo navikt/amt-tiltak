@@ -26,12 +26,12 @@ class ArrangorAnsattTilgangServiceImpl(
 		.maximumSize(100_000)
 		.build<String, UUID>()
 
-	private val ansattIdToArrangorIdListCache = Caffeine.newBuilder()
-		.expireAfterWrite(Duration.ofMinutes(15))
+	private val gjennomforingIdToArrangorIdCache = Caffeine.newBuilder()
+		.expireAfterWrite(Duration.ofHours(12))
 		.maximumSize(100_000)
-		.build<UUID, List<UUID>>()
+		.build<UUID, UUID>()
 
-	private val arrangorIdToGjennomforingIdListCache = Caffeine.newBuilder()
+	private val ansattIdToArrangorIdListCache = Caffeine.newBuilder()
 		.expireAfterWrite(Duration.ofMinutes(15))
 		.maximumSize(100_000)
 		.build<UUID, List<UUID>>()
@@ -61,9 +61,17 @@ class ArrangorAnsattTilgangServiceImpl(
 	private fun harTilgangTilGjennomforing(ansattId: UUID, gjennomforingId: UUID): Boolean {
 		val arrangorIder = hentArrangorIderForAnsatt(ansattId)
 
-		return arrangorIder.any {
-			hentGjennomforingIderForArrangor(it).contains(gjennomforingId)
+		val arrangorId = gjennomforingIdToArrangorIdCache.getIfPresent(gjennomforingId)
+
+		if (arrangorId != null) {
+			return arrangorIder.contains(arrangorId)
 		}
+
+		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
+
+		gjennomforingIdToArrangorIdCache.put(gjennomforing.id, gjennomforing.arrangorId)
+
+		return arrangorIder.contains(gjennomforing.arrangorId)
 	}
 
 	private fun hentAnsattId(ansattPersonligIdent: String): UUID {
@@ -84,12 +92,6 @@ class ArrangorAnsattTilgangServiceImpl(
 	private fun hentArrangorIderForAnsatt(ansattId: UUID): List<UUID> {
 		return tryCacheFirstNotNull(ansattIdToArrangorIdListCache, ansattId) {
 			ansattRolleRepository.hentArrangorIderForAnsatt(ansattId)
-		}
-	}
-
-	private fun hentGjennomforingIderForArrangor(arrangorId: UUID): List<UUID> {
-		return tryCacheFirstNotNull(arrangorIdToGjennomforingIdListCache, arrangorId) {
-			gjennomforingService.getGjennomforingerForArrangor(arrangorId).map { it.id }
 		}
 	}
 
