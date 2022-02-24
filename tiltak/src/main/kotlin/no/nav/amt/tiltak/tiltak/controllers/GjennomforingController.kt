@@ -32,7 +32,10 @@ class GjennomforingController(
 
 		arrangorAnsattTilgangService.verifiserTilgangTilArrangor(ansattPersonligIdent, arrangorId)
 
-		return gjennomforingService.getGjennomforingerForArrangor(arrangorId)
+		val tilgangTilGjennomforingIder = arrangorAnsattTilgangService
+			.hentGjennomforingIderForAnsattHosArrangor(ansattPersonligIdent, arrangorId)
+
+		return gjennomforingService.getGjennomforinger(tilgangTilGjennomforingIder)
 			.map { it.toDto() }
 	}
 

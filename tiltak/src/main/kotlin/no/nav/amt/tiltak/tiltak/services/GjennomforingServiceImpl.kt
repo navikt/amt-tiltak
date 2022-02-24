@@ -89,11 +89,12 @@ class GjennomforingServiceImpl(
 		} ?: throw NoSuchElementException("Fant ikke gjennomforing")
 	}
 
-	override fun getGjennomforingerForArrangor(arrangorId: UUID): List<Gjennomforing> {
-		val gjennomforing = gjennomforingRepository.getByArrandorId(arrangorId)
+	override fun getGjennomforinger(gjennomforingIder: List<UUID>): List<Gjennomforing> {
+		val gjennomforinger = gjennomforingRepository.get(gjennomforingIder)
 
-		return gjennomforing.map { gjennomforingDbo ->
+		return gjennomforinger.map { gjennomforingDbo ->
 			gjennomforingDbo.toGjennomforing(tiltakService.getTiltakById(gjennomforingDbo.tiltakId))
 		}
 	}
+
 }

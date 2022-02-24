@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.test.database.data
 
-import no.nav.amt.tiltak.test.database.DatabaseTestUtils.parameters
+import no.nav.amt.tiltak.test.database.DbTestDataUtils.parameters
 import no.nav.amt.tiltak.test.database.data.commands.*
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -20,6 +20,21 @@ class TestDataRepository(
 				"personlig_ident" to cmd.personlig_ident,
 				"fornavn" to cmd.fornavn,
 				"etternavn" to cmd.etternavn
+			)
+		)
+	}
+
+	fun insertArrangorAnsattGjennomforingTilgang(cmd: InsertArrangorAnsattGjennomforingTilgang) {
+		val sql = """
+			INSERT INTO arrangor_ansatt_gjennomforing_tilgang(id, ansatt_id, gjennomforing_id)
+			VALUES(:id, :ansatt_id, :gjennomforing_id)
+		""".trimIndent()
+
+		template.update(
+			sql, parameters(
+				"id" to cmd.id,
+				"ansatt_id" to cmd.ansatt_id,
+				"gjennomforing_id" to cmd.gjennomforing_id,
 			)
 		)
 	}

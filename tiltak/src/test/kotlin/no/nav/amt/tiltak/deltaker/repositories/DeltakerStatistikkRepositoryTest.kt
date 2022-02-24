@@ -9,7 +9,7 @@ import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.DELTAR
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.VENTER_PA_OPPSTART
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestDataSeeder
@@ -28,7 +28,7 @@ class DeltakerStatistikkRepositoryTest : FunSpec({
 
 		repository = DeltakerStatistikkRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanAndInitDatabaseWithTestData(dataSource) { testDataRepository ->
+		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource) { testDataRepository ->
 			TestDataSeeder.insertDefaultTestData(testDataRepository)
 
 			testDataRepository.insertArrangor(TestData.ARRANGOR_3)
@@ -59,14 +59,18 @@ class DeltakerStatistikkRepositoryTest : FunSpec({
 	}
 
 
-	test("antallGjennomforinger - returnerer 1") {
-		repository.antallGjennomforinger() shouldBe 1
+	test("antallGjennomforinger - returnerer 2") {
+		repository.antallGjennomforinger() shouldBe 2
 	}
 
 	test("antallGjennomforingerPrStatus - returnerer rett fordeling") {
-		repository.antallGjennomforingerPrStatus() shouldHaveSize 1
+		repository.antallGjennomforingerPrStatus() shouldHaveSize 2
+
 		repository.antallGjennomforingerPrStatus() shouldContain
 			StatusStatistikk(Gjennomforing.Status.GJENNOMFORES.name, 1)
+
+		repository.antallGjennomforingerPrStatus() shouldContain
+			StatusStatistikk(Gjennomforing.Status.AVSLUTTET.name, 1)
 	}
 
 	test("eksponerteBrukere - returnerer 3") {

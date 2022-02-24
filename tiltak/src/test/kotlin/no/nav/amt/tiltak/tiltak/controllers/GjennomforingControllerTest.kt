@@ -157,7 +157,6 @@ class GjennomforingControllerTest {
 
 	@Test
 	fun `hentGjennomforing() should return 401 when not authenticated`() {
-
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.get("/api/gjennomforing/$gjennomforingId")
 		).andReturn().response

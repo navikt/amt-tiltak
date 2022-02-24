@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.arrangor
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
-import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -24,7 +24,7 @@ internal class ArrangorRepositoryTest {
 
 		repository = ArrangorRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanDatabase(dataSource)
+		DbTestDataUtils.cleanDatabase(dataSource)
 	}
 
 	@Test
