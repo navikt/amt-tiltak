@@ -3,7 +3,6 @@ package no.nav.amt.tiltak.tiltak.repositories
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.collections.shouldBeSameSizeAs
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -19,8 +18,6 @@ import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.commands.InsertGjennomforingCommand
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -153,12 +150,18 @@ internal class GjennomforingRepositoryTest : FunSpec({
 		repository.get(id) shouldBe null
 	}
 
-	test("Skal hente flere gjennomføringer") {
+	test("get - skal hente flere gjennomføringer") {
 		val gjennomforinger = repository.get(listOf(GJENNOMFORING_1.id, GJENNOMFORING_2.id))
 
 		gjennomforinger shouldHaveSize 2
 		gjennomforinger.find { it.id == GJENNOMFORING_1.id } shouldNotBe null
 		gjennomforinger.find { it.id == GJENNOMFORING_2.id } shouldNotBe null
+	}
+
+	test("get - skal returnere tom liste hvis ingen gjennomføringer sendes inn") {
+		val gjennomforinger = repository.get(emptyList())
+
+		gjennomforinger shouldHaveSize 0
 	}
 
 })

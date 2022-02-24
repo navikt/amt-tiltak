@@ -120,6 +120,8 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 	}
 
 	fun get(gjennomforingIder: List<UUID>): List<GjennomforingDbo> {
+		if (gjennomforingIder.isEmpty()) return emptyList()
+
 		val sql = "SELECT * FROM gjennomforing WHERE id in(:ids)"
 
 		val parameters = MapSqlParameterSource().addValues(mapOf("ids" to gjennomforingIder))
