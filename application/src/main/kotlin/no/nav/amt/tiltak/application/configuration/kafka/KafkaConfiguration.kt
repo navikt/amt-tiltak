@@ -29,7 +29,7 @@ open class KafkaConfiguration(
 	arenaAclIngestor: ArenaAclIngestor,
 	tildeltVeilederIngestor: TildeltVeilederIngestor
 ) {
-	private val log = LoggerFactory.getLogger(this::class.java)
+	private val log = LoggerFactory.getLogger(javaClass)
     private var client: KafkaConsumerClient
 	private var consumerRepository = PostgresJdbcTemplateConsumerRepository(jdbcTemplate)
 	private var consumerRecordProcessor: KafkaConsumerRecordProcessor

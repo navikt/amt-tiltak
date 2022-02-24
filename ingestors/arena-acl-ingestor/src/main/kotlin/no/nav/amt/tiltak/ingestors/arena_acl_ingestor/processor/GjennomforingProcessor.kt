@@ -16,7 +16,7 @@ class GjennomforingProcessor(
 	private val tiltakService: TiltakService,
 ) : GenericProcessor<GjennomforingPayload>() {
 
-	private val log = LoggerFactory.getLogger(this::class.java)
+	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun processInsertMessage(message: MessageWrapper<GjennomforingPayload>) {
 		upsert(message)
@@ -45,6 +45,8 @@ class GjennomforingProcessor(
 			registrertDato = gjennomforing.registrertDato,
 			fremmoteDato = gjennomforing.fremmoteDato
 		)
+
+		log.info("Fullført upsert av gjennomføring id=${gjennomforing.id} arrangorId=${arrangor.id}")
 	}
 
 	private fun mapGjennomforingStatus(status: GjennomforingPayload.Status): Gjennomforing.Status {

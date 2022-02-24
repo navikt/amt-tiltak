@@ -8,7 +8,10 @@ import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.UnknownMessageWrapper
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.DeltakerProcessor
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.GjennomforingProcessor
+import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class ArenaAclIngestorImpl(
@@ -16,20 +19,45 @@ class ArenaAclIngestorImpl(
 	private val gjennomforingProcessor: GjennomforingProcessor
 ) : ArenaAclIngestor {
 
+	private val log = LoggerFactory.getLogger(javaClass)
+
 	override fun ingestKafkaMessageValue(messageValue: String) {
 		val unknownMessageWrapper = fromJson(messageValue, UnknownMessageWrapper::class.java)
 
-		when (unknownMessageWrapper.type) {
-			"DELTAKER" -> {
-				val deltakerPayload = getObjectMapper().treeToValue(unknownMessageWrapper.payload, DeltakerPayload::class.java)
-				val deltakerMessage = toKnownMessageWrapper(deltakerPayload, unknownMessageWrapper)
-				deltakerProcessor.processMessage(deltakerMessage)
+		wrapIngestWithLog(unknownMessageWrapper) {
+			when (unknownMessageWrapper.type) {
+				"DELTAKER" -> {
+					val deltakerPayload = getObjectMapper().treeToValue(unknownMessageWrapper.payload, DeltakerPayload::class.java)
+					val deltakerMessage = toKnownMessageWrapper(deltakerPayload, unknownMessageWrapper)
+					deltakerProcessor.processMessage(deltakerMessage)
+				}
+				"GJENNOMFORING" -> {
+					val gjennomforingPayload = getObjectMapper().treeToValue(unknownMessageWrapper.payload, GjennomforingPayload::class.java)
+					val gjennomforingMessage = toKnownMessageWrapper(gjennomforingPayload, unknownMessageWrapper)
+					gjennomforingProcessor.processMessage(gjennomforingMessage)
+				}
 			}
-			"GJENNOMFORING" -> {
-				val gjennomforingPayload = getObjectMapper().treeToValue(unknownMessageWrapper.payload, GjennomforingPayload::class.java)
-				val gjennomforingMessage = toKnownMessageWrapper(gjennomforingPayload, unknownMessageWrapper)
-				gjennomforingProcessor.processMessage(gjennomforingMessage)
-			}
+		}
+	}
+
+	private fun wrapIngestWithLog(message: UnknownMessageWrapper, ingestor: (message: UnknownMessageWrapper) -> Unit) {
+		try {
+			val traceId = UUID.randomUUID()
+
+			MDC.put("traceId", traceId.toString())
+
+			log.info(
+				"Processing arena message" +
+				" transactionId=${message.transactionId}" +
+				" traceId=$traceId" +
+				" type=${message.type}" +
+				" operation=${message.operation}" +
+				" timestamp=${message.timestamp}"
+			)
+
+			ingestor.invoke(message)
+		} finally {
+			MDC.remove("traceId")
 		}
 	}
 

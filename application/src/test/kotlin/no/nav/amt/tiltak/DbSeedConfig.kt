@@ -12,7 +12,7 @@ open class DbSeedConfig(
 	private val dataSource: DataSource
 ) {
 
-	private val log = LoggerFactory.getLogger(this::class.java)
+	private val log = LoggerFactory.getLogger(javaClass)
 
 	@EventListener
 	open fun onApplicationEvent(_event: ContextRefreshedEvent?) {
