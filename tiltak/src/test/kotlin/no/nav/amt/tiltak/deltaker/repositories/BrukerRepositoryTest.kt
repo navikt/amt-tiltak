@@ -6,7 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
-import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
@@ -27,7 +27,7 @@ class BrukerRepositoryTest : FunSpec({
 
 		repository = BrukerRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
 	test("Insert should insert bruker and return BrukerDbo") {

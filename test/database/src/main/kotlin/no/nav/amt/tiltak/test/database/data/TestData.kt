@@ -87,6 +87,18 @@ object TestData {
 		fremmote_dato = LocalDate.of(2022, 2, 1)
 	)
 
+	val GJENNOMFORING_2 = InsertGjennomforingCommand(
+		id = UUID.fromString("513219ca-481b-4aae-9d51-435dba9929cd"),
+		tiltak_id = TILTAK_1.id,
+		arrangor_id = ARRANGOR_2.id,
+		navn = "Tiltaksgjennomforing2",
+		status = "AVSLUTTET",
+		start_dato = LocalDate.of(2022, 2, 1),
+		slutt_dato = LocalDate.of(2022, 2, 13),
+		registrert_dato = LocalDate.of(2022, 1, 1),
+		fremmote_dato = LocalDate.of(2022, 2, 1)
+	)
+
 	val NAV_ANSATT_1 = InsertNavAnsattCommand(
 		id = UUID.fromString("91e1c2e6-83cf-46f9-b8e0-4a9192c7dcbe"),
 		nav_ident = "Z4321",

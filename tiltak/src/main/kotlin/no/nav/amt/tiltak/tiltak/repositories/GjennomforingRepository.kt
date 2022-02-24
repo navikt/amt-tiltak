@@ -112,37 +112,17 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 
 
 	fun get(id: UUID): GjennomforingDbo? {
+		val sql = "SELECT * FROM gjennomforing WHERE id = :id"
 
-		//language=PostgreSQL
-		val sql = """
-			SELECT *
-			FROM gjennomforing
-			WHERE id = :id
-		""".trimIndent()
-
-		val parameters = MapSqlParameterSource().addValues(
-			mapOf(
-				"id" to id
-			)
-		)
+		val parameters = MapSqlParameterSource().addValues(mapOf("id" to id))
 
 		return template.query(sql, parameters, rowMapper).firstOrNull()
 	}
 
-	fun getByArrandorId(arrangorId: UUID): List<GjennomforingDbo> {
+	fun get(gjennomforingIder: List<UUID>): List<GjennomforingDbo> {
+		val sql = "SELECT * FROM gjennomforing WHERE id in(:ids)"
 
-		//language=PostgreSQL
-		val sql = """
-			SELECT *
-			FROM gjennomforing
-			WHERE arrangor_id = :arrangorId
-		""".trimIndent()
-
-		val parameters = MapSqlParameterSource().addValues(
-			mapOf(
-				"arrangorId" to arrangorId
-			)
-		)
+		val parameters = MapSqlParameterSource().addValues(mapOf("ids" to gjennomforingIder))
 
 		return template.query(sql, parameters, rowMapper)
 	}

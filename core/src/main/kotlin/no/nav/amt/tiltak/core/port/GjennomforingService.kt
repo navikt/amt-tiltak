@@ -7,9 +7,9 @@ import java.util.*
 
 interface GjennomforingService {
 
-	fun getGjennomforingerForArrangor(arrangorId: UUID): List<Gjennomforing>
-
 	fun getGjennomforing(id: UUID): Gjennomforing
+
+	fun getGjennomforinger(gjennomforingIder: List<UUID>): List<Gjennomforing>
 
 	fun upsertGjennomforing(
 		id: UUID,

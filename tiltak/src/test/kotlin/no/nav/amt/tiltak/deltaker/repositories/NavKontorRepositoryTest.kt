@@ -6,7 +6,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_KONTOR_1
 import org.slf4j.LoggerFactory
@@ -24,7 +24,7 @@ class NavKontorRepositoryTest : FunSpec({
 
 		repository = NavKontorRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
 	test("Get NAV-kontor med id bør kaste NoSuchElementException om det ikke eksisterer") {

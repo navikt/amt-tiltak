@@ -15,6 +15,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_KONTOR_1
@@ -38,6 +39,7 @@ object TestDataSeeder {
 
 		repository.insertTiltak(TILTAK_1)
 		repository.insertGjennomforing(GJENNOMFORING_1)
+		repository.insertGjennomforing(GJENNOMFORING_2)
 
 		repository.insertNavAnsatt(NAV_ANSATT_1)
 		repository.insertNavAnsatt(NAV_ANSATT_2)

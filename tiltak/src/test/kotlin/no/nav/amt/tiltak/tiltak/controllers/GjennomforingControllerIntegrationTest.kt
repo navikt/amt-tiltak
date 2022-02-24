@@ -13,7 +13,7 @@ import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.repositories.NavKontorRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
-import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
@@ -91,7 +91,7 @@ class GjennomforingControllerIntegrationTest {
 			authService, mock(ArrangorAnsattTilgangService::class.java)
 		)
 
-		DatabaseTestUtils.cleanDatabase(dataSource)
+		DbTestDataUtils.cleanDatabase(dataSource)
 	}
 
 	@Test

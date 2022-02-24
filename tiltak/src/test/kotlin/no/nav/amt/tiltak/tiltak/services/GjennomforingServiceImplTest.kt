@@ -12,7 +12,7 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
-import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
@@ -63,7 +63,7 @@ class GjennomforingServiceImplTest : FunSpec({
 			transactionTemplate = transactionTemplate
 		)
 
-		DatabaseTestUtils.cleanDatabase(dataSource)
+		DbTestDataUtils.cleanDatabase(dataSource)
 	}
 
 	test("slettGjennomforing skal slette gjennomføring") {

@@ -6,7 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.deltaker.commands.UpsertNavAnsattCommand
-import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import org.slf4j.LoggerFactory
@@ -32,7 +32,7 @@ class NavAnsattRepositoryTest : FunSpec({
 
 		repository = NavAnsattRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
 	test("Hent nav-ansatt som ikke eksisterer returnerer null") {

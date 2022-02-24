@@ -4,7 +4,7 @@ import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
@@ -33,7 +33,7 @@ class GjennomforingTilgangRepositoryTest : FunSpec({
 		repository = GjennomforingTilgangRepository(parameterTemplate)
 		testRepository = TestDataRepository(parameterTemplate)
 
-		DatabaseTestUtils.cleanDatabase(dataSource)
+		DbTestDataUtils.cleanDatabase(dataSource)
 	}
 
 	test("hentGjennomforingerForAnsatt skal returnere ider") {

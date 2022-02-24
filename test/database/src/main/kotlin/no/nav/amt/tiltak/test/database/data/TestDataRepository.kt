@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.test.database.data
 
-import no.nav.amt.tiltak.test.database.DatabaseTestUtils.parameters
+import no.nav.amt.tiltak.test.database.DbTestDataUtils.parameters
 import no.nav.amt.tiltak.test.database.data.commands.*
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 

@@ -35,8 +35,7 @@ class GjennomforingController(
 		val tilgangTilGjennomforingIder = arrangorAnsattTilgangService
 			.hentGjennomforingIderForAnsattHosArrangor(ansattPersonligIdent, arrangorId)
 
-		return gjennomforingService.getGjennomforingerForArrangor(arrangorId)
-			.filter { tilgangTilGjennomforingIder.contains(it.id) }
+		return gjennomforingService.getGjennomforinger(tilgangTilGjennomforingIder)
 			.map { it.toDto() }
 	}
 

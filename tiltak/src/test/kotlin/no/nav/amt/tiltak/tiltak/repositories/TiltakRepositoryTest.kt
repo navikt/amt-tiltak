@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.tiltak.repositories
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
-import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -27,7 +27,7 @@ internal class TiltakRepositoryTest {
 
 		repository = TiltakRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
 	@Test

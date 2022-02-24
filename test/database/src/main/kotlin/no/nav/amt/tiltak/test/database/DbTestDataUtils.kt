@@ -6,7 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import javax.sql.DataSource
 
-object DatabaseTestUtils {
+object DbTestDataUtils {
 
 	private const val SCHEMA = "public"
 

@@ -11,7 +11,7 @@ import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
-import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_3
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
@@ -48,12 +48,12 @@ class DeltakerServiceImplTest {
 			brukerService, TransactionTemplate(DataSourceTransactionManager(dataSource))
 		)
 
-		DatabaseTestUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
 	@AfterEach
 	fun afterEach() {
-		DatabaseTestUtils.cleanDatabase(dataSource)
+		DbTestDataUtils.cleanDatabase(dataSource)
 	}
 
 	@Test
