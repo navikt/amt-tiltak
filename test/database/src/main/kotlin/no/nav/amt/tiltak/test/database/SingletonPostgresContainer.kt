@@ -11,7 +11,7 @@ import javax.sql.DataSource
 
 object SingletonPostgresContainer {
 
-	private val log = LoggerFactory.getLogger(this::class.java)
+	private val log = LoggerFactory.getLogger(javaClass)
 
 	private const val postgresDockerImageName = "postgres:12-alpine"
 

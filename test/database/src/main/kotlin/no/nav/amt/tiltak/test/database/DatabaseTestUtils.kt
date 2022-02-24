@@ -18,7 +18,7 @@ object DatabaseTestUtils {
 	}
 
 	fun runScriptFile(dataSource: DataSource, scriptFilePath: String) {
-		val script = this::class.java.getResource(scriptFilePath).readText()
+		val script = javaClass.getResource(scriptFilePath).readText()
 		runScript(dataSource, script)
 	}
 
