@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   amt-tiltak-postgres:
-    image: 'postgres:12-alpine'
+    image: 'postgres:14-alpine'
     container_name: amt-tiltak-postgres
     ports:
       - '5454:5432'
