@@ -53,7 +53,6 @@ object TestData {
 		rolle = "VEILEDER"
 	)
 
-
 	val ARRANGOR_ANSATT_2 = InsertArrangorAnsattCommand(
 		id = UUID.fromString("a24e659c-2651-4fbb-baad-01cacb2412f0"),
 		personlig_ident = "326749823",
@@ -97,6 +96,12 @@ object TestData {
 		slutt_dato = LocalDate.of(2022, 2, 13),
 		registrert_dato = LocalDate.of(2022, 1, 1),
 		fremmote_dato = LocalDate.of(2022, 2, 1)
+	)
+
+	val GJENNOMFORING_TILGANG_1 = InsertArrangorAnsattGjennomforingTilgang(
+		id = UUID.randomUUID(),
+		ansatt_id = ARRANGOR_ANSATT_1.id,
+		gjennomforing_id = GJENNOMFORING_1.id
 	)
 
 	val NAV_ANSATT_1 = InsertNavAnsattCommand(
