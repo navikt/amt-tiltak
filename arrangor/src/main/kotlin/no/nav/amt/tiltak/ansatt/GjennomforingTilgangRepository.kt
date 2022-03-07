@@ -18,4 +18,22 @@ class GjennomforingTilgangRepository(
 		) { rs, _ -> rs.getUUID("gjennomforing_id") }
 	}
 
+	fun hentGjennomforingerForAnsattHosArrangor(ansattId: UUID, arrangorId: UUID): List<UUID> {
+		val sql = """
+			SELECT gjennomforing_id FROM arrangor_ansatt_gjennomforing_tilgang
+			 INNER JOIN gjennomforing g on g.id = gjennomforing_id
+			 WHERE ansatt_id = :ansattId AND g.arrangor_id = :arrangorId
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(mapOf(
+			"ansattId" to ansattId,
+			"arrangorId" to arrangorId
+		))
+
+		return template.query(
+			sql,
+			parameters,
+		) { rs, _ -> rs.getUUID("gjennomforing_id") }
+	}
+
 }
