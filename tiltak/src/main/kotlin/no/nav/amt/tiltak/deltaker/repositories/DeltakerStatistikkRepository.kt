@@ -45,12 +45,12 @@ class DeltakerStatistikkRepository(
 
 	fun eksponerteBrukere(): Int {
 		val query = """
-			SELECT count(distinct d.bruker_id) FROM
-				gjennomforing g JOIN
-				deltaker d ON d.gjennomforing_id = g.id
-			WHERE g.arrangor_id IN (
-				SELECT distinct arrangor_id FROM arrangor a join arrangor_ansatt_rolle aar on a.id = aar.arrangor_id
-			);
+			select count(distinct bruker_id)
+			from deltaker
+			where deltaker.gjennomforing_id in (
+				select gjennomforing_id
+				from arrangor_ansatt_gjennomforing_tilgang tilgang
+				where deltaker.gjennomforing_id = tilgang.gjennomforing_id);
 		""".trimIndent()
 		return template.queryForObject(query, MapSqlParameterSource(), Int::class.java)!!
 	}
