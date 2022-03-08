@@ -20,6 +20,7 @@ open class DeltakerRepository(
 			brukerId = UUID.fromString(rs.getString("bruker_id")),
 			brukerFodselsnummer = rs.getString("fodselsnummer"),
 			brukerFornavn = rs.getString("fornavn"),
+			brukerMellomnavn = rs.getString("mellomnavn"),
 			brukerEtternavn = rs.getString("etternavn"),
 			startDato = rs.getDate("start_dato")?.toLocalDate(),
 			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
@@ -80,6 +81,7 @@ open class DeltakerRepository(
 			SELECT deltaker.*,
 				bruker.fodselsnummer,
 				bruker.fornavn,
+				bruker.mellomnavn,
 				bruker.etternavn
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
@@ -126,6 +128,7 @@ open class DeltakerRepository(
 			SELECT deltaker.*,
 				   bruker.fodselsnummer,
 				   bruker.fornavn,
+				   bruker.mellomnavn,
 				   bruker.etternavn
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
@@ -147,6 +150,7 @@ open class DeltakerRepository(
 			SELECT deltaker.*,
 				   bruker.fodselsnummer,
 				   bruker.fornavn,
+				   bruker.mellomnavn,
 				   bruker.etternavn
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
@@ -170,6 +174,7 @@ open class DeltakerRepository(
 			SELECT deltaker.*,
 				   bruker.fodselsnummer,
 				   bruker.fornavn,
+				   bruker.mellomnavn,
 				   bruker.etternavn
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
@@ -193,6 +198,7 @@ open class DeltakerRepository(
 			SELECT deltaker.*,
 				   bruker.fodselsnummer,
 				   bruker.fornavn,
+				   bruker.mellomnavn,
 				   bruker.etternavn
 			FROM deltaker_status
 					 inner join deltaker on deltaker_status.deltaker_id = deltaker.id
@@ -210,6 +216,7 @@ open class DeltakerRepository(
 			SELECT deltaker.*,
 				   bruker.fodselsnummer,
 				   bruker.fornavn,
+				   bruker.mellomnavn,
 				   bruker.etternavn
 			FROM deltaker_status
 					 inner join deltaker on deltaker_status.deltaker_id = deltaker.id

@@ -25,7 +25,7 @@ class DeltakerServiceTest: StringSpec ({
 	val fodselsnummer = "12345678904"
 	val gjennomforingId = UUID.randomUUID()
 	val deltakerId = UUID.randomUUID()
-	val defaultBruker = Bruker(id = UUID.randomUUID(), "GRØNN", "KOPP", fodselsnummer)
+	val defaultBruker = Bruker(id = UUID.randomUUID(), "GRØNN",null,"KOPP", fodselsnummer)
 
 	val defaultDeltaker = Deltaker(
 		id = deltakerId,

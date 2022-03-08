@@ -5,6 +5,7 @@ import java.util.*
 data class Bruker(
 	val id: UUID,
 	val fornavn: String,
+	val mellomnavn: String? = null,
 	val etternavn: String,
 	val fodselsnummer: String
 )

@@ -206,7 +206,7 @@ class IntegrationTest {
 
 	val person = Person(
 		fornavn = "Fornavn",
-		mellomnavn = "",
+		mellomnavn = null,
 		etternavn = "Etternavn",
 		telefonnummer = "12345678",
 		diskresjonskode = null
