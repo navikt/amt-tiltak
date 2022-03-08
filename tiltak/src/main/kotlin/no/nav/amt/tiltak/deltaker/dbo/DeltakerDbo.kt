@@ -11,6 +11,7 @@ data class DeltakerDbo(
 	val brukerId: UUID,
 	val brukerFodselsnummer: String,
 	val brukerFornavn: String,
+	val brukerMellomnavn: String? = null,
 	val brukerEtternavn: String,
 	val gjennomforingId: UUID? = null,
 	val startDato: LocalDate?,
@@ -44,6 +45,7 @@ data class DeltakerDbo(
 			bruker = Bruker(
 				id = brukerId,
 				fornavn = brukerFornavn,
+				mellomnavn = brukerMellomnavn,
 				etternavn = brukerEtternavn,
 				fodselsnummer = brukerFodselsnummer,
 			),
