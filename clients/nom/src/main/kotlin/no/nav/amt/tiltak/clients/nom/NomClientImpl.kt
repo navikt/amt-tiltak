@@ -78,6 +78,7 @@ class NomClientImpl(
 	}
 
 	private fun hentTjenesteTelefonnummer(telefonnumere: List<NomQueries.HentIdenter.Telefon>): String? {
-		return telefonnumere.find { it.type == "NAV_TJENESTE_TELEFON" }?.nummer
+		return telefonnumere.find { it.type == "NAV_KONTOR_TELEFON" }?.nummer
+			?: telefonnumere.find { it.type == "NAV_TJENESTE_TELEFON" }?.nummer
 	}
 }
