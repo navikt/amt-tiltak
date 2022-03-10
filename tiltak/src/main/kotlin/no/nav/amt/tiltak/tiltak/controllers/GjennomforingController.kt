@@ -27,15 +27,13 @@ class GjennomforingController(
 
 	@Protected
 	@GetMapping
-	fun hentGjennomforingerByArrangorId(@RequestParam("arrangorId") arrangorId: UUID): List<GjennomforingDto> {
+	fun hentGjennomforinger(): List<GjennomforingDto> {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 
-		arrangorAnsattTilgangService.verifiserTilgangTilArrangor(ansattPersonligIdent, arrangorId)
+		val gjennomforingIder = arrangorAnsattTilgangService
+			.hentGjennomforingIder(ansattPersonligIdent)
 
-		val tilgangTilGjennomforingIder = arrangorAnsattTilgangService
-			.hentGjennomforingIderForAnsattHosArrangor(ansattPersonligIdent, arrangorId)
-
-		return gjennomforingService.getGjennomforinger(tilgangTilGjennomforingIder)
+		return gjennomforingService.getGjennomforinger(gjennomforingIder)
 			.map { it.toDto() }
 	}
 
