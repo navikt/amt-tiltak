@@ -139,23 +139,6 @@ class GjennomforingControllerTest {
 	}
 
 	@Test
-	fun `hentGjennomforingerByArrangorId() should perform authorization check`() {
-		val token = server.issueToken("tokenx", "test", "test").serialize()
-
-		val arrangorId = UUID.randomUUID()
-
-		mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/gjennomforing")
-				.queryParam("arrangorId", arrangorId.toString())
-				.header("Authorization", "Bearer $token")
-		).andReturn().response
-
-		verify(arrangorAnsattTilgangService).verifiserTilgangTilArrangor(
-			eq(fnr), eq(arrangorId)
-		)
-	}
-
-	@Test
 	fun `hentGjennomforing() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.get("/api/gjennomforing/$gjennomforingId")

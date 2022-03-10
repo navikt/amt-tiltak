@@ -20,7 +20,8 @@ class GjennomforingTilgangRepository(
 
 	fun hentGjennomforingerForAnsattHosArrangor(ansattId: UUID, arrangorId: UUID): List<UUID> {
 		val sql = """
-			SELECT gjennomforing_id FROM arrangor_ansatt_gjennomforing_tilgang
+			SELECT gjennomforing_id
+			FROM arrangor_ansatt_gjennomforing_tilgang
 			 INNER JOIN gjennomforing g on g.id = gjennomforing_id
 			 WHERE ansatt_id = :ansattId AND g.arrangor_id = :arrangorId
 		""".trimIndent()
