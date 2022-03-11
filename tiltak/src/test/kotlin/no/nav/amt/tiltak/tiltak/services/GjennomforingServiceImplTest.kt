@@ -8,7 +8,9 @@ import io.mockk.mockk
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatuser
+import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
@@ -39,6 +41,10 @@ class GjennomforingServiceImplTest : FunSpec({
 
 	lateinit var deltakerService: DeltakerService
 
+	lateinit var arrangorService: ArrangorService
+
+	lateinit var tiltakService: TiltakService
+
 	lateinit var service: GjennomforingServiceImpl
 
 	beforeEach {
@@ -51,23 +57,27 @@ class GjennomforingServiceImplTest : FunSpec({
 
 		deltakerService = mockk()
 
+		arrangorService = mockk()
+
+		tiltakService = mockk()
+
 		service = GjennomforingServiceImpl(
 			gjennomforingRepository = gjennomforingRepository,
-			tiltakService = mockk(),
+			tiltakService = tiltakService,
 			deltakerService = DeltakerServiceImpl(
 				DeltakerRepository(parameterTemplate),
 				DeltakerStatusRepository(parameterTemplate),
 				mockk(),
 				transactionTemplate
 			),
-			arrangorService = mockk(),
+			arrangorService = arrangorService,
 			transactionTemplate = transactionTemplate
 		)
 
 		DbTestDataUtils.cleanDatabase(dataSource)
 	}
 
-	test("slettGjennomforing skal slette gjennomføring") {
+	test("slettGjennomforing - skal slette gjennomføring") {
 		testDataRepository.insertTiltak(TILTAK_1)
 		testDataRepository.insertArrangor(ARRANGOR_1)
 		testDataRepository.insertGjennomforing(GJENNOMFORING_1)
@@ -100,6 +110,21 @@ class GjennomforingServiceImplTest : FunSpec({
 		service.slettGjennomforing(GJENNOMFORING_1.id)
 
 		gjennomforingRepository.get(GJENNOMFORING_1.id) shouldBe null
+	}
+
+	test("getGjennomforing - gjennomføring finnes - returnerer gjennomføring") {
+		testDataRepository.insertTiltak(TILTAK_1)
+		testDataRepository.insertArrangor(ARRANGOR_1)
+		testDataRepository.insertGjennomforing(GJENNOMFORING_1)
+		val tiltakInserted = TILTAK_1.toTiltak()
+		val arrangorInserted = ARRANGOR_1.toArrangor()
+
+		every { arrangorService.getArrangorById(ARRANGOR_1.id) } returns arrangorInserted
+		every { tiltakService.getTiltakById(TILTAK_1.id) } returns tiltakInserted
+
+		val gjennomforing = service.getGjennomforing(GJENNOMFORING_1.id)
+
+		GJENNOMFORING_1.toGjennomforing(tiltakInserted, arrangorInserted) shouldBe gjennomforing
 	}
 
 })

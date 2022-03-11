@@ -1,8 +1,9 @@
 package no.nav.amt.tiltak.tiltak.controllers
 
 import io.kotest.matchers.shouldBe
+import io.mockk.mockk
+import no.nav.amt.tiltak.arrangor.ArrangorRepository
 import no.nav.amt.tiltak.common.auth.AuthService
-import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.*
@@ -27,7 +28,6 @@ import org.junit.Assert.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
@@ -70,7 +70,7 @@ class GjennomforingControllerIntegrationTest {
 		brukerRepository = BrukerRepository(namedJdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(namedJdbcTemplate)
 		authService = mock(AuthService::class.java)
-		arrangorService = mock(ArrangorService::class.java)
+		arrangorService = no.nav.amt.tiltak.arrangor.ArrangorService(mockk(), mockk(), ArrangorRepository(namedJdbcTemplate))
 		brukerService = BrukerServiceImpl(
 			brukerRepository,
 			mock(NavKontorRepository::class.java),
@@ -109,19 +109,20 @@ class GjennomforingControllerIntegrationTest {
 	}
 
 	@Test
-	fun `hentGjennomforinger - tiltak finnes - skal returnere tiltak`() {
+	fun `hentGjennomforinger - tiltak finnes - skal returnere gjennomføring med tiltak`() {
 		val tiltakNavn = "Gruppe amo"
-		val tlId = insertArrangor()
+		val orgNavn = "orgnavn"
+		val gjennomforingNavn = "Gjennomføringnavn"
+		val arrangor = insertArrangor(orgNavn)
 		val tiltak = tiltakRepository.insert(UUID.randomUUID(), tiltakNavn, "kode")
-		val gjennomforing = insertGjennomforing(tiltak.id, tlId)
-
-		Mockito.`when`(arrangorService.getArrangorById(tlId))
-			.thenReturn(Arrangor(UUID.randomUUID(), "", "", "", ""))
+		val gjennomforing = insertGjennomforing(tiltak.id, arrangor, gjennomforingNavn)
 
 		val resultat = controller.hentGjennomforing(gjennomforing.id)
 
 		assertEquals(gjennomforing.id, resultat.id)
+		assertEquals(gjennomforingNavn, resultat.navn)
 		assertEquals(tiltakNavn, resultat.tiltak.tiltaksnavn)
+		assertEquals(orgNavn, resultat.arrangor.organisasjonNavn)
 
 	}
 
@@ -220,13 +221,13 @@ class GjennomforingControllerIntegrationTest {
 	}
 
 
-	private fun insertGjennomforing(tiltakId: UUID, arrangorId: UUID): GjennomforingDbo {
+	private fun insertGjennomforing(tiltakId: UUID, arrangorId: UUID, navn: String = "Kaffekurs"): GjennomforingDbo {
 		val id = UUID.randomUUID()
 		return gjennomforingRepository.insert(
 			id = id,
 			tiltakId = tiltakId,
 			arrangorId = arrangorId,
-			navn = "Kaffekurs",
+			navn = navn,
 			status = Gjennomforing.Status.GJENNOMFORES,
 			startDato = null,
 			sluttDato = null,
@@ -235,12 +236,12 @@ class GjennomforingControllerIntegrationTest {
 		)
 	}
 
-	private fun insertArrangor(): UUID {
+	private fun insertArrangor(orgNavn: String? = "Et Orgnavn"): UUID {
 		val id = UUID.randomUUID()
 		val orgnr = (1000..9999).random()
 		val insert = """
 			INSERT INTO arrangor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer,navn)
-			VALUES ('$id', '12345678', 'Orgnavn1', '$orgnr', 'Virksomhetsnavn1')
+			VALUES ('$id', '12345678', '$orgNavn', '$orgnr', 'Virksomhetsnavn1')
 		""".trimIndent()
 		namedJdbcTemplate.jdbcTemplate.update(insert)
 
