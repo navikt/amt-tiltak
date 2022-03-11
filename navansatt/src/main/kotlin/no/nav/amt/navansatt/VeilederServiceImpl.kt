@@ -1,14 +1,12 @@
-package no.nav.amt.tiltak.deltaker.service
+package no.nav.amt.navansatt
 
 import no.nav.amt.tiltak.core.domain.veileder.Veileder
 import no.nav.amt.tiltak.core.port.VeilederService
-import no.nav.amt.tiltak.deltaker.commands.UpsertNavAnsattCommand
-import no.nav.amt.tiltak.deltaker.repositories.NavAnsattRepository
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class VeilederServiceImpl(
+internal class VeilederServiceImpl(
 	private val navAnsattRepository: NavAnsattRepository,
 ) : VeilederService {
 
@@ -26,16 +24,16 @@ class VeilederServiceImpl(
 			?: throw IllegalStateException("Fant ikke veileder med NAV-ident=${veileder.navIdent}")
 	}
 
-	override fun getVeileder(navIdent: String): Veileder? {
-		val veileder = navAnsattRepository.getNavAnsattWithIdent(navIdent) ?: return null
+	override fun getVeileder(navIdent: String) =
+		navAnsattRepository.getNavAnsattWithIdent(navIdent)?.let { it.toVeileder() }
 
-		return Veileder(
-			navIdent = veileder.navIdent,
-			navn = veileder.navn,
-			epost = veileder.epost,
-			telefonnummer = veileder.telefonnummer
-		)
-	}
+	internal fun getVeilederBatch(batch: Int) =
+		navAnsattRepository.getNavAnsattInBatch(batch).map { it.toVeileder() }
 
-
+	private fun NavAnsattDbo.toVeileder() = Veileder(
+		navIdent = navIdent,
+		navn = navn,
+		epost = epost,
+		telefonnummer = telefonnummer
+	)
 }

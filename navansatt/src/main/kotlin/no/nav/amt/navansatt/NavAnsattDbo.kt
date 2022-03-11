@@ -1,8 +1,8 @@
-package no.nav.amt.tiltak.deltaker.dbo
+package no.nav.amt.navansatt
 
 import java.util.*
 
-data class NavAnsattDbo(
+internal data class NavAnsattDbo(
 	val id: UUID,
 	val navIdent: String,
 	val navn: String,

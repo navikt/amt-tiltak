@@ -1,6 +1,6 @@
-package no.nav.amt.tiltak.deltaker.commands
+package no.nav.amt.navansatt
 
-data class UpsertNavAnsattCommand(
+internal data class UpsertNavAnsattCommand(
 	val navIdent: String,
 	val navn: String,
 	val telefonnummer: String?,

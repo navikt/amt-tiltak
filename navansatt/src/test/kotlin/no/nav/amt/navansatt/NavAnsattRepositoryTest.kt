@@ -1,11 +1,10 @@
-package no.nav.amt.tiltak.deltaker.repositories
+package no.nav.amt.navansatt
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt.tiltak.deltaker.commands.UpsertNavAnsattCommand
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
