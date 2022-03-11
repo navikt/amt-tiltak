@@ -59,12 +59,6 @@ class ArrangorAnsattTilgangServiceImpl(
 		}
 	}
 
-	override fun hentGjennomforingIder(ansattPersonligIdent: String): List<UUID> {
-		val ansattId = hentAnsattId(ansattPersonligIdent)
-
-		return hentGjennomforingerForAnsatt(ansattId)
-	}
-
 	private fun hentAnsattId(ansattPersonligIdent: String): UUID {
 		val ansattId = tryCacheFirstNullable(personligIdentToAnsattIdCache, ansattPersonligIdent) {
 			ansattRepository.getByPersonligIdent(
@@ -84,6 +78,12 @@ class ArrangorAnsattTilgangServiceImpl(
 		return tryCacheFirstNotNull(ansattIdToArrangorIdListCache, ansattId) {
 			ansattRolleRepository.hentArrangorIderForAnsatt(ansattId)
 		}
+	}
+
+	override fun hentGjennomforingIder(ansattPersonligIdent: String): List<UUID> {
+		val ansattId = hentAnsattId(ansattPersonligIdent)
+
+		return hentGjennomforingerForAnsatt(ansattId)
 	}
 
 	private fun hentGjennomforingerForAnsatt(ansattId: UUID): List<UUID> {
