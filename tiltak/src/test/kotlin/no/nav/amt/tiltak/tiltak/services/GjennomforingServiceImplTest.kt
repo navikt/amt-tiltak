@@ -60,6 +60,7 @@ class GjennomforingServiceImplTest : FunSpec({
 				mockk(),
 				transactionTemplate
 			),
+			arrangorService = mockk(),
 			transactionTemplate = transactionTemplate
 		)
 

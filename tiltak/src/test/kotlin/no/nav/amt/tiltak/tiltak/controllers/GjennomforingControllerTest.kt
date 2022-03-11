@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.tiltak.controllers
 
 import no.nav.amt.tiltak.common.auth.AuthService
+import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
@@ -83,7 +84,7 @@ class GjennomforingControllerTest {
 	val gjennomforing = Gjennomforing(
 		id = UUID.randomUUID(),
 		tiltak = tiltak,
-		arrangorId = UUID.randomUUID(),
+		arrangor = Arrangor(UUID.randomUUID(), "", "", "", ""),
 		navn = "tiltaksnavn",
 		fremmoteDato = LocalDateTime.now(),
 		startDato = LocalDate.now(),

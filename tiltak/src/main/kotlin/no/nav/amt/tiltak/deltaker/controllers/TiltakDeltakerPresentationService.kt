@@ -55,6 +55,10 @@ open class TiltakDeltakerPresentationService(
 				tiltak = TiltakDto(
 					tiltaksnavn = tiltakNavn,
 					tiltakskode = tiltakKode
+				),
+				arrangor = ArrangorDto(
+					virksomhetNavn = virksomhetNavn,
+					organisasjonNavn = organisasjonNavn
 				)
 			)
 		)

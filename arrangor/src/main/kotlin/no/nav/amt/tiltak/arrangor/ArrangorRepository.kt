@@ -86,4 +86,30 @@ open class ArrangorRepository(
             .firstOrNull()
     }
 
+	fun getById(id: UUID): ArrangorDbo {
+		return getNullableArrangor(id)?: throw IllegalStateException("Arrangør med id=$id eksisterer ikke")
+	}
+
+	fun getNullableArrangor(id: UUID): ArrangorDbo? {
+		val sql = """
+			SELECT id,
+				   overordnet_enhet_organisasjonsnummer,
+				   overordnet_enhet_navn,
+				   organisasjonsnummer,
+				   navn,
+				   created_at,
+				   modified_at
+			FROM arrangor
+			WHERE id = :id
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"id" to id
+			)
+		)
+
+		return template.query(sql, parameters, rowMapper)
+			.firstOrNull()
+	}
 }

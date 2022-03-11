@@ -29,5 +29,7 @@ data class DeltakerDetaljerDbo(
 	val gjennomforingSluttDato: LocalDate?,
 	val gjennomforingStatus: Gjennomforing.Status?,
 	val tiltakNavn: String,
-	val tiltakKode: String
+	val tiltakKode: String,
+	val virksomhetNavn: String,
+	val organisasjonNavn: String?,
 )

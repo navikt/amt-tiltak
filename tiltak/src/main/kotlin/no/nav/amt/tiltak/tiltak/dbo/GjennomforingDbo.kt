@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.tiltak.dbo
 
+import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.utils.UpdateCheck
@@ -22,11 +23,11 @@ data class GjennomforingDbo(
     val modifiedAt: LocalDateTime
 ) {
 
-	fun toGjennomforing(tiltak: Tiltak): Gjennomforing {
+	fun toGjennomforing(tiltak: Tiltak, arrangor: Arrangor): Gjennomforing {
 		return Gjennomforing(
 			id = id,
 			tiltak = tiltak,
-			arrangorId = arrangorId,
+			arrangor = arrangor,
 			navn = navn,
 			status = status,
 			startDato = startDato,
