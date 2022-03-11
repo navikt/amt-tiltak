@@ -6,16 +6,16 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
 @Component
-open class PeriodicNavAnsattUpdater(
+internal open class PeriodicNavAnsattUpdater(
 	private val navAnsattUpdater: NavAnsattUpdater
 ) {
 
 
 
-	@Scheduled(fixedInterval = 60 * 60 * 1000L)
-	@SchedulerLock(name = "navAnsattUpdater", lockAtMostFor = "120m")
+	@Scheduled(fixedRate = 5 * 60 * 1000L)
+	@SchedulerLock(name = "navAnsattUpdater", lockAtMostFor = "5m")
 	open fun update() {
-		JobRunner.run("oppdater_deltaker_statuser", navAnsattUpdater::oppdater)
+		JobRunner.run("oppdater_deltaker_statuser", navAnsattUpdater::oppdaterBatch)
 	}
 
 
