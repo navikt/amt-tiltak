@@ -12,7 +12,7 @@ internal class VeilederServiceImpl(
 
 	override fun upsertVeileder(veileder: Veileder): UUID {
 		navAnsattRepository.upsert(
-			UpsertNavAnsattCommand(
+			NavAnsattDbo(
 				navIdent = veileder.navIdent,
 				navn = veileder.navn,
 				epost = veileder.epost,
@@ -27,8 +27,8 @@ internal class VeilederServiceImpl(
 	override fun getVeileder(navIdent: String) =
 		navAnsattRepository.getNavAnsattWithIdent(navIdent)?.let { it.toVeileder() }
 
-	internal fun getVeilederBatch(batch: Int) =
-		navAnsattRepository.getNavAnsattInBatch(batch).map { it.toVeileder() }
+	internal fun getVeilederBatch(bucket: NavAnsattBucket) =
+		navAnsattRepository.getNavAnsattInBatch(bucket).map { it.toVeileder() }
 
 	private fun NavAnsattDbo.toVeileder() = Veileder(
 		navIdent = navIdent,

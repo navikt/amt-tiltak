@@ -21,7 +21,7 @@ internal open class NavAnsattRepository(
 		)
 	}
 
-	internal fun upsert(upsertCmd: UpsertNavAnsattCommand) {
+	internal fun upsert(upsertCmd: NavAnsattDbo) {
 		val sql = """
 			INSERT INTO nav_ansatt(id, nav_ident, navn, telefonnummer, epost)
 			VALUES (:id,
@@ -35,15 +35,14 @@ internal open class NavAnsattRepository(
 														epost         = :epost
 		""".trimIndent()
 
-		val id = UUID.randomUUID()
 		val parameterSource = MapSqlParameterSource().addValues(
 			mapOf(
-				"id" to id,
+				"id" to upsertCmd.id,
 				"navIdent" to upsertCmd.navIdent,
 				"navn" to upsertCmd.navn,
 				"telefonnummer" to upsertCmd.telefonnummer,
 				"epost" to upsertCmd.epost,
-				"bucket" to NavAnsattBucket.forUuid(id),
+				"bucket" to upsertCmd.bucket.id,
 			)
 		)
 
@@ -58,9 +57,9 @@ internal open class NavAnsattRepository(
 		).firstOrNull()
 	}
 
-	internal fun getNavAnsattInBatch(batch: Int): List<NavAnsattDbo> = template.query(
+	internal fun getNavAnsattInBatch(bucket: NavAnsattBucket): List<NavAnsattDbo> = template.query(
 		"SELECT * FROM nav_ansatt WHERE batchId = :batch",
-		MapSqlParameterSource().addValues(mapOf("batch" to batch)),
+		MapSqlParameterSource().addValues(mapOf("batch" to bucket.id)),
 		rowMapper
 	)
 
