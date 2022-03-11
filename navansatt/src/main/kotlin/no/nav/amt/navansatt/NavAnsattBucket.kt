@@ -14,7 +14,7 @@ internal class NavAnsattBucket {
 
 	internal companion object {
 		fun forUuid(uuid: UUID) = NavAnsattBucket(uuid)
-		fun forCurrentTime() = NavAnsattBucket(LocalDateTime.now()).id
+		fun forCurrentTime() = NavAnsattBucket(LocalDateTime.now())
 	}
 
 	private constructor(uuid: UUID) {
