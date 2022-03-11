@@ -1,0 +1,22 @@
+package no.nav.amt.navansatt
+
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
+import no.nav.common.job.JobRunner
+import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.stereotype.Component
+
+@Component
+open class PeriodicNavAnsattUpdater(
+	private val navAnsattUpdater: NavAnsattUpdater
+) {
+
+
+
+	@Scheduled(fixedInterval = 60 * 60 * 1000L)
+	@SchedulerLock(name = "navAnsattUpdater", lockAtMostFor = "120m")
+	open fun update() {
+		JobRunner.run("oppdater_deltaker_statuser", navAnsattUpdater::oppdater)
+	}
+
+
+}

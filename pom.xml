@@ -11,17 +11,18 @@
 
     <modules>
         <module>application</module>
-        <module>core</module>
-        <module>connectors</module>
         <module>arrangor</module>
-        <module>tiltak</module>
-        <module>ingestors</module>
-        <module>db-migrations</module>
-        <module>tools</module>
-        <module>mocks</module>
-        <module>common</module>
-        <module>test</module>
         <module>clients</module>
+        <module>common</module>
+        <module>connectors</module>
+        <module>core</module>
+        <module>db-migrations</module>
+        <module>ingestors</module>
+        <module>mocks</module>
+        <module>navansatt</module>
+        <module>test</module>
+        <module>tiltak</module>
+        <module>tools</module>
     </modules>
 
     <name>AMT-Tiltak</name>
