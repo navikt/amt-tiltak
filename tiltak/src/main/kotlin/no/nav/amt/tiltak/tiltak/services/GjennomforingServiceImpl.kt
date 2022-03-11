@@ -1,16 +1,16 @@
 package no.nav.amt.tiltak.tiltak.services
 
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltakService
+import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.utils.UpdateStatus
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -18,56 +18,52 @@ class GjennomforingServiceImpl(
 	private val gjennomforingRepository: GjennomforingRepository,
 	private val tiltakService: TiltakService,
 	private val deltakerService: DeltakerService,
+	private val arrangorService: ArrangorService,
 	private val transactionTemplate: TransactionTemplate
 ) : GjennomforingService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	override fun upsertGjennomforing(
-		id: UUID,
-		tiltakId: UUID,
-		arrangorId: UUID,
-		navn: String,
-		status: Gjennomforing.Status,
-		startDato: LocalDate?,
-		sluttDato: LocalDate?,
-		registrertDato: LocalDateTime,
-		fremmoteDato: LocalDateTime?
-	): Gjennomforing {
-		val storedGjennomforing = gjennomforingRepository.get(id)
-
-		val tiltak = tiltakService.getTiltakById(tiltakId)
+	override fun upsert(gjennomforing: Gjennomforing): Gjennomforing {
+		val storedGjennomforing = gjennomforingRepository.get(gjennomforing.id)
 
 		if (storedGjennomforing != null) {
-			val update = storedGjennomforing.update(
-				storedGjennomforing.copy(
-					navn = navn,
-					status = status,
-					startDato = startDato,
-					sluttDato = sluttDato,
-					registrertDato = registrertDato,
-					fremmoteDato = fremmoteDato
-				)
-			)
-
-			return if (update.status == UpdateStatus.UPDATED) {
-				gjennomforingRepository.update(update.updatedObject!!).toGjennomforing(tiltak)
-			} else {
-				storedGjennomforing.toGjennomforing(tiltak)
-			}
+			return updateGjennomforing(storedGjennomforing, gjennomforing)
 		}
 
 		return gjennomforingRepository.insert(
-			id = id,
-			tiltakId = tiltak.id,
-			arrangorId = arrangorId,
-			navn = navn,
-			status = status,
-			startDato = startDato,
-			sluttDato = sluttDato,
-			registrertDato = registrertDato,
-			fremmoteDato = fremmoteDato
-		).toGjennomforing(tiltak)
+			id = gjennomforing.id,
+			tiltakId = gjennomforing.tiltak.id,
+			arrangorId = gjennomforing.arrangor.id,
+			navn = gjennomforing.navn,
+			status = gjennomforing.status,
+			startDato = gjennomforing.startDato,
+			sluttDato = gjennomforing.sluttDato,
+			registrertDato = gjennomforing.registrertDato,
+			fremmoteDato = gjennomforing.fremmoteDato
+		).toGjennomforing(gjennomforing.tiltak, gjennomforing.arrangor)
+	}
+
+	private fun updateGjennomforing(storedGjennomforing: GjennomforingDbo, updatedGjennomforing: Gjennomforing): Gjennomforing {
+		val update = storedGjennomforing.update(
+			storedGjennomforing.copy(
+				navn = updatedGjennomforing.navn,
+				status = updatedGjennomforing.status,
+				startDato = updatedGjennomforing.startDato,
+				sluttDato = updatedGjennomforing.sluttDato,
+				registrertDato = updatedGjennomforing.registrertDato,
+				fremmoteDato = updatedGjennomforing.fremmoteDato
+			)
+		)
+
+		if (update.status == UpdateStatus.UPDATED) {
+			return gjennomforingRepository
+				.update(update.updatedObject!!)
+				.toGjennomforing(updatedGjennomforing.tiltak, updatedGjennomforing.arrangor)
+		} else {
+			return storedGjennomforing
+				.toGjennomforing(updatedGjennomforing.tiltak, updatedGjennomforing.arrangor)
+		}
 	}
 
 	override fun slettGjennomforing(gjennomforingId: UUID) {
@@ -85,16 +81,15 @@ class GjennomforingServiceImpl(
 	override fun getGjennomforing(id: UUID): Gjennomforing {
 		return gjennomforingRepository.get(id)?.let { gjennomforingDbo ->
 			val tiltak = tiltakService.getTiltakById(gjennomforingDbo.tiltakId)
-			return gjennomforingDbo.toGjennomforing(tiltak)
+			val arrangor = arrangorService.getArrangorById(gjennomforingDbo.arrangorId)
+			return gjennomforingDbo.toGjennomforing(tiltak, arrangor)
 		} ?: throw NoSuchElementException("Fant ikke gjennomforing")
 	}
 
 	override fun getGjennomforinger(gjennomforingIder: List<UUID>): List<Gjennomforing> {
-		val gjennomforinger = gjennomforingRepository.get(gjennomforingIder)
-
-		return gjennomforinger.map { gjennomforingDbo ->
-			gjennomforingDbo.toGjennomforing(tiltakService.getTiltakById(gjennomforingDbo.tiltakId))
-		}
+		return gjennomforingRepository
+			.get(gjennomforingIder)
+			.map{ getGjennomforing(it.id) }
 	}
 
 }

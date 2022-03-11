@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.tiltak.controllers
 
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.common.auth.AuthService
+import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.*
@@ -26,6 +27,7 @@ import org.junit.Assert.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
@@ -50,6 +52,7 @@ class GjennomforingControllerIntegrationTest {
 	private lateinit var gjennomforingRepository: GjennomforingRepository
 	private lateinit var gjennomforingService: GjennomforingService
 	private lateinit var deltakerService: DeltakerService
+	private lateinit var arrangorService: ArrangorService
 	private lateinit var authService: AuthService
 	private lateinit var controller: GjennomforingController
 	private var tiltakKode = "GRUPPEAMO"
@@ -67,6 +70,7 @@ class GjennomforingControllerIntegrationTest {
 		brukerRepository = BrukerRepository(namedJdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(namedJdbcTemplate)
 		authService = mock(AuthService::class.java)
+		arrangorService = mock(ArrangorService::class.java)
 		brukerService = BrukerServiceImpl(
 			brukerRepository,
 			mock(NavKontorRepository::class.java),
@@ -84,6 +88,7 @@ class GjennomforingControllerIntegrationTest {
 			gjennomforingRepository,
 			TiltakServiceImpl(tiltakRepository),
 			deltakerService,
+			arrangorService,
 			transactionTemplate
 		)
 		controller = GjennomforingController(
@@ -104,27 +109,19 @@ class GjennomforingControllerIntegrationTest {
 	}
 
 	@Test
-	fun `hentGjennomforing - tiltak finnes ikke - skal returnere INTERNAL SERVER ERROR`() {
+	fun `hentGjennomforinger - tiltak finnes - skal returnere tiltak`() {
 		val tiltakNavn = "Gruppe amo"
 		val tlId = insertArrangor()
 		val tiltak = tiltakRepository.insert(UUID.randomUUID(), tiltakNavn, "kode")
 		val gjennomforing = insertGjennomforing(tiltak.id, tlId)
 
+		Mockito.`when`(arrangorService.getArrangorById(tlId))
+			.thenReturn(Arrangor(UUID.randomUUID(), "", "", "", ""))
+
 		val resultat = controller.hentGjennomforing(gjennomforing.id)
 
 		assertEquals(gjennomforing.id, resultat.id)
 		assertEquals(tiltakNavn, resultat.tiltak.tiltaksnavn)
-	}
-
-	@Test
-	fun `hentGjennomforinger - tiltak finnes - skal returnere tiltak`() {
-		val arrangorId = insertArrangor()
-		val tiltak = tiltakRepository.insert(UUID.randomUUID(), tiltakKode, tiltakKode)
-		val gjennomforing = insertGjennomforing(tiltak.id, arrangorId)
-		val resultat = controller.hentGjennomforing(gjennomforing.id)
-
-		assertEquals(gjennomforing.id, resultat.id)
-		assertEquals(gjennomforing.navn, resultat.navn)
 
 	}
 

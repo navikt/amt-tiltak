@@ -26,6 +26,10 @@ class ArrangorService(
 		).toArrangor()
 	}
 
+	override fun getArrangorById(id: UUID): Arrangor {
+		return arrangorRepository.getById(id).toArrangor()
+	}
+
 	override fun getArrangorByVirksomhetsnummer(virksomhetsnummer: String): Arrangor? {
 		return arrangorRepository.getByOrganisasjonsnummer(virksomhetsnummer)?.toArrangor()
 	}

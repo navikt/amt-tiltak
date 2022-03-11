@@ -1,8 +1,6 @@
 package no.nav.amt.tiltak.core.port
 
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.*
 
 interface GjennomforingService {
@@ -11,17 +9,7 @@ interface GjennomforingService {
 
 	fun getGjennomforinger(gjennomforingIder: List<UUID>): List<Gjennomforing>
 
-	fun upsertGjennomforing(
-		id: UUID,
-		tiltakId: UUID,
-		arrangorId: UUID,
-		navn: String,
-		status: Gjennomforing.Status,
-		startDato: LocalDate?,
-		sluttDato: LocalDate?,
-		registrertDato: LocalDateTime,
-		fremmoteDato: LocalDateTime?
-	): Gjennomforing
+	fun upsert(gjennomforing: Gjennomforing): Gjennomforing
 
 	fun slettGjennomforing(gjennomforingId: UUID)
 

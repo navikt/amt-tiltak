@@ -80,6 +80,10 @@ class TiltakDeltakerControllerTest {
 			tiltak = TiltakDto(
 				tiltakskode = "",
 				tiltaksnavn = ""
+			),
+			arrangor = ArrangorDto(
+				virksomhetNavn = "",
+				organisasjonNavn = null
 			)
 		)
 	)

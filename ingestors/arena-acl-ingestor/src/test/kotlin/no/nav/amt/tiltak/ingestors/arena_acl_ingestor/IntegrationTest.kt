@@ -89,9 +89,9 @@ class IntegrationTest {
 		tiltakService = TiltakServiceImpl(tiltakRepository)
 		brukerService = BrukerServiceImpl(brukerRepository, navKontorRepository, navKontorService, personService, mockk())
 		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, transactionTemplate)
-		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, transactionTemplate)
-		deltakerProcessor = DeltakerProcessor(gjennomforingService, deltakerService, personService)
 		arrangorService = no.nav.amt.tiltak.arrangor.ArrangorService(mockk(), enhetsregisterClient, arrangorRepository)
+		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, arrangorService, transactionTemplate)
+		deltakerProcessor = DeltakerProcessor(gjennomforingService, deltakerService, personService)
 
 		gjennomforingProcessor = GjennomforingProcessor(arrangorService, gjennomforingService, tiltakService)
 		ingestor = ArenaAclIngestorImpl(deltakerProcessor, gjennomforingProcessor)

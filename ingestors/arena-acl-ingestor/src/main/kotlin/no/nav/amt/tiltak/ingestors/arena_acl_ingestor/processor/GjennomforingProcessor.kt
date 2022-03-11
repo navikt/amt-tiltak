@@ -28,22 +28,23 @@ class GjennomforingProcessor(
 
 	private fun upsert(message: MessageWrapper<GjennomforingPayload>) {
 		val gjennomforing = message.payload
-		val tiltak = gjennomforing.tiltak
+		val tiltakPayload = gjennomforing.tiltak
 
 		val arrangor = arrangorService.upsertArrangor(gjennomforing.virksomhetsnummer)
+		val tiltak = tiltakService.upsertTiltak(tiltakPayload.id, tiltakPayload.navn, tiltakPayload.kode)
 
-		tiltakService.upsertTiltak(tiltak.id, tiltak.navn, tiltak.kode)
-
-		gjennomforingService.upsertGjennomforing(
-			id = gjennomforing.id,
-			tiltakId = gjennomforing.tiltak.id,
-			arrangorId = arrangor.id,
-			navn = gjennomforing.navn,
-			status = mapGjennomforingStatus(gjennomforing.status),
-			startDato = gjennomforing.startDato,
-			sluttDato = gjennomforing.sluttDato,
-			registrertDato = gjennomforing.registrertDato,
-			fremmoteDato = gjennomforing.fremmoteDato
+		gjennomforingService.upsert(
+			Gjennomforing(
+				id = gjennomforing.id,
+				tiltak = tiltak,
+				arrangor = arrangor,
+				navn = gjennomforing.navn,
+				status = mapGjennomforingStatus(gjennomforing.status),
+				startDato = gjennomforing.startDato,
+				sluttDato = gjennomforing.sluttDato,
+				registrertDato = gjennomforing.registrertDato,
+				fremmoteDato = gjennomforing.fremmoteDato
+			)
 		)
 
 		log.info("Fullført upsert av gjennomføring id=${gjennomforing.id} arrangorId=${arrangor.id}")
