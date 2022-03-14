@@ -58,7 +58,7 @@ internal open class NavAnsattRepository(
 		).firstOrNull()
 	}
 
-	internal fun getNavAnsattInBatch(bucket: Bucket): List<NavAnsattDbo> = template.query(
+	internal fun getNavAnsattInBucket(bucket: Bucket): List<NavAnsattDbo> = template.query(
 		"SELECT * FROM nav_ansatt WHERE bucket = :bucket",
 		MapSqlParameterSource().addValues(mapOf("bucket" to bucket.id)),
 		rowMapper

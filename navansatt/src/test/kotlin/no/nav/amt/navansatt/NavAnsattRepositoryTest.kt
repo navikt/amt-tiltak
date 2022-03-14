@@ -73,25 +73,25 @@ class NavAnsattRepositoryTest : FunSpec({
 
 		repository.upsert(NavAnsattDbo(
 			navIdent = bucket0Identer[0],
-			navn = "Nytt navn",
-			epost = "Ny epost",
-			telefonnummer = "Nytt telefonnummer",
+			navn = "Nytt navn 1",
+			epost = "Ny epost 1",
+			telefonnummer = "Nytt telefonnummer 1",
 		))
 		repository.upsert(NavAnsattDbo(
 			navIdent = bucket50Identer[0],
-			navn = "Nytt navn",
-			epost = "Ny epost",
-			telefonnummer = "Nytt telefonnummer",
+			navn = "Nytt navn 2",
+			epost = "Ny epost 2",
+			telefonnummer = "Nytt telefonnummer 2",
 		))
 		repository.upsert(NavAnsattDbo(
 			navIdent = bucket50Identer[1],
-			navn = "Nytt navn",
-			epost = "Ny epost",
-			telefonnummer = "Nytt telefonnummer",
+			navn = "Nytt navn 3",
+			epost = "Ny epost 3",
+			telefonnummer = "Nytt telefonnummer 3",
 		))
 
-		repository.getNavAnsattInBatch(Bucket(50)) shouldHaveSize 2
-		repository.getNavAnsattInBatch(Bucket(0)) shouldHaveSize 1
+		repository.getNavAnsattInBucket(Bucket(50)) shouldHaveSize 2
+		repository.getNavAnsattInBucket(Bucket(0)) shouldHaveSize 1
 	}
 
 	test("getNavAnsattInBatch - opprinnelig bucket 0 - bucket beregnes på nytt ved upsert") {
@@ -99,22 +99,22 @@ class NavAnsattRepositoryTest : FunSpec({
 
 		repository.upsert(NavAnsattDbo(
 			navIdent = bucket50Identer[0],
-			navn = "Nytt navn",
-			epost = "Ny epost",
-			telefonnummer = "Nytt telefonnummer",
+			navn = "Nytt navn A",
+			epost = "Ny epost A",
+			telefonnummer = "Nytt telefonnummer A",
 			bucket = Bucket(0)
 		))
-		repository.getNavAnsattInBatch(Bucket(0)) shouldHaveSize 1
-		repository.getNavAnsattInBatch(Bucket(50)) shouldHaveSize 0
+		repository.getNavAnsattInBucket(Bucket(0)) shouldHaveSize 1
+		repository.getNavAnsattInBucket(Bucket(50)) shouldHaveSize 0
 
 		repository.upsert(NavAnsattDbo(
 			navIdent = bucket50Identer[0],
-			navn = "Nytt navn",
-			epost = "Ny epost",
-			telefonnummer = "Nytt telefonnummer",
+			navn = "Nytt navn B",
+			epost = "Ny epost B",
+			telefonnummer = "Nytt telefonnummer B",
 		))
-		repository.getNavAnsattInBatch(Bucket(0)) shouldHaveSize 0
-		repository.getNavAnsattInBatch(Bucket(50)) shouldHaveSize 1
+		repository.getNavAnsattInBucket(Bucket(0)) shouldHaveSize 0
+		repository.getNavAnsattInBucket(Bucket(50)) shouldHaveSize 1
 	}
 
 

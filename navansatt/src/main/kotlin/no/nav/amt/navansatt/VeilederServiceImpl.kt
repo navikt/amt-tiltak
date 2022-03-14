@@ -28,7 +28,7 @@ internal class VeilederServiceImpl(
 		navAnsattRepository.getNavAnsattWithIdent(navIdent)?.let { it.toVeileder() }
 
 	internal fun getVeilederBatch(bucket: Bucket) =
-		navAnsattRepository.getNavAnsattInBatch(bucket).map { it.toVeileder() }
+		navAnsattRepository.getNavAnsattInBucket(bucket).map { it.toVeileder() }
 
 	private fun NavAnsattDbo.toVeileder() = Veileder(
 		navIdent = navIdent,
