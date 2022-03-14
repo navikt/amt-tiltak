@@ -1,5 +1,7 @@
 package no.nav.amt.navansatt
 
+import no.nav.common.types.identer.NavIdent
+import org.springframework.util.DigestUtils
 import java.time.LocalDateTime
 import java.util.*
 
@@ -13,13 +15,12 @@ internal class NavAnsattBucket {
 	internal val id: Int
 
 	internal companion object {
-		fun forUuid(uuid: UUID) = NavAnsattBucket(uuid)
+		fun forNavIdent(navIdent: String) = NavAnsattBucket(navIdent)
 		fun forCurrentTime() = NavAnsattBucket(LocalDateTime.now())
 	}
 
-	private constructor(uuid: UUID) {
-		val mostSignificantBitsValue = uuid.mostSignificantBits and Long.MAX_VALUE // positive value of most significant bits
-		id = mostSignificantBitsValue.toInt() % bucketsPerDay
+	private constructor(navIdent: String) {
+		id = navIdent.hashCode() % bucketsPerDay
 	}
 
 	private constructor(time : LocalDateTime) {

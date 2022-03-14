@@ -9,5 +9,5 @@ internal data class NavAnsattDbo(
 	val telefonnummer: String?,
 	val epost: String?
 ) {
-	val bucket = NavAnsattBucket.forUuid(id)
+	val bucket = NavAnsattBucket.forNavIdent(navIdent)
 }
