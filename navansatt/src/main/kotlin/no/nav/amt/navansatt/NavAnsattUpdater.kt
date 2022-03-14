@@ -6,13 +6,12 @@ import org.springframework.stereotype.Component
 @Component
 internal class NavAnsattUpdater(
 	private val veilederConnector: VeilederConnector,
-	private val veilederService: VeilederServiceImpl // TODO burde vi ha separat interface for batchupdate - for det er sannsynligvis ikke core. Det er derfor impl tas inn som bønne
+	private val veilederService: VeilederServiceImpl
 ) {
 
 	fun oppdaterBatch() {
 		veilederService.getVeilederBatch(Bucket.forTidspunkt()).forEach { dbVeileder ->
 			veilederConnector.hentVeileder(dbVeileder.navIdent)?.let { nomVeileder ->
-				// TODO maybe implement some change detection
 				veilederService.upsertVeileder(nomVeileder)
 			}
 		}
