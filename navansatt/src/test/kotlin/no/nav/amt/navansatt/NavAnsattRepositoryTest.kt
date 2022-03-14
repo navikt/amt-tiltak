@@ -3,6 +3,7 @@ package no.nav.amt.navansatt
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -64,6 +65,56 @@ class NavAnsattRepositoryTest : FunSpec({
 		updatedDbo!!.navn shouldBe "Nytt navn"
 		updatedDbo.epost shouldBe "Ny epost"
 		updatedDbo.telefonnummer shouldBe "Nytt telefonnummer"
+	}
+
+	test("getNavAnsattInBatch - 2 bucket - skal samme antall ansatte som i bucket") {
+		val bucket0Identer = listOf("W998919")
+		val bucket50Identer = listOf("W100172", "W101063")
+
+		repository.upsert(NavAnsattDbo(
+			navIdent = bucket0Identer[0],
+			navn = "Nytt navn",
+			epost = "Ny epost",
+			telefonnummer = "Nytt telefonnummer",
+		))
+		repository.upsert(NavAnsattDbo(
+			navIdent = bucket50Identer[0],
+			navn = "Nytt navn",
+			epost = "Ny epost",
+			telefonnummer = "Nytt telefonnummer",
+		))
+		repository.upsert(NavAnsattDbo(
+			navIdent = bucket50Identer[1],
+			navn = "Nytt navn",
+			epost = "Ny epost",
+			telefonnummer = "Nytt telefonnummer",
+		))
+
+		repository.getNavAnsattInBatch(Bucket(50)) shouldHaveSize 2
+		repository.getNavAnsattInBatch(Bucket(0)) shouldHaveSize 1
+	}
+
+	test("getNavAnsattInBatch - opprinnelig bucket 0 - bucket beregnes på nytt ved upsert") {
+		val bucket50Identer = listOf("W100172")
+
+		repository.upsert(NavAnsattDbo(
+			navIdent = bucket50Identer[0],
+			navn = "Nytt navn",
+			epost = "Ny epost",
+			telefonnummer = "Nytt telefonnummer",
+			bucket = Bucket(0)
+		))
+		repository.getNavAnsattInBatch(Bucket(0)) shouldHaveSize 1
+		repository.getNavAnsattInBatch(Bucket(50)) shouldHaveSize 0
+
+		repository.upsert(NavAnsattDbo(
+			navIdent = bucket50Identer[0],
+			navn = "Nytt navn",
+			epost = "Ny epost",
+			telefonnummer = "Nytt telefonnummer",
+		))
+		repository.getNavAnsattInBatch(Bucket(0)) shouldHaveSize 0
+		repository.getNavAnsattInBatch(Bucket(50)) shouldHaveSize 1
 	}
 
 
