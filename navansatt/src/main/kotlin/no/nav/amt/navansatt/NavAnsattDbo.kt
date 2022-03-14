@@ -7,7 +7,7 @@ internal data class NavAnsattDbo(
 	val navIdent: String,
 	val navn: String,
 	val telefonnummer: String?,
-	val epost: String?
+	val epost: String?,
+	val bucket: Bucket = Bucket.forNavIdent(navIdent)
 ) {
-	val bucket = NavAnsattBucket.forNavIdent(navIdent)
 }

@@ -10,7 +10,7 @@ internal class NavAnsattUpdater(
 ) {
 
 	fun oppdaterBatch() {
-		veilederService.getVeilederBatch(NavAnsattBucket.forCurrentTime()).forEach { dbVeileder ->
+		veilederService.getVeilederBatch(Bucket.forTidspunkt()).forEach { dbVeileder ->
 			veilederConnector.hentVeileder(dbVeileder.navIdent)?.let { nomVeileder ->
 				// TODO maybe implement some change detection
 				veilederService.upsertVeileder(nomVeileder)
