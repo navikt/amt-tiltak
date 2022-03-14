@@ -18,7 +18,7 @@ class NavAnsattRepositoryTest : FunSpec({
 
 	lateinit var repository: NavAnsattRepository
 
-	val upsertCmd = UpsertNavAnsattCommand(
+	val upsertCmd = NavAnsattDbo(
 		navIdent = "test123",
 		navn = "Fornavn Etternavn",
 		telefonnummer = "7464635",
@@ -52,7 +52,7 @@ class NavAnsattRepositoryTest : FunSpec({
 	}
 
 	test("Update nav-ansatt så hent bør returnere oppdatert nav-ansatt") {
-		repository.upsert(UpsertNavAnsattCommand(
+		repository.upsert(NavAnsattDbo(
 			navIdent = NAV_ANSATT_1.nav_ident,
 			navn = "Nytt navn",
 			epost = "Ny epost",

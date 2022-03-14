@@ -23,7 +23,7 @@ internal open class NavAnsattRepository(
 
 	internal fun upsert(upsertCmd: NavAnsattDbo) {
 		val sql = """
-			INSERT INTO nav_ansatt(id, nav_ident, navn, telefonnummer, epost)
+			INSERT INTO nav_ansatt(id, nav_ident, navn, telefonnummer, epost, bucket)
 			VALUES (:id,
 					:navIdent,
 					:navn,
@@ -32,7 +32,8 @@ internal open class NavAnsattRepository(
 					:bucket)
 			ON CONFLICT (nav_ident) DO UPDATE SET navn       	  = :navn,
 														telefonnummer = :telefonnummer,
-														epost         = :epost
+														epost         = :epost,
+														bucket        = :bucket
 		""".trimIndent()
 
 		val parameterSource = MapSqlParameterSource().addValues(
