@@ -96,4 +96,31 @@ class EndringPaaBrukerIngestorImplTest {
 		verify ( exactly = 1 ) { norgClient.hentNavKontorNavn(nyEnhet) }
 		verify ( exactly = 1 ) { brukerService.oppdaterNavKontor(fnr, navKontor ) }
 	}
+
+	@Test
+	fun `ingestKafkaRecord - har nav kontor, fjernes på topic - endrer ikke nav kontor`() {
+		//Det er ikke mulig å fjerne nav kontor i arena men det kan legges meldinger på topicen som endrer andre ting
+		//og derfor ikke er relevante
+		val fnr = "121234324"
+		val nyEnhet = "enhet2"
+		val bruker = Bruker(
+			id = UUID.randomUUID(),
+			fornavn = "fornavn",
+			mellomnavn = null,
+			etternavn = "etternavn",
+			fodselsnummer = "$fnr",
+			navKontor = NavKontor("enhet", "Navn")
+		)
+		every { brukerService.getBruker(fnr) }.returns(bruker)
+
+		endringPaaBrukerIngestorImpl.ingestKafkaRecord("""
+			{
+				"fodselsnummer": "$fnr",
+				"oppfolgingsenhet": null
+			}
+		""".trimIndent())
+
+		verify ( exactly = 0 ) { norgClient.hentNavKontorNavn(nyEnhet) }
+		verify ( exactly = 0 ) { brukerService.oppdaterNavKontor(fnr, any() ) }
+	}
 }

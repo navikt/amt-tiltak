@@ -17,6 +17,7 @@ class EndringPaaBrukerIngestorImpl(
 		val bruker = brukerService.getBruker(brukerRecord.fodselsnummer) ?: return
 
 		if (bruker.navKontor?.enhetId == brukerRecord.oppfolgingsenhet) return
+		if (brukerRecord.oppfolgingsenhet == null) return
 
 		val enhetNavn = norgClient.hentNavKontorNavn(brukerRecord.oppfolgingsenhet)
 		val navKontor = NavKontor(brukerRecord.oppfolgingsenhet, enhetNavn)
