@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.connectors.nav_kontor
 
 import no.nav.amt.tiltak.clients.norg.NorgClient
 import no.nav.amt.tiltak.clients.veilarbarena.VeilarbarenaClient
-import no.nav.amt.tiltak.core.port.NavKontor
+import no.nav.amt.tiltak.core.domain.tiltak.NavKontor
 import no.nav.amt.tiltak.core.port.NavKontorService
 import org.springframework.stereotype.Service
 

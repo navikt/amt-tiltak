@@ -35,7 +35,7 @@ import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
 
-@Ignore
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IntegrationTest {
 	private lateinit var tiltakRepository: TiltakRepository
@@ -218,7 +218,8 @@ class IntegrationTest {
 			id = UUID.randomUUID(),
 			fornavn = person.fornavn,
 			etternavn = person.etternavn,
-			fodselsnummer = personIdent
+			fodselsnummer = personIdent,
+			navKontor = null
 		),
 		startDato = null,
 		sluttDato = null,

@@ -87,7 +87,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 					id = BRUKER_1.id,
 					fornavn = "",
 					etternavn = "",
-					fodselsnummer = ""
+					fodselsnummer = "",
+					navKontor = null
 				),
 				startDato = nyStartdato,
 				sluttDato = nySluttdato,

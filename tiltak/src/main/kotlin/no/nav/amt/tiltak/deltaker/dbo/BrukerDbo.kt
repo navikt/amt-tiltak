@@ -1,5 +1,7 @@
 package no.nav.amt.tiltak.deltaker.dbo
 
+import no.nav.amt.tiltak.core.domain.tiltak.Bruker
+import no.nav.amt.tiltak.core.domain.tiltak.NavKontor
 import java.time.LocalDateTime
 import java.util.*
 
@@ -12,6 +14,18 @@ data class BrukerDbo(
 	val telefonnummer: String?,
 	val epost: String?,
 	val ansvarligVeilederId: UUID?,
+	val navKontorId: UUID?,
 	val createdAt: LocalDateTime,
 	val modifiedAt: LocalDateTime
-)
+) {
+	fun toBruker(navKontor: NavKontor?): Bruker{
+		return Bruker(
+			id = this.id,
+			fornavn = this.fornavn,
+			mellomnavn = this.mellomnavn,
+			etternavn = this.etternavn,
+			fodselsnummer = this.fodselsnummer,
+			navKontor = navKontor
+		)
+	}
+}

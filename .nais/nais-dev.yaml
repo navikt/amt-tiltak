@@ -81,6 +81,8 @@ spec:
       value: pto.siste-tilordnet-veileder-v1
     - name: AMT_TILTAK_TOPIC
       value: amt.amt-tiltak-v1
+    - name: ENDRING_PAA_OPPF_BRUKER_TOPIC
+      value: pto.endring-paa-oppfolgingsbruker-v2
   gcp:
     sqlInstances:
       - name: amt-tiltak-v1
