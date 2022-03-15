@@ -1,4 +1,4 @@
-package endring_paa_oppf_bruker_ingestor
+package no.nav.amt.tiltak.ingestors.endring_paa_oppf_bruker_ingestor
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
