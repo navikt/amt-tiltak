@@ -7,5 +7,6 @@ data class Bruker(
 	val fornavn: String,
 	val mellomnavn: String? = null,
 	val etternavn: String,
-	val fodselsnummer: String
+	val fodselsnummer: String,
+	val navKontor: NavKontor?
 )

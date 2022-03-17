@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.application.configuration.kafka
 
+import no.nav.amt.tiltak.ingestors.endring_paa_oppf_bruker_ingestor.EndringPaaBrukerIngestor
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.ArenaAclIngestor
 import no.nav.amt.tiltak.ingestors.tildelt_veileder_ingestor.TildeltVeilederIngestor
@@ -23,11 +24,12 @@ import java.util.function.Consumer
 @Configuration
 @EnableConfigurationProperties(KafkaTopicProperties::class)
 open class KafkaConfiguration(
-    kafkaTopicProperties: KafkaTopicProperties,
+	kafkaTopicProperties: KafkaTopicProperties,
 	kafkaProperties: KafkaProperties,
 	jdbcTemplate: JdbcTemplate,
 	arenaAclIngestor: ArenaAclIngestor,
-	tildeltVeilederIngestor: TildeltVeilederIngestor
+	tildeltVeilederIngestor: TildeltVeilederIngestor,
+	endringPaaBrukerIngestor: EndringPaaBrukerIngestor
 ) {
 	private val log = LoggerFactory.getLogger(javaClass)
     private var client: KafkaConsumerClient
@@ -60,6 +62,18 @@ open class KafkaConfiguration(
 					stringDeserializer(),
 					stringDeserializer(),
 					Consumer<ConsumerRecord<String, String>> { tildeltVeilederIngestor.ingestKafkaRecord(it.value()) }
+				)
+		)
+
+		topicConfigs.add(
+			KafkaConsumerClientBuilder.TopicConfig<String, String>()
+				.withLogging()
+				.withStoreOnFailure(consumerRepository)
+				.withConsumerConfig(
+					kafkaTopicProperties.endringPaaBrukerTopic,
+					stringDeserializer(),
+					stringDeserializer(),
+					Consumer<ConsumerRecord<String, String>> { endringPaaBrukerIngestor.ingestKafkaRecord(it.value()) }
 				)
 		)
 

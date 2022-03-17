@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.configuration.kafka
 
+import no.nav.amt.tiltak.ingestors.endring_paa_oppf_bruker_ingestor.EndringPaaBrukerIngestor
 import junit.framework.Assert.assertEquals
 import no.nav.amt.tiltak.application.configuration.kafka.KafkaConfiguration
 import no.nav.amt.tiltak.application.configuration.kafka.KafkaProperties
@@ -13,7 +14,6 @@ import no.nav.common.kafka.util.KafkaPropertiesBuilder
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.junit.jupiter.api.Test
-import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.jdbc.core.JdbcTemplate
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy
@@ -28,6 +28,7 @@ class KafkaConfigurationTest {
 
 	val amtTiltakTopic = "amt-tiltak"
 	val sisteTilordnetVeilederTopic = "siste-tilordnet-veileder-v1"
+	val endringPaaBrukerTopic = "pto.endring-paa-oppfolgingsbruker-v2"
 
 	@Container
 	var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.4.3"))
@@ -39,7 +40,8 @@ class KafkaConfigurationTest {
 	fun `should ingest arena records after configuring kafka`() {
 		val kafkaTopicProperties = KafkaTopicProperties(
 			amtTiltakTopic = amtTiltakTopic,
-			sisteTilordnetVeilederTopic = sisteTilordnetVeilederTopic
+			sisteTilordnetVeilederTopic = sisteTilordnetVeilederTopic,
+			endringPaaBrukerTopic = endringPaaBrukerTopic
 		)
 
 		val kafkaProperties = object : KafkaProperties {
@@ -76,12 +78,19 @@ class KafkaConfigurationTest {
 			}
 		}
 
+		val endringPaaBrukerIngestor = object : EndringPaaBrukerIngestor {
+			override fun ingestKafkaRecord(recordValue: String) {
+				counter.incrementAndGet()
+			}
+		}
+
 		val config = KafkaConfiguration(
 			kafkaTopicProperties,
 			kafkaProperties,
 			JdbcTemplate(dataSource),
 			arenaAclIngestor,
 			tildeltVeilederIngestor,
+			endringPaaBrukerIngestor
 		)
 
 		config.onApplicationEvent(null)

@@ -1,5 +1,7 @@
 package no.nav.amt.tiltak.tiltak.services
 
+import no.nav.amt.tiltak.core.domain.tiltak.Bruker
+import no.nav.amt.tiltak.core.domain.tiltak.NavKontor
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.NavKontorService
 import no.nav.amt.tiltak.core.port.PersonService
@@ -21,6 +23,13 @@ class BrukerServiceImpl(
 	private val veilederService: VeilederService
 ) : BrukerService {
 
+	override fun getBruker(fodselsnummer: String): Bruker? {
+		return brukerRepository.get(fodselsnummer)?.let {
+			val navKontor = it.navKontorId?.let { navKontorRepository.get(it) }
+			it.toBruker(navKontor?.toNavKontor())
+		}
+	}
+
 	override fun getOrCreate(fodselsnummer: String): UUID {
 		val bruker = brukerRepository.get(fodselsnummer) ?: createBruker(fodselsnummer)
 		return bruker.id
@@ -32,6 +41,11 @@ class BrukerServiceImpl(
 
 	override fun oppdaterAnsvarligVeileder(brukerPersonligIdent: String, veilederId: UUID) {
 		brukerRepository.oppdaterVeileder(brukerPersonligIdent, veilederId)
+	}
+
+	override fun oppdaterNavKontor(fodselsnummer: String, navKontor: NavKontor) {
+		val navKontorDbo = navKontorRepository.upsert(navKontor.enhetId, navKontor.navn)
+		brukerRepository.oppdaterNavKontor(fodselsnummer, navKontorDbo.id)
 	}
 
 	private fun createBruker(fodselsnummer: String): BrukerDbo {

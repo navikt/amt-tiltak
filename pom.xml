@@ -145,6 +145,11 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>endring-paa-oppf-bruker-ingestor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>db-migrations</artifactId>
                 <version>${project.version}</version>
             </dependency>
