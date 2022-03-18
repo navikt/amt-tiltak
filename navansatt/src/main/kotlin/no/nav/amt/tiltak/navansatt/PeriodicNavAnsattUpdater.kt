@@ -1,4 +1,4 @@
-package no.nav.amt.navansatt
+package no.nav.amt.tiltak.navansatt
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.common.job.JobRunner

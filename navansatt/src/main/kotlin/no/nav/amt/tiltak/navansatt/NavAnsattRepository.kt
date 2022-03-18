@@ -1,4 +1,4 @@
-package no.nav.amt.navansatt
+package no.nav.amt.tiltak.navansatt
 
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-internal open class NavAnsattRepository(
+internal class NavAnsattRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
 

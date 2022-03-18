@@ -1,11 +1,11 @@
-package no.nav.amt.navansatt
+package no.nav.amt.tiltak.navansatt
 
 import no.nav.amt.tiltak.core.domain.veileder.Veileder
 import no.nav.amt.tiltak.core.port.VeilederService
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 import java.util.*
 
-@Service
+@Component
 internal class VeilederServiceImpl(
 	private val navAnsattRepository: NavAnsattRepository,
 ) : VeilederService {

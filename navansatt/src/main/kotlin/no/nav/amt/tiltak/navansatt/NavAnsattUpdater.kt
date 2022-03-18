@@ -1,4 +1,4 @@
-package no.nav.amt.navansatt
+package no.nav.amt.tiltak.navansatt
 
 import no.nav.amt.tiltak.core.port.VeilederConnector
 import org.springframework.stereotype.Component
