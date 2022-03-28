@@ -30,8 +30,8 @@ import java.time.LocalDateTime
 import java.util.*
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [GjennomforingController::class])
-class GjennomforingControllerTest {
+@WebMvcTest(controllers = [TiltakarrangorGjennomforingController::class])
+class TiltakarrangorGjennomforingControllerTest {
 	private val gjennomforingId = UUID.fromString("e68d54e2-47b5-11ec-81d3-0242ac130003")
 
 	private val fnr = "fnr"
@@ -107,6 +107,7 @@ class GjennomforingControllerTest {
 		init {
 			server.start()
 			System.setProperty("MOCK_TOKEN_X_DISCOVERY_URL", server.wellKnownUrl("tokenx").toString())
+			System.setProperty("MOCK_AZURE_AD_DISCOVERY_URL", server.wellKnownUrl("azuread").toString())
 		}
 
 		@AfterAll
@@ -119,7 +120,7 @@ class GjennomforingControllerTest {
 	@Test
 	fun `hentGjennomforingerByArrangorId() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/gjennomforing")
+			MockMvcRequestBuilders.get("/api/tiltakarrangor/gjennomforing")
 				.queryParam("arrangorId", "test")
 		).andReturn().response
 
@@ -131,7 +132,7 @@ class GjennomforingControllerTest {
 		val token = server.issueToken("tokenx", "test", "test").serialize()
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/gjennomforing")
+			MockMvcRequestBuilders.get("/api/tiltakarrangor/gjennomforing")
 				.queryParam("arrangorId", UUID.randomUUID().toString())
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
@@ -142,7 +143,7 @@ class GjennomforingControllerTest {
 	@Test
 	fun `hentGjennomforing() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/gjennomforing/$gjennomforingId")
+			MockMvcRequestBuilders.get("/api/tiltakarrangor/gjennomforing/$gjennomforingId")
 		).andReturn().response
 
 		assertEquals(401, response.status)
@@ -155,7 +156,7 @@ class GjennomforingControllerTest {
 		Mockito.`when`(gjennomforingService.getGjennomforing(gjennomforingId)).thenReturn(gjennomforing)
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/gjennomforing/$gjennomforingId")
+			MockMvcRequestBuilders.get("/api/tiltakarrangor/gjennomforing/$gjennomforingId")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
@@ -169,7 +170,7 @@ class GjennomforingControllerTest {
 		Mockito.`when`(gjennomforingService.getGjennomforing(gjennomforingId)).thenReturn(gjennomforing)
 
 		mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/gjennomforing/$gjennomforingId")
+			MockMvcRequestBuilders.get("/api/tiltakarrangor/gjennomforing/$gjennomforingId")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
@@ -181,7 +182,7 @@ class GjennomforingControllerTest {
 	@Test
 	fun `hentDeltakere() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/gjennomforing/ID/deltakere")
+			MockMvcRequestBuilders.get("/api/tiltakarrangor/gjennomforing/ID/deltakere")
 		).andReturn().response
 
 		assertEquals(401, response.status)
@@ -196,7 +197,7 @@ class GjennomforingControllerTest {
 		Mockito.`when`(deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)).thenReturn(listOf(deltaker))
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/gjennomforing/$gjennomforingId/deltakere")
+			MockMvcRequestBuilders.get("/api/tiltakarrangor/gjennomforing/$gjennomforingId/deltakere")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
@@ -212,7 +213,7 @@ class GjennomforingControllerTest {
 		Mockito.`when`(deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)).thenReturn(listOf(deltaker))
 
 		mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/gjennomforing/$gjennomforingId/deltakere")
+			MockMvcRequestBuilders.get("/api/tiltakarrangor/gjennomforing/$gjennomforingId/deltakere")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 

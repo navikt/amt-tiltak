@@ -34,6 +34,12 @@ spec:
   azure:
     application:
       enabled: true
+      allowAllUsers: false
+      claims:
+        groups:
+          - id: "f12fa5d6-ef0c-41db-80c9-5c9696bb5c14"
+        extra:
+          - "NAVident"
   tokenx:
     enabled: true
   accessPolicy:

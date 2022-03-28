@@ -17,8 +17,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import java.util.*
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [AnsattController::class])
-class AnsattControllerTest {
+@WebMvcTest(controllers = [TiltakarrangorAnsattController::class])
+class TiltakarrangorAnsattControllerTest {
 
 	companion object {
 		private val server = MockOAuth2Server()
@@ -47,7 +47,7 @@ class AnsattControllerTest {
 	@Test
 	fun `getInnloggetAnsatt() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/arrangor/ansatt/meg")
+			MockMvcRequestBuilders.get("/api/tiltakarrangor/ansatt/meg")
 		).andReturn().response
 
 		assertEquals(401, response.status)
@@ -69,7 +69,7 @@ class AnsattControllerTest {
 			))
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/arrangor/ansatt/meg")
+			MockMvcRequestBuilders.get("/api/tiltakarrangor/ansatt/meg")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
