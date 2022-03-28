@@ -23,8 +23,8 @@ import java.time.LocalDateTime
 import java.util.*
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [TiltakDeltakerController::class])
-class TiltakDeltakerControllerTest {
+@WebMvcTest(controllers = [TiltakarrangorDeltakerController::class])
+class TiltakarrangorDeltakerControllerTest {
 
 	companion object {
 		private val server = MockOAuth2Server()
@@ -32,6 +32,7 @@ class TiltakDeltakerControllerTest {
 		init {
 			server.start()
 			System.setProperty("MOCK_TOKEN_X_DISCOVERY_URL", server.wellKnownUrl("tokenx").toString())
+			System.setProperty("MOCK_AZURE_AD_DISCOVERY_URL", server.wellKnownUrl("azuread").toString())
 		}
 
 		@AfterAll
@@ -96,7 +97,7 @@ class TiltakDeltakerControllerTest {
 	@Test
 	fun `hentTiltakDeltakerDetaljer() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltak-deltaker/$deltakerId")
+			MockMvcRequestBuilders.get("/api/tiltakarrangor/tiltak-deltaker/$deltakerId")
 		).andReturn().response
 
 		Assertions.assertEquals(401, response.status)
@@ -113,7 +114,7 @@ class TiltakDeltakerControllerTest {
 			.thenReturn(tiltakDeltakerDetaljerDto)
 
 		mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltak-deltaker/$deltakerId")
+			MockMvcRequestBuilders.get("/api/tiltakarrangor/tiltak-deltaker/$deltakerId")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
@@ -130,7 +131,7 @@ class TiltakDeltakerControllerTest {
 			.thenReturn(tiltakDeltakerDetaljerDto)
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltak-deltaker/$deltakerId")
+			MockMvcRequestBuilders.get("/api/tiltakarrangor/tiltak-deltaker/$deltakerId")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
