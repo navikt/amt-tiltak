@@ -1,0 +1,12 @@
+CREATE TABLE endringsmelding
+(
+    id                          uuid PRIMARY KEY,
+    deltaker_id                 uuid                     not null references deltaker (id),
+    start_dato                  date,
+    slutt_dato                  date,
+    godkjent_av_nav_ident       varchar,
+    aktiv                       boolean, --ikke slettet/overskrevet
+    opprettet_av                uuid not null references arrangor_ansatt(id),
+    created_at                  timestamp with time zone default current_timestamp,
+    modified_at                 timestamp with time zone default current_timestamp
+);
