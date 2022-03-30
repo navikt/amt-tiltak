@@ -23,4 +23,10 @@ open class AuthService(
 		)
 	}
 
+	open fun navIdent() : String = tokenValidationContextHolder
+		.tokenValidationContext
+		.getClaims(Issuer.AZURE_AD)
+		.get("NAVIdent")
+		.toString()
+
 }
