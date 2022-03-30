@@ -23,6 +23,7 @@
         <module>test</module>
         <module>tiltak</module>
         <module>tools</module>
+        <module>tilgangskontroll</module>
     </modules>
 
     <name>AMT-Tiltak</name>
