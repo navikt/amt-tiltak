@@ -1,16 +1,31 @@
 package no.nav.amt.tiltak.tilgangskontroll.invitasjon
 
+import no.nav.amt.tiltak.core.port.PersonService
+import no.nav.amt.tiltak.tilgangskontroll.foresporsel.OpprettForesporselCmd
+import no.nav.amt.tiltak.tilgangskontroll.foresporsel.TilgangForesporselService
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.transaction.support.TransactionTemplate
+import org.springframework.web.server.ResponseStatusException
 import java.time.ZonedDateTime
 import java.util.*
 
 @Service
 class TilgangInvitasjonService(
-	private val tilgangInvitasjonRepository: TilgangInvitasjonRepository
+	private val hentInvitasjonInfoQuery: HentInvitasjonInfoQuery,
+	private val hentUbrukteInvitasjonerQuery: HentUbrukteInvitasjonerQuery,
+	private val tilgangInvitasjonRepository: TilgangInvitasjonRepository,
+	private val transactionTemplate: TransactionTemplate,
+	private val tilgangForesporselService: TilgangForesporselService,
+	private val personService: PersonService,
 ) {
 
-	fun hentUbrukteInvitasjoner(gjennomforingId: UUID): List<TilgangInvitasjonDbo> {
-		return tilgangInvitasjonRepository.hentUbrukteInvitasjoner(gjennomforingId)
+	fun hentInvitasjonInfo(invitasjonId: UUID): InvitasjonInfoDbo {
+		return hentInvitasjonInfoQuery.query(invitasjonId)
+	}
+
+	fun hentUbrukteInvitasjoner(gjennomforingId: UUID): List<UbruktInvitasjonDbo> {
+		return hentUbrukteInvitasjonerQuery.query(gjennomforingId)
 	}
 
 	fun opprettInvitasjon(gjennomforingId: UUID, opprettetAvNavAnsattId: UUID) {
@@ -26,11 +41,47 @@ class TilgangInvitasjonService(
 	}
 
 	fun aksepterInvitasjon(invitasjonId: UUID, arrangorAnsattPersonligIdent: String) {
+		val invitasjon = tilgangInvitasjonRepository.get(invitasjonId)
 
+		if (invitasjon.erBrukt) {
+			// Bruk heller custom exception og map med controller advice
+			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Kan ikke akseptere invitasjon som er brukt")
+		}
+
+		if (invitasjon.gydligTil.isAfter(ZonedDateTime.now())) {
+			// Bruk heller custom exception og map med controller advice
+			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Kan ikke akseptere invitasjon som er utgått")
+		}
+
+		val person = personService.hentPerson(arrangorAnsattPersonligIdent)
+
+		val foresporselId = UUID.randomUUID()
+
+		transactionTemplate.executeWithoutResult {
+			tilgangInvitasjonRepository.settTilBrukt(invitasjonId, foresporselId)
+
+			tilgangForesporselService.opprettForesporsel(
+				OpprettForesporselCmd(
+					id = foresporselId,
+					personligIdent = arrangorAnsattPersonligIdent,
+					fornavn = person.fornavn,
+					mellomnavn = person.mellomnavn,
+					etternavn = person.etternavn,
+					gjennomforingId = invitasjon.gjennomforingId,
+				)
+			)
+		}
 	}
 
-	fun avbrytInvitasjon(invitasjonId: UUID) {
-		tilgangInvitasjonRepository.avbrytInvitasjon(invitasjonId)
+	fun slettInvitasjon(invitasjonId: UUID) {
+		val invitasjon = tilgangInvitasjonRepository.get(invitasjonId)
+
+		if (invitasjon.erBrukt) {
+			// Bruk heller custom exception og map med controller advice
+			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Kan ikke slette invitasjon som er brukt")
+		}
+
+		tilgangInvitasjonRepository.slettInvitasjon(invitasjonId)
 	}
 
 }

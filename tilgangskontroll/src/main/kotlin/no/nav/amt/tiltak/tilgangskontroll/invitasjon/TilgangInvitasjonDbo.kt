@@ -8,8 +8,8 @@ data class TilgangInvitasjonDbo(
 	val gjennomforingId: UUID,
 	val gydligTil: ZonedDateTime,
 	val opprettetAvNavAnsattId: UUID,
-	val erBrukt: UUID,
-	val tidspunkt_brukt: UUID,
-	val tilgangForesporselId: UUID,
+	val erBrukt: Boolean,
+	val tidspunktBrukt: ZonedDateTime,
+	val tilgangForesporselId: UUID?,
 	val createdAt: ZonedDateTime,
 )

@@ -35,20 +35,20 @@ class NavAnsattTilgangInvitasjonController(
 		tilgangInvitasjonService.opprettInvitasjon(request.gjennomforingId, navAnsatt.id)
 	}
 
-	@PatchMapping("/{invitasjonId}/avbryt")
+	@DeleteMapping("/{invitasjonId}")
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
-	fun avbrytInvitasjon(@PathVariable invitasjonId: UUID) {
+	fun slettInvitasjon(@PathVariable invitasjonId: UUID) {
 		// Mangler tilgangskontroll på nav enhet
 
-		tilgangInvitasjonService.avbrytInvitasjon(invitasjonId)
+		tilgangInvitasjonService.slettInvitasjon(invitasjonId)
 	}
 
-	private fun toDto(invitasjonDbo: TilgangInvitasjonDbo): UbruktInvitasjonDto {
+	private fun toDto(dbo: UbruktInvitasjonDbo): UbruktInvitasjonDto {
 		return UbruktInvitasjonDto(
-			id = invitasjonDbo.id,
-			opprettetAvNavIdent = invitasjonDbo.opprettetAvNavAnsattId.toString(),
-			opprettetDato = invitasjonDbo.createdAt,
-			gyldigTilDato = invitasjonDbo.gydligTil,
+			id = dbo.id,
+			opprettetAvNavIdent = dbo.opprettetAvNavIdent,
+			opprettetDato = dbo.opprettetDato,
+			gyldigTilDato = dbo.gyldigTilDato,
 		)
 	}
 
