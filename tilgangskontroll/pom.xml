@@ -29,8 +29,20 @@
             <artifactId>token-validation-spring</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>navansatt</artifactId>
+        </dependency>
+        <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>auth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>db_utils</artifactId>
         </dependency>
 
         <dependency>

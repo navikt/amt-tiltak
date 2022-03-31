@@ -2,31 +2,37 @@ package no.nav.amt.tiltak.ansatt
 
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.TilknyttetArrangor
+import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class AnsattService(
-	val ansattRepository: AnsattRepository,
+class ArrangorAnsattServiceImpl(
+	val arrangorAnsattRepository: ArrangorAnsattRepository,
 	val template: NamedParameterJdbcTemplate
-) {
+) : ArrangorAnsattService {
 
-	fun getAnsatt(ansattId: UUID): Ansatt {
-		throw NotImplementedError("getAnsatt in AnsattService is not yet implemented")
-	}
-
-	fun getAnsattByPersonligIdent(personIdent: String): Ansatt {
-		val ansattDbo =
-			ansattRepository.getByPersonligIdent(personIdent) ?: throw NoSuchElementException("Ansatt ikke funnet")
+	override fun getAnsatt(ansattId: UUID): Ansatt {
+		val ansattDbo = arrangorAnsattRepository.get(ansattId) ?: throw NoSuchElementException("Ansatt ikke funnet")
 
 		val ansattesVirksomheter = mapTilknyttedeArrangorerTilAnsatt(
-			ArrangorerForAnsattRepository(template).query(personIdent)
+			ArrangorerForAnsattQuery(template).query(ansattDbo.personligIdent)
 		)
 
 		return ansattDbo.toAnsatt(ansattesVirksomheter)
 	}
 
+	override fun getAnsattByPersonligIdent(personIdent: String): Ansatt? {
+		val ansattDbo =
+			arrangorAnsattRepository.getByPersonligIdent(personIdent) ?: return null
+
+		val ansattesVirksomheter = mapTilknyttedeArrangorerTilAnsatt(
+			ArrangorerForAnsattQuery(template).query(personIdent)
+		)
+
+		return ansattDbo.toAnsatt(ansattesVirksomheter)
+	}
 
 	private fun mapTilknyttedeArrangorerTilAnsatt(ansattesVirksomheter: List<ArrangorForAnsattDbo>): List<TilknyttetArrangor> {
 		return ansattesVirksomheter

@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.ansatt
+package no.nav.amt.tiltak.tilgangskontroll.tilgang
 
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrowExactly
@@ -6,14 +6,15 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
+import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
-import java.time.LocalDateTime
 import java.util.*
 
 class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
-	lateinit var ansattRepository: AnsattRepository
+	lateinit var arrangorAnsattService: ArrangorAnsattService
 
 	lateinit var ansattRolleRepository: AnsattRolleRepository
 
@@ -30,25 +31,24 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 	val arrangorId = UUID.randomUUID()
 
 	beforeEach {
-		ansattRepository = mockk()
+		arrangorAnsattService = mockk()
 
 		ansattRolleRepository = mockk()
 
 		gjennomforingTilgangRepository = mockk()
 
 		arrangorAnsattTilgangServiceImpl = ArrangorAnsattTilgangServiceImpl(
-			ansattRepository, ansattRolleRepository, gjennomforingTilgangRepository
+			arrangorAnsattService, ansattRolleRepository, gjennomforingTilgangRepository
 		)
 
 		every {
-			ansattRepository.getByPersonligIdent(personligIdent)
-		} returns AnsattDbo(
+			arrangorAnsattService.getAnsattByPersonligIdent(personligIdent)
+		} returns Ansatt(
 			ansattId,
 			personligIdent,
 			"",
 			"",
-			LocalDateTime.now(),
-			LocalDateTime.now()
+			emptyList()
 		)
 	}
 

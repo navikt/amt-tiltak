@@ -162,6 +162,11 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>db_utils</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>token_provider</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -220,6 +225,12 @@
                 <artifactId>veileder</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>tilgangskontroll</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>net.javacrumbs.shedlock</groupId>

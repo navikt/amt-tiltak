@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.ansatt
+package no.nav.amt.tiltak.tilgangskontroll.tilgang
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger

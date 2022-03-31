@@ -13,23 +13,23 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2_ROLLE_1
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
-class ArrangorerForAnsattRepositoryTest : FunSpec({
+class ArrangorerForAnsattQueryTest : FunSpec({
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 
-	lateinit var arrangorerForAnsattRepository: ArrangorerForAnsattRepository
+	lateinit var arrangorerForAnsattQuery: ArrangorerForAnsattQuery
 
 	beforeEach {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 		rootLogger.level = Level.WARN
 
-		arrangorerForAnsattRepository = ArrangorerForAnsattRepository(NamedParameterJdbcTemplate(dataSource))
+		arrangorerForAnsattQuery = ArrangorerForAnsattQuery(NamedParameterJdbcTemplate(dataSource))
 
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
 	test("Should get arrangorer for ansatt") {
-		val arrangorer = arrangorerForAnsattRepository.query(ARRANGOR_ANSATT_2.personlig_ident)
+		val arrangorer = arrangorerForAnsattQuery.query(ARRANGOR_ANSATT_2.personlig_ident)
 
 		arrangorer shouldHaveSize 1
 

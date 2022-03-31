@@ -1,5 +1,7 @@
 package no.nav.amt.tiltak.arrangor
 
+import no.nav.amt.tiltak.common.db_utils.getLocalDateTime
+import no.nav.amt.tiltak.common.db_utils.getUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -13,13 +15,13 @@ open class ArrangorRepository(
 
     private val rowMapper = RowMapper { rs, _ ->
         ArrangorDbo(
-            id = UUID.fromString(rs.getString("id")),
+            id = rs.getUUID("id"),
             navn = rs.getString("navn"),
             organisasjonsnummer = rs.getString("organisasjonsnummer"),
             overordnetEnhetNavn = rs.getString("overordnet_enhet_navn"),
             overordnetEnhetOrganisasjonsnummer = rs.getString("overordnet_enhet_organisasjonsnummer"),
-            createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
-            modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
+            createdAt = rs.getLocalDateTime("created_at"),
+            modifiedAt = rs.getLocalDateTime("modified_at")
         )
     }
 

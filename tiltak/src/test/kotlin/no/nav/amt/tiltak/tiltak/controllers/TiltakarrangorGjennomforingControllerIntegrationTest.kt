@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.tiltak.controllers
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import no.nav.amt.tiltak.arrangor.ArrangorRepository
+import no.nav.amt.tiltak.arrangor.ArrangorServiceImpl
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
@@ -70,7 +71,7 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 		brukerRepository = BrukerRepository(namedJdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(namedJdbcTemplate)
 		authService = mock(AuthService::class.java)
-		arrangorService = no.nav.amt.tiltak.arrangor.ArrangorService(mockk(), mockk(), ArrangorRepository(namedJdbcTemplate))
+		arrangorService = ArrangorServiceImpl(mockk(), ArrangorRepository(namedJdbcTemplate))
 		brukerService = BrukerServiceImpl(
 			brukerRepository,
 			mock(NavKontorRepository::class.java),

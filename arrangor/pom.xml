@@ -41,8 +41,8 @@
             <artifactId>postgresql</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>db_utils</artifactId>
         </dependency>
 
         <dependency>

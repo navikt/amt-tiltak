@@ -1,9 +1,10 @@
-package no.nav.amt.tiltak.ansatt
+package no.nav.amt.tiltak.tilgangskontroll.tilgang
 
 import com.github.benmanes.caffeine.cache.Caffeine
+import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
-import no.nav.amt.tiltak.utils.CacheUtils.tryCacheFirstNotNull
-import no.nav.amt.tiltak.utils.CacheUtils.tryCacheFirstNullable
+import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils.tryCacheFirstNotNull
+import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils.tryCacheFirstNullable
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -13,7 +14,7 @@ import java.util.*
 
 @Service
 class ArrangorAnsattTilgangServiceImpl(
-	private val ansattRepository: AnsattRepository,
+	private val arrangorAnsattService: ArrangorAnsattService,
 	private val ansattRolleRepository: AnsattRolleRepository,
 	private val gjennomforingTilgangRepository: GjennomforingTilgangRepository,
 ) : ArrangorAnsattTilgangService {
@@ -61,9 +62,7 @@ class ArrangorAnsattTilgangServiceImpl(
 
 	private fun hentAnsattId(ansattPersonligIdent: String): UUID {
 		val ansattId = tryCacheFirstNullable(personligIdentToAnsattIdCache, ansattPersonligIdent) {
-			ansattRepository.getByPersonligIdent(
-				ansattPersonligIdent
-			)?.id
+			arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)?.id
 		}
 
 		if (ansattId == null) {

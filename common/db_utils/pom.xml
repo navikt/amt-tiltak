@@ -3,21 +3,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>amt-tiltak</artifactId>
+        <artifactId>common</artifactId>
         <groupId>no.nav.amt-tiltak</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>common</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>db_utils</artifactId>
 
-    <modules>
-        <module>token_provider</module>
-        <module>graphql</module>
-        <module>auth</module>
-        <module>json</module>
-        <module>db_utils</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

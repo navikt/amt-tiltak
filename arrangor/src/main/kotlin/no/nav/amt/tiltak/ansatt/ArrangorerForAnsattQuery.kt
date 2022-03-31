@@ -1,12 +1,12 @@
 package no.nav.amt.tiltak.ansatt
 
-import no.nav.amt.tiltak.utils.getUUID
+import no.nav.amt.tiltak.common.db_utils.getUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.util.*
 
-class ArrangorerForAnsattRepository(
+class ArrangorerForAnsattQuery(
 	private val template: NamedParameterJdbcTemplate
 ) {
 

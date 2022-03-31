@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.utils
+package no.nav.amt.tiltak.tilgangskontroll.utils
 
 import com.github.benmanes.caffeine.cache.Cache
 
