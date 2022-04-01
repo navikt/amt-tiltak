@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.ansatt
 
+import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getLocalDateTime
 import no.nav.amt.tiltak.common.db_utils.getUUID
 import org.springframework.jdbc.core.RowMapper
@@ -22,6 +23,23 @@ open class ArrangorAnsattRepository(
 			createdAt = rs.getLocalDateTime("created_at"),
 			modifiedAt = rs.getLocalDateTime("modified_at")
 		)
+	}
+
+	fun opprettAnsatt(id: UUID, personligIdent: String, fornavn: String, mellomnavn: String?, etternavn: String) {
+		val sql = """
+			INSERT INTO arrangor_ansatt(id, personlig_ident, fornavn, mellomnavn, etternavn)
+				VALUES(:id, :personligIdent, :fornavn, :mellomnavn, :etternavn)
+		""".trimIndent()
+
+		val parameters = sqlParameters(
+			"id" to id,
+			"personligIdent" to personligIdent,
+			"fornavn" to fornavn,
+			"mellomnavn" to mellomnavn,
+			"etternavn" to etternavn
+		)
+
+		template.update(sql, parameters)
 	}
 
 	fun get(ansattId: UUID): AnsattDbo? {

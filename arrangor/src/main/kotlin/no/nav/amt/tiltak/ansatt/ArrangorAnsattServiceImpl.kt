@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.TilknyttetArrangor
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
+import no.nav.amt.tiltak.core.port.PersonService
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Service
 import java.util.*
@@ -10,8 +11,31 @@ import java.util.*
 @Service
 class ArrangorAnsattServiceImpl(
 	val arrangorAnsattRepository: ArrangorAnsattRepository,
+	val personService: PersonService,
 	val template: NamedParameterJdbcTemplate
 ) : ArrangorAnsattService {
+
+	override fun opprettAnsattHvisIkkeFinnes(ansatttPersonIdent: String): Ansatt {
+		val ansatt = getAnsattByPersonligIdent(ansatttPersonIdent)
+
+		if (ansatt != null) {
+			return ansatt
+		}
+
+		val person = personService.hentPerson(ansatttPersonIdent)
+
+		val nyAnsattId = UUID.randomUUID()
+
+		arrangorAnsattRepository.opprettAnsatt(
+			id = nyAnsattId,
+			personligIdent = ansatttPersonIdent,
+			fornavn = person.fornavn,
+			mellomnavn = person.mellomnavn,
+			etternavn = person.etternavn
+		)
+
+		return getAnsatt(nyAnsattId)
+	}
 
 	override fun getAnsatt(ansattId: UUID): Ansatt {
 		val ansattDbo = arrangorAnsattRepository.get(ansattId) ?: throw NoSuchElementException("Ansatt ikke funnet")

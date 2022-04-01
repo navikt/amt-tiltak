@@ -32,7 +32,7 @@ class TilgangForesporselRepository(
 
 	}
 
-	internal fun hentForesporsel(foresporselId: UUID): TilgangForesporselDbo? {
+	internal fun hentForesporsel(foresporselId: UUID): TilgangForesporselDbo {
 		val sql = """
 			select * from gjennomforing_tilgang_foresporsel where id = :foresporselId
 		""".trimIndent()
@@ -41,7 +41,7 @@ class TilgangForesporselRepository(
 			sql,
 			sqlParameters("foresporselId" to foresporselId),
 			rowMapper
-		).firstOrNull()
+		).firstOrNull() ?: throw NoSuchElementException("Fant ikke tilgang forespørsel med id: $foresporselId")
 	}
 
 	internal fun hentUbesluttedeForesporsler(gjennomforingId: UUID): List<TilgangForesporselDbo> {
