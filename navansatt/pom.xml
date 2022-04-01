@@ -8,7 +8,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>tiltak</artifactId>
+    <artifactId>navansatt</artifactId>
 
     <dependencies>
         <dependency>
@@ -22,10 +22,6 @@
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>nav_kontor</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>navansatt</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
@@ -124,11 +120,6 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>arrangor</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 

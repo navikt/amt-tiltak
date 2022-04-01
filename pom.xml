@@ -11,17 +11,18 @@
 
     <modules>
         <module>application</module>
-        <module>core</module>
-        <module>connectors</module>
         <module>arrangor</module>
-        <module>tiltak</module>
-        <module>ingestors</module>
-        <module>db-migrations</module>
-        <module>tools</module>
-        <module>mocks</module>
-        <module>common</module>
-        <module>test</module>
         <module>clients</module>
+        <module>common</module>
+        <module>connectors</module>
+        <module>core</module>
+        <module>db-migrations</module>
+        <module>ingestors</module>
+        <module>mocks</module>
+        <module>navansatt</module>
+        <module>test</module>
+        <module>tiltak</module>
+        <module>tools</module>
     </modules>
 
     <name>AMT-Tiltak</name>
@@ -29,7 +30,7 @@
     <parent>
         <artifactId>spring-boot-starter-parent</artifactId>
         <groupId>org.springframework.boot</groupId>
-        <version>2.6.3</version>
+        <version>2.6.6</version>
     </parent>
 
     <properties>
@@ -141,6 +142,11 @@
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>tildelt-veileder-ingestor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>navansatt</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
