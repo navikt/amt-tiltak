@@ -24,17 +24,17 @@ class AnsattRolleRepository(
 		)
 	}
 
-	internal fun opprettRolle(ansattId: UUID, arrangorId: UUID, rolle: AnsattRolle) {
+	internal fun opprettRolle(id: UUID, ansattId: UUID, arrangorId: UUID, rolle: AnsattRolle) {
 		val sql = """
 			INSERT INTO arrangor_ansatt_rolle(id, ansatt_id, arrangor_id, rolle)
-				VALUES(:id, :ansattId, :arrangorId, :rolle)
+				VALUES(:id, :ansattId, :arrangorId, CAST(:rolle AS arrangor_rolle))
 		""".trimIndent()
 
 		val parameters = sqlParameters(
-			"id" to UUID.randomUUID(),
+			"id" to id,
 			"ansattId" to ansattId,
 			"arrangorId" to arrangorId,
-			"rolle" to rolle
+			"rolle" to rolle.name
 		)
 
 		template.update(sql, parameters)
@@ -42,7 +42,7 @@ class AnsattRolleRepository(
 
 	internal fun hentRoller(ansattId: UUID, arrangorId: UUID): List<AnsattRolleDbo> {
 		val sql = """
-			SELECT arrangor_id FROM arrangor_ansatt_rolle WHERE ansatt_id = :ansattId AND arrangor_id = :arrangorId
+			SELECT * FROM arrangor_ansatt_rolle WHERE ansatt_id = :ansattId AND arrangor_id = :arrangorId
 		""".trimIndent()
 
 		val parameters = sqlParameters(

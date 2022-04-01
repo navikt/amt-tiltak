@@ -38,6 +38,19 @@ class GjennomforingTilgangRepositoryTest : FunSpec({
 		DbTestDataUtils.cleanDatabase(dataSource)
 	}
 
+	test("opprettTilgang skal opprette tilgang") {
+		testRepository.insertArrangor(ARRANGOR_1)
+		testRepository.insertArrangorAnsatt(ARRANGOR_ANSATT_1)
+		testRepository.insertTiltak(TILTAK_1)
+		testRepository.insertGjennomforing(GJENNOMFORING_1)
+
+		repository.opprettTilgang(UUID.randomUUID(), ARRANGOR_ANSATT_1.id, GJENNOMFORING_1.id)
+
+		val gjennomforingIder = repository.hentGjennomforingerForAnsatt(ARRANGOR_ANSATT_1.id)
+
+		gjennomforingIder.first() shouldBe GJENNOMFORING_1.id
+	}
+
 	test("hentGjennomforingerForAnsatt skal returnere ider") {
 		testRepository.insertArrangor(ARRANGOR_1)
 		testRepository.insertArrangor(ARRANGOR_2)

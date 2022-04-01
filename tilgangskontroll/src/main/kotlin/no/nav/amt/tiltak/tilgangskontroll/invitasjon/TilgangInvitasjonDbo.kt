@@ -6,10 +6,10 @@ import java.util.*
 data class TilgangInvitasjonDbo(
 	val id: UUID,
 	val gjennomforingId: UUID,
-	val gydligTil: ZonedDateTime,
+	val gyldigTil: ZonedDateTime,
 	val opprettetAvNavAnsattId: UUID,
 	val erBrukt: Boolean,
-	val tidspunktBrukt: ZonedDateTime,
+	val tidspunktBrukt: ZonedDateTime?,
 	val tilgangForesporselId: UUID?,
 	val createdAt: ZonedDateTime,
 )

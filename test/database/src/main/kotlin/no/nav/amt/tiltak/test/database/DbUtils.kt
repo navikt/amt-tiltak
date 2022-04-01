@@ -19,7 +19,6 @@ object DbUtils {
 			&& this.hour == other.hour
 			&& this.minute == other.minute
 			&& this.second == other.second
-
 	}
 
 	fun LocalDate.isEqualTo(other: LocalDate?): Boolean {

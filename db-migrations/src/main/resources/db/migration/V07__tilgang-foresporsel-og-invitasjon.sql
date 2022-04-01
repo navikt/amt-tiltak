@@ -17,7 +17,7 @@ CREATE TABLE gjennomforing_tilgang_invitasjon
 (
     id                         uuid primary key,
     gjennomforing_id           uuid                     not null references gjennomforing (id),
-    gydlig_til                 timestamp with time zone not null,
+    gyldig_til                 timestamp with time zone not null,
     opprettet_av_nav_ansatt_id uuid                     not null references nav_ansatt (id),
     er_brukt                   boolean                  not null default false,
     tidspunkt_brukt            timestamp with time zone,

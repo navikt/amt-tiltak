@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.tilgangskontroll.invitasjon
 
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getNullableUUID
+import no.nav.amt.tiltak.common.db_utils.getNullableZonedDateTime
 import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.common.db_utils.getZonedDateTime
 import org.springframework.jdbc.core.RowMapper
@@ -19,10 +20,10 @@ class TilgangInvitasjonRepository(
 		TilgangInvitasjonDbo(
 			id = rs.getUUID("id"),
 			gjennomforingId = rs.getUUID("gjennomforing_id"),
-			gydligTil = rs.getZonedDateTime("gyldig_til"),
+			gyldigTil = rs.getZonedDateTime("gyldig_til"),
 			opprettetAvNavAnsattId = rs.getUUID("opprettet_av_nav_ansatt_id"),
 			erBrukt = rs.getBoolean("er_brukt"),
-			tidspunktBrukt = rs.getZonedDateTime("tidspunkt_brukt"),
+			tidspunktBrukt = rs.getNullableZonedDateTime("tidspunkt_brukt"),
 			tilgangForesporselId = rs.getNullableUUID("tilgang_foresporsel_id"),
 			createdAt = rs.getZonedDateTime("created_at"),
 		)
@@ -48,7 +49,7 @@ class TilgangInvitasjonRepository(
 		val parameters = sqlParameters(
 			"id" to id,
 			"gjennomforingId" to gjennomforingId,
-			"gydligTil" to gydligTil,
+			"gydligTil" to gydligTil.toOffsetDateTime(),
 			"opprettetAvNavAnsattId" to opprettetAvNavAnsattId
 		)
 

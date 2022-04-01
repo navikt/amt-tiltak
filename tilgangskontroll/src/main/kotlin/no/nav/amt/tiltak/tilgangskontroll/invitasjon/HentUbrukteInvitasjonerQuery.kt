@@ -23,15 +23,20 @@ class HentUbrukteInvitasjonerQuery(
 
 	private val rowMapper = RowMapper { rs, _ ->
 		UbruktInvitasjonDbo(
-			id = rs.getUUID("gti.id"),
-			opprettetAvNavIdent = rs.getString(""),
-			opprettetDato = rs.getZonedDateTime("gti.created_at"),
-			gyldigTilDato = rs.getZonedDateTime("gti.gyldig_til")
+			id = rs.getUUID("gjennomforing_tilgang_invitasjon__id"),
+			opprettetAvNavIdent = rs.getString("nav_ansatt__nav_ident"),
+			opprettetDato = rs.getZonedDateTime("gjennomforing_tilgang_invitasjon__created_at"),
+			gyldigTilDato = rs.getZonedDateTime("gjennomforing_tilgang_invitasjon__gyldig_til")
 		)
 	}
 
 	private val sql = """
-		select * from gjennomforing_tilgang_invitasjon gti
+		select
+			gti.id as gjennomforing_tilgang_invitasjon__id,
+			na.nav_ident as nav_ansatt__nav_ident,
+			gti.created_at as gjennomforing_tilgang_invitasjon__created_at,
+			gti.gyldig_til as gjennomforing_tilgang_invitasjon__gyldig_til
+		 from gjennomforing_tilgang_invitasjon gti
 			left join nav_ansatt na on na.id = gti.opprettet_av_nav_ansatt_id
 			where gti.gjennomforing_id = :gjennomforingId
 	""".trimIndent()

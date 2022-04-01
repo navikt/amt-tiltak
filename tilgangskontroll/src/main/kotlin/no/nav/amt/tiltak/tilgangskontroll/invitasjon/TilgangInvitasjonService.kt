@@ -48,7 +48,7 @@ class TilgangInvitasjonService(
 			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Kan ikke akseptere invitasjon som er brukt")
 		}
 
-		if (invitasjon.gydligTil.isAfter(ZonedDateTime.now())) {
+		if (invitasjon.gyldigTil.isAfter(ZonedDateTime.now())) {
 			// Bruk heller custom exception og map med controller advice
 			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Kan ikke akseptere invitasjon som er utgått")
 		}

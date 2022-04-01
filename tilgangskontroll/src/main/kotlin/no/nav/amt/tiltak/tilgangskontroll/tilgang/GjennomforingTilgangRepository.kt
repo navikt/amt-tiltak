@@ -12,13 +12,6 @@ class GjennomforingTilgangRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
 
-	internal fun hentGjennomforingerForAnsatt(ansattId: UUID): List<UUID> {
-		return template.query(
-			"SELECT gjennomforing_id FROM arrangor_ansatt_gjennomforing_tilgang WHERE ansatt_id = :ansattId",
-			MapSqlParameterSource().addValue("ansattId", ansattId),
-		) { rs, _ -> rs.getUUID("gjennomforing_id") }
-	}
-
 	internal fun opprettTilgang(id: UUID, ansattId: UUID, gjennomforingId: UUID) {
 		val sql = """
 			INSERT INTO arrangor_ansatt_gjennomforing_tilgang(id, ansatt_id, gjennomforing_id)
@@ -32,6 +25,13 @@ class GjennomforingTilgangRepository(
 		)
 
 		template.update(sql, parameters)
+	}
+
+	internal fun hentGjennomforingerForAnsatt(ansattId: UUID): List<UUID> {
+		return template.query(
+			"SELECT gjennomforing_id FROM arrangor_ansatt_gjennomforing_tilgang WHERE ansatt_id = :ansattId",
+			MapSqlParameterSource().addValue("ansattId", ansattId),
+		) { rs, _ -> rs.getUUID("gjennomforing_id") }
 	}
 
 	internal fun hentGjennomforingerForAnsattHosArrangor(ansattId: UUID, arrangorId: UUID): List<UUID> {

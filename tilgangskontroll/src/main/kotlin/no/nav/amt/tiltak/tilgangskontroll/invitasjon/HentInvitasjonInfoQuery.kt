@@ -22,15 +22,20 @@ class HentInvitasjonInfoQuery(
 
 	private val rowMapper = RowMapper { rs, _ ->
 		InvitasjonInfoDbo(
-			overordnetEnhetNavn = rs.getString("a.overordnet_enhet_navn"),
-			gjennomforingNavn = rs.getString("g.navn"),
-			erBrukt = rs.getBoolean("gti.er_brukt"),
-			gyldigTil = rs.getZonedDateTime("gti.gyldig_til"),
+			overordnetEnhetNavn = rs.getString("arrangor__overordnet_enhet_navn"),
+			gjennomforingNavn = rs.getString("gjennomforing__navn"),
+			erBrukt = rs.getBoolean("gjennomforing_tilgang_invitasjon__er_brukt"),
+			gyldigTil = rs.getZonedDateTime("gjennomforing_tilgang_invitasjon__gyldig_til"),
 		)
 	}
 
 	private val sql = """
-		select * from gjennomforing_tilgang_invitasjon gti
+		select
+		 	a.overordnet_enhet_navn as arrangor__overordnet_enhet_navn,
+		 	g.navn as gjennomforing__navn,
+		 	gti.er_brukt as gjennomforing_tilgang_invitasjon__er_brukt,
+		 	gti.gyldig_til as gjennomforing_tilgang_invitasjon__gyldig_til
+		 from gjennomforing_tilgang_invitasjon gti
 			left join gjennomforing g on g.id = gti.gjennomforing_id
 			left join arrangor a on a.id = g.arrangor_id
 			where gti.id = :invitasjonId

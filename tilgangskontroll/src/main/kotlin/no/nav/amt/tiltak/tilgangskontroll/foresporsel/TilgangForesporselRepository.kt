@@ -28,8 +28,22 @@ class TilgangForesporselRepository(
 		)
 	}
 
-	internal fun opprettForesporsel(opprettForesporselCmd: OpprettForesporselCmd) {
+	internal fun opprettForesporsel(cmd: OpprettForesporselCmd) {
+		val sql = """
+			INSERT INTO gjennomforing_tilgang_foresporsel(id, personlig_ident, fornavn, mellomnavn, etternavn, gjennomforing_id)
+				VALUES(:id, :personligIdent, :fornavn, :mellomnavn, :etternavn, :gjennomforingId)
+		""".trimIndent()
 
+		val parameters = sqlParameters(
+			"id" to cmd.id,
+			"personligIdent" to cmd.personligIdent,
+			"fornavn" to cmd.fornavn,
+			"mellomnavn" to cmd.mellomnavn,
+			"etternavn" to cmd.etternavn,
+			"gjennomforingId" to cmd.gjennomforingId,
+		)
+
+		template.update(sql, parameters)
 	}
 
 	internal fun hentForesporsel(foresporselId: UUID): TilgangForesporselDbo {
@@ -63,11 +77,11 @@ class TilgangForesporselRepository(
 				gjennomforing_tilgang_id = :gjennomforingTilgangId,
 				beslutning = :beslutning,
 				tidspunkt_beslutning = current_timestamp
-			 where foresporsel_id = :foresporselId
+			 where id = :id
 		""".trimIndent()
 
 		val params = sqlParameters(
-			"foresporselId" to foresporselId,
+			"id" to foresporselId,
 			"gjennomforingTilgangId" to gjennomforingTilgangId,
 			"beslutning" to Beslutning.GODKJENT.name,
 			"beslutningAvNavAnsattId" to beslutningAvNavAnsattId
@@ -80,14 +94,13 @@ class TilgangForesporselRepository(
 		val sql = """
 			update gjennomforing_tilgang_foresporsel set
 				beslutning_av_nav_ansatt_id = :beslutningAvNavAnsattId,
-				gjennomforing_tilgang_id = :gjennomforingTilgangId,
 				beslutning = :beslutning,
 				tidspunkt_beslutning = current_timestamp
-			 where foresporsel_id = :foresporselId
+			 where id = :id
 		""".trimIndent()
 
 		val params = sqlParameters(
-			"foresporselId" to foresporselId,
+			"id" to foresporselId,
 			"beslutning" to Beslutning.AVVIST.name,
 			"beslutningAvNavAnsattId" to beslutningAvNavAnsattId
 		)
