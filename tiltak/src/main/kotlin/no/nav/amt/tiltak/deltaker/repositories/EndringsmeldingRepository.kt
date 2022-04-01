@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.deltaker.dbo.EndringsmeldingDbo
+import no.nav.amt.tiltak.utils.getNullableUUID
 import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -21,7 +22,7 @@ open class EndringsmeldingRepository(
 			id = rs.getUUID("id"),
 			deltakerId = rs.getUUID("deltaker_id"),
 			startDato = rs.getDate("start_dato")?.toLocalDate(),
-			godkjentAvNavIdent = rs.getString("godkjent_av_nav_ansatt"),
+			godkjentAvNavAnsatt = rs.getNullableUUID("godkjent_av_nav_ansatt"),
 			aktiv = rs.getBoolean("aktiv"),
 			opprettetAv = rs.getUUID("opprettet_av"),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
@@ -29,19 +30,16 @@ open class EndringsmeldingRepository(
 		)
 	}
 
-	fun getTrengerGodkjenning(gjennomforingId: UUID): EndringsmeldingDbo? {
+	fun getByGjennomforing(gjennomforingId: UUID): List<EndringsmeldingDbo> {
 		val sql = """
 			SELECT *
 			FROM endringsmelding
-			JOIN deltaker on endringsmelding.deltakerId = deltaker.id
-			WHERE deltaker.gjennomforing_id = gjennomforing_id
-			AND aktiv=true
-			AND godkjent_av_nav_ident is null
+			JOIN deltaker on endringsmelding.deltaker_id = deltaker.id
+			WHERE deltaker.gjennomforing_id = :gjennomforing_id
 		""".trimIndent()
 
 		val param = MapSqlParameterSource().addValue("gjennomforing_id", gjennomforingId)
-		val res = template.query(sql, param, rowMapper)
-		return res.firstOrNull()
+		return template.query(sql, param, rowMapper)
 	}
 
 	fun get(id: UUID): EndringsmeldingDbo? {
