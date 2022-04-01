@@ -10,4 +10,6 @@ interface ArrangorAnsattTilgangService {
 
 	fun hentGjennomforingIder(ansattPersonligIdent: String): List<UUID>
 
+	fun hentAnsattId(ansattPersonligIdent: String): UUID
+
 }

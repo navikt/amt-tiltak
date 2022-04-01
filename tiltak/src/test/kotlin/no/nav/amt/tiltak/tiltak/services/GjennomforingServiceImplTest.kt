@@ -30,6 +30,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDateTime
+import java.util.*
 
 class GjennomforingServiceImplTest : FunSpec({
 
@@ -103,6 +104,7 @@ class GjennomforingServiceImplTest : FunSpec({
 			registrertDato = LocalDateTime.now(),
 			dagerPerUke = null,
 			prosentStilling = null,
+			gjennomforingId = UUID.randomUUID()
 		))
 
 		gjennomforingRepository.get(GJENNOMFORING_1.id) shouldNotBe null

@@ -93,7 +93,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 				startDato = nyStartdato,
 				sluttDato = nySluttdato,
 				statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(Deltaker.Status.DELTAR))),
-				registrertDato = LocalDateTime.now()
+				registrertDato = LocalDateTime.now(),
+				gjennomforingId = UUID.randomUUID()
 			)
 		))
 

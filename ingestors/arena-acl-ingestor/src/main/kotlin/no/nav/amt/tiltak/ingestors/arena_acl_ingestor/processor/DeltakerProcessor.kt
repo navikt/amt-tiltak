@@ -56,12 +56,12 @@ class DeltakerProcessor(
 			),
 			dagerPerUke = deltakerDto.dagerPerUke,
 			prosentStilling = deltakerDto.prosentDeltid,
-			registrertDato = deltakerDto.registrertDato
+			registrertDato = deltakerDto.registrertDato,
+			gjennomforingId = tiltaksgjennomforing.id
 		)
 
 		deltakerService.upsertDeltaker(
 			fodselsnummer =  deltakerDto.personIdent,
-			gjennomforingId = tiltaksgjennomforing.id,
 			deltaker = deltaker,
 		)
 

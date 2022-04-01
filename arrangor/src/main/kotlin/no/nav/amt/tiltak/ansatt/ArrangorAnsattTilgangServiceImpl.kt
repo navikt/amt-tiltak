@@ -59,7 +59,7 @@ class ArrangorAnsattTilgangServiceImpl(
 		}
 	}
 
-	private fun hentAnsattId(ansattPersonligIdent: String): UUID {
+	override fun hentAnsattId(ansattPersonligIdent: String): UUID {
 		val ansattId = tryCacheFirstNullable(personligIdentToAnsattIdCache, ansattPersonligIdent) {
 			ansattRepository.getByPersonligIdent(
 				ansattPersonligIdent
