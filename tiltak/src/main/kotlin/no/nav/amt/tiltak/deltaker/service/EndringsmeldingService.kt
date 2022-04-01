@@ -9,18 +9,12 @@ import java.time.LocalDate
 import java.util.*
 
 @Service
-@EnableTransactionManagement
 open class EndringsmeldingService(
 	private val repository: EndringsmeldingRepository,
 ) {
 
-	fun opprettMedStartDato(deltakerId: UUID, startDato: LocalDate, ansattId: UUID) {
-		insertOgInaktiverStartDato(startDato, deltakerId, ansattId)
+	fun opprettMedStartDato(deltakerId: UUID, startDato: LocalDate, ansattId: UUID): EndringsmeldingDbo{
+		return repository.insertOgInaktiverStartDato(startDato, deltakerId, ansattId)
 	}
 
-	@Transactional
-	open fun insertOgInaktiverStartDato(startDato: LocalDate, deltakerId: UUID, opprettetAv: UUID): EndringsmeldingDbo {
-		repository.inaktiverTidligereMeldinger(deltakerId)
-		return repository.insertNyStartDato(startDato, deltakerId, opprettetAv)
-	}
 }

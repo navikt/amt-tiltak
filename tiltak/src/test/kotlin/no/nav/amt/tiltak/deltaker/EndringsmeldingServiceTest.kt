@@ -27,9 +27,9 @@ class EndringsmeldingServiceTest {
 	fun `insertOgInaktiverStartDato - Inserter og inaktiverer forrige melding`() {
 		val dato = LocalDate.now()
 
-		var result1 = endringsmeldingService.insertOgInaktiverStartDato(dato, DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+		var result1 = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, dato, ARRANGOR_ANSATT_1.id)
 
-		val result2 = endringsmeldingService.insertOgInaktiverStartDato(dato.minusDays(2), DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+		val result2 = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, dato.minusDays(2), ARRANGOR_ANSATT_1.id)
 		result1 = repository.get(result1.id)!!
 
 		result1.aktiv shouldBe false

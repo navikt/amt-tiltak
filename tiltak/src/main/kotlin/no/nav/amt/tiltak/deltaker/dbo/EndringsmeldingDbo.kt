@@ -8,7 +8,6 @@ data class EndringsmeldingDbo(
 	val id: UUID,
 	val deltakerId: UUID,
 	val startDato: LocalDate?,
-	val sluttDato: LocalDate?,
 	val godkjentAvNavIdent: String?,
 	val aktiv: Boolean, // false hvis man sletter, kommer med ny endring, kanskje hvis en endring kommer fra arena etterpå?
 	val opprettetAv: UUID,

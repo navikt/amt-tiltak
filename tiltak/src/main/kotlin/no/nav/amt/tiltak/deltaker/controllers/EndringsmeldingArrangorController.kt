@@ -11,7 +11,7 @@ import java.time.LocalDate
 import java.util.*
 
 @RestController
-@RequestMapping(value = ["/api/tiltakarrangor/endringsmelding"])
+@RequestMapping("/api/tiltakarrangor/endringsmelding")
 class EndringsmeldingArrangorController(
 	private val endringsmeldingService: EndringsmeldingService,
 	private val arrangorTilgangService: ArrangorAnsattTilgangService,
@@ -21,7 +21,7 @@ class EndringsmeldingArrangorController(
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@PostMapping("/deltaker/{deltakerId}/startdato")
-	fun registrereStartDato(@PathVariable("deltakerId") deltakerId: UUID, @RequestParam startDato: LocalDate) {
+	fun registrerStartDato(@PathVariable("deltakerId") deltakerId: UUID, @RequestParam startDato: LocalDate) {
 
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 		val deltaker = deltakerService.hentDeltaker(deltakerId)

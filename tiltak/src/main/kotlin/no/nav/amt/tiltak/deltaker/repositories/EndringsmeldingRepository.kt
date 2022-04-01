@@ -6,11 +6,13 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.EnableTransactionManagement
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.util.*
 
 @Component
+@EnableTransactionManagement
 open class EndringsmeldingRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
@@ -19,7 +21,6 @@ open class EndringsmeldingRepository(
 			id = rs.getUUID("id"),
 			deltakerId = rs.getUUID("deltaker_id"),
 			startDato = rs.getDate("start_dato")?.toLocalDate(),
-			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
 			godkjentAvNavIdent = rs.getString("godkjent_av_nav_ansatt"),
 			aktiv = rs.getBoolean("aktiv"),
 			opprettetAv = rs.getUUID("opprettet_av"),
@@ -56,7 +57,13 @@ open class EndringsmeldingRepository(
 		return res.firstOrNull()
 	}
 
-	fun inaktiverTidligereMeldinger(deltakerId: UUID): Int {
+	@Transactional
+	open fun insertOgInaktiverStartDato(startDato: LocalDate, deltakerId: UUID, opprettetAv: UUID): EndringsmeldingDbo {
+		inaktiverTidligereMeldinger(deltakerId)
+		return insertNyStartDato(startDato, deltakerId, opprettetAv)
+	}
+
+	private fun inaktiverTidligereMeldinger(deltakerId: UUID): Int {
 		val sql = """
 			UPDATE endringsmelding
 			SET aktiv=false
@@ -68,7 +75,7 @@ open class EndringsmeldingRepository(
 		return template.update(sql, params)
 	}
 
-	fun insertNyStartDato(startDato: LocalDate, deltakerId: UUID, opprettetAv: UUID): EndringsmeldingDbo {
+	private fun insertNyStartDato(startDato: LocalDate, deltakerId: UUID, opprettetAv: UUID): EndringsmeldingDbo {
 		val id = UUID.randomUUID()
 		// language=sql
 		val sql = """
