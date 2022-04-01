@@ -22,11 +22,11 @@ open class DeltakerServiceImpl(
 
 	private val log = LoggerFactory.getLogger(DeltakerService::class.java)
 
-	override fun upsertDeltaker(fodselsnummer: String, gjennomforingId: UUID, deltaker: Deltaker) {
+	override fun upsertDeltaker(fodselsnummer: String, deltaker: Deltaker) {
 		val lagretDeltakerDbo = deltakerRepository.get(deltaker.id)
 
 		if (lagretDeltakerDbo == null) {
-			createDeltaker(fodselsnummer, gjennomforingId, deltaker)
+			createDeltaker(fodselsnummer, deltaker.gjennomforingId, deltaker)
 		} else {
 			val lagretDeltaker = lagretDeltakerDbo.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker)
 			val oppdatertDeltaker = lagretDeltaker.oppdater(deltaker)

@@ -7,7 +7,6 @@ interface DeltakerService {
 
 	fun upsertDeltaker(
 		fodselsnummer: String,
-		gjennomforingId: UUID,
 		deltaker: Deltaker,
 	)
 

@@ -13,7 +13,7 @@ data class DeltakerDbo(
 	val brukerFornavn: String,
 	val brukerMellomnavn: String? = null,
 	val brukerEtternavn: String,
-	val gjennomforingId: UUID? = null,
+	val gjennomforingId: UUID,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val dagerPerUke: Int?,
@@ -29,6 +29,7 @@ data class DeltakerDbo(
 		this(
 			id = deltaker.id,
 			brukerId = requireNotNull(deltaker.bruker?.id),
+			gjennomforingId = deltaker.gjennomforingId,
 			brukerFodselsnummer = requireNotNull(deltaker.bruker?.fodselsnummer),
 			brukerFornavn = requireNotNull(deltaker.bruker?.fornavn),
 			brukerEtternavn = requireNotNull(deltaker.bruker?.etternavn),
@@ -42,6 +43,7 @@ data class DeltakerDbo(
 	fun toDeltaker(statusProvider: (deltakerId: UUID) -> List<DeltakerStatusDbo>): Deltaker {
 		return Deltaker(
 			id = id,
+			gjennomforingId = gjennomforingId,
 			bruker = Bruker(
 				id = brukerId,
 				fornavn = brukerFornavn,

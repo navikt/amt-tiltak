@@ -58,7 +58,7 @@ class DeltakerServiceImplTest {
 
 	@Test
 	fun `upsertDeltaker - inserter ny deltaker`() {
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, deltaker)
 
 		val nyDeltaker = deltakerRepository.get(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id)
 
@@ -74,7 +74,7 @@ class DeltakerServiceImplTest {
 	@Test
 	fun `upsertDeltaker - deltaker får ny status - oppdaterer status på deltaker`() {
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, deltaker)
 
 		var nyDeltaker = deltakerRepository.get(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id)
 		var statuser = deltakerStatusRepository.getStatuserForDeltaker(deltakerId)
@@ -85,7 +85,7 @@ class DeltakerServiceImplTest {
 		val endretStatus = status.medNy(Deltaker.Status.HAR_SLUTTET, LocalDateTime.now())
 		val endretDeltaker = deltaker.copy(statuser = endretStatus)
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, endretDeltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, endretDeltaker)
 
 		nyDeltaker = deltakerRepository.get(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id)
 		statuser = deltakerStatusRepository.getStatuserForDeltaker(deltakerId)
@@ -101,14 +101,14 @@ class DeltakerServiceImplTest {
 	@Test
 	fun `upsertDeltaker - deltaker får samme status igjen - oppdaterer ikke status`() {
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, deltaker)
 		var nyDeltaker = deltakerRepository.get(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id)
 		var statuser = deltakerStatusRepository.getStatuserForDeltaker(deltakerId)
 
 		nyDeltaker shouldNotBe null
 		statuser shouldHaveSize 1
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, deltaker)
 
 		nyDeltaker = deltakerRepository.get(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id)
 		statuser = deltakerStatusRepository.getStatuserForDeltaker(deltakerId)
@@ -123,7 +123,7 @@ class DeltakerServiceImplTest {
 	@Test
 	fun `upsertDeltaker - deltaker får samme status på nytt etter opphold - oppdaterer status`() {
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, deltaker)
 
 		var nyDeltaker = deltakerRepository.get(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id)
 		var statuser = deltakerStatusRepository.getStatuserForDeltaker(deltakerId)
@@ -133,7 +133,7 @@ class DeltakerServiceImplTest {
 
 		val endretDeltaker = deltaker.copy(statuser = DeltakerStatuser.settAktivStatus(Deltaker.Status.HAR_SLUTTET))
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, endretDeltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, endretDeltaker)
 
 		nyDeltaker = deltakerRepository.get(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id)
 		statuser = deltakerStatusRepository.getStatuserForDeltaker(deltakerId)
@@ -143,13 +143,13 @@ class DeltakerServiceImplTest {
 		statuser shouldHaveSize 2
 		aktivStatus.status shouldBe Deltaker.Status.HAR_SLUTTET
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, deltaker.copy(statuser = DeltakerStatuser.settAktivStatus(Deltaker.Status.DELTAR)))
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, deltaker.copy(statuser = DeltakerStatuser.settAktivStatus(Deltaker.Status.DELTAR)))
 
 	}
 
 	@Test
 	fun `slettDeltaker - skal slette deltaker og status`() {
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, GJENNOMFORING_1.id, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, deltaker)
 
 		deltakerStatusRepository.getStatuserForDeltaker(deltakerId) shouldHaveSize 1
 
@@ -170,6 +170,8 @@ class DeltakerServiceImplTest {
 		statuser =  status,
 		registrertDato =  LocalDateTime.now(),
 		dagerPerUke = null,
-		prosentStilling = null
+		prosentStilling = null,
+		gjennomforingId = GJENNOMFORING_1.id
+
 	)
 }

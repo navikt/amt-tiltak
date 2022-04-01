@@ -20,7 +20,7 @@ open class EndringsmeldingRepository(
 			deltakerId = rs.getUUID("deltaker_id"),
 			startDato = rs.getDate("start_dato")?.toLocalDate(),
 			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
-			godkjentAvNavIdent = rs.getString("godkjent_av_nav_ident"),
+			godkjentAvNavIdent = rs.getString("godkjent_av_nav_ansatt"),
 			aktiv = rs.getBoolean("aktiv"),
 			opprettetAv = rs.getUUID("opprettet_av"),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
@@ -28,15 +28,18 @@ open class EndringsmeldingRepository(
 		)
 	}
 
-	fun getTrengerGodkjenning(): EndringsmeldingDbo? {
+	fun getTrengerGodkjenning(gjennomforingId: UUID): EndringsmeldingDbo? {
 		val sql = """
 			SELECT *
 			FROM endringsmelding
-			WHERE aktiv=true
+			JOIN deltaker on endringsmelding.deltakerId = deltaker.id
+			WHERE deltaker.gjennomforing_id = gjennomforing_id
+			AND aktiv=true
 			AND godkjent_av_nav_ident is null
 		""".trimIndent()
 
-		val res = template.query(sql, rowMapper)
+		val param = MapSqlParameterSource().addValue("gjennomforing_id", gjennomforingId)
+		val res = template.query(sql, param, rowMapper)
 		return res.firstOrNull()
 	}
 
@@ -47,37 +50,25 @@ open class EndringsmeldingRepository(
 			WHERE id=:id
 		""".trimIndent()
 
-		val params = MapSqlParameterSource().addValues(
-			mapOf(
-				"id" to id
-			)
-		)
+		val params = MapSqlParameterSource().addValue("id", id)
 
 		val res = template.query(sql, params, rowMapper)
 		return res.firstOrNull()
 	}
 
-	@Transactional
-	open fun insertOgInaktiverStartDato(startDato: LocalDate, deltakerId: UUID, opprettetAv: UUID): EndringsmeldingDbo {
-		inaktiverMeldinger(deltakerId)
-		return insertNyStartDato(startDato, deltakerId, opprettetAv)
-	}
-
-	private fun inaktiverMeldinger(deltakerId: UUID): Int {
+	fun inaktiverTidligereMeldinger(deltakerId: UUID): Int {
 		val sql = """
 			UPDATE endringsmelding
 			SET aktiv=false
 			WHERE deltaker_id = :deltaker_id
 		""".trimIndent()
 
-		val params = MapSqlParameterSource().addValues(
-			mapOf("deltaker_id" to deltakerId)
-		)
+		val params = MapSqlParameterSource().addValue("deltaker_id", deltakerId)
 
 		return template.update(sql, params)
 	}
 
-	private fun insertNyStartDato(startDato: LocalDate, deltakerId: UUID, opprettetAv: UUID): EndringsmeldingDbo {
+	fun insertNyStartDato(startDato: LocalDate, deltakerId: UUID, opprettetAv: UUID): EndringsmeldingDbo {
 		val id = UUID.randomUUID()
 		// language=sql
 		val sql = """

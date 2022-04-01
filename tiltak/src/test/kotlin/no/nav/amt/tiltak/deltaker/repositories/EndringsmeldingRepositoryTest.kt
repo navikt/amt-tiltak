@@ -25,9 +25,10 @@ internal class EndringsmeldingRepositoryTest : FunSpec({
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
-	test("insertOgInaktiver - Ingen tidligere endringsmeldinger - inserter melding med alle verdier") {
+	test("insertNyStartDato - Ingen tidligere endringsmeldinger - inserter melding med alle verdier") {
 		val now = LocalDate.now()
-		val melding = repository.insertOgInaktiverStartDato(now, DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+		val melding = repository.insertNyStartDato(now, DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+		repository.inaktiverTidligereMeldinger(DELTAKER_1.id)
 
 		melding shouldNotBe null
 		melding.deltakerId shouldBe DELTAKER_1.id
@@ -37,25 +38,41 @@ internal class EndringsmeldingRepositoryTest : FunSpec({
 		melding.startDato shouldBe now
 	}
 
-	test("insertOgInaktiver - Det finnes flere endringsmeldinger - inserter melding og inaktiverer den gamle") {
+	test("insertNyStartDato - Det finnes flere endringsmeldinger - inserter melding og inaktiverer den gamle") {
 		val idag = LocalDate.now()
-		val forsteMelding = repository.insertOgInaktiverStartDato(idag, DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+		val melding1 = repository.insertNyStartDato(idag, DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+		repository.inaktiverTidligereMeldinger(DELTAKER_1.id)
 
-		forsteMelding.deltakerId shouldBe DELTAKER_1.id
-		forsteMelding.aktiv shouldBe true
-		forsteMelding.startDato shouldBe idag
+		melding1.deltakerId shouldBe DELTAKER_1.id
+		melding1.aktiv shouldBe true
+		melding1.startDato shouldBe idag
+		melding1.sluttDato shouldBe null
 
 		val nyDato = LocalDate.now().minusDays(1)
-		val melding2 = repository.insertOgInaktiverStartDato(nyDato, DELTAKER_1.id, ARRANGOR_ANSATT_2.id)
+		val melding2 = repository.insertNyStartDato(nyDato, DELTAKER_1.id, ARRANGOR_ANSATT_2.id)
 
 		melding2 shouldNotBe null
 		melding2.startDato shouldBe nyDato
 		melding2.aktiv shouldBe true
 		melding2.opprettetAv shouldBe ARRANGOR_ANSATT_2.id
 
-		val forrigeMelding = repository.get(forsteMelding.id)
+		val forrigeMelding = repository.get(melding1.id)
 
-		forsteMelding.copy(aktiv = false) shouldBe forrigeMelding
+		melding1.copy(aktiv = false) shouldBe forrigeMelding
+	}
+
+	test("inaktiverTidligereMeldinger - Det finnes flere endringsmeldinger - Deaktiverer alle") {
+		val idag = LocalDate.now()
+		val melding1 = repository.insertNyStartDato(idag, DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+		val melding2 = repository.insertNyStartDato(idag, DELTAKER_1.id, ARRANGOR_ANSATT_2.id)
+		repository.inaktiverTidligereMeldinger(DELTAKER_1.id)
+
+		val melding1Inaktivert = repository.get(melding1.id)
+		val melding2Inaktivert = repository.get(melding2.id)
+
+		melding1Inaktivert!!.aktiv shouldBe false
+		melding2Inaktivert!!.aktiv shouldBe false
+
 
 	}
 })
