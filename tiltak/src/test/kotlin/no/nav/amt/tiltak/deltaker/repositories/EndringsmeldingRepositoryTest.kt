@@ -57,5 +57,27 @@ internal class EndringsmeldingRepositoryTest : FunSpec({
 		melding1.copy(aktiv = false) shouldBe forrigeMelding
 	}
 
+	test("getByGjennomforing - en endringsmelding - henter endringsmelding") {
+		val now = LocalDate.now()
+		repository.insertOgInaktiverStartDato(now, DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+		val meldinger = repository.getByGjennomforing(DELTAKER_1.gjennomforing_id)
+
+		meldinger.size shouldBe 1
+		meldinger.get(0).aktiv shouldBe true
+
+	}
+
+	test("getByGjennomforing - inaktiv endringsmelding - returnerer alle") {
+		val now = LocalDate.now()
+		repository.insertOgInaktiverStartDato(now, DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+		repository.insertOgInaktiverStartDato(now.minusDays(1), DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+
+		val meldinger = repository.getByGjennomforing(DELTAKER_1.gjennomforing_id)
+
+		meldinger.size shouldBe 2
+		meldinger.get(0).aktiv shouldBe false
+		meldinger.get(1).aktiv shouldBe true
+	}
+
 })
 
