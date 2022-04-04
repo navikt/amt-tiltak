@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.ZonedDateTime
 import java.util.*
-import kotlin.NoSuchElementException
 
 class TilgangInvitasjonRepositoryTest : FunSpec({
 
@@ -89,7 +88,7 @@ class TilgangInvitasjonRepositoryTest : FunSpec({
 			id = invitasjonId,
 			gjennomforingId = GJENNOMFORING_1.id,
 			opprettetAvNavAnsattId = NAV_ANSATT_1.id,
-			gydligTil = now
+			gyldigTil = now
 		)
 
 		val invitasjon = repository.get(invitasjonId)
@@ -101,7 +100,6 @@ class TilgangInvitasjonRepositoryTest : FunSpec({
 	}
 
 	test("settTilBrukt - skal marker invitasjon som brukt") {
-
 		val foresporselId = UUID.randomUUID()
 		val invitasjonId = UUID.randomUUID()
 		val now = ZonedDateTime.now()

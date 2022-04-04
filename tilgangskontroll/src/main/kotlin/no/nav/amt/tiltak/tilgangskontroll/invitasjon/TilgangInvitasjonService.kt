@@ -36,7 +36,7 @@ class TilgangInvitasjonService(
 			id = nyInvitasjonId,
 			gjennomforingId = gjennomforingId,
 			opprettetAvNavAnsattId = opprettetAvNavAnsattId,
-			gydligTil = invitasjonGyldigTil
+			gyldigTil = invitasjonGyldigTil
 		)
 	}
 

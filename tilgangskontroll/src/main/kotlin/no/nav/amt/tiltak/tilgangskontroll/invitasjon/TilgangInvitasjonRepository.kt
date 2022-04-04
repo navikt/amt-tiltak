@@ -40,16 +40,16 @@ class TilgangInvitasjonRepository(
 			?: throw NoSuchElementException("Fant ikke tilgang invitasjon med id: $id")
 	}
 
-	internal fun opprettInvitasjon(id: UUID, gjennomforingId: UUID, opprettetAvNavAnsattId: UUID, gydligTil: ZonedDateTime) {
+	internal fun opprettInvitasjon(id: UUID, gjennomforingId: UUID, opprettetAvNavAnsattId: UUID, gyldigTil: ZonedDateTime) {
 		val sql = """
-			INSERT INTO gjennomforing_tilgang_invitasjon(id, gjennomforing_id, gydlig_til, opprettet_av_nav_ansatt_id)
-			 	VALUES(:id, :gjennomforingId, :gydligTil, :opprettetAvNavAnsattId)
+			INSERT INTO gjennomforing_tilgang_invitasjon(id, gjennomforing_id, gyldig_til, opprettet_av_nav_ansatt_id)
+			 	VALUES(:id, :gjennomforingId, :gyldigTil, :opprettetAvNavAnsattId)
 		""".trimIndent()
 
 		val parameters = sqlParameters(
 			"id" to id,
 			"gjennomforingId" to gjennomforingId,
-			"gydligTil" to gydligTil.toOffsetDateTime(),
+			"gyldigTil" to gyldigTil.toOffsetDateTime(),
 			"opprettetAvNavAnsattId" to opprettetAvNavAnsattId
 		)
 
