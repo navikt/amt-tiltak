@@ -23,7 +23,6 @@ import java.util.*
 
 class DeltakerServiceTest: StringSpec ({
 	val fodselsnummer = "12345678904"
-	val gjennomforingId = UUID.randomUUID()
 	val deltakerId = UUID.randomUUID()
 	val defaultBruker = Bruker(id = UUID.randomUUID(), "GRØNN",null,"KOPP", fodselsnummer, null)
 
@@ -35,7 +34,8 @@ class DeltakerServiceTest: StringSpec ({
 		statuser = DeltakerStatuser.settAktivStatus(Deltaker.Status.VENTER_PA_OPPSTART),
 		registrertDato = LocalDateTime.now(),
 		dagerPerUke = 4,
-		prosentStilling = 0.8F
+		prosentStilling = 0.8F,
+		gjennomforingId = UUID.randomUUID()
 	)
 	val defaultDeltakerDbo = DeltakerDbo(defaultDeltaker)
 
@@ -77,12 +77,12 @@ class DeltakerServiceTest: StringSpec ({
 		every { deltakerRepository.insert(any(), any(), any(), any(), any(), any(), any(), any()) } returns deltakerDbo
 		every { deltakerStatusRepository.upsert(any<List<DeltakerStatusDbo>>()) } returns Unit
 
-		service.upsertDeltaker(fodselsnummer, gjennomforingId, deltaker)
+		service.upsertDeltaker(fodselsnummer, deltaker)
 
 		verify(exactly = 1) { deltakerRepository.insert(
 			id = deltaker.id,
 			brukerId = defaultBruker.id,
-			gjennomforingId = gjennomforingId,
+			gjennomforingId = deltaker.gjennomforingId,
 			startDato = deltaker.startDato,
 			sluttDato = deltaker.sluttDato,
 			dagerPerUke = deltaker.dagerPerUke,
@@ -113,7 +113,7 @@ class DeltakerServiceTest: StringSpec ({
 		every { deltakerRepository.update(any()) } returns deltakerDbo
 		every { deltakerStatusRepository.upsert(any<List<DeltakerStatusDbo>>()) } returns Unit
 
-		service.upsertDeltaker(fodselsnummer, gjennomforingId, deltaker)
+		service.upsertDeltaker(fodselsnummer, deltaker)
 
 		verify(exactly = 0) { deltakerRepository.insert(any(), any(), any(), any(), any(), any(), any(), any()) }
 		verify(exactly = 1) { deltakerRepository.update(any()) }
@@ -135,3 +135,11 @@ class DeltakerServiceTest: StringSpec ({
 	}
 
 })
+
+/*
+Implementerer støtte for å lagre endringsmeldinger med startdato
+- Endepunkt for å lagre en endringsmelding med oppstartsdato
+- Legge gjennomføring på Deltaker fordi det forenkler tilgangskontroll på tiltaksarranagør ansatt og jeg mener at en deltaker
+må også ha en gjennomføring for å gi mening på tvers
+- Tilrettelagt for at man kan sette start og sluttdato samtidig om det er behov i fremtiden
+ */

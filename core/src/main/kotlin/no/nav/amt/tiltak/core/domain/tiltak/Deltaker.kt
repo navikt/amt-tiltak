@@ -7,6 +7,7 @@ import java.util.*
 
 data class Deltaker(
 	val id: UUID = UUID.randomUUID(),
+	val gjennomforingId: UUID,
 	val bruker: Bruker? = null,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
