@@ -11,7 +11,7 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @Service
-class TilgangInvitasjonService(
+open class TilgangInvitasjonService(
 	private val hentInvitasjonInfoQuery: HentInvitasjonInfoQuery,
 	private val hentUbrukteInvitasjonerQuery: HentUbrukteInvitasjonerQuery,
 	private val tilgangInvitasjonRepository: TilgangInvitasjonRepository,
@@ -20,15 +20,15 @@ class TilgangInvitasjonService(
 	private val personService: PersonService,
 ) {
 
-	fun hentInvitasjonInfo(invitasjonId: UUID): InvitasjonInfoDbo {
+	open fun hentInvitasjonInfo(invitasjonId: UUID): InvitasjonInfoDbo {
 		return hentInvitasjonInfoQuery.query(invitasjonId)
 	}
 
-	fun hentUbrukteInvitasjoner(gjennomforingId: UUID): List<UbruktInvitasjonDbo> {
+	open fun hentUbrukteInvitasjoner(gjennomforingId: UUID): List<UbruktInvitasjonDbo> {
 		return hentUbrukteInvitasjonerQuery.query(gjennomforingId)
 	}
 
-	fun opprettInvitasjon(gjennomforingId: UUID, opprettetAvNavAnsattId: UUID) {
+	open fun opprettInvitasjon(gjennomforingId: UUID, opprettetAvNavAnsattId: UUID) {
 		val nyInvitasjonId = UUID.randomUUID()
 		val invitasjonGyldigTil = ZonedDateTime.now().plusDays(5)
 
@@ -40,7 +40,7 @@ class TilgangInvitasjonService(
 		)
 	}
 
-	fun aksepterInvitasjon(invitasjonId: UUID, arrangorAnsattPersonligIdent: String) {
+	open fun aksepterInvitasjon(invitasjonId: UUID, arrangorAnsattPersonligIdent: String) {
 		val invitasjon = tilgangInvitasjonRepository.get(invitasjonId)
 
 		if (invitasjon.erBrukt) {
@@ -73,7 +73,7 @@ class TilgangInvitasjonService(
 		}
 	}
 
-	fun slettInvitasjon(invitasjonId: UUID) {
+	open fun slettInvitasjon(invitasjonId: UUID) {
 		val invitasjon = tilgangInvitasjonRepository.get(invitasjonId)
 
 		if (invitasjon.erBrukt) {

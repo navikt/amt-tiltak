@@ -10,7 +10,7 @@ import org.springframework.transaction.support.TransactionTemplate
 import java.util.*
 
 @Service
-class TilgangForesporselService(
+open class TilgangForesporselService(
 	private val tilgangForesporselRepository: TilgangForesporselRepository,
 	private val transactionTemplate: TransactionTemplate,
 	private val gjennomforingTilgangService: GjennomforingTilgangService,
@@ -19,15 +19,15 @@ class TilgangForesporselService(
 	private val ansattRolleService: AnsattRolleService,
 ) {
 
-	fun hentUbesluttedeForesporsler(gjennomforingId: UUID): List<TilgangForesporselDbo> {
+	open fun hentUbesluttedeForesporsler(gjennomforingId: UUID): List<TilgangForesporselDbo> {
 		return tilgangForesporselRepository.hentUbesluttedeForesporsler(gjennomforingId)
 	}
 
-	fun opprettForesporsel(opprettForesporselCmd: OpprettForesporselCmd) {
+	open fun opprettForesporsel(opprettForesporselCmd: OpprettForesporselCmd) {
 		tilgangForesporselRepository.opprettForesporsel(opprettForesporselCmd)
 	}
 
-	fun godkjennForesporsel(foresporselId: UUID, beslutningAvNavAnsattId: UUID) {
+	open fun godkjennForesporsel(foresporselId: UUID, beslutningAvNavAnsattId: UUID) {
 		val foresporsel = tilgangForesporselRepository.hentForesporsel(foresporselId)
 
 		val nyGjennomforingTilgangId = UUID.randomUUID()
@@ -53,7 +53,7 @@ class TilgangForesporselService(
 		}
 	}
 
-	fun avvisForesporsel(foresporselId: UUID, avvistAvNavAnsattId: UUID) {
+	open fun avvisForesporsel(foresporselId: UUID, avvistAvNavAnsattId: UUID) {
 		tilgangForesporselRepository.avvisForesporsel(foresporselId, avvistAvNavAnsattId)
 	}
 

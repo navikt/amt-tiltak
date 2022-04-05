@@ -6,6 +6,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.DbUtils.shouldBeCloseTo
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
@@ -67,10 +68,10 @@ class TilgangInvitasjonRepositoryTest : FunSpec({
 
 		invitasjon.id shouldBe invitasjonId
 		invitasjon.gjennomforingId shouldBe GJENNOMFORING_1.id
-		invitasjon.gyldigTil.toLocalDate() shouldBe now.toLocalDate()
+		invitasjon.gyldigTil shouldBeCloseTo now
 		invitasjon.opprettetAvNavAnsattId shouldBe NAV_ANSATT_1.id
 		invitasjon.erBrukt shouldBe true
-		invitasjon.tidspunktBrukt?.toLocalDate() shouldBe now.toLocalDate()
+		invitasjon.tidspunktBrukt!! shouldBeCloseTo now
 		invitasjon.tilgangForesporselId shouldBe foresporselId
 	}
 
@@ -96,7 +97,7 @@ class TilgangInvitasjonRepositoryTest : FunSpec({
 		invitasjon.id shouldBe invitasjonId
 		invitasjon.gjennomforingId shouldBe GJENNOMFORING_1.id
 		invitasjon.opprettetAvNavAnsattId shouldBe NAV_ANSATT_1.id
-		invitasjon.gyldigTil.toLocalDate() shouldBe now.toLocalDate()
+		invitasjon.gyldigTil shouldBeCloseTo now
 	}
 
 	test("settTilBrukt - skal marker invitasjon som brukt") {
@@ -128,7 +129,7 @@ class TilgangInvitasjonRepositoryTest : FunSpec({
 		val invitasjon = repository.get(invitasjonId)
 
 		invitasjon.erBrukt shouldBe true
-		invitasjon.tidspunktBrukt?.toLocalDate() shouldBe now.toLocalDate()
+		invitasjon.tidspunktBrukt!! shouldBeCloseTo now
 		invitasjon.tilgangForesporselId shouldBe foresporselId
 	}
 

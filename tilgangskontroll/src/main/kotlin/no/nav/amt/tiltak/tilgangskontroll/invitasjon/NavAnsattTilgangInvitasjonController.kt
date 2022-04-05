@@ -4,6 +4,7 @@ import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.time.ZonedDateTime
 import java.util.*
@@ -26,6 +27,7 @@ class NavAnsattTilgangInvitasjonController(
 
 	@PostMapping
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
+	@ResponseStatus(HttpStatus.CREATED)
 	fun opprettInvitasjon(@RequestBody request: OpprettInvitasjonRequest) {
 		// Mangler tilgangskontroll på nav enhet
 

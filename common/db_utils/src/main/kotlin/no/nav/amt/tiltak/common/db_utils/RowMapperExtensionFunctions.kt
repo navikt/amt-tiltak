@@ -31,7 +31,7 @@ fun ResultSet.getNullableLocalDate(columnLabel: String): LocalDate? {
 
 fun ResultSet.getNullableZonedDateTime(columnLabel: String): ZonedDateTime? {
 	val timestamp = this.getTimestamp(columnLabel) ?: return null
-	return ZonedDateTime.ofInstant(Instant.ofEpochMilli(timestamp.time), ZoneOffset.UTC)
+	return ZonedDateTime.ofInstant(Instant.ofEpochMilli(timestamp.time), ZoneOffset.systemDefault())
 }
 
 fun ResultSet.getZonedDateTime(columnLabel: String): ZonedDateTime {

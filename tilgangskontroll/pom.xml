@@ -51,8 +51,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>no.nav.security</groupId>
-            <artifactId>mock-oauth2-server</artifactId>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>mock-oauth-server</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
