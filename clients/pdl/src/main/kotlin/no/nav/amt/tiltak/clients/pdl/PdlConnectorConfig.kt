@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.clients.pdl
 
-import no.nav.amt.tiltak.tools.token_provider.ScopedTokenProvider
+import no.nav.common.token_client.client.MachineToMachineTokenClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -15,10 +15,10 @@ open class PdlConnectorConfig {
 	lateinit var scope: String
 
 	@Bean
-	open fun pdlClient(scopedTokenProvider: ScopedTokenProvider): PdlClient {
+	open fun pdlClient(machineToMachineTokenClient: MachineToMachineTokenClient): PdlClient {
 		return PdlClientImpl(
-			tokenProvider = { scopedTokenProvider.getToken(scope) },
-			pdlUrl = url
+			pdlUrl = url,
+			tokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(scope) },
 		)
 	}
 

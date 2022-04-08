@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.clients.dkif
 
-import no.nav.amt.tiltak.tools.token_provider.ScopedTokenProvider
+import no.nav.common.token_client.client.MachineToMachineTokenClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -15,10 +15,10 @@ open class DkifConnectorConfig {
 	lateinit var scope: String
 
 	@Bean
-	open fun dkifClient(scopedTokenProvider: ScopedTokenProvider): DkifClient {
+	open fun dkifClient(machineToMachineTokenClient: MachineToMachineTokenClient): DkifClient {
 		return DkifClientImpl(
 			url = url,
-			tokenProvider = { scopedTokenProvider.getToken(scope) },
+			tokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(scope) },
 		)
 	}
 

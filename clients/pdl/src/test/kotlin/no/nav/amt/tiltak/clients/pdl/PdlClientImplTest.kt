@@ -15,8 +15,8 @@ class PdlClientImplTest {
 	@Test
 	fun `hentBruker - gyldig respons - skal lage riktig request og parse pdl bruker`(wmRuntimeInfo: WireMockRuntimeInfo) {
 		val connector = PdlClientImpl(
+			wmRuntimeInfo.httpBaseUrl,
 			{ "TOKEN" },
-			wmRuntimeInfo.httpBaseUrl
 		)
 
 		givenThat(
@@ -52,8 +52,8 @@ class PdlClientImplTest {
 	@Test
 	fun `hentBruker - data mangler - skal kaste exception`(wmRuntimeInfo: WireMockRuntimeInfo) {
 		val connector = PdlClientImpl(
+			wmRuntimeInfo.httpBaseUrl,
 			{ "TOKEN" },
-			wmRuntimeInfo.httpBaseUrl
 		)
 
 		givenThat(
@@ -83,8 +83,8 @@ class PdlClientImplTest {
 	@Test
 	fun `hentGjeldendePersonligIdent skal lage riktig request og parse response`(wmRuntimeInfo: WireMockRuntimeInfo) {
 		val connector = PdlClientImpl(
+			wmRuntimeInfo.httpBaseUrl,
 			{ "TOKEN" },
-			wmRuntimeInfo.httpBaseUrl
 		)
 
 		givenThat(
@@ -131,8 +131,8 @@ class PdlClientImplTest {
 	@Test
 	fun `hentGjeldendePersonligIdent skal kaste exception hvis data mangler`(wmRuntimeInfo: WireMockRuntimeInfo) {
 		val connector = PdlClientImpl(
+			wmRuntimeInfo.httpBaseUrl,
 			{ "TOKEN" },
-			wmRuntimeInfo.httpBaseUrl
 		)
 
 		givenThat(
@@ -161,8 +161,8 @@ class PdlClientImplTest {
 	@Test
 	fun `hentBruker - Detaljert respons - skal kaste exception med noe detaljert informasjon`(wmRuntimeInfo: WireMockRuntimeInfo) {
 		val connector = PdlClientImpl(
+			wmRuntimeInfo.httpBaseUrl,
 			{ "TOKEN" },
-			wmRuntimeInfo.httpBaseUrl
 		)
 
 		givenThat(
@@ -187,8 +187,8 @@ class PdlClientImplTest {
 	@Test
 	fun `hentBruker - Flere feil i respons - skal kaste exception med noe detaljert informasjon`(wmRuntimeInfo: WireMockRuntimeInfo) {
 		val connector = PdlClientImpl(
+			wmRuntimeInfo.httpBaseUrl,
 			{ "TOKEN" },
-			wmRuntimeInfo.httpBaseUrl
 		)
 
 		givenThat(

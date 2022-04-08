@@ -1,8 +1,8 @@
 package no.nav.amt.tiltak.application
 
-import no.nav.amt.tiltak.tools.token_provider.ScopedTokenProvider
-import no.nav.amt.tiltak.tools.token_provider.azure_ad.AzureAdScopedTokenProviderBuilder
 import no.nav.common.log.LogFilter
+import no.nav.common.token_client.builder.AzureAdTokenClientBuilder
+import no.nav.common.token_client.client.MachineToMachineTokenClient
 import no.nav.common.utils.EnvironmentUtils
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import org.springframework.boot.web.servlet.FilterRegistrationBean
@@ -16,8 +16,10 @@ import org.springframework.context.annotation.Profile
 open class ApplicationConfig {
 
 	@Bean
-	open fun scopedTokenProvider(): ScopedTokenProvider {
-		return AzureAdScopedTokenProviderBuilder.builder().withEnvironmentDefaults().build()
+	open fun machineToMachineTokenClient(): MachineToMachineTokenClient {
+		return AzureAdTokenClientBuilder.builder()
+			.withNaisDefaults()
+			.buildMachineToMachineTokenClient()
 	}
 
 	@Bean
