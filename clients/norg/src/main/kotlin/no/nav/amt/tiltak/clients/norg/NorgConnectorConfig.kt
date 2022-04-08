@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.clients.norg
 
-import no.nav.amt.tiltak.tools.token_provider.ScopedTokenProvider
+import no.nav.common.token_client.client.MachineToMachineTokenClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -15,10 +15,10 @@ open class NorgConnectorConfig {
 	lateinit var scope: String
 
 	@Bean
-	open fun norgClient(scopedTokenProvider: ScopedTokenProvider): NorgClient {
+	open fun norgClient(machineToMachineTokenClient: MachineToMachineTokenClient): NorgClient {
 		return NorgClientImpl(
 			url = "$url/proxy/norg2",
-			tokenProvider = { scopedTokenProvider.getToken(scope) },
+			tokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(scope) },
 		)
 	}
 

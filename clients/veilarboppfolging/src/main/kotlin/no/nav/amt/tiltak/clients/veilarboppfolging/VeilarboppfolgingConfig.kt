@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.clients.veilarboppfolging
 
-import no.nav.amt.tiltak.tools.token_provider.ScopedTokenProvider
+import no.nav.common.token_client.client.MachineToMachineTokenClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,11 +18,11 @@ open class VeilarboppfolgingConfig {
 	lateinit var veilarboppfolgingScope: String
 
 	@Bean
-	open fun veilarboppfolgingClient(scopedTokenProvider: ScopedTokenProvider): VeilarboppfolgingClient {
+	open fun veilarboppfolgingClient(machineToMachineTokenClient: MachineToMachineTokenClient): VeilarboppfolgingClient {
 		return VeilarboppfolgingClientImpl(
 			apiUrl = "$url/proxy/veilarboppfolging",
-			proxyTokenProvider = { scopedTokenProvider.getToken(poaoGcpProxyScope) },
-			veilarboppfolgingTokenProvider = { scopedTokenProvider.getToken(veilarboppfolgingScope) }
+			proxyTokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(poaoGcpProxyScope) },
+			veilarboppfolgingTokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(veilarboppfolgingScope) }
 		)
 	}
 }

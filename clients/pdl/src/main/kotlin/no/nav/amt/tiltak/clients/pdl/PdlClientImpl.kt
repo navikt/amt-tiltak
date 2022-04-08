@@ -11,8 +11,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.function.Supplier
 
 class PdlClientImpl(
-	private val tokenProvider: Supplier<String>,
 	private val pdlUrl: String,
+	private val tokenProvider: Supplier<String>,
 	private val httpClient: OkHttpClient = baseClient(),
 ) : PdlClient {
 

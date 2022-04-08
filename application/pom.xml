@@ -56,10 +56,6 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>token_provider</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>arena-acl-ingestor</artifactId>
         </dependency>
         <dependency>
@@ -71,6 +67,10 @@
             <artifactId>db-migrations</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>no.nav.common</groupId>
+            <artifactId>token-client</artifactId>
+        </dependency>
         <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>kafka</artifactId>

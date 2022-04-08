@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.clients.veilarbarena
 
-import no.nav.amt.tiltak.tools.token_provider.ScopedTokenProvider
+import no.nav.common.token_client.client.MachineToMachineTokenClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,11 +18,11 @@ open class VeilarbarenaConfig {
 	lateinit var veilarbarenaScope: String
 
 	@Bean
-	open fun veilarbarenaClient(scopedTokenProvider: ScopedTokenProvider): VeilarbarenaClient {
+	open fun veilarbarenaClient(machineToMachineTokenClient: MachineToMachineTokenClient): VeilarbarenaClient {
 		return VeilarbarenaClientImpl(
 			url = "$url/proxy/veilarbarena",
-			proxyTokenProvider = { scopedTokenProvider.getToken(poaoGcpProxyScope) },
-			veilarbarenaTokenProvider = { scopedTokenProvider.getToken(veilarbarenaScope) },
+			proxyTokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(poaoGcpProxyScope) },
+			veilarbarenaTokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(veilarbarenaScope) },
 		)
 	}
 
