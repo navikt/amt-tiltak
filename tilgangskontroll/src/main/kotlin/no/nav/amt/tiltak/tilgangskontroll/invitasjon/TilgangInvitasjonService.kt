@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.tilgangskontroll.invitasjon
 
 import no.nav.amt.tiltak.core.port.PersonService
-import no.nav.amt.tiltak.tilgangskontroll.foresporsel.OpprettForesporselCmd
+import no.nav.amt.tiltak.tilgangskontroll.foresporsel.OpprettForesporselInput
 import no.nav.amt.tiltak.tilgangskontroll.foresporsel.TilgangForesporselService
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -61,7 +61,7 @@ open class TilgangInvitasjonService(
 			tilgangInvitasjonRepository.settTilBrukt(invitasjonId, foresporselId)
 
 			tilgangForesporselService.opprettForesporsel(
-				OpprettForesporselCmd(
+				OpprettForesporselInput(
 					id = foresporselId,
 					personligIdent = arrangorAnsattPersonligIdent,
 					fornavn = person.fornavn,

@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
+import java.time.ZonedDateTime
 import java.util.*
 
 @RestController
@@ -45,6 +46,15 @@ class NavAnsattTilgangForesporselController(
 
 		tilgangForesporselService.avvisForesporsel(foresporselId, navAnsatt.id)
 	}
+
+	data class UbesluttetForesporselDto(
+		val id: UUID,
+		val fornavn: String,
+		val mellomnavn: String?,
+		val etternavn: String,
+		val fodselsnummer: String,
+		val opprettetDato: ZonedDateTime,
+	)
 
 	private fun tilDto(dbo: TilgangForesporselDbo): UbesluttetForesporselDto {
 		return UbesluttetForesporselDto(

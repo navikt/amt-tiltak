@@ -41,7 +41,7 @@ class TilgangForesporselRepositoryTest : FunSpec({
 	test("Skal opprette og hente foresporsel") {
 		val foresporselId = UUID.randomUUID()
 
-		repository.opprettForesporsel(OpprettForesporselCmd(
+		repository.opprettForesporsel(OpprettForesporselInput(
 			id = foresporselId,
 			personligIdent = "1234",
 			fornavn = "Test",

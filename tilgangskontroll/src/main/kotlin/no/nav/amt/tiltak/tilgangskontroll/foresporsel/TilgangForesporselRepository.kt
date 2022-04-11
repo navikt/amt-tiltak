@@ -28,7 +28,7 @@ class TilgangForesporselRepository(
 		)
 	}
 
-	internal fun opprettForesporsel(cmd: OpprettForesporselCmd) {
+	internal fun opprettForesporsel(cmd: OpprettForesporselInput) {
 		val sql = """
 			INSERT INTO gjennomforing_tilgang_foresporsel(id, personlig_ident, fornavn, mellomnavn, etternavn, gjennomforing_id)
 				VALUES(:id, :personligIdent, :fornavn, :mellomnavn, :etternavn, :gjennomforingId)

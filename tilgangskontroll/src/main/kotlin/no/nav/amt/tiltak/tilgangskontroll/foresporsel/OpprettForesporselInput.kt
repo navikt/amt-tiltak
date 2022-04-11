@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.tilgangskontroll.foresporsel
 
 import java.util.*
 
-data class OpprettForesporselCmd(
+data class OpprettForesporselInput(
 	val id: UUID,
 	val personligIdent: String,
 	val fornavn: String,

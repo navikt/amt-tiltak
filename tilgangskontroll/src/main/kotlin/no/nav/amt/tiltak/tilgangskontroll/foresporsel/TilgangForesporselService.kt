@@ -23,8 +23,8 @@ open class TilgangForesporselService(
 		return tilgangForesporselRepository.hentUbesluttedeForesporsler(gjennomforingId)
 	}
 
-	open fun opprettForesporsel(opprettForesporselCmd: OpprettForesporselCmd) {
-		tilgangForesporselRepository.opprettForesporsel(opprettForesporselCmd)
+	open fun opprettForesporsel(opprettForesporselInput: OpprettForesporselInput) {
+		tilgangForesporselRepository.opprettForesporsel(opprettForesporselInput)
 	}
 
 	open fun godkjennForesporsel(foresporselId: UUID, beslutningAvNavAnsattId: UUID) {
