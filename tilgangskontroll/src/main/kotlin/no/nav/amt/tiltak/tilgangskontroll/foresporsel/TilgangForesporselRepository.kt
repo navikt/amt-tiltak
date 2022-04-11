@@ -28,19 +28,19 @@ class TilgangForesporselRepository(
 		)
 	}
 
-	internal fun opprettForesporsel(cmd: OpprettForesporselInput) {
+	internal fun opprettForesporsel(input: OpprettForesporselInput) {
 		val sql = """
 			INSERT INTO gjennomforing_tilgang_foresporsel(id, personlig_ident, fornavn, mellomnavn, etternavn, gjennomforing_id)
 				VALUES(:id, :personligIdent, :fornavn, :mellomnavn, :etternavn, :gjennomforingId)
 		""".trimIndent()
 
 		val parameters = sqlParameters(
-			"id" to cmd.id,
-			"personligIdent" to cmd.personligIdent,
-			"fornavn" to cmd.fornavn,
-			"mellomnavn" to cmd.mellomnavn,
-			"etternavn" to cmd.etternavn,
-			"gjennomforingId" to cmd.gjennomforingId,
+			"id" to input.id,
+			"personligIdent" to input.personligIdent,
+			"fornavn" to input.fornavn,
+			"mellomnavn" to input.mellomnavn,
+			"etternavn" to input.etternavn,
+			"gjennomforingId" to input.gjennomforingId,
 		)
 
 		template.update(sql, parameters)

@@ -5,7 +5,7 @@ import java.util.*
 
 interface ArrangorAnsattService {
 
-	fun opprettAnsattHvisIkkeFinnes(ansatttPersonIdent: String): Ansatt
+	fun opprettAnsattHvisIkkeFinnes(personIdent: String): Ansatt
 
 	fun getAnsatt(ansattId: UUID): Ansatt
 

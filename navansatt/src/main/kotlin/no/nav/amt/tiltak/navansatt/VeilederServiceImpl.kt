@@ -49,9 +49,9 @@ internal class VeilederServiceImpl(
 		return getVeileder(navIdent) ?: throw IllegalStateException("Fant ikke nylig opprettet nav ansatt")
 	}
 
-	private fun getVeileder(navIdent: String): Veileder? {
-		return navAnsattRepository.getNavAnsattWithIdent(navIdent)?.toVeileder()
-	}
+	private fun getVeileder(navIdent: String): Veileder? =
+		navAnsattRepository.getNavAnsattWithIdent(navIdent)?.toVeileder()
+
 
 	internal fun getVeilederBatch(bucket: Bucket) =
 		navAnsattRepository.getNavAnsattInBucket(bucket).map { it.toVeileder() }

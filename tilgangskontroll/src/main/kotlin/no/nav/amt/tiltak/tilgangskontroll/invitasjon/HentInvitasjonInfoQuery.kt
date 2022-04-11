@@ -5,15 +5,7 @@ import no.nav.amt.tiltak.common.db_utils.getZonedDateTime
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
-import java.time.ZonedDateTime
 import java.util.*
-
-data class InvitasjonInfoDbo(
-	val overordnetEnhetNavn: String,
-	val gjennomforingNavn: String,
-	val erBrukt: Boolean,
-	val gyldigTil: ZonedDateTime
-)
 
 @Repository
 class HentInvitasjonInfoQuery(
@@ -43,7 +35,9 @@ class HentInvitasjonInfoQuery(
 
 	internal fun query(invitasjonId: UUID): InvitasjonInfoDbo {
 		val parameters = DbUtils.sqlParameters("invitasjonId" to invitasjonId)
-		return template.query(sql, parameters, rowMapper).firstOrNull() ?: throw NoSuchElementException("Fant ikke tilgang invitasjon med id: $invitasjonId")
+
+		return template.query(sql, parameters, rowMapper).firstOrNull()
+			?: throw NoSuchElementException("Fant ikke tilgang invitasjon med id: $invitasjonId")
 	}
 
 }

@@ -6,15 +6,7 @@ import no.nav.amt.tiltak.common.db_utils.getZonedDateTime
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
-import java.time.ZonedDateTime
 import java.util.*
-
-data class UbruktInvitasjonDbo(
-	val id: UUID,
-	val opprettetAvNavIdent: String,
-	val opprettetDato: ZonedDateTime,
-	val gyldigTilDato: ZonedDateTime,
-)
 
 @Repository
 class HentUbrukteInvitasjonerQuery(

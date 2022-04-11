@@ -22,8 +22,8 @@ class TiltakarrangorAnsattController(
 	fun getInnloggetAnsatt(): AnsattDto {
 		val personligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 
-		return arrangorAnsattService.getAnsattByPersonligIdent(personligIdent)
-			?.toDto() ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Fant ikke arrangor ansatt")
+		return arrangorAnsattService.getAnsattByPersonligIdent(personligIdent)?.toDto()
+			?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Fant ikke arrangor ansatt")
 	}
 
 }

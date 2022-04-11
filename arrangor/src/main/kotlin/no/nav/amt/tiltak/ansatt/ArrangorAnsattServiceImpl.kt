@@ -10,31 +10,14 @@ import java.util.*
 
 @Service
 class ArrangorAnsattServiceImpl(
-	val arrangorAnsattRepository: ArrangorAnsattRepository,
-	val personService: PersonService,
-	val template: NamedParameterJdbcTemplate
+	private val arrangorAnsattRepository: ArrangorAnsattRepository,
+	private val personService: PersonService,
+	private val template: NamedParameterJdbcTemplate
 ) : ArrangorAnsattService {
 
-	override fun opprettAnsattHvisIkkeFinnes(ansatttPersonIdent: String): Ansatt {
-		val ansatt = getAnsattByPersonligIdent(ansatttPersonIdent)
-
-		if (ansatt != null) {
-			return ansatt
-		}
-
-		val person = personService.hentPerson(ansatttPersonIdent)
-
-		val nyAnsattId = UUID.randomUUID()
-
-		arrangorAnsattRepository.opprettAnsatt(
-			id = nyAnsattId,
-			personligIdent = ansatttPersonIdent,
-			fornavn = person.fornavn,
-			mellomnavn = person.mellomnavn,
-			etternavn = person.etternavn
-		)
-
-		return getAnsatt(nyAnsattId)
+	override fun opprettAnsattHvisIkkeFinnes(personIdent: String): Ansatt {
+		return getAnsattByPersonligIdent(personIdent)
+			?: createAnsatt(personIdent)
 	}
 
 	override fun getAnsatt(ansattId: UUID): Ansatt {
@@ -56,6 +39,22 @@ class ArrangorAnsattServiceImpl(
 		)
 
 		return ansattDbo.toAnsatt(ansattesVirksomheter)
+	}
+
+	private fun createAnsatt(ansattPersonIdent: String): Ansatt {
+		val person = personService.hentPerson(ansattPersonIdent)
+
+		val nyAnsattId = UUID.randomUUID()
+
+		arrangorAnsattRepository.opprettAnsatt(
+			id = nyAnsattId,
+			personligIdent = ansattPersonIdent,
+			fornavn = person.fornavn,
+			mellomnavn = person.mellomnavn,
+			etternavn = person.etternavn
+		)
+
+		return getAnsatt(nyAnsattId)
 	}
 
 	private fun mapTilknyttedeArrangorerTilAnsatt(ansattesVirksomheter: List<ArrangorForAnsattDbo>): List<TilknyttetArrangor> {
