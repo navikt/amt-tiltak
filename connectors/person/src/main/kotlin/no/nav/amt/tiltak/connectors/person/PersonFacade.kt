@@ -7,7 +7,7 @@ import no.nav.amt.tiltak.clients.dkif.DkifClient
 import no.nav.amt.tiltak.clients.pdl.AdressebeskyttelseGradering
 import no.nav.amt.tiltak.clients.pdl.PdlClient
 import no.nav.amt.tiltak.clients.veilarboppfolging.VeilarboppfolgingClient
-import no.nav.amt.tiltak.core.domain.veileder.Veileder
+import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.port.*
 import org.springframework.stereotype.Service
 
@@ -48,7 +48,7 @@ class PersonFacade(
 		).also { person -> person.diskresjonskode?.let { incrementCounter(it) } }
 	}
 
-	override fun hentTildeltVeileder(fnr: String) : Veileder? {
+	override fun hentTildeltVeileder(fnr: String) : NavAnsatt? {
 		return veilarboppfolgingClient.hentVeilederIdent(fnr)?.let { ident ->
 			veilederConnector.hentVeileder(ident)
 		}

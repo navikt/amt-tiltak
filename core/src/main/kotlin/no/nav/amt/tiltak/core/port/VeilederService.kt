@@ -1,12 +1,12 @@
 package no.nav.amt.tiltak.core.port
 
-import no.nav.amt.tiltak.core.domain.veileder.Veileder
+import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import java.util.*
 
 interface VeilederService {
 
-	fun upsertVeileder(veileder: Veileder): UUID
+	fun upsertVeileder(navAnsatt: NavAnsatt): UUID
 
-	fun getOrCreateVeileder(navIdent: String): Veileder
+	fun getOrCreateVeileder(navIdent: String): NavAnsatt
 
 }

@@ -1,9 +1,13 @@
 package no.nav.amt.tiltak.tiltak.controllers
 
+import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
+import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
+import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.security.mock.oauth2.MockOAuth2Server
@@ -11,9 +15,11 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
@@ -30,6 +36,16 @@ class NavGjennomforingControllerTest {
 
 	@Autowired
 	private lateinit var mockMvc: MockMvc
+
+	@MockBean
+	private lateinit var authService: AuthService
+
+	@MockBean
+	private lateinit var navAnsattService: NavAnsattService
+
+	@MockBean
+	private lateinit var gjennomforingService: GjennomforingService
+
 
 	val statusConverterMock = fun (id: UUID) =
 		listOf(
@@ -109,6 +125,12 @@ class NavGjennomforingControllerTest {
 	@Test
 	fun `hentGjennomforingerForNavAnsatte() - sender med azure ad-token - skal returnere 200`() {
 		val token = server.issueToken("azuread", "test", "test").serialize()
+		val navIdent = "ab12345"
+
+		Mockito.`when`(authService.hentNavIdentTilInnloggetBruker()).thenReturn(navIdent)
+
+		Mockito.`when`(navAnsattService.getNavAnsatt(navIdent)).thenReturn(NavAnsatt(navIdent = navIdent, navn = "Navn Navnesen"))
+
 
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.get("/api/nav-ansatt/gjennomforing")

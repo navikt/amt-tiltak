@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.navansatt
 
-import no.nav.amt.tiltak.core.domain.veileder.Veileder
+import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.port.VeilederConnector
 import no.nav.amt.tiltak.core.port.VeilederService
 import org.slf4j.LoggerFactory
@@ -15,21 +15,21 @@ internal class VeilederServiceImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	override fun upsertVeileder(veileder: Veileder): UUID {
+	override fun upsertVeileder(navAnsatt: NavAnsatt): UUID {
 		navAnsattRepository.upsert(
 			NavAnsattDbo(
-				navIdent = veileder.navIdent,
-				navn = veileder.navn,
-				epost = veileder.epost,
-				telefonnummer = veileder.telefonnummer
+				navIdent = navAnsatt.navIdent,
+				navn = navAnsatt.navn,
+				epost = navAnsatt.epost,
+				telefonnummer = navAnsatt.telefonnummer
 			)
 		)
 
-		return navAnsattRepository.getNavAnsattWithIdent(veileder.navIdent)?.id
-			?: throw IllegalStateException("Fant ikke veileder med NAV-ident=${veileder.navIdent}")
+		return navAnsattRepository.getNavAnsattWithIdent(navAnsatt.navIdent)?.id
+			?: throw IllegalStateException("Fant ikke veileder med NAV-ident=${navAnsatt.navIdent}")
 	}
 
-	override fun getOrCreateVeileder(navIdent: String): Veileder {
+	override fun getOrCreateVeileder(navIdent: String): NavAnsatt {
 		val veileder = getVeileder(navIdent)
 
 		if (veileder != null)
@@ -49,15 +49,14 @@ internal class VeilederServiceImpl(
 		return getVeileder(navIdent) ?: throw IllegalStateException("Fant ikke nylig opprettet nav ansatt")
 	}
 
-	private fun getVeileder(navIdent: String): Veileder? =
+	private fun getVeileder(navIdent: String): NavAnsatt? =
 		navAnsattRepository.getNavAnsattWithIdent(navIdent)?.toVeileder()
 
 
 	internal fun getVeilederBatch(bucket: Bucket) =
 		navAnsattRepository.getNavAnsattInBucket(bucket).map { it.toVeileder() }
 
-	private fun NavAnsattDbo.toVeileder() = Veileder(
-		id = id,
+	private fun NavAnsattDbo.toVeileder() = NavAnsatt(
 		navIdent = navIdent,
 		navn = navn,
 		epost = epost,

@@ -23,17 +23,13 @@ open class AuthService(
 		)
 	}
 
-	open fun hentNavIdentTilInnloggetBruker(): String {
-		val context = tokenValidationContextHolder.tokenValidationContext
-
-		val token = context.firstValidToken.orElseThrow {
-			throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not authorized, valid token is missing")
-		}
-
-		return token.jwtTokenClaims["NAVident"]?.toString() ?: throw ResponseStatusException(
+	open fun hentNavIdentTilInnloggetBruker() : String = tokenValidationContextHolder
+		.tokenValidationContext
+		.getClaims(Issuer.AZURE_AD)
+		.get("NAVIdent")
+		?.toString() ?: throw ResponseStatusException(
 			HttpStatus.UNAUTHORIZED,
-			"NAVident is missing or is not a string"
+			"NAVIdent is missing"
 		)
-	}
 
 }

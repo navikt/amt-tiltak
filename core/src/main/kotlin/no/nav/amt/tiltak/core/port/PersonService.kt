@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.core.port
 
-import no.nav.amt.tiltak.core.domain.veileder.Veileder
+import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 
 interface PersonService {
 
@@ -8,7 +8,7 @@ interface PersonService {
 
 	fun hentPerson(fnr: String): Person
 
-	fun hentTildeltVeileder(fnr: String): Veileder?
+	fun hentTildeltVeileder(fnr: String): NavAnsatt?
 
 	fun hentGjeldendePersonligIdent(ident: String): String
 
