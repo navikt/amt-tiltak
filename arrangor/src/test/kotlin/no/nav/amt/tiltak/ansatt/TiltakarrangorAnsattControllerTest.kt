@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.ansatt
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
-import no.nav.amt.tiltak.core.port.ArrangorService
+import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -39,7 +39,7 @@ class TiltakarrangorAnsattControllerTest {
 	private lateinit var mockMvc: MockMvc
 
 	@MockBean
-	private lateinit var arrangorService: ArrangorService
+	private lateinit var arrangorAnsattService: ArrangorAnsattService
 
 	@MockBean
 	private lateinit var authService: AuthService
@@ -59,7 +59,7 @@ class TiltakarrangorAnsattControllerTest {
 
 		Mockito.`when`(authService.hentPersonligIdentTilInnloggetBruker()).thenReturn("12345678")
 
-		Mockito.`when`(arrangorService.getAnsattByPersonligIdent("12345678"))
+		Mockito.`when`(arrangorAnsattService.getAnsattByPersonligIdent("12345678"))
 			.thenReturn(Ansatt(
 				id = UUID.randomUUID(),
 				personligIdent = "",

@@ -16,6 +16,7 @@
         <module>graphql</module>
         <module>auth</module>
         <module>json</module>
+        <module>db_utils</module>
     </modules>
 
 </project>

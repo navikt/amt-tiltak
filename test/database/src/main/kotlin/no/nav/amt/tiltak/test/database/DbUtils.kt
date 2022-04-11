@@ -1,7 +1,11 @@
 package no.nav.amt.tiltak.test.database
 
+import io.kotest.matchers.date.shouldBeWithin
+import io.kotest.matchers.shouldNotBe
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 object DbUtils {
 
@@ -19,7 +23,11 @@ object DbUtils {
 			&& this.hour == other.hour
 			&& this.minute == other.minute
 			&& this.second == other.second
+	}
 
+	infix fun ZonedDateTime.shouldBeCloseTo(expected: ZonedDateTime?) {
+		expected shouldNotBe null
+		expected!!.shouldBeWithin(Duration.ofSeconds(1), this)
 	}
 
 	fun LocalDate.isEqualTo(other: LocalDate?): Boolean {

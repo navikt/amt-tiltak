@@ -5,7 +5,10 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.veileder.Veileder
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.BrukerService
+import no.nav.amt.tiltak.core.port.PersonService
+import no.nav.amt.tiltak.core.port.VeilederConnector
+import no.nav.amt.tiltak.core.port.VeilederService
 import java.util.*
 
 class TildeltveilederIngestorImplTest : StringSpec({
@@ -20,7 +23,7 @@ class TildeltveilederIngestorImplTest : StringSpec({
 
 		val brukerFnr = "123454364334"
 		val veilederId = UUID.randomUUID()
-		val veileder = Veileder("Z12345", "Test", null, null)
+		val veileder = Veileder(UUID.randomUUID(), "Z12345", "Test", null, null)
 
 		every {
 			veilederConnector.hentVeileder("Z12345")

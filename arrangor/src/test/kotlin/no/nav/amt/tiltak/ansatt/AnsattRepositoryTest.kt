@@ -17,14 +17,14 @@ class AnsattRepositoryTest {
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 
-	lateinit var repository: AnsattRepository
+	lateinit var repository: ArrangorAnsattRepository
 
 	@BeforeEach
 	fun migrate() {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 		rootLogger.level = Level.WARN
 
-		repository = AnsattRepository(NamedParameterJdbcTemplate(dataSource))
+		repository = ArrangorAnsattRepository(NamedParameterJdbcTemplate(dataSource))
 
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
