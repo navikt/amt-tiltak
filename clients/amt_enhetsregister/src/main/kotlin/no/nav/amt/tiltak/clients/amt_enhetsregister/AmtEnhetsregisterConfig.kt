@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.clients.amt_enhetsregister
 
-import no.nav.amt.tiltak.tools.token_provider.ScopedTokenProvider
+import no.nav.common.token_client.client.MachineToMachineTokenClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -15,10 +15,10 @@ open class AmtEnhetsregisterConfig {
 	lateinit var scope: String
 
 	@Bean
-	open fun enhetsregiserClient(scopedTokenProvider: ScopedTokenProvider): EnhetsregisterClient {
+	open fun enhetsregiserClient(machineToMachineTokenClient: MachineToMachineTokenClient): EnhetsregisterClient {
 		return AmtEnhetsregisterClient(
 			url = url,
-			tokenProvider = { scopedTokenProvider.getToken(scope) },
+			tokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(scope) },
 		)
 	}
 
