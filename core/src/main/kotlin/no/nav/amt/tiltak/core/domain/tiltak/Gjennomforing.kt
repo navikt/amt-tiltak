@@ -1,7 +1,6 @@
 package no.nav.amt.tiltak.core.domain.tiltak
 
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
-import no.nav.amt.tiltak.core.domain.arrangor.Avtale
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*

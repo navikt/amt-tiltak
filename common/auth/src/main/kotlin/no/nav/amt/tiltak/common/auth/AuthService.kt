@@ -23,10 +23,13 @@ open class AuthService(
 		)
 	}
 
-	open fun navIdent() : String = tokenValidationContextHolder
+	open fun hentNavIdentTilInnloggetBruker() : String = tokenValidationContextHolder
 		.tokenValidationContext
 		.getClaims(Issuer.AZURE_AD)
 		.get("NAVIdent")
-		.toString()
+		?.toString() ?: throw ResponseStatusException(
+			HttpStatus.UNAUTHORIZED,
+			"NAVIdent is missing"
+		)
 
 }

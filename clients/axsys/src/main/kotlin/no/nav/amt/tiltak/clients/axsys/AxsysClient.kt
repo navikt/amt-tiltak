@@ -2,15 +2,11 @@ package no.nav.amt.tiltak.clients.axsys
 
 interface AxsysClient {
 
-	fun hentTilganger(brukerident: String): Enheter
+	fun hentTilganger(navIdent: String): List<EnhetTilgang>
 
 }
 
-data class Enheter(
-	val enheter: List<Enhet> = listOf()
-)
-
-data class Enhet(
+data class EnhetTilgang(
 	val enhetId: String,
 	val temaer: List<String>,
 	val navn: String

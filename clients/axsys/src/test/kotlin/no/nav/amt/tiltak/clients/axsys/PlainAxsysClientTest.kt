@@ -3,7 +3,8 @@ package no.nav.amt.tiltak.clients.axsys
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 @WireMockTest
@@ -14,7 +15,7 @@ internal class PlainAxsysClientTest {
 	@Test
 	fun `hentTilganger - med fodselsnummer - skal returnere korrekt parset respons`(wmRuntimeInfo: WireMockRuntimeInfo) {
 		val client = PlainAxsysClient(
-			url = wmRuntimeInfo.httpBaseUrl,
+			baseUrl = wmRuntimeInfo.httpBaseUrl,
 			tokenProvider = { "TOKEN" },
 		)
 
@@ -51,10 +52,9 @@ internal class PlainAxsysClientTest {
 
 		val tilganger = client.hentTilganger(brukerident)
 
-
-		assertEquals("0104", tilganger.enheter.first().enhetId)
-		assertTrue(tilganger.enheter.first().temaer.containsAll(listOf("MOB", "OPA", "HJE")))
-		assertEquals("NAV Moss", tilganger.enheter.first().navn)
+		assertEquals("0104", tilganger.first().enhetId)
+		assertTrue(tilganger.first().temaer.containsAll(listOf("MOB", "OPA", "HJE")))
+		assertEquals("NAV Moss", tilganger.first().navn)
 	}
 
 }

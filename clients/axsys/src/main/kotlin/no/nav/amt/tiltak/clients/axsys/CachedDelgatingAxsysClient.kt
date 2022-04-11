@@ -1,20 +1,19 @@
 package no.nav.amt.tiltak.clients.axsys
 
 import com.github.benmanes.caffeine.cache.Caffeine
-import java.lang.IllegalStateException
 import java.time.Duration
 
-private typealias Brukerident = String
+private typealias NavIdent = String
 
 class CachedDelgatingAxsysClient(private val delegate: AxsysClient) : AxsysClient {
 
-	val cache = Caffeine.newBuilder()
+	private val cache = Caffeine.newBuilder()
 		.expireAfterAccess(Duration.ofMinutes(5))
-		.build<Brukerident, Enheter> {
-				brukerident -> delegate.hentTilganger(brukerident)
+		.build<NavIdent, List<EnhetTilgang>> {
+				navIdent -> delegate.hentTilganger(navIdent)
 		}
 
-	override fun hentTilganger(brukerident: String) = cache.get(brukerident) ?:
+	override fun hentTilganger(navIdent: String) = cache.get(navIdent) ?:
 		throw IllegalStateException("Fant ikke brukerident")
 
 }

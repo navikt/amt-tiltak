@@ -9,29 +9,47 @@ import org.springframework.http.MediaType
 import java.util.function.Supplier
 
 internal class PlainAxsysClient(
-	private val url: String,
+	private val baseUrl: String,
 	private val tokenProvider: Supplier<String>,
 	private val httpClient: OkHttpClient = baseClient(),
 ) : AxsysClient {
 
 	private val mapper = JsonUtils.getObjectMapper()
 
-	override fun hentTilganger(brukerident: String): Enheter {
+	override fun hentTilganger(navIdent: String): List<EnhetTilgang> {
+		val request = Request.Builder()
+			.url("$baseUrl/api/v2/tilgang/$navIdent?inkluderAlleEnheter=false")
+			.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+			.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenProvider.get())
+			.build()
 
-		httpClient.newCall(axysRequest(brukerident)).execute().use { response ->
+		httpClient.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
 				throw RuntimeException("Klarte ikke å hente veileders tilganger fra axsys. Status: ${response.code}")
 			}
 
-			return response.body?.string().let {
-				mapper.readValue(it, Enheter::class.java)
-			} ?: throw RuntimeException("Body is missing")
+			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
+
+			val tilgangResponse = mapper.readValue(body, TilgangResponse::class.java)
+
+			return tilgangResponse.enheter.map {
+				return@map EnhetTilgang(
+					enhetId = it.enhetId,
+					navn = it.navn,
+					temaer = it.temaer
+				)
+			}
 		}
 	}
 
-	private fun axysRequest(brukerident: String) = Request.Builder()
-		.url("$url/api/v2/tilgang/$brukerident?inkluderAlleEnheter=false") // TODO injection prone?
-		.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-		.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenProvider.get())
-		.build()
+	private data class TilgangResponse(
+		val enheter: List<TilgangResponseEnhet>
+	)
+
+	private data class TilgangResponseEnhet(
+		val enhetId: String,
+		val temaer: List<String>,
+		val navn: String
+	)
+
 }

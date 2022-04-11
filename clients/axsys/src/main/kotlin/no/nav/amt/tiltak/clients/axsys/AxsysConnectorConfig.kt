@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.clients.axsys
 
-import no.nav.amt.tiltak.tools.token_provider.ScopedTokenProvider
+import no.nav.common.token_client.client.MachineToMachineTokenClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -15,11 +15,12 @@ open class AxsysConnectorConfig {
 	lateinit var scope: String
 
 	@Bean
-	open fun axsysClient(scopedTokenProvider: ScopedTokenProvider): AxsysClient {
+	open fun axsysClient(machineToMachineTokenClient: MachineToMachineTokenClient): AxsysClient {
 		val delegate = PlainAxsysClient(
-			url = url,
-			tokenProvider = { scopedTokenProvider.getToken(scope) },
+			baseUrl = url,
+			tokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(scope) },
 		)
+
 		return CachedDelgatingAxsysClient(delegate)
 	}
 

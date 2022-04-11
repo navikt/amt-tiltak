@@ -2,8 +2,7 @@ package no.nav.amt.tiltak.tiltak.controllers
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
-import no.nav.amt.tiltak.core.domain.navansatt.AnsattTilgang
-import no.nav.amt.tiltak.core.domain.navansatt.NavAnsatt
+import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
@@ -128,9 +127,9 @@ class NavGjennomforingControllerTest {
 		val token = server.issueToken("azuread", "test", "test").serialize()
 		val navIdent = "ab12345"
 
-		Mockito.`when`(authService.navIdent()).thenReturn(navIdent)
+		Mockito.`when`(authService.hentNavIdentTilInnloggetBruker()).thenReturn(navIdent)
 
-		Mockito.`when`(navAnsattService.getNavAnsatt(navIdent)).thenReturn(NavAnsatt(navIdent, "Navn Navnesen", AnsattTilgang.alltidTilgang))
+		Mockito.`when`(navAnsattService.getNavAnsatt(navIdent)).thenReturn(NavAnsatt(navIdent, "Navn Navnesen"))
 
 
 		val response = mockMvc.perform(

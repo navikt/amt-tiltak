@@ -13,13 +13,13 @@ internal class CachedDelgatingAxsysClientTest {
 
 	val brukerIdent = "AB12345"
 
-	val enheter = Enheter(listOf(
-		Enhet(
-		enhetId = "1234",
-		temaer = listOf("ABC", "DEF"),
-		navn = "Bygdeby"
+	val enheter = listOf(
+		EnhetTilgang(
+			enhetId = "1234",
+			temaer = listOf("ABC", "DEF"),
+			navn = "Bygdeby"
+		)
 	)
-	))
 
 	@Test
 	fun `hentTilganger - kaller to ganger - delegate blir bare kalt en gang og resultatet er likt`() {
