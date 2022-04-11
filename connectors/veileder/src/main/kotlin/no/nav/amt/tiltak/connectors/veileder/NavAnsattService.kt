@@ -14,7 +14,8 @@ open class NavAnsattServiceImpl(
 ) : NavAnsattService {
 
 	override fun getNavAnsatt(navIdent: String): NavAnsatt {
-		return veilederConnector.hentVeileder(navIdent) ?: throw NoSuchElementException("Fant ikke nav ansatt med ident $navIdent")
+		return veilederConnector.hentVeileder(navIdent)
+			?: throw NoSuchElementException("Fant ikke nav ansatt med ident $navIdent")
 	}
 
 	override fun hentEnhetTilganger(navIdent: String): List<NavEnhetTilgang> {

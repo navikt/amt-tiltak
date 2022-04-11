@@ -6,13 +6,10 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-open class AxsysConnectorConfig {
-
-	@Value("\${axsys.url}")
-	lateinit var url: String
-
-	@Value("\${axsys.scope}")
-	lateinit var scope: String
+open class AxsysConnectorConfig(
+	@Value("\${axsys.url}") val url: String,
+	@Value("\${axsys.scope}") val scope: String
+) {
 
 	@Bean
 	open fun axsysClient(machineToMachineTokenClient: MachineToMachineTokenClient): AxsysClient {
