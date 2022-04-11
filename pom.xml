@@ -23,6 +23,7 @@
         <module>test</module>
         <module>tiltak</module>
         <module>tools</module>
+        <module>tilgangskontroll</module>
     </modules>
 
     <name>AMT-Tiltak</name>
@@ -166,6 +167,11 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>db_utils</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>json</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -219,6 +225,12 @@
                 <artifactId>veileder</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>tilgangskontroll</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>net.javacrumbs.shedlock</groupId>
@@ -291,6 +303,12 @@
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>database</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>mock-oauth-server</artifactId>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>

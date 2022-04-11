@@ -7,6 +7,6 @@ interface VeilederService {
 
 	fun upsertVeileder(navAnsatt: NavAnsatt): UUID
 
-	fun getVeileder(navIdent: String): NavAnsatt?
+	fun getOrCreateVeileder(navIdent: String): NavAnsatt
 
 }

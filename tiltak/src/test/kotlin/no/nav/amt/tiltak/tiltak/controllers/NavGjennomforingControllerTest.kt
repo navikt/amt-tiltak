@@ -129,7 +129,7 @@ class NavGjennomforingControllerTest {
 
 		Mockito.`when`(authService.hentNavIdentTilInnloggetBruker()).thenReturn(navIdent)
 
-		Mockito.`when`(navAnsattService.getNavAnsatt(navIdent)).thenReturn(NavAnsatt(navIdent, "Navn Navnesen"))
+		Mockito.`when`(navAnsattService.getNavAnsatt(navIdent)).thenReturn(NavAnsatt(navIdent = navIdent, navn = "Navn Navnesen"))
 
 
 		val response = mockMvc.perform(

@@ -14,6 +14,7 @@
 
     <modules>
         <module>database</module>
+        <module>mock-oauth-server</module>
     </modules>
 
 </project>

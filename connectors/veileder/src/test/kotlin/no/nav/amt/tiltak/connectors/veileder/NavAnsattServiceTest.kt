@@ -23,7 +23,7 @@ class NavAnsattServiceTest: StringSpec ({
 	}
 
 	"getNavAnsatt - henter veileder - happy path" {
-		every { veilederConnector.hentVeileder(navIdent) } returns NavAnsatt(navIdent, navn, null, null)
+		every { veilederConnector.hentVeileder(navIdent) } returns NavAnsatt(navIdent = navIdent, navn = navn)
 		val ansatt = navAnsattService.getNavAnsatt(navIdent)
 
 		ansatt.navIdent shouldBe navIdent

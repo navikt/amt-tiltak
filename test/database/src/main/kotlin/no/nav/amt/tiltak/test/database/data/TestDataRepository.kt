@@ -186,7 +186,6 @@ class TestDataRepository(
 		val sql = """
 			INSERT INTO tiltak(id, navn, type)
 			VALUES (:id, :navn, :type)
-
 		""".trimIndent()
 
 		template.update(
@@ -197,5 +196,57 @@ class TestDataRepository(
 			)
 		)
 	}
+
+	fun insertTilgangForesporsel(cmd: InsertTilgangForesporselCommand) {
+		val sql = """
+			INSERT INTO gjennomforing_tilgang_foresporsel(
+				id, personlig_ident, fornavn, mellomnavn, etternavn, gjennomforing_id,
+				beslutning_av_nav_ansatt_id, tidspunkt_beslutning, beslutning, gjennomforing_tilgang_id
+			)
+			VALUES (
+				:id, :personligIdent, :fornavn, :mellomnavn, :etternavn, :gjennomforingId,
+				:beslutningAvNavAnsattId, :tidspunktBeslutning, :beslutning, :gjennomforingTilgangId
+			)
+		""".trimIndent()
+
+		template.update(
+			sql, parameters(
+				"id" to cmd.id,
+				"personligIdent" to cmd.personligIdent,
+				"fornavn" to cmd.fornavn,
+				"mellomnavn" to cmd.mellomnavn,
+				"etternavn" to cmd.etternavn,
+				"gjennomforingId" to cmd.gjennomforingId,
+				"beslutningAvNavAnsattId" to cmd.beslutningAvNavAnsattId,
+				"tidspunktBeslutning" to cmd.tidspunktBeslutning?.toOffsetDateTime(),
+				"beslutning" to cmd.beslutning,
+				"gjennomforingTilgangId" to cmd.gjennomforingTilgangId
+			)
+		)
+	}
+
+	fun insertTilgangInvitasjon(cmd: InsertTilgangInvitasjonCommand) {
+		val sql = """
+			INSERT INTO gjennomforing_tilgang_invitasjon(
+				id, gjennomforing_id, gyldig_til, opprettet_av_nav_ansatt_id, er_brukt, tidspunkt_brukt, tilgang_foresporsel_id
+			)
+			VALUES (
+				:id, :gjennomforingId, :gyldigTil, :opprettetAvNavAnsattId, :erBrukt, :tidspunktBrukt, :tilgangForesporselId
+			)
+		""".trimIndent()
+
+		template.update(
+			sql, parameters(
+				"id" to cmd.id,
+				"gjennomforingId" to cmd.gjennomforingId,
+				"gyldigTil" to cmd.gyldigTil.toOffsetDateTime(),
+				"opprettetAvNavAnsattId" to cmd.opprettetAvNavAnsattId,
+				"erBrukt" to cmd.erBrukt,
+				"tidspunktBrukt" to cmd.tidspunktBrukt?.toOffsetDateTime(),
+				"tilgangForesporselId" to cmd.tilgangForesporselId,
+			)
+		)
+	}
+
 
 }
