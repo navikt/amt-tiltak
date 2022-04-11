@@ -51,7 +51,7 @@
         <okhttp.version>4.9.3</okhttp.version>
         <token-support.version>1.3.19</token-support.version>
         <mock-oauth2-server.version>0.3.5</mock-oauth2-server.version>
-        <common.version>2.2022.01.21_08.02-cd96965058ef</common.version>
+        <common.version>2.2022.04.01_08.27-cbfeb0be0ee0</common.version>
         <logstash.version>7.0.1</logstash.version>
     </properties>
 
@@ -166,11 +166,6 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>token_provider</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>json</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -264,6 +259,11 @@
             <dependency>
                 <groupId>no.nav.common</groupId>
                 <artifactId>types</artifactId>
+                <version>${common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.common</groupId>
+                <artifactId>token-client</artifactId>
                 <version>${common.version}</version>
             </dependency>
 
