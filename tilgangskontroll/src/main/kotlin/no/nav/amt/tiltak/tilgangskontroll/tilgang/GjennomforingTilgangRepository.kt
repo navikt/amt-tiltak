@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-class GjennomforingTilgangRepository(
+open class GjennomforingTilgangRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
 

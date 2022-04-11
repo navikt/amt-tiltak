@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-class HentUbrukteInvitasjonerQuery(
+open class HentUbrukteInvitasjonerQuery(
 	private val template: NamedParameterJdbcTemplate
 ) {
 

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-class HentInvitasjonInfoQuery(
+open class HentInvitasjonInfoQuery(
 	private val template: NamedParameterJdbcTemplate
 ) {
 

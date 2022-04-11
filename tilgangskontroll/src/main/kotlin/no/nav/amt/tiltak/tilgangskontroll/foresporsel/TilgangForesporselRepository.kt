@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-class TilgangForesporselRepository(
+open class TilgangForesporselRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
 

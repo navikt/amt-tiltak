@@ -12,7 +12,7 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @Repository
-class TilgangInvitasjonRepository(
+open class TilgangInvitasjonRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
 
