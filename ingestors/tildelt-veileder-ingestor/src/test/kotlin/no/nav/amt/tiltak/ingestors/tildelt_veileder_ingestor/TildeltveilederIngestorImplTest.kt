@@ -23,7 +23,7 @@ class TildeltveilederIngestorImplTest : StringSpec({
 
 		val brukerFnr = "123454364334"
 		val veilederId = UUID.randomUUID()
-		val navAnsatt = NavAnsatt("Z12345", "Test", null, null)
+		val navAnsatt = NavAnsatt(navIdent = "Z12345", navn = "Test")
 
 		every {
 			veilederConnector.hentVeileder("Z12345")

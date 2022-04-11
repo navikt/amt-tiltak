@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.tilgangskontroll.invitasjon
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.amt.tiltak.common.auth.AuthService
-import no.nav.amt.tiltak.core.domain.veileder.Veileder
+import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import org.junit.jupiter.api.AfterAll
@@ -103,7 +103,7 @@ class NavAnsattTilgangInvitasjonControllerTest {
 			.thenReturn(navAnsattIdent)
 
 		`when`(veilederService.getOrCreateVeileder(navAnsattIdent))
-			.thenReturn(Veileder(
+			.thenReturn(NavAnsatt(
 				id = navAnsattId,
 				navIdent = navAnsattIdent,
 				epost = "",
