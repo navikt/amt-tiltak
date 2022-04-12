@@ -6,6 +6,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.NavKontor
 import no.nav.amt.tiltak.core.port.BrukerService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class EndringPaaBrukerIngestorImpl(
@@ -24,7 +25,7 @@ class EndringPaaBrukerIngestorImpl(
 
 		log.info("Endrer oppfølgingsenhet på bruker med id=${bruker.id}")
 		val enhetNavn = norgClient.hentNavKontorNavn(brukerRecord.oppfolgingsenhet)
-		val navKontor = NavKontor(brukerRecord.oppfolgingsenhet, enhetNavn)
+		val navKontor = NavKontor(UUID.randomUUID(), brukerRecord.oppfolgingsenhet, enhetNavn)
 
 		brukerService.oppdaterNavKontor(bruker.fodselsnummer, navKontor)
 

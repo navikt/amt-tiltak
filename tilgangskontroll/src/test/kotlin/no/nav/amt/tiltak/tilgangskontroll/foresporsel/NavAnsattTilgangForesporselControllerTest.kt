@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.tilgangskontroll.foresporsel
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
+import no.nav.amt.tiltak.core.port.NavAnsattTilgangService
 import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import org.junit.jupiter.api.AfterAll
@@ -41,6 +42,9 @@ class NavAnsattTilgangForesporselControllerTest {
 	@MockBean
 	private lateinit var veilederService: VeilederService
 
+	@MockBean
+	private lateinit var navAnsattTilgangService: NavAnsattTilgangService
+
 	@Test
 	fun `hentUbesluttedeForesporsler() - skal returnere 401 hvis token mangler`() {
 		val response = mockMvc.perform(
@@ -54,6 +58,9 @@ class NavAnsattTilgangForesporselControllerTest {
 	fun `hentUbesluttedeForesporsler() - skal returnere 200 med data`() {
 		val foresporselId = UUID.fromString("9e84392d-4b8d-463d-8509-216e573f975d")
 		val gjennomforingId = UUID.randomUUID()
+		val navAnsattIdent = "Z1234"
+
+		`when`(authService.hentNavIdentTilInnloggetBruker()).thenReturn(navAnsattIdent)
 
 		`when`(tilgangForesporselService.hentUbesluttedeForesporsler(gjennomforingId))
 			.thenReturn(listOf(TilgangForesporselDbo(
@@ -70,6 +77,9 @@ class NavAnsattTilgangForesporselControllerTest {
 				createdAt = ZonedDateTime.parse("2022-04-04T17:30:46.114332+02:00")
 			)))
 
+		`when`(navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
+			.thenReturn(true)
+
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.get("/api/nav-ansatt/tilgang/foresporsel/ubesluttet?gjennomforingId=$gjennomforingId")
 				.header("Authorization", "Bearer ${azureAdToken()}")
@@ -79,8 +89,8 @@ class NavAnsattTilgangForesporselControllerTest {
 			[{"id":"9e84392d-4b8d-463d-8509-216e573f975d","fornavn":"Test","mellomnavn":null,"etternavn":"Testersen","fodselsnummer":"1234","opprettetDato":"2022-04-04T17:30:46.114332+02:00"}]
 		""".trimIndent()
 
-		assertEquals(expectedJson, response.contentAsString)
 		assertEquals(200, response.status)
+		assertEquals(expectedJson, response.contentAsString)
 	}
 
 	@Test
@@ -95,6 +105,7 @@ class NavAnsattTilgangForesporselControllerTest {
 	@Test
 	fun `godkjennForesporsel() - skal godkjenne foresporsel og returnere 200`() {
 		val foresporselId = UUID.randomUUID()
+		val gjennomforingId = UUID.randomUUID()
 		val navAnsattId = UUID.randomUUID()
 		val navAnsattIdent = "Z1234"
 
@@ -108,6 +119,24 @@ class NavAnsattTilgangForesporselControllerTest {
 				navn = "",
 				telefonnummer = ""
 			))
+
+		`when`(tilgangForesporselService.hentForesporsel(foresporselId))
+			.thenReturn(TilgangForesporselDbo(
+				id = foresporselId,
+				personligIdent = "",
+				fornavn = "",
+				mellomnavn = "",
+				etternavn = "",
+				gjennomforingId = gjennomforingId,
+				beslutningAvNavAnsattId = null,
+				tidspunktBeslutning = null,
+				beslutning = null,
+				gjennomforingTilgangId = null,
+				createdAt = ZonedDateTime.now(),
+			))
+
+		`when`(navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
+			.thenReturn(true)
 
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.patch("/api/nav-ansatt/tilgang/foresporsel/$foresporselId/godkjenn")
@@ -131,6 +160,7 @@ class NavAnsattTilgangForesporselControllerTest {
 	@Test
 	fun `avvisForesporsel() - skal avvise foresporsel og returnere 200`() {
 		val foresporselId = UUID.randomUUID()
+		val gjennomforingId = UUID.randomUUID()
 		val navAnsattId = UUID.randomUUID()
 		val navAnsattIdent = "Z1234"
 
@@ -144,6 +174,24 @@ class NavAnsattTilgangForesporselControllerTest {
 				navn = "",
 				telefonnummer = ""
 			))
+
+		`when`(tilgangForesporselService.hentForesporsel(foresporselId))
+			.thenReturn(TilgangForesporselDbo(
+				id = foresporselId,
+				personligIdent = "",
+				fornavn = "",
+				mellomnavn = "",
+				etternavn = "",
+				gjennomforingId = gjennomforingId,
+				beslutningAvNavAnsattId = null,
+				tidspunktBeslutning = null,
+				beslutning = null,
+				gjennomforingTilgangId = null,
+				createdAt = ZonedDateTime.now(),
+			))
+
+		`when`(navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
+			.thenReturn(true)
 
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.patch("/api/nav-ansatt/tilgang/foresporsel/$foresporselId/avvis")

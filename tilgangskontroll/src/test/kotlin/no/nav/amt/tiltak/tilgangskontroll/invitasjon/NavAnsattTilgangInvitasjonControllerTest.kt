@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.tilgangskontroll.invitasjon
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
+import no.nav.amt.tiltak.core.port.NavAnsattTilgangService
 import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import org.junit.jupiter.api.AfterAll
@@ -45,6 +46,9 @@ class NavAnsattTilgangInvitasjonControllerTest {
 	@MockBean
 	private lateinit var veilederService: VeilederService
 
+	@MockBean
+	private lateinit var navAnsattTilgangService: NavAnsattTilgangService
+
 	@Test
 	fun `hentUbrukteInvitasjoner() - skal returnere 401 hvis token mangler`() {
 		val response = mockMvc.perform(
@@ -60,6 +64,13 @@ class NavAnsattTilgangInvitasjonControllerTest {
 		val invitasjonId = UUID.fromString("885ede1b-c940-4b2b-9023-4fc5992888e7")
 		val opprettetDato = ZonedDateTime.parse("2022-04-05T09:06:07.650476+02:00")
 		val gyldigTilDato = ZonedDateTime.parse("2022-04-08T09:06:07.650476+02:00")
+		val navAnsattIdent = "Z1234"
+
+		`when`(authService.hentNavIdentTilInnloggetBruker())
+			.thenReturn(navAnsattIdent)
+
+		`when`(navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
+			.thenReturn(true)
 
 		`when`(tilgangInvitasjonService.hentUbrukteInvitasjoner(gjennomforingId))
 			.thenReturn(listOf(
@@ -111,6 +122,9 @@ class NavAnsattTilgangInvitasjonControllerTest {
 				telefonnummer = ""
 			))
 
+		`when`(navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
+			.thenReturn(true)
+
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.post("/api/nav-ansatt/tilgang/invitasjon")
 				.header("Authorization", "Bearer ${azureAdToken()}")
@@ -137,6 +151,26 @@ class NavAnsattTilgangInvitasjonControllerTest {
 	@Test
 	fun `slettInvitasjon() - skal returnere 200 og slette invitasjon`() {
 		val invitasjonId = UUID.randomUUID()
+		val gjennomforingId = UUID.randomUUID()
+		val innloggetNavAnsattIdent = "Z1234"
+
+		`when`(authService.hentNavIdentTilInnloggetBruker())
+			.thenReturn(innloggetNavAnsattIdent)
+
+		`when`(tilgangInvitasjonService.hentInvitasjon(invitasjonId))
+			.thenReturn(TilgangInvitasjonDbo(
+				id = UUID.randomUUID(),
+				gjennomforingId = gjennomforingId,
+				gyldigTil = ZonedDateTime.now(),
+				opprettetAvNavAnsattId = UUID.randomUUID(),
+				erBrukt = false,
+				tidspunktBrukt = null,
+				tilgangForesporselId = null,
+				createdAt = ZonedDateTime.now()
+			))
+
+		`when`(navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(innloggetNavAnsattIdent, gjennomforingId))
+			.thenReturn(true)
 
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.delete("/api/nav-ansatt/tilgang/invitasjon/${invitasjonId}")

@@ -7,6 +7,12 @@ import java.util.*
 
 object TestData {
 
+	val NAV_KONTOR_1 = InsertNavKontorCommand(
+		id = UUID.fromString("09405517-99c0-49e5-9eb3-31c61b9579cf"),
+		enhet_id = "1234",
+		navn = "NAV Testheim"
+	)
+
 	val ARRANGOR_1 = InsertArrangorCommand(
 		id = UUID.fromString("8a37bce6-3bc1-11ec-8d3d-0242ac130003"),
 		overordnet_enhet_organisasjonsnummer = "911111111",
@@ -82,6 +88,7 @@ object TestData {
 		status = "GJENNOMFORES",
 		start_dato = LocalDate.of(2022, 2, 1),
 		slutt_dato = LocalDate.of(2050, 12, 30),
+		nav_kontor_id = NAV_KONTOR_1.id,
 		registrert_dato = LocalDate.of(2022, 1, 1),
 		fremmote_dato = LocalDate.of(2022, 2, 1)
 	)
@@ -94,6 +101,7 @@ object TestData {
 		status = "AVSLUTTET",
 		start_dato = LocalDate.of(2022, 2, 1),
 		slutt_dato = LocalDate.of(2022, 2, 13),
+		nav_kontor_id = null,
 		registrert_dato = LocalDate.of(2022, 1, 1),
 		fremmote_dato = LocalDate.of(2022, 2, 1)
 	)
@@ -118,12 +126,6 @@ object TestData {
 		navn = "Ola Nordmann",
 		telefonnummer = "99887654",
 		epost = "ola.nordmann@nav.no"
-	)
-
-	val NAV_KONTOR_1 = InsertNavKontorCommand(
-		id = UUID.fromString("09405517-99c0-49e5-9eb3-31c61b9579cf"),
-		enhet_id = "1234",
-		navn = "NAV Testheim"
 	)
 
 

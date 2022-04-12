@@ -89,6 +89,7 @@ class TiltakarrangorGjennomforingControllerTest {
 		fremmoteDato = LocalDateTime.now(),
 		startDato = LocalDate.now(),
 		registrertDato = LocalDateTime.now(),
+		navKontorId = null,
 		sluttDato = LocalDate.now(),
 		status = Gjennomforing.Status.GJENNOMFORES,
 	)

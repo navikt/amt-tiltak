@@ -27,6 +27,7 @@ import javax.sql.DataSource
 object TestDataSeeder {
 
 	fun insertDefaultTestData(repository: TestDataRepository) {
+		repository.insertNavKontor(NAV_KONTOR_1)
 
 		repository.insertArrangor(ARRANGOR_1)
 		repository.insertArrangor(ARRANGOR_2)
@@ -46,8 +47,6 @@ object TestDataSeeder {
 
 		repository.insertNavAnsatt(NAV_ANSATT_1)
 		repository.insertNavAnsatt(NAV_ANSATT_2)
-
-		repository.insertNavKontor(NAV_KONTOR_1)
 
 		repository.insertBruker(BRUKER_1)
 		repository.insertDeltaker(DELTAKER_1)
