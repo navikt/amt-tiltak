@@ -25,9 +25,7 @@ class NavAnsattTilgangInvitasjonController(
 	fun hentUbrukteInvitasjoner(@RequestParam gjennomforingId: UUID): List<UbruktInvitasjonDto> {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
 
-		if (!navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navIdent, gjennomforingId)) {
-			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Har ikke tilgang til gjennomføring")
-		}
+		verifisierTilgangTilGjennomforing(navIdent, gjennomforingId)
 
 		return tilgangInvitasjonService.hentUbrukteInvitasjoner(gjennomforingId).map { toDto(it) }
 	}
@@ -39,9 +37,7 @@ class NavAnsattTilgangInvitasjonController(
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
 		val navAnsatt = veilederService.getOrCreateVeileder(navIdent)
 
-		if (!navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navIdent, request.gjennomforingId)) {
-			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Har ikke tilgang til gjennomføring")
-		}
+		verifisierTilgangTilGjennomforing(navIdent, request.gjennomforingId)
 
 		tilgangInvitasjonService.opprettInvitasjon(request.gjennomforingId, navAnsatt.id)
 	}
@@ -53,20 +49,9 @@ class NavAnsattTilgangInvitasjonController(
 
 		val invitasjon = tilgangInvitasjonService.hentInvitasjon(invitasjonId)
 
-		if (!navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navIdent, invitasjon.gjennomforingId)) {
-			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Har ikke tilgang til gjennomføring")
-		}
+		verifisierTilgangTilGjennomforing(navIdent, invitasjon.gjennomforingId)
 
 		tilgangInvitasjonService.slettInvitasjon(invitasjonId)
-	}
-
-	private fun toDto(dbo: UbruktInvitasjonDbo): UbruktInvitasjonDto {
-		return UbruktInvitasjonDto(
-			id = dbo.id,
-			opprettetAvNavIdent = dbo.opprettetAvNavIdent,
-			opprettetDato = dbo.opprettetDato,
-			gyldigTilDato = dbo.gyldigTilDato,
-		)
 	}
 
 	data class UbruktInvitasjonDto(
@@ -79,5 +64,20 @@ class NavAnsattTilgangInvitasjonController(
 	data class OpprettInvitasjonRequest(
 		val gjennomforingId: UUID
 	)
+
+	private fun verifisierTilgangTilGjennomforing(navIdent: String, gjennomforingId: UUID) {
+		if (!navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navIdent, gjennomforingId)) {
+			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Har ikke tilgang til gjennomføring")
+		}
+	}
+
+	private fun toDto(dbo: UbruktInvitasjonDbo): UbruktInvitasjonDto {
+		return UbruktInvitasjonDto(
+			id = dbo.id,
+			opprettetAvNavIdent = dbo.opprettetAvNavIdent,
+			opprettetDato = dbo.opprettetDato,
+			gyldigTilDato = dbo.gyldigTilDato,
+		)
+	}
 
 }

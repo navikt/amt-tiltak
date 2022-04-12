@@ -25,9 +25,7 @@ class NavAnsattTilgangForesporselController(
 	fun hentUbesluttedeForesporsler(@RequestParam gjennomforingId: UUID): List<UbesluttetForesporselDto> {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
 
-		if (!navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navIdent, gjennomforingId)) {
-			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Har ikke tilgang til gjennomføring")
-		}
+		verifisierTilgangTilGjennomforing(navIdent, gjennomforingId)
 
 		return tilgangForesporselService.hentUbesluttedeForesporsler(gjennomforingId)
 			.map { tilDto(it) }
@@ -40,9 +38,7 @@ class NavAnsattTilgangForesporselController(
 		val navAnsatt = veilederService.getOrCreateVeileder(navIdent)
 		val foresporsel = tilgangForesporselService.hentForesporsel(foresporselId)
 
-		if (!navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navIdent, foresporsel.gjennomforingId)) {
-			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Har ikke tilgang til gjennomføring")
-		}
+		verifisierTilgangTilGjennomforing(navIdent, foresporsel.gjennomforingId)
 
 		tilgangForesporselService.godkjennForesporsel(foresporselId, navAnsatt.id)
 	}
@@ -54,9 +50,7 @@ class NavAnsattTilgangForesporselController(
 		val navAnsatt = veilederService.getOrCreateVeileder(navIdent)
 		val foresporsel = tilgangForesporselService.hentForesporsel(foresporselId)
 
-		if (!navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navIdent, foresporsel.gjennomforingId)) {
-			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Har ikke tilgang til gjennomføring")
-		}
+		verifisierTilgangTilGjennomforing(navIdent, foresporsel.gjennomforingId)
 
 		tilgangForesporselService.avvisForesporsel(foresporselId, navAnsatt.id)
 	}
@@ -79,6 +73,12 @@ class NavAnsattTilgangForesporselController(
 			fodselsnummer = dbo.personligIdent,
 			opprettetDato = dbo.createdAt,
 		)
+	}
+
+	private fun verifisierTilgangTilGjennomforing(navIdent: String, gjennomforingId: UUID) {
+		if (!navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navIdent, gjennomforingId)) {
+			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Har ikke tilgang til gjennomføring")
+		}
 	}
 
 }
