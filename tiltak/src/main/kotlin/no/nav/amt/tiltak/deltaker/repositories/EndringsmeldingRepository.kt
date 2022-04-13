@@ -24,7 +24,7 @@ open class EndringsmeldingRepository(
 			startDato = rs.getDate("start_dato")?.toLocalDate(),
 			godkjentAvNavAnsatt = rs.getNullableUUID("godkjent_av_nav_ansatt"),
 			aktiv = rs.getBoolean("aktiv"),
-			opprettetAv = rs.getUUID("opprettet_av"),
+			opprettetAvId = rs.getUUID("opprettet_av"),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
 		)

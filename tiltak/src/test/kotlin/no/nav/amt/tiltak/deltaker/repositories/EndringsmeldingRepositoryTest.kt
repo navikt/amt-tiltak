@@ -32,7 +32,7 @@ internal class EndringsmeldingRepositoryTest : FunSpec({
 		melding shouldNotBe null
 		melding.deltakerId shouldBe DELTAKER_1.id
 		melding.aktiv shouldBe true
-		melding.opprettetAv shouldBe ARRANGOR_ANSATT_1.id
+		melding.opprettetAvId shouldBe ARRANGOR_ANSATT_1.id
 		melding.startDato shouldBe now
 	}
 
@@ -50,7 +50,7 @@ internal class EndringsmeldingRepositoryTest : FunSpec({
 		melding2 shouldNotBe null
 		melding2.startDato shouldBe nyDato
 		melding2.aktiv shouldBe true
-		melding2.opprettetAv shouldBe ARRANGOR_ANSATT_2.id
+		melding2.opprettetAvId shouldBe ARRANGOR_ANSATT_2.id
 
 		val forrigeMelding = repository.get(melding1.id)
 

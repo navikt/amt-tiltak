@@ -30,7 +30,7 @@ object DbUtils {
 	 */
 	infix fun ZonedDateTime.shouldBeEqualTo(expected: ZonedDateTime?) {
 		expected shouldNotBe null
-		expected!!.shouldBeWithin(Duration.ofSeconds(1), this)
+		expected!!.shouldBeWithin(Duration.ofSeconds(10), this)
 	}
 
 	infix fun ZonedDateTime.shouldBeCloseTo(expected: ZonedDateTime?) {
