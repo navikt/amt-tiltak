@@ -7,6 +7,6 @@ interface NavAnsattService {
 
 	fun getNavAnsatt(navIdent: String): NavAnsatt
 
-	fun hentEnhetTilganger(navIdent: String): List<NavEnhetTilgang>
+	fun hentTiltaksansvarligEnhetTilganger(navIdent: String): List<NavEnhetTilgang>
 
 }

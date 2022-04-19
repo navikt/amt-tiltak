@@ -19,6 +19,7 @@ data class GjennomforingDbo(
     val sluttDato: LocalDate?,
     val registrertDato: LocalDateTime,
     val fremmoteDato: LocalDateTime?,
+	val navKontorId: UUID?,
     val createdAt: LocalDateTime,
     val modifiedAt: LocalDateTime
 ) {
@@ -32,6 +33,7 @@ data class GjennomforingDbo(
 			status = status,
 			startDato = startDato,
 			sluttDato = sluttDato,
+			navKontorId = navKontorId,
 			registrertDato = registrertDato,
 			fremmoteDato = fremmoteDato
 		)

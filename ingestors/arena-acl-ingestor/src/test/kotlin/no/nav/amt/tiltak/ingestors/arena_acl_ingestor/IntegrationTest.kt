@@ -13,10 +13,10 @@ import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
-import no.nav.amt.tiltak.deltaker.repositories.NavKontorRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.DeltakerProcessor
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.GjennomforingProcessor
+import no.nav.amt.tiltak.nav_kontor.NavKontorRepository
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
@@ -50,7 +50,7 @@ class IntegrationTest {
 
 	private lateinit var brukerRepository: BrukerRepository
 	private lateinit var navKontorRepository: NavKontorRepository
-	private lateinit var navKontorService: NavKontorService
+	private lateinit var navKontorConnector: NavKontorConnector
 
 	private lateinit var gjennomforingProcessor: GjennomforingProcessor;
 	private lateinit var deltakerProcessor: DeltakerProcessor
@@ -82,12 +82,12 @@ class IntegrationTest {
 		arrangorRepository = ArrangorRepository(jdbcTemplate)
 		brukerRepository = BrukerRepository(jdbcTemplate)
 
-		navKontorService = mockk()
+		navKontorConnector = mockk()
 		personService = mockk()
 		enhetsregisterClient = mockk()
 
 		tiltakService = TiltakServiceImpl(tiltakRepository)
-		brukerService = BrukerServiceImpl(brukerRepository, navKontorRepository, navKontorService, personService, mockk())
+		brukerService = BrukerServiceImpl(brukerRepository, navKontorRepository, navKontorConnector, personService, mockk())
 		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, transactionTemplate)
 		arrangorService = ArrangorServiceImpl(enhetsregisterClient, arrangorRepository)
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, arrangorService, transactionTemplate)
@@ -99,7 +99,7 @@ class IntegrationTest {
 		every { enhetsregisterClient.hentVirksomhet(virksomhetsnr) } returns virksomhet
 
 		every { personService.hentPersonKontaktinformasjon(personIdent) } returns Kontaktinformasjon("epost", "telefon" )
-		every { navKontorService.hentNavKontorForBruker(personIdent) } returns null
+		every { navKontorConnector.hentNavKontorForBruker(personIdent) } returns null
 		every { personService.hentTildeltVeileder(personIdent) } returns null
 		every { personService.hentPerson(personIdent) } returns person
 	}
@@ -170,6 +170,7 @@ class IntegrationTest {
 		sluttDato =  LocalDate.now().minusDays(1),
 		registrertDato =  now.minusDays(5),
 		fremmoteDato =  null,
+		navKontorId = null,
 		createdAt =  now,
 		modifiedAt =  now
 	)
@@ -178,7 +179,7 @@ class IntegrationTest {
 			{
 			  "transactionId": "b3b46fc2-ad90-4dbb-abfb-2b767318258b",
 			  "type": "GJENNOMFORING",
-			  "timestamp": "${now}",
+			  "timestamp": "$now",
 			  "operation": "CREATED",
 			  "payload": {
 			    "id": "${toInsertGjennomforing.id}",

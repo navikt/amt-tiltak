@@ -43,7 +43,8 @@ class GjennomforingProcessor(
 				startDato = gjennomforing.startDato,
 				sluttDato = gjennomforing.sluttDato,
 				registrertDato = gjennomforing.registrertDato,
-				fremmoteDato = gjennomforing.fremmoteDato
+				fremmoteDato = gjennomforing.fremmoteDato,
+				navKontorId = null // Dette blir implementert i en annen PR
 			)
 		)
 

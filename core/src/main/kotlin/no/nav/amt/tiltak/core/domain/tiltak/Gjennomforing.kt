@@ -13,6 +13,7 @@ data class Gjennomforing(
 	val status: Status,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
+	val navKontorId: UUID?,
 	val registrertDato: LocalDateTime,
 	val fremmoteDato: LocalDateTime?,
 ) {

@@ -14,6 +14,7 @@ data class InsertGjennomforingCommand(
 	val status: String,
 	val start_dato: LocalDate,
 	val slutt_dato: LocalDate,
+	val nav_kontor_id: UUID?,
 	val registrert_dato: LocalDate,
 	val fremmote_dato: LocalDate
 ) {
@@ -26,6 +27,7 @@ data class InsertGjennomforingCommand(
 				status = Gjennomforing.Status.valueOf(this.status),
 				startDato = this.start_dato,
 				sluttDato = this.slutt_dato,
+				navKontorId = this.nav_kontor_id,
 				registrertDato = this.registrert_dato.atStartOfDay(),
 				fremmoteDato = this.fremmote_dato.atStartOfDay()
 		)

@@ -13,7 +13,7 @@ class NavAnsattServiceTest: StringSpec ({
 
 	val veilederConnector: VeilederConnector = mockk()
 	val axsysClient: AxsysClient = mockk()
-	val navAnsattService = NavAnsattServiceImpl(veilederConnector, axsysClient)
+	val navAnsattService = NavAnsattServiceImpl(veilederConnector, axsysClient, mockk())
 
 	val navn = "Navn Navnesen"
 	val navIdent = "AB12345"

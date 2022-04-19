@@ -19,6 +19,10 @@ open class TilgangForesporselService(
 	private val ansattRolleService: AnsattRolleService,
 ) {
 
+	open fun hentForesporsel(foresporselId: UUID): TilgangForesporselDbo {
+		return tilgangForesporselRepository.hentForesporsel(foresporselId)
+	}
+
 	open fun hentUbesluttedeForesporsler(gjennomforingId: UUID): List<TilgangForesporselDbo> {
 		return tilgangForesporselRepository.hentUbesluttedeForesporsler(gjennomforingId)
 	}

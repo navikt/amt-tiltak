@@ -3,14 +3,14 @@ package no.nav.amt.tiltak.tiltak.services
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.NavKontor
 import no.nav.amt.tiltak.core.port.BrukerService
-import no.nav.amt.tiltak.core.port.NavKontorService
+import no.nav.amt.tiltak.core.port.NavKontorConnector
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
-import no.nav.amt.tiltak.deltaker.dbo.NavKontorDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
-import no.nav.amt.tiltak.deltaker.repositories.NavKontorRepository
+import no.nav.amt.tiltak.nav_kontor.NavKontorDbo
+import no.nav.amt.tiltak.nav_kontor.NavKontorRepository
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -18,7 +18,7 @@ import java.util.*
 class BrukerServiceImpl(
 	private val brukerRepository: BrukerRepository,
 	private val navKontorRepository: NavKontorRepository,
-	private val navKontorService: NavKontorService,
+	private val navKontorConnector: NavKontorConnector,
 	private val personService: PersonService,
 	private val veilederService: VeilederService
 ) : BrukerService {
@@ -78,7 +78,7 @@ class BrukerServiceImpl(
 	}
 
 	private fun getNavKontor(fodselsnummer: String): NavKontorDbo? {
-		return navKontorService.hentNavKontorForBruker(fodselsnummer)?.let {
+		return navKontorConnector.hentNavKontorForBruker(fodselsnummer)?.let {
 			navKontorRepository.upsert(it.enhetId, it.navn)
 		}
 	}

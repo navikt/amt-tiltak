@@ -79,12 +79,12 @@ class GjennomforingServiceImplTest : FunSpec({
 	}
 
 	test("slettGjennomforing - skal slette gjennomføring") {
+		testDataRepository.insertNavKontor(NAV_KONTOR_1)
 		testDataRepository.insertTiltak(TILTAK_1)
 		testDataRepository.insertArrangor(ARRANGOR_1)
 		testDataRepository.insertGjennomforing(GJENNOMFORING_1)
 
 		testDataRepository.insertNavAnsatt(NAV_ANSATT_1)
-		testDataRepository.insertNavKontor(NAV_KONTOR_1)
 		testDataRepository.insertBruker(BRUKER_1)
 		testDataRepository.insertDeltaker(DELTAKER_1)
 		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1)
@@ -115,6 +115,7 @@ class GjennomforingServiceImplTest : FunSpec({
 	}
 
 	test("getGjennomforing - gjennomføring finnes - returnerer gjennomføring") {
+		testDataRepository.insertNavKontor(NAV_KONTOR_1)
 		testDataRepository.insertTiltak(TILTAK_1)
 		testDataRepository.insertArrangor(ARRANGOR_1)
 		testDataRepository.insertGjennomforing(GJENNOMFORING_1)

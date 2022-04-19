@@ -20,6 +20,10 @@ open class TilgangInvitasjonService(
 	private val personService: PersonService,
 ) {
 
+	open fun hentInvitasjon(invitasjonId: UUID): TilgangInvitasjonDbo {
+		return tilgangInvitasjonRepository.get(invitasjonId)
+	}
+
 	open fun hentInvitasjonInfo(invitasjonId: UUID): InvitasjonInfoDbo {
 		return hentInvitasjonInfoQuery.query(invitasjonId)
 	}

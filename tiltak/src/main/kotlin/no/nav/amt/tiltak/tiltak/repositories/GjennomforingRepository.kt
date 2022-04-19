@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.tiltak.repositories
 
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
+import no.nav.amt.tiltak.utils.getNullableUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -24,6 +25,7 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
 			registrertDato = rs.getTimestamp("registrert_dato").toLocalDateTime(),
 			fremmoteDato = rs.getTimestamp("fremmote_dato")?.toLocalDateTime(),
+			navKontorId = rs.getNullableUUID("nav_kontor_id"),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
 		)

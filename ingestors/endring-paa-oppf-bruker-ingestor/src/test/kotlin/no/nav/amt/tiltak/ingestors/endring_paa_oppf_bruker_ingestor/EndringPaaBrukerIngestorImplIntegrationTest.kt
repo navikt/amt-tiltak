@@ -2,17 +2,16 @@ package no.nav.amt.tiltak.ingestors.endring_paa_oppf_bruker_ingestor
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.amt.tiltak.clients.norg.NorgClient
 import no.nav.amt.tiltak.core.port.BrukerService
-import no.nav.amt.tiltak.core.port.NavKontorService
+import no.nav.amt.tiltak.core.port.NavKontorConnector
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
-import no.nav.amt.tiltak.deltaker.repositories.NavKontorRepository
-import no.nav.amt.tiltak.ingestors.endring_paa_oppf_bruker_ingestor.EndringPaaBrukerIngestor
-import no.nav.amt.tiltak.ingestors.endring_paa_oppf_bruker_ingestor.EndringPaaBrukerIngestorImpl
+import no.nav.amt.tiltak.nav_kontor.NavKontorRepository
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
 import org.junit.jupiter.api.BeforeEach
@@ -28,7 +27,7 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 	lateinit var brukerRepository: BrukerRepository
 	lateinit var navKontorRepository: NavKontorRepository
 
-	val navKontorService: NavKontorService = mockk()
+	val navKontorConnector: NavKontorConnector = mockk()
 	val personService: PersonService = mockk()
 	val veilederService: VeilederService = mockk()
 
@@ -43,7 +42,7 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 
 		navKontorRepository = NavKontorRepository(jdbcTemplate)
 		brukerRepository = BrukerRepository(jdbcTemplate)
-		brukerService = BrukerServiceImpl(brukerRepository, navKontorRepository, navKontorService, personService, veilederService)
+		brukerService = BrukerServiceImpl(brukerRepository, navKontorRepository, navKontorConnector, personService, veilederService)
 		endringPaaBrukerIngestorImpl = EndringPaaBrukerIngestorImpl(brukerService, norgClient)
 	}
 

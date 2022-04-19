@@ -1,12 +1,12 @@
 package no.nav.amt.tiltak.ingestors.endring_paa_oppf_bruker_ingestor
 
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import no.nav.amt.tiltak.clients.norg.NorgClient
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.NavKontor
 import no.nav.amt.tiltak.core.port.BrukerService
-import no.nav.amt.tiltak.ingestors.endring_paa_oppf_bruker_ingestor.EndringPaaBrukerIngestor
-import no.nav.amt.tiltak.ingestors.endring_paa_oppf_bruker_ingestor.EndringPaaBrukerIngestorImpl
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -52,8 +52,8 @@ class EndringPaaBrukerIngestorImplTest {
 			fornavn = "fornavn",
 			mellomnavn = null,
 			etternavn = "etternavn",
-			fodselsnummer = "$fnr",
-			navKontor = NavKontor(enhet, "Navn")
+			fodselsnummer = fnr,
+			navKontor = NavKontor(UUID.randomUUID(), enhet, "Navn")
 		)
 		every { brukerService.getBruker(fnr) }.returns(bruker)
 
@@ -78,13 +78,13 @@ class EndringPaaBrukerIngestorImplTest {
 			fornavn = "fornavn",
 			mellomnavn = null,
 			etternavn = "etternavn",
-			fodselsnummer = "$fnr",
-			navKontor = NavKontor("enhet", "Navn")
+			fodselsnummer = fnr,
+			navKontor = NavKontor(UUID.randomUUID(),"enhet", "Navn")
 		)
-		val navKontor = NavKontor(nyEnhet, nyttKontorNavn)
+
 		every { brukerService.getBruker(fnr) }.returns(bruker)
 		every { norgClient.hentNavKontorNavn(nyEnhet)}.returns(nyttKontorNavn)
-		every { brukerService.oppdaterNavKontor(fnr, navKontor)}.returns(Unit)
+		every { brukerService.oppdaterNavKontor(fnr, any())}.returns(Unit)
 
 		endringPaaBrukerIngestorImpl.ingestKafkaRecord("""
 			{
@@ -94,7 +94,7 @@ class EndringPaaBrukerIngestorImplTest {
 		""".trimIndent())
 
 		verify ( exactly = 1 ) { norgClient.hentNavKontorNavn(nyEnhet) }
-		verify ( exactly = 1 ) { brukerService.oppdaterNavKontor(fnr, navKontor ) }
+		verify ( exactly = 1 ) { brukerService.oppdaterNavKontor(fnr, any() ) }
 	}
 
 	@Test
@@ -108,8 +108,8 @@ class EndringPaaBrukerIngestorImplTest {
 			fornavn = "fornavn",
 			mellomnavn = null,
 			etternavn = "etternavn",
-			fodselsnummer = "$fnr",
-			navKontor = NavKontor("enhet", "Navn")
+			fodselsnummer = fnr,
+			navKontor = NavKontor(UUID.randomUUID(),"enhet", "Navn")
 		)
 		every { brukerService.getBruker(fnr) }.returns(bruker)
 
