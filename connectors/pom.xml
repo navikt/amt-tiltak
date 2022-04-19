@@ -13,7 +13,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>nav_kontor</module>
         <module>person</module>
         <module>veileder</module>
     </modules>

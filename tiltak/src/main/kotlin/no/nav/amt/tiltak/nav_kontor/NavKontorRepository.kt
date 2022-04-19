@@ -41,7 +41,7 @@ open class NavKontorRepository(
 		)
 
 		template.update(sql, parameters)
-		return getByEnhetId(enhetId)
+		return hentEnhet(enhetId) ?: throw NoSuchElementException("Kontor med enhetId $enhetId eksisterer ikke.")
 	}
 
 	fun get(id: UUID): NavKontorDbo {
@@ -64,11 +64,16 @@ open class NavKontorRepository(
 		)
 	}
 
-	private fun getByEnhetId(enhetId: String): NavKontorDbo {
+	fun hentEnhet(enhetId: String): NavKontorDbo? {
+		val sql = """
+			SELECT * FROM nav_kontor WHERE enhet_id = :enhetId
+		""".trimIndent()
+
 		return template.query(
-			"SELECT * FROM nav_kontor WHERE enhet_id = :enhetId",
-			MapSqlParameterSource().addValues(mapOf("enhetId" to enhetId)),
+			sql,
+			sqlParameters("enhetId" to enhetId),
 			rowMapper
-		).firstOrNull() ?: throw NoSuchElementException("Kontor med enhetId $enhetId eksisterer ikke.")
+		).firstOrNull()
 	}
+
 }

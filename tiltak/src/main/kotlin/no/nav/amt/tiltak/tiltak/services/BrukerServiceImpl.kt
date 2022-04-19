@@ -3,30 +3,27 @@ package no.nav.amt.tiltak.tiltak.services
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.NavKontor
 import no.nav.amt.tiltak.core.port.BrukerService
-import no.nav.amt.tiltak.core.port.NavKontorConnector
+import no.nav.amt.tiltak.core.port.NavKontorService
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
-import no.nav.amt.tiltak.nav_kontor.NavKontorDbo
-import no.nav.amt.tiltak.nav_kontor.NavKontorRepository
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
 class BrukerServiceImpl(
 	private val brukerRepository: BrukerRepository,
-	private val navKontorRepository: NavKontorRepository,
-	private val navKontorConnector: NavKontorConnector,
 	private val personService: PersonService,
-	private val veilederService: VeilederService
+	private val veilederService: VeilederService,
+	private val navKontorService: NavKontorService
 ) : BrukerService {
 
 	override fun getBruker(fodselsnummer: String): Bruker? {
 		return brukerRepository.get(fodselsnummer)?.let {
-			val navKontor = it.navKontorId?.let { navKontorRepository.get(it) }
-			it.toBruker(navKontor?.toNavKontor())
+			val navKontor = it.navKontorId?.let(navKontorService::getNavKontor)
+			it.toBruker(navKontor)
 		}
 	}
 
@@ -44,14 +41,13 @@ class BrukerServiceImpl(
 	}
 
 	override fun oppdaterNavKontor(fodselsnummer: String, navKontor: NavKontor) {
-		val navKontorDbo = navKontorRepository.upsert(navKontor.enhetId, navKontor.navn)
-		brukerRepository.oppdaterNavKontor(fodselsnummer, navKontorDbo.id)
+		brukerRepository.oppdaterNavKontor(fodselsnummer, navKontor.id)
 	}
 
 	private fun createBruker(fodselsnummer: String): BrukerDbo {
 		val veilederId = upsertVeileder(fodselsnummer)
 
-		val navKontor = getNavKontor(fodselsnummer)
+		val navKontor = navKontorService.getNavKontorForBruker(fodselsnummer)
 
 		val personKontaktinformasjon = personService.hentPersonKontaktinformasjon(fodselsnummer)
 
@@ -77,9 +73,4 @@ class BrukerServiceImpl(
 		}
 	}
 
-	private fun getNavKontor(fodselsnummer: String): NavKontorDbo? {
-		return navKontorConnector.hentNavKontorForBruker(fodselsnummer)?.let {
-			navKontorRepository.upsert(it.enhetId, it.navn)
-		}
-	}
 }

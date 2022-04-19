@@ -3,10 +3,10 @@ package no.nav.amt.tiltak.ingestors.endring_paa_oppf_bruker_ingestor
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.amt.tiltak.clients.norg.NorgClient
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.NavKontor
 import no.nav.amt.tiltak.core.port.BrukerService
+import no.nav.amt.tiltak.core.port.NavKontorService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -15,14 +15,14 @@ class EndringPaaBrukerIngestorImplTest {
 
 	lateinit var endringPaaBrukerIngestorImpl: EndringPaaBrukerIngestor
 	lateinit var brukerService: BrukerService
-	lateinit var norgClient: NorgClient
+	lateinit var navKontorService: NavKontorService
 
 
 	@BeforeEach
 	fun beforeEach() {
-		norgClient = mockk()
+		navKontorService = mockk()
 		brukerService = mockk()
-		endringPaaBrukerIngestorImpl = EndringPaaBrukerIngestorImpl(brukerService, norgClient)
+		endringPaaBrukerIngestorImpl = EndringPaaBrukerIngestorImpl(brukerService, navKontorService)
 	}
 
 	@Test
@@ -38,7 +38,7 @@ class EndringPaaBrukerIngestorImplTest {
 			}
 		""".trimIndent())
 
-		verify ( exactly = 0 ) { norgClient.hentNavKontorNavn(enhet) }
+		verify ( exactly = 0 ) { navKontorService.getNavKontor(enhet) }
 		verify ( exactly = 0 ) { brukerService.oppdaterNavKontor(fnr, any()) }
 
 	}
@@ -64,7 +64,7 @@ class EndringPaaBrukerIngestorImplTest {
 			}
 		""".trimIndent())
 
-		verify ( exactly = 0 ) { norgClient.hentNavKontorNavn(enhet) }
+		verify ( exactly = 0 ) { navKontorService.getNavKontor(enhet) }
 		verify ( exactly = 0 ) { brukerService.oppdaterNavKontor(fnr, any()) }
 	}
 
@@ -83,7 +83,7 @@ class EndringPaaBrukerIngestorImplTest {
 		)
 
 		every { brukerService.getBruker(fnr) }.returns(bruker)
-		every { norgClient.hentNavKontorNavn(nyEnhet)}.returns(nyttKontorNavn)
+		every { navKontorService.getNavKontor(nyEnhet)}.returns(NavKontor(UUID.randomUUID(), nyEnhet, nyttKontorNavn))
 		every { brukerService.oppdaterNavKontor(fnr, any())}.returns(Unit)
 
 		endringPaaBrukerIngestorImpl.ingestKafkaRecord("""
@@ -93,7 +93,7 @@ class EndringPaaBrukerIngestorImplTest {
 			}
 		""".trimIndent())
 
-		verify ( exactly = 1 ) { norgClient.hentNavKontorNavn(nyEnhet) }
+		verify ( exactly = 1 ) { navKontorService.getNavKontor(nyEnhet) }
 		verify ( exactly = 1 ) { brukerService.oppdaterNavKontor(fnr, any() ) }
 	}
 
@@ -120,7 +120,7 @@ class EndringPaaBrukerIngestorImplTest {
 			}
 		""".trimIndent())
 
-		verify ( exactly = 0 ) { norgClient.hentNavKontorNavn(nyEnhet) }
+		verify ( exactly = 0 ) { navKontorService.getNavKontor(nyEnhet) }
 		verify ( exactly = 0 ) { brukerService.oppdaterNavKontor(fnr, any() ) }
 	}
 }

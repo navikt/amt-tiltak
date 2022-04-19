@@ -21,10 +21,6 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>nav_kontor</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>auth</artifactId>
         </dependency>
         <dependency>
