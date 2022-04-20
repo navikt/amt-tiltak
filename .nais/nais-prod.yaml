@@ -46,6 +46,7 @@ spec:
     inbound:
       rules:
         - application: amt-tiltaksarrangor-flate
+        - application: amt-tiltaksansvarlig-flate
     outbound:
       rules:
         - application: amt-enhetsregister
