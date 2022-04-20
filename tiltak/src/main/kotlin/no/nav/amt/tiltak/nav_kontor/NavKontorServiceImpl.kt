@@ -14,4 +14,8 @@ open class NavKontorServiceImpl(
 			.map { NavKontor(id = it.id, enhetId = it.enhetId, navn = it.navn) }
 	}
 
+	override fun upsertNavKontor(enhetId: String, navn: String) {
+		navKontorRepository.upsert(enhetId, navn)
+	}
+
 }

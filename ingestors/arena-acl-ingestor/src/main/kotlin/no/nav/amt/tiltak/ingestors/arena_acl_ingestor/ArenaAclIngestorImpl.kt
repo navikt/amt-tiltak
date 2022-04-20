@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.ingestors.arena_acl_ingestor
 
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonNode
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
+import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.GjennomforingPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
@@ -21,8 +22,8 @@ class ArenaAclIngestorImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	override fun ingestKafkaMessageValue(messageValue: String) {
-		val unknownMessageWrapper = fromJsonString<UnknownMessageWrapper>(messageValue)
+	override fun ingestKafkaRecord(recordValue: String) {
+		val unknownMessageWrapper = fromJsonString<UnknownMessageWrapper>(recordValue)
 
 		wrapIngestWithLog(unknownMessageWrapper) {
 			when (unknownMessageWrapper.type) {

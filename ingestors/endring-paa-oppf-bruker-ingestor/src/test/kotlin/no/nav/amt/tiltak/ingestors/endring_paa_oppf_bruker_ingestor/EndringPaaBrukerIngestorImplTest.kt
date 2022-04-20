@@ -6,6 +6,7 @@ import io.mockk.verify
 import no.nav.amt.tiltak.clients.norg.NorgClient
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.NavKontor
+import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
 import no.nav.amt.tiltak.core.port.BrukerService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

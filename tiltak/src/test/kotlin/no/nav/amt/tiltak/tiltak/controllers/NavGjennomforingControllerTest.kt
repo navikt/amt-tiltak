@@ -10,6 +10,7 @@ import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
+import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -46,6 +47,13 @@ class NavGjennomforingControllerTest {
 	@MockBean
 	private lateinit var gjennomforingService: GjennomforingService
 
+	companion object : MockOAuthServer() {
+		@AfterAll
+		@JvmStatic
+		fun cleanup() {
+			shutdownMockServer()
+		}
+	}
 
 	val statusConverterMock = fun (id: UUID) =
 		listOf(
@@ -95,25 +103,9 @@ class NavGjennomforingControllerTest {
 		MockitoAnnotations.openMocks(this)
 	}
 
-	companion object {
-		private val server = MockOAuth2Server()
-
-		init {
-			server.start()
-			System.setProperty("MOCK_TOKEN_X_DISCOVERY_URL", server.wellKnownUrl("tokenx").toString())
-			System.setProperty("MOCK_AZURE_AD_DISCOVERY_URL", server.wellKnownUrl("azuread").toString())
-		}
-
-		@AfterAll
-		@JvmStatic
-		fun cleanup() {
-			server.shutdown()
-		}
-	}
-
 	@Test
 	fun `hentGjennomforingerForNavAnsatte() - sender med tokenx-token - skal returnere 401`() {
-		val token = server.issueToken("tokenx", "test", "test").serialize()
+		val token = tokenXToken("test", "test")
 
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.get("/api/nav-ansatt/gjennomforing")
@@ -125,7 +117,7 @@ class NavGjennomforingControllerTest {
 
 	@Test
 	fun `hentGjennomforingerForNavAnsatte() - sender med azure ad-token - skal returnere 200`() {
-		val token = server.issueToken("azuread", "test", "test").serialize()
+		val token = azureAdToken("test", "test")
 		val navIdent = "ab12345"
 
 		Mockito.`when`(authService.hentNavIdentTilInnloggetBruker()).thenReturn(navIdent)

@@ -1,9 +1,10 @@
 package no.nav.amt.tiltak.kafka
 
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider
-import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.ArenaAclIngestor
-import no.nav.amt.tiltak.ingestors.endring_paa_oppf_bruker_ingestor.EndringPaaBrukerIngestor
-import no.nav.amt.tiltak.ingestors.tildelt_veileder_ingestor.TildeltVeilederIngestor
+import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
+import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
+import no.nav.amt.tiltak.core.kafka.NavEnhetIngestor
+import no.nav.amt.tiltak.core.kafka.TildeltVeilederIngestor
 import no.nav.common.kafka.consumer.KafkaConsumerClient
 import no.nav.common.kafka.consumer.feilhandtering.KafkaConsumerRecordProcessor
 import no.nav.common.kafka.consumer.feilhandtering.util.KafkaConsumerRecordProcessorBuilder
@@ -32,7 +33,8 @@ open class KafkaConfiguration(
 	jdbcTemplate: JdbcTemplate,
 	arenaAclIngestor: ArenaAclIngestor,
 	tildeltVeilederIngestor: TildeltVeilederIngestor,
-	endringPaaBrukerIngestor: EndringPaaBrukerIngestor
+	endringPaaBrukerIngestor: EndringPaaBrukerIngestor,
+	navEnhetIngestor: NavEnhetIngestor
 ) {
 	private val log = LoggerFactory.getLogger(javaClass)
     private var client: KafkaConsumerClient
@@ -51,7 +53,7 @@ open class KafkaConfiguration(
 						kafkaTopicProperties.amtTiltakTopic,
 						stringDeserializer(),
 						stringDeserializer(),
-						Consumer<ConsumerRecord<String, String>> { arenaAclIngestor.ingestKafkaMessageValue(it.value()) }
+						Consumer<ConsumerRecord<String, String>> { arenaAclIngestor.ingestKafkaRecord(it.value()) }
 					)
 			)
 		)
@@ -77,6 +79,18 @@ open class KafkaConfiguration(
 					stringDeserializer(),
 					stringDeserializer(),
 					Consumer<ConsumerRecord<String, String>> { endringPaaBrukerIngestor.ingestKafkaRecord(it.value()) }
+				)
+		)
+
+		topicConfigs.add(
+			KafkaConsumerClientBuilder.TopicConfig<String, String>()
+				.withLogging()
+				.withStoreOnFailure(consumerRepository)
+				.withConsumerConfig(
+					kafkaTopicProperties.navEnhetTopic,
+					stringDeserializer(),
+					stringDeserializer(),
+					Consumer<ConsumerRecord<String, String>> { navEnhetIngestor.ingestKafkaRecord(it.value()) }
 				)
 		)
 

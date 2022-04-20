@@ -1,8 +1,9 @@
 package no.nav.amt.tiltak.kafka
 
-import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.ArenaAclIngestor
-import no.nav.amt.tiltak.ingestors.endring_paa_oppf_bruker_ingestor.EndringPaaBrukerIngestor
-import no.nav.amt.tiltak.ingestors.tildelt_veileder_ingestor.TildeltVeilederIngestor
+import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
+import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
+import no.nav.amt.tiltak.core.kafka.NavEnhetIngestor
+import no.nav.amt.tiltak.core.kafka.TildeltVeilederIngestor
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.common.kafka.producer.KafkaProducerClientImpl
 import no.nav.common.kafka.producer.util.ProducerUtils.toJsonProducerRecord
@@ -26,6 +27,7 @@ class KafkaConfigurationTest {
 	private val amtTiltakTopic = "amt-tiltak"
 	private val sisteTilordnetVeilederTopic = "siste-tilordnet-veileder-v1"
 	private val endringPaaBrukerTopic = "pto.endring-paa-oppfolgingsbruker-v2"
+	private val navEnhetTopic = "amt.nav-enhet-v1"
 
 	@Container
 	var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.4.3"))
@@ -38,7 +40,8 @@ class KafkaConfigurationTest {
 		val kafkaTopicProperties = KafkaTopicProperties(
 			amtTiltakTopic = amtTiltakTopic,
 			sisteTilordnetVeilederTopic = sisteTilordnetVeilederTopic,
-			endringPaaBrukerTopic = endringPaaBrukerTopic
+			endringPaaBrukerTopic = endringPaaBrukerTopic,
+			navEnhetTopic = navEnhetTopic
 		)
 
 		val kafkaProperties = object : KafkaProperties {
@@ -64,7 +67,7 @@ class KafkaConfigurationTest {
 		val counter = AtomicInteger()
 
 		val arenaAclIngestor = object : ArenaAclIngestor {
-			override fun ingestKafkaMessageValue(messageValue: String) {
+			override fun ingestKafkaRecord(recordValue: String) {
 				counter.incrementAndGet()
 			}
 		}
@@ -81,13 +84,20 @@ class KafkaConfigurationTest {
 			}
 		}
 
+		val navEnhetIngestor = object : NavEnhetIngestor {
+			override fun ingestKafkaRecord(recordValue: String) {
+				counter.incrementAndGet()
+			}
+		}
+
 		val config = KafkaConfiguration(
 			kafkaTopicProperties,
 			kafkaProperties,
 			JdbcTemplate(dataSource),
 			arenaAclIngestor,
 			tildeltVeilederIngestor,
-			endringPaaBrukerIngestor
+			endringPaaBrukerIngestor,
+			navEnhetIngestor
 		)
 
 		config.onApplicationEvent(null)
@@ -97,6 +107,8 @@ class KafkaConfigurationTest {
 
 		kafkaProducer.sendSync(toJsonProducerRecord(amtTiltakTopic, "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord(sisteTilordnetVeilederTopic, "1", value))
+		kafkaProducer.sendSync(toJsonProducerRecord(endringPaaBrukerTopic, "1", value))
+		kafkaProducer.sendSync(toJsonProducerRecord(navEnhetTopic, "1", value))
 
 		kafkaProducer.close()
 
@@ -104,7 +116,7 @@ class KafkaConfigurationTest {
 
 		Thread.sleep(3000)
 
-		assertEquals(2, counter.get())
+		assertEquals(4, counter.get())
 	}
 
 }

@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.deltaker.controllers
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
+import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import no.nav.amt.tiltak.tiltak.dto.*
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
@@ -26,19 +27,11 @@ import java.util.*
 @WebMvcTest(controllers = [TiltakarrangorDeltakerController::class])
 class TiltakarrangorDeltakerControllerTest {
 
-	companion object {
-		private val server = MockOAuth2Server()
-
-		init {
-			server.start()
-			System.setProperty("MOCK_TOKEN_X_DISCOVERY_URL", server.wellKnownUrl("tokenx").toString())
-			System.setProperty("MOCK_AZURE_AD_DISCOVERY_URL", server.wellKnownUrl("azuread").toString())
-		}
-
+	companion object : MockOAuthServer() {
 		@AfterAll
 		@JvmStatic
 		fun cleanup() {
-			server.shutdown()
+			shutdownMockServer()
 		}
 	}
 
@@ -105,7 +98,7 @@ class TiltakarrangorDeltakerControllerTest {
 
 	@Test
 	fun `hentTiltakDeltakerDetaljer() should perform authorization check`() {
-		val token = server.issueToken("tokenx", "test", "test").serialize()
+		val token = tokenXToken("test", "test")
 
 		Mockito.`when`(authService.hentPersonligIdentTilInnloggetBruker())
 			.thenReturn("fnr")
@@ -125,7 +118,7 @@ class TiltakarrangorDeltakerControllerTest {
 
 	@Test
 	fun `hentTiltakDeltakerDetaljer() should return 200 when authenticated`() {
-		val token = server.issueToken("tokenx", "test", "test").serialize()
+		val token = tokenXToken("test", "test")
 
 		Mockito.`when`(tiltakDeltakerPresentationService.getDeltakerDetaljerById(deltakerId))
 			.thenReturn(tiltakDeltakerDetaljerDto)

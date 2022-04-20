@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.amt.tiltak.clients.norg.NorgClient
+import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.NavKontorConnector
 import no.nav.amt.tiltak.core.port.PersonService

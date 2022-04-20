@@ -33,10 +33,6 @@
     <dependencies>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>tiltak</artifactId>
         </dependency>
         <dependency>
@@ -66,6 +62,23 @@
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>db-migrations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>arena-acl-ingestor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>tildelt-veileder-ingestor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>endring-paa-oppf-bruker-ingestor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>nav-enhet-ingestor</artifactId>
         </dependency>
 
         <dependency>

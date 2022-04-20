@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping("/internal/nav-kontor")
-class InternalNavKontorController(
+open class InternalNavKontorController(
 	private val authService: AuthService,
 	private val publiserNavKontorService: PubliserNavKontorService
 ) {

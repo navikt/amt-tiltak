@@ -1,8 +1,8 @@
 package no.nav.amt.tiltak.nav_kontor
 
 import no.nav.amt.tiltak.clients.norg.NorgClient
-import no.nav.amt.tiltak.kafka.KafkaProducerService
-import no.nav.amt.tiltak.kafka.dto.NavEnhetKafkaDto
+import no.nav.amt.tiltak.core.kafka.KafkaProducerService
+import no.nav.amt.tiltak.core.kafka.NavEnhetKafkaDto
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -20,10 +20,12 @@ open class PubliserNavKontorService(
 		log.info("Publiserer ${alleKontorer.size} NAV enheter på kafka")
 
 		alleKontorer.forEach {
-			kafkaProducerService.sendNavEnhet(NavEnhetKafkaDto(
-				enhetId = it.enhetId,
-				navn = it.navn
-			))
+			kafkaProducerService.sendNavEnhet(
+				NavEnhetKafkaDto(
+					enhetId = it.enhetId,
+					navn = it.navn
+				)
+			)
 		}
 	}
 
