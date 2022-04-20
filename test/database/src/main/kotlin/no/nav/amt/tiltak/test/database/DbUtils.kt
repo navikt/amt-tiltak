@@ -25,9 +25,17 @@ object DbUtils {
 			&& this.second == other.second
 	}
 
-	infix fun ZonedDateTime.shouldBeCloseTo(expected: ZonedDateTime?) {
+	/**
+	 * Should be used to check equality, 1 second skew is allowed to work around different precision on milliseconds
+	 */
+	infix fun ZonedDateTime.shouldBeEqualTo(expected: ZonedDateTime?) {
 		expected shouldNotBe null
 		expected!!.shouldBeWithin(Duration.ofSeconds(1), this)
+	}
+
+	infix fun ZonedDateTime.shouldBeCloseTo(expected: ZonedDateTime?) {
+		expected shouldNotBe null
+		expected!!.shouldBeWithin(Duration.ofSeconds(10), this)
 	}
 
 	fun LocalDate.isEqualTo(other: LocalDate?): Boolean {
