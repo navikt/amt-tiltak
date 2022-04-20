@@ -1,14 +1,6 @@
-package no.nav.amt.tiltak.deltaker
+package no.nav.amt.tiltak.endringsmelding
 
 import io.kotest.matchers.shouldBe
-import io.mockk.mockk
-import no.nav.amt.tiltak.ansatt.ArrangorAnsattRepository
-import no.nav.amt.tiltak.ansatt.ArrangorAnsattServiceImpl
-import no.nav.amt.tiltak.core.port.PersonService
-import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
-import no.nav.amt.tiltak.deltaker.repositories.EndringsmeldingRepository
-import no.nav.amt.tiltak.deltaker.repositories.NavKontorRepository
-import no.nav.amt.tiltak.deltaker.service.EndringsmeldingService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
@@ -26,15 +18,11 @@ class EndringsmeldingServiceTest {
 	var dataSource = SingletonPostgresContainer.getDataSource()
 	var jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
 	var repository: EndringsmeldingRepository = EndringsmeldingRepository(jdbcTemplate)
-
-	var brukerRepository = BrukerRepository(jdbcTemplate)
-	var navKontorRepository = NavKontorRepository(jdbcTemplate)
-	var arrangorAnsattRepository = ArrangorAnsattRepository(jdbcTemplate)
-	var arrangorAnsattService = ArrangorAnsattServiceImpl(arrangorAnsattRepository,mockk<PersonService>(), jdbcTemplate)
+	var endringsmeldingForGjennomforingQuery = EndringsmeldingForGjennomforingQuery(jdbcTemplate)
 
 	@BeforeEach
 	fun beforeEach() {
-		endringsmeldingService = EndringsmeldingService(repository, brukerRepository, navKontorRepository, arrangorAnsattService)
+		endringsmeldingService = EndringsmeldingService(repository, endringsmeldingForGjennomforingQuery)
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 

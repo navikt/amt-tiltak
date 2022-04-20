@@ -1,8 +1,7 @@
-package no.nav.amt.tiltak.deltaker.dbo
+package no.nav.amt.tiltak.endringsmelding
 
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
-import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.deltaker.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.deltaker.dto.toDto
 import java.time.LocalDate
@@ -28,16 +27,5 @@ data class EndringsmeldingDbo(
 		arkivert = !aktiv || godkjentAvNavAnsatt != null,
 		opprettetAvArrangorAnsatt = opprettetAv.toDto(),
 		opprettetDato = createdAt,
-	)
-
-	fun toEndringsmelding(bruker: Bruker, opprettetAv: Ansatt) = Endringsmelding(
-		id = id,
-		bruker = bruker,
-		startDato = startDato,
-		aktiv = aktiv,
-		godkjent = godkjentAvNavAnsatt != null,
-		arkivert = !aktiv || godkjentAvNavAnsatt != null,
-		opprettetAvArrangorAnsatt = opprettetAv,
-		opprettetDato = createdAt
 	)
 }

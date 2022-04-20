@@ -83,23 +83,6 @@ open class BrukerRepository(
             .firstOrNull()
     }
 
-	fun getByDeltakerId(deltakerId: UUID): BrukerDbo? {
-		val sql = """
-			SELECT *
-			FROM bruker join deltaker on deltaker.bruker_id = bruker.id
-			WHERE deltaker.id = :deltakerId
-		""".trimIndent()
-
-		val parameters = MapSqlParameterSource().addValues(
-			mapOf(
-				"deltakerId" to deltakerId
-			)
-		)
-
-		return template.query(sql, parameters, rowMapper)
-			.firstOrNull()
-	}
-
 	fun oppdaterVeileder(fodselsnummer: String, veilederId: UUID) {
 		val sql = """
 			UPDATE bruker SET ansvarlig_veileder_id = :veilederId WHERE fodselsnummer = :fodselsnummer

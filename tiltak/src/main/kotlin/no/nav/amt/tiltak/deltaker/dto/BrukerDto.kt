@@ -8,7 +8,6 @@ data class BrukerDto (
 	val mellomnavn: String? = null,
 	val etternavn: String,
 	val fodselsnummer: String,
-	val navKontor: String?
 )
 
 fun Bruker.toDto() = BrukerDto(
@@ -16,5 +15,4 @@ fun Bruker.toDto() = BrukerDto(
 	mellomnavn = mellomnavn,
 	etternavn = etternavn,
 	fodselsnummer = fodselsnummer,
-	navKontor = navKontor?.navn
 )

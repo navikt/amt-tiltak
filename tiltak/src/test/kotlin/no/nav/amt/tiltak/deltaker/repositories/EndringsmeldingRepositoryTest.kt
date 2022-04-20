@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.deltaker.repositories
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
 
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer

@@ -1,6 +1,5 @@
-package no.nav.amt.tiltak.deltaker.repositories
+package no.nav.amt.tiltak.endringsmelding
 
-import no.nav.amt.tiltak.deltaker.dbo.EndringsmeldingDbo
 import no.nav.amt.tiltak.utils.getNullableUUID
 import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
