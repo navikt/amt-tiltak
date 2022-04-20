@@ -1,11 +1,7 @@
-package no.nav.amt.tiltak.configuration.kafka
+package no.nav.amt.tiltak.kafka
 
-import no.nav.amt.tiltak.ingestors.endring_paa_oppf_bruker_ingestor.EndringPaaBrukerIngestor
-import junit.framework.Assert.assertEquals
-import no.nav.amt.tiltak.application.configuration.kafka.KafkaConfiguration
-import no.nav.amt.tiltak.application.configuration.kafka.KafkaProperties
-import no.nav.amt.tiltak.application.configuration.kafka.KafkaTopicProperties
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.ArenaAclIngestor
+import no.nav.amt.tiltak.ingestors.endring_paa_oppf_bruker_ingestor.EndringPaaBrukerIngestor
 import no.nav.amt.tiltak.ingestors.tildelt_veileder_ingestor.TildeltVeilederIngestor
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.common.kafka.producer.KafkaProducerClientImpl
@@ -13,6 +9,7 @@ import no.nav.common.kafka.producer.util.ProducerUtils.toJsonProducerRecord
 import no.nav.common.kafka.util.KafkaPropertiesBuilder
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.JdbcTemplate
 import org.testcontainers.containers.KafkaContainer
@@ -26,15 +23,15 @@ import java.util.concurrent.atomic.AtomicInteger
 @Testcontainers
 class KafkaConfigurationTest {
 
-	val amtTiltakTopic = "amt-tiltak"
-	val sisteTilordnetVeilederTopic = "siste-tilordnet-veileder-v1"
-	val endringPaaBrukerTopic = "pto.endring-paa-oppfolgingsbruker-v2"
+	private val amtTiltakTopic = "amt-tiltak"
+	private val sisteTilordnetVeilederTopic = "siste-tilordnet-veileder-v1"
+	private val endringPaaBrukerTopic = "pto.endring-paa-oppfolgingsbruker-v2"
 
 	@Container
 	var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.4.3"))
 		.waitingFor(HostPortWaitStrategy())
 
-	val dataSource = SingletonPostgresContainer.getDataSource()
+	private val dataSource = SingletonPostgresContainer.getDataSource()
 
 	@Test
 	fun `should ingest arena records after configuring kafka`() {

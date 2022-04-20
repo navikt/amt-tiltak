@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.application.configuration.kafka
+package no.nav.amt.tiltak.kafka
 
 import java.util.*
 

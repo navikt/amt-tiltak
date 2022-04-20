@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.clients.amt_enhetsregister
 
-import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.common.rest.client.RestClient.baseClient
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -35,7 +35,7 @@ class AmtEnhetsregisterClient(
 
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
 
-			val enhetDto = fromJson(body, EnhetDto::class.java)
+			val enhetDto = fromJsonString<EnhetDto>(body)
 
 			return Virksomhet(
 				navn = enhetDto.navn,

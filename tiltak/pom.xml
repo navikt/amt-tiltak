@@ -21,6 +21,10 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>norg</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>nav_kontor</artifactId>
         </dependency>
         <dependency>
@@ -30,6 +34,10 @@
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>auth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>kafka</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
@@ -63,6 +71,10 @@
         <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>job</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.common</groupId>
+            <artifactId>kafka</artifactId>
         </dependency>
 
         <dependency>

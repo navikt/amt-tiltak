@@ -14,10 +14,10 @@ class EndringPaaBrukerIngestorImpl(
 	private val norgClient: NorgClient
 ) : EndringPaaBrukerIngestor {
 
-	private val log = LoggerFactory.getLogger(EndringPaaBrukerIngestorImpl::class.java)
+	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun ingestKafkaRecord(recordValue: String) {
-		val brukerRecord = JsonUtils.fromJson(recordValue, EndringPaaBrukerRecord::class.java)
+		val brukerRecord = JsonUtils.fromJsonString<EndringPaaBrukerRecord>(recordValue)
 		val bruker = brukerService.getBruker(brukerRecord.fodselsnummer) ?: return
 
 		if (bruker.navKontor?.enhetId == brukerRecord.oppfolgingsenhet) return
