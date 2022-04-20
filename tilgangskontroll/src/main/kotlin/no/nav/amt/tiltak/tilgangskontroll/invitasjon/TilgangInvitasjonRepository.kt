@@ -7,11 +7,11 @@ import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.common.db_utils.getZonedDateTime
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.stereotype.Repository
+import org.springframework.stereotype.Component
 import java.time.ZonedDateTime
 import java.util.*
 
-@Repository
+@Component
 open class TilgangInvitasjonRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {

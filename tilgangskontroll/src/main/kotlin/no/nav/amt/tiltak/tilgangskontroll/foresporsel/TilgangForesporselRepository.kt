@@ -4,10 +4,10 @@ import no.nav.amt.tiltak.common.db_utils.*
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.stereotype.Repository
+import org.springframework.stereotype.Component
 import java.util.*
 
-@Repository
+@Component
 open class TilgangForesporselRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
