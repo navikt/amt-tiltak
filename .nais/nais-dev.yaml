@@ -37,7 +37,7 @@ spec:
       allowAllUsers: false
       claims:
         groups:
-          - id: "f12fa5d6-ef0c-41db-80c9-5c9696bb5c14"
+          - id: "f12fa5d6-ef0c-41db-80c9-5c9696bb5c14" # 0000-GA-Tiltaksansvarlig, NAV Preprod
         extra:
           - "NAVident"
   tokenx:
@@ -46,6 +46,7 @@ spec:
     inbound:
       rules:
         - application: amt-tiltaksarrangor-flate
+        - application: amt-tiltaksansvarlig-flate
     outbound:
       rules:
         - application: amt-enhetsregister
