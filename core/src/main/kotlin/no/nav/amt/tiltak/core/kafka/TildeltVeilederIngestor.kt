@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.ingestors.tildelt_veileder_ingestor
+package no.nav.amt.tiltak.core.kafka
 
 interface TildeltVeilederIngestor {
 

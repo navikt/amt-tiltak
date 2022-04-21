@@ -41,7 +41,7 @@ class ArenaAclIngestorImplTest : StringSpec({
 			deltakerProcessor.processMessage(any())
 		} returns Unit
 
-		ingestor.ingestKafkaMessageValue(json)
+		ingestor.ingestKafkaRecord(json)
 
 		verify(exactly = 1) {
 			deltakerProcessor.processMessage(any())
@@ -78,7 +78,7 @@ class ArenaAclIngestorImplTest : StringSpec({
 			gjennomforingProcessor.processMessage(any())
 		} returns Unit
 
-		ingestor.ingestKafkaMessageValue(json)
+		ingestor.ingestKafkaRecord(json)
 
 		verify(exactly = 1) {
 			gjennomforingProcessor.processMessage(any())

@@ -1,7 +1,8 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor
 
-import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
-import no.nav.amt.tiltak.common.json.JsonUtils.getObjectMapper
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonNode
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
+import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.GjennomforingPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
@@ -21,18 +22,18 @@ class ArenaAclIngestorImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	override fun ingestKafkaMessageValue(messageValue: String) {
-		val unknownMessageWrapper = fromJson(messageValue, UnknownMessageWrapper::class.java)
+	override fun ingestKafkaRecord(recordValue: String) {
+		val unknownMessageWrapper = fromJsonString<UnknownMessageWrapper>(recordValue)
 
 		wrapIngestWithLog(unknownMessageWrapper) {
 			when (unknownMessageWrapper.type) {
 				"DELTAKER" -> {
-					val deltakerPayload = getObjectMapper().treeToValue(unknownMessageWrapper.payload, DeltakerPayload::class.java)
+					val deltakerPayload = fromJsonNode<DeltakerPayload>(unknownMessageWrapper.payload)
 					val deltakerMessage = toKnownMessageWrapper(deltakerPayload, unknownMessageWrapper)
 					deltakerProcessor.processMessage(deltakerMessage)
 				}
 				"GJENNOMFORING" -> {
-					val gjennomforingPayload = getObjectMapper().treeToValue(unknownMessageWrapper.payload, GjennomforingPayload::class.java)
+					val gjennomforingPayload = fromJsonNode<GjennomforingPayload>(unknownMessageWrapper.payload)
 					val gjennomforingMessage = toKnownMessageWrapper(gjennomforingPayload, unknownMessageWrapper)
 					gjennomforingProcessor.processMessage(gjennomforingMessage)
 				}

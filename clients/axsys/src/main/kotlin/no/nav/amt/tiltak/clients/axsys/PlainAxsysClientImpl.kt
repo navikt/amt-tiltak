@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.clients.axsys
 
-import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.common.rest.client.RestClient.baseClient
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -13,8 +13,6 @@ internal class PlainAxsysClient(
 	private val tokenProvider: Supplier<String>,
 	private val httpClient: OkHttpClient = baseClient(),
 ) : AxsysClient {
-
-	private val mapper = JsonUtils.getObjectMapper()
 
 	override fun hentTilganger(navIdent: String): List<EnhetTilgang> {
 		val request = Request.Builder()
@@ -30,7 +28,7 @@ internal class PlainAxsysClient(
 
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
 
-			val tilgangResponse = mapper.readValue(body, TilgangResponse::class.java)
+			val tilgangResponse = fromJsonString<TilgangResponse>(body)
 
 			return tilgangResponse.enheter.map {
 				return@map EnhetTilgang(

@@ -1,8 +1,8 @@
-package no.nav.amt.tiltak.ingestors.tildelt_veileder_ingestor.dto
+package no.nav.amt.tiltak.ingestors.tildelt_veileder_ingestor
 
 import java.time.ZonedDateTime
 
-data class SisteTildeltVeilederV1RecordValue(
+internal data class SisteTildeltVeilederDto(
 	val aktorId: String,
 	val veilederId: String,
 	val tilordnet: ZonedDateTime,

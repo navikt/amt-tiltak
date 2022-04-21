@@ -16,6 +16,7 @@
         <module>arena-acl-ingestor</module>
         <module>tildelt-veileder-ingestor</module>
         <module>endring-paa-oppf-bruker-ingestor</module>
+        <module>nav-enhet-ingestor</module>
     </modules>
 
 </project>

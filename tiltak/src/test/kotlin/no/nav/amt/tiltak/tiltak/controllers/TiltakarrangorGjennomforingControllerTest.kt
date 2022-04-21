@@ -10,6 +10,7 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
+import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -102,19 +103,11 @@ class TiltakarrangorGjennomforingControllerTest {
 			.thenReturn(fnr)
 	}
 
-	companion object {
-		private val server = MockOAuth2Server()
-
-		init {
-			server.start()
-			System.setProperty("MOCK_TOKEN_X_DISCOVERY_URL", server.wellKnownUrl("tokenx").toString())
-			System.setProperty("MOCK_AZURE_AD_DISCOVERY_URL", server.wellKnownUrl("azuread").toString())
-		}
-
+	companion object : MockOAuthServer() {
 		@AfterAll
 		@JvmStatic
 		fun cleanup() {
-			server.shutdown()
+			shutdownMockServer()
 		}
 	}
 
@@ -130,7 +123,7 @@ class TiltakarrangorGjennomforingControllerTest {
 
 	@Test
 	fun `hentGjennomforingerByArrangorId() should return 200 when authenticated`() {
-		val token = server.issueToken("tokenx", "test", "test").serialize()
+		val token = tokenXToken("test", "test")
 
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.get("/api/tiltakarrangor/gjennomforing")
@@ -152,7 +145,7 @@ class TiltakarrangorGjennomforingControllerTest {
 
 	@Test
 	fun `hentGjennomforing() should return 200 when authenticated`() {
-		val token = server.issueToken("tokenx", "test", "test").serialize()
+		val token = tokenXToken("test", "test")
 
 		Mockito.`when`(gjennomforingService.getGjennomforing(gjennomforingId)).thenReturn(gjennomforing)
 
@@ -166,7 +159,7 @@ class TiltakarrangorGjennomforingControllerTest {
 
 	@Test
 	fun `hentGjennomforing() should perform authorization check`() {
-		val token = server.issueToken("tokenx", "test", "test").serialize()
+		val token = tokenXToken("test", "test")
 
 		Mockito.`when`(gjennomforingService.getGjennomforing(gjennomforingId)).thenReturn(gjennomforing)
 
@@ -193,7 +186,7 @@ class TiltakarrangorGjennomforingControllerTest {
 	fun `hentDeltakere() should return 200 when authenticated`() {
 		val deltaker = deltakerDbo.toDeltaker(statusConverterMock)
 
-		val token = server.issueToken("tokenx", "test", "test").serialize()
+		val token = tokenXToken("test", "test")
 
 		Mockito.`when`(deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)).thenReturn(listOf(deltaker))
 
@@ -209,7 +202,7 @@ class TiltakarrangorGjennomforingControllerTest {
 	fun `hentDeltakere() should perform authorization check`() {
 		val deltaker = deltakerDbo.toDeltaker(statusConverterMock)
 
-		val token = server.issueToken("tokenx", "test", "test").serialize()
+		val token = tokenXToken("test", "test")
 
 		Mockito.`when`(deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)).thenReturn(listOf(deltaker))
 

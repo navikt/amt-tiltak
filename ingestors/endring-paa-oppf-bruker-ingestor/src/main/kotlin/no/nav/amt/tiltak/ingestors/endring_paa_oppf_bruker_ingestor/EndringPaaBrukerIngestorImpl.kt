@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.ingestors.endring_paa_oppf_bruker_ingestor
 
 import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.NavKontorService
 import org.slf4j.LoggerFactory
@@ -12,10 +13,10 @@ class EndringPaaBrukerIngestorImpl(
 	private val navKontorService: NavKontorService
 ) : EndringPaaBrukerIngestor {
 
-	private val log = LoggerFactory.getLogger(EndringPaaBrukerIngestorImpl::class.java)
+	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun ingestKafkaRecord(recordValue: String) {
-		val brukerRecord = JsonUtils.fromJson(recordValue, EndringPaaBrukerRecord::class.java)
+		val brukerRecord = JsonUtils.fromJsonString<EndringPaaBrukerKafkaDto>(recordValue)
 		val bruker = brukerService.getBruker(brukerRecord.fodselsnummer) ?: return
 
 		if (bruker.navKontor?.enhetId == brukerRecord.oppfolgingsenhet) return
