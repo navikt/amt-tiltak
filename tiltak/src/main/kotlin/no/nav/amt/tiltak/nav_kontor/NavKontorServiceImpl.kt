@@ -18,6 +18,10 @@ open class NavKontorServiceImpl(
 			.map { NavKontor(id = it.id, enhetId = it.enhetId, navn = it.navn) }
 	}
 
+	override fun upsertNavKontor(enhetId: String, navn: String) {
+		navKontorRepository.upsert(enhetId, navn)
+	}
+
 	override fun getNavKontorForBruker(fodselsnummer: String): NavKontor? {
 		return veilarbarenaClient.hentBrukerOppfolgingsenhetId(fodselsnummer)?.let {
 			navKontorRepository.hentEnhet(it) ?: throw IllegalStateException("Ugyldig kontor for bruker ($it")

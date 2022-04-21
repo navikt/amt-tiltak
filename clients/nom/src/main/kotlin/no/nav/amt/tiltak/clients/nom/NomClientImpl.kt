@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.clients.nom
 
-import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
-import no.nav.amt.tiltak.common.json.JsonUtils.toJson
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
+import no.nav.amt.tiltak.common.json.JsonUtils.toJsonString
 import no.nav.amt.tiltak.tools.graphql.Graphql
 import no.nav.common.rest.client.RestClient.baseClient
 import okhttp3.MediaType.Companion.toMediaType
@@ -30,7 +30,7 @@ class NomClientImpl(
 	}
 
 	private fun hentVeilederTilIdenter(navIdenter: List<String>): List<NomVeileder> {
-		val requestBody = toJson(
+		val requestBody = toJsonString(
 			Graphql.GraphqlQuery(
 				NomQueries.HentIdenter.query,
 				NomQueries.HentIdenter.Variables(navIdenter)
@@ -51,7 +51,7 @@ class NomClientImpl(
 			response.takeUnless { response.body != null }
 				?.let { throw IllegalStateException("Ingen body i response") }
 
-			val hentIdenterResponse = fromJson(response.body!!.string(), NomQueries.HentIdenter.Response::class.java)
+			val hentIdenterResponse = fromJsonString<NomQueries.HentIdenter.Response>(response.body!!.string())
 
 			return toVeiledere(hentIdenterResponse)
 		}

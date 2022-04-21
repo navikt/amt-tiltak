@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.application.configuration.kafka
+package no.nav.amt.tiltak.kafka
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 
@@ -6,5 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class KafkaTopicProperties(
 	var amtTiltakTopic: String = "",
 	var sisteTilordnetVeilederTopic: String = "",
-	var endringPaaBrukerTopic: String = ""
+	var endringPaaBrukerTopic: String = "",
+	var navEnhetTopic: String = ""
 )

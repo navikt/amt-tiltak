@@ -21,6 +21,10 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>norg</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>navansatt</artifactId>
         </dependency>
         <dependency>
@@ -59,10 +63,18 @@
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-spring</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>job</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.common</groupId>
+            <artifactId>kafka</artifactId>
         </dependency>
 
         <dependency>
@@ -95,7 +107,6 @@
             <artifactId>mockito-kotlin</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>database</artifactId>
@@ -125,10 +136,6 @@
             <groupId>io.kotest</groupId>
             <artifactId>kotest-assertions-core-jvm</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>

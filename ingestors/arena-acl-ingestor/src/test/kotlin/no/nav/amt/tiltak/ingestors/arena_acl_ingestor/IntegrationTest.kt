@@ -10,6 +10,7 @@ import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.clients.amt_enhetsregister.Virksomhet
 import no.nav.amt.tiltak.clients.veilarbarena.VeilarbarenaClient
 import no.nav.amt.tiltak.core.domain.tiltak.*
+import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
 import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
@@ -111,7 +112,7 @@ class IntegrationTest {
 	@Test
 	fun `ingestKafkaMessageValue() - Skal ingeste gyldig gjennomføring`() {
 
-		ingestor.ingestKafkaMessageValue(gjennomforingJson)
+		ingestor.ingestKafkaRecord(gjennomforingJson)
 
 		val inserted = gjennomforingRepository.get(toInsertGjennomforing.id)
 
@@ -124,8 +125,8 @@ class IntegrationTest {
 	@Test
 	fun `ingestKafkaMessageValue() - Skal ingeste gyldig deltaker`() {
 
-		ingestor.ingestKafkaMessageValue(gjennomforingJson)
-		ingestor.ingestKafkaMessageValue(deltakerJson)
+		ingestor.ingestKafkaRecord(gjennomforingJson)
+		ingestor.ingestKafkaRecord(deltakerJson)
 
 		val inserted = deltakerService.hentDeltaker(deltakerToInsert.id)
 
@@ -144,9 +145,9 @@ class IntegrationTest {
 
 	@Test
 	fun `ingestKafkaMessageValue() - Skal ingeste gyldig deltaker oppdatering`() {
-		ingestor.ingestKafkaMessageValue(gjennomforingJson)
-		ingestor.ingestKafkaMessageValue(deltakerJson)
-		ingestor.ingestKafkaMessageValue(deltakerOppdatertJson)
+		ingestor.ingestKafkaRecord(gjennomforingJson)
+		ingestor.ingestKafkaRecord(deltakerJson)
+		ingestor.ingestKafkaRecord(deltakerOppdatertJson)
 
 		val inserted = deltakerService.hentDeltaker(deltakerOppdatert.id)
 

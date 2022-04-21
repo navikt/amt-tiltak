@@ -7,6 +7,8 @@ interface NavKontorService {
 
 	fun hentNavKontorer(enhetIder: List<String>): List<NavKontor>
 
+	fun upsertNavKontor(enhetId: String, navn: String)
+
 	fun getNavKontorForBruker(fodselsnummer: String): NavKontor?
 
 	fun getNavKontor(enhetId: String): NavKontor

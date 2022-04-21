@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.application.configuration.kafka
+package no.nav.amt.tiltak.kafka
 
 import no.nav.common.kafka.util.KafkaPropertiesBuilder
 import no.nav.common.kafka.util.KafkaPropertiesPreset

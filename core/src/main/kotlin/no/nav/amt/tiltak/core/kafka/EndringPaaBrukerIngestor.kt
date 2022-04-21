@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.ingestors.endring_paa_oppf_bruker_ingestor
+package no.nav.amt.tiltak.core.kafka
 
 interface EndringPaaBrukerIngestor {
 	fun ingestKafkaRecord(recordValue: String)

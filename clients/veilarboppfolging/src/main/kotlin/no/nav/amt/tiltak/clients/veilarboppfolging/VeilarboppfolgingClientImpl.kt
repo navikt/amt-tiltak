@@ -1,5 +1,5 @@
 package no.nav.amt.tiltak.clients.veilarboppfolging
-import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.common.rest.client.RestClient.baseClient
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -31,7 +31,7 @@ class VeilarboppfolgingClientImpl(
 			response.takeIf { it.body == null }
 				?.let { throw RuntimeException("Body mangler i respons fra veilarboppfolging") }
 
-			val veilederRespons = fromJson(response.body!!.string(), HentBrukersVeilederRespons::class.java)
+			val veilederRespons = fromJsonString<HentBrukersVeilederRespons>(response.body!!.string())
 
 			return veilederRespons.veilederIdent.toString()
 		}

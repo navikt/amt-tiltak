@@ -52,6 +52,13 @@ class NavAnsattGjennomforingControllerTest {
 	@MockBean
 	private lateinit var gjennomforingerPaEnheterQuery: GjennomforingerPaEnheterQuery
 
+	companion object : MockOAuthServer() {
+		@AfterAll
+		@JvmStatic
+		fun cleanup() {
+			shutdownMockServer()
+		}
+	}
 
 	val statusConverterMock = fun (id: UUID) =
 		listOf(
@@ -99,14 +106,6 @@ class NavAnsattGjennomforingControllerTest {
 	@BeforeEach
 	fun before() {
 		MockitoAnnotations.openMocks(this)
-	}
-
-	companion object : MockOAuthServer() {
-		@AfterAll
-		@JvmStatic
-		fun cleanup() {
-			shutdownMockServer()
-		}
 	}
 
 	@Test
