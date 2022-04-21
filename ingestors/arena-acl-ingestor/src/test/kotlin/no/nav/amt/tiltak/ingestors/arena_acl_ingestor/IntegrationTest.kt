@@ -8,6 +8,7 @@ import no.nav.amt.tiltak.arrangor.ArrangorRepository
 import no.nav.amt.tiltak.arrangor.ArrangorServiceImpl
 import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.clients.amt_enhetsregister.Virksomhet
+import no.nav.amt.tiltak.clients.veilarbarena.VeilarbarenaClient
 import no.nav.amt.tiltak.core.domain.tiltak.*
 import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
 import no.nav.amt.tiltak.core.port.*
@@ -18,6 +19,7 @@ import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.DeltakerProcessor
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.GjennomforingProcessor
 import no.nav.amt.tiltak.nav_kontor.NavKontorRepository
+import no.nav.amt.tiltak.nav_kontor.NavKontorServiceImpl
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
@@ -51,7 +53,8 @@ class IntegrationTest {
 
 	private lateinit var brukerRepository: BrukerRepository
 	private lateinit var navKontorRepository: NavKontorRepository
-	private lateinit var navKontorConnector: NavKontorConnector
+	private lateinit var veilarbarenaClient: VeilarbarenaClient
+	private lateinit var navKontorService: NavKontorService
 
 	private lateinit var gjennomforingProcessor: GjennomforingProcessor;
 	private lateinit var deltakerProcessor: DeltakerProcessor
@@ -83,12 +86,13 @@ class IntegrationTest {
 		arrangorRepository = ArrangorRepository(jdbcTemplate)
 		brukerRepository = BrukerRepository(jdbcTemplate)
 
-		navKontorConnector = mockk()
+		veilarbarenaClient = mockk()
 		personService = mockk()
 		enhetsregisterClient = mockk()
 
+		navKontorService = NavKontorServiceImpl(navKontorRepository, veilarbarenaClient)
 		tiltakService = TiltakServiceImpl(tiltakRepository)
-		brukerService = BrukerServiceImpl(brukerRepository, navKontorRepository, navKontorConnector, personService, mockk())
+		brukerService = BrukerServiceImpl(brukerRepository, personService, mockk(), navKontorService)
 		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, transactionTemplate)
 		arrangorService = ArrangorServiceImpl(enhetsregisterClient, arrangorRepository)
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, arrangorService, transactionTemplate)
@@ -100,7 +104,7 @@ class IntegrationTest {
 		every { enhetsregisterClient.hentVirksomhet(virksomhetsnr) } returns virksomhet
 
 		every { personService.hentPersonKontaktinformasjon(personIdent) } returns Kontaktinformasjon("epost", "telefon" )
-		every { navKontorConnector.hentNavKontorForBruker(personIdent) } returns null
+		every { veilarbarenaClient.hentBrukerOppfolgingsenhetId(personIdent) } returns null
 		every { personService.hentTildeltVeileder(personIdent) } returns null
 		every { personService.hentPerson(personIdent) } returns person
 	}

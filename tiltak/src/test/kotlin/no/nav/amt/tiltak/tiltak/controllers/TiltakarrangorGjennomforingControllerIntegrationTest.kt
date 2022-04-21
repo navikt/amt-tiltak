@@ -15,7 +15,6 @@ import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
-import no.nav.amt.tiltak.nav_kontor.NavKontorRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
@@ -74,10 +73,9 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 		arrangorService = ArrangorServiceImpl(mockk(), ArrangorRepository(namedJdbcTemplate))
 		brukerService = BrukerServiceImpl(
 			brukerRepository,
-			mock(NavKontorRepository::class.java),
-			mock(NavKontorConnector::class.java),
 			mock(PersonService::class.java),
 			mock(VeilederService::class.java),
+			mock(NavKontorService::class.java)
 		)
 		deltakerService = DeltakerServiceImpl(
 			deltakerRepository,

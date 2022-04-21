@@ -40,7 +40,7 @@ class DeltakerServiceImplTest {
 	fun beforeEach() {
 		brukerRepository = BrukerRepository(jdbcTemplate)
 
-		brukerService = BrukerServiceImpl(brukerRepository, mockk(), mockk(), mockk(), mockk())
+		brukerService = BrukerServiceImpl(brukerRepository, mockk(), mockk(), mockk())
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		deltakerServiceImpl = DeltakerServiceImpl(
