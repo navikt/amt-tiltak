@@ -13,6 +13,12 @@ object TestData {
 		navn = "NAV Testheim"
 	)
 
+	val NAV_KONTOR_2 = InsertNavKontorCommand(
+		id = UUID.fromString("a1247bfb-255f-411d-b3ae-6d6d29a4fa58"),
+		enhet_id = "5678",
+		navn = "NAV Test"
+	)
+
 	val ARRANGOR_1 = InsertArrangorCommand(
 		id = UUID.fromString("8a37bce6-3bc1-11ec-8d3d-0242ac130003"),
 		overordnet_enhet_organisasjonsnummer = "911111111",
@@ -101,7 +107,7 @@ object TestData {
 		status = "AVSLUTTET",
 		start_dato = LocalDate.of(2022, 2, 1),
 		slutt_dato = LocalDate.of(2022, 2, 13),
-		nav_kontor_id = null,
+		nav_kontor_id = NAV_KONTOR_2.id,
 		registrert_dato = LocalDate.of(2022, 1, 1),
 		fremmote_dato = LocalDate.of(2022, 2, 1)
 	)

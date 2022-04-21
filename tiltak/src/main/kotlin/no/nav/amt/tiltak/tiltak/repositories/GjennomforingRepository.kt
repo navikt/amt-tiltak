@@ -79,7 +79,6 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 	}
 
 	fun update(gjennomforing: GjennomforingDbo): GjennomforingDbo {
-
 		//language=PostgreSQL
 		val sql = """
 			UPDATE gjennomforing

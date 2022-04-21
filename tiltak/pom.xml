@@ -93,6 +93,7 @@
         <dependency>
             <groupId>org.mockito.kotlin</groupId>
             <artifactId>mockito-kotlin</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -132,6 +133,11 @@
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>arrangor</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>mock-oauth-server</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
