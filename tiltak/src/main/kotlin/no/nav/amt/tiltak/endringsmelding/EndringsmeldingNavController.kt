@@ -1,9 +1,8 @@
-package no.nav.amt.tiltak.deltaker.controllers
+package no.nav.amt.tiltak.endringsmelding
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.deltaker.dto.EndringsmeldingDto
-import no.nav.amt.tiltak.deltaker.service.EndringsmeldingService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*

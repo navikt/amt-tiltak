@@ -32,7 +32,6 @@ object DbUtils {
 		expected shouldNotBe null
 		expected!!.shouldBeWithin(Duration.ofSeconds(1), this)
 	}
-
 	infix fun ZonedDateTime.shouldBeCloseTo(expected: ZonedDateTime?) {
 		expected shouldNotBe null
 		expected!!.shouldBeWithin(Duration.ofSeconds(10), this)

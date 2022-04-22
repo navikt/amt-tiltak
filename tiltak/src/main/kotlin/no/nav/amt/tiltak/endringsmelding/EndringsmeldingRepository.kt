@@ -1,6 +1,5 @@
-package no.nav.amt.tiltak.deltaker.repositories
+package no.nav.amt.tiltak.endringsmelding
 
-import no.nav.amt.tiltak.deltaker.dbo.EndringsmeldingDbo
 import no.nav.amt.tiltak.utils.getNullableUUID
 import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
@@ -24,7 +23,7 @@ open class EndringsmeldingRepository(
 			startDato = rs.getDate("start_dato")?.toLocalDate(),
 			godkjentAvNavAnsatt = rs.getNullableUUID("godkjent_av_nav_ansatt"),
 			aktiv = rs.getBoolean("aktiv"),
-			opprettetAv = rs.getUUID("opprettet_av"),
+			opprettetAvId = rs.getUUID("opprettet_av"),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
 		)
