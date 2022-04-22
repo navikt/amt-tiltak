@@ -20,6 +20,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_TILGANG_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_KONTOR_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_KONTOR_2
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import javax.sql.DataSource
@@ -28,6 +29,7 @@ object TestDataSeeder {
 
 	fun insertDefaultTestData(repository: TestDataRepository) {
 		repository.insertNavKontor(NAV_KONTOR_1)
+		repository.insertNavKontor(NAV_KONTOR_2)
 
 		repository.insertArrangor(ARRANGOR_1)
 		repository.insertArrangor(ARRANGOR_2)
