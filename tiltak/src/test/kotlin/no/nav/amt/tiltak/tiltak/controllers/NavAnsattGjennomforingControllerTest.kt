@@ -2,9 +2,10 @@ package no.nav.amt.tiltak.tiltak.controllers
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
-import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
+import no.nav.amt.tiltak.core.domain.nav_ansatt.NavEnhetTilgang
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.domain.tiltak.NavKontor
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavAnsattService
@@ -12,7 +13,6 @@ import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingerPaEnheterQuery
-import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -98,7 +98,7 @@ class NavAnsattGjennomforingControllerTest {
 		fremmoteDato = LocalDateTime.now(),
 		startDato = LocalDate.now(),
 		registrertDato = LocalDateTime.now(),
-		navKontorId = null,
+		navKontorId = UUID.randomUUID(),
 		sluttDato = LocalDate.now(),
 		status = Gjennomforing.Status.GJENNOMFORES,
 	)
@@ -109,7 +109,7 @@ class NavAnsattGjennomforingControllerTest {
 	}
 
 	@Test
-	fun `hentGjennomforingerForNavAnsatte() - sender med tokenx-token - skal returnere 401`() {
+	fun `hentGjennomforinger() - sender med tokenx-token - skal returnere 401`() {
 		val token = tokenXToken("test", "test")
 
 		val response = mockMvc.perform(
@@ -121,7 +121,7 @@ class NavAnsattGjennomforingControllerTest {
 	}
 
 	@Test
-	fun `hentGjennomforingerForNavAnsatte() - sender med azure ad-token - skal returnere 200`() {
+	fun `hentGjennomforinger() - sender med azure ad-token - skal returnere 200`() {
 		val token = azureAdToken("test", "test")
 		val navIdent = "a12345"
 
@@ -141,5 +141,76 @@ class NavAnsattGjennomforingControllerTest {
 
 		assertEquals(200, response.status)
 	}
+
+	@Test
+	fun `hentGjennomforing() - skal returnere 401 hvis token mangler`() {
+		val response = mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/nav-ansatt/gjennomforing/${UUID.randomUUID()}")
+		).andReturn().response
+
+		assertEquals(401, response.status)
+	}
+
+	@Test
+	fun `hentGjennomforing() - skal returnere 200`() {
+		val token = azureAdToken("test", "test")
+		val navIdent = "a12345"
+		val gjennomforingId = UUID.randomUUID()
+
+		Mockito.`when`(authService.hentNavIdentTilInnloggetBruker())
+			.thenReturn(navIdent)
+
+		Mockito.`when`(navAnsattService.hentTiltaksansvarligEnhetTilganger(navIdent))
+			.thenReturn(listOf(NavEnhetTilgang(
+				kontor = NavKontor(
+					id = gjennomforing.navKontorId!!,
+					enhetId = "1234",
+					navn = "test"
+				),
+				temaer = listOf("TIL")
+			)))
+
+		Mockito.`when`(gjennomforingService.getGjennomforing(gjennomforingId))
+			.thenReturn(gjennomforing)
+
+		val response = mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/nav-ansatt/gjennomforing/$gjennomforingId")
+				.header("Authorization", "Bearer $token")
+		).andReturn().response
+
+		assertEquals(200, response.status)
+	}
+
+	@Test
+	fun `hentGjennomforing() - skal returnere 403 hvis ikke tilgang til enhet`() {
+		val token = azureAdToken("test", "test")
+		val navIdent = "a12345"
+		val gjennomforingId = UUID.randomUUID()
+
+		Mockito.`when`(authService.hentNavIdentTilInnloggetBruker())
+			.thenReturn(navIdent)
+
+		Mockito.`when`(navAnsattService.hentTiltaksansvarligEnhetTilganger(navIdent))
+			.thenReturn(listOf(NavEnhetTilgang(
+				kontor = NavKontor(
+					id = UUID.randomUUID(), // En annen id enn den på gjennomføringen
+					enhetId = "1234",
+					navn = "test"
+				),
+				temaer = listOf("TIL")
+			)))
+
+		Mockito.`when`(gjennomforingService.getGjennomforing(gjennomforingId))
+			.thenReturn(gjennomforing)
+
+		val response = mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/nav-ansatt/gjennomforing/$gjennomforingId")
+				.header("Authorization", "Bearer $token")
+		).andReturn().response
+
+		assertEquals(403, response.status)
+		assertEquals("Ikke tilgang til enhet", response.errorMessage)
+	}
+
 
 }
