@@ -18,6 +18,7 @@
         <module>core</module>
         <module>db-migrations</module>
         <module>ingestors</module>
+        <module>kafka</module>
         <module>mocks</module>
         <module>navansatt</module>
         <module>test</module>

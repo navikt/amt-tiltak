@@ -7,10 +7,9 @@
         <groupId>no.nav.amt-tiltak</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
+    <modelVersion>4.0.0</modelVersion>
     <artifactId>application</artifactId>
-    <packaging>pom</packaging>
 
     <build>
         <finalName>amt-tiltak</finalName>
@@ -25,10 +24,6 @@
 
         </plugins>
     </build>
-
-    <modules>
-        <module>kafka</module>
-    </modules>
 
     <dependencies>
         <dependency>
@@ -64,6 +59,10 @@
             <artifactId>db-migrations</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>kafka</artifactId>
+        </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>arena-acl-ingestor</artifactId>
@@ -171,7 +170,6 @@
             <artifactId>database</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
 </project>
