@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.kafka
 import no.nav.common.kafka.util.KafkaPropertiesBuilder
 import no.nav.common.kafka.util.KafkaPropertiesPreset
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
+import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
@@ -20,8 +21,14 @@ open class KafkaBeans {
             }
 
             override fun producer(): Properties {
-                throw NotImplementedError("Not yet implemented")
-            }
+				return KafkaPropertiesBuilder.producerBuilder()
+					.withBaseProperties()
+					.withProducerId("amt-tiltak-producer")
+					.withAivenBrokerUrl()
+					.withAivenAuth()
+					.withSerializers(StringSerializer::class.java, StringSerializer::class.java)
+					.build()
+			}
         }
     }
 
@@ -39,7 +46,12 @@ open class KafkaBeans {
             }
 
             override fun producer(): Properties {
-                throw NotImplementedError("Not yet implemented")
+				return KafkaPropertiesBuilder.producerBuilder()
+					.withBrokerUrl("localhost:9092")
+					.withBaseProperties()
+					.withProducerId("amt-tiltak-producer")
+					.withSerializers(StringSerializer::class.java, StringSerializer::class.java)
+					.build()
             }
         }
     }
