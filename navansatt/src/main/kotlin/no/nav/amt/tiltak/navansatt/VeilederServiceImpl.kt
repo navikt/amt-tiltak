@@ -57,6 +57,7 @@ internal class VeilederServiceImpl(
 		navAnsattRepository.getNavAnsattInBucket(bucket).map { it.toVeileder() }
 
 	private fun NavAnsattDbo.toVeileder() = NavAnsatt(
+		id = id,
 		navIdent = navIdent,
 		navn = navn,
 		epost = epost,
