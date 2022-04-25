@@ -10,15 +10,17 @@ import java.util.function.Supplier
 
 internal class PlainAxsysClient(
 	private val baseUrl: String,
-	private val tokenProvider: Supplier<String>,
+	private val proxyTokenProvider: Supplier<String>,
+	private val axsysTokenProvider: Supplier<String>,
 	private val httpClient: OkHttpClient = baseClient(),
-) : AxsysClient {
+	) : AxsysClient {
 
 	override fun hentTilganger(navIdent: String): List<EnhetTilgang> {
 		val request = Request.Builder()
 			.url("$baseUrl/api/v2/tilgang/$navIdent?inkluderAlleEnheter=false")
 			.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-			.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenProvider.get())
+			.header(HttpHeaders.AUTHORIZATION, "Bearer " + proxyTokenProvider.get())
+			.header("Downstream-Authorization", "Bearer " + axsysTokenProvider.get())
 			.build()
 
 		httpClient.newCall(request).execute().use { response ->

@@ -52,8 +52,6 @@ spec:
         - application: amt-enhetsregister
           namespace: amt
           cluster: dev-gcp
-      external:
-        - host: https://axsys.dev.intern.nav.no
   kafka:
     pool: nav-dev
   secureLogs:
@@ -61,8 +59,6 @@ spec:
   env:
     - name: AXSYS_SCOPE
       value: api://dev-fss.org.axsys/.default
-    - name: AXSYS_URL
-      value: https://axsys.dev.intern.nav.no
     - name: PDL_SCOPE
       value: api://dev-fss.pdl.pdl-api/.default
     - name: PDL_URL
