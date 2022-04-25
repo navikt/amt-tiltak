@@ -25,7 +25,7 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
 			registrertDato = rs.getTimestamp("registrert_dato").toLocalDateTime(),
 			fremmoteDato = rs.getTimestamp("fremmote_dato")?.toLocalDateTime(),
-			navKontorId = rs.getNullableUUID("nav_kontor_id"),
+			navEnhetId = rs.getNullableUUID("nav_kontor_id"),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
 		)

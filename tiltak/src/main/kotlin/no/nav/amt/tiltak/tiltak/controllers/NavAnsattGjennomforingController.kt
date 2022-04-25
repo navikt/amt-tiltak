@@ -42,7 +42,7 @@ class NavAnsattGjennomforingController(
 
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
 
-		if (!enheter.any { it.kontor.id == gjennomforing.navKontorId }) {
+		if (!enheter.any { it.kontor.id == gjennomforing.navEnhetId }) {
 			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til enhet")
 		}
 

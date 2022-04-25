@@ -1,14 +1,14 @@
 package no.nav.amt.tiltak.nav_kontor
 
-import no.nav.amt.tiltak.core.domain.tiltak.NavKontor
+import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import java.util.*
 
-data class NavKontorDbo(
+data class NavEnhetDbo(
 	val id: UUID,
 	val enhetId: String,
 	val navn: String
 ) {
-	fun toNavKontor() = NavKontor(
+	fun toNavEnhet() = NavEnhet(
 		id = this.id,
 		enhetId = this.enhetId,
 		navn = this.navn

@@ -17,8 +17,8 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [InternalNavKontorController::class])
-class InternalNavKontorControllerTest {
+@WebMvcTest(controllers = [InternalNavEnhetController::class])
+class InternalNavEnhetControllerTest {
 
 	companion object : MockOAuthServer() {
 		@AfterAll
@@ -35,7 +35,7 @@ class InternalNavKontorControllerTest {
 	private lateinit var authService: AuthService
 
 	@MockBean
-	private lateinit var publiserNavKontorService: PubliserNavKontorService
+	private lateinit var publiserNavEnhetService: PubliserNavEnhetService
 
 	@BeforeEach
 	fun before() {

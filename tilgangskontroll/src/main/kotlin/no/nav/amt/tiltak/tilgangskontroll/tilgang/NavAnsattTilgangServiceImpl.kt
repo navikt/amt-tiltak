@@ -17,7 +17,7 @@ open class NavAnsattTilgangServiceImpl(
 
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
 
-		return gjennomforing.navKontorId != null && enhetTilganger.any { it.kontor.id == gjennomforing.navKontorId }
+		return gjennomforing.navEnhetId != null && enhetTilganger.any { it.kontor.id == gjennomforing.navEnhetId }
 	}
 
 }

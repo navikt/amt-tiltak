@@ -18,8 +18,8 @@ import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.DeltakerProcessor
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.GjennomforingProcessor
-import no.nav.amt.tiltak.nav_kontor.NavKontorRepository
-import no.nav.amt.tiltak.nav_kontor.NavKontorServiceImpl
+import no.nav.amt.tiltak.nav_kontor.NavEnhetRepository
+import no.nav.amt.tiltak.nav_kontor.NavEnhetServiceImpl
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
@@ -52,9 +52,9 @@ class IntegrationTest {
 	private lateinit var personService: PersonService
 
 	private lateinit var brukerRepository: BrukerRepository
-	private lateinit var navKontorRepository: NavKontorRepository
+	private lateinit var navEnhetRepository: NavEnhetRepository
 	private lateinit var veilarbarenaClient: VeilarbarenaClient
-	private lateinit var navKontorService: NavKontorService
+	private lateinit var navEnhetService: NavEnhetService
 
 	private lateinit var gjennomforingProcessor: GjennomforingProcessor;
 	private lateinit var deltakerProcessor: DeltakerProcessor
@@ -81,7 +81,7 @@ class IntegrationTest {
 		tiltakRepository = TiltakRepository(jdbcTemplate)
 		gjennomforingRepository = GjennomforingRepository(jdbcTemplate)
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
-		navKontorRepository = NavKontorRepository(jdbcTemplate)
+		navEnhetRepository = NavEnhetRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		arrangorRepository = ArrangorRepository(jdbcTemplate)
 		brukerRepository = BrukerRepository(jdbcTemplate)
@@ -90,9 +90,9 @@ class IntegrationTest {
 		personService = mockk()
 		enhetsregisterClient = mockk()
 
-		navKontorService = NavKontorServiceImpl(navKontorRepository, veilarbarenaClient)
+		navEnhetService = NavEnhetServiceImpl(navEnhetRepository, veilarbarenaClient)
 		tiltakService = TiltakServiceImpl(tiltakRepository)
-		brukerService = BrukerServiceImpl(brukerRepository, personService, mockk(), navKontorService)
+		brukerService = BrukerServiceImpl(brukerRepository, personService, mockk(), navEnhetService)
 		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, transactionTemplate)
 		arrangorService = ArrangorServiceImpl(enhetsregisterClient, arrangorRepository)
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, arrangorService, transactionTemplate)
@@ -175,7 +175,7 @@ class IntegrationTest {
 		sluttDato =  LocalDate.now().minusDays(1),
 		registrertDato =  now.minusDays(5),
 		fremmoteDato =  null,
-		navKontorId = null,
+		navEnhetId = null,
 		createdAt =  now,
 		modifiedAt =  now
 	)
@@ -225,7 +225,7 @@ class IntegrationTest {
 			fornavn = person.fornavn,
 			etternavn = person.etternavn,
 			fodselsnummer = personIdent,
-			navKontor = null
+			navEnhet = null
 		),
 		startDato = null,
 		sluttDato = null,

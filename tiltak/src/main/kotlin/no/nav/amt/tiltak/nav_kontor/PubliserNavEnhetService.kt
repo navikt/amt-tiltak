@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
-open class PubliserNavKontorService(
+open class PubliserNavEnhetService(
 	private val kafkaProducerService: KafkaProducerService,
 	private val norgClient: NorgClient
 ) {
@@ -15,7 +15,7 @@ open class PubliserNavKontorService(
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	open fun publiserAlleNavEnheter() {
-		val alleKontorer = norgClient.hentAlleNavKontorer()
+		val alleKontorer = norgClient.hentAlleNavEnheter()
 
 		log.info("Publiserer ${alleKontorer.size} NAV enheter på kafka")
 

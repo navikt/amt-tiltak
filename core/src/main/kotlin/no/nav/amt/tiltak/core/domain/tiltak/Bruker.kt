@@ -8,5 +8,5 @@ data class Bruker(
 	val mellomnavn: String? = null,
 	val etternavn: String,
 	val fodselsnummer: String,
-	val navKontor: NavKontor?
+	val navEnhet: NavEnhet?
 )

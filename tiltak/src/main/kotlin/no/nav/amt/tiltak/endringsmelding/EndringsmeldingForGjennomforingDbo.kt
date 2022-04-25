@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.endringsmelding
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
-import no.nav.amt.tiltak.core.domain.tiltak.NavKontor
+import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -18,9 +18,9 @@ data class EndringsmeldingForGjennomforingDbo (
 	val brukerMellomnavn: String?,
 	val brukerFnr: String,
 
-	val navkontorId: UUID?,
-	val navKontorEnhetId: String?,
-	val navKontorNavn: String?,
+	val navEnhetId: UUID?,
+	val navEnhetNorgId: String?,
+	val navEnhetNavn: String?,
 
 	val opprettetAvId: UUID,
 	val opprettetAvPersonligIdent: String,
@@ -42,10 +42,10 @@ data class EndringsmeldingForGjennomforingDbo (
 			mellomnavn = brukerMellomnavn,
 			etternavn = brukerEtternavn,
 			fodselsnummer = brukerFnr,
-			navKontor = if (navkontorId == null) null else NavKontor(
-				id = navkontorId,
-				enhetId = navKontorEnhetId!!,
-				navn = navKontorNavn!!
+			navEnhet = if (navEnhetId == null) null else NavEnhet(
+				id = navEnhetId,
+				enhetId = navEnhetNorgId!!,
+				navn = navEnhetNavn!!
 			)
 		),
 		startDato = startDato,

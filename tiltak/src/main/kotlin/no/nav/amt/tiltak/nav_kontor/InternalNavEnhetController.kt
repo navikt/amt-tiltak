@@ -12,9 +12,9 @@ import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping("/internal/nav-kontor")
-open class InternalNavKontorController(
+open class InternalNavEnhetController(
 	private val authService: AuthService,
-	private val publiserNavKontorService: PubliserNavKontorService
+	private val publiserNavEnhetService: PubliserNavEnhetService
 ) {
 
 	@Unprotected
@@ -24,7 +24,7 @@ open class InternalNavKontorController(
 			throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not an internal request")
 		}
 
-		JobRunner.runAsync("publiser_alle_nav_enheter", publiserNavKontorService::publiserAlleNavEnheter)
+		JobRunner.runAsync("publiser_alle_nav_enheter", publiserNavEnhetService::publiserAlleNavEnheter)
 	}
 
 }

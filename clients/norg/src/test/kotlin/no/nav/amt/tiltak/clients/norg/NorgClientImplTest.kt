@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 class NorgClientImplTest {
 
 	@Test
-	fun `hentNavKontorNavn skal lage riktig request og parse respons`(wmRuntimeInfo: WireMockRuntimeInfo) {
+	fun `hentNavEnhetNavn skal lage riktig request og parse respons`(wmRuntimeInfo: WireMockRuntimeInfo) {
 		val client = NorgClientImpl(
 			url = wmRuntimeInfo.httpBaseUrl,
 			tokenProvider = { "TOKEN" },
@@ -49,9 +49,9 @@ class NorgClientImplTest {
 
 		)
 
-		val kontorNavn = client.hentNavKontorNavn("1234")
+		val enhetNavn = client.hentNavEnhetNavn("1234")
 
-		assertEquals("NAV Testheim", kontorNavn)
+		assertEquals("NAV Testheim", enhetNavn)
 	}
 
 }

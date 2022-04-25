@@ -33,9 +33,9 @@ class EndringsmeldingForGjennomforingQuery(
 			opprettetAvMellomnavn = rs.getString("opprettet_av_mellomnavn"),
 			opprettetAvPersonligIdent = rs.getString("opprettet_av_ident"),
 
-			navkontorId = rs.getNullableUUID("nav_kontor_id"),
-			navKontorEnhetId = rs.getString("nav_kontor_enhet_id"),
-			navKontorNavn = rs.getString("nav_kontor_navn"),
+			navEnhetId = rs.getNullableUUID("nav_kontor_id"),
+			navEnhetNorgId = rs.getString("nav_kontor_enhet_id"),
+			navEnhetNavn = rs.getString("nav_kontor_navn"),
 
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()

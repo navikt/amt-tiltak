@@ -44,7 +44,7 @@ class GjennomforingProcessor(
 				sluttDato = gjennomforing.sluttDato,
 				registrertDato = gjennomforing.registrertDato,
 				fremmoteDato = gjennomforing.fremmoteDato,
-				navKontorId = null // Dette blir implementert i en annen PR
+				navEnhetId = null // Dette blir implementert i en annen PR
 			)
 		)
 

@@ -32,7 +32,7 @@ class GetDeltakerDetaljerQuery(
 			registrertDato = rs.getLocalDateTime("registrert_dato"),
 			status = Deltaker.Status.valueOf(rs.getString("status")),
 			statusEndretDato = rs.getLocalDateTime("status_endret_dato"),
-			navKontorNavn = rs.getString("nav_kontor_navn"),
+			navEnhetNavn = rs.getString("nav_kontor_navn"),
 			gjennomforingId = rs.getUUID("gjennomforing_id"),
 			gjennomforingNavn = rs.getString("gjennomforing_navn"),
 			gjennomforingStartDato = rs.getNullableLocalDate("gjennomforing_start_dato"),

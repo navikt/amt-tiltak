@@ -6,24 +6,24 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt.tiltak.nav_kontor.NavKontorRepository
+import no.nav.amt.tiltak.nav_kontor.NavEnhetRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_KONTOR_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.util.*
 
-class NavKontorRepositoryTest : FunSpec({
+class NavEnhetRepositoryTest : FunSpec({
 	val dataSource = SingletonPostgresContainer.getDataSource()
 
-	lateinit var repository: NavKontorRepository
+	lateinit var repository: NavEnhetRepository
 
 	beforeEach {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 		rootLogger.level = Level.WARN
 
-		repository = NavKontorRepository(NamedParameterJdbcTemplate(dataSource))
+		repository = NavEnhetRepository(NamedParameterJdbcTemplate(dataSource))
 
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
@@ -38,25 +38,25 @@ class NavKontorRepositoryTest : FunSpec({
 		exception.message shouldBe "Kontor med id $id eksisterer ikke."
 	}
 
-	test("Legg til NAV-Kontor legger til og returnerer navkontor") {
+	test("Legg til NAV-Kontor legger til og returnerer nav enhet") {
 		val enhetId = "ENHET_001"
 		val navn = "ENHET_001_NAVN"
 
-		val lagretKontor = repository.upsert(enhetId, navn)
+		val lagretEnhet = repository.upsert(enhetId, navn)
 
-		lagretKontor.id shouldNotBe null
+		lagretEnhet.id shouldNotBe null
 
-		val hentetKontor = repository.get(lagretKontor.id)
+		val hentetEnhet = repository.get(lagretEnhet.id)
 
-		lagretKontor shouldBe hentetKontor
+		lagretEnhet shouldBe hentetEnhet
 	}
 
 	test("Endring av navn fører til endring av navn") {
-		val oppdatertKontor = repository.upsert(NAV_KONTOR_1.enhet_id, "Nytt navn")
+		val oppdatertEnhet = repository.upsert(NAV_ENHET_1.enhet_id, "Nytt navn")
 
-		oppdatertKontor.id shouldBe NAV_KONTOR_1.id
-		oppdatertKontor.enhetId shouldBe NAV_KONTOR_1.enhet_id
-		oppdatertKontor.navn shouldBe "Nytt navn"
+		oppdatertEnhet.id shouldBe NAV_ENHET_1.id
+		oppdatertEnhet.enhetId shouldBe NAV_ENHET_1.enhet_id
+		oppdatertEnhet.navn shouldBe "Nytt navn"
 	}
 
 })

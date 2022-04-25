@@ -11,8 +11,8 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_KONTOR_1
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_KONTOR_2
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_2
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.commands.InsertArrangorAnsattGjennomforingTilgang
@@ -41,7 +41,7 @@ class GjennomforingTilgangRepositoryTest : FunSpec({
 	}
 
 	test("opprettTilgang skal opprette tilgang") {
-		testRepository.insertNavKontor(NAV_KONTOR_1)
+		testRepository.insertNavEnhet(NAV_ENHET_1)
 		testRepository.insertArrangor(ARRANGOR_1)
 		testRepository.insertArrangorAnsatt(ARRANGOR_ANSATT_1)
 		testRepository.insertTiltak(TILTAK_1)
@@ -55,8 +55,8 @@ class GjennomforingTilgangRepositoryTest : FunSpec({
 	}
 
 	test("hentGjennomforingerForAnsatt skal returnere ider") {
-		testRepository.insertNavKontor(NAV_KONTOR_1)
-		testRepository.insertNavKontor(NAV_KONTOR_2)
+		testRepository.insertNavEnhet(NAV_ENHET_1)
+		testRepository.insertNavEnhet(NAV_ENHET_2)
 		testRepository.insertArrangor(ARRANGOR_1)
 		testRepository.insertArrangor(ARRANGOR_2)
 		testRepository.insertArrangorAnsatt(ARRANGOR_ANSATT_1)
@@ -84,8 +84,8 @@ class GjennomforingTilgangRepositoryTest : FunSpec({
 	}
 
 	test("hentGjennomforingerForAnsattHosArrangor skal returnere ider") {
-		testRepository.insertNavKontor(NAV_KONTOR_1)
-		testRepository.insertNavKontor(NAV_KONTOR_2)
+		testRepository.insertNavEnhet(NAV_ENHET_1)
+		testRepository.insertNavEnhet(NAV_ENHET_2)
 		testRepository.insertArrangor(ARRANGOR_1)
 		testRepository.insertArrangor(ARRANGOR_2)
 		testRepository.insertArrangorAnsatt(ARRANGOR_ANSATT_1)

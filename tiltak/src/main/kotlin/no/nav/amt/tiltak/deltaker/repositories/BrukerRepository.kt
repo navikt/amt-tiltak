@@ -25,7 +25,7 @@ open class BrukerRepository(
             telefonnummer = rs.getString("telefonnummer"),
             epost = rs.getString("epost"),
             ansvarligVeilederId = rs.getNullableUUID("ansvarlig_veileder_id"),
-			navKontorId = rs.getNullableUUID("nav_kontor_id"),
+			navEnhetId = rs.getNullableUUID("nav_kontor_id"),
             createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
             modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
         )
@@ -56,7 +56,7 @@ open class BrukerRepository(
                 "telefonnummer" to bruker.telefonnummer,
                 "epost" to bruker.epost,
                 "veileder_id" to bruker.ansvarligVeilederId,
-				"nav_kontor_id" to bruker.navKontorId
+				"nav_kontor_id" to bruker.navEnhetId
             )
         )
 
@@ -98,7 +98,7 @@ open class BrukerRepository(
 		template.update(sql, parameters)
 	}
 
-	fun oppdaterNavKontor(fodselsnummer: String, navKontorId: UUID) {
+	fun oppdaterNavEnhet(fodselsnummer: String, navKontorId: UUID) {
 		val sql = """
 			UPDATE bruker SET nav_kontor_id = :navKontorId WHERE fodselsnummer = :fodselsnummer
 		""".trimIndent()

@@ -2,13 +2,13 @@ package no.nav.amt.tiltak.clients.norg
 
 interface NorgClient {
 
-	fun hentNavKontorNavn(enhetId: String): String
+	fun hentNavEnhetNavn(enhetId: String): String
 
-	fun hentAlleNavKontorer(): List<NorgNavKontor>
+	fun hentAlleNavEnheter(): List<NorgNavEnhet>
 
 }
 
-data class NorgNavKontor(
+data class NorgNavEnhet(
 	val enhetId: String,
 	val navn: String
 )

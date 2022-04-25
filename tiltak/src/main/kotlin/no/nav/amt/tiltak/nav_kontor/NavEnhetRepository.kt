@@ -9,19 +9,19 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-open class NavKontorRepository(
+open class NavEnhetRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
 
 	private val rowMapper = RowMapper { rs, _ ->
-		NavKontorDbo(
+		NavEnhetDbo(
 			id = rs.getUUID("id"),
 			enhetId = rs.getString("enhet_id"),
 			navn = rs.getString("navn")
 		)
 	}
 
-	fun upsert(enhetId: String, navn: String): NavKontorDbo {
+	fun upsert(enhetId: String, navn: String): NavEnhetDbo {
 		val sql = """
 			INSERT INTO nav_kontor(id, enhet_id, navn)
 			VALUES (:id,
@@ -44,7 +44,7 @@ open class NavKontorRepository(
 		return hentEnhet(enhetId) ?: throw NoSuchElementException("Kontor med enhetId $enhetId eksisterer ikke.")
 	}
 
-	fun get(id: UUID): NavKontorDbo {
+	fun get(id: UUID): NavEnhetDbo {
 		return template.query(
 			"SELECT * FROM nav_kontor WHERE id = :id",
 			MapSqlParameterSource().addValues(mapOf("id" to id)),
@@ -52,7 +52,7 @@ open class NavKontorRepository(
 		).firstOrNull() ?: throw NoSuchElementException("Kontor med id $id eksisterer ikke.")
 	}
 
-	fun hentEnheter(enhetIder: List<String>): List<NavKontorDbo> {
+	fun hentEnheter(enhetIder: List<String>): List<NavEnhetDbo> {
 		val sql = """
 			SELECT * FROM nav_kontor WHERE enhet_id in(:enhetIder)
 		""".trimIndent()
@@ -64,7 +64,7 @@ open class NavKontorRepository(
 		)
 	}
 
-	fun hentEnhet(enhetId: String): NavKontorDbo? {
+	fun hentEnhet(enhetId: String): NavEnhetDbo? {
 		val sql = """
 			SELECT * FROM nav_kontor WHERE enhet_id = :enhetId
 		""".trimIndent()

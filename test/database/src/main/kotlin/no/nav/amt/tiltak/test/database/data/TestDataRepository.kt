@@ -167,7 +167,7 @@ class TestDataRepository(
 		)
 	}
 
-	fun insertNavKontor(cmd: InsertNavKontorCommand) {
+	fun insertNavEnhet(cmd: InsertNavEnhetCommand) {
 		val sql = """
 			INSERT INTO nav_kontor (id, enhet_id, navn)
 			VALUES (:id, :enhet_id, :navn)
