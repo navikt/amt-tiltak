@@ -73,8 +73,8 @@ class TestDataRepository(
 
 	fun insertBruker(cmd: InsertBrukerCommand) {
 		val sql = """
-			INSERT INTO bruker (id, fodselsnummer, fornavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_kontor_id)
-			VALUES (:id, :fodselsnummer, :fornavn, :etternavn, :telefonnummer, :epost, :ansvarlig_veileder_id, :nav_kontor_id);
+			INSERT INTO bruker (id, fodselsnummer, fornavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_enhet_id)
+			VALUES (:id, :fodselsnummer, :fornavn, :etternavn, :telefonnummer, :epost, :ansvarlig_veileder_id, :nav_enhet_id);
 		""".trimIndent()
 
 		template.update(
@@ -86,7 +86,7 @@ class TestDataRepository(
 				"telefonnummer" to cmd.telefonnummer,
 				"epost" to cmd.epost,
 				"ansvarlig_veileder_id" to cmd.ansvarlig_veileder_id,
-				"nav_kontor_id" to cmd.nav_kontor_id
+				"nav_enhet_id" to cmd.nav_enhet_id
 			)
 		)
 	}
@@ -130,8 +130,8 @@ class TestDataRepository(
 
 	fun insertGjennomforing(cmd: InsertGjennomforingCommand) {
 		val sql = """
-			INSERT INTO gjennomforing (id, tiltak_id, arrangor_id, navn, status, start_dato, slutt_dato, registrert_dato, fremmote_dato, nav_kontor_id)
-			VALUES (:id, :tiltak_id, :arrangor_id, :navn, :status, :start_dato, :slutt_dato, :registrert_dato, :fremmote_dato, :nav_kontor_id)
+			INSERT INTO gjennomforing (id, tiltak_id, arrangor_id, navn, status, start_dato, slutt_dato, registrert_dato, fremmote_dato, nav_enhet_id)
+			VALUES (:id, :tiltak_id, :arrangor_id, :navn, :status, :start_dato, :slutt_dato, :registrert_dato, :fremmote_dato, :nav_enhet_id)
 		""".trimIndent()
 
 		template.update(
@@ -145,7 +145,7 @@ class TestDataRepository(
 				"slutt_dato" to cmd.slutt_dato,
 				"registrert_dato" to cmd.registrert_dato,
 				"fremmote_dato" to cmd.fremmote_dato,
-				"nav_kontor_id" to cmd.nav_kontor_id
+				"nav_enhet_id" to cmd.nav_enhet_id
 			)
 		)
 	}
@@ -169,7 +169,7 @@ class TestDataRepository(
 
 	fun insertNavEnhet(cmd: InsertNavEnhetCommand) {
 		val sql = """
-			INSERT INTO nav_kontor (id, enhet_id, navn)
+			INSERT INTO nav_enhet(id, enhet_id, navn)
 			VALUES (:id, :enhet_id, :navn)
 		""".trimIndent()
 

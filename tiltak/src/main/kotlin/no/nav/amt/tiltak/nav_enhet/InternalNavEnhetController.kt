@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.nav_kontor
+package no.nav.amt.tiltak.nav_enhet
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.common.job.JobRunner
@@ -11,7 +11,7 @@ import org.springframework.web.server.ResponseStatusException
 import javax.servlet.http.HttpServletRequest
 
 @RestController
-@RequestMapping("/internal/nav-kontor")
+@RequestMapping("/internal/nav-enhet")
 open class InternalNavEnhetController(
 	private val authService: AuthService,
 	private val publiserNavEnhetService: PubliserNavEnhetService

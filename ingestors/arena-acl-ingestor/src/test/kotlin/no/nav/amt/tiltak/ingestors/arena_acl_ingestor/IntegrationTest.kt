@@ -18,8 +18,8 @@ import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.DeltakerProcessor
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.GjennomforingProcessor
-import no.nav.amt.tiltak.nav_kontor.NavEnhetRepository
-import no.nav.amt.tiltak.nav_kontor.NavEnhetServiceImpl
+import no.nav.amt.tiltak.nav_enhet.NavEnhetRepository
+import no.nav.amt.tiltak.nav_enhet.NavEnhetServiceImpl
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository

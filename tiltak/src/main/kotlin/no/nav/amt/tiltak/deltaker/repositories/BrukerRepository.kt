@@ -25,7 +25,7 @@ open class BrukerRepository(
             telefonnummer = rs.getString("telefonnummer"),
             epost = rs.getString("epost"),
             ansvarligVeilederId = rs.getNullableUUID("ansvarlig_veileder_id"),
-			navEnhetId = rs.getNullableUUID("nav_kontor_id"),
+			navEnhetId = rs.getNullableUUID("nav_enhet_id"),
             createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
             modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
         )
@@ -34,7 +34,7 @@ open class BrukerRepository(
     fun insert(bruker: BrukerInsertDbo): BrukerDbo {
 
 		val sql = """
-			INSERT INTO bruker(id, fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_kontor_id)
+			INSERT INTO bruker(id, fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_enhet_id)
 			VALUES (:id,
 					:fodselsnummer,
 					:fornavn,
@@ -43,7 +43,7 @@ open class BrukerRepository(
 					:telefonnummer,
 					:epost,
 					:veileder_id,
-					:nav_kontor_id)
+					:nav_enhet_id)
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
@@ -56,7 +56,7 @@ open class BrukerRepository(
                 "telefonnummer" to bruker.telefonnummer,
                 "epost" to bruker.epost,
                 "veileder_id" to bruker.ansvarligVeilederId,
-				"nav_kontor_id" to bruker.navEnhetId
+				"nav_enhet_id" to bruker.navEnhetId
             )
         )
 
@@ -98,14 +98,14 @@ open class BrukerRepository(
 		template.update(sql, parameters)
 	}
 
-	fun oppdaterNavEnhet(fodselsnummer: String, navKontorId: UUID) {
+	fun oppdaterNavEnhet(fodselsnummer: String, navEnhetId: UUID) {
 		val sql = """
-			UPDATE bruker SET nav_kontor_id = :navKontorId WHERE fodselsnummer = :fodselsnummer
+			UPDATE bruker SET nav_enhet_id = :navEnhetId WHERE fodselsnummer = :fodselsnummer
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"navKontorId" to navKontorId,
+				"navEnhetId" to navEnhetId,
 				"fodselsnummer" to fodselsnummer,
 			)
 		)

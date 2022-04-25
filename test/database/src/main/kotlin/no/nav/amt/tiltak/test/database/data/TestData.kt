@@ -94,7 +94,7 @@ object TestData {
 		status = "GJENNOMFORES",
 		start_dato = LocalDate.of(2022, 2, 1),
 		slutt_dato = LocalDate.of(2050, 12, 30),
-		nav_kontor_id = NAV_ENHET_1.id,
+		nav_enhet_id = NAV_ENHET_1.id,
 		registrert_dato = LocalDate.of(2022, 1, 1),
 		fremmote_dato = LocalDate.of(2022, 2, 1)
 	)
@@ -107,7 +107,7 @@ object TestData {
 		status = "AVSLUTTET",
 		start_dato = LocalDate.of(2022, 2, 1),
 		slutt_dato = LocalDate.of(2022, 2, 13),
-		nav_kontor_id = NAV_ENHET_2.id,
+		nav_enhet_id = NAV_ENHET_2.id,
 		registrert_dato = LocalDate.of(2022, 1, 1),
 		fremmote_dato = LocalDate.of(2022, 2, 1)
 	)
@@ -145,7 +145,7 @@ object TestData {
 		telefonnummer = "73404782",
 		epost = "bruker1@example.com",
 		ansvarlig_veileder_id = NAV_ANSATT_1.id,
-		nav_kontor_id = NAV_ENHET_1.id
+		nav_enhet_id = NAV_ENHET_1.id
 	)
 
 	val DELTAKER_1 = InsertDeltakerCommand(
@@ -178,7 +178,7 @@ object TestData {
 		telefonnummer = "65443532",
 		epost = "bruker2@example.com",
 		ansvarlig_veileder_id = null,
-		nav_kontor_id = NAV_ENHET_1.id
+		nav_enhet_id = NAV_ENHET_1.id
 	)
 
 	val DELTAKER_2 = InsertDeltakerCommand(
@@ -210,7 +210,7 @@ object TestData {
 		telefonnummer = "39057809",
 		epost = "bruker3@example.com",
 		ansvarlig_veileder_id = null,
-		nav_kontor_id = NAV_ENHET_1.id
+		nav_enhet_id = NAV_ENHET_1.id
 	)
 
 	// Bruker 4
@@ -223,7 +223,7 @@ object TestData {
 		telefonnummer = "11223344",
 		epost = "bruker4@example.com",
 		ansvarlig_veileder_id = null,
-		nav_kontor_id = NAV_ENHET_1.id
+		nav_enhet_id = NAV_ENHET_1.id
 	)
 
 

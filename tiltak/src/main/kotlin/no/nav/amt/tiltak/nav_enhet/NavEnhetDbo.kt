@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.nav_kontor
+package no.nav.amt.tiltak.nav_enhet
 
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import java.util.*

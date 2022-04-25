@@ -6,7 +6,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt.tiltak.nav_kontor.NavEnhetRepository
+import no.nav.amt.tiltak.nav_enhet.NavEnhetRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
@@ -35,7 +35,7 @@ class NavEnhetRepositoryTest : FunSpec({
 			repository.get(id)
 		}
 
-		exception.message shouldBe "Kontor med id $id eksisterer ikke."
+		exception.message shouldBe "Enhet med id $id eksisterer ikke."
 	}
 
 	test("Legg til NAV-Kontor legger til og returnerer nav enhet") {

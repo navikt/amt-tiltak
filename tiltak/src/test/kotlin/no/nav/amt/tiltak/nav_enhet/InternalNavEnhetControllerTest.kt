@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.nav_kontor
+package no.nav.amt.tiltak.nav_enhet
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
@@ -47,7 +47,7 @@ class InternalNavEnhetControllerTest {
 		`when`(authService.isInternalRequest(any())).thenReturn(true)
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.post("/internal/nav-kontor/publiser-alle-enheter")
+			MockMvcRequestBuilders.post("/internal/nav-enhet/publiser-alle-enheter")
 		).andReturn().response
 
 		assertEquals(200, response.status)
@@ -58,7 +58,7 @@ class InternalNavEnhetControllerTest {
 		`when`(authService.isInternalRequest(any())).thenReturn(false)
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.post("/internal/nav-kontor/publiser-alle-enheter")
+			MockMvcRequestBuilders.post("/internal/nav-enhet/publiser-alle-enheter")
 		).andReturn().response
 
 		assertEquals(401, response.status)

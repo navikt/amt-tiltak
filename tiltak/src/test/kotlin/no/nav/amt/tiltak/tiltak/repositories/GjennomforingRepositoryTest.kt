@@ -140,7 +140,7 @@ internal class GjennomforingRepositoryTest : FunSpec({
 			slutt_dato = LocalDate.of(2050, 12, 30),
 			registrert_dato = LocalDate.of(2022, 1, 1),
 			fremmote_dato = LocalDate.of(2022, 2, 1),
-			nav_kontor_id = null,
+			nav_enhet_id = null,
 		)
 
 		TestDataRepository(NamedParameterJdbcTemplate(dataSource))

@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.nav_kontor
+package no.nav.amt.tiltak.nav_enhet
 
 import no.nav.amt.tiltak.clients.norg.NorgClient
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
@@ -15,11 +15,11 @@ open class PubliserNavEnhetService(
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	open fun publiserAlleNavEnheter() {
-		val alleKontorer = norgClient.hentAlleNavEnheter()
+		val alleEnheter = norgClient.hentAlleNavEnheter()
 
-		log.info("Publiserer ${alleKontorer.size} NAV enheter på kafka")
+		log.info("Publiserer ${alleEnheter.size} NAV enheter på kafka")
 
-		alleKontorer.forEach {
+		alleEnheter.forEach {
 			kafkaProducerService.sendNavEnhet(
 				NavEnhetKafkaDto(
 					enhetId = it.enhetId,

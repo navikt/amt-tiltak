@@ -30,7 +30,7 @@ class NavAnsattGjennomforingController(
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
 		val enheter = navAnsattService.hentTiltaksansvarligEnhetTilganger(navIdent)
 
-		return gjennomforingerPaEnheterQuery.query(enheter.map { it.kontor.id })
+		return gjennomforingerPaEnheterQuery.query(enheter.map { it.enhet.id })
 			.map { HentAlleGjennomforingDto(it.id, it.navn) }
 	}
 
@@ -42,7 +42,7 @@ class NavAnsattGjennomforingController(
 
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
 
-		if (!enheter.any { it.kontor.id == gjennomforing.navEnhetId }) {
+		if (!enheter.any { it.enhet.id == gjennomforing.navEnhetId }) {
 			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til enhet")
 		}
 

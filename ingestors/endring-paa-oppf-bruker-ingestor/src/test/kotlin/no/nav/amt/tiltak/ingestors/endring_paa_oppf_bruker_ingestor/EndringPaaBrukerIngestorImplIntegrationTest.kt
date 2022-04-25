@@ -11,7 +11,7 @@ import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
-import no.nav.amt.tiltak.nav_kontor.NavEnhetRepository
+import no.nav.amt.tiltak.nav_enhet.NavEnhetRepository
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.commands.InsertNavEnhetCommand

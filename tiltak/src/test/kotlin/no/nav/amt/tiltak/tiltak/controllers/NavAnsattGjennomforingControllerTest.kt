@@ -162,7 +162,7 @@ class NavAnsattGjennomforingControllerTest {
 
 		Mockito.`when`(navAnsattService.hentTiltaksansvarligEnhetTilganger(navIdent))
 			.thenReturn(listOf(NavEnhetTilgang(
-				kontor = NavEnhet(
+				enhet = NavEnhet(
 					id = gjennomforing.navEnhetId!!,
 					enhetId = "1234",
 					navn = "test"
@@ -192,7 +192,7 @@ class NavAnsattGjennomforingControllerTest {
 
 		Mockito.`when`(navAnsattService.hentTiltaksansvarligEnhetTilganger(navIdent))
 			.thenReturn(listOf(NavEnhetTilgang(
-				kontor = NavEnhet(
+				enhet = NavEnhet(
 					id = UUID.randomUUID(), // En annen id enn den på gjennomføringen
 					enhetId = "1234",
 					navn = "test"

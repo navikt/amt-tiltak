@@ -32,7 +32,7 @@ class GetDeltakerDetaljerQuery(
 			registrertDato = rs.getLocalDateTime("registrert_dato"),
 			status = Deltaker.Status.valueOf(rs.getString("status")),
 			statusEndretDato = rs.getLocalDateTime("status_endret_dato"),
-			navEnhetNavn = rs.getString("nav_kontor_navn"),
+			navEnhetNavn = rs.getString("nav_enhet_navn"),
 			gjennomforingId = rs.getUUID("gjennomforing_id"),
 			gjennomforingNavn = rs.getString("gjennomforing_navn"),
 			gjennomforingStartDato = rs.getNullableLocalDate("gjennomforing_start_dato"),
@@ -58,8 +58,8 @@ class GetDeltakerDetaljerQuery(
 			   bruker.fodselsnummer         	AS fodselsnummer,
 			   bruker.telefonnummer         	AS telefonnummer,
 			   bruker.epost                 	AS epost,
-			   bruker.nav_kontor_id         	AS nav_kontor_id,
-			   nav_kontor.navn					AS nav_kontor_navn,
+			   bruker.nav_enhet_id         		AS nav_enhet_id,
+			   nav_enhet.navn					AS nav_enhet_navn,
 			   nav_ansatt.navn           		AS veileder_navn,
 			   nav_ansatt.telefonnummer     	AS veileder_telefonnummer,
 			   nav_ansatt.epost             	AS veileder_epost,
@@ -75,7 +75,7 @@ class GetDeltakerDetaljerQuery(
 		FROM deltaker
 				 LEFT JOIN bruker ON bruker.id = deltaker.bruker_id
 				 LEFT JOIN nav_ansatt ON nav_ansatt.id = bruker.ansvarlig_veileder_id
-				 LEFT JOIN nav_kontor ON nav_kontor.id = bruker.nav_kontor_id
+				 LEFT JOIN nav_enhet ON nav_enhet.id = bruker.nav_enhet_id
 				 LEFT JOIN gjennomforing ON gjennomforing.id = deltaker.gjennomforing_id
 				 LEFT JOIN tiltak ON gjennomforing.tiltak_id = tiltak.id
 				 LEFT JOIN deltaker_status ON deltaker_status.deltaker_id = deltaker.id
