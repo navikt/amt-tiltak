@@ -52,6 +52,8 @@ spec:
         - application: amt-enhetsregister
           namespace: amt
           cluster: dev-gcp
+      external:
+        - host: https://axsys.dev.intern.nav.no
   kafka:
     pool: nav-dev
   secureLogs:
