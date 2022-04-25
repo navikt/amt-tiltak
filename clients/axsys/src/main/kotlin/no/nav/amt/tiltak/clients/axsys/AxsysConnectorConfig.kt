@@ -15,7 +15,7 @@ open class AxsysConnectorConfig(
 	@Bean
 	open fun axsysClient(machineToMachineTokenClient: MachineToMachineTokenClient): AxsysClient {
 		val delegate = PlainAxsysClient(
-			baseUrl = proxyUrl,
+			baseUrl = "$proxyUrl/proxy/axsys",
 			proxyTokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(proxyScope) },
 			axsysTokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(axsysScope) },
 		)
