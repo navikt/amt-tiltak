@@ -16,16 +16,18 @@ internal class PlainAxsysClientTest {
 	fun `hentTilganger - med fodselsnummer - skal returnere korrekt parset respons`(wmRuntimeInfo: WireMockRuntimeInfo) {
 		val client = PlainAxsysClient(
 			baseUrl = wmRuntimeInfo.httpBaseUrl,
-			tokenProvider = { "TOKEN" },
+			proxyTokenProvider = { "PROXY_TOKEN" },
+			axsysTokenProvider = { "AXSYS_TOKEN" },
 		)
 
 		System.setProperty("NAIS_APP_NAME", "amt-tiltak")
 
 		givenThat(
 			get(urlEqualTo("/api/v2/tilgang/$brukerident?inkluderAlleEnheter=false"))
-				.withHeader("Authorization", equalTo("Bearer TOKEN"))
+				.withHeader("Authorization", equalTo("Bearer PROXY_TOKEN"))
 				.withHeader("Nav-Consumer-Id", equalTo("amt-tiltak"))
 				.withHeader("Nav-Call-Id", matching("[0-9a-fA-F]{32}"))
+				.withHeader("Downstream-Authorization", equalTo("Bearer AXSYS_TOKEN"))
 				.willReturn(
 					aResponse()
 						.withStatus(200)
