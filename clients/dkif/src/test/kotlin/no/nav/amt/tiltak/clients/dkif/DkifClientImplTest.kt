@@ -45,6 +45,7 @@ class DkifClientImplTest : FunSpec({
 		val request = server.takeRequest()
 
 		request.path shouldBe "/rest/v1/person?inkluderSikkerDigitalPost=false"
+		request.method shouldBe "GET"
 		request.getHeader("Authorization") shouldBe "Bearer TOKEN"
 		request.getHeader("Nav-Personident") shouldBe "12345678900"
 		request.getHeader("Nav-Consumer-Id") shouldBe "amt-tiltak"

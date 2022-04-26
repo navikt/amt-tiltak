@@ -43,6 +43,7 @@ class AmtEnhetsregisterClientTest : FunSpec({
 		val request = server.takeRequest()
 
 		request.path shouldBe "/api/enhet/987654"
+		request.method shouldBe "GET"
 		request.getHeader("Authorization") shouldBe "Bearer TOKEN"
 	}
 
@@ -64,6 +65,7 @@ class AmtEnhetsregisterClientTest : FunSpec({
 		val request = server.takeRequest()
 
 		request.path shouldBe "/api/enhet/987654"
+		request.method shouldBe "GET"
 	}
 
 })

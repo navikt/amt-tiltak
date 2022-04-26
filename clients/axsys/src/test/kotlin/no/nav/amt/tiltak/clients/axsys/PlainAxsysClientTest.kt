@@ -55,7 +55,7 @@ class AxsysClientTest : FunSpec({
 		val request = server.takeRequest()
 
 		request.path shouldBe "/api/v2/tilgang/$brukerident?inkluderAlleEnheter=false"
-
+		request.method shouldBe "GET"
 		request.getHeader("Authorization") shouldBe "Bearer PROXY_TOKEN"
 		request.getHeader("Nav-Consumer-Id") shouldBe "amt-tiltak"
 		request.getHeader("Nav-Call-Id") shouldNotBe null
