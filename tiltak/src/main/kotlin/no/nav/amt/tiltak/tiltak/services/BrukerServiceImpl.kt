@@ -1,9 +1,9 @@
 package no.nav.amt.tiltak.tiltak.services
 
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
-import no.nav.amt.tiltak.core.domain.tiltak.NavKontor
+import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.port.BrukerService
-import no.nav.amt.tiltak.core.port.NavKontorService
+import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
@@ -17,13 +17,13 @@ class BrukerServiceImpl(
 	private val brukerRepository: BrukerRepository,
 	private val personService: PersonService,
 	private val veilederService: VeilederService,
-	private val navKontorService: NavKontorService
+	private val navEnhetService: NavEnhetService
 ) : BrukerService {
 
 	override fun getBruker(fodselsnummer: String): Bruker? {
 		return brukerRepository.get(fodselsnummer)?.let {
-			val navKontor = it.navKontorId?.let(navKontorService::getNavKontor)
-			it.toBruker(navKontor)
+			val navEnhet = it.navEnhetId?.let(navEnhetService::getNavEnhet)
+			it.toBruker(navEnhet)
 		}
 	}
 
@@ -40,14 +40,14 @@ class BrukerServiceImpl(
 		brukerRepository.oppdaterVeileder(brukerPersonligIdent, veilederId)
 	}
 
-	override fun oppdaterNavKontor(fodselsnummer: String, navKontor: NavKontor) {
-		brukerRepository.oppdaterNavKontor(fodselsnummer, navKontor.id)
+	override fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet) {
+		brukerRepository.oppdaterNavEnhet(fodselsnummer, navEnhet.id)
 	}
 
 	private fun createBruker(fodselsnummer: String): BrukerDbo {
 		val veilederId = upsertVeileder(fodselsnummer)
 
-		val navKontor = navKontorService.getNavKontorForBruker(fodselsnummer)
+		val navEnhet = navEnhetService.getNavEnhetForBruker(fodselsnummer)
 
 		val personKontaktinformasjon = personService.hentPersonKontaktinformasjon(fodselsnummer)
 
@@ -61,7 +61,7 @@ class BrukerServiceImpl(
 			telefonnummer = person.telefonnummer ?: personKontaktinformasjon.telefonnummer,
 			epost = personKontaktinformasjon.epost,
 			ansvarligVeilederId = veilederId,
-			navKontorId = navKontor?.id
+			navEnhetId = navEnhet?.id
 		)
 
 		return brukerRepository.insert(bruker)

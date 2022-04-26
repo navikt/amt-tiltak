@@ -11,7 +11,6 @@ import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
-import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -90,7 +89,7 @@ class TiltakarrangorGjennomforingControllerTest {
 		fremmoteDato = LocalDateTime.now(),
 		startDato = LocalDate.now(),
 		registrertDato = LocalDateTime.now(),
-		navKontorId = null,
+		navEnhetId = null,
 		sluttDato = LocalDate.now(),
 		status = Gjennomforing.Status.GJENNOMFORES,
 	)

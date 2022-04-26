@@ -40,7 +40,7 @@ open class TiltakDeltakerPresentationService(
 			fodselsnummer = fodselsnummer,
 			telefonnummer = telefonnummer,
 			epost = epost,
-			navKontor = navKontorNavn?.let { NavKontorDto(it) },
+			navEnhet = navEnhetNavn?.let { NavEnhetDto(it) },
 			navVeileder = veileder,
 			startDato = startDato,
 			sluttDato = sluttDato,

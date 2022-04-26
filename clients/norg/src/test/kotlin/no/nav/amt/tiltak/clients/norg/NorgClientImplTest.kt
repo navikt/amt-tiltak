@@ -14,7 +14,7 @@ class NorgClientImplTest : FunSpec({
 		server.shutdown()
 	}
 
-	test("hentNavKontorNavn skal lage riktig request og parse respons") {
+	test("hentNavEnhetNavn skal lage riktig request og parse respons") {
 		val client = NorgClientImpl(
 			url = serverUrl,
 			tokenProvider = { "TOKEN" },
@@ -46,9 +46,9 @@ class NorgClientImplTest : FunSpec({
 			)
 		)
 
-		val kontorNavn = client.hentNavKontorNavn("1234")
+		val enhetNavn = client.hentNavEnhetNavn("1234")
 
-		kontorNavn shouldBe "NAV Testheim"
+		enhetNavn shouldBe "NAV Testheim"
 
 		val request = server.takeRequest()
 

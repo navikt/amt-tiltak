@@ -3,18 +3,18 @@ package no.nav.amt.tiltak.ingestors.endring_paa_oppf_bruker_ingestor
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
-import no.nav.amt.tiltak.core.domain.tiltak.NavKontor
 import no.nav.amt.tiltak.core.port.BrukerService
-import no.nav.amt.tiltak.core.port.NavKontorService
+import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
-import no.nav.amt.tiltak.nav_kontor.NavKontorRepository
+import no.nav.amt.tiltak.nav_enhet.NavEnhetRepository
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
-import no.nav.amt.tiltak.test.database.data.commands.InsertNavKontorCommand
+import no.nav.amt.tiltak.test.database.data.commands.InsertNavEnhetCommand
 import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -28,11 +28,11 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 	lateinit var brukerService: BrukerService
 
 	lateinit var brukerRepository: BrukerRepository
-	lateinit var navKontorRepository: NavKontorRepository
+	lateinit var navEnhetRepository: NavEnhetRepository
 
 	val personService: PersonService = mockk()
 	val veilederService: VeilederService = mockk()
-	val navKontorService: NavKontorService = mockk()
+	val navEnhetService: NavEnhetService = mockk()
 
 	lateinit var dataSource: DataSource
 	lateinit var jdbcTemplate: NamedParameterJdbcTemplate
@@ -44,18 +44,18 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 		jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
 		testDataRepository = TestDataRepository(jdbcTemplate)
 
-		navKontorRepository = NavKontorRepository(jdbcTemplate)
+		navEnhetRepository = NavEnhetRepository(jdbcTemplate)
 		brukerRepository = BrukerRepository(jdbcTemplate)
-		brukerService = BrukerServiceImpl(brukerRepository, personService, veilederService, navKontorService)
-		endringPaaBrukerIngestorImpl = EndringPaaBrukerIngestorImpl(brukerService, navKontorService)
+		brukerService = BrukerServiceImpl(brukerRepository, personService, veilederService, navEnhetService)
+		endringPaaBrukerIngestorImpl = EndringPaaBrukerIngestorImpl(brukerService, navEnhetService)
 	}
 
 	@Test
 	fun `ingestKafkaRecord - bruker finnes, har ikke nav kontor - oppdatere nav kontor`() {
 		val fnr = "121234324"
 		val expectedNyEnhet = "enhet2"
-		val expectedNyttKontorNavn = "Nytt navkontor navn"
-		val navKontor = NavKontor(UUID.randomUUID(), expectedNyEnhet, expectedNyttKontorNavn)
+		val expectedNyttEnhetNavn = "Nytt nav enhet navn"
+		val navEnhet = NavEnhet(UUID.randomUUID(), expectedNyEnhet, expectedNyttEnhetNavn)
 
 		val bruker = BrukerInsertDbo(
 			fodselsnummer = fnr,
@@ -65,14 +65,14 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 			telefonnummer = null,
 			epost = null,
 			ansvarligVeilederId = null,
-			navKontorId = null
+			navEnhetId = null
 		)
 
-		testDataRepository.insertNavKontor(InsertNavKontorCommand(navKontor.id, navKontor.enhetId, navKontor.navn))
+		testDataRepository.insertNavEnhet(InsertNavEnhetCommand(navEnhet.id, navEnhet.enhetId, navEnhet.navn))
 		brukerRepository.insert(bruker)
 
-		every { navKontorService.getNavKontor(expectedNyEnhet) }.returns(
-			navKontor
+		every { navEnhetService.getNavEnhet(expectedNyEnhet) }.returns(
+			navEnhet
 		)
 
 		endringPaaBrukerIngestorImpl.ingestKafkaRecord("""
@@ -83,9 +83,9 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 		""".trimIndent())
 
 		val insertedBruker = brukerRepository.get(fnr)
-		val navKontorId = insertedBruker?.navKontorId
+		val navEnhetId = insertedBruker?.navEnhetId
 		insertedBruker shouldNotBe null
-		navKontorId shouldNotBe null
+		navEnhetId shouldNotBe null
 
 	}
 }

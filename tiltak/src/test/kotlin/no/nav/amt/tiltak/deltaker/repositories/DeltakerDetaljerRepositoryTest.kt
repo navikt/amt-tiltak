@@ -14,7 +14,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_KONTOR_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -45,7 +45,7 @@ class DeltakerDetaljerRepositoryTest : FunSpec({
 		deltakerDetaljer.fodselsnummer shouldBe BRUKER_1.fodselsnummer
 		deltakerDetaljer.telefonnummer shouldBe BRUKER_1.telefonnummer
 		deltakerDetaljer.epost shouldBe BRUKER_1.epost
-		deltakerDetaljer.navKontorNavn shouldBe NAV_KONTOR_1.navn
+		deltakerDetaljer.navEnhetNavn shouldBe NAV_ENHET_1.navn
 		deltakerDetaljer.veilederNavn shouldBe NAV_ANSATT_1.navn
 		deltakerDetaljer.veilederTelefonnummer shouldBe NAV_ANSATT_1.telefonnummer
 		deltakerDetaljer.veilederEpost shouldBe NAV_ANSATT_1.epost

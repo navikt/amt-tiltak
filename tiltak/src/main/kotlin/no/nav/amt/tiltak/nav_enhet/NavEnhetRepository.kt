@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.nav_kontor
+package no.nav.amt.tiltak.nav_enhet
 
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.utils.getUUID
@@ -9,21 +9,21 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-open class NavKontorRepository(
+open class NavEnhetRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
 
 	private val rowMapper = RowMapper { rs, _ ->
-		NavKontorDbo(
+		NavEnhetDbo(
 			id = rs.getUUID("id"),
 			enhetId = rs.getString("enhet_id"),
 			navn = rs.getString("navn")
 		)
 	}
 
-	fun upsert(enhetId: String, navn: String): NavKontorDbo {
+	fun upsert(enhetId: String, navn: String): NavEnhetDbo {
 		val sql = """
-			INSERT INTO nav_kontor(id, enhet_id, navn)
+			INSERT INTO nav_enhet(id, enhet_id, navn)
 			VALUES (:id,
 					:enhetId,
 					:navn)
@@ -41,20 +41,20 @@ open class NavKontorRepository(
 		)
 
 		template.update(sql, parameters)
-		return hentEnhet(enhetId) ?: throw NoSuchElementException("Kontor med enhetId $enhetId eksisterer ikke.")
+		return hentEnhet(enhetId) ?: throw NoSuchElementException("Enhet med enhetId $enhetId eksisterer ikke.")
 	}
 
-	fun get(id: UUID): NavKontorDbo {
+	fun get(id: UUID): NavEnhetDbo {
 		return template.query(
-			"SELECT * FROM nav_kontor WHERE id = :id",
+			"SELECT * FROM nav_enhet WHERE id = :id",
 			MapSqlParameterSource().addValues(mapOf("id" to id)),
 			rowMapper
-		).firstOrNull() ?: throw NoSuchElementException("Kontor med id $id eksisterer ikke.")
+		).firstOrNull() ?: throw NoSuchElementException("Enhet med id $id eksisterer ikke.")
 	}
 
-	fun hentEnheter(enhetIder: List<String>): List<NavKontorDbo> {
+	fun hentEnheter(enhetIder: List<String>): List<NavEnhetDbo> {
 		val sql = """
-			SELECT * FROM nav_kontor WHERE enhet_id in(:enhetIder)
+			SELECT * FROM nav_enhet WHERE enhet_id in(:enhetIder)
 		""".trimIndent()
 
 		return template.query(
@@ -64,9 +64,9 @@ open class NavKontorRepository(
 		)
 	}
 
-	fun hentEnhet(enhetId: String): NavKontorDbo? {
+	fun hentEnhet(enhetId: String): NavEnhetDbo? {
 		val sql = """
-			SELECT * FROM nav_kontor WHERE enhet_id = :enhetId
+			SELECT * FROM nav_enhet WHERE enhet_id = :enhetId
 		""".trimIndent()
 
 		return template.query(
