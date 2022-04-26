@@ -59,8 +59,6 @@ spec:
   env:
     - name: AXSYS_SCOPE
       value: api://prod-fss.org.axsys/.default
-    - name: AXSYS_URL
-      value: https://axsys.intern.nav.no
     - name: PDL_SCOPE
       value: api://prod-fss.pdl.pdl-api/.default
     - name: PDL_URL
