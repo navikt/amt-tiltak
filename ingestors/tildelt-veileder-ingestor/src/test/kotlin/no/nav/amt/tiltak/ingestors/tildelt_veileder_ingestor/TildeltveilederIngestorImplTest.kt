@@ -4,8 +4,11 @@ import io.kotest.core.spec.style.StringSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.amt.tiltak.core.domain.veileder.Veileder
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
+import no.nav.amt.tiltak.core.port.BrukerService
+import no.nav.amt.tiltak.core.port.PersonService
+import no.nav.amt.tiltak.core.port.VeilederConnector
+import no.nav.amt.tiltak.core.port.VeilederService
 import java.util.*
 
 class TildeltveilederIngestorImplTest : StringSpec({
@@ -20,14 +23,14 @@ class TildeltveilederIngestorImplTest : StringSpec({
 
 		val brukerFnr = "123454364334"
 		val veilederId = UUID.randomUUID()
-		val veileder = Veileder("Z12345", "Test", null, null)
+		val navAnsatt = NavAnsatt(navIdent = "Z12345", navn = "Test")
 
 		every {
 			veilederConnector.hentVeileder("Z12345")
-		} returns veileder
+		} returns navAnsatt
 
 		every {
-			veilederService.upsertVeileder(veileder)
+			veilederService.upsertVeileder(navAnsatt)
 		} returns veilederId
 
 		every {

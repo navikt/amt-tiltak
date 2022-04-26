@@ -26,8 +26,8 @@
             <artifactId>types</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>token_provider</artifactId>
+            <groupId>no.nav.common</groupId>
+            <artifactId>token-client</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>

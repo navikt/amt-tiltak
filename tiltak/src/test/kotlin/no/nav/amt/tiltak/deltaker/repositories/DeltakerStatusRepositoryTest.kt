@@ -6,7 +6,7 @@ import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.*
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
-import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -24,7 +24,7 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 
 		repository = DeltakerStatusRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
 	test("upsert - 2 statuser knyttet til deltaker - begge hentes") {

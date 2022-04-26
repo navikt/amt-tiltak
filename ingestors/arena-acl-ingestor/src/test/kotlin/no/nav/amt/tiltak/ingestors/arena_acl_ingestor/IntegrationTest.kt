@@ -5,17 +5,21 @@ import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.amt.tiltak.arrangor.ArrangorRepository
+import no.nav.amt.tiltak.arrangor.ArrangorServiceImpl
 import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.clients.amt_enhetsregister.Virksomhet
+import no.nav.amt.tiltak.clients.veilarbarena.VeilarbarenaClient
 import no.nav.amt.tiltak.core.domain.tiltak.*
+import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
 import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
-import no.nav.amt.tiltak.deltaker.repositories.NavKontorRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.DeltakerProcessor
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.GjennomforingProcessor
+import no.nav.amt.tiltak.nav_kontor.NavKontorRepository
+import no.nav.amt.tiltak.nav_kontor.NavKontorServiceImpl
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
@@ -23,18 +27,18 @@ import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
 import no.nav.amt.tiltak.tiltak.services.GjennomforingServiceImpl
 import no.nav.amt.tiltak.tiltak.services.TiltakServiceImpl
-import org.junit.Ignore
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
-import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
 
-@Ignore
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IntegrationTest {
 	private lateinit var tiltakRepository: TiltakRepository
@@ -49,6 +53,7 @@ class IntegrationTest {
 
 	private lateinit var brukerRepository: BrukerRepository
 	private lateinit var navKontorRepository: NavKontorRepository
+	private lateinit var veilarbarenaClient: VeilarbarenaClient
 	private lateinit var navKontorService: NavKontorService
 
 	private lateinit var gjennomforingProcessor: GjennomforingProcessor;
@@ -70,23 +75,28 @@ class IntegrationTest {
 
 	@BeforeAll
 	fun beforeAll() {
+		val transactionTemplate = TransactionTemplate(DataSourceTransactionManager(datasource))
+
 		jdbcTemplate = NamedParameterJdbcTemplate(datasource)
 		tiltakRepository = TiltakRepository(jdbcTemplate)
-		tiltakService = TiltakServiceImpl(tiltakRepository)
 		gjennomforingRepository = GjennomforingRepository(jdbcTemplate)
-		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService)
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
-		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		navKontorRepository = NavKontorRepository(jdbcTemplate)
-		navKontorService = mockk()
-		personService = mockk()
-		brukerRepository = BrukerRepository(jdbcTemplate)
-		brukerService = BrukerServiceImpl(brukerRepository, navKontorRepository, navKontorService, personService, mockk())
-		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, TransactionTemplate(DataSourceTransactionManager(datasource)))
-		deltakerProcessor = DeltakerProcessor(gjennomforingService, deltakerService, personService)
-		enhetsregisterClient = mockk()
+		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		arrangorRepository = ArrangorRepository(jdbcTemplate)
-		arrangorService = no.nav.amt.tiltak.arrangor.ArrangorService(mockk(), enhetsregisterClient, arrangorRepository)
+		brukerRepository = BrukerRepository(jdbcTemplate)
+
+		veilarbarenaClient = mockk()
+		personService = mockk()
+		enhetsregisterClient = mockk()
+
+		navKontorService = NavKontorServiceImpl(navKontorRepository, veilarbarenaClient)
+		tiltakService = TiltakServiceImpl(tiltakRepository)
+		brukerService = BrukerServiceImpl(brukerRepository, personService, mockk(), navKontorService)
+		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, transactionTemplate)
+		arrangorService = ArrangorServiceImpl(enhetsregisterClient, arrangorRepository)
+		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, arrangorService, transactionTemplate)
+		deltakerProcessor = DeltakerProcessor(gjennomforingService, deltakerService, personService)
 
 		gjennomforingProcessor = GjennomforingProcessor(arrangorService, gjennomforingService, tiltakService)
 		ingestor = ArenaAclIngestorImpl(deltakerProcessor, gjennomforingProcessor)
@@ -94,7 +104,7 @@ class IntegrationTest {
 		every { enhetsregisterClient.hentVirksomhet(virksomhetsnr) } returns virksomhet
 
 		every { personService.hentPersonKontaktinformasjon(personIdent) } returns Kontaktinformasjon("epost", "telefon" )
-		every { navKontorService.hentNavKontorForBruker(personIdent) } returns null
+		every { veilarbarenaClient.hentBrukerOppfolgingsenhetId(personIdent) } returns null
 		every { personService.hentTildeltVeileder(personIdent) } returns null
 		every { personService.hentPerson(personIdent) } returns person
 	}
@@ -102,7 +112,7 @@ class IntegrationTest {
 	@Test
 	fun `ingestKafkaMessageValue() - Skal ingeste gyldig gjennomføring`() {
 
-		ingestor.ingestKafkaMessageValue(gjennomforingJson)
+		ingestor.ingestKafkaRecord(gjennomforingJson)
 
 		val inserted = gjennomforingRepository.get(toInsertGjennomforing.id)
 
@@ -115,8 +125,8 @@ class IntegrationTest {
 	@Test
 	fun `ingestKafkaMessageValue() - Skal ingeste gyldig deltaker`() {
 
-		ingestor.ingestKafkaMessageValue(gjennomforingJson)
-		ingestor.ingestKafkaMessageValue(deltakerJson)
+		ingestor.ingestKafkaRecord(gjennomforingJson)
+		ingestor.ingestKafkaRecord(deltakerJson)
 
 		val inserted = deltakerService.hentDeltaker(deltakerToInsert.id)
 
@@ -135,9 +145,9 @@ class IntegrationTest {
 
 	@Test
 	fun `ingestKafkaMessageValue() - Skal ingeste gyldig deltaker oppdatering`() {
-		ingestor.ingestKafkaMessageValue(gjennomforingJson)
-		ingestor.ingestKafkaMessageValue(deltakerJson)
-		ingestor.ingestKafkaMessageValue(deltakerOppdatertJson)
+		ingestor.ingestKafkaRecord(gjennomforingJson)
+		ingestor.ingestKafkaRecord(deltakerJson)
+		ingestor.ingestKafkaRecord(deltakerOppdatertJson)
 
 		val inserted = deltakerService.hentDeltaker(deltakerOppdatert.id)
 
@@ -165,6 +175,7 @@ class IntegrationTest {
 		sluttDato =  LocalDate.now().minusDays(1),
 		registrertDato =  now.minusDays(5),
 		fremmoteDato =  null,
+		navKontorId = null,
 		createdAt =  now,
 		modifiedAt =  now
 	)
@@ -173,7 +184,7 @@ class IntegrationTest {
 			{
 			  "transactionId": "b3b46fc2-ad90-4dbb-abfb-2b767318258b",
 			  "type": "GJENNOMFORING",
-			  "timestamp": "${now}",
+			  "timestamp": "$now",
 			  "operation": "CREATED",
 			  "payload": {
 			    "id": "${toInsertGjennomforing.id}",
@@ -201,7 +212,7 @@ class IntegrationTest {
 
 	val person = Person(
 		fornavn = "Fornavn",
-		mellomnavn = "",
+		mellomnavn = null,
 		etternavn = "Etternavn",
 		telefonnummer = "12345678",
 		diskresjonskode = null
@@ -213,7 +224,8 @@ class IntegrationTest {
 			id = UUID.randomUUID(),
 			fornavn = person.fornavn,
 			etternavn = person.etternavn,
-			fodselsnummer = personIdent
+			fodselsnummer = personIdent,
+			navKontor = null
 		),
 		startDato = null,
 		sluttDato = null,
@@ -227,6 +239,7 @@ class IntegrationTest {
 		registrertDato = now,
 		dagerPerUke = 5,
 		prosentStilling = 100F,
+		gjennomforingId = gjennomforingId
 	)
 
 	val deltakerOppdatert = Deltaker(
@@ -238,6 +251,7 @@ class IntegrationTest {
 		registrertDato = now,
 		dagerPerUke = 3,
 		prosentStilling = 50F,
+		gjennomforingId = gjennomforingId
 	)
 
 	val deltakerOppdatertJson = """

@@ -8,4 +8,8 @@ interface ArrangorAnsattTilgangService {
 
 	fun verifiserTilgangTilArrangor(ansattPersonligIdent: String, arrangorId: UUID)
 
+	fun hentGjennomforingIder(ansattPersonligIdent: String): List<UUID>
+
+	fun hentAnsattId(ansattPersonligIdent: String): UUID
+
 }

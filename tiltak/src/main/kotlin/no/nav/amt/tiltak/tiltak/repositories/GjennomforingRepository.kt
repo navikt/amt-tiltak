@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.tiltak.repositories
 
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
+import no.nav.amt.tiltak.utils.getNullableUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -24,6 +25,7 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
 			registrertDato = rs.getTimestamp("registrert_dato").toLocalDateTime(),
 			fremmoteDato = rs.getTimestamp("fremmote_dato")?.toLocalDateTime(),
+			navKontorId = rs.getNullableUUID("nav_kontor_id"),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
 		)
@@ -77,7 +79,6 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 	}
 
 	fun update(gjennomforing: GjennomforingDbo): GjennomforingDbo {
-
 		//language=PostgreSQL
 		val sql = """
 			UPDATE gjennomforing
@@ -112,39 +113,33 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 
 
 	fun get(id: UUID): GjennomforingDbo? {
+		val sql = "SELECT * FROM gjennomforing WHERE id = :id"
 
-		//language=PostgreSQL
-		val sql = """
-			SELECT *
-			FROM gjennomforing
-			WHERE id = :id
-		""".trimIndent()
-
-		val parameters = MapSqlParameterSource().addValues(
-			mapOf(
-				"id" to id
-			)
-		)
+		val parameters = MapSqlParameterSource().addValues(mapOf("id" to id))
 
 		return template.query(sql, parameters, rowMapper).firstOrNull()
 	}
 
-	fun getByArrandorId(arrangorId: UUID): List<GjennomforingDbo> {
+	fun get(gjennomforingIder: List<UUID>): List<GjennomforingDbo> {
+		if (gjennomforingIder.isEmpty()) return emptyList()
 
-		//language=PostgreSQL
-		val sql = """
-			SELECT *
-			FROM gjennomforing
-			WHERE arrangor_id = :arrangorId
-		""".trimIndent()
+		val sql = "SELECT * FROM gjennomforing WHERE id in(:ids)"
+
+		val parameters = MapSqlParameterSource().addValues(mapOf("ids" to gjennomforingIder))
+
+		return template.query(sql, parameters, rowMapper)
+	}
+
+	fun delete(gjennomforingId: UUID) {
+		val sql = "DELETE FROM gjennomforing WHERE id = :gjennomforingId"
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"arrangorId" to arrangorId
+				"gjennomforingId" to gjennomforingId
 			)
 		)
 
-		return template.query(sql, parameters, rowMapper)
+		template.update(sql, parameters)
 	}
 
 }

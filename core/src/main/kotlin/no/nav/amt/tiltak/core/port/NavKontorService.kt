@@ -1,12 +1,19 @@
 package no.nav.amt.tiltak.core.port
 
+import no.nav.amt.tiltak.core.domain.tiltak.NavKontor
+import java.util.*
+
 interface NavKontorService {
 
-	fun hentNavKontorForBruker(fnr: String): NavKontor?
+	fun hentNavKontorer(enhetIder: List<String>): List<NavKontor>
+
+	fun upsertNavKontor(enhetId: String, navn: String)
+
+	fun getNavKontorForBruker(fodselsnummer: String): NavKontor?
+
+	fun getNavKontor(enhetId: String): NavKontor
+
+	fun getNavKontor(id: UUID): NavKontor
 
 }
 
-data class NavKontor(
-	val enhetId: String,
-	val navn: String,
-)

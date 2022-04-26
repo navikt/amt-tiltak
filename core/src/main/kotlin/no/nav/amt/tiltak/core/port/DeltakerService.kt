@@ -7,11 +7,10 @@ interface DeltakerService {
 
 	fun upsertDeltaker(
 		fodselsnummer: String,
-		gjennomforingId: UUID,
 		deltaker: Deltaker,
 	)
 
-	fun hentDeltakerePaaGjennomforing(id: UUID): List<Deltaker>
+	fun hentDeltakerePaaGjennomforing(gjennomforingId: UUID): List<Deltaker>
 
 	fun hentDeltaker(deltakerId: UUID): Deltaker
 

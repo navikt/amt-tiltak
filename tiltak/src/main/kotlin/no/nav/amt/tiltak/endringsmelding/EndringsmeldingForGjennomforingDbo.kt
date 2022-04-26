@@ -1,0 +1,64 @@
+package no.nav.amt.tiltak.endringsmelding
+
+import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
+import no.nav.amt.tiltak.core.domain.tiltak.Bruker
+import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.core.domain.tiltak.NavKontor
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.*
+
+data class EndringsmeldingForGjennomforingDbo (
+	val id: UUID,
+	val deltakerId: UUID,
+
+	val brukerId: UUID,
+	val brukerFornavn: String,
+	val brukerEtternavn: String,
+	val brukerMellomnavn: String?,
+	val brukerFnr: String,
+
+	val navkontorId: UUID?,
+	val navKontorEnhetId: String?,
+	val navKontorNavn: String?,
+
+	val opprettetAvId: UUID,
+	val opprettetAvPersonligIdent: String,
+	val opprettetAvFornavn: String,
+	val opprettetAvMellomnavn: String?,
+	val opprettetAvEtternavn: String,
+
+	val startDato: LocalDate?,
+	val godkjentAvNavAnsatt: UUID?,
+	val aktiv: Boolean, // false hvis man sletter eller kommer en ny endring
+	val createdAt: LocalDateTime,
+	val modifiedAt: LocalDateTime
+) {
+	fun toEndringsmelding() = Endringsmelding (
+		id = id,
+		bruker = Bruker (
+			id = brukerId,
+			fornavn = brukerFornavn,
+			mellomnavn = brukerMellomnavn,
+			etternavn = brukerEtternavn,
+			fodselsnummer = brukerFnr,
+			navKontor = if (navkontorId == null) null else NavKontor(
+				id = navkontorId,
+				enhetId = navKontorEnhetId!!,
+				navn = navKontorNavn!!
+			)
+		),
+		startDato = startDato,
+		aktiv = aktiv,
+		godkjent = godkjentAvNavAnsatt != null,
+		arkivert = !aktiv || godkjentAvNavAnsatt != null,
+		opprettetAvArrangorAnsatt = Ansatt(
+			id = opprettetAvId,
+			personligIdent = opprettetAvPersonligIdent,
+			fornavn = opprettetAvFornavn,
+			etternavn = opprettetAvEtternavn,
+			arrangorer = emptyList()
+		),
+		opprettetDato = createdAt
+	)
+}

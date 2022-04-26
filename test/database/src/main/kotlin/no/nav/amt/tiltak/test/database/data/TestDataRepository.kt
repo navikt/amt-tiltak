@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.test.database.data
 
-import no.nav.amt.tiltak.test.database.DatabaseTestUtils.parameters
+import no.nav.amt.tiltak.test.database.DbTestDataUtils.parameters
 import no.nav.amt.tiltak.test.database.data.commands.*
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -20,6 +20,21 @@ class TestDataRepository(
 				"personlig_ident" to cmd.personlig_ident,
 				"fornavn" to cmd.fornavn,
 				"etternavn" to cmd.etternavn
+			)
+		)
+	}
+
+	fun insertArrangorAnsattGjennomforingTilgang(cmd: InsertArrangorAnsattGjennomforingTilgang) {
+		val sql = """
+			INSERT INTO arrangor_ansatt_gjennomforing_tilgang(id, ansatt_id, gjennomforing_id)
+			VALUES(:id, :ansatt_id, :gjennomforing_id)
+		""".trimIndent()
+
+		template.update(
+			sql, parameters(
+				"id" to cmd.id,
+				"ansatt_id" to cmd.ansatt_id,
+				"gjennomforing_id" to cmd.gjennomforing_id,
 			)
 		)
 	}
@@ -115,8 +130,8 @@ class TestDataRepository(
 
 	fun insertGjennomforing(cmd: InsertGjennomforingCommand) {
 		val sql = """
-			INSERT INTO gjennomforing (id, tiltak_id, arrangor_id, navn, status, start_dato, slutt_dato, registrert_dato, fremmote_dato)
-			VALUES (:id, :tiltak_id, :arrangor_id, :navn, :status, :start_dato, :slutt_dato, :registrert_dato, :fremmote_dato)
+			INSERT INTO gjennomforing (id, tiltak_id, arrangor_id, navn, status, start_dato, slutt_dato, registrert_dato, fremmote_dato, nav_kontor_id)
+			VALUES (:id, :tiltak_id, :arrangor_id, :navn, :status, :start_dato, :slutt_dato, :registrert_dato, :fremmote_dato, :nav_kontor_id)
 		""".trimIndent()
 
 		template.update(
@@ -129,7 +144,8 @@ class TestDataRepository(
 				"start_dato" to cmd.start_dato,
 				"slutt_dato" to cmd.slutt_dato,
 				"registrert_dato" to cmd.registrert_dato,
-				"fremmote_dato" to cmd.fremmote_dato
+				"fremmote_dato" to cmd.fremmote_dato,
+				"nav_kontor_id" to cmd.nav_kontor_id
 			)
 		)
 	}
@@ -171,7 +187,6 @@ class TestDataRepository(
 		val sql = """
 			INSERT INTO tiltak(id, navn, type)
 			VALUES (:id, :navn, :type)
-
 		""".trimIndent()
 
 		template.update(
@@ -182,5 +197,57 @@ class TestDataRepository(
 			)
 		)
 	}
+
+	fun insertTilgangForesporsel(cmd: InsertTilgangForesporselCommand) {
+		val sql = """
+			INSERT INTO gjennomforing_tilgang_foresporsel(
+				id, personlig_ident, fornavn, mellomnavn, etternavn, gjennomforing_id,
+				beslutning_av_nav_ansatt_id, tidspunkt_beslutning, beslutning, gjennomforing_tilgang_id
+			)
+			VALUES (
+				:id, :personligIdent, :fornavn, :mellomnavn, :etternavn, :gjennomforingId,
+				:beslutningAvNavAnsattId, :tidspunktBeslutning, :beslutning, :gjennomforingTilgangId
+			)
+		""".trimIndent()
+
+		template.update(
+			sql, parameters(
+				"id" to cmd.id,
+				"personligIdent" to cmd.personligIdent,
+				"fornavn" to cmd.fornavn,
+				"mellomnavn" to cmd.mellomnavn,
+				"etternavn" to cmd.etternavn,
+				"gjennomforingId" to cmd.gjennomforingId,
+				"beslutningAvNavAnsattId" to cmd.beslutningAvNavAnsattId,
+				"tidspunktBeslutning" to cmd.tidspunktBeslutning?.toOffsetDateTime(),
+				"beslutning" to cmd.beslutning,
+				"gjennomforingTilgangId" to cmd.gjennomforingTilgangId
+			)
+		)
+	}
+
+	fun insertTilgangInvitasjon(cmd: InsertTilgangInvitasjonCommand) {
+		val sql = """
+			INSERT INTO gjennomforing_tilgang_invitasjon(
+				id, gjennomforing_id, gyldig_til, opprettet_av_nav_ansatt_id, er_brukt, tidspunkt_brukt, tilgang_foresporsel_id
+			)
+			VALUES (
+				:id, :gjennomforingId, :gyldigTil, :opprettetAvNavAnsattId, :erBrukt, :tidspunktBrukt, :tilgangForesporselId
+			)
+		""".trimIndent()
+
+		template.update(
+			sql, parameters(
+				"id" to cmd.id,
+				"gjennomforingId" to cmd.gjennomforingId,
+				"gyldigTil" to cmd.gyldigTil.toOffsetDateTime(),
+				"opprettetAvNavAnsattId" to cmd.opprettetAvNavAnsattId,
+				"erBrukt" to cmd.erBrukt,
+				"tidspunktBrukt" to cmd.tidspunktBrukt?.toOffsetDateTime(),
+				"tilgangForesporselId" to cmd.tilgangForesporselId,
+			)
+		)
+	}
+
 
 }

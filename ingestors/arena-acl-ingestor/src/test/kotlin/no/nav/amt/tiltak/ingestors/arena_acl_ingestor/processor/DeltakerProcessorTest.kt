@@ -50,7 +50,7 @@ class DeltakerProcessorTest : StringSpec({
 		))
 
 		verify(exactly = 0) {
-			deltakerService.upsertDeltaker(any(), any(), any())
+			deltakerService.upsertDeltaker(any(), any())
 		}
 	}
 

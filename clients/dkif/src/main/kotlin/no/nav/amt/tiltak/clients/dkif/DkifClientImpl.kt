@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.clients.dkif
 
-import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.common.rest.client.RestClient.baseClient
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -29,7 +29,7 @@ class DkifClientImpl(
 
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
 
-			val responseDto = fromJson(body, KontaktinformasjonDto::class.java)
+			val responseDto = fromJsonString<KontaktinformasjonDto>(body)
 
 			return Kontaktinformasjon(
 				epost = responseDto.epostadresse,

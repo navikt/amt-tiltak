@@ -7,6 +7,18 @@ import java.util.*
 
 object TestData {
 
+	val NAV_KONTOR_1 = InsertNavKontorCommand(
+		id = UUID.fromString("09405517-99c0-49e5-9eb3-31c61b9579cf"),
+		enhet_id = "1234",
+		navn = "NAV Testheim"
+	)
+
+	val NAV_KONTOR_2 = InsertNavKontorCommand(
+		id = UUID.fromString("a1247bfb-255f-411d-b3ae-6d6d29a4fa58"),
+		enhet_id = "5678",
+		navn = "NAV Test"
+	)
+
 	val ARRANGOR_1 = InsertArrangorCommand(
 		id = UUID.fromString("8a37bce6-3bc1-11ec-8d3d-0242ac130003"),
 		overordnet_enhet_organisasjonsnummer = "911111111",
@@ -53,7 +65,6 @@ object TestData {
 		rolle = "VEILEDER"
 	)
 
-
 	val ARRANGOR_ANSATT_2 = InsertArrangorAnsattCommand(
 		id = UUID.fromString("a24e659c-2651-4fbb-baad-01cacb2412f0"),
 		personlig_ident = "326749823",
@@ -83,8 +94,28 @@ object TestData {
 		status = "GJENNOMFORES",
 		start_dato = LocalDate.of(2022, 2, 1),
 		slutt_dato = LocalDate.of(2050, 12, 30),
+		nav_kontor_id = NAV_KONTOR_1.id,
 		registrert_dato = LocalDate.of(2022, 1, 1),
 		fremmote_dato = LocalDate.of(2022, 2, 1)
+	)
+
+	val GJENNOMFORING_2 = InsertGjennomforingCommand(
+		id = UUID.fromString("513219ca-481b-4aae-9d51-435dba9929cd"),
+		tiltak_id = TILTAK_1.id,
+		arrangor_id = ARRANGOR_2.id,
+		navn = "Tiltaksgjennomforing2",
+		status = "AVSLUTTET",
+		start_dato = LocalDate.of(2022, 2, 1),
+		slutt_dato = LocalDate.of(2022, 2, 13),
+		nav_kontor_id = NAV_KONTOR_2.id,
+		registrert_dato = LocalDate.of(2022, 1, 1),
+		fremmote_dato = LocalDate.of(2022, 2, 1)
+	)
+
+	val GJENNOMFORING_TILGANG_1 = InsertArrangorAnsattGjennomforingTilgang(
+		id = UUID.randomUUID(),
+		ansatt_id = ARRANGOR_ANSATT_1.id,
+		gjennomforing_id = GJENNOMFORING_1.id
 	)
 
 	val NAV_ANSATT_1 = InsertNavAnsattCommand(
@@ -101,12 +132,6 @@ object TestData {
 		navn = "Ola Nordmann",
 		telefonnummer = "99887654",
 		epost = "ola.nordmann@nav.no"
-	)
-
-	val NAV_KONTOR_1 = InsertNavKontorCommand(
-		id = UUID.fromString("09405517-99c0-49e5-9eb3-31c61b9579cf"),
-		enhet_id = "1234",
-		navn = "NAV Testheim"
 	)
 
 

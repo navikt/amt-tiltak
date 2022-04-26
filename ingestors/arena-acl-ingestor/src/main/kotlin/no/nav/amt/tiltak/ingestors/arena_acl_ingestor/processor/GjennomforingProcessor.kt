@@ -6,6 +6,7 @@ import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.GjennomforingPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
@@ -14,6 +15,8 @@ class GjennomforingProcessor(
 	private val gjennomforingService: GjennomforingService,
 	private val tiltakService: TiltakService,
 ) : GenericProcessor<GjennomforingPayload>() {
+
+	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun processInsertMessage(message: MessageWrapper<GjennomforingPayload>) {
 		upsert(message)
@@ -25,23 +28,27 @@ class GjennomforingProcessor(
 
 	private fun upsert(message: MessageWrapper<GjennomforingPayload>) {
 		val gjennomforing = message.payload
-		val tiltak = gjennomforing.tiltak
+		val tiltakPayload = gjennomforing.tiltak
 
 		val arrangor = arrangorService.upsertArrangor(gjennomforing.virksomhetsnummer)
+		val tiltak = tiltakService.upsertTiltak(tiltakPayload.id, tiltakPayload.navn, tiltakPayload.kode)
 
-		tiltakService.upsertTiltak(tiltak.id, tiltak.navn, tiltak.kode)
-
-		gjennomforingService.upsertGjennomforing(
-			id = gjennomforing.id,
-			tiltakId = gjennomforing.tiltak.id,
-			arrangorId = arrangor.id,
-			navn = gjennomforing.navn,
-			status = mapGjennomforingStatus(gjennomforing.status),
-			startDato = gjennomforing.startDato,
-			sluttDato = gjennomforing.sluttDato,
-			registrertDato = gjennomforing.registrertDato,
-			fremmoteDato = gjennomforing.fremmoteDato
+		gjennomforingService.upsert(
+			Gjennomforing(
+				id = gjennomforing.id,
+				tiltak = tiltak,
+				arrangor = arrangor,
+				navn = gjennomforing.navn,
+				status = mapGjennomforingStatus(gjennomforing.status),
+				startDato = gjennomforing.startDato,
+				sluttDato = gjennomforing.sluttDato,
+				registrertDato = gjennomforing.registrertDato,
+				fremmoteDato = gjennomforing.fremmoteDato,
+				navKontorId = null // Dette blir implementert i en annen PR
+			)
 		)
+
+		log.info("Fullført upsert av gjennomføring id=${gjennomforing.id} arrangorId=${arrangor.id}")
 	}
 
 	private fun mapGjennomforingStatus(status: GjennomforingPayload.Status): Gjennomforing.Status {
@@ -53,7 +60,11 @@ class GjennomforingProcessor(
 	}
 
 	override fun processDeleteMessage(message: MessageWrapper<GjennomforingPayload>) {
-		throw NotImplementedError("Håntering av delete-meldinger for tiltakgjennomføring er ikke implementert")
+		val gjennomforingId = message.payload.id
+
+		log.info("Motatt delete-melding, sletter gjennomføring med id=$gjennomforingId")
+
+		gjennomforingService.slettGjennomforing(gjennomforingId)
 	}
 
 }

@@ -2,16 +2,22 @@ package no.nav.amt.tiltak.tiltak.repositories
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.test.database.DatabaseTestUtils
+import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.DbUtils.isEqualTo
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
+import no.nav.amt.tiltak.test.database.data.TestDataRepository
+import no.nav.amt.tiltak.test.database.data.commands.InsertGjennomforingCommand
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -19,24 +25,22 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-internal class GjennomforingRepositoryTest {
+internal class GjennomforingRepositoryTest : FunSpec({
 
-	private val dataSource = SingletonPostgresContainer.getDataSource()
+	val dataSource = SingletonPostgresContainer.getDataSource()
 
 	lateinit var repository: GjennomforingRepository
 
-	@BeforeEach
-	fun migrate() {
+	beforeEach {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 		rootLogger.level = Level.WARN
 
 		repository = GjennomforingRepository(NamedParameterJdbcTemplate(dataSource))
 
-		DatabaseTestUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
-	@Test
-	internal fun `insert() should insert gjennomforing and return object`() {
+	test("insert() should insert gjennomforing and return object") {
 		val id = UUID.randomUUID()
 		val navn = "TEST Tiltaksgjennomforing"
 		val status = Gjennomforing.Status.IKKE_STARTET
@@ -71,8 +75,7 @@ internal class GjennomforingRepositoryTest {
 		assertTrue(fremmoteDato.isEqualTo(savedGjennomforing.fremmoteDato!!))
 	}
 
-	@Test
-	internal fun `update() should throw if gjennomforing does not exist`() {
+	test("update() should throw if gjennomforing does not exist") {
 		assertThrows<NoSuchElementException> {
 			repository.update(
 				GjennomforingDbo(
@@ -85,6 +88,7 @@ internal class GjennomforingRepositoryTest {
 					sluttDato = null,
 					registrertDato = LocalDateTime.now(),
 					fremmoteDato = null,
+					navKontorId = null,
 					createdAt = LocalDateTime.now(),
 					modifiedAt = LocalDateTime.now()
 				)
@@ -92,8 +96,7 @@ internal class GjennomforingRepositoryTest {
 		}
 	}
 
-	@Test
-	internal fun `update() should return updated object`() {
+	test("update() should return updated object") {
 		val updatedNavn = "UpdatedNavn"
 		val updatedStatus = Gjennomforing.Status.GJENNOMFORES
 		val updatedStartDato = LocalDate.now().plusDays(4)
@@ -110,6 +113,7 @@ internal class GjennomforingRepositoryTest {
 				startDato = updatedStartDato,
 				sluttDato = updatedSluttDato,
 				fremmoteDato = updatedFremmotedato,
+				navKontorId = null,
 				createdAt = LocalDateTime.now(),
 				modifiedAt = LocalDateTime.now(),
 				registrertDato = LocalDateTime.now()
@@ -123,32 +127,45 @@ internal class GjennomforingRepositoryTest {
 		assertTrue(updatedFremmotedato.isEqualTo(updatedGjennomforing.fremmoteDato))
 	}
 
-}
+	test("delete should delete gjennomføring") {
+		val id = UUID.randomUUID()
 
+		val gjennomforing = InsertGjennomforingCommand(
+			id = id,
+			tiltak_id = TILTAK_1.id,
+			arrangor_id = ARRANGOR_1.id,
+			navn = "Tiltaksgjennomforing",
+			status = "GJENNOMFORES",
+			start_dato = LocalDate.of(2022, 2, 1),
+			slutt_dato = LocalDate.of(2050, 12, 30),
+			registrert_dato = LocalDate.of(2022, 1, 1),
+			fremmote_dato = LocalDate.of(2022, 2, 1),
+			nav_kontor_id = null,
+		)
 
-/**
- * A helping function as SQL Timestamp and LocalDateTime does not have the same precision
- */
-fun LocalDateTime.isEqualTo(other: LocalDateTime?): Boolean {
-	if (other == null) {
-		return false
+		TestDataRepository(NamedParameterJdbcTemplate(dataSource))
+			.insertGjennomforing(gjennomforing)
+
+		repository.get(id) shouldNotBe null
+
+		repository.delete(id)
+
+		repository.get(id) shouldBe null
 	}
 
-	return this.year == other.year
-		&& this.month == other.month
-		&& this.dayOfMonth == other.dayOfMonth
-		&& this.hour == other.hour
-		&& this.minute == other.minute
-		&& this.second == other.second
+	test("get - skal hente flere gjennomføringer") {
+		val gjennomforinger = repository.get(listOf(GJENNOMFORING_1.id, GJENNOMFORING_2.id))
 
-}
-
-fun LocalDate.isEqualTo(other: LocalDate?): Boolean {
-	if (other == null) {
-		return false
+		gjennomforinger shouldHaveSize 2
+		gjennomforinger.find { it.id == GJENNOMFORING_1.id } shouldNotBe null
+		gjennomforinger.find { it.id == GJENNOMFORING_2.id } shouldNotBe null
 	}
 
-	return this.year == other.year
-		&& this.month == other.month
-		&& this.dayOfMonth == other.dayOfMonth
-}
+	test("get - skal returnere tom liste hvis ingen gjennomføringer sendes inn") {
+		val gjennomforinger = repository.get(emptyList())
+
+		gjennomforinger shouldHaveSize 0
+	}
+
+})
+

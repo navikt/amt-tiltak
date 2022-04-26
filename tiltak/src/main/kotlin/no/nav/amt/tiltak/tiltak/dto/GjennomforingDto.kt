@@ -10,7 +10,8 @@ data class GjennomforingDto(
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val status: Gjennomforing.Status?,
-	val tiltak: TiltakDto
+	val tiltak: TiltakDto,
+	val arrangor: ArrangorDto
 )
 
 fun Gjennomforing.toDto() = GjennomforingDto(
@@ -19,5 +20,6 @@ fun Gjennomforing.toDto() = GjennomforingDto(
 	startDato = this.startDato,
 	sluttDato = this.sluttDato,
 	status = this.status,
-	tiltak = this.tiltak.toDto()
+	tiltak = this.tiltak.toDto(),
+	arrangor = this.arrangor.toDto()
 )

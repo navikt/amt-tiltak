@@ -17,6 +17,7 @@ private const val arrangorer = "amt.tiltak.antall.arrangorer"
 private const val arrangorerMedBrukere = "amt.tiltak.antall.arrangorer.med.brukere"
 private const val gjennomforinger = "amt.tiltak.antall.gjennomforinger"
 private const val gjennomforingerPrStatus = "amt.tiltak.antall.gjennomforinger.pr.status"
+private const val eksponerteBrukere = "amt.tiltak.antall.brukere.eksponerte"
 
 @Component
 class DeltakerStatistikkUpdater(
@@ -26,6 +27,7 @@ class DeltakerStatistikkUpdater(
 
 	private val simpleGauges: Map<String, AtomicInteger> = mapOf(
 		Pair(deltakere, registry.gauge(deltakere, AtomicInteger(0))!!),
+		Pair(eksponerteBrukere, registry.gauge(eksponerteBrukere, AtomicInteger(0))!!),
 		Pair(arrangorer, registry.gauge(arrangorer, AtomicInteger(0))!!),
 		Pair(arrangorerMedBrukere, registry.gauge(arrangorerMedBrukere, AtomicInteger(0))!!),
 		Pair(gjennomforinger, registry.gauge(gjennomforinger, AtomicInteger(0))!!),
@@ -52,5 +54,6 @@ class DeltakerStatistikkUpdater(
 		deltakerStatistikkRepository.antallGjennomforingerPrStatus().forEach {
 			gjennomforingStatusGauges.getValue(it.first).set(it.second)
 		}
+		simpleGauges.getValue(eksponerteBrukere).set(deltakerStatistikkRepository.eksponerteBrukere()!!)
 	}
 }

@@ -20,15 +20,13 @@ open class DeltakerServiceImpl(
 	private val transactionTemplate: TransactionTemplate
 ) : DeltakerService {
 
-	companion object {
-		private val log = LoggerFactory.getLogger(DeltakerService::class.java)
-	}
+	private val log = LoggerFactory.getLogger(DeltakerService::class.java)
 
-	override fun upsertDeltaker(fodselsnummer: String, gjennomforingId: UUID, deltaker: Deltaker) {
+	override fun upsertDeltaker(fodselsnummer: String, deltaker: Deltaker) {
 		val lagretDeltakerDbo = deltakerRepository.get(deltaker.id)
 
 		if (lagretDeltakerDbo == null) {
-			createDeltaker(fodselsnummer, gjennomforingId, deltaker)
+			createDeltaker(fodselsnummer, deltaker.gjennomforingId, deltaker)
 		} else {
 			val lagretDeltaker = lagretDeltakerDbo.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker)
 			val oppdatertDeltaker = lagretDeltaker.oppdater(deltaker)
@@ -66,8 +64,8 @@ open class DeltakerServiceImpl(
 		return dbo
 	}
 
-	override fun hentDeltakerePaaGjennomforing(id: UUID): List<Deltaker> {
-		return deltakerRepository.getDeltakerePaaTiltak(id)
+	override fun hentDeltakerePaaGjennomforing(gjennomforingId: UUID): List<Deltaker> {
+		return deltakerRepository.getDeltakerePaaTiltak(gjennomforingId)
 			.map { it.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker) }
 	}
 
@@ -86,6 +84,8 @@ open class DeltakerServiceImpl(
 			deltakerStatusRepository.slettDeltakerStatus(deltakerId)
 			deltakerRepository.slettDeltaker(deltakerId)
 		}
+
+		log.info("Deltaker med id=$deltakerId er slettet")
 	}
 
 	private fun progressStatuser(kandidatProvider: () -> List<DeltakerDbo>) = kandidatProvider()

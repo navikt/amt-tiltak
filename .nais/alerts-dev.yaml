@@ -8,8 +8,8 @@ metadata:
 spec:
   receivers:
     slack:
-      channel: 'team_komet_alerts'
-      prependText: '<!here> | '
+      channel: 'team_komet_dev_alerts'
+      prependText: ' | '
   alerts:
     - alert: applikasjon nede
       expr: kube_deployment_status_replicas_available{deployment="amt-tiltak"} == 0

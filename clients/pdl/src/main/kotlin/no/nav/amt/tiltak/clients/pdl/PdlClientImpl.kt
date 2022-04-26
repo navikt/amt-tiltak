@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.clients.pdl
 
-import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
-import no.nav.amt.tiltak.common.json.JsonUtils.toJson
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
+import no.nav.amt.tiltak.common.json.JsonUtils.toJsonString
 import no.nav.amt.tiltak.tools.graphql.Graphql
 import no.nav.common.rest.client.RestClient.baseClient
 import okhttp3.MediaType.Companion.toMediaType
@@ -11,15 +11,15 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.function.Supplier
 
 class PdlClientImpl(
-	private val tokenProvider: Supplier<String>,
 	private val pdlUrl: String,
+	private val tokenProvider: Supplier<String>,
 	private val httpClient: OkHttpClient = baseClient(),
 ) : PdlClient {
 
 	private val mediaTypeJson = "application/json".toMediaType()
 
 	override fun hentBruker(brukerFnr: String): PdlBruker {
-		val requestBody = toJson(
+		val requestBody = toJsonString(
 			Graphql.GraphqlQuery(
 				PdlQueries.HentBruker.query,
 				PdlQueries.HentBruker.Variables(brukerFnr)
@@ -35,7 +35,7 @@ class PdlClientImpl(
 
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing from PDL request")
 
-			val gqlResponse = fromJson(body, PdlQueries.HentBruker.Response::class.java)
+			val gqlResponse = fromJsonString<PdlQueries.HentBruker.Response>(body)
 
 			throwPdlApiErrors(gqlResponse) // respons kan inneholde feil selv om den ikke er tom ref: https://pdldocs-navno.msappproxy.net/ekstern/index.html#appendix-graphql-feilhandtering
 
@@ -48,7 +48,7 @@ class PdlClientImpl(
 	}
 
 	override fun hentGjeldendePersonligIdent(ident: String): String {
-		val requestBody = toJson(
+		val requestBody = toJsonString(
 			Graphql.GraphqlQuery(
 				PdlQueries.HentGjeldendeIdent.query,
 				PdlQueries.HentGjeldendeIdent.Variables(ident)
@@ -64,7 +64,7 @@ class PdlClientImpl(
 
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing from PDL request")
 
-			val gqlResponse = fromJson(body, PdlQueries.HentGjeldendeIdent.Response::class.java)
+			val gqlResponse = fromJsonString<PdlQueries.HentGjeldendeIdent.Response>(body)
 
 			if (gqlResponse.data == null) {
 				throw RuntimeException("PDL respons inneholder ikke data")

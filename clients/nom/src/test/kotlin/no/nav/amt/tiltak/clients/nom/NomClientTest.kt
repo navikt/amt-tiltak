@@ -124,6 +124,71 @@ class NomGraphqlClientTest : StringSpec({
 
 		recordedRequest.getHeader("Authorization") shouldBe "Bearer $token"
 	}
+
+
+	"hentVeileder - skal ikke hente kontortelefon først" {
+		val kontorTelefon = "11111111"
+		val tjenesteTelefon = "22222222"
+		val veilederRespons = """
+			{
+			  "data": {
+				"ressurser": [
+				  {
+					"ressurs": {
+					  "navIdent": "H156147",
+					  "visningsNavn": "Alias",
+					  "fornavn": "Blaut",
+					  "etternavn": "Slappfisk",
+					  "epost": "blaut.slappfisk@nav.no",
+					  "telefon": [
+					  	{ "type": "NAV_TJENESTE_TELEFON", "nummer": "$tjenesteTelefon" },
+					  	{ "type": "NAV_KONTOR_TELEFON", "nummer": "$kontorTelefon" }
+					  ]
+					},
+					"code": "OK"
+				  }
+				]
+			  }
+		}
+		""".trimIndent()
+
+		server.enqueue(MockResponse().setBody(veilederRespons))
+
+		val veileder = client.hentVeileder("H156147") ?: fail("Veileder finnes ikke")
+
+		veileder.telefonnummer shouldBe kontorTelefon
+	}
+
+	"hentVeileder - skal ikke hente tjenestetelefon naar kontortelefon mangler" {
+		val tjenesteTelefon = "22222222"
+		val veilederRespons = """
+			{
+			  "data": {
+				"ressurser": [
+				  {
+					"ressurs": {
+					  "navIdent": "H156147",
+					  "visningsNavn": "Alias",
+					  "fornavn": "Blaut",
+					  "etternavn": "Slappfisk",
+					  "epost": "blaut.slappfisk@nav.no",
+					  "telefon": [
+					  	{ "type": "NAV_TJENESTE_TELEFON", "nummer": "$tjenesteTelefon" }
+					  ]
+					},
+					"code": "OK"
+				  }
+				]
+			  }
+		}
+		""".trimIndent()
+
+		server.enqueue(MockResponse().setBody(veilederRespons))
+
+		val veileder = client.hentVeileder("H156147") ?: fail("Fant ikke veileder")
+
+		veileder.telefonnummer shouldBe tjenesteTelefon
+	}
 })
 
 

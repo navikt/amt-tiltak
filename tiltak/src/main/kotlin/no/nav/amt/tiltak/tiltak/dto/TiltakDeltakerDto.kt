@@ -20,6 +20,7 @@ data class TiltakDeltakerDto(
 fun Deltaker.toDto() = TiltakDeltakerDto(
 	id = id,
 	fornavn = requireNotNull(bruker).fornavn,
+	mellomnavn = requireNotNull(bruker).mellomnavn,
 	etternavn = requireNotNull(bruker).etternavn,
 	fodselsnummer = requireNotNull(bruker).fodselsnummer,
 	startDato = startDato,

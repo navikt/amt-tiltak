@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.clients.veilarbarena
 
-import no.nav.amt.tiltak.common.json.JsonUtils.fromJson
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.common.rest.client.RestClient.baseClient
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -38,7 +38,7 @@ class VeilarbarenaClientImpl(
 
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
 
-			val statusDto = fromJson(body, BrukerArenaStatusDto::class.java)
+			val statusDto = fromJsonString<BrukerArenaStatusDto>(body)
 
 			return statusDto.oppfolgingsenhet
 		}

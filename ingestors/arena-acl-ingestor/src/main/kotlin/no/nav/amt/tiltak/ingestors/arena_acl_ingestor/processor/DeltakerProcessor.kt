@@ -17,7 +17,7 @@ class DeltakerProcessor(
 	private val personService: PersonService
 ) : GenericProcessor<DeltakerPayload>() {
 
-	private val log = LoggerFactory.getLogger(this::class.java)
+	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun processInsertMessage(message: MessageWrapper<DeltakerPayload>) {
 		upsert(message)
@@ -40,7 +40,7 @@ class DeltakerProcessor(
 		val person = personService.hentPerson(deltakerFnr)
 
 		if (person.diskresjonskode != null) {
-			log.info("Bruker ${deltakerDto.id} har diskresjonskode ${person.diskresjonskode} og skal filtreres ut")
+			log.info("Deltaker id=${deltakerDto.id} har diskresjonskode ${person.diskresjonskode} og skal filtreres ut")
 			return
 		}
 
@@ -56,14 +56,16 @@ class DeltakerProcessor(
 			),
 			dagerPerUke = deltakerDto.dagerPerUke,
 			prosentStilling = deltakerDto.prosentDeltid,
-			registrertDato = deltakerDto.registrertDato
+			registrertDato = deltakerDto.registrertDato,
+			gjennomforingId = tiltaksgjennomforing.id
 		)
 
 		deltakerService.upsertDeltaker(
 			fodselsnummer =  deltakerDto.personIdent,
-			gjennomforingId = tiltaksgjennomforing.id,
 			deltaker = deltaker,
 		)
+
+		log.info("Fullført upsert av deltaker id=${deltaker.id} gjennomforingId=${tiltaksgjennomforing.id}")
 	}
 
 	private fun tilDeltakerStatus(status: DeltakerPayload.Status): Deltaker.Status {
@@ -80,6 +82,7 @@ class DeltakerProcessor(
 		val deltakerId = message.payload.id
 
 		log.info("Motatt delete-melding, sletter deltaker med id=$deltakerId")
+
 		deltakerService.slettDeltaker(deltakerId)
 	}
 

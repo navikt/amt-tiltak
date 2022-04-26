@@ -25,11 +25,13 @@ class DeltakerTest {
 					endretDato = LocalDateTime.now().minusWeeks(1)
 			))),
 			registrertDato = LocalDateTime.now().minusWeeks(1),
+			gjennomforingId = UUID.randomUUID()
 		)
 		val oppdatertStatus = deltaker.oppdaterStatus(DELTAR, LocalDateTime.now())
 
 		assertNotEquals(oppdatertStatus.statuser, deltaker.statuser)
 		assertEquals(oppdatertStatus.current.status, DELTAR)
+
 	}
 
 	@Test
@@ -42,6 +44,7 @@ class DeltakerTest {
 				endretDato = LocalDateTime.now().minusWeeks(1),
 			))),
 			registrertDato = LocalDateTime.now().minusWeeks(1),
+			gjennomforingId = UUID.randomUUID()
 		)
 
 		val updatedDeltaker = deltaker.oppdaterStatus(
@@ -63,6 +66,7 @@ class DeltakerTest {
 				endretDato = LocalDateTime.now().minusWeeks(1)
 			))),
 			registrertDato = LocalDateTime.now().minusWeeks(1),
+			gjennomforingId = UUID.randomUUID()
 		)
 		val nyDeltaker = Deltaker(
 			id = deltaker.id,
@@ -74,8 +78,8 @@ class DeltakerTest {
 			))),
 			registrertDato = LocalDateTime.now().minusWeeks(1),
 			dagerPerUke = 3,
-			prosentStilling = 100F
-
+			prosentStilling = 100F,
+			gjennomforingId = UUID.randomUUID()
 		)
 		val uuid = UUID.randomUUID()
 		val deltakerInserted = deltaker.oppdater(nyDeltaker)
@@ -140,7 +144,7 @@ class DeltakerTest {
 
 	private fun deltaker(status: Deltaker.Status, startDato: LocalDate? = null, sluttDato: LocalDate? = null):Deltaker {
 		val statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(status)))
-		return Deltaker(statuser = statuser, startDato = startDato, sluttDato = sluttDato, registrertDato = LocalDateTime.now())
+		return Deltaker(statuser = statuser, startDato = startDato, sluttDato = sluttDato, registrertDato = LocalDateTime.now(), gjennomforingId = UUID.randomUUID())
 
 	}
 
