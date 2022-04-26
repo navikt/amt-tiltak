@@ -7,7 +7,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_KONTOR_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -61,7 +61,7 @@ class EndringsmeldingServiceTest {
 		endringsmelding.godkjent shouldBe false
 		endringsmelding.opprettetAvArrangorAnsatt.fornavn shouldBe ARRANGOR_ANSATT_1.fornavn
 		endringsmelding.opprettetAvArrangorAnsatt.etternavn shouldBe ARRANGOR_ANSATT_1.etternavn
-		endringsmelding.bruker.navKontor?.navn shouldBe NAV_KONTOR_1.navn
+		endringsmelding.bruker.navEnhet?.navn shouldBe NAV_ENHET_1.navn
 
 	}
 

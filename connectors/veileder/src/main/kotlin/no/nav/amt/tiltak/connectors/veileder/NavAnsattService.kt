@@ -4,7 +4,7 @@ import no.nav.amt.tiltak.clients.axsys.AxsysClient
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavEnhetTilgang
 import no.nav.amt.tiltak.core.port.NavAnsattService
-import no.nav.amt.tiltak.core.port.NavKontorService
+import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.VeilederConnector
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 open class NavAnsattServiceImpl(
 	private val veilederConnector: VeilederConnector,
 	private val axsysClient: AxsysClient,
-	private val navKontorService: NavKontorService
+	private val navEnhetService: NavEnhetService
 ) : NavAnsattService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -30,18 +30,18 @@ open class NavAnsattServiceImpl(
 		val enhetIder = tilgangerTilTiltaksadministrasjon
 			.map { it.enhetId }
 
-		val navKontorer = navKontorService.hentNavKontorer(enhetIder)
+		val navEnheter = navEnhetService.hentNavEnheter(enhetIder)
 
 		return tilgangerTilTiltaksadministrasjon.map { tilgang ->
-			val kontor = navKontorer.find { it.enhetId == tilgang.enhetId }
+			val enhet = navEnheter.find { it.enhetId == tilgang.enhetId }
 
-			if (kontor == null) {
-				log.warn("Nav kontor fra Axsys med id ${tilgang.enhetId} finnes ikke i database")
+			if (enhet == null) {
+				log.warn("Nav enhet fra Axsys med id ${tilgang.enhetId} finnes ikke i database")
 				return@map null
 			}
 
 			return@map NavEnhetTilgang(
-				kontor,
+				enhet,
 				tilgang.temaer
 			)
 		}.filterNotNull()

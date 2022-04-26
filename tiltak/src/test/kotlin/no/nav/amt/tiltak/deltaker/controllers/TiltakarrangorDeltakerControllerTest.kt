@@ -5,7 +5,6 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import no.nav.amt.tiltak.tiltak.dto.*
-import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -57,7 +56,7 @@ class TiltakarrangorDeltakerControllerTest {
 		fodselsnummer = "",
 		telefonnummer = "",
 		epost = "",
-		navKontor = NavKontorDto(
+		navEnhet = NavEnhetDto(
 			navn = "NAV Testheim",
 		),
 		navVeileder = null,

@@ -12,7 +12,7 @@ class NorgClientImpl(
 	private val httpClient: OkHttpClient = baseClient(),
 ) : NorgClient {
 
-	override fun hentNavKontorNavn(enhetId: String): String {
+	override fun hentNavEnhetNavn(enhetId: String): String {
 		val request = Request.Builder()
 			.url("$url/api/v1/enhet/$enhetId")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
@@ -26,13 +26,13 @@ class NorgClientImpl(
 
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
 
-			val responseDto = fromJsonString<NavKontorDto>(body)
+			val responseDto = fromJsonString<NavEnhetDto>(body)
 
 			return responseDto.navn
 		}
 	}
 
-	override fun hentAlleNavKontorer(): List<NorgNavKontor> {
+	override fun hentAlleNavEnheter(): List<NorgNavEnhet> {
 		val request = Request.Builder()
 			.url("$url/api/v1/enhet/")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
@@ -46,13 +46,13 @@ class NorgClientImpl(
 
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
 
-			val responseBody = fromJsonString<List<NavKontorDto>>(body)
+			val responseBody = fromJsonString<List<NavEnhetDto>>(body)
 
-			return responseBody.map { NorgNavKontor(enhetId = it.enhetNr, navn = it.navn) }
+			return responseBody.map { NorgNavEnhet(enhetId = it.enhetNr, navn = it.navn) }
 		}
 	}
 
-	private data class NavKontorDto(
+	private data class NavEnhetDto(
 		val navn: String,
 		val enhetNr: String
 	)

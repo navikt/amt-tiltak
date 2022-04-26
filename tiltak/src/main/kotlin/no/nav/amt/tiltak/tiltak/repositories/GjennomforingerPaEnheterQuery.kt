@@ -23,7 +23,7 @@ open class GjennomforingerPaEnheterQuery(
 		if (navEnhetIder.isEmpty()) return emptyList()
 
 		val sql = """
-			SELECT * FROM gjennomforing WHERE nav_kontor_id in(:navEnhetIder)
+			SELECT * FROM gjennomforing WHERE nav_enhet_id in(:navEnhetIder)
 		""".trimIndent()
 
 		val parameters = sqlParameters(

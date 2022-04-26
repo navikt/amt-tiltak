@@ -22,7 +22,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_KONTOR_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
@@ -79,7 +79,7 @@ class GjennomforingServiceImplTest : FunSpec({
 	}
 
 	test("slettGjennomforing - skal slette gjennomføring") {
-		testDataRepository.insertNavKontor(NAV_KONTOR_1)
+		testDataRepository.insertNavEnhet(NAV_ENHET_1)
 		testDataRepository.insertTiltak(TILTAK_1)
 		testDataRepository.insertArrangor(ARRANGOR_1)
 		testDataRepository.insertGjennomforing(GJENNOMFORING_1)
@@ -115,7 +115,7 @@ class GjennomforingServiceImplTest : FunSpec({
 	}
 
 	test("getGjennomforing - gjennomføring finnes - returnerer gjennomføring") {
-		testDataRepository.insertNavKontor(NAV_KONTOR_1)
+		testDataRepository.insertNavEnhet(NAV_ENHET_1)
 		testDataRepository.insertTiltak(TILTAK_1)
 		testDataRepository.insertArrangor(ARRANGOR_1)
 		testDataRepository.insertGjennomforing(GJENNOMFORING_1)

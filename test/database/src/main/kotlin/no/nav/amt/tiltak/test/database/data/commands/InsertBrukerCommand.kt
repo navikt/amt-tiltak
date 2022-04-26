@@ -10,6 +10,6 @@ data class InsertBrukerCommand(
 	val telefonnummer: String,
 	val epost: String,
 	val ansvarlig_veileder_id: UUID?,
-	val nav_kontor_id: UUID
+	val nav_enhet_id: UUID
 )
 

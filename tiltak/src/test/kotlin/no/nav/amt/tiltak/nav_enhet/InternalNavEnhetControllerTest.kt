@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.nav_kontor
+package no.nav.amt.tiltak.nav_enhet
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
@@ -17,8 +17,8 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [InternalNavKontorController::class])
-class InternalNavKontorControllerTest {
+@WebMvcTest(controllers = [InternalNavEnhetController::class])
+class InternalNavEnhetControllerTest {
 
 	companion object : MockOAuthServer() {
 		@AfterAll
@@ -35,7 +35,7 @@ class InternalNavKontorControllerTest {
 	private lateinit var authService: AuthService
 
 	@MockBean
-	private lateinit var publiserNavKontorService: PubliserNavKontorService
+	private lateinit var publiserNavEnhetService: PubliserNavEnhetService
 
 	@BeforeEach
 	fun before() {
@@ -47,7 +47,7 @@ class InternalNavKontorControllerTest {
 		`when`(authService.isInternalRequest(any())).thenReturn(true)
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.post("/internal/nav-kontor/publiser-alle-enheter")
+			MockMvcRequestBuilders.post("/internal/nav-enhet/publiser-alle-enheter")
 		).andReturn().response
 
 		assertEquals(200, response.status)
@@ -58,7 +58,7 @@ class InternalNavKontorControllerTest {
 		`when`(authService.isInternalRequest(any())).thenReturn(false)
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.post("/internal/nav-kontor/publiser-alle-enheter")
+			MockMvcRequestBuilders.post("/internal/nav-enhet/publiser-alle-enheter")
 		).andReturn().response
 
 		assertEquals(401, response.status)

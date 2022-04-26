@@ -9,8 +9,8 @@ import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_KONTOR_1
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_KONTOR_2
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_2
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -32,7 +32,7 @@ internal class GjennomforingPaEnheterQueryTest : FunSpec({
 	}
 
 	test("skal hente gjennomføringer på enheter") {
-		val gjennomforinger = query.query(listOf(NAV_KONTOR_1.id, NAV_KONTOR_2.id))
+		val gjennomforinger = query.query(listOf(NAV_ENHET_1.id, NAV_ENHET_2.id))
 
 		gjennomforinger shouldHaveSize 2
 		gjennomforinger.any { it.id == GJENNOMFORING_1.id } shouldBe true

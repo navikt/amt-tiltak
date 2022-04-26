@@ -33,9 +33,9 @@ class EndringsmeldingForGjennomforingQuery(
 			opprettetAvMellomnavn = rs.getString("opprettet_av_mellomnavn"),
 			opprettetAvPersonligIdent = rs.getString("opprettet_av_ident"),
 
-			navkontorId = rs.getNullableUUID("nav_kontor_id"),
-			navKontorEnhetId = rs.getString("nav_kontor_enhet_id"),
-			navKontorNavn = rs.getString("nav_kontor_navn"),
+			navEnhetId = rs.getNullableUUID("nav_enhet_id"),
+			navEnhetNorgId = rs.getString("nav_enhet_enhet_id"),
+			navEnhetNavn = rs.getString("nav_enhet_navn"),
 
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
@@ -50,9 +50,9 @@ class EndringsmeldingForGjennomforingQuery(
 			bruker.etternavn,
 			bruker.id as bruker_id,
 			bruker.fodselsnummer,
-			nav_kontor.id as nav_kontor_id,
-			nav_kontor.navn as nav_kontor_navn,
-			nav_kontor.enhet_id as nav_kontor_enhet_id,
+			nav_enhet.id as nav_enhet_id,
+			nav_enhet.navn as nav_enhet_navn,
+			nav_enhet.enhet_id as nav_enhet_enhet_id,
 			arrangor_ansatt.id as opprettet_av_id,
 			arrangor_ansatt.fornavn as opprettet_av_fornavn,
 			arrangor_ansatt.mellomnavn as opprettet_av_mellomnavn,
@@ -63,7 +63,7 @@ class EndringsmeldingForGjennomforingQuery(
 			JOIN deltaker on endringsmelding.deltaker_id = deltaker.id
 			JOIN arrangor_ansatt on endringsmelding.opprettet_av = arrangor_ansatt.id
 			JOIN bruker on deltaker.bruker_id = bruker.id
-			JOIN nav_kontor on bruker.nav_kontor_id = nav_kontor.id
+			JOIN nav_enhet on bruker.nav_enhet_id = nav_enhet.id
 			WHERE deltaker.gjennomforing_id = :gjennomforing_id
 		""".trimIndent()
 

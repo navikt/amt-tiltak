@@ -17,7 +17,7 @@ open class AmtEnhetsregisterConfig {
 	@Bean
 	open fun enhetsregiserClient(machineToMachineTokenClient: MachineToMachineTokenClient): EnhetsregisterClient {
 		return AmtEnhetsregisterClient(
-			url = url,
+			baseUrl = url,
 			tokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(scope) },
 		)
 	}

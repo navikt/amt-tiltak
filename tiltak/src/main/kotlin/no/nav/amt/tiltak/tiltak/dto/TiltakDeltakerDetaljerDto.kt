@@ -12,7 +12,7 @@ data class TiltakDeltakerDetaljerDto(
 	val fodselsnummer: String,
 	val telefonnummer: String?,
 	val epost: String?,
-	val navKontor: NavKontorDto?,
+	val navEnhet: NavEnhetDto?,
 	val navVeileder: NavVeilederDto?,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
@@ -21,7 +21,7 @@ data class TiltakDeltakerDetaljerDto(
 	val gjennomforing: GjennomforingDto
 )
 
-data class NavKontorDto(
+data class NavEnhetDto(
 	val navn: String,
 )
 

@@ -4,17 +4,17 @@ import io.kotest.core.spec.style.StringSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.amt.tiltak.core.port.NavKontorService
+import no.nav.amt.tiltak.core.port.NavEnhetService
 
 class NavEnhetIngestorImplTest : StringSpec({
 
 	"Skal ingeste kafka melding" {
-		val navKontorService = mockk<NavKontorService>()
+		val navEnhetService = mockk<NavEnhetService>()
 
-		val ingestor = NavEnhetIngestorImpl(navKontorService)
+		val ingestor = NavEnhetIngestorImpl(navEnhetService)
 
 		every {
-			navKontorService.upsertNavKontor(any(), any())
+			navEnhetService.upsertNavEnhet(any(), any())
 		} returns Unit
 
 		ingestor.ingestKafkaRecord("""
@@ -24,7 +24,7 @@ class NavEnhetIngestorImplTest : StringSpec({
 			}
 		""".trimIndent())
 
-		verify (exactly = 1) { navKontorService.upsertNavKontor("1234", "NAV Testheim") }
+		verify (exactly = 1) { navEnhetService.upsertNavEnhet("1234", "NAV Testheim") }
 	}
 
 })

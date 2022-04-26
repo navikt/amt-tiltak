@@ -88,7 +88,7 @@ internal class GjennomforingRepositoryTest : FunSpec({
 					sluttDato = null,
 					registrertDato = LocalDateTime.now(),
 					fremmoteDato = null,
-					navKontorId = null,
+					navEnhetId = null,
 					createdAt = LocalDateTime.now(),
 					modifiedAt = LocalDateTime.now()
 				)
@@ -113,7 +113,7 @@ internal class GjennomforingRepositoryTest : FunSpec({
 				startDato = updatedStartDato,
 				sluttDato = updatedSluttDato,
 				fremmoteDato = updatedFremmotedato,
-				navKontorId = null,
+				navEnhetId = null,
 				createdAt = LocalDateTime.now(),
 				modifiedAt = LocalDateTime.now(),
 				registrertDato = LocalDateTime.now()
@@ -140,7 +140,7 @@ internal class GjennomforingRepositoryTest : FunSpec({
 			slutt_dato = LocalDate.of(2050, 12, 30),
 			registrert_dato = LocalDate.of(2022, 1, 1),
 			fremmote_dato = LocalDate.of(2022, 2, 1),
-			nav_kontor_id = null,
+			nav_enhet_id = null,
 		)
 
 		TestDataRepository(NamedParameterJdbcTemplate(dataSource))

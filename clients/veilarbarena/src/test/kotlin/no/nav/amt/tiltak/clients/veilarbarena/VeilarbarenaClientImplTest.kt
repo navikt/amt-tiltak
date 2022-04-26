@@ -1,65 +1,63 @@
 package no.nav.amt.tiltak.clients.veilarbarena
 
-import com.github.tomakehurst.wiremock.client.WireMock.*
-import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
-import com.github.tomakehurst.wiremock.junit5.WireMockTest
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
 
-@WireMockTest
-class VeilarbarenaClientImplTest {
+class VeilarbarenaClientImplTest : FunSpec({
 
-	@Test
-	fun `hentBrukerOppfolgingsenhetId skal lage riktig request og parse respons`(wmRuntimeInfo: WireMockRuntimeInfo) {
+	val server = MockWebServer()
+	val serverUrl = server.url("").toString().removeSuffix("/")
+
+	afterSpec {
+		server.shutdown()
+	}
+
+	test("hentBrukerOppfolgingsenhetId skal lage riktig request og parse respons") {
 		val client = VeilarbarenaClientImpl(
-			url = wmRuntimeInfo.httpBaseUrl,
+			baseUrl = serverUrl,
 			proxyTokenProvider = { "PROXY_TOKEN" },
 			veilarbarenaTokenProvider = { "VEILARBARENA_TOKEN" },
 		)
 
-		givenThat(
-			get(urlEqualTo("/api/arena/status?fnr=987654"))
-				.withHeader("Downstream-Authorization", equalTo("Bearer VEILARBARENA_TOKEN"))
-				.withHeader("Authorization", equalTo("Bearer PROXY_TOKEN"))
-				.withHeader("Nav-Consumer-Id", equalTo("amt-tiltak"))
-				.willReturn(
-					aResponse()
-						.withStatus(200)
-						.withBody(
-							"""
-								{
-									"formidlingsgruppe": "ARBS",
-									"kvalifiseringsgruppe": "BFORM",
-									"rettighetsgruppe": "DAGP",
-									"iservFraDato": "2021-11-16T10:09:03",
-									"oppfolgingsenhet": "1234"
-								}
-							""".trimIndent()
-						)
-				)
-
+		server.enqueue(
+			MockResponse().setBody(
+				"""
+					{
+						"formidlingsgruppe": "ARBS",
+						"kvalifiseringsgruppe": "BFORM",
+						"rettighetsgruppe": "DAGP",
+						"iservFraDato": "2021-11-16T10:09:03",
+						"oppfolgingsenhet": "1234"
+					}
+				""".trimIndent()
+			)
 		)
 
 		val oppfolgingsenhetId = client.hentBrukerOppfolgingsenhetId("987654")
 
-		assertEquals("1234", oppfolgingsenhetId)
+		oppfolgingsenhetId shouldBe "1234"
+
+		val request = server.takeRequest()
+
+		request.path shouldBe "/api/arena/status?fnr=987654"
+		request.method shouldBe "GET"
+		request.getHeader("Authorization") shouldBe "Bearer PROXY_TOKEN"
+		request.getHeader("Downstream-Authorization") shouldBe "Bearer VEILARBARENA_TOKEN"
+		request.getHeader("Nav-Consumer-Id") shouldBe "amt-tiltak"
 	}
 
-	@Test
-	fun `hentBrukerOppfolgingsenhetId skal returnere null hvis veilarbarena returnerer 404`(wmRuntimeInfo: WireMockRuntimeInfo) {
+	test("hentBrukerOppfolgingsenhetId skal returnere null hvis veilarbarena returnerer 404") {
 		val client = VeilarbarenaClientImpl(
-			url = wmRuntimeInfo.httpBaseUrl,
+			baseUrl = serverUrl,
 			proxyTokenProvider = { "PROXY_TOKEN" },
 			veilarbarenaTokenProvider = { "VEILARBARENA_TOKEN" },
 		)
 
-		givenThat(
-			get(urlEqualTo("/api/arena/status?fnr=987654"))
-				.willReturn(aResponse().withStatus(404))
-		)
+		server.enqueue(MockResponse().setResponseCode(404))
 
-		assertNull(client.hentBrukerOppfolgingsenhetId("987654"))
+		client.hentBrukerOppfolgingsenhetId("987654") shouldBe null
 	}
 
-}
+})
