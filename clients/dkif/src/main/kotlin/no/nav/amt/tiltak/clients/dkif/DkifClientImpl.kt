@@ -9,14 +9,14 @@ import org.springframework.http.MediaType
 import java.util.function.Supplier
 
 class DkifClientImpl(
-	private val url: String,
+	private val baseUrl: String,
 	private val tokenProvider: Supplier<String>,
 	private val httpClient: OkHttpClient = baseClient(),
 ) : DkifClient {
 
 	override fun hentBrukerKontaktinformasjon(fnr: String): Kontaktinformasjon {
 		val request: Request = Request.Builder()
-			.url("$url/rest/v1/person?inkluderSikkerDigitalPost=false")
+			.url("$baseUrl/rest/v1/person?inkluderSikkerDigitalPost=false")
 			.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
 			.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenProvider.get())
 			.header("Nav-Personident", fnr)
