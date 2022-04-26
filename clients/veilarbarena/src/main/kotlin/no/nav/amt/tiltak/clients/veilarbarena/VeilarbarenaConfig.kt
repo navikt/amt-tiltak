@@ -20,7 +20,7 @@ open class VeilarbarenaConfig {
 	@Bean
 	open fun veilarbarenaClient(machineToMachineTokenClient: MachineToMachineTokenClient): VeilarbarenaClient {
 		return VeilarbarenaClientImpl(
-			url = "$url/proxy/veilarbarena",
+			baseUrl = "$url/proxy/veilarbarena",
 			proxyTokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(poaoGcpProxyScope) },
 			veilarbarenaTokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(veilarbarenaScope) },
 		)
