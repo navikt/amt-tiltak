@@ -7,14 +7,14 @@ import okhttp3.Request
 import java.util.function.Supplier
 
 class AmtEnhetsregisterClient(
-	private val url: String,
-	private val tokenProvider: Supplier<String>,
-	private val httpClient: OkHttpClient = baseClient(),
+    private val baseUrl: String,
+    private val tokenProvider: Supplier<String>,
+    private val httpClient: OkHttpClient = baseClient(),
 ) : EnhetsregisterClient {
 
 	override fun hentVirksomhet(organisasjonsnummer: String): Virksomhet {
 		val request = Request.Builder()
-			.url("$url/api/enhet/$organisasjonsnummer")
+			.url("$baseUrl/api/enhet/$organisasjonsnummer")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
 			.get()
 			.build()

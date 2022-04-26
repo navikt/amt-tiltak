@@ -1,60 +1,65 @@
 package no.nav.amt.tiltak.clients.axsys
 
-import com.github.tomakehurst.wiremock.client.WireMock.*
-import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
-import com.github.tomakehurst.wiremock.junit5.WireMockTest
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
 
-@WireMockTest
-internal class PlainAxsysClientTest {
+class AxsysClientTest : FunSpec({
 
-	private val brukerident = "AB12345"
+	val server = MockWebServer()
+	val serverUrl = server.url("").toString().removeSuffix("/")
 
-	@Test
-	fun `hentTilganger - med fodselsnummer - skal returnere korrekt parset respons`(wmRuntimeInfo: WireMockRuntimeInfo) {
+	afterSpec {
+		server.shutdown()
+	}
+
+	test("hentTilganger - med fodselsnummer - skal returnere korrekt parset response") {
+		val brukerident = "AB12345"
+
 		val client = PlainAxsysClient(
-			baseUrl = wmRuntimeInfo.httpBaseUrl,
-			tokenProvider = { "TOKEN" },
+			baseUrl = serverUrl,
+			proxyTokenProvider = { "PROXY_TOKEN" },
+			axsysTokenProvider = { "AXSYS_TOKEN" },
 		)
 
 		System.setProperty("NAIS_APP_NAME", "amt-tiltak")
 
-		givenThat(
-			get(urlEqualTo("/api/v2/tilgang/$brukerident?inkluderAlleEnheter=false"))
-				.withHeader("Authorization", equalTo("Bearer TOKEN"))
-				.withHeader("Nav-Consumer-Id", equalTo("amt-tiltak"))
-				.withHeader("Nav-Call-Id", matching("[0-9a-fA-F]{32}"))
-				.willReturn(
-					aResponse()
-						.withStatus(200)
-						.withBody(
-							"""
-								{
-								  "enheter": [
-									{
-									  "enhetId": "0104",
-									  "temaer": [
-										"MOB",
-										"OPA",
-										"HJE"
-									  ],
-									  "navn": "NAV Moss"
-									}
-								  ]
-								}
-							""".trimIndent()
-						)
-				)
-
+		server.enqueue(
+			MockResponse().setBody(
+				"""
+					{
+					  "enheter": [
+						{
+						  "enhetId": "0104",
+						  "temaer": [
+							"MOB",
+							"OPA",
+							"HJE"
+						  ],
+						  "navn": "NAV Moss"
+						}
+					  ]
+					}
+				""".trimIndent()
+			)
 		)
 
 		val tilganger = client.hentTilganger(brukerident)
 
-		assertEquals("0104", tilganger.first().enhetId)
-		assertTrue(tilganger.first().temaer.containsAll(listOf("MOB", "OPA", "HJE")))
-		assertEquals("NAV Moss", tilganger.first().navn)
+		tilganger.first().enhetId shouldBe "0104"
+		tilganger.first().navn shouldBe "NAV Moss"
+		tilganger.first().temaer.containsAll(listOf("MOB", "OPA", "HJE")) shouldBe true
+
+		val request = server.takeRequest()
+
+		request.path shouldBe "/api/v2/tilgang/$brukerident?inkluderAlleEnheter=false"
+		request.method shouldBe "GET"
+		request.getHeader("Authorization") shouldBe "Bearer PROXY_TOKEN"
+		request.getHeader("Nav-Consumer-Id") shouldBe "amt-tiltak"
+		request.getHeader("Nav-Call-Id") shouldNotBe null
+		request.getHeader("Downstream-Authorization") shouldBe "Bearer AXSYS_TOKEN"
 	}
 
-}
+})
