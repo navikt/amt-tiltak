@@ -1,57 +1,59 @@
 package no.nav.amt.tiltak.clients.norg
 
-import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
-import com.github.tomakehurst.wiremock.junit5.WireMockTest
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
 
-@WireMockTest
-class NorgClientImplTest {
+class NorgClientImplTest : FunSpec({
 
-	@Test
-	fun `hentNavKontorNavn skal lage riktig request og parse respons`(wmRuntimeInfo: WireMockRuntimeInfo) {
+	val server = MockWebServer()
+	val serverUrl = server.url("").toString().removeSuffix("/")
+
+	afterSpec {
+		server.shutdown()
+	}
+
+	test("hentNavKontorNavn skal lage riktig request og parse respons") {
 		val client = NorgClientImpl(
-			url = wmRuntimeInfo.httpBaseUrl,
+			url = serverUrl,
 			tokenProvider = { "TOKEN" },
 		)
 
-		WireMock.givenThat(
-			WireMock.get(WireMock.urlEqualTo("/api/v1/enhet/1234"))
-				.withHeader("Authorization", WireMock.equalTo("Bearer TOKEN"))
-				.willReturn(
-					WireMock.aResponse()
-						.withStatus(200)
-						.withBody(
-							"""
-								{
-								  "enhetId": 900000042,
-								  "navn": "NAV Testheim",
-								  "enhetNr": "1234",
-								  "antallRessurser": 330,
-								  "status": "Aktiv",
-								  "orgNivaa": "EN",
-								  "type": "LOKAL",
-								  "organisasjonsnummer": "12345645",
-								  "underEtableringDato": "1970-01-01",
-								  "aktiveringsdato": "1970-01-01",
-								  "underAvviklingDato": null,
-								  "nedleggelsesdato": null,
-								  "oppgavebehandler": true,
-								  "versjon": 40,
-								  "sosialeTjenester": "Fritekst",
-								  "kanalstrategi": null,
-								  "orgNrTilKommunaltNavKontor": "123456789"
-								}
-							""".trimIndent()
-						)
-				)
-
+		server.enqueue(
+			MockResponse().setBody(
+				"""
+					{
+					  "enhetId": 900000042,
+					  "navn": "NAV Testheim",
+					  "enhetNr": "1234",
+					  "antallRessurser": 330,
+					  "status": "Aktiv",
+					  "orgNivaa": "EN",
+					  "type": "LOKAL",
+					  "organisasjonsnummer": "12345645",
+					  "underEtableringDato": "1970-01-01",
+					  "aktiveringsdato": "1970-01-01",
+					  "underAvviklingDato": null,
+					  "nedleggelsesdato": null,
+					  "oppgavebehandler": true,
+					  "versjon": 40,
+					  "sosialeTjenester": "Fritekst",
+					  "kanalstrategi": null,
+					  "orgNrTilKommunaltNavKontor": "123456789"
+					}
+				""".trimIndent()
+			)
 		)
 
 		val kontorNavn = client.hentNavKontorNavn("1234")
 
-		assertEquals("NAV Testheim", kontorNavn)
+		kontorNavn shouldBe "NAV Testheim"
+
+		val request = server.takeRequest()
+
+		request.path shouldBe "/api/v1/enhet/1234"
+		request.getHeader("Authorization") shouldBe "Bearer TOKEN"
 	}
 
-}
+})
