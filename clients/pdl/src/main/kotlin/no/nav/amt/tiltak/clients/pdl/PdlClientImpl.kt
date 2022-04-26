@@ -11,7 +11,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.function.Supplier
 
 class PdlClientImpl(
-	private val pdlUrl: String,
+	private val baseUrl: String,
 	private val tokenProvider: Supplier<String>,
 	private val httpClient: OkHttpClient = baseClient(),
 ) : PdlClient {
@@ -76,7 +76,7 @@ class PdlClientImpl(
 
 	private fun createGraphqlRequest(jsonPayload: String): Request {
 		return Request.Builder()
-			.url("$pdlUrl/graphql")
+			.url("$baseUrl/graphql")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
 			.addHeader("Tema", "GEN")
 			.post(jsonPayload.toRequestBody(mediaTypeJson))

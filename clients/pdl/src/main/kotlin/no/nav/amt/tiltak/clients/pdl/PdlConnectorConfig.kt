@@ -17,7 +17,7 @@ open class PdlConnectorConfig {
 	@Bean
 	open fun pdlClient(machineToMachineTokenClient: MachineToMachineTokenClient): PdlClient {
 		return PdlClientImpl(
-			pdlUrl = url,
+			baseUrl = url,
 			tokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(scope) },
 		)
 	}
