@@ -50,7 +50,7 @@ data class DeltakerDbo(
 				mellomnavn = brukerMellomnavn,
 				etternavn = brukerEtternavn,
 				fodselsnummer = brukerFodselsnummer,
-				navKontor = null
+				navEnhet = null
 			),
 			startDato = startDato,
 			sluttDato = sluttDato,

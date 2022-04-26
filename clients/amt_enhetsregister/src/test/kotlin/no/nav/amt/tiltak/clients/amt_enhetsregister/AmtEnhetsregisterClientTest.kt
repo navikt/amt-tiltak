@@ -1,68 +1,71 @@
 package no.nav.amt.tiltak.clients.amt_enhetsregister
 
-import com.github.tomakehurst.wiremock.client.WireMock.*
-import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
-import com.github.tomakehurst.wiremock.junit5.WireMockTest
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
 
-@WireMockTest
-class AmtEnhetsregisterClientTest {
+class AmtEnhetsregisterClientTest : FunSpec({
 
-	@Test
-	fun `hentVirksomhet() skal lage riktig request og parse respons`(wmRuntimeInfo: WireMockRuntimeInfo) {
+	val server = MockWebServer()
+	val serverUrl = server.url("").toString().removeSuffix("/")
+
+	afterSpec {
+		server.shutdown()
+	}
+
+	test("hentVirksomhet() skal lage riktig request og parse respons") {
 		val client = AmtEnhetsregisterClient(
-			url = wmRuntimeInfo.httpBaseUrl,
+			baseUrl = serverUrl,
 			tokenProvider = { "TOKEN" },
 		)
 
-		givenThat(
-			get(urlEqualTo("/api/enhet/987654"))
-				.withHeader("Authorization", equalTo("Bearer TOKEN"))
-				.willReturn(
-					aResponse()
-						.withStatus(200)
-						.withBody(
-							"""
-								{
-									"navn": "Underenhet",
-									"organisasjonsnummer": "1234",
-									"overordnetEnhetNavn": "Overordnet enhet",
-									"overordnetEnhetOrganisasjonsnummer": "5678"
-								}
-							""".trimIndent()
-						)
-				)
-
+		server.enqueue(
+			MockResponse().setBody(
+				"""
+					{
+						"navn": "Underenhet",
+						"organisasjonsnummer": "1234",
+						"overordnetEnhetNavn": "Overordnet enhet",
+						"overordnetEnhetOrganisasjonsnummer": "5678"
+					}
+				""".trimIndent()
+			)
 		)
 
 		val virksomhet = client.hentVirksomhet("987654")
 
-		assertEquals("Underenhet", virksomhet.navn)
-		assertEquals("1234", virksomhet.organisasjonsnummer)
-		assertEquals("Overordnet enhet", virksomhet.overordnetEnhetNavn)
-		assertEquals("5678", virksomhet.overordnetEnhetOrganisasjonsnummer)
+		virksomhet.navn shouldBe "Underenhet"
+		virksomhet.organisasjonsnummer shouldBe "1234"
+		virksomhet.overordnetEnhetNavn shouldBe "Overordnet enhet"
+		virksomhet.overordnetEnhetOrganisasjonsnummer shouldBe "5678"
+
+		val request = server.takeRequest()
+
+		request.path shouldBe "/api/enhet/987654"
+		request.method shouldBe "GET"
+		request.getHeader("Authorization") shouldBe "Bearer TOKEN"
 	}
 
-	@Test
-	fun `hentVirksomhet() skal returnere default virksomhet hvis amt-enhetsregister returnerer 404`(wmRuntimeInfo: WireMockRuntimeInfo) {
+	test("hentVirksomhet() skal returnere default virksomhet hvis amt-enhetsregister returnerer 404") {
 		val client = AmtEnhetsregisterClient(
-			url = wmRuntimeInfo.httpBaseUrl,
+			baseUrl = serverUrl,
 			tokenProvider = { "TOKEN" },
 		)
 
-		givenThat(
-			get(urlEqualTo("/api/enhet/987654"))
-				.willReturn(aResponse().withStatus(404))
-
-		)
+		server.enqueue(MockResponse().setResponseCode(404))
 
 		val virksomhet = client.hentVirksomhet("987654")
 
-		assertEquals("Ukjent virksomhet", virksomhet.navn)
-		assertEquals("987654", virksomhet.organisasjonsnummer)
-		assertEquals("Ukjent virksomhet", virksomhet.overordnetEnhetNavn)
-		assertEquals("999999999", virksomhet.overordnetEnhetOrganisasjonsnummer)
+		virksomhet.navn shouldBe "Ukjent virksomhet"
+		virksomhet.organisasjonsnummer shouldBe "987654"
+		virksomhet.overordnetEnhetNavn shouldBe "Ukjent virksomhet"
+		virksomhet.overordnetEnhetOrganisasjonsnummer shouldBe "999999999"
+
+		val request = server.takeRequest()
+
+		request.path shouldBe "/api/enhet/987654"
+		request.method shouldBe "GET"
 	}
 
-}
+})

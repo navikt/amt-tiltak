@@ -5,7 +5,7 @@ import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavEnhetTilgang
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.core.domain.tiltak.NavKontor
+import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavAnsattService
@@ -98,7 +98,7 @@ class NavAnsattGjennomforingControllerTest {
 		fremmoteDato = LocalDateTime.now(),
 		startDato = LocalDate.now(),
 		registrertDato = LocalDateTime.now(),
-		navKontorId = UUID.randomUUID(),
+		navEnhetId = UUID.randomUUID(),
 		sluttDato = LocalDate.now(),
 		status = Gjennomforing.Status.GJENNOMFORES,
 	)
@@ -162,8 +162,8 @@ class NavAnsattGjennomforingControllerTest {
 
 		Mockito.`when`(navAnsattService.hentTiltaksansvarligEnhetTilganger(navIdent))
 			.thenReturn(listOf(NavEnhetTilgang(
-				kontor = NavKontor(
-					id = gjennomforing.navKontorId!!,
+				enhet = NavEnhet(
+					id = gjennomforing.navEnhetId!!,
 					enhetId = "1234",
 					navn = "test"
 				),
@@ -192,7 +192,7 @@ class NavAnsattGjennomforingControllerTest {
 
 		Mockito.`when`(navAnsattService.hentTiltaksansvarligEnhetTilganger(navIdent))
 			.thenReturn(listOf(NavEnhetTilgang(
-				kontor = NavKontor(
+				enhet = NavEnhet(
 					id = UUID.randomUUID(), // En annen id enn den på gjennomføringen
 					enhetId = "1234",
 					navn = "test"

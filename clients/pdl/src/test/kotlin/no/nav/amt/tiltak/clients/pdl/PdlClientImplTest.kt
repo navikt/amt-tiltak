@@ -1,305 +1,197 @@
 package no.nav.amt.tiltak.clients.pdl
 
-import com.github.tomakehurst.wiremock.client.WireMock.*
-import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
-import com.github.tomakehurst.wiremock.junit5.WireMockTest
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+import io.kotest.assertions.json.shouldEqualJson
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import no.nav.amt.tiltak.clients.pdl.PdlClientImplTestData.errorPrefix
+import no.nav.amt.tiltak.clients.pdl.PdlClientImplTestData.flereFeilRespons
+import no.nav.amt.tiltak.clients.pdl.PdlClientImplTestData.gyldigRespons
+import no.nav.amt.tiltak.clients.pdl.PdlClientImplTestData.minimalFeilRespons
+import no.nav.amt.tiltak.clients.pdl.PdlClientImplTestData.nullError
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.assertThrows
 
-@WireMockTest
-class PdlClientImplTest {
-	val nullError = "- data i respons er null \n"
-	val errorPrefix = "Feilmeldinger i respons fra pdl:\n"
+class PdlClientImplTest : FunSpec({
 
-	@Test
-	fun `hentBruker - gyldig respons - skal lage riktig request og parse pdl bruker`(wmRuntimeInfo: WireMockRuntimeInfo) {
+	val server = MockWebServer()
+	val serverUrl = server.url("").toString().removeSuffix("/")
+
+	afterSpec {
+		server.shutdown()
+	}
+
+	test("hentBruker - gyldig respons - skal lage riktig request og parse pdl bruker") {
 		val connector = PdlClientImpl(
-			wmRuntimeInfo.httpBaseUrl,
+			serverUrl,
 			{ "TOKEN" },
 		)
 
-		givenThat(
-			post(urlEqualTo("/graphql"))
-				.withHeader("Authorization", equalTo("Bearer TOKEN"))
-				.withHeader("Tema", equalTo("GEN"))
-				.withRequestBody(
-					equalToJson(
-						"""
-							{
-								"query": "${PdlQueries.HentBruker.query.replace("\n", "\\n").replace("\t", "\\t")}",
-								"variables": { "ident": "FNR" }
-							}
-						""".trimIndent()
-					)
-				)
-				.willReturn(
-					aResponse()
-						.withStatus(200)
-						.withBody(gyldigRespons)
-				)
-
-		)
+		server.enqueue(MockResponse().setBody(gyldigRespons))
 
 		val pdlBruker = connector.hentBruker("FNR")
 
-		assertEquals("Tester", pdlBruker.fornavn)
-		assertEquals("Test", pdlBruker.mellomnavn)
-		assertEquals("Testersen", pdlBruker.etternavn)
-		assertEquals("+47 12345678", pdlBruker.telefonnummer)
-	}
+		pdlBruker.fornavn shouldBe "Tester"
+		pdlBruker.mellomnavn shouldBe "Test"
+		pdlBruker.etternavn shouldBe "Testersen"
+		pdlBruker.telefonnummer shouldBe "+47 12345678"
 
-	@Test
-	fun `hentBruker - data mangler - skal kaste exception`(wmRuntimeInfo: WireMockRuntimeInfo) {
-		val connector = PdlClientImpl(
-			wmRuntimeInfo.httpBaseUrl,
-			{ "TOKEN" },
-		)
+		val request = server.takeRequest()
 
-		givenThat(
-			post(urlEqualTo("/graphql"))
-				.willReturn(
-					aResponse()
-						.withStatus(200)
-						.withBody(
-							"""
-								{
-									"errors": [{"message": "Noe gikk galt"}],
-									"data": null
-								}
-							""".trimIndent()
-						)
-				)
-		)
+		request.path shouldBe "/graphql"
+		request.method shouldBe "POST"
+		request.getHeader("Authorization") shouldBe "Bearer TOKEN"
+		request.getHeader("Tema") shouldBe "GEN"
 
-		val exception = assertThrows<RuntimeException> {
-			connector.hentBruker("FNR")
-		}
-
-		assertEquals(errorPrefix + nullError +
-			"- Noe gikk galt (code: null details: null)\n", exception.message)
-	}
-
-	@Test
-	fun `hentGjeldendePersonligIdent skal lage riktig request og parse response`(wmRuntimeInfo: WireMockRuntimeInfo) {
-		val connector = PdlClientImpl(
-			wmRuntimeInfo.httpBaseUrl,
-			{ "TOKEN" },
-		)
-
-		givenThat(
-			post(urlEqualTo("/graphql"))
-				.withHeader("Authorization", equalTo("Bearer TOKEN"))
-				.withHeader("Tema", equalTo("GEN"))
-				.withRequestBody(
-					equalToJson(
-						"""
-							{
-								"query": "${PdlQueries.HentGjeldendeIdent.query.replace("\n", "\\n").replace("\t", "\\t")}",
-								"variables": { "ident": "112233445566" }
-							}
-						""".trimIndent()
-					)
-				)
-				.willReturn(
-					aResponse()
-						.withStatus(200)
-						.withBody(
-							"""
-								{
-									"errors": null,
-									"data": {
-										"hentIdenter": {
-										  "identer": [
-											{
-											  "ident": "12345678900"
-											}
-										  ]
-										}
-									  }
-								}
-							""".trimIndent()
-						)
-				)
-
-		)
-
-		val gjeldendeIdent = connector.hentGjeldendePersonligIdent("112233445566")
-		assertEquals("12345678900", gjeldendeIdent)
-	}
-
-	@Test
-	fun `hentGjeldendePersonligIdent skal kaste exception hvis data mangler`(wmRuntimeInfo: WireMockRuntimeInfo) {
-		val connector = PdlClientImpl(
-			wmRuntimeInfo.httpBaseUrl,
-			{ "TOKEN" },
-		)
-
-		givenThat(
-			post(urlEqualTo("/graphql"))
-				.willReturn(
-					aResponse()
-						.withStatus(200)
-						.withBody(
-							"""
-								{
-									"errors": [{"message": "error :("}],
-									"data": null
-								}
-							""".trimIndent()
-						)
-				)
-		)
-
-		val exception = assertThrows<RuntimeException> {
-			connector.hentGjeldendePersonligIdent("112233445566")
-		}
-
-		assertEquals("PDL respons inneholder ikke data", exception.message)
-	}
-
-	@Test
-	fun `hentBruker - Detaljert respons - skal kaste exception med noe detaljert informasjon`(wmRuntimeInfo: WireMockRuntimeInfo) {
-		val connector = PdlClientImpl(
-			wmRuntimeInfo.httpBaseUrl,
-			{ "TOKEN" },
-		)
-
-		givenThat(
-			post(urlEqualTo("/graphql"))
-				.willReturn(
-					aResponse()
-						.withStatus(200)
-						.withBody(minimalFeilRespons)
-				)
-		)
-		val exception = assertThrows<RuntimeException> {
-			connector.hentBruker("FNR")
-		}
-
-		assertEquals(
-			errorPrefix + nullError +
-				"- Ikke tilgang til å se person (code: unauthorized details: PdlErrorDetails(type=abac-deny, cause=cause-0001-manglerrolle, policy=adressebeskyttelse_strengt_fortrolig_adresse))\n",
-			exception.message
-		)
-	}
-
-	@Test
-	fun `hentBruker - Flere feil i respons - skal kaste exception med noe detaljert informasjon`(wmRuntimeInfo: WireMockRuntimeInfo) {
-		val connector = PdlClientImpl(
-			wmRuntimeInfo.httpBaseUrl,
-			{ "TOKEN" },
-		)
-
-		givenThat(
-			post(urlEqualTo("/graphql"))
-				.willReturn(
-					aResponse()
-						.withStatus(200)
-						.withBody(flereFeilRespons)
-				)
-		)
-		val exception = assertThrows<RuntimeException> {
-			connector.hentBruker("FNR")
-		}
-
-		assertEquals(
-			errorPrefix + nullError +
-				"- Ikke tilgang til å se person (code: unauthorized details: PdlErrorDetails(type=abac-deny, cause=cause-0001-manglerrolle, policy=adressebeskyttelse_strengt_fortrolig_adresse))\n" +
-				"- Test (code: unauthorized details: PdlErrorDetails(type=abac-deny, cause=cause-0001-manglerrolle, policy=adressebeskyttelse_strengt_fortrolig_adresse))\n",
-			exception.message
-		)
-	}
-
-	val minimalFeilRespons = """
+		val expectedJson =
+			"""
 				{
-					"errors": [
-						{
-						  "message": "Ikke tilgang til å se person",
-						  "locations": [
-							{
-							  "line": 2,
-							  "column": 5
-							}
-						  ],
-						  "path": [
-							"hentPerson"
-						  ],
-						  "extensions": {
-							"code": "unauthorized",
-							"details": {
-							  "type": "abac-deny",
-							  "cause": "cause-0001-manglerrolle",
-							  "policy": "adressebeskyttelse_strengt_fortrolig_adresse"
-							},
-							"classification": "ExecutionAborted"
-						  }
-						}
-  					]
+					"query": "${PdlQueries.HentBruker.query.replace("\n", "\\n").replace("\t", "\\t")}",
+					"variables": { "ident": "FNR" }
 				}
 			""".trimIndent()
 
-	var flereFeilRespons = """
-				{
-					"errors": [
-						{
-						  "message": "Ikke tilgang til å se person",
-						  "extensions": {
-							"code": "unauthorized",
-							"details": {
-							  "type": "abac-deny",
-							  "cause": "cause-0001-manglerrolle",
-							  "policy": "adressebeskyttelse_strengt_fortrolig_adresse"
-							}
-						  }
-						},
+		request.body.readUtf8() shouldEqualJson expectedJson
+	}
 
-						{
-						  "message": "Test",
-						  "extensions": {
-							"code": "unauthorized",
-							"details": {
-							  "type": "abac-deny",
-							  "cause": "cause-0001-manglerrolle",
-							  "policy": "adressebeskyttelse_strengt_fortrolig_adresse"
+	test("hentBruker - data mangler - skal kaste exception") {
+		val client = PdlClientImpl(
+			serverUrl,
+			{ "TOKEN" },
+		)
+
+		server.enqueue(
+			MockResponse().setBody(
+				"""
+					{
+						"errors": [{"message": "Noe gikk galt"}],
+						"data": null
+					}
+				""".trimIndent()
+			)
+		)
+
+		val exception = assertThrows<RuntimeException> {
+			client.hentBruker("FNR")
+		}
+
+		exception.message shouldBe "$errorPrefix$nullError- Noe gikk galt (code: null details: null)\n"
+
+		val request = server.takeRequest()
+
+		request.path shouldBe "/graphql"
+		request.method shouldBe "POST"
+	}
+
+	test("hentGjeldendePersonligIdent skal lage riktig request og parse response") {
+		val client = PdlClientImpl(
+			serverUrl,
+			{ "TOKEN" },
+		)
+
+		server.enqueue(
+			MockResponse().setBody(
+				"""
+					{
+						"errors": null,
+						"data": {
+							"hentIdenter": {
+							  "identer": [
+								{
+								  "ident": "12345678900"
+								}
+							  ]
 							}
 						  }
-						}
-  					]
+					}
+				""".trimIndent()
+			)
+		)
+
+		val gjeldendeIdent = client.hentGjeldendePersonligIdent("112233445566")
+
+		gjeldendeIdent shouldBe "12345678900"
+
+		val request = server.takeRequest()
+
+		request.path shouldBe "/graphql"
+		request.method shouldBe "POST"
+		request.getHeader("Authorization") shouldBe "Bearer TOKEN"
+		request.getHeader("Tema") shouldBe "GEN"
+
+		val expectedJson =
+			"""
+				{
+					"query": "${PdlQueries.HentGjeldendeIdent.query.replace("\n", "\\n").replace("\t", "\\t")}",
+					"variables": { "ident": "112233445566" }
 				}
 			""".trimIndent()
 
-	var gyldigRespons = """
-		{
-			"errors": null,
-			"data": {
-				"hentPerson": {
-					"navn": [
-						{
-							"fornavn": "Tester",
-							"mellomnavn": "Test",
-							"etternavn": "Testersen"
-						}
-					],
-					"telefonnummer": [
-						{
-							"landskode": "+47",
-							"nummer": "98765432",
-							"prioritet": 2
-						},
-						{
-							"landskode": "+47",
-							"nummer": "12345678",
-							"prioritet": 1
-						}
-					],
-					"adressebeskyttelse": [
-						{
-							"gradering": "FORTROLIG"
-						}
-					]
-				}
-			}
+		request.body.readUtf8() shouldEqualJson expectedJson
+	}
+
+	test("hentGjeldendePersonligIdent skal kaste exception hvis data mangler") {
+		val client = PdlClientImpl(
+			serverUrl,
+			{ "TOKEN" },
+		)
+
+		server.enqueue(
+			MockResponse().setBody(
+				"""
+					{
+						"errors": [{"message": "error :("}],
+						"data": null
+					}
+				""".trimIndent()
+			)
+		)
+
+		val exception = assertThrows<RuntimeException> {
+			client.hentGjeldendePersonligIdent("112233445566")
 		}
-	""".trimIndent()
-}
+
+		exception.message shouldBe "PDL respons inneholder ikke data"
+
+		val request = server.takeRequest()
+
+		request.path shouldBe "/graphql"
+		request.method shouldBe "POST"
+		request.getHeader("Authorization") shouldBe "Bearer TOKEN"
+		request.getHeader("Tema") shouldBe "GEN"
+	}
+
+	test("hentBruker - Detaljert respons - skal kaste exception med noe detaljert informasjon") {
+		val client = PdlClientImpl(
+			serverUrl,
+			{ "TOKEN" },
+		)
+
+		server.enqueue(MockResponse().setBody(minimalFeilRespons))
+
+		val exception = assertThrows<RuntimeException> {
+			client.hentBruker("FNR")
+		}
+
+		exception.message shouldBe errorPrefix + nullError +
+			"- Ikke tilgang til å se person (code: unauthorized details: PdlErrorDetails(type=abac-deny, cause=cause-0001-manglerrolle, policy=adressebeskyttelse_strengt_fortrolig_adresse))\n"
+	}
+
+	test("hentBruker - Flere feil i respons - skal kaste exception med noe detaljert informasjon") {
+		val client = PdlClientImpl(
+			serverUrl,
+			{ "TOKEN" },
+		)
+
+		server.enqueue(MockResponse().setBody(flereFeilRespons))
+
+		val exception = assertThrows<RuntimeException> {
+			client.hentBruker("FNR")
+		}
+
+		exception.message shouldBe errorPrefix + nullError +
+			"- Ikke tilgang til å se person (code: unauthorized details: PdlErrorDetails(type=abac-deny, cause=cause-0001-manglerrolle, policy=adressebeskyttelse_strengt_fortrolig_adresse))\n" +
+			"- Test (code: unauthorized details: PdlErrorDetails(type=abac-deny, cause=cause-0001-manglerrolle, policy=adressebeskyttelse_strengt_fortrolig_adresse))\n"
+	}
+
+})

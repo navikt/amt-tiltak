@@ -10,5 +10,5 @@ data class BrukerInsertDbo(
 	val telefonnummer: String?,
 	val epost: String?,
 	val ansvarligVeilederId: UUID?,
-	val navKontorId: UUID?
+	val navEnhetId: UUID?
 )

@@ -17,7 +17,7 @@ open class DkifConnectorConfig {
 	@Bean
 	open fun dkifClient(machineToMachineTokenClient: MachineToMachineTokenClient): DkifClient {
 		return DkifClientImpl(
-			url = url,
+			baseUrl = url,
 			tokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(scope) },
 		)
 	}

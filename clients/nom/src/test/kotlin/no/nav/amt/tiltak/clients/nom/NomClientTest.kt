@@ -9,16 +9,20 @@ import okhttp3.mockwebserver.MockWebServer
 
 class NomGraphqlClientTest : StringSpec({
 
+	val server = MockWebServer()
+	val serverUrl = server.url("").toString().removeSuffix("/")
+
+	afterSpec {
+		server.shutdown()
+	}
+
 	val token = "DUMMYTOKEN"
 
-	lateinit var server: MockWebServer
 	lateinit var client: NomClientImpl
 	isolationMode = IsolationMode.InstancePerTest
 
 	beforeTest {
-		server = MockWebServer()
-
-		client = NomClientImpl(server.url("").toString(), { token })
+		client = NomClientImpl(serverUrl, { token })
 	}
 
 	"hentVeileder - veileder finnes - returnerer veileder" {

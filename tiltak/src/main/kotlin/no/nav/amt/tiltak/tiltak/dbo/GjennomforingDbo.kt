@@ -10,18 +10,18 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class GjennomforingDbo(
-    val id: UUID,
-    val arrangorId: UUID,
-    val tiltakId: UUID,
-    val navn: String,
-    val status: Gjennomforing.Status,
-    val startDato: LocalDate?,
-    val sluttDato: LocalDate?,
-    val registrertDato: LocalDateTime,
-    val fremmoteDato: LocalDateTime?,
-	val navKontorId: UUID?,
-    val createdAt: LocalDateTime,
-    val modifiedAt: LocalDateTime
+	val id: UUID,
+	val arrangorId: UUID,
+	val tiltakId: UUID,
+	val navn: String,
+	val status: Gjennomforing.Status,
+	val startDato: LocalDate?,
+	val sluttDato: LocalDate?,
+	val registrertDato: LocalDateTime,
+	val fremmoteDato: LocalDateTime?,
+	val navEnhetId: UUID?,
+	val createdAt: LocalDateTime,
+	val modifiedAt: LocalDateTime
 ) {
 
 	fun toGjennomforing(tiltak: Tiltak, arrangor: Arrangor): Gjennomforing {
@@ -33,7 +33,7 @@ data class GjennomforingDbo(
 			status = status,
 			startDato = startDato,
 			sluttDato = sluttDato,
-			navKontorId = navKontorId,
+			navEnhetId = navEnhetId,
 			registrertDato = registrertDato,
 			fremmoteDato = fremmoteDato
 		)
