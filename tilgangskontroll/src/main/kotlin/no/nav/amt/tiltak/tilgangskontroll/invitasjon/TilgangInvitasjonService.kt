@@ -62,8 +62,6 @@ open class TilgangInvitasjonService(
 		val foresporselId = UUID.randomUUID()
 
 		transactionTemplate.executeWithoutResult {
-			tilgangInvitasjonRepository.settTilBrukt(invitasjonId, foresporselId)
-
 			tilgangForesporselService.opprettForesporsel(
 				OpprettForesporselInput(
 					id = foresporselId,
@@ -74,6 +72,8 @@ open class TilgangInvitasjonService(
 					gjennomforingId = invitasjon.gjennomforingId,
 				)
 			)
+
+			tilgangInvitasjonRepository.settTilBrukt(invitasjonId, foresporselId)
 		}
 	}
 
