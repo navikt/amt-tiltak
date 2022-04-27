@@ -87,7 +87,8 @@ class ArrangorAnsattTilgangServiceImpl(
 
 	private fun hentGjennomforingerForAnsatt(ansattId: UUID): List<UUID> {
 		return tryCacheFirstNotNull(ansattIdToGjennomforingIdListCache, ansattId) {
-			gjennomforingTilgangRepository.hentGjennomforingerForAnsatt(ansattId)
+			gjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
+				.map { it.gjennomforingId }
 		}
 	}
 

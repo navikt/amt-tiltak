@@ -10,6 +10,7 @@ import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
+import java.time.ZonedDateTime
 import java.util.*
 
 class ArrangorAnsattTilgangServiceImplTest : FunSpec({
@@ -54,8 +55,8 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	test("verifiserTilgangTilGjennomforing skal kaste exception hvis ikke tilgang") {
 		every {
-			gjennomforingTilgangRepository.hentGjennomforingerForAnsatt(ansattId)
-		} returns listOf(UUID.randomUUID())
+			gjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
+		} returns emptyList()
 
 		val exception = shouldThrowExactly<ResponseStatusException> {
 			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(personligIdent, gjennomforingId)
@@ -66,8 +67,16 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	test("verifiserTilgangTilGjennomforing skal ikke kaste exception hvis tilgang") {
 		every {
-			gjennomforingTilgangRepository.hentGjennomforingerForAnsatt(ansattId)
-		} returns listOf(gjennomforingId)
+			gjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
+		} returns listOf(GjennomforingTilgangDbo(
+			id = UUID.randomUUID(),
+			ansattId = ansattId,
+			gjennomforingId = gjennomforingId,
+			opprettetAvNavAnsattId = UUID.randomUUID(),
+			stoppetAvNavAnsattId = null,
+			stoppetTidspunkt = null,
+			createdAt = ZonedDateTime.now()
+		))
 
 		shouldNotThrow<Throwable> {
 			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(personligIdent, gjennomforingId)

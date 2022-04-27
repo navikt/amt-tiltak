@@ -53,16 +53,24 @@ class GjennomforingTilgangRepositoryTest : FunSpec({
 		testRepository.insertTiltak(TILTAK_1)
 		testRepository.insertGjennomforing(GJENNOMFORING_1)
 
-		repository.opprettTilgang(UUID.randomUUID(), ARRANGOR_ANSATT_1.id, NAV_ANSATT_1.id, GJENNOMFORING_1.id)
+		val tilgangId = UUID.randomUUID()
 
-		val gjennomforingIder = repository.hentGjennomforingerForAnsatt(ARRANGOR_ANSATT_1.id)
+		repository.opprettTilgang(tilgangId, ARRANGOR_ANSATT_1.id, NAV_ANSATT_1.id, GJENNOMFORING_1.id)
 
-		gjennomforingIder.first() shouldBe GJENNOMFORING_1.id
+		val tilgang = repository.get(tilgangId)
+
+		tilgang.id shouldBe tilgangId
+		tilgang.gjennomforingId shouldBe GJENNOMFORING_1.id
+		tilgang.stoppetTidspunkt shouldBe null
+		tilgang.stoppetAvNavAnsattId shouldBe null
+		tilgang.opprettetAvNavAnsattId shouldBe NAV_ANSATT_1.id
+		tilgang.ansattId shouldBe ARRANGOR_ANSATT_1.id
 	}
 
-	test("hentGjennomforingerForAnsatt skal returnere ider") {
+	test("hentAktiveGjennomforingTilgangerForAnsatt - skal returnere tilganger som ikke er stoppet") {
 		testRepository.insertNavEnhet(NAV_ENHET_1)
 		testRepository.insertNavEnhet(NAV_ENHET_2)
+		testRepository.insertNavAnsatt(NAV_ANSATT_1)
 		testRepository.insertArrangor(ARRANGOR_1)
 		testRepository.insertArrangor(ARRANGOR_2)
 		testRepository.insertArrangorAnsatt(ARRANGOR_ANSATT_1)
@@ -74,45 +82,24 @@ class GjennomforingTilgangRepositoryTest : FunSpec({
 		val gjennomforing1Id = GJENNOMFORING_1.id
 		val gjennomforing2Id = GJENNOMFORING_2.id
 
+		val tilgangId1 = UUID.randomUUID()
+		val tilgangId2 = UUID.randomUUID()
+
 		testRepository.insertArrangorAnsattGjennomforingTilgang(InsertArrangorAnsattGjennomforingTilgang(
-			UUID.randomUUID(), ansattId, gjennomforing1Id
+			tilgangId1, ansattId, gjennomforing1Id
 		))
 
 		testRepository.insertArrangorAnsattGjennomforingTilgang(InsertArrangorAnsattGjennomforingTilgang(
-			UUID.randomUUID(), ansattId, gjennomforing2Id
+			tilgangId2, ansattId, gjennomforing2Id
 		))
 
-		val ider = repository.hentGjennomforingerForAnsatt(ansattId)
+		repository.stopTilgang(tilgangId2, NAV_ANSATT_1.id, ZonedDateTime.now().minusMinutes(1))
 
-		ider.size shouldBe 2
-		ider.contains(gjennomforing1Id) shouldBe true
-		ider.contains(gjennomforing2Id) shouldBe true
-	}
+		val tilganger = repository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
 
-	test("hentGjennomforingerForAnsattHosArrangor skal returnere ider") {
-		testRepository.insertNavEnhet(NAV_ENHET_1)
-		testRepository.insertNavEnhet(NAV_ENHET_2)
-		testRepository.insertArrangor(ARRANGOR_1)
-		testRepository.insertArrangor(ARRANGOR_2)
-		testRepository.insertArrangorAnsatt(ARRANGOR_ANSATT_1)
-		testRepository.insertTiltak(TILTAK_1)
-		testRepository.insertGjennomforing(GJENNOMFORING_1)
-		testRepository.insertGjennomforing(GJENNOMFORING_2)
-
-		val ansattId = ARRANGOR_ANSATT_1.id
-
-		testRepository.insertArrangorAnsattGjennomforingTilgang(InsertArrangorAnsattGjennomforingTilgang(
-			UUID.randomUUID(), ansattId, GJENNOMFORING_1.id
-		))
-
-		testRepository.insertArrangorAnsattGjennomforingTilgang(InsertArrangorAnsattGjennomforingTilgang(
-			UUID.randomUUID(), ansattId, GJENNOMFORING_2.id
-		))
-
-		val ider = repository.hentGjennomforingerForAnsattHosArrangor(ansattId, GJENNOMFORING_2.arrangor_id)
-
-		ider.size shouldBe 1
-		ider[0] shouldBe GJENNOMFORING_2.id
+		tilganger.size shouldBe 1
+		tilganger.any { it.gjennomforingId == gjennomforing1Id } shouldBe true
+		tilganger.any { it.gjennomforingId == gjennomforing2Id } shouldBe false
 	}
 
 	test("stopTilgang - skal stoppe tilgang") {
