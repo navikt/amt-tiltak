@@ -12,8 +12,8 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @RestController
-@RequestMapping("/api/nav-ansatt/tilgang")
-class NavAnsattTilgangController(
+@RequestMapping("/api/nav-ansatt/arrangor-ansatt-tilgang")
+class NavAnsattArrangorAnsattTilgangController(
 	private val authService: AuthService,
 	private val navAnsattTilgangService: NavAnsattTilgangService,
 	private val veilederService: VeilederService,

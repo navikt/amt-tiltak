@@ -23,8 +23,8 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [NavAnsattTilgangController::class])
-class NavAnsattTilgangControllerTest {
+@WebMvcTest(controllers = [NavAnsattArrangorAnsattTilgangController::class])
+class NavAnsattArrangorAnsattTilgangControllerTest {
 
 	companion object : MockOAuthServer() {
 		@AfterAll
@@ -55,7 +55,7 @@ class NavAnsattTilgangControllerTest {
 	@Test
 	fun `hentTilganger() - skal returnere 401 hvis token mangler`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/nav-ansatt/tilgang?gjennomforingId=${UUID.randomUUID()}")
+			MockMvcRequestBuilders.get("/api/nav-ansatt/arrangor-ansatt-tilgang?gjennomforingId=${UUID.randomUUID()}")
 		).andReturn().response
 
 		assertEquals(401, response.status)
@@ -83,7 +83,7 @@ class NavAnsattTilgangControllerTest {
 			)))
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/nav-ansatt/tilgang?gjennomforingId=$gjennomforingId")
+			MockMvcRequestBuilders.get("/api/nav-ansatt/arrangor-ansatt-tilgang?gjennomforingId=$gjennomforingId")
 				.header("Authorization", "Bearer ${azureAdToken()}")
 		).andReturn().response
 
@@ -98,7 +98,7 @@ class NavAnsattTilgangControllerTest {
 	@Test
 	fun `stopTilgang() - skal returnere 401 hvis token mangler`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.patch("/api/nav-ansatt/tilgang/${UUID.randomUUID()}/stop")
+			MockMvcRequestBuilders.patch("/api/nav-ansatt/arrangor-ansatt-tilgang/${UUID.randomUUID()}/stop")
 		).andReturn().response
 
 		assertEquals(401, response.status)
@@ -133,7 +133,7 @@ class NavAnsattTilgangControllerTest {
 			))
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.patch("/api/nav-ansatt/tilgang/$tilgangId/stop")
+			MockMvcRequestBuilders.patch("/api/nav-ansatt/arrangor-ansatt-tilgang/$tilgangId/stop")
 				.header("Authorization", "Bearer ${azureAdToken()}")
 		).andReturn().response
 

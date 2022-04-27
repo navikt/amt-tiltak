@@ -21,8 +21,8 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [NavAnsattTilgangInvitasjonController::class])
-class NavAnsattTilgangInvitasjonControllerTest {
+@WebMvcTest(controllers = [NavAnsattArrangorAnsattTilgangInvitasjonController::class])
+class NavAnsattArrangorAnsattTilgangInvitasjonControllerTest {
 
 	companion object : MockOAuthServer() {
 		@AfterAll
@@ -52,7 +52,7 @@ class NavAnsattTilgangInvitasjonControllerTest {
 	@Test
 	fun `hentUbrukteInvitasjoner() - skal returnere 401 hvis token mangler`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/nav-ansatt/tilgang/invitasjon/ubrukt?gjennomforingId=${UUID.randomUUID()}")
+			MockMvcRequestBuilders.get("/api/nav-ansatt/arrangor-ansatt-tilgang/invitasjon/ubrukt?gjennomforingId=${UUID.randomUUID()}")
 		).andReturn().response
 
 		assertEquals(401, response.status)
@@ -83,7 +83,7 @@ class NavAnsattTilgangInvitasjonControllerTest {
 			))
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/nav-ansatt/tilgang/invitasjon/ubrukt?gjennomforingId=$gjennomforingId")
+			MockMvcRequestBuilders.get("/api/nav-ansatt/arrangor-ansatt-tilgang/invitasjon/ubrukt?gjennomforingId=$gjennomforingId")
 				.header("Authorization", "Bearer ${azureAdToken()}")
 		).andReturn().response
 
@@ -98,7 +98,7 @@ class NavAnsattTilgangInvitasjonControllerTest {
 	@Test
 	fun `opprettInvitasjon() - skal returnere 401 hvis token mangler`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.post("/api/nav-ansatt/tilgang/invitasjon")
+			MockMvcRequestBuilders.post("/api/nav-ansatt/arrangor-ansatt-tilgang/invitasjon")
 		).andReturn().response
 
 		assertEquals(401, response.status)
@@ -126,11 +126,11 @@ class NavAnsattTilgangInvitasjonControllerTest {
 			.thenReturn(true)
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.post("/api/nav-ansatt/tilgang/invitasjon")
+			MockMvcRequestBuilders.post("/api/nav-ansatt/arrangor-ansatt-tilgang/invitasjon")
 				.header("Authorization", "Bearer ${azureAdToken()}")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(
-					NavAnsattTilgangInvitasjonController.OpprettInvitasjonRequest(gjennomforingId))
+					NavAnsattArrangorAnsattTilgangInvitasjonController.OpprettInvitasjonRequest(gjennomforingId))
 				)
 		).andReturn().response
 
@@ -142,7 +142,7 @@ class NavAnsattTilgangInvitasjonControllerTest {
 	@Test
 	fun `slettInvitasjon() - skal returnere 401 hvis token mangler`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.delete("/api/nav-ansatt/tilgang/invitasjon/${UUID.randomUUID()}")
+			MockMvcRequestBuilders.delete("/api/nav-ansatt/arrangor-ansatt-tilgang/invitasjon/${UUID.randomUUID()}")
 		).andReturn().response
 
 		assertEquals(401, response.status)
@@ -173,7 +173,7 @@ class NavAnsattTilgangInvitasjonControllerTest {
 			.thenReturn(true)
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.delete("/api/nav-ansatt/tilgang/invitasjon/${invitasjonId}")
+			MockMvcRequestBuilders.delete("/api/nav-ansatt/arrangor-ansatt-tilgang/invitasjon/${invitasjonId}")
 				.header("Authorization", "Bearer ${azureAdToken()}")
 		).andReturn().response
 
