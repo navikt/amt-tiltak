@@ -30,7 +30,7 @@ open class HentUbrukteInvitasjonerQuery(
 			gti.gyldig_til as gjennomforing_tilgang_invitasjon__gyldig_til
 		 from gjennomforing_tilgang_invitasjon gti
 			left join nav_ansatt na on na.id = gti.opprettet_av_nav_ansatt_id
-			where gti.gjennomforing_id = :gjennomforingId
+			where gti.gjennomforing_id = :gjennomforingId and gti.er_brukt = false
 	""".trimIndent()
 
 	internal fun query(gjennomforingId: UUID): List<UbruktInvitasjonDbo> {

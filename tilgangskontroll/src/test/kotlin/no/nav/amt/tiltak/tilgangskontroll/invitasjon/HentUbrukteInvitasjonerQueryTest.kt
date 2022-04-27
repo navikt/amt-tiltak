@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.tilgangskontroll.invitasjon
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
@@ -36,19 +37,34 @@ class HentUbrukteInvitasjonerQueryTest : FunSpec({
 	}
 
 	test("skal hente ubrukte invitasjoner") {
-		val invitasjonId = UUID.randomUUID()
+		val invitasjon1Id = UUID.randomUUID()
+		val invitasjon2Id = UUID.randomUUID()
 		val gyldigTil = ZonedDateTime.now()
 
 		testDataRepository.insertTilgangInvitasjon(InsertTilgangInvitasjonCommand(
-			id = invitasjonId,
+			id = invitasjon1Id,
 			gjennomforingId = GJENNOMFORING_1.id,
 			gyldigTil = gyldigTil,
-			opprettetAvNavAnsattId = NAV_ANSATT_1.id
+			opprettetAvNavAnsattId = NAV_ANSATT_1.id,
+			erBrukt = false
 		))
 
-		val invitasjon = hentUbrukteInvitasjonerQuery.query(GJENNOMFORING_1.id).first()
+		testDataRepository.insertTilgangInvitasjon(InsertTilgangInvitasjonCommand(
+			id = invitasjon2Id,
+			gjennomforingId = GJENNOMFORING_1.id,
+			gyldigTil = gyldigTil,
+			opprettetAvNavAnsattId = NAV_ANSATT_1.id,
+			erBrukt = true,
+			tidspunktBrukt = ZonedDateTime.now()
+		))
 
-		invitasjon.id shouldBe invitasjonId
+		val invitasjoner = hentUbrukteInvitasjonerQuery.query(GJENNOMFORING_1.id)
+
+		invitasjoner shouldHaveSize 1
+
+		val invitasjon = invitasjoner.first()
+
+		invitasjon.id shouldBe invitasjon1Id
 		invitasjon.gyldigTilDato.toLocalDate() shouldBe gyldigTil.toLocalDate()
 		invitasjon.opprettetDato.toLocalDate() shouldBe LocalDate.now()
 		invitasjon.opprettetAvNavIdent shouldBe NAV_ANSATT_1.nav_ident
