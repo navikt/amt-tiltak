@@ -19,7 +19,7 @@ import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController
-@RequestMapping(value = [ "/api/gjennomforing", "/api/tiltakarrangor/gjennomforing" ])
+@RequestMapping(value = [ "/api/gjennomforing", "/api/tiltaksarrangor/gjennomforing" ])
 class TiltakarrangorGjennomforingController(
 	private val gjennomforingService: GjennomforingService,
 	private val deltakerService: DeltakerService,

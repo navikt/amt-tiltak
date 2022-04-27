@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 
 @RestController
-@RequestMapping(value = [ "/api/arrangor/ansatt", "/api/tiltakarrangor/ansatt" ])
+@RequestMapping(value = [ "/api/arrangor/ansatt", "/api/tiltaksarrangor/ansatt" ])
 class TiltakarrangorAnsattController(
 	private val authService: AuthService,
 	private val arrangorAnsattService: ArrangorAnsattService

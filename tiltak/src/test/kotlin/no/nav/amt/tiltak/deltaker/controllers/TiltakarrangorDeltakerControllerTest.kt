@@ -89,7 +89,7 @@ class TiltakarrangorDeltakerControllerTest {
 	@Test
 	fun `hentTiltakDeltakerDetaljer() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltakarrangor/tiltak-deltaker/$deltakerId")
+			MockMvcRequestBuilders.get("/api/tiltaksarrangor/tiltak-deltaker/$deltakerId")
 		).andReturn().response
 
 		Assertions.assertEquals(401, response.status)
@@ -106,7 +106,7 @@ class TiltakarrangorDeltakerControllerTest {
 			.thenReturn(tiltakDeltakerDetaljerDto)
 
 		mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltakarrangor/tiltak-deltaker/$deltakerId")
+			MockMvcRequestBuilders.get("/api/tiltaksarrangor/tiltak-deltaker/$deltakerId")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
@@ -123,7 +123,7 @@ class TiltakarrangorDeltakerControllerTest {
 			.thenReturn(tiltakDeltakerDetaljerDto)
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltakarrangor/tiltak-deltaker/$deltakerId")
+			MockMvcRequestBuilders.get("/api/tiltaksarrangor/tiltak-deltaker/$deltakerId")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 

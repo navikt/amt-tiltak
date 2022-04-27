@@ -47,7 +47,7 @@ class TiltakarrangorAnsattControllerTest {
 	@Test
 	fun `getInnloggetAnsatt() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltakarrangor/ansatt/meg")
+			MockMvcRequestBuilders.get("/api/tiltaksarrangor/ansatt/meg")
 		).andReturn().response
 
 		assertEquals(401, response.status)
@@ -69,7 +69,7 @@ class TiltakarrangorAnsattControllerTest {
 			))
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltakarrangor/ansatt/meg")
+			MockMvcRequestBuilders.get("/api/tiltaksarrangor/ansatt/meg")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 

@@ -113,7 +113,7 @@ class TiltakarrangorGjennomforingControllerTest {
 	@Test
 	fun `hentGjennomforingerByArrangorId() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltakarrangor/gjennomforing")
+			MockMvcRequestBuilders.get("/api/tiltaksarrangor/gjennomforing")
 				.queryParam("arrangorId", "test")
 		).andReturn().response
 
@@ -125,7 +125,7 @@ class TiltakarrangorGjennomforingControllerTest {
 		val token = tokenXToken("test", "test")
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltakarrangor/gjennomforing")
+			MockMvcRequestBuilders.get("/api/tiltaksarrangor/gjennomforing")
 				.queryParam("arrangorId", UUID.randomUUID().toString())
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
@@ -136,7 +136,7 @@ class TiltakarrangorGjennomforingControllerTest {
 	@Test
 	fun `hentGjennomforing() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltakarrangor/gjennomforing/$gjennomforingId")
+			MockMvcRequestBuilders.get("/api/tiltaksarrangor/gjennomforing/$gjennomforingId")
 		).andReturn().response
 
 		assertEquals(401, response.status)
@@ -149,7 +149,7 @@ class TiltakarrangorGjennomforingControllerTest {
 		Mockito.`when`(gjennomforingService.getGjennomforing(gjennomforingId)).thenReturn(gjennomforing)
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltakarrangor/gjennomforing/$gjennomforingId")
+			MockMvcRequestBuilders.get("/api/tiltaksarrangor/gjennomforing/$gjennomforingId")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
@@ -163,7 +163,7 @@ class TiltakarrangorGjennomforingControllerTest {
 		Mockito.`when`(gjennomforingService.getGjennomforing(gjennomforingId)).thenReturn(gjennomforing)
 
 		mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltakarrangor/gjennomforing/$gjennomforingId")
+			MockMvcRequestBuilders.get("/api/tiltaksarrangor/gjennomforing/$gjennomforingId")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
@@ -175,7 +175,7 @@ class TiltakarrangorGjennomforingControllerTest {
 	@Test
 	fun `hentDeltakere() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltakarrangor/gjennomforing/ID/deltakere")
+			MockMvcRequestBuilders.get("/api/tiltaksarrangor/gjennomforing/ID/deltakere")
 		).andReturn().response
 
 		assertEquals(401, response.status)
@@ -190,7 +190,7 @@ class TiltakarrangorGjennomforingControllerTest {
 		Mockito.`when`(deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)).thenReturn(listOf(deltaker))
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltakarrangor/gjennomforing/$gjennomforingId/deltakere")
+			MockMvcRequestBuilders.get("/api/tiltaksarrangor/gjennomforing/$gjennomforingId/deltakere")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
@@ -206,7 +206,7 @@ class TiltakarrangorGjennomforingControllerTest {
 		Mockito.`when`(deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)).thenReturn(listOf(deltaker))
 
 		mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltakarrangor/gjennomforing/$gjennomforingId/deltakere")
+			MockMvcRequestBuilders.get("/api/tiltaksarrangor/gjennomforing/$gjennomforingId/deltakere")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
