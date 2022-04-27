@@ -45,7 +45,8 @@ open class TilgangForesporselService(
 
 			gjennomforingTilgangService.opprettTilgang(
 				id = nyGjennomforingTilgangId,
-				ansattId = nyAnsatt.id,
+				arrangorAnsattId = nyAnsatt.id,
+				opprettetAvNavAnsattId = beslutningAvNavAnsattId,
 				gjennomforingId = foresporsel.gjennomforingId
 			)
 

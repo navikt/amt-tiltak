@@ -12,8 +12,8 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @RestController
-@RequestMapping("/api/nav-ansatt/tilgang/invitasjon")
-class NavAnsattTilgangInvitasjonController(
+@RequestMapping("/api/nav-ansatt/arrangor-ansatt-tilgang/invitasjon")
+class NavAnsattArrangorAnsattTilgangInvitasjonController(
 	private val tilgangInvitasjonService: TilgangInvitasjonService,
 	private val authService: AuthService,
 	private val veilederService: VeilederService,

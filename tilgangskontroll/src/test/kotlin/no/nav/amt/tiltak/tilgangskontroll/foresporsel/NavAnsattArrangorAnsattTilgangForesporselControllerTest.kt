@@ -19,8 +19,8 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [NavAnsattTilgangForesporselController::class])
-class NavAnsattTilgangForesporselControllerTest {
+@WebMvcTest(controllers = [NavAnsattArrangorAnsattTilgangForesporselController::class])
+class NavAnsattArrangorAnsattTilgangForesporselControllerTest {
 
 	companion object : MockOAuthServer() {
 		@AfterAll
@@ -48,7 +48,7 @@ class NavAnsattTilgangForesporselControllerTest {
 	@Test
 	fun `hentUbesluttedeForesporsler() - skal returnere 401 hvis token mangler`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/nav-ansatt/tilgang/foresporsel/ubesluttet")
+			MockMvcRequestBuilders.get("/api/nav-ansatt/arrangor-ansatt-tilgang/foresporsel/ubesluttet")
 		).andReturn().response
 
 		assertEquals(401, response.status)
@@ -81,7 +81,7 @@ class NavAnsattTilgangForesporselControllerTest {
 			.thenReturn(true)
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/nav-ansatt/tilgang/foresporsel/ubesluttet?gjennomforingId=$gjennomforingId")
+			MockMvcRequestBuilders.get("/api/nav-ansatt/arrangor-ansatt-tilgang/foresporsel/ubesluttet?gjennomforingId=$gjennomforingId")
 				.header("Authorization", "Bearer ${azureAdToken()}")
 		).andReturn().response
 
@@ -96,7 +96,7 @@ class NavAnsattTilgangForesporselControllerTest {
 	@Test
 	fun `godkjennForesporsel() - skal returnere 401 hvis token mangler`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.patch("/api/nav-ansatt/tilgang/foresporsel/${UUID.randomUUID()}/godkjenn")
+			MockMvcRequestBuilders.patch("/api/nav-ansatt/arrangor-ansatt-tilgang/foresporsel/${UUID.randomUUID()}/godkjenn")
 		).andReturn().response
 
 		assertEquals(401, response.status)
@@ -139,7 +139,7 @@ class NavAnsattTilgangForesporselControllerTest {
 			.thenReturn(true)
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.patch("/api/nav-ansatt/tilgang/foresporsel/$foresporselId/godkjenn")
+			MockMvcRequestBuilders.patch("/api/nav-ansatt/arrangor-ansatt-tilgang/foresporsel/$foresporselId/godkjenn")
 				.header("Authorization", "Bearer ${azureAdToken()}")
 		).andReturn().response
 
@@ -151,7 +151,7 @@ class NavAnsattTilgangForesporselControllerTest {
 	@Test
 	fun `avvisForesporsel() - skal returnere 401 hvis token mangler`() {
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.patch("/api/nav-ansatt/tilgang/foresporsel/${UUID.randomUUID()}/avvis")
+			MockMvcRequestBuilders.patch("/api/nav-ansatt/arrangor-ansatt-tilgang/foresporsel/${UUID.randomUUID()}/avvis")
 		).andReturn().response
 
 		assertEquals(401, response.status)
@@ -194,7 +194,7 @@ class NavAnsattTilgangForesporselControllerTest {
 			.thenReturn(true)
 
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.patch("/api/nav-ansatt/tilgang/foresporsel/$foresporselId/avvis")
+			MockMvcRequestBuilders.patch("/api/nav-ansatt/arrangor-ansatt-tilgang/foresporsel/$foresporselId/avvis")
 				.header("Authorization", "Bearer ${azureAdToken()}")
 		).andReturn().response
 
