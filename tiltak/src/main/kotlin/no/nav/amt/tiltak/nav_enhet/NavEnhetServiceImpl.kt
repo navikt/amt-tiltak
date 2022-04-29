@@ -28,7 +28,7 @@ open class NavEnhetServiceImpl(
 	}
 
 	override fun getNavEnhet(enhetId: String) = navEnhetRepository.hentEnhet(enhetId)?.toNavEnhet()
-		?: throw IllegalStateException("Ugyldig kontor ($enhetId")
+		?: throw IllegalStateException("Ugyldig kontor $enhetId")
 
 	override fun getNavEnhet(id: UUID) = navEnhetRepository.get(id).toNavEnhet()
 

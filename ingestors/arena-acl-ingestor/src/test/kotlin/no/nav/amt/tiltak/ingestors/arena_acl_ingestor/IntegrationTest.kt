@@ -20,7 +20,10 @@ import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.DeltakerProcesso
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.GjennomforingProcessor
 import no.nav.amt.tiltak.nav_enhet.NavEnhetRepository
 import no.nav.amt.tiltak.nav_enhet.NavEnhetServiceImpl
+import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
+import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
@@ -98,7 +101,7 @@ class IntegrationTest {
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, arrangorService, transactionTemplate)
 		deltakerProcessor = DeltakerProcessor(gjennomforingService, deltakerService, personService)
 
-		gjennomforingProcessor = GjennomforingProcessor(arrangorService, gjennomforingService, tiltakService)
+		gjennomforingProcessor = GjennomforingProcessor(arrangorService, gjennomforingService, tiltakService, navEnhetService)
 		ingestor = ArenaAclIngestorImpl(deltakerProcessor, gjennomforingProcessor)
 
 		every { enhetsregisterClient.hentVirksomhet(virksomhetsnr) } returns virksomhet
@@ -107,6 +110,12 @@ class IntegrationTest {
 		every { veilarbarenaClient.hentBrukerOppfolgingsenhetId(personIdent) } returns null
 		every { personService.hentTildeltVeileder(personIdent) } returns null
 		every { personService.hentPerson(personIdent) } returns person
+
+		DbTestDataUtils.cleanDatabase(datasource)
+
+		val testDataRepository = TestDataRepository(jdbcTemplate)
+
+		testDataRepository.insertNavEnhet(NAV_ENHET_1)
 	}
 
 	@Test
@@ -175,9 +184,11 @@ class IntegrationTest {
 		sluttDato =  LocalDate.now().minusDays(1),
 		registrertDato =  now.minusDays(5),
 		fremmoteDato =  null,
-		navEnhetId = null,
+		navEnhetId = NAV_ENHET_1.id,
 		createdAt =  now,
-		modifiedAt =  now
+		modifiedAt =  now,
+		lopenr = 123,
+		opprettetAar = 2020
 	)
 
 	val gjennomforingJson = """
@@ -198,7 +209,10 @@ class IntegrationTest {
 				"status": "${toInsertGjennomforing.status.name}",
 				"startDato": "${toInsertGjennomforing.startDato}",
 				"sluttDato": "${toInsertGjennomforing.sluttDato}",
-				"registrertDato": "${toInsertGjennomforing.registrertDato}"
+				"registrertDato": "${toInsertGjennomforing.registrertDato}",
+				"opprettetAar": ${toInsertGjennomforing.opprettetAar},
+				"lopenr": ${toInsertGjennomforing.lopenr},
+				"ansvarligNavEnhetId": "${NAV_ENHET_1.enhet_id}"
 			  }
 			}
 		""".trimIndent()

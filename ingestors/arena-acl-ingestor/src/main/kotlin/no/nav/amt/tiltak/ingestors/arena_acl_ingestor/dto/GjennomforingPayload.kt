@@ -13,7 +13,10 @@ data class GjennomforingPayload(
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val registrertDato: LocalDateTime,
-	val fremmoteDato: LocalDateTime?
+	val fremmoteDato: LocalDateTime?,
+	val ansvarligNavEnhetId: String?,
+	val opprettetAar: Int?,
+	val lopenr: Int?,
 ) {
 	enum class Status {
 		IKKE_STARTET, GJENNOMFORES, AVSLUTTET

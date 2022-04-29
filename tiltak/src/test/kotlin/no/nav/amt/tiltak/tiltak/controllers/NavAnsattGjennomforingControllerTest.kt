@@ -101,6 +101,8 @@ class NavAnsattGjennomforingControllerTest {
 		navEnhetId = UUID.randomUUID(),
 		sluttDato = LocalDate.now(),
 		status = Gjennomforing.Status.GJENNOMFORES,
+		lopenr = 123,
+		opprettetAar = 2020
 	)
 
 	@BeforeEach

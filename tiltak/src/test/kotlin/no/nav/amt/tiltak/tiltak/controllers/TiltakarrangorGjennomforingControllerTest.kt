@@ -92,6 +92,8 @@ class TiltakarrangorGjennomforingControllerTest {
 		navEnhetId = null,
 		sluttDato = LocalDate.now(),
 		status = Gjennomforing.Status.GJENNOMFORES,
+		lopenr = 123,
+		opprettetAar = 2020
 	)
 
 	@BeforeEach
