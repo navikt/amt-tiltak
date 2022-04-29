@@ -40,7 +40,10 @@ class GjennomforingServiceImpl(
 			startDato = gjennomforing.startDato,
 			sluttDato = gjennomforing.sluttDato,
 			registrertDato = gjennomforing.registrertDato,
-			fremmoteDato = gjennomforing.fremmoteDato
+			fremmoteDato = gjennomforing.fremmoteDato,
+			navEnhetId = gjennomforing.navEnhetId,
+			opprettetAar = gjennomforing.opprettetAar,
+			lopenr = gjennomforing.lopenr
 		).toGjennomforing(gjennomforing.tiltak, gjennomforing.arrangor)
 	}
 

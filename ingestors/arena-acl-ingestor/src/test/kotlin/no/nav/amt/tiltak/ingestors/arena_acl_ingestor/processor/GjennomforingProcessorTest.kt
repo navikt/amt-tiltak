@@ -6,6 +6,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.GjennomforingPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
@@ -16,20 +17,25 @@ import java.util.*
 
 class GjennomforingProcessorTest : StringSpec({
 
+	val arrangorService: ArrangorService = mockk()
+	val gjennomforingService: GjennomforingService = mockk()
+	val tiltakService: TiltakService = mockk()
+	val navEnhetService: NavEnhetService = mockk()
+
+	lateinit var gjennomforingProcessor: GjennomforingProcessor
+
+	beforeEach {
+		gjennomforingProcessor = GjennomforingProcessor(arrangorService, gjennomforingService, tiltakService, navEnhetService)
+	}
+
 	"Skal slette gjennomføring hvis melding om sletting mottas" {
 		val gjennomforingId = UUID.randomUUID()
-
-		val arrangorService: ArrangorService = mockk()
-		val gjennomforingService: GjennomforingService = mockk()
-		val tiltakService: TiltakService = mockk()
-
-		val processor = GjennomforingProcessor(arrangorService, gjennomforingService, tiltakService)
 
 		every {
 			gjennomforingService.slettGjennomforing(gjennomforingId)
 		} returns Unit
 
-		processor.processMessage(MessageWrapper(
+		gjennomforingProcessor.processMessage(MessageWrapper(
 			transactionId = "",
 			type = "",
 			timestamp = LocalDateTime.now(),
@@ -43,7 +49,10 @@ class GjennomforingProcessorTest : StringSpec({
 				startDato = null,
 				sluttDato = null,
 				registrertDato = LocalDateTime.now(),
-				fremmoteDato = null
+				fremmoteDato = null,
+				ansvarligNavEnhetId = null,
+				lopenr = null,
+				opprettetAar = null
 			)
 		))
 

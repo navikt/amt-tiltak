@@ -96,7 +96,9 @@ object TestData {
 		slutt_dato = LocalDate.of(2050, 12, 30),
 		nav_enhet_id = NAV_ENHET_1.id,
 		registrert_dato = LocalDate.of(2022, 1, 1),
-		fremmote_dato = LocalDate.of(2022, 2, 1)
+		fremmote_dato = LocalDate.of(2022, 2, 1),
+		opprettet_aar = 2020,
+		lopenr = 123
 	)
 
 	val GJENNOMFORING_2 = InsertGjennomforingCommand(
@@ -109,7 +111,9 @@ object TestData {
 		slutt_dato = LocalDate.of(2022, 2, 13),
 		nav_enhet_id = NAV_ENHET_2.id,
 		registrert_dato = LocalDate.of(2022, 1, 1),
-		fremmote_dato = LocalDate.of(2022, 2, 1)
+		fremmote_dato = LocalDate.of(2022, 2, 1),
+		opprettet_aar = 2020,
+		lopenr = 124
 	)
 
 	val GJENNOMFORING_TILGANG_1 = InsertArrangorAnsattGjennomforingTilgang(

@@ -69,7 +69,10 @@ class ArenaAclIngestorImplTest : StringSpec({
 				"startDato": "2022-01-10",
 				"sluttDato": "2022-01-12",
 				"registrertDato": "2022-01-08T11:46:44.799Z",
-				"fremmoteDato": "2022-01-10T11:46:44.799Z"
+				"fremmoteDato": "2022-01-10T11:46:44.799Z",
+				"ansvarligNavEnhetId": "1234",
+				"opprettetAar": 2020,
+				"lopenr": 65432
 			  }
 			}
 		""".trimIndent()

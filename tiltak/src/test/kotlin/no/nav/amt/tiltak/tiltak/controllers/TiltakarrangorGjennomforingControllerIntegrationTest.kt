@@ -231,7 +231,10 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 			startDato = null,
 			sluttDato = null,
 			registrertDato = LocalDateTime.now(),
-			fremmoteDato = null
+			fremmoteDato = null,
+			navEnhetId = null,
+			lopenr = 123,
+			opprettetAar = 2020
 		)
 	}
 

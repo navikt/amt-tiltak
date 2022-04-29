@@ -26,6 +26,8 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 			registrertDato = rs.getTimestamp("registrert_dato").toLocalDateTime(),
 			fremmoteDato = rs.getTimestamp("fremmote_dato")?.toLocalDateTime(),
 			navEnhetId = rs.getNullableUUID("nav_enhet_id"),
+			opprettetAar = rs.getInt("opprettet_aar"),
+			lopenr = rs.getInt("lopenr"),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
 		)
@@ -40,13 +42,16 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 		startDato: LocalDate?,
 		sluttDato: LocalDate?,
 		registrertDato: LocalDateTime,
-		fremmoteDato: LocalDateTime?
+		fremmoteDato: LocalDateTime?,
+		navEnhetId: UUID?,
+		opprettetAar: Int?,
+		lopenr: Int?,
 	): GjennomforingDbo {
 
 		//language=PostgreSQL
 		val sql = """
 		INSERT INTO gjennomforing(id, tiltak_id, arrangor_id, navn, status, start_dato,
-                           slutt_dato, registrert_dato, fremmote_dato)
+                           slutt_dato, registrert_dato, fremmote_dato, nav_enhet_id, opprettet_aar, lopenr)
 		VALUES (:id,
 				:tiltakId,
 				:arrangorId,
@@ -55,7 +60,10 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 				:startDato,
 				:sluttDato,
 				:registrertDato,
-				:fremmoteDato)
+				:fremmoteDato,
+				:navEnhetId,
+				:opprettetAar,
+				:lopenr)
 	""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
@@ -68,7 +76,10 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 				"startDato" to startDato,
 				"sluttDato" to sluttDato,
 				"registrertDato" to registrertDato,
-				"fremmoteDato" to fremmoteDato
+				"fremmoteDato" to fremmoteDato,
+				"navEnhetId" to navEnhetId,
+				"opprettetAar" to opprettetAar,
+				"lopenr" to lopenr
 			)
 		)
 
@@ -84,11 +95,14 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 			UPDATE gjennomforing
 			SET navn            = :navn,
 				status          = :status,
-				start_dato      = :start_dato,
-				slutt_dato      = :slutt_dato,
-				registrert_dato = :registrert_dato,
-				fremmote_dato   = :fremmote_dato,
-				modified_at     = :modified_at
+				start_dato      = :startDato,
+				slutt_dato      = :sluttDato,
+				registrert_dato = :registrertDato,
+				fremmote_dato   = :fremmoteDato,
+				nav_enhet_id 	= :navEnhetId,
+				opprettet_aar 	= :opprettetAar,
+				lopenr 			= :lopenr,
+				modified_at     = :modifiedAt
 			WHERE id = :id
 		""".trimIndent()
 
@@ -96,11 +110,14 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 			mapOf(
 				"navn" to gjennomforing.navn,
 				"status" to gjennomforing.status.name,
-				"start_dato" to gjennomforing.startDato,
-				"slutt_dato" to gjennomforing.sluttDato,
-				"registrert_dato" to gjennomforing.registrertDato,
-				"fremmote_dato" to gjennomforing.fremmoteDato,
-				"modified_at" to gjennomforing.modifiedAt,
+				"startDato" to gjennomforing.startDato,
+				"sluttDato" to gjennomforing.sluttDato,
+				"registrertDato" to gjennomforing.registrertDato,
+				"fremmoteDato" to gjennomforing.fremmoteDato,
+				"opprettetAar" to gjennomforing.opprettetAar,
+				"navEnhetId" to gjennomforing.navEnhetId,
+				"lopenr" to gjennomforing.lopenr,
+				"modifiedAt" to gjennomforing.modifiedAt,
 				"id" to gjennomforing.id
 			)
 		)

@@ -13,6 +13,7 @@ import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.commands.InsertGjennomforingCommand
@@ -58,7 +59,10 @@ internal class GjennomforingRepositoryTest : FunSpec({
 			startDato = startDato,
 			sluttDato = sluttDato,
 			registrertDato = registrertDato,
-			fremmoteDato = fremmoteDato
+			fremmoteDato = fremmoteDato,
+			navEnhetId = NAV_ENHET_1.id,
+			lopenr = 123,
+			opprettetAar = 2020,
 		)
 
 		assertNotNull(savedGjennomforing)
@@ -73,6 +77,8 @@ internal class GjennomforingRepositoryTest : FunSpec({
 		assertTrue(sluttDato.isEqualTo(savedGjennomforing.sluttDato!!))
 		assertTrue(registrertDato.isEqualTo(savedGjennomforing.registrertDato))
 		assertTrue(fremmoteDato.isEqualTo(savedGjennomforing.fremmoteDato!!))
+		assertEquals(2020, savedGjennomforing.opprettetAar)
+		assertEquals(123, savedGjennomforing.lopenr)
 	}
 
 	test("update() should throw if gjennomforing does not exist") {
@@ -90,7 +96,9 @@ internal class GjennomforingRepositoryTest : FunSpec({
 					fremmoteDato = null,
 					navEnhetId = null,
 					createdAt = LocalDateTime.now(),
-					modifiedAt = LocalDateTime.now()
+					modifiedAt = LocalDateTime.now(),
+					lopenr = 123,
+					opprettetAar = 2020
 				)
 			)
 		}
@@ -116,7 +124,9 @@ internal class GjennomforingRepositoryTest : FunSpec({
 				navEnhetId = null,
 				createdAt = LocalDateTime.now(),
 				modifiedAt = LocalDateTime.now(),
-				registrertDato = LocalDateTime.now()
+				registrertDato = LocalDateTime.now(),
+				lopenr = 90879,
+				opprettetAar = 2030
 			)
 		)
 
@@ -125,6 +135,8 @@ internal class GjennomforingRepositoryTest : FunSpec({
 		assertTrue(updatedStartDato.isEqualTo(updatedGjennomforing.startDato))
 		assertTrue(updatedSluttDato.isEqualTo(updatedGjennomforing.sluttDato))
 		assertTrue(updatedFremmotedato.isEqualTo(updatedGjennomforing.fremmoteDato))
+		assertEquals(90879, updatedGjennomforing.lopenr)
+		assertEquals(2030, updatedGjennomforing.opprettetAar)
 	}
 
 	test("delete should delete gjennomføring") {
@@ -141,6 +153,8 @@ internal class GjennomforingRepositoryTest : FunSpec({
 			registrert_dato = LocalDate.of(2022, 1, 1),
 			fremmote_dato = LocalDate.of(2022, 2, 1),
 			nav_enhet_id = null,
+			lopenr = 123,
+			opprettet_aar = 2020
 		)
 
 		TestDataRepository(NamedParameterJdbcTemplate(dataSource))

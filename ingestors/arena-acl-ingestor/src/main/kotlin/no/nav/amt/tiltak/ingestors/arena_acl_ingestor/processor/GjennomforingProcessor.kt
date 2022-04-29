@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.GjennomforingPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
@@ -14,6 +15,7 @@ class GjennomforingProcessor(
 	private val arrangorService: ArrangorService,
 	private val gjennomforingService: GjennomforingService,
 	private val tiltakService: TiltakService,
+	private val navEnhetService: NavEnhetService
 ) : GenericProcessor<GjennomforingPayload>() {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -32,6 +34,7 @@ class GjennomforingProcessor(
 
 		val arrangor = arrangorService.upsertArrangor(gjennomforing.virksomhetsnummer)
 		val tiltak = tiltakService.upsertTiltak(tiltakPayload.id, tiltakPayload.navn, tiltakPayload.kode)
+		val navEnhet = gjennomforing.ansvarligNavEnhetId?.let { navEnhetService.getNavEnhet(it) }
 
 		gjennomforingService.upsert(
 			Gjennomforing(
@@ -44,7 +47,9 @@ class GjennomforingProcessor(
 				sluttDato = gjennomforing.sluttDato,
 				registrertDato = gjennomforing.registrertDato,
 				fremmoteDato = gjennomforing.fremmoteDato,
-				navEnhetId = null // Dette blir implementert i en annen PR
+				navEnhetId = navEnhet?.id,
+				lopenr = gjennomforing.lopenr,
+				opprettetAar = gjennomforing.opprettetAar
 			)
 		)
 
