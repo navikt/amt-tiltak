@@ -55,16 +55,19 @@ class GjennomforingServiceImpl(
 				startDato = updatedGjennomforing.startDato,
 				sluttDato = updatedGjennomforing.sluttDato,
 				registrertDato = updatedGjennomforing.registrertDato,
-				fremmoteDato = updatedGjennomforing.fremmoteDato
+				fremmoteDato = updatedGjennomforing.fremmoteDato,
+				navEnhetId = updatedGjennomforing.navEnhetId,
+				lopenr = updatedGjennomforing.lopenr,
+				opprettetAar = updatedGjennomforing.opprettetAar
 			)
 		)
 
-		if (update.status == UpdateStatus.UPDATED) {
-			return gjennomforingRepository
+		return if (update.status == UpdateStatus.UPDATED) {
+			gjennomforingRepository
 				.update(update.updatedObject!!)
 				.toGjennomforing(updatedGjennomforing.tiltak, updatedGjennomforing.arrangor)
 		} else {
-			return storedGjennomforing
+			storedGjennomforing
 				.toGjennomforing(updatedGjennomforing.tiltak, updatedGjennomforing.arrangor)
 		}
 	}
