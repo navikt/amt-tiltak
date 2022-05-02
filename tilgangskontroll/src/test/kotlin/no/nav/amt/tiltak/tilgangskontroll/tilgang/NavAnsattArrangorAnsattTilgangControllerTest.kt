@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.tilgangskontroll.tilgang
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
-import no.nav.amt.tiltak.core.domain.tilgangskontroll.GjennomforingTilgang
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattGjennomforingTilgang
 import no.nav.amt.tiltak.core.port.NavAnsattTilgangService
 import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
@@ -113,7 +113,7 @@ class NavAnsattArrangorAnsattTilgangControllerTest {
 			.thenReturn(navAnsattIdent)
 
 		`when`(gjennomforingTilgangService.hentTilgang(tilgangId))
-			.thenReturn(GjennomforingTilgang(
+			.thenReturn(ArrangorAnsattGjennomforingTilgang(
 				id = tilgangId,
 				ansattId = ARRANGOR_ANSATT_1.id,
 				gjennomforingId = GJENNOMFORING_1.id,

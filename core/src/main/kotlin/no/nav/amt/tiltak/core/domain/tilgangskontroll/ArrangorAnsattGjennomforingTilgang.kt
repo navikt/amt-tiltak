@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.core.domain.tilgangskontroll
 import java.time.ZonedDateTime
 import java.util.*
 
-data class GjennomforingTilgang(
+data class ArrangorAnsattGjennomforingTilgang(
 	val id: UUID,
 	val ansattId: UUID,
 	val gjennomforingId: UUID,

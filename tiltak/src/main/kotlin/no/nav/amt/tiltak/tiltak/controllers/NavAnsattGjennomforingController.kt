@@ -5,12 +5,10 @@ import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingerPaEnheterQuery
+import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingMedLopenrQuery
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 import java.util.*
@@ -21,7 +19,8 @@ class NavAnsattGjennomforingController(
 	private val authService: AuthService,
 	private val navAnsattService: NavAnsattService,
 	private val gjennomforingerPaEnheterQuery: GjennomforingerPaEnheterQuery,
-	private val gjennomforingService: GjennomforingService
+	private val gjennomforingService: GjennomforingService,
+	private val hentGjennomforingMedLopenrQuery: HentGjennomforingMedLopenrQuery
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
@@ -57,6 +56,29 @@ class NavAnsattGjennomforingController(
 			)
 		)
 	}
+
+	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
+	@GetMapping
+	fun hentGjennomforingerMedLopenr(@RequestParam("lopenr") lopenr: Int): List<HentGjennomforingMedLopenrDto> {
+		return hentGjennomforingMedLopenrQuery.query(lopenr)
+			.map {
+				HentGjennomforingMedLopenrDto(
+					id = it.id,
+					navn = it.navn,
+					lopenr = it.lopenr,
+					opprettetAr = it.opprettetAr,
+					arrangorNavn = it.arrangorOrganisasjonsnavn ?: it.arrangorVirksomhetsnavn
+				)
+			}
+	}
+
+	data class HentGjennomforingMedLopenrDto(
+		val id: UUID,
+		val navn: String,
+		val lopenr: Int,
+		val opprettetAr: Int,
+		val arrangorNavn: String,
+	)
 
 	data class HentAlleGjennomforingDto(
 		val id: UUID,
