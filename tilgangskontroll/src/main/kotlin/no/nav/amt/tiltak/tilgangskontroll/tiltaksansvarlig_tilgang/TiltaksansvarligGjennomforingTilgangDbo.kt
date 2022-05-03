@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tiltaksoversikt
+package no.nav.amt.tiltak.tilgangskontroll.tiltaksansvarlig_tilgang
 
 import java.time.ZonedDateTime
 import java.util.*

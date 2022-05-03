@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.tilgangskontroll.tilgang
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
-import no.nav.amt.tiltak.core.port.NavAnsattTilgangService
+import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
 import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpStatus
@@ -15,7 +15,7 @@ import java.util.*
 @RequestMapping("/api/nav-ansatt/arrangor-ansatt-tilgang")
 class NavAnsattArrangorAnsattTilgangController(
 	private val authService: AuthService,
-	private val navAnsattTilgangService: NavAnsattTilgangService,
+	private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService,
 	private val veilederService: VeilederService,
 	private val hentArrangorAnsattTilgangerQuery: HentArrangorAnsattTilgangerQuery,
 	private val gjennomforingTilgangService: GjennomforingTilgangService
@@ -64,7 +64,7 @@ class NavAnsattArrangorAnsattTilgangController(
 	)
 
 	private fun verifisierTilgangTilGjennomforing(navIdent: String, gjennomforingId: UUID) {
-		if (!navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navIdent, gjennomforingId)) {
+		if (!tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navIdent, gjennomforingId)) {
 			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Har ikke tilgang til gjennomføring")
 		}
 	}

@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.tilgangskontroll.tilgang
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattGjennomforingTilgang
-import no.nav.amt.tiltak.core.port.NavAnsattTilgangService
+import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
 import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
@@ -44,7 +44,7 @@ class NavAnsattArrangorAnsattTilgangControllerTest {
 	private lateinit var veilederService: VeilederService
 
 	@MockBean
-	private lateinit var navAnsattTilgangService: NavAnsattTilgangService
+	private lateinit var tiltaksansvarligTilgangService: TiltaksansvarligTilgangService
 
 	@MockBean
 	private lateinit var hentArrangorAnsattTilgangerQuery: HentArrangorAnsattTilgangerQuery
@@ -69,7 +69,7 @@ class NavAnsattArrangorAnsattTilgangControllerTest {
 		`when`(authService.hentNavIdentTilInnloggetBruker())
 			.thenReturn(navAnsattIdent)
 
-		`when`(navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
+		`when`(tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
 			.thenReturn(true)
 
 		`when`(hentArrangorAnsattTilgangerQuery.query(gjennomforingId))
@@ -120,7 +120,7 @@ class NavAnsattArrangorAnsattTilgangControllerTest {
 				createdAt = ZonedDateTime.now(),
 			))
 
-		`when`(navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navAnsattIdent, GJENNOMFORING_1.id))
+		`when`(tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navAnsattIdent, GJENNOMFORING_1.id))
 			.thenReturn(true)
 
 		`when`(veilederService.getOrCreateVeileder(navAnsattIdent))

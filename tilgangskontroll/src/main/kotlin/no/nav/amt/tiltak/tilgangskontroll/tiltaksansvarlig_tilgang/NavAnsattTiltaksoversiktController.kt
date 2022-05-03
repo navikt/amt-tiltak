@@ -1,8 +1,9 @@
-package no.nav.amt.tiltak.tiltaksoversikt
+package no.nav.amt.tiltak.tilgangskontroll.tiltaksansvarlig_tilgang
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.NavAnsattService
+import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -12,7 +13,7 @@ import java.util.*
 class NavAnsattTiltaksoversiktController(
 	private val authService: AuthService,
 	private val navAnsattService: NavAnsattService,
-	private val tiltaksoversiktService: TiltaksoversiktService,
+	private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService,
 	private val hentTiltaksoversiktQuery: HentTiltaksoversiktQuery
 ) {
 
@@ -22,7 +23,7 @@ class NavAnsattTiltaksoversiktController(
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
 		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 
-		val gjennomforingIder = tiltaksoversiktService.hentAktiveTilgangerForTiltaksansvarlig(navAnsatt.id)
+		val gjennomforingIder = tiltaksansvarligTilgangService.hentAktiveTilganger(navAnsatt.id)
 			.map { it.gjennomforingId }
 
 		return hentTiltaksoversiktQuery.query(gjennomforingIder)
@@ -41,7 +42,7 @@ class NavAnsattTiltaksoversiktController(
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
 		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 
-		tiltaksoversiktService.leggTilGjennomforingIOversikt(navAnsatt.id, gjennomforingId)
+		tiltaksansvarligTilgangService.giTilgangTilGjennomforing(navAnsatt.id, gjennomforingId)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
@@ -50,7 +51,7 @@ class NavAnsattTiltaksoversiktController(
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
 		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 
-		tiltaksoversiktService.fjernGjennomforingFraOversikt(navAnsatt.id, gjennomforingId)
+		tiltaksansvarligTilgangService.fjernTilgangTilGjennomforing(navAnsatt.id, gjennomforingId)
 	}
 
 	data class TiltaksoversiktGjennomforingDto(

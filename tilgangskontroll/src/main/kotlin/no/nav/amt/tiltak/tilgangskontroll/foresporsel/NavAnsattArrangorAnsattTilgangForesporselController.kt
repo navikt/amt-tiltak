@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.tilgangskontroll.foresporsel
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
-import no.nav.amt.tiltak.core.port.NavAnsattTilgangService
+import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
 import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpStatus
@@ -17,7 +17,7 @@ class NavAnsattArrangorAnsattTilgangForesporselController(
 	private val tilgangForesporselService: TilgangForesporselService,
 	private val authService: AuthService,
 	private val veilederService: VeilederService,
-	private val navAnsattTilgangService: NavAnsattTilgangService
+	private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService
 ) {
 
 	@GetMapping("/ubesluttet")
@@ -76,7 +76,7 @@ class NavAnsattArrangorAnsattTilgangForesporselController(
 	}
 
 	private fun verifisierTilgangTilGjennomforing(navIdent: String, gjennomforingId: UUID) {
-		if (!navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navIdent, gjennomforingId)) {
+		if (!tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navIdent, gjennomforingId)) {
 			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Har ikke tilgang til gjennomføring")
 		}
 	}

@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tiltaksoversikt
+package no.nav.amt.tiltak.tilgangskontroll.tiltaksansvarlig_tilgang
 
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getUUID
@@ -13,7 +13,6 @@ import java.util.*
 class TiltaksansvarligGjennomforingTilgangRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
-	private val DEFAULT_GYLDIG_TIL = ZonedDateTime.parse("3000-01-01T00:00:00.00000+00:00")
 
 	private val rowMapper = RowMapper { rs, _ ->
 		TiltaksansvarligGjennomforingTilgangDbo(
@@ -36,7 +35,7 @@ class TiltaksansvarligGjennomforingTilgangRepository(
 		return template.query(sql, parameters, rowMapper)
 	}
 
-	fun opprettTilgang(id: UUID, navAnsattId: UUID, gjennomforingId: UUID) {
+	fun opprettTilgang(id: UUID, navAnsattId: UUID, gjennomforingId: UUID, gyldigTil: ZonedDateTime) {
 		val sql = """
 			INSERT INTO tiltaksansavarlig_gjennomforing_tilgang(id, nav_ansatt_id, gjennomforing_id, gyldig_til)
 			 VALUES(:id, :navAnsattId, :gjennomforingId, :gyldigTil)
@@ -46,7 +45,7 @@ class TiltaksansvarligGjennomforingTilgangRepository(
 			"id" to id,
 			"navAnsattId" to navAnsattId,
 			"gjennomforingId" to gjennomforingId,
-			"gyldigTil" to DEFAULT_GYLDIG_TIL.toOffsetDateTime(),
+			"gyldigTil" to gyldigTil.toOffsetDateTime(),
 		)
 
 		template.update(sql, parameters)
