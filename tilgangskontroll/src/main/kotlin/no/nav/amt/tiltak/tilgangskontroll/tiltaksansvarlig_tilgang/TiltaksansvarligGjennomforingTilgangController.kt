@@ -26,12 +26,12 @@ class TiltaksansvarligGjennomforingTilgangController(
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
-	@DeleteMapping
-	fun fjernTilgangTilGjennomforing(@RequestParam gjennomforingId: UUID){
+	@PatchMapping("/stop")
+	fun stopTilgangTilGjennomforing(@RequestParam("gjennomforingId") gjennomforingId: UUID){
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
 		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 
-		tiltaksansvarligTilgangService.fjernTilgangTilGjennomforing(navAnsatt.id, gjennomforingId)
+		tiltaksansvarligTilgangService.stopTilgangTilGjennomforing(navAnsatt.id, gjennomforingId)
 	}
 
 }

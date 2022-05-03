@@ -10,8 +10,9 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
-import no.nav.amt.tiltak.tilgangskontroll.tiltaksansvarlig_tilgang.HentTiltaksoversiktQuery
 import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingMedLopenrQuery
+import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingMedLopenrQueryDbo
+import no.nav.amt.tiltak.tiltak.repositories.HentTiltaksoversiktQuery
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -90,7 +91,7 @@ class NavAnsattGjennomforingControllerTest {
 	}
 
 	@Test
-	fun `hentGjennomforinger() - sender med tokenx-token - skal returnere 401`() {
+	fun `hentTiltaksoversikt() - sender med tokenx-token - skal returnere 401`() {
 		val token = tokenXToken("test", "test")
 
 		val response = mockMvc.perform(
@@ -102,7 +103,7 @@ class NavAnsattGjennomforingControllerTest {
 	}
 
 	@Test
-	fun `hentGjennomforinger() - sender med azure ad-token - skal returnere 200`() {
+	fun `hentTiltaksoversikt() - sender med azure ad-token - skal returnere 200`() {
 		val token = azureAdToken("test", "test")
 		val navIdent = "a12345"
 
@@ -181,6 +182,44 @@ class NavAnsattGjennomforingControllerTest {
 		).andReturn().response
 
 		assertEquals(403, response.status)
+	}
+
+	@Test
+	fun `hentGjennomforingerMedLopenr() - skal returnere 401 hvis token mangler`() {
+		val response = mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/nav-ansatt/gjennomforing?lopenr=123")
+		).andReturn().response
+
+		assertEquals(401, response.status)
+	}
+
+	@Test
+	fun `hentGjennomforingerMedLopenr() - skal returnere 200 og gjennomføringer med matchende løpenummer`() {
+		val lopenr = 123
+
+		Mockito.`when`(hentGjennomforingMedLopenrQuery.query(lopenr))
+			.thenReturn(listOf(
+				HentGjennomforingMedLopenrQueryDbo(
+					id = GJENNOMFORING_1.id,
+					navn = "navn",
+					lopenr = lopenr,
+					opprettetAr = 2020,
+					arrangorVirksomhetsnavn = "virksomhetsnavn",
+					arrangorOrganisasjonsnavn = null
+				)
+			))
+
+		val response = mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/nav-ansatt/gjennomforing?lopenr=$lopenr")
+				.header("Authorization", "Bearer ${azureAdToken("test", "test")}")
+		).andReturn().response
+
+		val expectedJson = """
+			[{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"navn","lopenr":123,"opprettetAr":2020,"arrangorNavn":"virksomhetsnavn"}]
+		""".trimIndent()
+
+		assertEquals(expectedJson, response.contentAsString)
+		assertEquals(200, response.status)
 	}
 
 

@@ -40,7 +40,7 @@ open class TiltaksansvarligTilgangServiceImpl(
 		)
 	}
 
-	override fun fjernTilgangTilGjennomforing(navAnsattId: UUID, gjennomforingId: UUID) {
+	override fun stopTilgangTilGjennomforing(navAnsattId: UUID, gjennomforingId: UUID) {
 		val tilganger = hentAktiveTilganger(navAnsattId)
 
 		// Kast heller custom exception og map
@@ -52,7 +52,7 @@ open class TiltaksansvarligTilgangServiceImpl(
 	}
 
 	override fun hentAktiveTilganger(navAnsattId: UUID): List<TiltaksansvarligGjennomforingTilgang> {
-		val tilganger = tiltaksansvarligGjennomforingTilgangRepository.hentAktiveTilgangerTilTiltaksansvarlig(navAnsattId)
+		val tilganger = tiltaksansvarligGjennomforingTilgangRepository.hentAktiveTilganger(navAnsattId)
 
 		return tilganger.map {
 			TiltaksansvarligGjennomforingTilgang(

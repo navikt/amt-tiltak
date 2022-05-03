@@ -9,7 +9,7 @@ interface TiltaksansvarligTilgangService {
 
 	fun giTilgangTilGjennomforing(navAnsattId: UUID, gjennomforingId: UUID)
 
-	fun fjernTilgangTilGjennomforing(navAnsattId: UUID, gjennomforingId: UUID)
+	fun stopTilgangTilGjennomforing(navAnsattId: UUID, gjennomforingId: UUID)
 
 	fun hentAktiveTilganger(navAnsattId: UUID): List<TiltaksansvarligGjennomforingTilgang>
 

@@ -251,5 +251,21 @@ class TestDataRepository(
 		)
 	}
 
+	fun insertTiltaksansvarligGjennomforingTilgang(cmd: InsertTiltaksansvarligGjennomforingTilgangCommand) {
+		val sql = """
+			INSERT INTO tiltaksansavarlig_gjennomforing_tilgang(id, nav_ansatt_id, gjennomforing_id, gyldig_til, created_at)
+			 VALUES(:id, :navAnsattId, :gjennomforingId, :gyldigTil, :createdAt)
+		""".trimIndent()
+
+		val sqlParameters = parameters(
+			"id" to cmd.id,
+			"navAnsattId" to cmd.navAnsattId,
+			"gjennomforingId" to cmd.gjennomforingId,
+			"gyldigTil" to cmd.gyldigTil.toOffsetDateTime(),
+			"createdAt" to cmd.createdAt.toOffsetDateTime()
+		)
+
+		template.update(sql, sqlParameters)
+	}
 
 }

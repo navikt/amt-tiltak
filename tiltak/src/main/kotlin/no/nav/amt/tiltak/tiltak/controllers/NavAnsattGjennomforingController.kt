@@ -4,8 +4,8 @@ import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
-import no.nav.amt.tiltak.tilgangskontroll.tiltaksansvarlig_tilgang.HentTiltaksoversiktQuery
 import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingMedLopenrQuery
+import no.nav.amt.tiltak.tiltak.repositories.HentTiltaksoversiktQuery
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -25,7 +25,7 @@ class NavAnsattGjennomforingController(
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@GetMapping
-	fun hentGjennomforinger(): List<TiltaksoversiktGjennomforingDto> {
+	fun hentTiltaksoversikt(): List<TiltaksoversiktGjennomforingDto> {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
 
 		val tilganger = tiltaksansvarligTilgangService.hentAktiveTilganger(navIdent)

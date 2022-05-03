@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tilgangskontroll.tiltaksansvarlig_tilgang
+package no.nav.amt.tiltak.tiltak.repositories
 
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getNullableString

@@ -24,7 +24,18 @@ class TiltaksansvarligGjennomforingTilgangRepository(
 		)
 	}
 
-	fun hentAktiveTilgangerTilTiltaksansvarlig(navAnsattId: UUID): List<TiltaksansvarligGjennomforingTilgangDbo> {
+	fun hentTilgang(id:  UUID): TiltaksansvarligGjennomforingTilgangDbo {
+		val sql = """
+			SELECT * FROM tiltaksansavarlig_gjennomforing_tilgang WHERE id = :id
+		""".trimIndent()
+
+		val parameters = sqlParameters("id" to id)
+
+		return template.query(sql, parameters, rowMapper).firstOrNull()
+			?: throw NoSuchElementException("Fant ikke tilgang med id=$id")
+	}
+
+	fun hentAktiveTilganger(navAnsattId: UUID): List<TiltaksansvarligGjennomforingTilgangDbo> {
 		val sql = """
 			SELECT * FROM tiltaksansavarlig_gjennomforing_tilgang
 				WHERE nav_ansatt_id = :navAnsattId AND gyldig_til > current_timestamp
