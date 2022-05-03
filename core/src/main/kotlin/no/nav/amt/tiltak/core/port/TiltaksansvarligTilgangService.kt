@@ -13,4 +13,6 @@ interface TiltaksansvarligTilgangService {
 
 	fun hentAktiveTilganger(navAnsattId: UUID): List<TiltaksansvarligGjennomforingTilgang>
 
+	fun hentAktiveTilganger(navIdent: String): List<TiltaksansvarligGjennomforingTilgang>
+
 }

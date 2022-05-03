@@ -2,17 +2,16 @@ package no.nav.amt.tiltak.tiltak.controllers
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
-import no.nav.amt.tiltak.core.domain.nav_ansatt.NavEnhetTilgang
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.core.port.NavAnsattService
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
+import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
-import no.nav.amt.tiltak.tiltak.repositories.GjennomforingerPaEnheterQuery
+import no.nav.amt.tiltak.tilgangskontroll.tiltaksansvarlig_tilgang.HentTiltaksoversiktQuery
+import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingMedLopenrQuery
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -33,9 +32,6 @@ import java.util.*
 @ActiveProfiles("test")
 @WebMvcTest(controllers = [NavAnsattGjennomforingController::class])
 class NavAnsattGjennomforingControllerTest {
-	private val gjennomforingId = UUID.fromString("e68d54e2-47b5-11ec-81d3-0242ac130003")
-
-	private val fnr = "fnr"
 
 	@Autowired
 	private lateinit var mockMvc: MockMvc
@@ -44,13 +40,16 @@ class NavAnsattGjennomforingControllerTest {
 	private lateinit var authService: AuthService
 
 	@MockBean
-	private lateinit var navAnsattService: NavAnsattService
-
-	@MockBean
 	private lateinit var gjennomforingService: GjennomforingService
 
 	@MockBean
-	private lateinit var gjennomforingerPaEnheterQuery: GjennomforingerPaEnheterQuery
+	private lateinit var tiltaksansvarligTilgangService: TiltaksansvarligTilgangService
+
+	@MockBean
+	private lateinit var hentGjennomforingMedLopenrQuery: HentGjennomforingMedLopenrQuery
+
+	@MockBean
+	private lateinit var hentTiltaksoversiktQuery: HentTiltaksoversiktQuery
 
 	companion object : MockOAuthServer() {
 		@AfterAll
@@ -60,46 +59,26 @@ class NavAnsattGjennomforingControllerTest {
 		}
 	}
 
-	val statusConverterMock = fun (id: UUID) =
-		listOf(
-			DeltakerStatusDbo(
-				deltakerId = id,
-				status = Deltaker.Status.DELTAR,
-				endretDato = LocalDateTime.now(),
-				aktiv = true)
-		)
-
-	val deltakerDbo = DeltakerDbo(
-		id = UUID.randomUUID(),
-		brukerId = UUID.randomUUID(),
-		brukerFodselsnummer = "12129312375",
-		brukerFornavn = "Fornavn",
-		brukerEtternavn = "Etternavn",
-		gjennomforingId = gjennomforingId,
-		startDato = LocalDate.now(),
-		sluttDato = LocalDate.now(),
-		dagerPerUke = 1,
-		prosentStilling = 10.343f,
-		createdAt = LocalDateTime.now(),
-		modifiedAt = LocalDateTime.now(),
-		registrertDato = LocalDateTime.now()
-	)
-
 	val tiltak = Tiltak(
 		id = UUID.randomUUID(),
 		navn = "tiltaksnavn",
 		kode = "kode"
 	)
 	val gjennomforing = Gjennomforing(
-		id = UUID.randomUUID(),
+		id = GJENNOMFORING_1.id,
 		tiltak = tiltak,
-		arrangor = Arrangor(UUID.randomUUID(), "", "", "", ""),
+		arrangor = Arrangor(ARRANGOR_1.id,
+			"Navn",
+			"1234",
+			"5678",
+			"Orgnavn"
+		),
 		navn = "tiltaksnavn",
 		fremmoteDato = LocalDateTime.now(),
-		startDato = LocalDate.now(),
+		startDato = LocalDate.parse("2022-05-03"),
 		registrertDato = LocalDateTime.now(),
-		navEnhetId = UUID.randomUUID(),
-		sluttDato = LocalDate.now(),
+		navEnhetId = NAV_ENHET_1.id,
+		sluttDato = LocalDate.parse("2022-05-03"),
 		status = Gjennomforing.Status.GJENNOMFORES,
 		lopenr = 123,
 		opprettetAar = 2020
@@ -130,10 +109,10 @@ class NavAnsattGjennomforingControllerTest {
 		Mockito.`when`(authService.hentNavIdentTilInnloggetBruker())
 			.thenReturn(navIdent)
 
-		Mockito.`when`(navAnsattService.hentTiltaksansvarligEnhetTilganger(navIdent))
+		Mockito.`when`(tiltaksansvarligTilgangService.hentAktiveTilganger(navIdent))
 			.thenReturn(emptyList())
 
-		Mockito.`when`(gjennomforingerPaEnheterQuery.query(any()))
+		Mockito.`when`(hentTiltaksoversiktQuery.query(any()))
 			.thenReturn(emptyList())
 
 		val response = mockMvc.perform(
@@ -162,15 +141,8 @@ class NavAnsattGjennomforingControllerTest {
 		Mockito.`when`(authService.hentNavIdentTilInnloggetBruker())
 			.thenReturn(navIdent)
 
-		Mockito.`when`(navAnsattService.hentTiltaksansvarligEnhetTilganger(navIdent))
-			.thenReturn(listOf(NavEnhetTilgang(
-				enhet = NavEnhet(
-					id = gjennomforing.navEnhetId!!,
-					enhetId = "1234",
-					navn = "test"
-				),
-				temaer = listOf("TIL")
-			)))
+		Mockito.`when`(tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navIdent, gjennomforingId))
+			.thenReturn(true)
 
 		Mockito.`when`(gjennomforingService.getGjennomforing(gjennomforingId))
 			.thenReturn(gjennomforing)
@@ -180,6 +152,11 @@ class NavAnsattGjennomforingControllerTest {
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
+		val expectedJson = """
+			{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"tiltaksnavn","startDato":"2022-05-03","sluttDato":"2022-05-03","arrangor":{"virksomhetNavn":"Navn","organisasjonNavn":"Orgnavn"}}
+		""".trimIndent()
+
+		assertEquals(expectedJson, response.contentAsString)
 		assertEquals(200, response.status)
 	}
 
@@ -192,15 +169,8 @@ class NavAnsattGjennomforingControllerTest {
 		Mockito.`when`(authService.hentNavIdentTilInnloggetBruker())
 			.thenReturn(navIdent)
 
-		Mockito.`when`(navAnsattService.hentTiltaksansvarligEnhetTilganger(navIdent))
-			.thenReturn(listOf(NavEnhetTilgang(
-				enhet = NavEnhet(
-					id = UUID.randomUUID(), // En annen id enn den på gjennomføringen
-					enhetId = "1234",
-					navn = "test"
-				),
-				temaer = listOf("TIL")
-			)))
+		Mockito.`when`(tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navIdent, gjennomforingId))
+			.thenReturn(false)
 
 		Mockito.`when`(gjennomforingService.getGjennomforing(gjennomforingId))
 			.thenReturn(gjennomforing)
@@ -211,7 +181,6 @@ class NavAnsattGjennomforingControllerTest {
 		).andReturn().response
 
 		assertEquals(403, response.status)
-		assertEquals("Ikke tilgang til enhet", response.errorMessage)
 	}
 
 

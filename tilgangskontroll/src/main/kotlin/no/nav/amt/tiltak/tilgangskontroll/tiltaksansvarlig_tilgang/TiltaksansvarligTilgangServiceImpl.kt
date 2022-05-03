@@ -65,4 +65,9 @@ open class TiltaksansvarligTilgangServiceImpl(
 		}
 	}
 
+	override fun hentAktiveTilganger(navIdent: String): List<TiltaksansvarligGjennomforingTilgang> {
+		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
+		return hentAktiveTilganger(navAnsatt.id)
+	}
+
 }
