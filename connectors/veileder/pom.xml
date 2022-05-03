@@ -20,10 +20,6 @@
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>nom</artifactId>
         </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>axsys</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>io.kotest</groupId>
