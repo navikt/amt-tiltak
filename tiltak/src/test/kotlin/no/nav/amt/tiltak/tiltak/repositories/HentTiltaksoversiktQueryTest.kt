@@ -7,36 +7,40 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_2
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
-internal class GjennomforingPaEnheterQueryTest : FunSpec({
+class HentTiltaksoversiktQueryTest : FunSpec({
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 
-	lateinit var query: GjennomforingerPaEnheterQuery
+	lateinit var query: HentTiltaksoversiktQuery
 
 	beforeEach {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 		rootLogger.level = Level.WARN
 
-		val template = NamedParameterJdbcTemplate(dataSource)
-
-		query = GjennomforingerPaEnheterQuery(template)
+		query = HentTiltaksoversiktQuery(NamedParameterJdbcTemplate(dataSource))
 
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
-	test("skal hente gjennomføringer på enheter") {
-		val gjennomforinger = query.query(listOf(NAV_ENHET_1.id, NAV_ENHET_2.id))
+	test("skal hente gjennomføringer") {
+		val gjennomforinger = query.query(listOf(GJENNOMFORING_1.id, GJENNOMFORING_2.id))
 
 		gjennomforinger shouldHaveSize 2
-		gjennomforinger.any { it.id == GJENNOMFORING_1.id } shouldBe true
-		gjennomforinger.any { it.id == GJENNOMFORING_2.id } shouldBe true
+
+		val gjennomforing = gjennomforinger.find { it.id == GJENNOMFORING_1.id }!!
+
+		gjennomforing.id shouldBe GJENNOMFORING_1.id
+		gjennomforing.navn shouldBe GJENNOMFORING_1.navn
+		gjennomforing.lopenr shouldBe GJENNOMFORING_1.lopenr
+		gjennomforing.opprettetAar shouldBe GJENNOMFORING_1.opprettet_aar
+		gjennomforing.arrangorOrganisasjonsnavn shouldBe ARRANGOR_1.overordnet_enhet_navn
+		gjennomforing.arrangorVirksomhetsnavn shouldBe ARRANGOR_1.navn
 	}
 
 })

@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.tilgangskontroll.foresporsel
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
-import no.nav.amt.tiltak.core.port.NavAnsattTilgangService
+import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
 import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import org.junit.jupiter.api.AfterAll
@@ -43,7 +43,7 @@ class NavAnsattArrangorAnsattTilgangForesporselControllerTest {
 	private lateinit var veilederService: VeilederService
 
 	@MockBean
-	private lateinit var navAnsattTilgangService: NavAnsattTilgangService
+	private lateinit var tiltaksansvarligTilgangService: TiltaksansvarligTilgangService
 
 	@Test
 	fun `hentUbesluttedeForesporsler() - skal returnere 401 hvis token mangler`() {
@@ -77,7 +77,7 @@ class NavAnsattArrangorAnsattTilgangForesporselControllerTest {
 				createdAt = ZonedDateTime.parse("2022-04-04T17:30:46.114332+02:00")
 			)))
 
-		`when`(navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
+		`when`(tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
 			.thenReturn(true)
 
 		val response = mockMvc.perform(
@@ -135,7 +135,7 @@ class NavAnsattArrangorAnsattTilgangForesporselControllerTest {
 				createdAt = ZonedDateTime.now(),
 			))
 
-		`when`(navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
+		`when`(tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
 			.thenReturn(true)
 
 		val response = mockMvc.perform(
@@ -190,7 +190,7 @@ class NavAnsattArrangorAnsattTilgangForesporselControllerTest {
 				createdAt = ZonedDateTime.now(),
 			))
 
-		`when`(navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
+		`when`(tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
 			.thenReturn(true)
 
 		val response = mockMvc.perform(
