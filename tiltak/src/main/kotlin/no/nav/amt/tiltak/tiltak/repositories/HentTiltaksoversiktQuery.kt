@@ -17,6 +17,8 @@ open class HentTiltaksoversiktQuery(
 		HentTiltaksoversiktQueryDbo(
 			id = rs.getUUID("gjennomforing_id"),
 			navn = rs.getString("gjennomforing_navn"),
+			lopenr = rs.getInt("gjennomforing_lopenr"),
+			opprettetAar = rs.getInt("gjennomforing_opprettet_aar"),
 			arrangorVirksomhetsnavn = rs.getString("arrangor_navn"),
 			arrangorOrganisasjonsnavn = rs.getNullableString("arrangor_overordnet_enhet_navn"),
 		)
@@ -27,6 +29,8 @@ open class HentTiltaksoversiktQuery(
 			SELECT
 			 	g.id as gjennomforing_id,
 			 	g.navn as gjennomforing_navn,
+			 	g.lopenr as gjennomforing_lopenr,
+			 	g.opprettet_aar as gjennomforing_opprettet_aar,
 			 	a.navn as arrangor_navn,
 			 	a.overordnet_enhet_navn as arrangor_overordnet_enhet_navn
 			 FROM gjennomforing g
@@ -46,6 +50,8 @@ open class HentTiltaksoversiktQuery(
 data class HentTiltaksoversiktQueryDbo(
 	val id: UUID,
 	val navn: String,
+	val lopenr: Int,
+	val opprettetAar: Int,
 	val arrangorVirksomhetsnavn: String,
 	val arrangorOrganisasjonsnavn: String?
 )

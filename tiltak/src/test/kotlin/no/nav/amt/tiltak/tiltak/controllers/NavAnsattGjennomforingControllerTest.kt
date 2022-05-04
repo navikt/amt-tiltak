@@ -91,7 +91,7 @@ class NavAnsattGjennomforingControllerTest {
 	}
 
 	@Test
-	fun `hentTiltaksoversikt() - sender med tokenx-token - skal returnere 401`() {
+	fun `hentGjennomforinger() - sender med tokenx-token - skal returnere 401`() {
 		val token = tokenXToken("test", "test")
 
 		val response = mockMvc.perform(
@@ -103,7 +103,7 @@ class NavAnsattGjennomforingControllerTest {
 	}
 
 	@Test
-	fun `hentTiltaksoversikt() - sender med azure ad-token - skal returnere 200`() {
+	fun `hentGjennomforinger() - sender med azure ad-token - skal returnere 200`() {
 		val token = azureAdToken("test", "test")
 		val navIdent = "a12345"
 

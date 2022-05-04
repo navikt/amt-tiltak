@@ -25,7 +25,7 @@ class NavAnsattGjennomforingController(
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@GetMapping
-	fun hentTiltaksoversikt(): List<TiltaksoversiktGjennomforingDto> {
+	fun hentGjennomforinger(): List<HentGjennomforingerDto> {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
 
 		val tilganger = tiltaksansvarligTilgangService.hentAktiveTilganger(navIdent)
@@ -33,9 +33,11 @@ class NavAnsattGjennomforingController(
 
 		return hentTiltaksoversiktQuery.query(tilganger)
 			.map {
-				TiltaksoversiktGjennomforingDto(
+				HentGjennomforingerDto(
 					id = it.id,
 					navn = it.navn,
+					lopenr = it.lopenr,
+					opprettetAar = it.opprettetAar,
 					arrangorNavn = it.arrangorOrganisasjonsnavn ?: it.arrangorVirksomhetsnavn
 				)
 			}
@@ -79,10 +81,12 @@ class NavAnsattGjennomforingController(
 			}
 	}
 
-	data class TiltaksoversiktGjennomforingDto(
+	data class HentGjennomforingerDto(
 		val id: UUID,
 		val navn: String,
 		val arrangorNavn: String,
+		val lopenr: Int,
+		val opprettetAar: Int,
 	)
 
 	data class HentGjennomforingMedLopenrDto(
