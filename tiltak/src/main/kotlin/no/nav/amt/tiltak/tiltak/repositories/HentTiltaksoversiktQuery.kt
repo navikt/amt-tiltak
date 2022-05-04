@@ -25,6 +25,8 @@ open class HentTiltaksoversiktQuery(
 	}
 
 	open fun query(gjennomforingIder: List<UUID>): List<HentTiltaksoversiktQueryDbo> {
+		if (gjennomforingIder.isEmpty()) return emptyList()
+
 		val sql = """
 			SELECT
 			 	g.id as gjennomforing_id,

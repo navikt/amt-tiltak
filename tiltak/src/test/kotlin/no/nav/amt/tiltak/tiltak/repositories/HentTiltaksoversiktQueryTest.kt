@@ -43,4 +43,8 @@ class HentTiltaksoversiktQueryTest : FunSpec({
 		gjennomforing.arrangorVirksomhetsnavn shouldBe ARRANGOR_1.navn
 	}
 
+	test("skal returnere tom liste hvis ingen gjennomføringIder blir sendt inn") {
+		query.query(emptyList()) shouldHaveSize 0
+	}
+
 })
