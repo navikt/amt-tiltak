@@ -9,6 +9,7 @@ data class AnsattDbo(
 	val id: UUID,
 	val personligIdent: String,
 	val fornavn: String,
+	val mellomnavn: String?,
 	val etternavn: String,
 	val createdAt: LocalDateTime,
 	val modifiedAt: LocalDateTime
@@ -19,6 +20,7 @@ data class AnsattDbo(
 			id = id,
 			personligIdent = personligIdent,
 			fornavn = fornavn,
+			mellomnavn = mellomnavn,
 			etternavn = etternavn,
 			arrangorer = virksomheter
 		)

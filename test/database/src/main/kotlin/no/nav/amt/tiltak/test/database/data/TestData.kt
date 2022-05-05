@@ -48,6 +48,7 @@ object TestData {
 		id = UUID.fromString("6321c7dc-6cfb-47b0-b566-32979be5041f"),
 		personlig_ident = "123456789",
 		fornavn = "Ansatt 1 fornavn",
+		mellomnavn = "Ansatt 1 mellomnavn",
 		etternavn = "Ansatt 1 etternavn"
 	)
 
@@ -69,6 +70,7 @@ object TestData {
 		id = UUID.fromString("a24e659c-2651-4fbb-baad-01cacb2412f0"),
 		personlig_ident = "326749823",
 		fornavn = "Ansatt 2 fornavn",
+		mellomnavn = null,
 		etternavn = "Ansatt 2 etternavn"
 	)
 

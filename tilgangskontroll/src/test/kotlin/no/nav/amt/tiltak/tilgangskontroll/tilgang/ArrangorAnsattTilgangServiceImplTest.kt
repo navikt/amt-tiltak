@@ -48,6 +48,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 			ansattId,
 			personligIdent,
 			"",
+			null,
 			"",
 			emptyList()
 		)

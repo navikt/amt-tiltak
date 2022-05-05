@@ -19,6 +19,7 @@ open class ArrangorAnsattRepository(
 			id = rs.getUUID("id"),
 			personligIdent = rs.getString("personlig_ident"),
 			fornavn = rs.getString("fornavn"),
+			mellomnavn = rs.getString("mellomnavn"),
 			etternavn = rs.getString("etternavn"),
 			createdAt = rs.getLocalDateTime("created_at"),
 			modifiedAt = rs.getLocalDateTime("modified_at")

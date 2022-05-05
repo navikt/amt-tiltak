@@ -10,8 +10,8 @@ class TestDataRepository(
 
 	fun insertArrangorAnsatt(cmd: InsertArrangorAnsattCommand) {
 		val sql = """
-			INSERT INTO arrangor_ansatt(id, personlig_ident, fornavn, etternavn)
-			VALUES(:id, :personlig_ident, :fornavn, :etternavn)
+			INSERT INTO arrangor_ansatt(id, personlig_ident, fornavn, mellomnavn, etternavn)
+			VALUES(:id, :personlig_ident, :fornavn, :mellomnavn, :etternavn)
 		""".trimIndent()
 
 		template.update(
@@ -19,6 +19,7 @@ class TestDataRepository(
 				"id" to cmd.id,
 				"personlig_ident" to cmd.personlig_ident,
 				"fornavn" to cmd.fornavn,
+				"mellomnavn" to cmd.mellomnavn,
 				"etternavn" to cmd.etternavn
 			)
 		)

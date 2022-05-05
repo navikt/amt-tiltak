@@ -103,6 +103,7 @@ class EndringsmeldingNavControllerTest {
 					id = UUID.randomUUID(),
 					personligIdent = "1234567890",
 					fornavn = "Test",
+					mellomnavn = null,
 					etternavn = "Test",
 					arrangorer = emptyList()
 				),
@@ -115,7 +116,7 @@ class EndringsmeldingNavControllerTest {
 		).andReturn().response
 
 		val expectedJson = """
-			[{"id":"$endringsmeldingId","bruker":{"fornavn":"Fornavn","mellomnavn":null,"etternavn":"Etternavn","fodselsnummer":"487329"},"startDato":"2022-05-05","aktiv":true,"godkjent":false,"arkivert":false,"opprettetAvArrangorAnsatt":{"fornavn":"Test","etternavn":"Test"},"opprettetDato":"2022-05-05T08:52:18.314953"}]
+			[{"id":"$endringsmeldingId","bruker":{"fornavn":"Fornavn","mellomnavn":null,"etternavn":"Etternavn","fodselsnummer":"487329"},"startDato":"2022-05-05","aktiv":true,"godkjent":false,"arkivert":false,"opprettetAvArrangorAnsatt":{"fornavn":"Test","mellomnavn":null,"etternavn":"Test"},"opprettetDato":"2022-05-05T08:52:18.314953"}]
 		""".trimIndent()
 
 		assertEquals(expectedJson, response.contentAsString)
