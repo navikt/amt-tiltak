@@ -14,5 +14,4 @@ data class Endringsmelding (
 	val arkivert: Boolean,
 	val opprettetAvArrangorAnsatt: Ansatt,
 	val opprettetDato: LocalDateTime
-
 )

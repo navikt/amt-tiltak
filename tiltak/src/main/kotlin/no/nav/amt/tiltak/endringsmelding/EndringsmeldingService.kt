@@ -11,11 +11,11 @@ open class EndringsmeldingService(
 	private val endringsmeldingQuery: EndringsmeldingForGjennomforingQuery,
 ) {
 
-	fun opprettMedStartDato(deltakerId: UUID, startDato: LocalDate, ansattId: UUID): EndringsmeldingDbo {
+	open fun opprettMedStartDato(deltakerId: UUID, startDato: LocalDate, ansattId: UUID): EndringsmeldingDbo {
 		return endringsmeldingRepository.insertOgInaktiverStartDato(startDato, deltakerId, ansattId)
 	}
 
-	fun hentEndringsmeldinger(gjennomforingId: UUID) : List<Endringsmelding> {
+	open fun hentEndringsmeldinger(gjennomforingId: UUID) : List<Endringsmelding> {
 		return endringsmeldingQuery
 			.query(gjennomforingId)
 			.map { it.toEndringsmelding()}

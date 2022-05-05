@@ -1,32 +1,36 @@
 package no.nav.amt.tiltak.endringsmelding
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
-import no.nav.amt.tiltak.core.port.NavAnsattService
+import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
 import no.nav.amt.tiltak.deltaker.dto.EndringsmeldingDto
+import no.nav.amt.tiltak.deltaker.dto.toDto
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.slf4j.LoggerFactory
-import org.springframework.web.bind.annotation.*
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController
 @RequestMapping("/api/nav-ansatt/endringsmelding")
 class EndringsmeldingNavController(
 	private val service: EndringsmeldingService,
-	private val navAnsattService: NavAnsattService,
+	private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService,
 	private val authService: AuthService
 ) {
-	private val log = LoggerFactory.getLogger(javaClass)
-
 
 	@GetMapping
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	fun hentEndringsmeldinger(@RequestParam("gjennomforingId") gjennomforingId: UUID) : List<EndringsmeldingDto> {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
-		log.info("Henter endringsmeldinger for nav-ansatt(${navIdent}, ${navAnsatt.navn}. Ikke implementert enda")
 
-		// Når enhetene hentes fra arena: return service.hentEndringsmeldinger(gjennomforingId).map { it.toDto() }
-		return emptyList()
+		if (!tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navIdent, gjennomforingId)) {
+			throw ResponseStatusException(HttpStatus.FORBIDDEN)
+		}
 
+		return service.hentEndringsmeldinger(gjennomforingId).map { it.toDto() }
 	}
+
 }
