@@ -6,20 +6,20 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.port.BrukerService
+import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.core.port.VeilederConnector
-import no.nav.amt.tiltak.core.port.VeilederService
 import java.util.*
 
 class TildeltveilederIngestorImplTest : StringSpec({
 
 	"Skal ingeste kafka melding" {
 		val veilederConnector = mockk<VeilederConnector>()
-		val veilederService = mockk<VeilederService>()
+		val navAnsattService = mockk<NavAnsattService>()
 		val personService = mockk<PersonService>()
 		val brukerService = mockk<BrukerService>()
 
-		val ingestor = TildeltVeilederIngestorImpl(veilederConnector, veilederService, personService, brukerService)
+		val ingestor = TildeltVeilederIngestorImpl(veilederConnector, navAnsattService, personService, brukerService)
 
 		val brukerFnr = "123454364334"
 		val veilederId = UUID.randomUUID()
@@ -30,7 +30,7 @@ class TildeltveilederIngestorImplTest : StringSpec({
 		} returns navAnsatt
 
 		every {
-			veilederService.upsertVeileder(navAnsatt)
+			navAnsattService.upsertVeileder(navAnsatt)
 		} returns veilederId
 
 		every {
@@ -56,11 +56,11 @@ class TildeltveilederIngestorImplTest : StringSpec({
 
 	"Skal ikke upserte veileder hvis bruker ikke finnes" {
 		val veilederConnector = mockk<VeilederConnector>()
-		val veilederService = mockk<VeilederService>()
+		val navAnsattService = mockk<NavAnsattService>()
 		val personService = mockk<PersonService>()
 		val brukerService = mockk<BrukerService>()
 
-		val ingestor = TildeltVeilederIngestorImpl(veilederConnector, veilederService, personService, brukerService)
+		val ingestor = TildeltVeilederIngestorImpl(veilederConnector, navAnsattService, personService, brukerService)
 
 		val brukerFnr = "123454364334"
 
@@ -93,7 +93,7 @@ class TildeltveilederIngestorImplTest : StringSpec({
 		}
 
 		verify(exactly = 0) {
-			veilederService.upsertVeileder(any())
+			navAnsattService.upsertVeileder(any())
 		}
 	}
 

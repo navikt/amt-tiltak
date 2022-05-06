@@ -2,8 +2,8 @@ package no.nav.amt.tiltak.tilgangskontroll.invitasjon
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
+import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
-import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -14,10 +14,10 @@ import java.util.*
 @RestController
 @RequestMapping("/api/nav-ansatt/arrangor-ansatt-tilgang/invitasjon")
 class NavAnsattArrangorAnsattTilgangInvitasjonController(
-	private val tilgangInvitasjonService: TilgangInvitasjonService,
-	private val authService: AuthService,
-	private val veilederService: VeilederService,
-	private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService
+    private val tilgangInvitasjonService: TilgangInvitasjonService,
+    private val authService: AuthService,
+    private val navAnsattService: NavAnsattService,
+    private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService
 ) {
 
 	@GetMapping("/ubrukt")
@@ -35,7 +35,7 @@ class NavAnsattArrangorAnsattTilgangInvitasjonController(
 	@ResponseStatus(HttpStatus.CREATED)
 	fun opprettInvitasjon(@RequestBody request: OpprettInvitasjonRequest) {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-		val navAnsatt = veilederService.getOrCreateVeileder(navIdent)
+		val navAnsatt = navAnsattService.getOrCreateNavAnsatt(navIdent)
 
 		verifisierTilgangTilGjennomforing(navIdent, request.gjennomforingId)
 

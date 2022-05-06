@@ -6,19 +6,19 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
-import no.nav.amt.tiltak.core.port.VeilederService
+import no.nav.amt.tiltak.core.port.NavAnsattService
 import org.springframework.web.server.ResponseStatusException
 import java.time.ZonedDateTime
 import java.util.*
 
 class TiltaksansvarligTilgangServiceImplTest : FunSpec({
 
-	val veilederService: VeilederService = mockk()
+	val navAnsattService: NavAnsattService = mockk()
 
 	val tiltaksansvarligGjennomforingTilgangRepository: TiltaksansvarligGjennomforingTilgangRepository = mockk()
 
 	val service = TiltaksansvarligTilgangServiceImpl(
-		veilederService,
+		navAnsattService,
 		tiltaksansvarligGjennomforingTilgangRepository
 	)
 
@@ -28,7 +28,7 @@ class TiltaksansvarligTilgangServiceImplTest : FunSpec({
 		val gjennomforingId = UUID.randomUUID()
 
 		every {
-			veilederService.getOrCreateVeileder(navIdent)
+			navAnsattService.getOrCreateNavAnsatt(navIdent)
 		} returns NavAnsatt(
 			navAnsattId,
 			navIdent,
@@ -56,7 +56,7 @@ class TiltaksansvarligTilgangServiceImplTest : FunSpec({
 		val gjennomforingId = UUID.randomUUID()
 
 		every {
-			veilederService.getOrCreateVeileder(navIdent)
+			navAnsattService.getOrCreateNavAnsatt(navIdent)
 		} returns NavAnsatt(
 			navAnsattId,
 			navIdent,
@@ -84,7 +84,7 @@ class TiltaksansvarligTilgangServiceImplTest : FunSpec({
 		val gjennomforingId = UUID.randomUUID()
 
 		every {
-			veilederService.getOrCreateVeileder(navIdent)
+			navAnsattService.getOrCreateNavAnsatt(navIdent)
 		} returns NavAnsatt(
 			navAnsattId,
 			navIdent,
@@ -114,7 +114,7 @@ class TiltaksansvarligTilgangServiceImplTest : FunSpec({
 		val gjennomforingId = UUID.randomUUID()
 
 		every {
-			veilederService.getOrCreateVeileder(navIdent)
+			navAnsattService.getOrCreateNavAnsatt(navIdent)
 		} returns NavAnsatt(
 			navAnsattId,
 			navIdent,

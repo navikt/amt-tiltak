@@ -3,8 +3,8 @@ package no.nav.amt.tiltak.tilgangskontroll.invitasjon
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
+import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
-import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -44,7 +44,7 @@ class NavAnsattArrangorAnsattTilgangInvitasjonControllerTest {
 	private lateinit var authService: AuthService
 
 	@MockBean
-	private lateinit var veilederService: VeilederService
+	private lateinit var navAnsattService: NavAnsattService
 
 	@MockBean
 	private lateinit var tiltaksansvarligTilgangService: TiltaksansvarligTilgangService
@@ -113,7 +113,7 @@ class NavAnsattArrangorAnsattTilgangInvitasjonControllerTest {
 		`when`(authService.hentNavIdentTilInnloggetBruker())
 			.thenReturn(navAnsattIdent)
 
-		`when`(veilederService.getOrCreateVeileder(navAnsattIdent))
+		`when`(navAnsattService.getOrCreateNavAnsatt(navAnsattIdent))
 			.thenReturn(NavAnsatt(
 				id = navAnsattId,
 				navIdent = navAnsattIdent,

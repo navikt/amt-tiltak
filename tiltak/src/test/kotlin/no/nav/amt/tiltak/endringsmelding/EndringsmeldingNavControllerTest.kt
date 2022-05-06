@@ -5,8 +5,8 @@ import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.domain.tiltak.*
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
-import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -41,7 +41,7 @@ class EndringsmeldingNavControllerTest {
 	private lateinit var endringsmeldingService: EndringsmeldingService
 
 	@MockBean
-	private lateinit var veilederService: VeilederService
+	private lateinit var navAnsattService: NavAnsattService
 
 	@MockBean
 	private lateinit var deltakerService: DeltakerService
@@ -181,7 +181,7 @@ class EndringsmeldingNavControllerTest {
 		Mockito.`when`(tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navIdent, gjennomforingId))
 			.thenReturn(true)
 
-		Mockito.`when`(veilederService.getNavAnsatt(navIdent))
+		Mockito.`when`(navAnsattService.getNavAnsatt(navIdent))
 			.thenReturn(NavAnsatt(
 				id = navAnsattId,
 				navIdent = navIdent,

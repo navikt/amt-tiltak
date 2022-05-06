@@ -2,8 +2,8 @@ package no.nav.amt.tiltak.tilgangskontroll.tiltaksansvarlig_tilgang
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
+import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
-import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -38,7 +38,7 @@ class TiltaksansvarligGjennomforingTilgangControllerTest {
 	private lateinit var authService: AuthService
 
 	@MockBean
-	private lateinit var veilederService: VeilederService
+	private lateinit var navAnsattService: NavAnsattService
 
 	@MockBean
 	private lateinit var tiltaksansvarligTilgangService: TiltaksansvarligTilgangService
@@ -62,7 +62,7 @@ class TiltaksansvarligGjennomforingTilgangControllerTest {
 		Mockito.`when`(authService.hentNavIdentTilInnloggetBruker())
 			.thenReturn(navAnsattIdent)
 
-		Mockito.`when`(veilederService.getOrCreateVeileder(navAnsattIdent))
+		Mockito.`when`(navAnsattService.getOrCreateNavAnsatt(navAnsattIdent))
 			.thenReturn(NavAnsatt(
 				navAnsattId,
 				navAnsattIdent,
@@ -100,7 +100,7 @@ class TiltaksansvarligGjennomforingTilgangControllerTest {
 		Mockito.`when`(authService.hentNavIdentTilInnloggetBruker())
 			.thenReturn(navAnsattIdent)
 
-		Mockito.`when`(veilederService.getOrCreateVeileder(navAnsattIdent))
+		Mockito.`when`(navAnsattService.getOrCreateNavAnsatt(navAnsattIdent))
 			.thenReturn(NavAnsatt(
 				navAnsattId,
 				navAnsattIdent,

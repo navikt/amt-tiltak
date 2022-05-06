@@ -6,11 +6,11 @@ import org.springframework.stereotype.Component
 @Component
 internal class NavAnsattUpdater(
 	private val veilederConnector: VeilederConnector,
-	private val veilederService: VeilederServiceImpl
+	private val veilederService: NavAnsattServiceImpl
 ) {
 
 	fun oppdaterBatch() {
-		veilederService.getVeilederBatch(Bucket.forTidspunkt()).forEach { dbVeileder ->
+		veilederService.getNavAnsattBatch(Bucket.forTidspunkt()).forEach { dbVeileder ->
 			veilederConnector.hentVeileder(dbVeileder.navIdent)?.let { nomVeileder ->
 				veilederService.upsertVeileder(nomVeileder)
 			}
