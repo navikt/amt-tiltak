@@ -6,15 +6,14 @@ import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.EnableTransactionManagement
-import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
 import java.util.*
 
 @Component
-@EnableTransactionManagement
 open class EndringsmeldingRepository(
-	private val template: NamedParameterJdbcTemplate
+	private val template: NamedParameterJdbcTemplate,
+	private val transactionTemplate: TransactionTemplate
 ) {
 	private val rowMapper = RowMapper { rs, _ ->
 		EndringsmeldingDbo(
@@ -69,10 +68,11 @@ open class EndringsmeldingRepository(
 		template.update(sql, params)
 	}
 
-	@Transactional
 	open fun insertOgInaktiverStartDato(startDato: LocalDate, deltakerId: UUID, opprettetAv: UUID): EndringsmeldingDbo {
-		inaktiverTidligereMeldinger(deltakerId)
-		return insertNyStartDato(startDato, deltakerId, opprettetAv)
+		return transactionTemplate.execute {
+			inaktiverTidligereMeldinger(deltakerId)
+			return@execute insertNyStartDato(startDato, deltakerId, opprettetAv)
+		}!!
 	}
 
 	private fun inaktiverTidligereMeldinger(deltakerId: UUID): Int {
