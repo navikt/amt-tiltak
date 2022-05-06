@@ -15,6 +15,11 @@ internal class VeilederServiceImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
+	override fun getNavAnsatt(navIdent: String): NavAnsatt {
+		return veilederConnector.hentVeileder(navIdent)
+			?: throw NoSuchElementException("Fant ikke nav ansatt med ident $navIdent")
+	}
+
 	override fun upsertVeileder(navAnsatt: NavAnsatt): UUID {
 		navAnsattRepository.upsert(
 			NavAnsattDbo(

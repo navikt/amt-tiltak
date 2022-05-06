@@ -2,8 +2,8 @@ package no.nav.amt.tiltak.endringsmelding
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
+import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.deltaker.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.deltaker.dto.toDto
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -16,7 +16,7 @@ import java.util.*
 @RequestMapping("/api/nav-ansatt/endringsmelding")
 class EndringsmeldingNavController(
 	private val endringsmeldingService: EndringsmeldingService,
-	private val navAnsattService: NavAnsattService,
+	private val veilederService: VeilederService,
 	private val deltakerService: DeltakerService,
 	private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService,
 	private val authService: AuthService
@@ -46,7 +46,7 @@ class EndringsmeldingNavController(
 			throw ResponseStatusException(HttpStatus.FORBIDDEN)
 		}
 
-		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
+		val navAnsatt = veilederService.getNavAnsatt(navIdent)
 
 		endringsmeldingService.markerSomFerdig(endringsmeldingId, navAnsatt.id)
 	}
