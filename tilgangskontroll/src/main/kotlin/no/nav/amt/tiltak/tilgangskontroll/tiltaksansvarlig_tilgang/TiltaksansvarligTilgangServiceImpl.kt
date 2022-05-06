@@ -18,7 +18,7 @@ open class TiltaksansvarligTilgangServiceImpl(
 	private val defaultGyldigTil = ZonedDateTime.parse("3000-01-01T00:00:00.00000+00:00")
 
 	override fun harTilgangTilGjennomforing(navIdent: String, gjennomforingId: UUID): Boolean {
-		val navAnsatt = navAnsattService.getOrCreateNavAnsatt(navIdent)
+		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 
 		return hentAktiveTilganger(navAnsatt.id)
 			.any { it.gjennomforingId == gjennomforingId }
@@ -66,7 +66,7 @@ open class TiltaksansvarligTilgangServiceImpl(
 	}
 
 	override fun hentAktiveTilganger(navIdent: String): List<TiltaksansvarligGjennomforingTilgang> {
-		val navAnsatt = navAnsattService.getOrCreateNavAnsatt(navIdent)
+		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 		return hentAktiveTilganger(navAnsatt.id)
 	}
 

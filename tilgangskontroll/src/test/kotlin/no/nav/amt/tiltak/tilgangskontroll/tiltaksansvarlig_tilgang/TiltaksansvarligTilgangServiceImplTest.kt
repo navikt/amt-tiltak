@@ -28,7 +28,7 @@ class TiltaksansvarligTilgangServiceImplTest : FunSpec({
 		val gjennomforingId = UUID.randomUUID()
 
 		every {
-			navAnsattService.getOrCreateNavAnsatt(navIdent)
+			navAnsattService.getNavAnsatt(navIdent)
 		} returns NavAnsatt(
 			navAnsattId,
 			navIdent,
@@ -56,7 +56,7 @@ class TiltaksansvarligTilgangServiceImplTest : FunSpec({
 		val gjennomforingId = UUID.randomUUID()
 
 		every {
-			navAnsattService.getOrCreateNavAnsatt(navIdent)
+			navAnsattService.getNavAnsatt(navIdent)
 		} returns NavAnsatt(
 			navAnsattId,
 			navIdent,
@@ -84,7 +84,7 @@ class TiltaksansvarligTilgangServiceImplTest : FunSpec({
 		val gjennomforingId = UUID.randomUUID()
 
 		every {
-			navAnsattService.getOrCreateNavAnsatt(navIdent)
+			navAnsattService.getNavAnsatt(navIdent)
 		} returns NavAnsatt(
 			navAnsattId,
 			navIdent,
@@ -114,7 +114,7 @@ class TiltaksansvarligTilgangServiceImplTest : FunSpec({
 		val gjennomforingId = UUID.randomUUID()
 
 		every {
-			navAnsattService.getOrCreateNavAnsatt(navIdent)
+			navAnsattService.getNavAnsatt(navIdent)
 		} returns NavAnsatt(
 			navAnsattId,
 			navIdent,

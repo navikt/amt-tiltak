@@ -5,13 +5,11 @@ import no.nav.amt.tiltak.core.kafka.TildeltVeilederIngestor
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.PersonService
-import no.nav.amt.tiltak.core.port.VeilederConnector
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
 class TildeltVeilederIngestorImpl(
-    private val veilederConnector: VeilederConnector,
     private val navAnsattService: NavAnsattService,
     private val personService: PersonService,
     private val brukerService: BrukerService
@@ -29,12 +27,9 @@ class TildeltVeilederIngestorImpl(
 			return
 		}
 
-		val veileder = veilederConnector.hentVeileder(sisteTildeltVeileder.veilederId)
-			?: throw IllegalStateException("Klarte ikke å hente informasjon om veileder med ident ${sisteTildeltVeileder.veilederId}")
+		val veileder = navAnsattService.getNavAnsatt(sisteTildeltVeileder.veilederId)
 
-		val veilederId = navAnsattService.upsertVeileder(veileder)
-
-		brukerService.oppdaterAnsvarligVeileder(gjeldendeIdent, veilederId)
+		brukerService.oppdaterAnsvarligVeileder(gjeldendeIdent, veileder.id)
 	}
 
 }

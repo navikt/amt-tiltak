@@ -54,7 +54,7 @@ class NavAnsattAutentiseringControllerTest {
 		`when`(authService.hentNavIdentTilInnloggetBruker())
 			.thenReturn(navIdent)
 
-		`when`(navAnsattService.getOrCreateNavAnsatt(navIdent))
+		`when`(navAnsattService.getNavAnsatt(navIdent))
 			.thenReturn(NavAnsatt(
 				UUID.randomUUID(),
 				navIdent,

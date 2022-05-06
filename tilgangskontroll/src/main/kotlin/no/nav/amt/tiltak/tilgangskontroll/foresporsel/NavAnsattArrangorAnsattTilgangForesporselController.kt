@@ -35,7 +35,7 @@ class NavAnsattArrangorAnsattTilgangForesporselController(
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	fun godkjennForesporsel(@PathVariable foresporselId: UUID) {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-		val navAnsatt = navAnsattService.getOrCreateNavAnsatt(navIdent)
+		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 		val foresporsel = tilgangForesporselService.hentForesporsel(foresporselId)
 
 		verifisierTilgangTilGjennomforing(navIdent, foresporsel.gjennomforingId)
@@ -47,7 +47,7 @@ class NavAnsattArrangorAnsattTilgangForesporselController(
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	fun avvisForesporsel(@PathVariable foresporselId: UUID) {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-		val navAnsatt = navAnsattService.getOrCreateNavAnsatt(navIdent)
+		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 		val foresporsel = tilgangForesporselService.hentForesporsel(foresporselId)
 
 		verifisierTilgangTilGjennomforing(navIdent, foresporsel.gjennomforingId)

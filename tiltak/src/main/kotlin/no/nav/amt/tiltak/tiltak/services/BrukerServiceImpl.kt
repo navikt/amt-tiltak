@@ -36,8 +36,8 @@ class BrukerServiceImpl(
 		return brukerRepository.get(fodselsnummer) != null
 	}
 
-	override fun oppdaterAnsvarligVeileder(brukerPersonligIdent: String, veilederId: UUID) {
-		brukerRepository.oppdaterVeileder(brukerPersonligIdent, veilederId)
+	override fun oppdaterAnsvarligVeileder(brukerPersonligIdent: String, navAnsattId: UUID) {
+		brukerRepository.oppdaterVeileder(brukerPersonligIdent, navAnsattId)
 	}
 
 	override fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet) {
@@ -45,7 +45,9 @@ class BrukerServiceImpl(
 	}
 
 	private fun createBruker(fodselsnummer: String): BrukerDbo {
-		val veilederId = upsertVeileder(fodselsnummer)
+		val tildeltVeilederNavIdent = personService.hentTildeltVeilederNavIdent(fodselsnummer)
+
+		val veileder = tildeltVeilederNavIdent?.let { navAnsattService.getNavAnsatt(it) }
 
 		val navEnhet = navEnhetService.getNavEnhetForBruker(fodselsnummer)
 
@@ -60,17 +62,11 @@ class BrukerServiceImpl(
 			etternavn = person.etternavn,
 			telefonnummer = person.telefonnummer ?: personKontaktinformasjon.telefonnummer,
 			epost = personKontaktinformasjon.epost,
-			ansvarligVeilederId = veilederId,
+			ansvarligVeilederId = veileder?.id,
 			navEnhetId = navEnhet?.id
 		)
 
 		return brukerRepository.insert(bruker)
-	}
-
-	private fun upsertVeileder(fodselsnummer: String): UUID? {
-		return personService.hentTildeltVeileder(fodselsnummer)?.let { veileder ->
-			return navAnsattService.upsertVeileder(veileder)
-		}
 	}
 
 }

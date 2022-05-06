@@ -111,7 +111,7 @@ class NavAnsattArrangorAnsattTilgangForesporselControllerTest {
 
 		`when`(authService.hentNavIdentTilInnloggetBruker()).thenReturn(navAnsattIdent)
 
-		`when`(navAnsattService.getOrCreateNavAnsatt(navAnsattIdent))
+		`when`(navAnsattService.getNavAnsatt(navAnsattIdent))
 			.thenReturn(NavAnsatt(
 				id = navAnsattId,
 				navIdent = navAnsattIdent,
@@ -166,7 +166,7 @@ class NavAnsattArrangorAnsattTilgangForesporselControllerTest {
 
 		`when`(authService.hentNavIdentTilInnloggetBruker()).thenReturn(navAnsattIdent)
 
-		`when`(navAnsattService.getOrCreateNavAnsatt(navAnsattIdent))
+		`when`(navAnsattService.getNavAnsatt(navAnsattIdent))
 			.thenReturn(NavAnsatt(
 				id = navAnsattId,
 				navIdent = navAnsattIdent,

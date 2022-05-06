@@ -123,7 +123,7 @@ class NavAnsattArrangorAnsattTilgangControllerTest {
 		`when`(tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navAnsattIdent, GJENNOMFORING_1.id))
 			.thenReturn(true)
 
-		`when`(navAnsattService.getOrCreateNavAnsatt(navAnsattIdent))
+		`when`(navAnsattService.getNavAnsatt(navAnsattIdent))
 			.thenReturn(NavAnsatt(
 				id = NAV_ANSATT_1.id,
 				navIdent = navAnsattIdent,

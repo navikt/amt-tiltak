@@ -62,7 +62,7 @@ class TiltaksansvarligGjennomforingTilgangControllerTest {
 		Mockito.`when`(authService.hentNavIdentTilInnloggetBruker())
 			.thenReturn(navAnsattIdent)
 
-		Mockito.`when`(navAnsattService.getOrCreateNavAnsatt(navAnsattIdent))
+		Mockito.`when`(navAnsattService.getNavAnsatt(navAnsattIdent))
 			.thenReturn(NavAnsatt(
 				navAnsattId,
 				navAnsattIdent,
@@ -100,7 +100,7 @@ class TiltaksansvarligGjennomforingTilgangControllerTest {
 		Mockito.`when`(authService.hentNavIdentTilInnloggetBruker())
 			.thenReturn(navAnsattIdent)
 
-		Mockito.`when`(navAnsattService.getOrCreateNavAnsatt(navAnsattIdent))
+		Mockito.`when`(navAnsattService.getNavAnsatt(navAnsattIdent))
 			.thenReturn(NavAnsatt(
 				navAnsattId,
 				navAnsattIdent,

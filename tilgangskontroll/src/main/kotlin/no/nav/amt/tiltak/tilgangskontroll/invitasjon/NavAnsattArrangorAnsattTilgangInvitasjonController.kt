@@ -35,7 +35,7 @@ class NavAnsattArrangorAnsattTilgangInvitasjonController(
 	@ResponseStatus(HttpStatus.CREATED)
 	fun opprettInvitasjon(@RequestBody request: OpprettInvitasjonRequest) {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-		val navAnsatt = navAnsattService.getOrCreateNavAnsatt(navIdent)
+		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 
 		verifisierTilgangTilGjennomforing(navIdent, request.gjennomforingId)
 

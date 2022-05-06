@@ -19,7 +19,7 @@ open class NavAnsattAutentiseringController(
 	@GetMapping("/meg")
 	fun me(): MegDto {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-		val veileder = navAnsattService.getOrCreateNavAnsatt(navIdent)
+		val veileder = navAnsattService.getNavAnsatt(navIdent)
 
 		return MegDto(
 			navIdent = veileder.navIdent,

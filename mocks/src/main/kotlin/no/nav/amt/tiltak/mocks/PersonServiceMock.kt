@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.mocks
 
-import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.port.Kontaktinformasjon
 import no.nav.amt.tiltak.core.port.Person
 import no.nav.amt.tiltak.core.port.PersonService
@@ -22,7 +21,7 @@ class PersonServiceMock : PersonService {
 			?: throw RuntimeException("Mock inneholder ikke informasjon om bruker med fødselsnummer $fnr")
 	}
 
-	override fun hentTildeltVeileder(fnr: String): NavAnsatt? {
+	override fun hentTildeltVeilederNavIdent(fnr: String): String? {
 		throw UnsupportedOperationException()
 	}
 

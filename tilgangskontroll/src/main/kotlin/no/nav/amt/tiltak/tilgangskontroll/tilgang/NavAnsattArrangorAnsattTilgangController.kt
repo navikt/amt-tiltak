@@ -49,7 +49,7 @@ class NavAnsattArrangorAnsattTilgangController(
 
 		verifisierTilgangTilGjennomforing(navIdent, tilgang.gjennomforingId)
 
-		val navAnsatt = navAnsattService.getOrCreateNavAnsatt(navIdent)
+		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 
 		gjennomforingTilgangService.stopTilgang(tilgang.id, navAnsatt.id)
 	}

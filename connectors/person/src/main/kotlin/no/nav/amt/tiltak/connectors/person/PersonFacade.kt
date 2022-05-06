@@ -7,8 +7,10 @@ import no.nav.amt.tiltak.clients.dkif.DkifClient
 import no.nav.amt.tiltak.clients.pdl.AdressebeskyttelseGradering
 import no.nav.amt.tiltak.clients.pdl.PdlClient
 import no.nav.amt.tiltak.clients.veilarboppfolging.VeilarboppfolgingClient
-import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.Diskresjonskode
+import no.nav.amt.tiltak.core.port.Kontaktinformasjon
+import no.nav.amt.tiltak.core.port.Person
+import no.nav.amt.tiltak.core.port.PersonService
 import org.springframework.stereotype.Service
 
 @Service
@@ -16,7 +18,6 @@ class PersonFacade(
 	private val pdlClient: PdlClient,
 	private val dkifClient: DkifClient,
 	private val veilarboppfolgingClient: VeilarboppfolgingClient,
-	private val veilederConnector: VeilederConnector,
 	private val meterRegistry: MeterRegistry = SimpleMeterRegistry()
 ) : PersonService {
 
@@ -48,10 +49,8 @@ class PersonFacade(
 		).also { person -> person.diskresjonskode?.let { incrementCounter(it) } }
 	}
 
-	override fun hentTildeltVeileder(fnr: String) : NavAnsatt? {
-		return veilarboppfolgingClient.hentVeilederIdent(fnr)?.let { ident ->
-			veilederConnector.hentVeileder(ident)
-		}
+	override fun hentTildeltVeilederNavIdent(fnr: String): String? {
+		return veilarboppfolgingClient.hentVeilederIdent(fnr)
 	}
 
 	override fun hentGjeldendePersonligIdent(ident: String) : String = pdlClient.hentGjeldendePersonligIdent(ident)

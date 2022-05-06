@@ -20,7 +20,7 @@ class TiltaksansvarligGjennomforingTilgangController(
 	@PostMapping
 	fun giTilgangTilGjennomforing(@RequestParam gjennomforingId: UUID){
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-		val navAnsatt = navAnsattService.getOrCreateNavAnsatt(navIdent)
+		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 
 		tiltaksansvarligTilgangService.giTilgangTilGjennomforing(navAnsatt.id, gjennomforingId)
 	}
@@ -29,7 +29,7 @@ class TiltaksansvarligGjennomforingTilgangController(
 	@PatchMapping("/stop")
 	fun stopTilgangTilGjennomforing(@RequestParam("gjennomforingId") gjennomforingId: UUID){
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-		val navAnsatt = navAnsattService.getOrCreateNavAnsatt(navIdent)
+		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 
 		tiltaksansvarligTilgangService.stopTilgangTilGjennomforing(navAnsatt.id, gjennomforingId)
 	}

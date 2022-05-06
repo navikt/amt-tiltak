@@ -1,8 +1,9 @@
 package no.nav.amt.tiltak.navansatt
 
+import no.nav.amt.tiltak.clients.nom.NomClient
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
+import no.nav.amt.tiltak.core.domain.nav_ansatt.UpsertNavAnsattInput
 import no.nav.amt.tiltak.core.port.NavAnsattService
-import no.nav.amt.tiltak.core.port.VeilederConnector
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.util.*
@@ -10,55 +11,42 @@ import java.util.*
 @Component
 internal class NavAnsattServiceImpl(
 	private val navAnsattRepository: NavAnsattRepository,
-	private val veilederConnector: VeilederConnector,
+	private val nomClient: NomClient,
 ) : NavAnsattService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun getNavAnsatt(navIdent: String): NavAnsatt {
-		return veilederConnector.hentVeileder(navIdent)
-			?: throw NoSuchElementException("Fant ikke nav ansatt med ident $navIdent")
-	}
+		val navAnsatt = navAnsattRepository.getNavAnsattWithIdent(navIdent)
 
-	override fun upsertVeileder(navAnsatt: NavAnsatt): UUID {
-		navAnsattRepository.upsert(
-			NavAnsattDbo(
-				navIdent = navAnsatt.navIdent,
-				navn = navAnsatt.navn,
-				epost = navAnsatt.epost,
-				telefonnummer = navAnsatt.telefonnummer
-			)
-		)
+		if (navAnsatt != null)
+			return navAnsatt.toNavAnsatt()
 
-		return navAnsattRepository.getNavAnsattWithIdent(navAnsatt.navIdent)?.id
-			?: throw IllegalStateException("Fant ikke veileder med NAV-ident=${navAnsatt.navIdent}")
-	}
+		val nyNavAnsatt = nomClient.hentNavAnsatt(navIdent)
 
-	override fun getOrCreateNavAnsatt(navIdent: String): NavAnsatt {
-		val veileder = getLagretNavAnsatt(navIdent)
-
-		if (veileder != null)
-			return veileder
-
-		val nyVeileder = veilederConnector.hentVeileder(navIdent)
-
-		if (nyVeileder == null) {
+		if (nyNavAnsatt == null) {
 			log.error("Klarte ikke å hente nav ansatt med ident $navIdent")
 			throw IllegalArgumentException("Klarte ikke å finne nav ansatt med ident")
 		}
 
 		log.info("Oppretter ny nav ansatt for nav ident $navIdent")
 
-		upsertVeileder(nyVeileder)
+		val nyAnsattId = UUID.randomUUID()
 
-		return getLagretNavAnsatt(navIdent) ?: throw IllegalStateException("Fant ikke nylig opprettet nav ansatt")
+		navAnsattRepository.upsert(UpsertNavAnsattInput(
+			id = nyAnsattId,
+			navIdent = nyNavAnsatt.navIdent,
+			navn = nyNavAnsatt.navn,
+			epost = nyNavAnsatt.epost,
+			telefonnummer = nyNavAnsatt.telefonnummer,
+		))
+
+		return navAnsattRepository.get(nyAnsattId).toNavAnsatt()
 	}
 
-	private fun getLagretNavAnsatt(navIdent: String): NavAnsatt? =
-		navAnsattRepository.getNavAnsattWithIdent(navIdent)?.toNavAnsatt()
-
-	internal fun getNavAnsattBatch(bucket: Bucket) =
-		navAnsattRepository.getNavAnsattInBucket(bucket).map { it.toNavAnsatt() }
+	override fun upsertNavAnsatt(input: UpsertNavAnsattInput) {
+		navAnsattRepository.upsert(input)
+	}
 
 	private fun NavAnsattDbo.toNavAnsatt() = NavAnsatt(
 		id = id,
@@ -67,4 +55,5 @@ internal class NavAnsattServiceImpl(
 		epost = epost,
 		telefonnummer = telefonnummer
 	)
+
 }
