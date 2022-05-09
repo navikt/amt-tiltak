@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.navansatt
+package no.nav.amt.tiltak.core.domain.nav_ansatt
 
 import java.time.LocalTime
 import kotlin.math.abs
@@ -10,15 +10,14 @@ private const val bucketIntervalInMinutes : Int = 5 // every 5 minutes
 /**
  * Fordeler døgnet i 5 minutters buckets, eller UUIDer i like mange buckets
  */
-internal data class Bucket(
-	internal val id: Int
+data class Bucket(
+	val id: Int
 ) {
 	init {
 	    require(id < bucketsPerDay) { "Bucket er utenfor forventet intervall"}
 	}
 
-	internal companion object {
-
+	companion object {
 		fun forNavIdent(navIdent: String) = Bucket(abs(navIdent.hashCode() % bucketsPerDay))
 		fun forTidspunkt(time: LocalTime = LocalTime.now()) = Bucket(time)
 	}

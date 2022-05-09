@@ -6,32 +6,30 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.port.BrukerService
+import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.PersonService
-import no.nav.amt.tiltak.core.port.VeilederConnector
-import no.nav.amt.tiltak.core.port.VeilederService
 import java.util.*
 
 class TildeltveilederIngestorImplTest : StringSpec({
 
 	"Skal ingeste kafka melding" {
-		val veilederConnector = mockk<VeilederConnector>()
-		val veilederService = mockk<VeilederService>()
+		val navAnsattService = mockk<NavAnsattService>()
 		val personService = mockk<PersonService>()
 		val brukerService = mockk<BrukerService>()
 
-		val ingestor = TildeltVeilederIngestorImpl(veilederConnector, veilederService, personService, brukerService)
+		val ingestor = TildeltVeilederIngestorImpl(navAnsattService, personService, brukerService)
 
 		val brukerFnr = "123454364334"
 		val veilederId = UUID.randomUUID()
-		val navAnsatt = NavAnsatt(navIdent = "Z12345", navn = "Test")
+		val navAnsatt = NavAnsatt(id = veilederId, navIdent = "Z12345", navn = "Test")
 
 		every {
-			veilederConnector.hentVeileder("Z12345")
+			navAnsattService.getNavAnsatt("Z12345")
 		} returns navAnsatt
 
 		every {
-			veilederService.upsertVeileder(navAnsatt)
-		} returns veilederId
+			navAnsattService.upsertNavAnsatt(any())
+		} returns Unit
 
 		every {
 			personService.hentGjeldendePersonligIdent("10000000000")
@@ -55,12 +53,11 @@ class TildeltveilederIngestorImplTest : StringSpec({
 	}
 
 	"Skal ikke upserte veileder hvis bruker ikke finnes" {
-		val veilederConnector = mockk<VeilederConnector>()
-		val veilederService = mockk<VeilederService>()
+		val navAnsattService = mockk<NavAnsattService>()
 		val personService = mockk<PersonService>()
 		val brukerService = mockk<BrukerService>()
 
-		val ingestor = TildeltVeilederIngestorImpl(veilederConnector, veilederService, personService, brukerService)
+		val ingestor = TildeltVeilederIngestorImpl(navAnsattService, personService, brukerService)
 
 		val brukerFnr = "123454364334"
 
@@ -81,7 +78,7 @@ class TildeltveilederIngestorImplTest : StringSpec({
 		""".trimIndent())
 
 		verify(exactly = 0) {
-			veilederConnector.hentVeileder(any())
+			navAnsattService.getNavAnsatt(any())
 		}
 
 		verify(exactly = 0) {
@@ -89,11 +86,7 @@ class TildeltveilederIngestorImplTest : StringSpec({
 		}
 
 		verify(exactly = 0) {
-			veilederConnector.hentVeileder(any())
-		}
-
-		verify(exactly = 0) {
-			veilederService.upsertVeileder(any())
+			navAnsattService.upsertNavAnsatt(any())
 		}
 	}
 

@@ -1,10 +1,9 @@
-package no.nav.amt.tiltak.navansatt
+package no.nav.amt.tiltak.core.domain.nav_ansatt
 
-import no.nav.amt.tiltak.core.domain.nav_ansatt.Bucket
 import java.util.*
 
-internal data class NavAnsattDbo(
-	val id: UUID = UUID.randomUUID(),
+data class UpsertNavAnsattInput(
+	val id: UUID,
 	val navIdent: String,
 	val navn: String,
 	val telefonnummer: String?,

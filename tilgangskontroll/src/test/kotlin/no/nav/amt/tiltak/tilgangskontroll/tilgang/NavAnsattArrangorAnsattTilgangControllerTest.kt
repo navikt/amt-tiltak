@@ -3,8 +3,8 @@ package no.nav.amt.tiltak.tilgangskontroll.tilgang
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattGjennomforingTilgang
+import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
-import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
@@ -41,7 +41,7 @@ class NavAnsattArrangorAnsattTilgangControllerTest {
 	private lateinit var authService: AuthService
 
 	@MockBean
-	private lateinit var veilederService: VeilederService
+	private lateinit var navAnsattService: NavAnsattService
 
 	@MockBean
 	private lateinit var tiltaksansvarligTilgangService: TiltaksansvarligTilgangService
@@ -123,7 +123,7 @@ class NavAnsattArrangorAnsattTilgangControllerTest {
 		`when`(tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navAnsattIdent, GJENNOMFORING_1.id))
 			.thenReturn(true)
 
-		`when`(veilederService.getOrCreateVeileder(navAnsattIdent))
+		`when`(navAnsattService.getNavAnsatt(navAnsattIdent))
 			.thenReturn(NavAnsatt(
 				id = NAV_ANSATT_1.id,
 				navIdent = navAnsattIdent,

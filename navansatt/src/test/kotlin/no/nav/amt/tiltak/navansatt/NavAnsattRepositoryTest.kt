@@ -6,14 +6,14 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt.tiltak.navansatt.Bucket
-import no.nav.amt.tiltak.navansatt.NavAnsattDbo
-import no.nav.amt.tiltak.navansatt.NavAnsattRepository
+import no.nav.amt.tiltak.core.domain.nav_ansatt.Bucket
+import no.nav.amt.tiltak.core.domain.nav_ansatt.UpsertNavAnsattInput
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import java.util.*
 
 
 class NavAnsattRepositoryTest : FunSpec({
@@ -22,7 +22,8 @@ class NavAnsattRepositoryTest : FunSpec({
 
 	lateinit var repository: NavAnsattRepository
 
-	val upsertCmd = NavAnsattDbo(
+	val upsertCmd = UpsertNavAnsattInput(
+		id = UUID.randomUUID(),
 		navIdent = "test123",
 		navn = "Fornavn Etternavn",
 		telefonnummer = "7464635",
@@ -57,12 +58,13 @@ class NavAnsattRepositoryTest : FunSpec({
 
 	test("Update nav-ansatt så hent bør returnere oppdatert nav-ansatt") {
 		repository.upsert(
-			NavAnsattDbo(
-			navIdent = NAV_ANSATT_1.nav_ident,
-			navn = "Nytt navn",
-			epost = "Ny epost",
-			telefonnummer = "Nytt telefonnummer",
-		)
+			UpsertNavAnsattInput(
+				id = UUID.randomUUID(),
+				navIdent = NAV_ANSATT_1.nav_ident,
+				navn = "Nytt navn",
+				epost = "Ny epost",
+				telefonnummer = "Nytt telefonnummer",
+			)
 		)
 
 		val updatedDbo = repository.getNavAnsattWithIdent(NAV_ANSATT_1.nav_ident)
@@ -77,28 +79,31 @@ class NavAnsattRepositoryTest : FunSpec({
 		val bucket50Identer = listOf("W100172", "W101063")
 
 		repository.upsert(
-			NavAnsattDbo(
-			navIdent = bucket0Identer[0],
-			navn = "Nytt navn 1",
-			epost = "Ny epost 1",
-			telefonnummer = "Nytt telefonnummer 1",
-		)
-		)
-		repository.upsert(
-			NavAnsattDbo(
-			navIdent = bucket50Identer[0],
-			navn = "Nytt navn 2",
-			epost = "Ny epost 2",
-			telefonnummer = "Nytt telefonnummer 2",
-		)
+			UpsertNavAnsattInput(
+				id = UUID.randomUUID(),
+				navIdent = bucket0Identer[0],
+				navn = "Nytt navn 1",
+				epost = "Ny epost 1",
+				telefonnummer = "Nytt telefonnummer 1",
+			)
 		)
 		repository.upsert(
-			NavAnsattDbo(
-			navIdent = bucket50Identer[1],
-			navn = "Nytt navn 3",
-			epost = "Ny epost 3",
-			telefonnummer = "Nytt telefonnummer 3",
+			UpsertNavAnsattInput(
+				id = UUID.randomUUID(),
+				navIdent = bucket50Identer[0],
+				navn = "Nytt navn 2",
+				epost = "Ny epost 2",
+				telefonnummer = "Nytt telefonnummer 2",
+			)
 		)
+		repository.upsert(
+			UpsertNavAnsattInput(
+				id = UUID.randomUUID(),
+				navIdent = bucket50Identer[1],
+				navn = "Nytt navn 3",
+				epost = "Ny epost 3",
+				telefonnummer = "Nytt telefonnummer 3",
+			)
 		)
 
 		repository.getNavAnsattInBucket(Bucket(50)) shouldHaveSize 2
@@ -109,24 +114,26 @@ class NavAnsattRepositoryTest : FunSpec({
 		val bucket50Identer = listOf("W100172")
 
 		repository.upsert(
-			NavAnsattDbo(
-			navIdent = bucket50Identer[0],
-			navn = "Nytt navn A",
-			epost = "Ny epost A",
-			telefonnummer = "Nytt telefonnummer A",
-			bucket = Bucket(0)
-		)
+			UpsertNavAnsattInput(
+				id = UUID.randomUUID(),
+				navIdent = bucket50Identer[0],
+				navn = "Nytt navn A",
+				epost = "Ny epost A",
+				telefonnummer = "Nytt telefonnummer A",
+				bucket = Bucket(0)
+			)
 		)
 		repository.getNavAnsattInBucket(Bucket(0)) shouldHaveSize 1
 		repository.getNavAnsattInBucket(Bucket(50)) shouldHaveSize 0
 
 		repository.upsert(
-			NavAnsattDbo(
-			navIdent = bucket50Identer[0],
-			navn = "Nytt navn B",
-			epost = "Ny epost B",
-			telefonnummer = "Nytt telefonnummer B",
-		)
+			UpsertNavAnsattInput(
+				id = UUID.randomUUID(),
+				navIdent = bucket50Identer[0],
+				navn = "Nytt navn B",
+				epost = "Ny epost B",
+				telefonnummer = "Nytt telefonnummer B",
+			)
 		)
 		repository.getNavAnsattInBucket(Bucket(0)) shouldHaveSize 0
 		repository.getNavAnsattInBucket(Bucket(50)) shouldHaveSize 1
