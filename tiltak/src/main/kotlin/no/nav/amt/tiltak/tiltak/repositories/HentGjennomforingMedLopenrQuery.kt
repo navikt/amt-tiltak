@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.tiltak.repositories
 import no.nav.amt.tiltak.common.db_utils.DbUtils
 import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getUUID
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
@@ -35,7 +36,7 @@ open class HentGjennomforingMedLopenrQuery(
 			 	a.overordnet_enhet_navn as arrangor_overordnet_enhet_navn
 			 FROM gjennomforing g
 				JOIN arrangor a on a.id = g.arrangor_id
-			WHERE lopenr = :lopenr
+			WHERE lopenr = :lopenr and g.status = '${Gjennomforing.Status.GJENNOMFORES.name}'
 		""".trimIndent()
 
 		val parameters = DbUtils.sqlParameters(

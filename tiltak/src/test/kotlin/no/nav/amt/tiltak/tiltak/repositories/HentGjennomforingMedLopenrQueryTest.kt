@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -27,7 +28,7 @@ class HentGjennomforingMedLopenrQueryTest : FunSpec({
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
-	test("skal hente gjennomføringer med løpenummer") {
+	test("skal hente gjennomføringer som er aktive") {
 		val gjennomforinger = query.query(GJENNOMFORING_1.lopenr!!)
 
 		gjennomforinger shouldHaveSize 1
@@ -40,6 +41,12 @@ class HentGjennomforingMedLopenrQueryTest : FunSpec({
 		gjennomforing.navn shouldBe GJENNOMFORING_1.navn
 		gjennomforing.arrangorOrganisasjonsnavn shouldBe ARRANGOR_1.overordnet_enhet_navn
 		gjennomforing.arrangorVirksomhetsnavn shouldBe ARRANGOR_1.navn
+	}
+
+	test("skal ikke hente gjennomføringer som er avsluttet") {
+		val gjennomforinger = query.query(GJENNOMFORING_2.lopenr!!)
+
+		gjennomforinger shouldHaveSize 0
 	}
 
 })
