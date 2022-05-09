@@ -25,7 +25,7 @@ class NomGraphqlClientTest : StringSpec({
 		client = NomClientImpl(serverUrl, { token })
 	}
 
-	"hentVeileder - veileder finnes - returnerer veileder" {
+	"hentVeileder - veileder finnes - returnerer veileder med alias" {
 		val veilederRespons = """
 			{
 			  "data": {
@@ -48,12 +48,41 @@ class NomGraphqlClientTest : StringSpec({
 
 		server.enqueue(MockResponse().setBody(veilederRespons))
 
-		val veileder = client.hentVeileder("H156147") ?: fail("Veileder er null")
+		val veileder = client.hentNavAnsatt("H156147") ?: fail("Veileder er null")
 
 		veileder.navIdent shouldBe "H156147"
-		veileder.visningNavn shouldBe "Alias"
-		veileder.fornavn shouldBe "Blaut"
-		veileder.etternavn shouldBe "Slappfisk"
+		veileder.navn shouldBe "Alias"
+		veileder.epost shouldBe "blaut.slappfisk@nav.no"
+		veileder.telefonnummer shouldBe "12345678"
+	}
+
+	"hentVeileder - veileder finnes - returnerer veileder uten alias" {
+		val veilederRespons = """
+			{
+			  "data": {
+				"ressurser": [
+				  {
+					"ressurs": {
+					  "navIdent": "H156147",
+					  "visningsNavn": null,
+					  "fornavn": "Blaut",
+					  "etternavn": "Slappfisk",
+					  "epost": "blaut.slappfisk@nav.no",
+					  "telefon": [{ "type": "NAV_TJENESTE_TELEFON", "nummer": "12345678" }]
+					},
+					"code": "OK"
+				  }
+				]
+			  }
+			}
+		""".trimIndent()
+
+		server.enqueue(MockResponse().setBody(veilederRespons))
+
+		val veileder = client.hentNavAnsatt("H156147") ?: fail("Veileder er null")
+
+		veileder.navIdent shouldBe "H156147"
+		veileder.navn shouldBe "Blaut Slappfisk"
 		veileder.epost shouldBe "blaut.slappfisk@nav.no"
 		veileder.telefonnummer shouldBe "12345678"
 	}
@@ -81,7 +110,7 @@ class NomGraphqlClientTest : StringSpec({
 
 		server.enqueue(MockResponse().setBody(veilederRespons))
 
-		val veileder = client.hentVeileder("H156147") ?: fail("Veileder er null")
+		val veileder = client.hentNavAnsatt("H156147") ?: fail("Veileder er null")
 
 		veileder.telefonnummer shouldBe null
 	}
@@ -102,7 +131,7 @@ class NomGraphqlClientTest : StringSpec({
 
 		server.enqueue(MockResponse().setBody(veilederRespons))
 
-		val veileder = client.hentVeileder("test")
+		val veileder = client.hentNavAnsatt("test")
 		veileder shouldBe null
 	}
 
@@ -122,7 +151,7 @@ class NomGraphqlClientTest : StringSpec({
 
 		server.enqueue(MockResponse().setBody(veilederRespons))
 
-		client.hentVeileder("test")
+		client.hentNavAnsatt("test")
 
 		val recordedRequest = server.takeRequest()
 
@@ -158,7 +187,7 @@ class NomGraphqlClientTest : StringSpec({
 
 		server.enqueue(MockResponse().setBody(veilederRespons))
 
-		val veileder = client.hentVeileder("H156147") ?: fail("Veileder finnes ikke")
+		val veileder = client.hentNavAnsatt("H156147") ?: fail("Veileder finnes ikke")
 
 		veileder.telefonnummer shouldBe kontorTelefon
 	}
@@ -189,7 +218,7 @@ class NomGraphqlClientTest : StringSpec({
 
 		server.enqueue(MockResponse().setBody(veilederRespons))
 
-		val veileder = client.hentVeileder("H156147") ?: fail("Fant ikke veileder")
+		val veileder = client.hentNavAnsatt("H156147") ?: fail("Fant ikke veileder")
 
 		veileder.telefonnummer shouldBe tjenesteTelefon
 	}

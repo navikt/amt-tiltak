@@ -108,7 +108,7 @@ class IntegrationTest {
 
 		every { personService.hentPersonKontaktinformasjon(personIdent) } returns Kontaktinformasjon("epost", "telefon" )
 		every { veilarbarenaClient.hentBrukerOppfolgingsenhetId(personIdent) } returns null
-		every { personService.hentTildeltVeileder(personIdent) } returns null
+		every { personService.hentTildeltVeilederNavIdent(personIdent) } returns null
 		every { personService.hentPerson(personIdent) } returns person
 
 		DbTestDataUtils.cleanDatabase(datasource)

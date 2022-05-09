@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.tilgangskontroll.autentisering
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
-import no.nav.amt.tiltak.core.port.VeilederService
+import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -35,7 +35,7 @@ class NavAnsattAutentiseringControllerTest {
 	private lateinit var authService: AuthService
 
 	@MockBean
-	private lateinit var veilederService: VeilederService
+	private lateinit var navAnsattService: NavAnsattService
 
 	@Test
 	fun `meg() - skal returnere 401 hvis token mangler`() {
@@ -54,7 +54,7 @@ class NavAnsattAutentiseringControllerTest {
 		`when`(authService.hentNavIdentTilInnloggetBruker())
 			.thenReturn(navIdent)
 
-		`when`(veilederService.getOrCreateVeileder(navIdent))
+		`when`(navAnsattService.getNavAnsatt(navIdent))
 			.thenReturn(NavAnsatt(
 				UUID.randomUUID(),
 				navIdent,

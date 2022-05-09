@@ -11,13 +11,18 @@ import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.jdbc.datasource.DataSourceTransactionManager
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
 
 class EndringsmeldingServiceTest {
 	lateinit var endringsmeldingService: EndringsmeldingService
 	var dataSource = SingletonPostgresContainer.getDataSource()
 	var jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
-	var repository: EndringsmeldingRepository = EndringsmeldingRepository(jdbcTemplate)
+	var repository = EndringsmeldingRepository(
+		jdbcTemplate,
+		TransactionTemplate(DataSourceTransactionManager(dataSource))
+	)
 	var endringsmeldingForGjennomforingQuery = EndringsmeldingForGjennomforingQuery(jdbcTemplate)
 
 	@BeforeEach

@@ -1,27 +1,36 @@
-package no.nav.amt.tiltak.deltaker.repositories
+package no.nav.amt.tiltak.endringsmelding
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
-
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
-import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
+import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.jdbc.datasource.DataSourceTransactionManager
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
 
-internal class EndringsmeldingRepositoryTest : FunSpec({
+class EndringsmeldingRepositoryTest : FunSpec({
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 
 	lateinit var repository: EndringsmeldingRepository
 
 	beforeEach {
+		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
+		rootLogger.level = Level.WARN
 
-		repository = EndringsmeldingRepository(NamedParameterJdbcTemplate(dataSource))
+		repository = EndringsmeldingRepository(
+			NamedParameterJdbcTemplate(dataSource),
+			TransactionTemplate(DataSourceTransactionManager(dataSource))
+		)
 
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
@@ -46,12 +55,12 @@ internal class EndringsmeldingRepositoryTest : FunSpec({
 		melding1.startDato shouldBe idag
 
 		val nyDato = LocalDate.now().minusDays(1)
-		val melding2 = repository.insertOgInaktiverStartDato(nyDato, DELTAKER_1.id, ARRANGOR_ANSATT_2.id)
+		val melding2 = repository.insertOgInaktiverStartDato(nyDato, DELTAKER_1.id, TestData.ARRANGOR_ANSATT_2.id)
 
 		melding2 shouldNotBe null
 		melding2.startDato shouldBe nyDato
 		melding2.aktiv shouldBe true
-		melding2.opprettetAvId shouldBe ARRANGOR_ANSATT_2.id
+		melding2.opprettetAvId shouldBe TestData.ARRANGOR_ANSATT_2.id
 
 		val forrigeMelding = repository.get(melding1.id)
 
@@ -80,5 +89,16 @@ internal class EndringsmeldingRepositoryTest : FunSpec({
 		meldinger.get(1).aktiv shouldBe true
 	}
 
-})
+	test("markerSomFerdig - skal sette aktiv=false og nav ansatt") {
+		val melding =
+			repository.insertOgInaktiverStartDato(LocalDate.now(), DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
 
+		repository.markerSomFerdig(melding.id, NAV_ANSATT_1.id)
+
+		val oppdatertMelding = repository.get(melding.id)
+
+		oppdatertMelding.aktiv shouldBe false
+		oppdatertMelding.godkjentAvNavAnsatt shouldBe NAV_ANSATT_1.id
+	}
+
+})
