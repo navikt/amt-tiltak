@@ -23,13 +23,13 @@ class NomClientImpl(
 		private val log = LoggerFactory.getLogger(NomClientImpl::class.java)
 	}
 
-	override fun hentVeileder(navIdent: String): NomVeileder? {
+	override fun hentNavAnsatt(navIdent: String): NomNavAnsatt? {
 		return hentVeilederTilIdenter(listOf(navIdent))
 			.firstOrNull()
 			.also { if(it == null) log.info("Fant ikke veileder i NOM med ident $navIdent") }
 	}
 
-	private fun hentVeilederTilIdenter(navIdenter: List<String>): List<NomVeileder> {
+	private fun hentVeilederTilIdenter(navIdenter: List<String>): List<NomNavAnsatt> {
 		val requestBody = toJsonString(
 			Graphql.GraphqlQuery(
 				NomQueries.HentIdenter.query,
@@ -57,7 +57,7 @@ class NomClientImpl(
 		}
 	}
 
-	private fun toVeiledere(hentIdenterResponse: NomQueries.HentIdenter.Response): List<NomVeileder> {
+	private fun toVeiledere(hentIdenterResponse: NomQueries.HentIdenter.Response): List<NomNavAnsatt> {
 		return hentIdenterResponse.data?.ressurser?.mapNotNull {
 			if (it.code != NomQueries.HentIdenter.ResultCode.OK || it.ressurs == null) {
 				log.warn("Fant ikke veileder i NOM. statusCode=${it.code}")
@@ -66,11 +66,11 @@ class NomClientImpl(
 
 			val telefonnummer = hentTjenesteTelefonnummer(it.ressurs.telefon)
 
-			NomVeileder(
-				navIdent = it.ressurs.navIdent,
-				visningNavn = it.ressurs.visningsNavn,
-				fornavn = it.ressurs.fornavn,
-				etternavn = it.ressurs.etternavn,
+			val ansatt = it.ressurs
+
+			NomNavAnsatt(
+				navIdent = ansatt.navIdent,
+				navn = ansatt.visningsNavn ?: "${ansatt.fornavn} ${ansatt.etternavn}",
 				epost = it.ressurs.epost,
 				telefonnummer = telefonnummer
 			)

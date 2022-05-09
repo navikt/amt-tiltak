@@ -1,14 +1,12 @@
 package no.nav.amt.tiltak.core.port
 
-import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
-
 interface PersonService {
 
 	fun hentPersonKontaktinformasjon(fnr: String): Kontaktinformasjon
 
 	fun hentPerson(fnr: String): Person
 
-	fun hentTildeltVeileder(fnr: String): NavAnsatt?
+	fun hentTildeltVeilederNavIdent(fnr: String): String?
 
 	fun hentGjeldendePersonligIdent(ident: String): String
 

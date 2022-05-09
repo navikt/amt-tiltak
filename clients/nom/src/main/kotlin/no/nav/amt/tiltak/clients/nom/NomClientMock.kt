@@ -2,12 +2,10 @@ package no.nav.amt.tiltak.clients.nom
 
 class NomClientMock : NomClient {
 
-	override fun hentVeileder(navIdent: String): NomVeileder {
-		return NomVeileder(
+	override fun hentNavAnsatt(navIdent: String): NomNavAnsatt {
+		return NomNavAnsatt(
 			navIdent = navIdent,
-			fornavn = "F_$navIdent",
-			etternavn = "E_$navIdent",
-			visningNavn = "F_$navIdent E_$navIdent",
+			navn = "F_$navIdent E_$navIdent",
 			epost = "F_$navIdent.E_$navIdent@trygdeetaten.no",
 			telefonnummer = "12345678"
 		)
