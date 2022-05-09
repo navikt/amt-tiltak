@@ -1,7 +1,9 @@
 package no.nav.amt.tiltak.navansatt
 
+import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
+import no.nav.amt.tiltak.core.domain.nav_ansatt.Bucket
+import no.nav.amt.tiltak.core.domain.nav_ansatt.UpsertNavAnsattInput
 import org.springframework.jdbc.core.RowMapper
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 import java.util.*
@@ -21,7 +23,18 @@ internal class NavAnsattRepository(
 		)
 	}
 
-	internal fun upsert(upsertCmd: NavAnsattDbo) {
+	internal fun get(id: UUID): NavAnsattDbo {
+		val sql = """
+			SELECT * FROM nav_ansatt WHERE id = :id
+		""".trimIndent()
+
+		val parameters = sqlParameters("id" to id)
+
+		return template.query(sql, parameters, rowMapper).firstOrNull()
+			?: throw NoSuchElementException("Fant ikke NAV Ansatt med id=$id")
+	}
+
+	internal fun upsert(upsertCmd: UpsertNavAnsattInput) {
 		val sql = """
 			INSERT INTO nav_ansatt(id, nav_ident, navn, telefonnummer, epost, bucket)
 			VALUES (:id,
@@ -36,15 +49,13 @@ internal class NavAnsattRepository(
 														bucket        = :bucket
 		""".trimIndent()
 
-		val parameterSource = MapSqlParameterSource().addValues(
-			mapOf(
-				"id" to upsertCmd.id,
-				"navIdent" to upsertCmd.navIdent,
-				"navn" to upsertCmd.navn,
-				"telefonnummer" to upsertCmd.telefonnummer,
-				"epost" to upsertCmd.epost,
-				"bucket" to upsertCmd.bucket.id,
-			)
+		val parameterSource = sqlParameters(
+			"id" to upsertCmd.id,
+			"navIdent" to upsertCmd.navIdent,
+			"navn" to upsertCmd.navn,
+			"telefonnummer" to upsertCmd.telefonnummer,
+			"epost" to upsertCmd.epost,
+			"bucket" to upsertCmd.bucket.id,
 		)
 
 		template.update(sql, parameterSource)
@@ -53,14 +64,14 @@ internal class NavAnsattRepository(
 	internal fun getNavAnsattWithIdent(navIdent: String): NavAnsattDbo? {
 		return template.query(
 			"SELECT * FROM nav_ansatt WHERE nav_ident = :navIdent",
-			MapSqlParameterSource().addValues(mapOf("navIdent" to navIdent)),
+			sqlParameters("navIdent" to navIdent),
 			rowMapper
 		).firstOrNull()
 	}
 
 	internal fun getNavAnsattInBucket(bucket: Bucket): List<NavAnsattDbo> = template.query(
 		"SELECT * FROM nav_ansatt WHERE bucket = :bucket",
-		MapSqlParameterSource().addValues(mapOf("bucket" to bucket.id)),
+		sqlParameters("bucket" to bucket.id),
 		rowMapper
 	)
 

@@ -64,6 +64,7 @@ class TiltakarrangorAnsattControllerTest {
 				id = UUID.randomUUID(),
 				personligIdent = "",
 				fornavn = "",
+				mellomnavn = null,
 				etternavn = "",
 				arrangorer = emptyList()
 			))

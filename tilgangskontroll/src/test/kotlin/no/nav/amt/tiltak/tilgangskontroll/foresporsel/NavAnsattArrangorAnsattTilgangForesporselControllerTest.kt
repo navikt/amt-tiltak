@@ -2,8 +2,8 @@ package no.nav.amt.tiltak.tilgangskontroll.foresporsel
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
-import no.nav.amt.tiltak.core.port.NavAnsattTilgangService
-import no.nav.amt.tiltak.core.port.VeilederService
+import no.nav.amt.tiltak.core.port.NavAnsattService
+import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -40,10 +40,10 @@ class NavAnsattArrangorAnsattTilgangForesporselControllerTest {
 	private lateinit var authService: AuthService
 
 	@MockBean
-	private lateinit var veilederService: VeilederService
+	private lateinit var navAnsattService: NavAnsattService
 
 	@MockBean
-	private lateinit var navAnsattTilgangService: NavAnsattTilgangService
+	private lateinit var tiltaksansvarligTilgangService: TiltaksansvarligTilgangService
 
 	@Test
 	fun `hentUbesluttedeForesporsler() - skal returnere 401 hvis token mangler`() {
@@ -77,7 +77,7 @@ class NavAnsattArrangorAnsattTilgangForesporselControllerTest {
 				createdAt = ZonedDateTime.parse("2022-04-04T17:30:46.114332+02:00")
 			)))
 
-		`when`(navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
+		`when`(tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
 			.thenReturn(true)
 
 		val response = mockMvc.perform(
@@ -111,7 +111,7 @@ class NavAnsattArrangorAnsattTilgangForesporselControllerTest {
 
 		`when`(authService.hentNavIdentTilInnloggetBruker()).thenReturn(navAnsattIdent)
 
-		`when`(veilederService.getOrCreateVeileder(navAnsattIdent))
+		`when`(navAnsattService.getNavAnsatt(navAnsattIdent))
 			.thenReturn(NavAnsatt(
 				id = navAnsattId,
 				navIdent = navAnsattIdent,
@@ -135,7 +135,7 @@ class NavAnsattArrangorAnsattTilgangForesporselControllerTest {
 				createdAt = ZonedDateTime.now(),
 			))
 
-		`when`(navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
+		`when`(tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
 			.thenReturn(true)
 
 		val response = mockMvc.perform(
@@ -166,7 +166,7 @@ class NavAnsattArrangorAnsattTilgangForesporselControllerTest {
 
 		`when`(authService.hentNavIdentTilInnloggetBruker()).thenReturn(navAnsattIdent)
 
-		`when`(veilederService.getOrCreateVeileder(navAnsattIdent))
+		`when`(navAnsattService.getNavAnsatt(navAnsattIdent))
 			.thenReturn(NavAnsatt(
 				id = navAnsattId,
 				navIdent = navAnsattIdent,
@@ -190,7 +190,7 @@ class NavAnsattArrangorAnsattTilgangForesporselControllerTest {
 				createdAt = ZonedDateTime.now(),
 			))
 
-		`when`(navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
+		`when`(tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
 			.thenReturn(true)
 
 		val response = mockMvc.perform(

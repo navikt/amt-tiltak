@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.navansatt
 
+import no.nav.amt.tiltak.core.domain.nav_ansatt.Bucket
 import java.util.*
 
 internal data class NavAnsattDbo(

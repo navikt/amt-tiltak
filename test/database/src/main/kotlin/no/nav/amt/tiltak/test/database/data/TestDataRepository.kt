@@ -10,8 +10,8 @@ class TestDataRepository(
 
 	fun insertArrangorAnsatt(cmd: InsertArrangorAnsattCommand) {
 		val sql = """
-			INSERT INTO arrangor_ansatt(id, personlig_ident, fornavn, etternavn)
-			VALUES(:id, :personlig_ident, :fornavn, :etternavn)
+			INSERT INTO arrangor_ansatt(id, personlig_ident, fornavn, mellomnavn, etternavn)
+			VALUES(:id, :personlig_ident, :fornavn, :mellomnavn, :etternavn)
 		""".trimIndent()
 
 		template.update(
@@ -19,6 +19,7 @@ class TestDataRepository(
 				"id" to cmd.id,
 				"personlig_ident" to cmd.personlig_ident,
 				"fornavn" to cmd.fornavn,
+				"mellomnavn" to cmd.mellomnavn,
 				"etternavn" to cmd.etternavn
 			)
 		)
@@ -251,5 +252,21 @@ class TestDataRepository(
 		)
 	}
 
+	fun insertTiltaksansvarligGjennomforingTilgang(cmd: InsertTiltaksansvarligGjennomforingTilgangCommand) {
+		val sql = """
+			INSERT INTO tiltaksansavarlig_gjennomforing_tilgang(id, nav_ansatt_id, gjennomforing_id, gyldig_til, created_at)
+			 VALUES(:id, :navAnsattId, :gjennomforingId, :gyldigTil, :createdAt)
+		""".trimIndent()
+
+		val sqlParameters = parameters(
+			"id" to cmd.id,
+			"navAnsattId" to cmd.navAnsattId,
+			"gjennomforingId" to cmd.gjennomforingId,
+			"gyldigTil" to cmd.gyldigTil.toOffsetDateTime(),
+			"createdAt" to cmd.createdAt.toOffsetDateTime()
+		)
+
+		template.update(sql, sqlParameters)
+	}
 
 }

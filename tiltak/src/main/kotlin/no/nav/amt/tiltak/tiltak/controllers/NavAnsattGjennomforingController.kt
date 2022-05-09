@@ -3,14 +3,12 @@ package no.nav.amt.tiltak.tiltak.controllers
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.core.port.NavAnsattService
-import no.nav.amt.tiltak.tiltak.repositories.GjennomforingerPaEnheterQuery
+import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
+import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingMedLopenrQuery
+import no.nav.amt.tiltak.tiltak.repositories.HentTiltaksoversiktQuery
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 import java.util.*
@@ -19,32 +17,42 @@ import java.util.*
 @RequestMapping("/api/nav-ansatt/gjennomforing")
 class NavAnsattGjennomforingController(
 	private val authService: AuthService,
-	private val navAnsattService: NavAnsattService,
-	private val gjennomforingerPaEnheterQuery: GjennomforingerPaEnheterQuery,
-	private val gjennomforingService: GjennomforingService
+	private val gjennomforingService: GjennomforingService,
+	private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService,
+	private val hentGjennomforingMedLopenrQuery: HentGjennomforingMedLopenrQuery,
+	private val hentTiltaksoversiktQuery: HentTiltaksoversiktQuery
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@GetMapping
-	fun hentGjennomforinger(): List<HentAlleGjennomforingDto> {
+	fun hentGjennomforinger(): List<HentGjennomforingerDto> {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-		val enheter = navAnsattService.hentTiltaksansvarligEnhetTilganger(navIdent)
 
-		return gjennomforingerPaEnheterQuery.query(enheter.map { it.enhet.id })
-			.map { HentAlleGjennomforingDto(it.id, it.navn) }
+		val tilganger = tiltaksansvarligTilgangService.hentAktiveTilganger(navIdent)
+			.map { it.gjennomforingId }
+
+		return hentTiltaksoversiktQuery.query(tilganger)
+			.map {
+				HentGjennomforingerDto(
+					id = it.id,
+					navn = it.navn,
+					lopenr = it.lopenr,
+					opprettetAar = it.opprettetAar,
+					arrangorNavn = it.arrangorOrganisasjonsnavn ?: it.arrangorVirksomhetsnavn
+				)
+			}
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@GetMapping("/{gjennomforingId}")
 	fun hentGjennomforing(@PathVariable gjennomforingId: UUID): GjennomforingDto {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-		val enheter = navAnsattService.hentTiltaksansvarligEnhetTilganger(navIdent)
+
+		if (!tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navIdent, gjennomforingId)) {
+			throw ResponseStatusException(HttpStatus.FORBIDDEN)
+		}
 
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
-
-		if (!enheter.any { it.enhet.id == gjennomforing.navEnhetId }) {
-			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til enhet")
-		}
 
 		return GjennomforingDto(
 			id = gjennomforing.id,
@@ -58,9 +66,35 @@ class NavAnsattGjennomforingController(
 		)
 	}
 
-	data class HentAlleGjennomforingDto(
+	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
+	@GetMapping(params = ["lopenr"])
+	fun hentGjennomforingerMedLopenr(@RequestParam("lopenr") lopenr: Int): List<HentGjennomforingMedLopenrDto> {
+		return hentGjennomforingMedLopenrQuery.query(lopenr)
+			.map {
+				HentGjennomforingMedLopenrDto(
+					id = it.id,
+					navn = it.navn,
+					lopenr = it.lopenr,
+					opprettetAr = it.opprettetAr,
+					arrangorNavn = it.arrangorOrganisasjonsnavn ?: it.arrangorVirksomhetsnavn
+				)
+			}
+	}
+
+	data class HentGjennomforingerDto(
 		val id: UUID,
 		val navn: String,
+		val arrangorNavn: String,
+		val lopenr: Int,
+		val opprettetAar: Int,
+	)
+
+	data class HentGjennomforingMedLopenrDto(
+		val id: UUID,
+		val navn: String,
+		val lopenr: Int,
+		val opprettetAr: Int,
+		val arrangorNavn: String,
 	)
 
 	data class GjennomforingDto(

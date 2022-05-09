@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 import java.util.*
@@ -20,7 +21,10 @@ class EndringsmeldingArrangorController(
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@PostMapping("/deltaker/{deltakerId}/startdato")
-	fun registrerStartDato(@PathVariable("deltakerId") deltakerId: UUID, @RequestParam startDato: LocalDate) {
+	fun registrerStartDato(
+		@PathVariable("deltakerId") deltakerId: UUID,
+		@RequestParam("startDato") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startDato: LocalDate
+	) {
 
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 		val deltaker = deltakerService.hentDeltaker(deltakerId)
