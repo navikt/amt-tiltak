@@ -27,6 +27,27 @@ class DeltakerStatistikkRepository(
 		MapSqlParameterSource(),
 		Int::class.java)
 
+	fun antallAktiveArrangorerMedBrukere() = template.queryForObject(
+		"""
+			SELECT count(distinct a.id)
+			FROM arrangor a
+			join arrangor_ansatt_rolle aar on a.id = aar.arrangor_id
+			join gjennomforing g on a.id = g.arrangor_id
+			where g.status = 'GJENNOMFORES';
+		""".trimMargin(),
+		MapSqlParameterSource(),
+		Int::class.java)
+
+	fun antallAktiveArrangorer() = template.queryForObject(
+		"""
+			SELECT count(distinct arrangor_id)
+			FROM arrangor a
+			join gjennomforing g on a.id = g.arrangor_id
+			where g.status = 'GJENNOMFORES';
+		""".trimMargin(),
+		MapSqlParameterSource(),
+		Int::class.java)
+
 	fun antallArrangorerMedBrukere() = template.queryForObject(
 		"SELECT count(distinct arrangor_id) FROM arrangor a join arrangor_ansatt_rolle aar on a.id = aar.arrangor_id;",
 		MapSqlParameterSource(),

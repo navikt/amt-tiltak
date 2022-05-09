@@ -74,7 +74,7 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 		brukerService = BrukerServiceImpl(
 			brukerRepository,
 			mock(PersonService::class.java),
-			mock(VeilederService::class.java),
+			mock(NavAnsattService::class.java),
 			mock(NavEnhetService::class.java)
 		)
 		deltakerService = DeltakerServiceImpl(

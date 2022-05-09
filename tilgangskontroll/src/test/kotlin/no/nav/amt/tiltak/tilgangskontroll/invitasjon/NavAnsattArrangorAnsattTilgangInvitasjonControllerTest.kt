@@ -3,8 +3,8 @@ package no.nav.amt.tiltak.tilgangskontroll.invitasjon
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
-import no.nav.amt.tiltak.core.port.NavAnsattTilgangService
-import no.nav.amt.tiltak.core.port.VeilederService
+import no.nav.amt.tiltak.core.port.NavAnsattService
+import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -44,10 +44,10 @@ class NavAnsattArrangorAnsattTilgangInvitasjonControllerTest {
 	private lateinit var authService: AuthService
 
 	@MockBean
-	private lateinit var veilederService: VeilederService
+	private lateinit var navAnsattService: NavAnsattService
 
 	@MockBean
-	private lateinit var navAnsattTilgangService: NavAnsattTilgangService
+	private lateinit var tiltaksansvarligTilgangService: TiltaksansvarligTilgangService
 
 	@Test
 	fun `hentUbrukteInvitasjoner() - skal returnere 401 hvis token mangler`() {
@@ -69,7 +69,7 @@ class NavAnsattArrangorAnsattTilgangInvitasjonControllerTest {
 		`when`(authService.hentNavIdentTilInnloggetBruker())
 			.thenReturn(navAnsattIdent)
 
-		`when`(navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
+		`when`(tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
 			.thenReturn(true)
 
 		`when`(tilgangInvitasjonService.hentUbrukteInvitasjoner(gjennomforingId))
@@ -113,7 +113,7 @@ class NavAnsattArrangorAnsattTilgangInvitasjonControllerTest {
 		`when`(authService.hentNavIdentTilInnloggetBruker())
 			.thenReturn(navAnsattIdent)
 
-		`when`(veilederService.getOrCreateVeileder(navAnsattIdent))
+		`when`(navAnsattService.getNavAnsatt(navAnsattIdent))
 			.thenReturn(NavAnsatt(
 				id = navAnsattId,
 				navIdent = navAnsattIdent,
@@ -122,7 +122,7 @@ class NavAnsattArrangorAnsattTilgangInvitasjonControllerTest {
 				telefonnummer = ""
 			))
 
-		`when`(navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
+		`when`(tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navAnsattIdent, gjennomforingId))
 			.thenReturn(true)
 
 		val response = mockMvc.perform(
@@ -169,7 +169,7 @@ class NavAnsattArrangorAnsattTilgangInvitasjonControllerTest {
 				createdAt = ZonedDateTime.now()
 			))
 
-		`when`(navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(innloggetNavAnsattIdent, gjennomforingId))
+		`when`(tiltaksansvarligTilgangService.harTilgangTilGjennomforing(innloggetNavAnsattIdent, gjennomforingId))
 			.thenReturn(true)
 
 		val response = mockMvc.perform(

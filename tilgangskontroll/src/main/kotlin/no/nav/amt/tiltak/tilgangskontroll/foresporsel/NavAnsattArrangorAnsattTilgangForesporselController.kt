@@ -2,8 +2,8 @@ package no.nav.amt.tiltak.tilgangskontroll.foresporsel
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
-import no.nav.amt.tiltak.core.port.NavAnsattTilgangService
-import no.nav.amt.tiltak.core.port.VeilederService
+import no.nav.amt.tiltak.core.port.NavAnsattService
+import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -14,10 +14,10 @@ import java.util.*
 @RestController
 @RequestMapping("/api/nav-ansatt/arrangor-ansatt-tilgang/foresporsel")
 class NavAnsattArrangorAnsattTilgangForesporselController(
-	private val tilgangForesporselService: TilgangForesporselService,
-	private val authService: AuthService,
-	private val veilederService: VeilederService,
-	private val navAnsattTilgangService: NavAnsattTilgangService
+    private val tilgangForesporselService: TilgangForesporselService,
+    private val authService: AuthService,
+    private val navAnsattService: NavAnsattService,
+    private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService
 ) {
 
 	@GetMapping("/ubesluttet")
@@ -35,7 +35,7 @@ class NavAnsattArrangorAnsattTilgangForesporselController(
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	fun godkjennForesporsel(@PathVariable foresporselId: UUID) {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-		val navAnsatt = veilederService.getOrCreateVeileder(navIdent)
+		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 		val foresporsel = tilgangForesporselService.hentForesporsel(foresporselId)
 
 		verifisierTilgangTilGjennomforing(navIdent, foresporsel.gjennomforingId)
@@ -47,7 +47,7 @@ class NavAnsattArrangorAnsattTilgangForesporselController(
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	fun avvisForesporsel(@PathVariable foresporselId: UUID) {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-		val navAnsatt = veilederService.getOrCreateVeileder(navIdent)
+		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 		val foresporsel = tilgangForesporselService.hentForesporsel(foresporselId)
 
 		verifisierTilgangTilGjennomforing(navIdent, foresporsel.gjennomforingId)
@@ -76,7 +76,7 @@ class NavAnsattArrangorAnsattTilgangForesporselController(
 	}
 
 	private fun verifisierTilgangTilGjennomforing(navIdent: String, gjennomforingId: UUID) {
-		if (!navAnsattTilgangService.harTiltaksansvarligTilgangTilGjennomforing(navIdent, gjennomforingId)) {
+		if (!tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navIdent, gjennomforingId)) {
 			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Har ikke tilgang til gjennomføring")
 		}
 	}

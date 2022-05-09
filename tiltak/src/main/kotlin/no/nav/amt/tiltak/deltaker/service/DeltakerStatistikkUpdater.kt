@@ -15,6 +15,8 @@ private const val deltakere = "amt.tiltak.antall.deltakere"
 private const val deltakerePrStatus = "amt.tiltak.antall.deltakere.pr.status"
 private const val arrangorer = "amt.tiltak.antall.arrangorer"
 private const val arrangorerMedBrukere = "amt.tiltak.antall.arrangorer.med.brukere"
+private const val aktiveArrangorer = "amt.tiltak.antall.aktive.arrangorer"
+private const val aktiveArrangorerMedBrukere = "amt.tiltak.antall.aktive.arrangorer.med.brukere"
 private const val gjennomforinger = "amt.tiltak.antall.gjennomforinger"
 private const val gjennomforingerPrStatus = "amt.tiltak.antall.gjennomforinger.pr.status"
 private const val eksponerteBrukere = "amt.tiltak.antall.brukere.eksponerte"
@@ -31,6 +33,8 @@ class DeltakerStatistikkUpdater(
 		Pair(arrangorer, registry.gauge(arrangorer, AtomicInteger(0))!!),
 		Pair(arrangorerMedBrukere, registry.gauge(arrangorerMedBrukere, AtomicInteger(0))!!),
 		Pair(gjennomforinger, registry.gauge(gjennomforinger, AtomicInteger(0))!!),
+		Pair(aktiveArrangorer, registry.gauge(aktiveArrangorer, AtomicInteger(0))!!),
+		Pair(aktiveArrangorerMedBrukere, registry.gauge(aktiveArrangorerMedBrukere, AtomicInteger(0))!!),
 	)
 
 	private val deltakerStatusGauges: Map<String, AtomicInteger> =
@@ -50,6 +54,8 @@ class DeltakerStatistikkUpdater(
 		}
 		simpleGauges.getValue(arrangorer).set(deltakerStatistikkRepository.antallArrangorer()!!)
 		simpleGauges.getValue(arrangorerMedBrukere).set(deltakerStatistikkRepository.antallArrangorerMedBrukere()!!)
+		simpleGauges.getValue(aktiveArrangorer).set(deltakerStatistikkRepository.antallAktiveArrangorer()!!)
+		simpleGauges.getValue(aktiveArrangorerMedBrukere).set(deltakerStatistikkRepository.antallAktiveArrangorerMedBrukere()!!)
 		simpleGauges.getValue(gjennomforinger).set(deltakerStatistikkRepository.antallGjennomforinger()!!)
 		deltakerStatistikkRepository.antallGjennomforingerPrStatus().forEach {
 			gjennomforingStatusGauges.getValue(it.first).set(it.second)

@@ -52,6 +52,9 @@ data class GjennomforingDbo(
 				sluttDato = other.sluttDato,
 				registrertDato = other.registrertDato,
 				fremmoteDato = other.fremmoteDato,
+				navEnhetId = other.navEnhetId,
+				lopenr = other.lopenr,
+				opprettetAar = other.opprettetAar,
 				modifiedAt = LocalDateTime.now()
 			)
 

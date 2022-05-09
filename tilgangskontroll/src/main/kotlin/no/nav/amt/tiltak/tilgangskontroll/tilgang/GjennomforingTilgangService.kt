@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.tilgangskontroll.tilgang
 
-import no.nav.amt.tiltak.core.domain.tilgangskontroll.GjennomforingTilgang
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattGjennomforingTilgang
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
 import java.util.*
@@ -14,7 +14,7 @@ open class GjennomforingTilgangService(
 		gjennomforingTilgangRepository.opprettTilgang(id, arrangorAnsattId, opprettetAvNavAnsattId, gjennomforingId)
 	}
 
-	open fun hentTilgang(id: UUID): GjennomforingTilgang {
+	open fun hentTilgang(id: UUID): ArrangorAnsattGjennomforingTilgang {
 		return mapGjennomforingTilgang(gjennomforingTilgangRepository.get(id))
 	}
 
@@ -22,8 +22,8 @@ open class GjennomforingTilgangService(
 		gjennomforingTilgangRepository.stopTilgang(id, ansattId, ZonedDateTime.now())
 	}
 
-	private fun mapGjennomforingTilgang(dbo: GjennomforingTilgangDbo): GjennomforingTilgang {
-		return GjennomforingTilgang(
+	private fun mapGjennomforingTilgang(dbo: GjennomforingTilgangDbo): ArrangorAnsattGjennomforingTilgang {
+		return ArrangorAnsattGjennomforingTilgang(
 			id = dbo.id,
 			ansattId = dbo.ansattId,
 			gjennomforingId = dbo.gjennomforingId,

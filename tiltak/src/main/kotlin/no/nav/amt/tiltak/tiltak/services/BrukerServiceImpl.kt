@@ -3,9 +3,9 @@ package no.nav.amt.tiltak.tiltak.services
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.port.BrukerService
+import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.PersonService
-import no.nav.amt.tiltak.core.port.VeilederService
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
@@ -16,7 +16,7 @@ import java.util.*
 class BrukerServiceImpl(
 	private val brukerRepository: BrukerRepository,
 	private val personService: PersonService,
-	private val veilederService: VeilederService,
+	private val navAnsattService: NavAnsattService,
 	private val navEnhetService: NavEnhetService
 ) : BrukerService {
 
@@ -36,8 +36,8 @@ class BrukerServiceImpl(
 		return brukerRepository.get(fodselsnummer) != null
 	}
 
-	override fun oppdaterAnsvarligVeileder(brukerPersonligIdent: String, veilederId: UUID) {
-		brukerRepository.oppdaterVeileder(brukerPersonligIdent, veilederId)
+	override fun oppdaterAnsvarligVeileder(brukerPersonligIdent: String, navAnsattId: UUID) {
+		brukerRepository.oppdaterVeileder(brukerPersonligIdent, navAnsattId)
 	}
 
 	override fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet) {
@@ -45,7 +45,9 @@ class BrukerServiceImpl(
 	}
 
 	private fun createBruker(fodselsnummer: String): BrukerDbo {
-		val veilederId = upsertVeileder(fodselsnummer)
+		val tildeltVeilederNavIdent = personService.hentTildeltVeilederNavIdent(fodselsnummer)
+
+		val veileder = tildeltVeilederNavIdent?.let { navAnsattService.getNavAnsatt(it) }
 
 		val navEnhet = navEnhetService.getNavEnhetForBruker(fodselsnummer)
 
@@ -60,17 +62,11 @@ class BrukerServiceImpl(
 			etternavn = person.etternavn,
 			telefonnummer = person.telefonnummer ?: personKontaktinformasjon.telefonnummer,
 			epost = personKontaktinformasjon.epost,
-			ansvarligVeilederId = veilederId,
+			ansvarligVeilederId = veileder?.id,
 			navEnhetId = navEnhet?.id
 		)
 
 		return brukerRepository.insert(bruker)
-	}
-
-	private fun upsertVeileder(fodselsnummer: String): UUID? {
-		return personService.hentTildeltVeileder(fodselsnummer)?.let { veileder ->
-			return veilederService.upsertVeileder(veileder)
-		}
 	}
 
 }

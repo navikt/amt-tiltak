@@ -33,7 +33,7 @@ class HentArrangorAnsattTilgangerQueryTest : FunSpec({
 
 		tilgang.id shouldBe GJENNOMFORING_TILGANG_1.id
 		tilgang.fornavn shouldBe "Ansatt 1 fornavn"
-		tilgang.mellomnavn shouldBe null
+		tilgang.mellomnavn shouldBe "Ansatt 1 mellomnavn"
 		tilgang.etternavn shouldBe "Ansatt 1 etternavn"
 		tilgang.opprettetDato shouldNotBe null
 		tilgang.opprettetAvNavIdent shouldBe null

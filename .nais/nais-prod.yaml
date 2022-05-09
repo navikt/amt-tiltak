@@ -57,8 +57,6 @@ spec:
   secureLogs:
     enabled: true
   env:
-    - name: AXSYS_SCOPE
-      value: api://prod-fss.org.axsys/.default
     - name: PDL_SCOPE
       value: api://prod-fss.pdl.pdl-api/.default
     - name: PDL_URL
