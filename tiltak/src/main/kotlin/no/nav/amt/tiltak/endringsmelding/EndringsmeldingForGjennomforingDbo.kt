@@ -56,6 +56,7 @@ data class EndringsmeldingForGjennomforingDbo (
 			id = opprettetAvId,
 			personligIdent = opprettetAvPersonligIdent,
 			fornavn = opprettetAvFornavn,
+			mellomnavn = opprettetAvMellomnavn,
 			etternavn = opprettetAvEtternavn,
 			arrangorer = emptyList()
 		),

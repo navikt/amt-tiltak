@@ -63,7 +63,7 @@ class EndringsmeldingForGjennomforingQuery(
 			JOIN deltaker on endringsmelding.deltaker_id = deltaker.id
 			JOIN arrangor_ansatt on endringsmelding.opprettet_av = arrangor_ansatt.id
 			JOIN bruker on deltaker.bruker_id = bruker.id
-			JOIN nav_enhet on bruker.nav_enhet_id = nav_enhet.id
+			LEFT JOIN nav_enhet on bruker.nav_enhet_id = nav_enhet.id
 			WHERE deltaker.gjennomforing_id = :gjennomforing_id
 		""".trimIndent()
 

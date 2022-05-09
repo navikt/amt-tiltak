@@ -4,8 +4,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt.tiltak.navansatt.Bucket
-import java.lang.IllegalArgumentException
+import no.nav.amt.tiltak.core.domain.nav_ansatt.Bucket
 import java.time.LocalTime
 
 class BucketTest : StringSpec ({

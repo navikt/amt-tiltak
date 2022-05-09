@@ -41,6 +41,7 @@ class AnsattRepositoryTest {
 		assertEquals(ARRANGOR_ANSATT_1.id, ansatt.id)
 		assertEquals(ARRANGOR_ANSATT_1.personlig_ident, ansatt.personligIdent)
 		assertEquals("Ansatt 1 fornavn", ansatt.fornavn)
+		assertEquals("Ansatt 1 mellomnavn", ansatt.mellomnavn)
 		assertEquals("Ansatt 1 etternavn", ansatt.etternavn)
 	}
 

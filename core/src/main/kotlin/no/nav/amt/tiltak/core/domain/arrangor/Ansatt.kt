@@ -6,6 +6,7 @@ data class Ansatt (
     val id: UUID,
 	val personligIdent: String,
     val fornavn: String,
+	val mellomnavn: String?,
     val etternavn: String,
     val arrangorer: List<TilknyttetArrangor>
 )
