@@ -41,6 +41,16 @@ open class EndringsmeldingRepository(
 		return template.query(sql, param, rowMapper)
 	}
 
+	fun getByDeltaker(deltakerId: UUID): List<EndringsmeldingDbo> {
+		val sql = """
+			SELECT * FROM endringsmelding WHERE deltaker_id = :deltakerId
+		""".trimIndent()
+
+		val param = sqlParameters("deltakerId" to deltakerId)
+
+		return template.query(sql, param, rowMapper)
+	}
+
 	fun get(id: UUID): EndringsmeldingDbo {
 		val sql = """
 			SELECT *

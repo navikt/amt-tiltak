@@ -17,7 +17,24 @@ class EndringsmeldingArrangorController(
 	private val arrangorTilgangService: ArrangorAnsattTilgangService,
 	private val deltakerService: DeltakerService,
 	private val authService: AuthService
-	) {
+) {
+
+	@GetMapping
+	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
+	fun hentEndringsmeldinger(@RequestParam("deltakerId") deltakerId: UUID): List<EndringsmeldingDto> {
+		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
+
+		arrangorTilgangService.verifiserTilgangTilDeltaker(ansattPersonligIdent, deltakerId)
+
+		return endringsmeldingService.hentEndringsmeldingerForDeltaker(deltakerId)
+			.map {
+				EndringsmeldingDto(
+					id = it.id,
+					startDato = it.startDato,
+					aktiv = it.aktiv
+				)
+			}
+	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@PostMapping("/deltaker/{deltakerId}/startdato")
@@ -33,4 +50,11 @@ class EndringsmeldingArrangorController(
 
 		endringsmeldingService.opprettMedStartDato(deltakerId, startDato, ansattId)
 	}
+
+	data class EndringsmeldingDto(
+		val id: UUID,
+		val startDato: LocalDate?,
+		val aktiv: Boolean,
+	)
+
 }

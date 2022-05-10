@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.tilgangskontroll.tilgang
 import com.github.benmanes.caffeine.cache.Caffeine
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
+import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils.tryCacheFirstNotNull
 import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils.tryCacheFirstNullable
 import org.slf4j.LoggerFactory
@@ -16,6 +17,7 @@ import java.util.*
 class ArrangorAnsattTilgangServiceImpl(
 	private val arrangorAnsattService: ArrangorAnsattService,
 	private val ansattRolleRepository: AnsattRolleRepository,
+	private val deltakerService: DeltakerService,
 	private val gjennomforingTilgangRepository: GjennomforingTilgangRepository,
 ) : ArrangorAnsattTilgangService {
 
@@ -58,6 +60,12 @@ class ArrangorAnsattTilgangServiceImpl(
 			secureLog.warn("Ansatt med id=$ansattId har ikke tilgang til arrangør med id=$arrangorId")
 			throw ResponseStatusException(HttpStatus.FORBIDDEN)
 		}
+	}
+
+	override fun verifiserTilgangTilDeltaker(ansattPersonligIdent: String, deltakerId: UUID) {
+		val deltaker = deltakerService.hentDeltaker(deltakerId)
+
+		verifiserTilgangTilGjennomforing(ansattPersonligIdent, deltaker.gjennomforingId)
 	}
 
 	override fun hentAnsattId(ansattPersonligIdent: String): UUID {
