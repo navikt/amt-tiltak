@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.endringsmelding
 
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
+import no.nav.amt.tiltak.common.db_utils.getNullableZonedDateTime
 import no.nav.amt.tiltak.utils.getNullableUUID
 import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
@@ -20,9 +21,10 @@ open class EndringsmeldingRepository(
 			id = rs.getUUID("id"),
 			deltakerId = rs.getUUID("deltaker_id"),
 			startDato = rs.getDate("start_dato")?.toLocalDate(),
-			godkjentAvNavAnsatt = rs.getNullableUUID("godkjent_av_nav_ansatt"),
+			ferdiggjortAvNavAnsattId = rs.getNullableUUID("ferdiggjort_av_nav_ansatt_id"),
+			ferdiggjortTidspunkt = rs.getNullableZonedDateTime("ferdiggjort_tidspunkt"),
 			aktiv = rs.getBoolean("aktiv"),
-			opprettetAvId = rs.getUUID("opprettet_av"),
+			opprettetAvArrangorAnsattId = rs.getUUID("opprettet_av_arrangor_ansatt_id"),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
 		)
@@ -56,7 +58,10 @@ open class EndringsmeldingRepository(
 
 	fun markerSomFerdig(endringsmeldingId: UUID, navAnsattId: UUID) {
 		val sql = """
-			UPDATE endringsmelding SET aktiv = false, godkjent_av_nav_ansatt = :navAnsattId
+			UPDATE endringsmelding
+				SET aktiv = false,
+					ferdiggjort_tidspunkt = current_timestamp,
+					ferdiggjort_av_nav_ansatt_id = :navAnsattId
 				WHERE id = :endringsmeldingId
 		""".trimIndent()
 
@@ -87,11 +92,11 @@ open class EndringsmeldingRepository(
 		return template.update(sql, params)
 	}
 
-	private fun insertNyStartDato(startDato: LocalDate, deltakerId: UUID, opprettetAv: UUID): EndringsmeldingDbo {
+	private fun insertNyStartDato(startDato: LocalDate, deltakerId: UUID, opprettetAvArrangorAnsattId: UUID): EndringsmeldingDbo {
 		val id = UUID.randomUUID()
 
 		val sql = """
-			INSERT INTO endringsmelding(id, deltaker_id, start_dato, aktiv, opprettet_av)
+			INSERT INTO endringsmelding(id, deltaker_id, start_dato, aktiv, opprettet_av_arrangor_ansatt_id)
 			VALUES (:id, :deltaker_id, :start_dato, true, :opprettet_av)
 		""".trimIndent()
 
@@ -99,11 +104,11 @@ open class EndringsmeldingRepository(
 			"id" to id,
 			"deltaker_id" to deltakerId,
 			"start_dato" to startDato,
-			"opprettet_av" to opprettetAv
+			"opprettet_av" to opprettetAvArrangorAnsattId
 		)
 
 		template.update(sql, params)
 
-		return get(id) ?: throw Error("Fant ikke aktiv endringsmelding på deltaker: $deltakerId etter insert ")
+		return get(id)
 	}
 }

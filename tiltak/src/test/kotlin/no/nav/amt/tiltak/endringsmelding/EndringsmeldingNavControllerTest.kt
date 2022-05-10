@@ -158,9 +158,10 @@ class EndringsmeldingNavControllerTest {
 				id = endringsmeldingId,
 				deltakerId = deltakerId,
 				startDato = null,
-				godkjentAvNavAnsatt = null,
+				ferdiggjortAvNavAnsattId = null,
+				ferdiggjortTidspunkt = null,
 				aktiv = true,
-				opprettetAvId = UUID.randomUUID(),
+				opprettetAvArrangorAnsattId = UUID.randomUUID(),
 				createdAt = LocalDateTime.now(),
 				modifiedAt = LocalDateTime.now()
 			))
