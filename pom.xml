@@ -23,7 +23,6 @@
         <module>navansatt</module>
         <module>test</module>
         <module>tiltak</module>
-        <module>tools</module>
         <module>tilgangskontroll</module>
     </modules>
 
