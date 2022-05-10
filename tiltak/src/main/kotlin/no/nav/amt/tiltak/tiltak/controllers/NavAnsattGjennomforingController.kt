@@ -59,10 +59,14 @@ class NavAnsattGjennomforingController(
 			navn = gjennomforing.navn,
 			startDato = gjennomforing.startDato,
 			sluttDato = gjennomforing.sluttDato,
+			tiltakNavn = gjennomforing.tiltak.navn,
 			arrangor = ArrangorDto(
 				virksomhetNavn = gjennomforing.arrangor.navn,
 				organisasjonNavn = gjennomforing.arrangor.overordnetEnhetNavn
-			)
+			),
+			// I praksis så kan ikke disse være null, når vi får SAK i prod og alle gjennomføringer har løpenr/år så kan dette forenkles
+			lopenr = gjennomforing.lopenr ?: 0,
+			opprettetAr = gjennomforing.opprettetAar ?: 0
 		)
 	}
 
@@ -100,9 +104,12 @@ class NavAnsattGjennomforingController(
 	data class GjennomforingDto(
 		val id: UUID,
 		val navn: String,
+		val tiltakNavn: String,
 		val startDato: LocalDate?,
 		val sluttDato: LocalDate?,
-		val arrangor: ArrangorDto
+		val arrangor: ArrangorDto,
+		val lopenr: Int,
+		val opprettetAr: Int
 	)
 
 	data class ArrangorDto(

@@ -154,7 +154,7 @@ class NavAnsattGjennomforingControllerTest {
 		).andReturn().response
 
 		val expectedJson = """
-			{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"tiltaksnavn","startDato":"2022-05-03","sluttDato":"2022-05-03","arrangor":{"virksomhetNavn":"Navn","organisasjonNavn":"Orgnavn"}}
+			{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"tiltaksnavn","tiltakNavn":"tiltaksnavn","startDato":"2022-05-03","sluttDato":"2022-05-03","arrangor":{"virksomhetNavn":"Navn","organisasjonNavn":"Orgnavn"},"lopenr":123,"opprettetAr":2020}
 		""".trimIndent()
 
 		assertEquals(expectedJson, response.contentAsString)
