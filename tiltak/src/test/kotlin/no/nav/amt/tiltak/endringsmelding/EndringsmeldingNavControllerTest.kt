@@ -94,7 +94,7 @@ class EndringsmeldingNavControllerTest {
 		Mockito.`when`(tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navIdent, gjennomforingId))
 			.thenReturn(true)
 
-		Mockito.`when`(endringsmeldingService.hentEndringsmeldinger(gjennomforingId))
+		Mockito.`when`(endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId))
 			.thenReturn(listOf(Endringsmelding(
 				id = endringsmeldingId,
 				bruker = Bruker(

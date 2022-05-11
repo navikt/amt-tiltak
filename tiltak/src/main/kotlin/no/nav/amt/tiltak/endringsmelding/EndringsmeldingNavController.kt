@@ -31,7 +31,7 @@ class EndringsmeldingNavController(
 			throw ResponseStatusException(HttpStatus.FORBIDDEN)
 		}
 
-		return endringsmeldingService.hentEndringsmeldinger(gjennomforingId).map { it.toDto() }
+		return endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId).map { it.toDto() }
 	}
 
 	@PatchMapping("/{endringsmeldingId}/ferdig")

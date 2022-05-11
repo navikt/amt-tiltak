@@ -32,10 +32,14 @@ open class EndringsmeldingService(
 		endringsmeldingRepository.markerSomFerdig(endringsmeldingId, navAnsattId)
 	}
 
-	open fun hentEndringsmeldinger(gjennomforingId: UUID) : List<Endringsmelding> {
+	open fun hentEndringsmeldingerForGjennomforing(gjennomforingId: UUID) : List<Endringsmelding> {
 		return endringsmeldingQuery
 			.query(gjennomforingId)
 			.map { it.toEndringsmelding()}
+	}
+
+	open fun hentEndringsmeldingerForDeltaker(deltakerId: UUID) : List<EndringsmeldingDbo> {
+		return endringsmeldingRepository.getByDeltaker(deltakerId)
 	}
 
 }

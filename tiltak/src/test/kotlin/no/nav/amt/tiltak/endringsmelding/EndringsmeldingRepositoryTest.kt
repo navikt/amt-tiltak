@@ -9,7 +9,9 @@ import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -73,8 +75,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		val meldinger = repository.getByGjennomforing(DELTAKER_1.gjennomforing_id)
 
 		meldinger.size shouldBe 1
-		meldinger.get(0).aktiv shouldBe true
-
+		meldinger[0].aktiv shouldBe true
 	}
 
 	test("getByGjennomforing - inaktiv endringsmelding - returnerer alle") {
@@ -85,8 +86,18 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		val meldinger = repository.getByGjennomforing(DELTAKER_1.gjennomforing_id)
 
 		meldinger.size shouldBe 2
-		meldinger.get(0).aktiv shouldBe false
-		meldinger.get(1).aktiv shouldBe true
+		meldinger[0].aktiv shouldBe false
+		meldinger[1].aktiv shouldBe true
+	}
+
+	test("getByDeltaker - henter endringsmelding") {
+		repository.insertOgInaktiverStartDato(LocalDate.now(), DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+		repository.insertOgInaktiverStartDato(LocalDate.now(), DELTAKER_2.id, ARRANGOR_ANSATT_2.id)
+
+		val meldinger = repository.getByDeltaker(DELTAKER_1.id)
+
+		meldinger.size shouldBe 1
+		meldinger[0].opprettetAvId shouldBe ARRANGOR_ANSATT_1.id
 	}
 
 	test("markerSomFerdig - skal sette aktiv=false og nav ansatt") {
