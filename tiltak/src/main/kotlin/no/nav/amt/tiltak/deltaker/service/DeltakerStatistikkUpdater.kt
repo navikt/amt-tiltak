@@ -17,6 +17,7 @@ private const val arrangorer = "amt.tiltak.antall.arrangorer"
 private const val arrangorerMedBrukere = "amt.tiltak.antall.arrangorer.med.brukere"
 private const val aktiveArrangorer = "amt.tiltak.antall.aktive.arrangorer"
 private const val aktiveArrangorerMedBrukere = "amt.tiltak.antall.aktive.arrangorer.med.brukere"
+private const val gjennomforing = "amt.tiltak.antall.gjennomforing"
 private const val gjennomforinger = "amt.tiltak.antall.gjennomforinger"
 private const val gjennomforingerPrStatus = "amt.tiltak.antall.gjennomforinger.pr.status"
 private const val eksponerteBrukere = "amt.tiltak.antall.brukere.eksponerte"
@@ -36,6 +37,9 @@ class DeltakerStatistikkUpdater(
 		Pair(aktiveArrangorer, registry.gauge(aktiveArrangorer, AtomicInteger(0))!!),
 		Pair(aktiveArrangorerMedBrukere, registry.gauge(aktiveArrangorerMedBrukere, AtomicInteger(0))!!),
 	)
+
+	private val gjennomforingGauge = MultiGauge.builder(gjennomforing).register(registry)
+
 
 	private val deltakerStatusGauges: Map<String, AtomicInteger> =
 		Deltaker.Status.values().associate {
@@ -61,5 +65,20 @@ class DeltakerStatistikkUpdater(
 			gjennomforingStatusGauges.getValue(it.first).set(it.second)
 		}
 		simpleGauges.getValue(eksponerteBrukere).set(deltakerStatistikkRepository.eksponerteBrukere()!!)
+		oppdaterGjennomforingMaalinger()
+	}
+
+
+
+	fun oppdaterGjennomforingMaalinger() {
+
+		val rows = deltakerStatistikkRepository.antallGjennomforingerGruppert().map {
+			MultiGauge.Row.of(
+				Tags.of(Tag.of("status", it.status), Tag.of("synligHosArrangor", it.synligHosArrangor.toString())),
+				it.antall
+			)
+		}
+
+		gjennomforingGauge.register(rows)
 	}
 }
