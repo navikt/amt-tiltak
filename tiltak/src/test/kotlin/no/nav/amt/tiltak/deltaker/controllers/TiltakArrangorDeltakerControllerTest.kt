@@ -23,8 +23,8 @@ import java.time.LocalDateTime
 import java.util.*
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [TiltakarrangorDeltakerController::class])
-class TiltakarrangorDeltakerControllerTest {
+@WebMvcTest(controllers = [TiltakArrangorDeltakerController::class])
+class TiltakArrangorDeltakerControllerTest {
 
 	companion object : MockOAuthServer() {
 		@AfterAll

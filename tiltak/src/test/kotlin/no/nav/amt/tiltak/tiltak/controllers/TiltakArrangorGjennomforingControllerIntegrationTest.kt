@@ -39,7 +39,7 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class TiltakarrangorGjennomforingControllerIntegrationTest {
+class TiltakArrangorGjennomforingControllerIntegrationTest {
 
 	private val dataSource = SingletonPostgresContainer.getDataSource()
 
@@ -54,7 +54,7 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 	private lateinit var deltakerService: DeltakerService
 	private lateinit var arrangorService: ArrangorService
 	private lateinit var authService: AuthService
-	private lateinit var controller: TiltakarrangorGjennomforingController
+	private lateinit var controller: TiltakArrangorGjennomforingController
 	private var tiltakKode = "GRUPPEAMO"
 	private var epost = "bla@bla.com"
 
@@ -90,7 +90,7 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 			arrangorService,
 			transactionTemplate
 		)
-		controller = TiltakarrangorGjennomforingController(
+		controller = TiltakArrangorGjennomforingController(
 			gjennomforingService, deltakerService,
 			authService, mock(ArrangorAnsattTilgangService::class.java)
 		)

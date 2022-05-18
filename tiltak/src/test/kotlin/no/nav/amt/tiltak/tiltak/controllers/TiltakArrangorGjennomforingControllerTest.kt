@@ -30,8 +30,8 @@ import java.time.LocalDateTime
 import java.util.*
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [TiltakarrangorGjennomforingController::class])
-class TiltakarrangorGjennomforingControllerTest {
+@WebMvcTest(controllers = [TiltakArrangorGjennomforingController::class])
+class TiltakArrangorGjennomforingControllerTest {
 	private val gjennomforingId = UUID.fromString("e68d54e2-47b5-11ec-81d3-0242ac130003")
 
 	private val fnr = "fnr"

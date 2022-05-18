@@ -13,7 +13,7 @@ import java.util.*
 
 @RestController
 @RequestMapping(value = [ "/api/tiltak-deltaker", "/api/tiltaksarrangor/tiltak-deltaker" ])
-class TiltakarrangorDeltakerController(
+class TiltakArrangorDeltakerController(
 	private val deltakerPresentationService: TiltakDeltakerPresentationService,
 	private val authService: AuthService,
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService
