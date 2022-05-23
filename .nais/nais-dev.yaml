@@ -52,6 +52,9 @@ spec:
         - application: amt-enhetsregister
           namespace: amt
           cluster: dev-gcp
+        - application: poao-tilgang
+          namespace: poao
+          cluster: dev-gcp
   kafka:
     pool: nav-dev
   secureLogs:
@@ -83,6 +86,10 @@ spec:
       value: api://dev-fss.pto.poao-gcp-proxy/.default
     - name: POAO_GCP_PROXY_URL
       value: https://poao-gcp-proxy.dev-fss-pub.nais.io
+    - name: POAO_TILGANG_URL
+      value: http://poao-tilgang.poao.svc.cluster.local
+    - name: POAO_TILGANG_SCOPE
+      value: api://dev-gcp.poao.poao-tilgang/.default
     # Kafka topics
     - name: SISTE_TILORDNET_VEILEDER_TOPIC
       value: pto.siste-tilordnet-veileder-v1
