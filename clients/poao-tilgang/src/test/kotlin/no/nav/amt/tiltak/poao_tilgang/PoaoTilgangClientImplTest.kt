@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.poao_tilgang
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.clients.poao_tilgang.PoaoTilgangClientImpl
 import okhttp3.mockwebserver.MockResponse
@@ -47,8 +48,52 @@ class PoaoTilgangClientImplTest : FunSpec({
 
 		val request = server.takeRequest()
 
+		val expectedJson = """
+			{"navIdent":"Z12312"}
+		""".trimIndent()
+
 		request.path shouldBe "/api/v1/ad-gruppe"
 		request.method shouldBe "POST"
+		request.body.readUtf8() shouldBe expectedJson
+		request.getHeader("Authorization") shouldBe "Bearer TOKEN"
+	}
+
+	test("erSkjermet - skal lage riktig request og parse respons") {
+		val client = PoaoTilgangClientImpl(
+			baseUrl = serverUrl,
+			tokenProvider = { "TOKEN" },
+		)
+
+		val ident1 = "1111111111"
+		val ident2 = "2222222222"
+
+		server.enqueue(
+			MockResponse().setBody(
+				"""
+					{
+						"$ident1": true,
+						"$ident2": false
+					}
+				""".trimIndent()
+			)
+		)
+
+		val adGrupper = client.erSkjermet(listOf(ident1, ident2))
+
+		adGrupper shouldHaveSize 2
+
+		adGrupper[ident1] shouldBe true
+		adGrupper[ident2] shouldBe false
+
+		val request = server.takeRequest()
+
+		val expectedJson = """
+			{"norskeIdenter":["1111111111","2222222222"]}
+		""".trimIndent()
+
+		request.path shouldBe "/api/v1/skjermet-person/bulk"
+		request.method shouldBe "POST"
+		request.body.readUtf8() shouldBe expectedJson
 		request.getHeader("Authorization") shouldBe "Bearer TOKEN"
 	}
 

@@ -6,6 +6,8 @@ interface PoaoTilgangClient {
 
 	fun hentAdGrupper(navIdent: String): List<AdGruppe>
 
+	fun erSkjermet(norskeIdenter: List<String>): Map<String, Boolean>
+
 }
 
 data class AdGruppe(
