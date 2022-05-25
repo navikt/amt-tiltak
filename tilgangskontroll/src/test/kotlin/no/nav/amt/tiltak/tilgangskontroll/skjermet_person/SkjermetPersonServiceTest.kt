@@ -11,7 +11,7 @@ class SkjermetPersonServiceTest : FunSpec ({
 
 	test("erSkjermet - skal cache svar fra client") {
 		val client = mockk<PoaoTilgangClient>()
-		val service = SkjermetPersonService(client)
+		val service = SkjermetPersonServiceImpl(client)
 
 		val norskIdent = "21354354"
 
