@@ -36,8 +36,6 @@ spec:
       enabled: true
       allowAllUsers: false
       claims:
-        groups:
-          - id: "f12fa5d6-ef0c-41db-80c9-5c9696bb5c14" # 0000-GA-Tiltaksansvarlig, NAV Preprod
         extra:
           - "NAVident"
   tokenx:

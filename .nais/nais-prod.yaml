@@ -36,8 +36,6 @@ spec:
       enabled: true
       allowAllUsers: false
       claims:
-        groups:
-          - id: "ace70121-3382-47b0-a91d-f20a6b481a70"
         extra:
           - "NAVident"
   tokenx:
