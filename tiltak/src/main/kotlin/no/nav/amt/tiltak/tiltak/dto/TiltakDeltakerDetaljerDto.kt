@@ -14,6 +14,7 @@ data class TiltakDeltakerDetaljerDto(
 	val epost: String?,
 	val navEnhet: NavEnhetDto?,
 	val navVeileder: NavVeilederDto?,
+	val erSkjermetPerson: Boolean,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val registrertDato: LocalDateTime,

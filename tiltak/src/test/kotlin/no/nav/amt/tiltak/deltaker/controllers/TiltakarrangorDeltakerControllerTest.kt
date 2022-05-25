@@ -60,6 +60,7 @@ class TiltakarrangorDeltakerControllerTest {
 			navn = "NAV Testheim",
 		),
 		navVeileder = null,
+		erSkjermetPerson = false,
 		startDato = null,
 		sluttDato = null,
 		registrertDato = LocalDateTime.now(),
