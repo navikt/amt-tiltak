@@ -33,6 +33,10 @@
             <groupId>no.nav.common</groupId>
             <artifactId>rest</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>log</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
