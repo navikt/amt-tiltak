@@ -3,6 +3,10 @@ package no.nav.amt.tiltak.endringsmelding
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.comparables.shouldBeEqualComparingTo
+import io.kotest.matchers.equality.shouldBeEqualToComparingFields
+import io.kotest.matchers.equality.shouldBeEqualToComparingFieldsExcept
+import io.kotest.matchers.equality.shouldNotBeEqualToIgnoringFields
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -19,6 +23,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 class EndringsmeldingRepositoryTest : FunSpec({
 
@@ -112,7 +117,11 @@ class EndringsmeldingRepositoryTest : FunSpec({
 
 		oppdatertMelding.aktiv shouldBe false
 		oppdatertMelding.godkjentAvNavAnsatt shouldBe NAV_ANSATT_1.id
-		oppdatertMelding.godkjentTidspunkt shouldBe godkjentTidspunkt
+		oppdatertMelding.godkjentTidspunkt!!.toLocalDate() shouldBe godkjentTidspunkt.toLocalDate()
+		ChronoUnit.MILLIS.between(oppdatertMelding.godkjentTidspunkt, godkjentTidspunkt) shouldBe 0
+		ChronoUnit.SECONDS.between(oppdatertMelding.godkjentTidspunkt, godkjentTidspunkt) shouldBe 0
+		ChronoUnit.MINUTES.between(oppdatertMelding.godkjentTidspunkt, godkjentTidspunkt) shouldBe 0
+		ChronoUnit.HOURS.between(oppdatertMelding.godkjentTidspunkt, godkjentTidspunkt) shouldBe 0
 	}
 
 })
