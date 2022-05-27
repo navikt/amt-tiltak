@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 @Component
@@ -21,6 +22,7 @@ open class EndringsmeldingRepository(
 			deltakerId = rs.getUUID("deltaker_id"),
 			startDato = rs.getDate("start_dato")?.toLocalDate(),
 			godkjentAvNavAnsatt = rs.getNullableUUID("godkjent_av_nav_ansatt"),
+			godkjentTidspunkt = rs.getTimestamp("godkjent_tidspunkt")?.toLocalDateTime(),
 			aktiv = rs.getBoolean("aktiv"),
 			opprettetAvId = rs.getUUID("opprettet_av"),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
@@ -64,15 +66,20 @@ open class EndringsmeldingRepository(
 			?: throw NoSuchElementException("Fant ingen endringsmelding med id=$id")
 	}
 
-	fun markerSomFerdig(endringsmeldingId: UUID, navAnsattId: UUID) {
+	fun markerSomFerdig(
+		endringsmeldingId: UUID,
+		navAnsattId: UUID,
+		godkjentTidspunkt: LocalDateTime = LocalDateTime.now()
+	) {
 		val sql = """
-			UPDATE endringsmelding SET aktiv = false, godkjent_av_nav_ansatt = :navAnsattId
+			UPDATE endringsmelding SET aktiv = false, godkjent_av_nav_ansatt = :navAnsattId, godkjent_tidspunkt = :godkjentTidspunkt
 				WHERE id = :endringsmeldingId
 		""".trimIndent()
 
 		val params = sqlParameters(
 			"endringsmeldingId" to endringsmeldingId,
 			"navAnsattId" to navAnsattId,
+			"godkjentTidspunkt" to godkjentTidspunkt
 		)
 
 		template.update(sql, params)

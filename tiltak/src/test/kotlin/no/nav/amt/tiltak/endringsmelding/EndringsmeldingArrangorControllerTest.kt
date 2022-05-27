@@ -76,6 +76,7 @@ class EndringsmeldingArrangorControllerTest {
 				deltakerId = deltakerId,
 				startDato = LocalDate.parse("2022-09-05"),
 				godkjentAvNavAnsatt = null,
+				godkjentTidspunkt = null,
 				aktiv = false,
 				opprettetAvId = ARRANGOR_ANSATT_1.id,
 				createdAt = LocalDateTime.now(),

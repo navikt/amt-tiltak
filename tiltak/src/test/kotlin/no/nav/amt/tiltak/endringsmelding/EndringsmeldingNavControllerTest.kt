@@ -159,6 +159,7 @@ class EndringsmeldingNavControllerTest {
 				deltakerId = deltakerId,
 				startDato = null,
 				godkjentAvNavAnsatt = null,
+				godkjentTidspunkt = null,
 				aktiv = true,
 				opprettetAvId = UUID.randomUUID(),
 				createdAt = LocalDateTime.now(),

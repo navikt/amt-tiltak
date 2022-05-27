@@ -18,6 +18,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 class EndringsmeldingRepositoryTest : FunSpec({
 
@@ -101,15 +102,17 @@ class EndringsmeldingRepositoryTest : FunSpec({
 	}
 
 	test("markerSomFerdig - skal sette aktiv=false og nav ansatt") {
+		val godkjentTidspunkt = LocalDateTime.now()
 		val melding =
 			repository.insertOgInaktiverStartDato(LocalDate.now(), DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
 
-		repository.markerSomFerdig(melding.id, NAV_ANSATT_1.id)
+		repository.markerSomFerdig(melding.id, NAV_ANSATT_1.id, godkjentTidspunkt)
 
 		val oppdatertMelding = repository.get(melding.id)
 
 		oppdatertMelding.aktiv shouldBe false
 		oppdatertMelding.godkjentAvNavAnsatt shouldBe NAV_ANSATT_1.id
+		oppdatertMelding.godkjentTidspunkt shouldBe godkjentTidspunkt
 	}
 
 })
