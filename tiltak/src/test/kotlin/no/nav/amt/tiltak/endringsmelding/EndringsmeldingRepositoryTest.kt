@@ -24,6 +24,7 @@ import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalUnit
 
 class EndringsmeldingRepositoryTest : FunSpec({
 
@@ -117,11 +118,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 
 		oppdatertMelding.aktiv shouldBe false
 		oppdatertMelding.godkjentAvNavAnsatt shouldBe NAV_ANSATT_1.id
-		oppdatertMelding.godkjentTidspunkt!!.toLocalDate() shouldBe godkjentTidspunkt.toLocalDate()
-		ChronoUnit.MILLIS.between(oppdatertMelding.godkjentTidspunkt, godkjentTidspunkt) shouldBe 0
-		ChronoUnit.SECONDS.between(oppdatertMelding.godkjentTidspunkt, godkjentTidspunkt) shouldBe 0
-		ChronoUnit.MINUTES.between(oppdatertMelding.godkjentTidspunkt, godkjentTidspunkt) shouldBe 0
-		ChronoUnit.HOURS.between(oppdatertMelding.godkjentTidspunkt, godkjentTidspunkt) shouldBe 0
+		oppdatertMelding.godkjentTidspunkt!!.truncatedTo(ChronoUnit.MILLIS) shouldBe godkjentTidspunkt.truncatedTo(ChronoUnit.MILLIS)
 	}
 
 })
