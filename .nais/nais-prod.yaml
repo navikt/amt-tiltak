@@ -34,7 +34,6 @@ spec:
   azure:
     application:
       enabled: true
-      allowAllUsers: false
       claims:
         extra:
           - "NAVident"
