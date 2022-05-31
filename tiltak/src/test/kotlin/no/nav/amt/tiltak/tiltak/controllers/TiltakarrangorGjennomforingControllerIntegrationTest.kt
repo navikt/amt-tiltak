@@ -10,7 +10,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
@@ -211,12 +211,14 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 	) {
 		deltakerStatusRepository.upsert(
 			listOf(
-				DeltakerStatusDbo(
-				deltakerId = deltakerId,
-				endretDato = LocalDateTime.now().minusDays(1),
-				status = Deltaker.Status.DELTAR,
-				aktiv = true
-		)))
+				DeltakerStatusInsertDbo(
+					id = UUID.randomUUID(),
+					deltakerId = deltakerId,
+					gyldigFra = LocalDateTime.now().minusDays(1),
+					status = Deltaker.Status.DELTAR,
+					aktiv = true
+				)
+			))
 	}
 
 

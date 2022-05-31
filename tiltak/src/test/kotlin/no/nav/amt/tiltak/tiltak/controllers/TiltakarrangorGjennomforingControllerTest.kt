@@ -56,8 +56,10 @@ class TiltakarrangorGjennomforingControllerTest {
 			DeltakerStatusDbo(
 				deltakerId = id,
 				status = Deltaker.Status.DELTAR,
-				endretDato = LocalDateTime.now(),
-				aktiv = true)
+				gyldigFra = LocalDateTime.now(),
+				aktiv = true,
+				opprettetDato = LocalDateTime.now()
+			)
 		)
 
 	val deltakerDbo = DeltakerDbo(

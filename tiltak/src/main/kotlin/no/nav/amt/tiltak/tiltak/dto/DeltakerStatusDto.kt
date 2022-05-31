@@ -5,5 +5,10 @@ import java.time.LocalDateTime
 
 data class DeltakerStatusDto(
 	val type: Deltaker.Status,
-	val endretDato: LocalDateTime
-)
+	val gjelderFra: LocalDateTime,
+	val endretDato: LocalDateTime? //= createdAt
+){
+	init {
+	    require(endretDato != null) {"DeltakerStatusDto.endretDato kan ikke være null"}
+	}
+}

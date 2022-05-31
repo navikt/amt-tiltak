@@ -4,7 +4,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import org.slf4j.LoggerFactory
@@ -32,7 +32,7 @@ open class DeltakerServiceImpl(
 			val oppdatertDeltaker = lagretDeltaker.oppdater(deltaker)
 
 			if (lagretDeltaker != oppdatertDeltaker) {
-				deltakerStatusRepository.upsert(DeltakerStatusDbo.fromDeltaker(oppdatertDeltaker))
+				deltakerStatusRepository.upsert(DeltakerStatusInsertDbo.fromDeltaker(oppdatertDeltaker))
 				update(oppdatertDeltaker)
 			}
 		}
@@ -59,7 +59,7 @@ open class DeltakerServiceImpl(
 			registrertDato = deltaker.registrertDato
 		)
 
-		deltakerStatusRepository.upsert(DeltakerStatusDbo.fromDeltaker(deltaker) )
+		deltakerStatusRepository.upsert(DeltakerStatusInsertDbo.fromDeltaker(deltaker) )
 
 		return dbo
 	}
@@ -92,7 +92,7 @@ open class DeltakerServiceImpl(
 		.also { log.info("Oppdaterer status på ${it.size} deltakere ") }
 		.map { it.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker) }
 		.map { it.progressStatus() }
-		.forEach { deltakerStatusRepository.upsert( DeltakerStatusDbo.fromDeltaker(it)) }
+		.forEach { deltakerStatusRepository.upsert( DeltakerStatusInsertDbo.fromDeltaker(it)) }
 
 }
 

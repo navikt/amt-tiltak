@@ -2,6 +2,8 @@ package no.nav.amt.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
+import no.nav.amt.tiltak.utils.getLocalDateTime
 import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -19,24 +21,25 @@ open class DeltakerStatusRepository(
 		DeltakerStatusDbo(
 			id = rs.getUUID("id"),
 			deltakerId = rs.getUUID("deltaker_id"),
-			endretDato = rs.getTimestamp("endret_dato").toLocalDateTime(),
 			status = Deltaker.Status.valueOf(rs.getString("status")),
 			aktiv = rs.getBoolean("aktiv"),
+			gyldigFra = rs.getLocalDateTime("gyldig_fra"),
+			opprettetDato = rs.getTimestamp("created_at").toLocalDateTime(),
 		)
 
 	}
 
-	open fun upsert(deltakerStatuser: List<DeltakerStatusDbo>) = deltakerStatuser.forEach { upsert(it) }
+	open fun upsert(deltakerStatuser: List<DeltakerStatusInsertDbo>) = deltakerStatuser.forEach { upsert(it) }
 
-	private fun upsert(dbo: DeltakerStatusDbo) {
+	private fun upsert(dbo: DeltakerStatusInsertDbo) {
 		val sql = """
-			INSERT INTO deltaker_status(id, deltaker_id, endret_dato, status, aktiv)
+			INSERT INTO deltaker_status(id, deltaker_id, gyldig_fra, status, aktiv)
 			VALUES (:id,
 					:deltakerId,
-					:endretDato,
+					:gyldigFra,
 					:status,
 					:aktiv)
-			ON CONFLICT (id) DO UPDATE SET endret_dato  = :endretDato,
+			ON CONFLICT (id) DO UPDATE SET gyldig_fra = :gyldigFra,
 										   status = :status,
 										   aktiv  = :aktiv
 		""".trimIndent()
@@ -45,7 +48,7 @@ open class DeltakerStatusRepository(
 			mapOf(
 				"id" to dbo.id,
 				"deltakerId" to dbo.deltakerId,
-				"endretDato" to dbo.endretDato,
+				"gyldigFra" to dbo.gyldigFra,
 				"status" to dbo.status.name,
 				"aktiv" to dbo.aktiv,
 			)
@@ -56,7 +59,7 @@ open class DeltakerStatusRepository(
 
 	fun getStatuserForDeltaker(deltakerId: UUID): List<DeltakerStatusDbo> {
 		val sql = """
-			SELECT id, deltaker_id, endret_dato, status, aktiv
+			SELECT id, deltaker_id, gyldig_fra, status, aktiv, created_at
 			FROM deltaker_status
 			WHERE deltaker_id = :deltakerId;
 		""".trimIndent()

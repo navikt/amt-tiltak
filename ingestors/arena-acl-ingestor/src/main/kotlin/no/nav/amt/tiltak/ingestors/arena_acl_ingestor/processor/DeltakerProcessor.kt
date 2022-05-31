@@ -50,7 +50,7 @@ class DeltakerProcessor(
 			id = deltakerDto.id,
 			startDato = deltakerDto.startDato,
 			sluttDato = deltakerDto.sluttDato,
-			statuser = DeltakerStatuser.settAktivStatus(
+			statuser = DeltakerStatuser.medNyAktiv(
 				tilDeltakerStatus(deltakerDto.status),
 				endretDato = deltakerDto.statusEndretDato
 			),
