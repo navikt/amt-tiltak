@@ -22,14 +22,14 @@ class DeltakerTest {
 			sluttDato = tomorrow,
 			statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(
 					status = VENTER_PA_OPPSTART,
-					endretDato = LocalDateTime.now().minusWeeks(1)
+					gjelderFra = LocalDateTime.now().minusWeeks(1)
 			))),
 			registrertDato = LocalDateTime.now().minusWeeks(1),
 			gjennomforingId = UUID.randomUUID()
 		)
 		val oppdatertStatus = deltaker.oppdaterStatus(DELTAR, LocalDateTime.now())
 
-		assertNotEquals(oppdatertStatus.statuser, deltaker.statuser)
+		assertNotEquals(oppdatertStatus.statuser, deltaker.status)
 		assertEquals(oppdatertStatus.current.status, DELTAR)
 
 	}
@@ -41,7 +41,7 @@ class DeltakerTest {
 			sluttDato = yesterday,
 			statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(
 				status = DELTAR,
-				endretDato = LocalDateTime.now().minusWeeks(1),
+				gjelderFra = LocalDateTime.now().minusWeeks(1),
 			))),
 			registrertDato = LocalDateTime.now().minusWeeks(1),
 			gjennomforingId = UUID.randomUUID()
@@ -63,7 +63,7 @@ class DeltakerTest {
 			sluttDato = tomorrow,
 			statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(
 				status = VENTER_PA_OPPSTART,
-				endretDato = LocalDateTime.now().minusWeeks(1)
+				gjelderFra = LocalDateTime.now().minusWeeks(1)
 			))),
 			registrertDato = LocalDateTime.now().minusWeeks(1),
 			gjennomforingId = UUID.randomUUID()
@@ -74,7 +74,7 @@ class DeltakerTest {
 			sluttDato = LocalDate.now().plusWeeks(1),
 			statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(
 				status = DELTAR,
-				endretDato = LocalDateTime.now().minusHours(3)
+				gjelderFra = LocalDateTime.now().minusHours(3)
 			))),
 			registrertDato = LocalDateTime.now().minusWeeks(1),
 			dagerPerUke = 3,
@@ -83,7 +83,7 @@ class DeltakerTest {
 		)
 		val uuid = UUID.randomUUID()
 		val deltakerInserted = deltaker.oppdater(nyDeltaker)
-		val expectedStatus = deltaker.statuser.medNy(nyDeltaker.status, nyDeltaker.statuser.current.endretDato)
+		val expectedStatus = deltaker.statuser.medNy(nyDeltaker.status, nyDeltaker.statuser.current.statusGjelderFra)
 		val actual = deltakerInserted.copy(
 			statuser = DeltakerStatuser(deltakerInserted.statuser.statuser.map { it.copy(id = uuid) })
 		)

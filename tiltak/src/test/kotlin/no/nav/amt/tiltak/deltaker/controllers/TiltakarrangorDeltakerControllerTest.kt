@@ -64,7 +64,7 @@ class TiltakarrangorDeltakerControllerTest {
 		startDato = null,
 		sluttDato = null,
 		registrertDato = LocalDateTime.now(),
-		status = DeltakerStatusDto(Deltaker.Status.DELTAR, LocalDateTime.now()),
+		status = DeltakerStatusDto(Deltaker.Status.DELTAR, LocalDateTime.now(), LocalDateTime.now()),
 		gjennomforing = GjennomforingDto(
 			id = UUID.randomUUID(),
 			navn = "",

@@ -145,9 +145,9 @@ class IntegrationTest {
 		val uuid = UUID.randomUUID()
 		val expected = deltakerToInsert.copy(
 			bruker = deltakerToInsert.bruker?.copy(id= inserted.bruker!!.id),
-			statuser = DeltakerStatuser(deltakerToInsert.statuser.statuser.map { it.copy(id = uuid) })
+			statuser = DeltakerStatuser(deltakerToInsert.statuser.statuser.map { it.copy(id = uuid, opprettetDato = null) })
 		)
-		val actual = inserted.copy(statuser = DeltakerStatuser(inserted.statuser.statuser.map { it.copy(id = uuid) }))
+		val actual = inserted.copy(statuser = DeltakerStatuser(inserted.statuser.statuser.map { it.copy(id = uuid, opprettetDato = null) }))
 		actual shouldBe expected
 
 	}
@@ -166,10 +166,10 @@ class IntegrationTest {
 		val uuid = UUID.randomUUID()
 		val expected = deltakerOppdatert.copy(
 			bruker = deltakerOppdatert.bruker?.copy(id= inserted.bruker!!.id),
-			statuser = DeltakerStatuser(deltakerOppdatert.statuser.statuser.map { it.copy(id = uuid) })
+			statuser = DeltakerStatuser(deltakerOppdatert.statuser.statuser.map { it.copy(id = uuid, opprettetDato = null) })
 		)
-		val actual = inserted.copy(statuser = DeltakerStatuser(inserted.statuser.statuser.map { it.copy(id = uuid) }))
-		actual.statuser shouldBe expected.statuser
+		val actual = inserted.copy(statuser = DeltakerStatuser(inserted.statuser.statuser.map { it.copy(id = uuid, opprettetDato = null) }))
+		actual.status shouldBe expected.status
 		actual shouldBe expected
 
 	}
@@ -247,7 +247,8 @@ class IntegrationTest {
 			DeltakerStatus(
 				id = UUID.randomUUID(),
 				status =  Deltaker.Status.VENTER_PA_OPPSTART,
-				endretDato =  now.minusHours(1),
+				statusGjelderFra =  now.minusHours(1),
+				opprettetDato = null,
 				aktiv = true
 			))),
 		registrertDato = now,
@@ -284,7 +285,7 @@ class IntegrationTest {
 			    "dagerPerUke": "${deltakerOppdatert.dagerPerUke}",
 			    "prosentDeltid": ${deltakerOppdatert.prosentStilling},
 			    "registrertDato": "${deltakerOppdatert.registrertDato}",
-				"statusEndretDato": "${deltakerOppdatert.statuser.statuser.last().endretDato}"
+				"statusEndretDato": "${deltakerOppdatert.statuser.statuser.last().statusGjelderFra}"
 			  }
 			}
 		""".trimIndent()
@@ -303,7 +304,7 @@ class IntegrationTest {
 			    "dagerPerUke": ${deltakerToInsert.dagerPerUke},
 			    "prosentDeltid": ${deltakerToInsert.prosentStilling},
 			    "registrertDato": "${deltakerToInsert.registrertDato}",
-				"statusEndretDato": "${deltakerToInsert.statuser.statuser.last().endretDato}"
+				"statusEndretDato": "${deltakerToInsert.statuser.statuser.last().statusGjelderFra}"
 			  }
 			}
 		""".trimIndent()

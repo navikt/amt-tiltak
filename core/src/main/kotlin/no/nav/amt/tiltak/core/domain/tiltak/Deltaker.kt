@@ -26,7 +26,7 @@ data class Deltaker(
 	fun oppdater(nyDeltaker: Deltaker) : Deltaker {
 		if (nyDeltaker.id != id) throw IllegalStateException("Kan ikke oppdatere deltaker id ${id} med en annen deltaker id")
 		return nyDeltaker.copy(
-			statuser = oppdaterStatus(nyDeltaker.status, nyDeltaker.statuser.current.endretDato),
+			statuser = oppdaterStatus(nyDeltaker.status, nyDeltaker.statuser.current.statusGjelderFra),
 			bruker = bruker
 		)
 	}

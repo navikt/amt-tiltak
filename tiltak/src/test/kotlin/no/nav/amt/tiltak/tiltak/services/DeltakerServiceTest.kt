@@ -14,6 +14,7 @@ import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
@@ -31,7 +32,7 @@ class DeltakerServiceTest: StringSpec ({
 		bruker = defaultBruker,
 		startDato = LocalDate.now(),
 		sluttDato = LocalDate.now(),
-		statuser = DeltakerStatuser.settAktivStatus(Deltaker.Status.VENTER_PA_OPPSTART),
+		statuser = DeltakerStatuser.medNyAktiv(Deltaker.Status.VENTER_PA_OPPSTART),
 		registrertDato = LocalDateTime.now(),
 		dagerPerUke = 4,
 		prosentStilling = 0.8F,
@@ -45,11 +46,8 @@ class DeltakerServiceTest: StringSpec ({
 	val deltakerStatusRepository = mockk<DeltakerStatusRepository>()
 	val brukerService = mockk<BrukerService>()
 
-	val deltakerStatusDboer = fun(statuser: List<DeltakerStatus>, deltakerId: UUID) =
-		DeltakerStatusDbo.fromDeltakerStatuser(statuser, deltakerId)
-
-	val deltakerStatuser = fun(aktivStatus: Deltaker.Status, dekativerteStatuser: Set<Deltaker.Status>): List<DeltakerStatus> {
-		return dekativerteStatuser.map { status -> DeltakerStatus.nyInaktiv(status) } + DeltakerStatus.nyAktiv(aktivStatus)
+	val deltakerStatuser = fun(aktivStatus: Deltaker.Status, deaktiverteStatuser: Set<Deltaker.Status>): List<DeltakerStatus> {
+		return deaktiverteStatuser.map { status -> DeltakerStatus.nyInaktiv(status) } + DeltakerStatus.nyAktiv(aktivStatus)
 	}
 
 	beforeEach {
@@ -75,7 +73,7 @@ class DeltakerServiceTest: StringSpec ({
 		every { deltakerRepository.get(deltaker.id) } returns null
 		every { brukerService.getOrCreate(fodselsnummer) } returns defaultBruker.id
 		every { deltakerRepository.insert(any(), any(), any(), any(), any(), any(), any(), any()) } returns deltakerDbo
-		every { deltakerStatusRepository.upsert(any<List<DeltakerStatusDbo>>()) } returns Unit
+		every { deltakerStatusRepository.upsert(any<List<DeltakerStatusInsertDbo>>()) } returns Unit
 
 		service.upsertDeltaker(fodselsnummer, deltaker)
 
@@ -89,11 +87,11 @@ class DeltakerServiceTest: StringSpec ({
 			prosentStilling = deltaker.prosentStilling,
 			registrertDato = deltaker.registrertDato) }
 		verify(exactly = 0) { deltakerRepository.update(any()) }
-		verify(exactly = 1) { deltakerStatusRepository.upsert(listOf(DeltakerStatusDbo(
+		verify(exactly = 1) { deltakerStatusRepository.upsert(listOf(DeltakerStatusInsertDbo(
 			id = deltaker.statuser.current.id,
 			deltakerId = deltaker.id,
 			status = Deltaker.Status.VENTER_PA_OPPSTART,
-			endretDato = deltaker.statuser.current.endretDato,
+			gyldigFra = deltaker.statuser.current.statusGjelderFra,
 			aktiv = true))) }
 	}
 
@@ -106,40 +104,36 @@ class DeltakerServiceTest: StringSpec ({
 		val deltaker = defaultDeltaker.copy(statuser = DeltakerStatuser(nyStatus))
 		val deltakerDbo = defaultDeltakerDbo
 
+		val statusDboer = eksisterendeStatuser.map {
+			DeltakerStatusDbo(id=it.id, deltakerId=deltaker.id, status=it.status, gyldigFra=it.statusGjelderFra, aktiv = it.aktiv, opprettetDato = LocalDateTime.now())
+		}
+
 		every { deltakerRepository.get(deltaker.id) } returns defaultDeltakerDbo
-		every { deltakerStatusRepository.getStatuserForDeltaker(defaultDeltakerDbo.id) } returns
-			deltakerStatusDboer(eksisterendeStatuser, deltaker.id)
+		every { deltakerStatusRepository.getStatuserForDeltaker(defaultDeltakerDbo.id) } returns statusDboer
 
 		every { deltakerRepository.update(any()) } returns deltakerDbo
-		every { deltakerStatusRepository.upsert(any<List<DeltakerStatusDbo>>()) } returns Unit
+		every { deltakerStatusRepository.upsert(any()) } returns Unit
 
 		service.upsertDeltaker(fodselsnummer, deltaker)
 
 		verify(exactly = 0) { deltakerRepository.insert(any(), any(), any(), any(), any(), any(), any(), any()) }
 		verify(exactly = 1) { deltakerRepository.update(any()) }
-		val slot = slot<List<DeltakerStatusDbo>>()
+		val slot = slot<List<DeltakerStatusInsertDbo>>()
 
 		verify(exactly = 1) { deltakerStatusRepository.upsert(capture(slot)) }
-		slot.captured shouldContain DeltakerStatusDbo(
+		slot.captured shouldContain DeltakerStatusInsertDbo(
 			id = eksisterendeStatuser[0].id,
 			deltakerId = deltaker.id,
 			status = eksisterendeStatuser[0].status,
-			endretDato = eksisterendeStatuser[0].endretDato,
-			aktiv = false)
+			gyldigFra = eksisterendeStatuser[0].statusGjelderFra,
+			aktiv = false,
+		)
 		slot.captured.forOne {
 			it.deltakerId shouldBe deltaker.id
 			it.status shouldBe nyStatus[0].status
-			it.endretDato shouldBe nyStatus[0].endretDato
+			it.gyldigFra shouldBe nyStatus[0].statusGjelderFra
 			it.aktiv shouldBe true
 		}
 	}
 
 })
-
-/*
-Implementerer støtte for å lagre endringsmeldinger med startdato
-- Endepunkt for å lagre en endringsmelding med oppstartsdato
-- Legge gjennomføring på Deltaker fordi det forenkler tilgangskontroll på tiltaksarranagør ansatt og jeg mener at en deltaker
-må også ha en gjennomføring for å gi mening på tvers
-- Tilrettelagt for at man kan sette start og sluttdato samtidig om det er behov i fremtiden
- */

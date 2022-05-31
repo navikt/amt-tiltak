@@ -20,7 +20,7 @@ class DeltakerStatuserTest {
 		)
 
 		assertEquals(statuser.current.status, DELTAR)
-		assertEquals(statuser.current.endretDato, now)
+		assertEquals(statuser.current.statusGjelderFra, now)
 	}
 
 	@Test
@@ -58,7 +58,7 @@ class DeltakerStatuserTest {
 			.containsAll(listOf(VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET))
 		)
 		assertEquals(oppdaterteStatuser.current.status, HAR_SLUTTET)
-		assertEquals(oppdaterteStatuser.current.endretDato, now)
+		assertEquals(oppdaterteStatuser.current.statusGjelderFra, now)
 	}
 
 
@@ -70,7 +70,7 @@ class DeltakerStatuserTest {
 		assertFalse(deaktivert.aktiv)
 		assertEquals(status.id, deaktivert.id)
 		assertEquals(status.status, deaktivert.status)
-		assertEquals(status.endretDato, deaktivert.endretDato)
+		assertEquals(status.statusGjelderFra, deaktivert.statusGjelderFra)
 	}
 }
 

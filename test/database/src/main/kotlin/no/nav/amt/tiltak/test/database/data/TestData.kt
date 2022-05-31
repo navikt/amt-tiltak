@@ -168,7 +168,7 @@ object TestData {
 	val DELTAKER_1_STATUS_1 = InsertDeltakerStatusCommand(
 		id = UUID.fromString("d6770809-29e3-47e0-8cc2-4fa667d1a756"),
 		deltaker_id = DELTAKER_1.id,
-		endret_dato = ZonedDateTime.now(),
+		gyldigFra = ZonedDateTime.now(),
 		status = "DELTAR",
 		aktiv = true
 	)
@@ -201,7 +201,7 @@ object TestData {
 	val DELTAKER_2_STATUS_1 = InsertDeltakerStatusCommand(
 		id = UUID.fromString("227b67ea-92ca-4b94-9588-89209b01c0e5"),
 		deltaker_id = DELTAKER_2.id,
-		endret_dato = ZonedDateTime.now(),
+		gyldigFra = ZonedDateTime.now(),
 		status = "DELTAR",
 		aktiv = true
 	)
@@ -247,7 +247,7 @@ object TestData {
 	val DELTAKER_4_STATUS_1 = InsertDeltakerStatusCommand(
 		id = UUID.fromString("b9cb7403-fda6-42d9-a011-8712f4a37801"),
 		deltaker_id = DELTAKER_4.id,
-		endret_dato = ZonedDateTime.now(),
+		gyldigFra = ZonedDateTime.now(),
 		status = "VENTER_PA_OPPSTART",
 		aktiv = true
 	)

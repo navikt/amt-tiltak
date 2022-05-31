@@ -131,7 +131,7 @@ class DeltakerServiceImplTest {
 		nyDeltaker shouldNotBe null
 		statuser shouldHaveSize 1
 
-		val endretDeltaker = deltaker.copy(statuser = DeltakerStatuser.settAktivStatus(Deltaker.Status.HAR_SLUTTET))
+		val endretDeltaker = deltaker.copy(statuser = DeltakerStatuser.medNyAktiv(Deltaker.Status.HAR_SLUTTET))
 
 		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, endretDeltaker)
 
@@ -143,7 +143,7 @@ class DeltakerServiceImplTest {
 		statuser shouldHaveSize 2
 		aktivStatus.status shouldBe Deltaker.Status.HAR_SLUTTET
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, deltaker.copy(statuser = DeltakerStatuser.settAktivStatus(Deltaker.Status.DELTAR)))
+		deltakerServiceImpl.upsertDeltaker(BRUKER_3.fodselsnummer, deltaker.copy(statuser = DeltakerStatuser.medNyAktiv(Deltaker.Status.DELTAR)))
 
 	}
 
@@ -160,7 +160,7 @@ class DeltakerServiceImplTest {
 		deltakerStatusRepository.getStatuserForDeltaker(deltakerId) shouldHaveSize 0
 	}
 
-	val status = DeltakerStatuser.settAktivStatus(Deltaker.Status.DELTAR)
+	val status = DeltakerStatuser.medNyAktiv(Deltaker.Status.DELTAR)
 
 	val deltaker = Deltaker(
 		id =  deltakerId,

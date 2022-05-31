@@ -50,7 +50,7 @@ open class TiltakDeltakerPresentationService(
 			startDato = startDato,
 			sluttDato = sluttDato,
 			registrertDato = registrertDato,
-			status = DeltakerStatusDto(status, statusEndretDato),
+			status = DeltakerStatusDto(status, statusGjelderFra, statusOpprettet),
 			gjennomforing = GjennomforingDto(
 				id = gjennomforingId,
 				navn = gjennomforingNavn,
