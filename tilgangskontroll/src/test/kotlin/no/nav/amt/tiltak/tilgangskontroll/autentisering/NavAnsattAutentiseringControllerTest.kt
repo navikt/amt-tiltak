@@ -1,9 +1,11 @@
 package no.nav.amt.tiltak.tilgangskontroll.autentisering
 
+import no.nav.amt.tiltak.clients.poao_tilgang.AdGruppe
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
+import no.nav.amt.tiltak.tilgangskontroll.ad_gruppe.AdGruppeService
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -37,6 +39,9 @@ class NavAnsattAutentiseringControllerTest {
 	@MockBean
 	private lateinit var navAnsattService: NavAnsattService
 
+	@MockBean
+	private lateinit var adGruppeService: AdGruppeService
+
 	@Test
 	fun `meg() - skal returnere 401 hvis token mangler`() {
 		val response = mockMvc.perform(
@@ -63,13 +68,20 @@ class NavAnsattAutentiseringControllerTest {
 				""
 			))
 
+		`when`(adGruppeService.hentAdGrupper(navIdent))
+			.thenReturn(listOf(
+				AdGruppe(UUID.randomUUID(), "0000-GA-TILTAK-ANSVARLIG"),
+				AdGruppe(UUID.randomUUID(), "0000-GA-TILTAK-ENDRINGSMELDING"),
+				AdGruppe(UUID.randomUUID(), "0000-GA-123-ABC"),
+			))
+
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.get("/api/nav-ansatt/autentisering/meg")
 				.header("Authorization", "Bearer ${azureAdToken()}")
 		).andReturn().response
 
 		val expectedJson = """
-			{"navIdent":"Z1234","navn":"Veileder Veiledersen"}
+			{"navIdent":"Z1234","navn":"Veileder Veiledersen","tilganger":["FLATE","ENDRINGSMELDING"]}
 		""".trimIndent()
 
 		assertEquals(200, response.status)
