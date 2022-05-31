@@ -3,13 +3,12 @@ package no.nav.amt.tiltak.tiltak.controllers
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
 import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingMedLopenrQuery
 import no.nav.amt.tiltak.tiltak.repositories.HentTiltaksoversiktQuery
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 import java.util.*
 
@@ -20,13 +19,16 @@ class NavAnsattGjennomforingController(
 	private val gjennomforingService: GjennomforingService,
 	private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService,
 	private val hentGjennomforingMedLopenrQuery: HentGjennomforingMedLopenrQuery,
-	private val hentTiltaksoversiktQuery: HentTiltaksoversiktQuery
+	private val hentTiltaksoversiktQuery: HentTiltaksoversiktQuery,
+	private val tiltaksansvarligAutoriseringService: TiltaksansvarligAutoriseringService,
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@GetMapping
 	fun hentGjennomforinger(): List<HentGjennomforingerDto> {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
+
+		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navIdent)
 
 		val tilganger = tiltaksansvarligTilgangService.hentAktiveTilganger(navIdent)
 			.map { it.gjennomforingId }
@@ -48,9 +50,8 @@ class NavAnsattGjennomforingController(
 	fun hentGjennomforing(@PathVariable gjennomforingId: UUID): GjennomforingDto {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
 
-		if (!tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navIdent, gjennomforingId)) {
-			throw ResponseStatusException(HttpStatus.FORBIDDEN)
-		}
+		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navIdent)
+		tiltaksansvarligAutoriseringService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId)
 
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
 
@@ -73,6 +74,10 @@ class NavAnsattGjennomforingController(
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@GetMapping(params = ["lopenr"])
 	fun hentGjennomforingerMedLopenr(@RequestParam("lopenr") lopenr: Int): List<HentGjennomforingMedLopenrDto> {
+		val navIdent = authService.hentNavIdentTilInnloggetBruker()
+
+		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navIdent)
+
 		return hentGjennomforingMedLopenrQuery.query(lopenr)
 			.map {
 				HentGjennomforingMedLopenrDto(
