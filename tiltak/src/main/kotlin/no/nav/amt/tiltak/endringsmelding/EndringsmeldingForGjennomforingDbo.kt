@@ -22,14 +22,14 @@ data class EndringsmeldingForGjennomforingDbo (
 	val navEnhetNorgId: String?,
 	val navEnhetNavn: String?,
 
-	val opprettetAvId: UUID,
+	val opprettetAvArrangorAnsattId: UUID,
 	val opprettetAvPersonligIdent: String,
 	val opprettetAvFornavn: String,
 	val opprettetAvMellomnavn: String?,
 	val opprettetAvEtternavn: String,
 
 	val startDato: LocalDate?,
-	val godkjentAvNavAnsatt: UUID?,
+	val ferdiggjortAvNavAnsattId: UUID?,
 	val aktiv: Boolean, // false hvis man sletter eller kommer en ny endring
 	val createdAt: LocalDateTime,
 	val modifiedAt: LocalDateTime
@@ -50,10 +50,10 @@ data class EndringsmeldingForGjennomforingDbo (
 		),
 		startDato = startDato,
 		aktiv = aktiv,
-		godkjent = godkjentAvNavAnsatt != null,
-		arkivert = !aktiv || godkjentAvNavAnsatt != null,
+		godkjent = ferdiggjortAvNavAnsattId != null,
+		arkivert = !aktiv || ferdiggjortAvNavAnsattId != null,
 		opprettetAvArrangorAnsatt = Ansatt(
-			id = opprettetAvId,
+			id = opprettetAvArrangorAnsattId,
 			personligIdent = opprettetAvPersonligIdent,
 			fornavn = opprettetAvFornavn,
 			mellomnavn = opprettetAvMellomnavn,
