@@ -24,7 +24,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	lateinit var arrangorAnsattTilgangServiceImpl: ArrangorAnsattTilgangServiceImpl
 
-	lateinit var gjennomforingTilgangRepository: GjennomforingTilgangRepository
+	lateinit var arrangorAnsattGjennomforingTilgangRepository: ArrangorAnsattGjennomforingTilgangRepository
 
 	val personligIdent = "fnr"
 
@@ -41,10 +41,10 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		deltakerService = mockk()
 
-		gjennomforingTilgangRepository = mockk()
+		arrangorAnsattGjennomforingTilgangRepository = mockk()
 
 		arrangorAnsattTilgangServiceImpl = ArrangorAnsattTilgangServiceImpl(
-			arrangorAnsattService, ansattRolleRepository, deltakerService, gjennomforingTilgangRepository
+			arrangorAnsattService, ansattRolleRepository, deltakerService, arrangorAnsattGjennomforingTilgangRepository
 		)
 
 		every {
@@ -61,7 +61,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	test("verifiserTilgangTilGjennomforing skal kaste exception hvis ikke tilgang") {
 		every {
-			gjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
+			arrangorAnsattGjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
 		} returns emptyList()
 
 		val exception = shouldThrowExactly<ResponseStatusException> {
@@ -73,14 +73,13 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	test("verifiserTilgangTilGjennomforing skal ikke kaste exception hvis tilgang") {
 		every {
-			gjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
-		} returns listOf(GjennomforingTilgangDbo(
+			arrangorAnsattGjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
+		} returns listOf(ArrangorAnsattGjennomforingTilgangDbo(
 			id = UUID.randomUUID(),
 			ansattId = ansattId,
 			gjennomforingId = gjennomforingId,
-			opprettetAvNavAnsattId = UUID.randomUUID(),
-			stoppetAvNavAnsattId = null,
-			stoppetTidspunkt = null,
+			gyldigFra = ZonedDateTime.now(),
+			gyldigTil = ZonedDateTime.now().plusHours(1),
 			createdAt = ZonedDateTime.now()
 		))
 

@@ -13,8 +13,6 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_2
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
@@ -25,11 +23,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.ZonedDateTime
 import java.util.*
 
-class GjennomforingTilgangRepositoryTest : FunSpec({
+class ArrangorAnsattGjennomforingTilgangRepositoryTest : FunSpec({
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 
-	lateinit var repository: GjennomforingTilgangRepository
+	lateinit var repository: ArrangorAnsattGjennomforingTilgangRepository
 
 	lateinit var testRepository: TestDataRepository
 
@@ -39,7 +37,7 @@ class GjennomforingTilgangRepositoryTest : FunSpec({
 
 		val parameterTemplate = NamedParameterJdbcTemplate(dataSource)
 
-		repository = GjennomforingTilgangRepository(parameterTemplate)
+		repository = ArrangorAnsattGjennomforingTilgangRepository(parameterTemplate)
 		testRepository = TestDataRepository(parameterTemplate)
 
 		DbTestDataUtils.cleanDatabase(dataSource)
@@ -47,7 +45,6 @@ class GjennomforingTilgangRepositoryTest : FunSpec({
 
 	test("opprettTilgang skal opprette tilgang") {
 		testRepository.insertNavEnhet(NAV_ENHET_1)
-		testRepository.insertNavAnsatt(NAV_ANSATT_1)
 		testRepository.insertArrangor(ARRANGOR_1)
 		testRepository.insertArrangorAnsatt(ARRANGOR_ANSATT_1)
 		testRepository.insertTiltak(TILTAK_1)
@@ -55,22 +52,23 @@ class GjennomforingTilgangRepositoryTest : FunSpec({
 
 		val tilgangId = UUID.randomUUID()
 
-		repository.opprettTilgang(tilgangId, ARRANGOR_ANSATT_1.id, NAV_ANSATT_1.id, GJENNOMFORING_1.id)
+		val gyldigFra = ZonedDateTime.now()
+		val gyldigTil = ZonedDateTime.now().plusHours(1)
+
+		repository.opprettTilgang(tilgangId, ARRANGOR_ANSATT_1.id, GJENNOMFORING_1.id, gyldigFra, gyldigTil)
 
 		val tilgang = repository.get(tilgangId)
 
 		tilgang.id shouldBe tilgangId
 		tilgang.gjennomforingId shouldBe GJENNOMFORING_1.id
-		tilgang.stoppetTidspunkt shouldBe null
-		tilgang.stoppetAvNavAnsattId shouldBe null
-		tilgang.opprettetAvNavAnsattId shouldBe NAV_ANSATT_1.id
+		tilgang.gyldigFra shouldBeEqualTo gyldigFra
+		tilgang.gyldigTil shouldBeEqualTo gyldigTil
 		tilgang.ansattId shouldBe ARRANGOR_ANSATT_1.id
 	}
 
 	test("hentAktiveGjennomforingTilgangerForAnsatt - skal returnere tilganger som ikke er stoppet") {
 		testRepository.insertNavEnhet(NAV_ENHET_1)
 		testRepository.insertNavEnhet(NAV_ENHET_2)
-		testRepository.insertNavAnsatt(NAV_ANSATT_1)
 		testRepository.insertArrangor(ARRANGOR_1)
 		testRepository.insertArrangor(ARRANGOR_2)
 		testRepository.insertArrangorAnsatt(ARRANGOR_ANSATT_1)
@@ -93,7 +91,7 @@ class GjennomforingTilgangRepositoryTest : FunSpec({
 			tilgangId2, ansattId, gjennomforing2Id
 		))
 
-		repository.stopTilgang(tilgangId2, NAV_ANSATT_1.id, ZonedDateTime.now().minusMinutes(1))
+		repository.oppdaterGyldigTil(tilgangId2, ZonedDateTime.now().minusMinutes(1))
 
 		val tilganger = repository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
 
@@ -102,11 +100,9 @@ class GjennomforingTilgangRepositoryTest : FunSpec({
 		tilganger.any { it.gjennomforingId == gjennomforing2Id } shouldBe false
 	}
 
-	test("stopTilgang - skal stoppe tilgang") {
+	test("oppdaterGyldigTil - skal sette gyldig_til") {
 		testRepository.insertNavEnhet(NAV_ENHET_1)
 		testRepository.insertNavEnhet(NAV_ENHET_2)
-		testRepository.insertNavAnsatt(NAV_ANSATT_1)
-		testRepository.insertNavAnsatt(NAV_ANSATT_2)
 		testRepository.insertArrangor(ARRANGOR_1)
 		testRepository.insertArrangor(ARRANGOR_2)
 		testRepository.insertArrangorAnsatt(ARRANGOR_ANSATT_1)
@@ -125,12 +121,11 @@ class GjennomforingTilgangRepositoryTest : FunSpec({
 
 		val stopTidspunkt = ZonedDateTime.now()
 
-		repository.stopTilgang(tilgangId, NAV_ANSATT_2.id, stopTidspunkt)
+		repository.oppdaterGyldigTil(tilgangId, stopTidspunkt)
 
 		val tilgang = repository.get(tilgangId)
 
-		tilgang.stoppetAvNavAnsattId shouldBe NAV_ANSATT_2.id
-		tilgang.stoppetTidspunkt!! shouldBeEqualTo stopTidspunkt
+		tilgang.gyldigTil shouldBeEqualTo stopTidspunkt
 	}
 
 
