@@ -99,7 +99,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		val meldinger = repository.getByDeltaker(DELTAKER_1.id)
 
 		meldinger.size shouldBe 1
-		meldinger[0].opprettetAvId shouldBe ARRANGOR_ANSATT_1.id
+		meldinger[0].opprettetAvArrangorAnsattId shouldBe ARRANGOR_ANSATT_1.id
 	}
 
 	test("markerSomFerdig - skal sette aktiv=false og nav ansatt") {

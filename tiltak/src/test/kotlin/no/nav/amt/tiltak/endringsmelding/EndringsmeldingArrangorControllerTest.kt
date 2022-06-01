@@ -75,9 +75,10 @@ class EndringsmeldingArrangorControllerTest {
 				id = endringsmeldingId,
 				deltakerId = deltakerId,
 				startDato = LocalDate.parse("2022-09-05"),
-				godkjentAvNavAnsatt = null,
+				ferdiggjortAvNavAnsattId = null,
+				ferdiggjortTidspunkt = null,
 				aktiv = false,
-				opprettetAvId = ARRANGOR_ANSATT_1.id,
+				opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
 				createdAt = LocalDateTime.now(),
 				modifiedAt = LocalDateTime.now()
 			)))
