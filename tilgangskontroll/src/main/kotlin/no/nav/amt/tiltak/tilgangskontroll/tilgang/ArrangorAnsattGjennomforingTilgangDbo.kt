@@ -3,12 +3,11 @@ package no.nav.amt.tiltak.tilgangskontroll.tilgang
 import java.time.ZonedDateTime
 import java.util.*
 
-data class GjennomforingTilgangDbo(
+data class ArrangorAnsattGjennomforingTilgangDbo(
 	val id: UUID,
 	val ansattId: UUID,
 	val gjennomforingId: UUID,
-	val opprettetAvNavAnsattId: UUID?,
-	val stoppetAvNavAnsattId: UUID?,
-	val stoppetTidspunkt: ZonedDateTime?,
+	val gyldigFra: ZonedDateTime,
+	val gyldigTil: ZonedDateTime,
 	val createdAt: ZonedDateTime,
 )

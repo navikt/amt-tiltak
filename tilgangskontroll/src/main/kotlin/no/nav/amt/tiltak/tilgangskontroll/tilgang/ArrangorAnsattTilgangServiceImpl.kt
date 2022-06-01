@@ -18,7 +18,7 @@ class ArrangorAnsattTilgangServiceImpl(
 	private val arrangorAnsattService: ArrangorAnsattService,
 	private val ansattRolleRepository: AnsattRolleRepository,
 	private val deltakerService: DeltakerService,
-	private val gjennomforingTilgangRepository: GjennomforingTilgangRepository,
+	private val arrangorAnsattGjennomforingTilgangRepository: ArrangorAnsattGjennomforingTilgangRepository,
 ) : ArrangorAnsattTilgangService {
 
 	private val personligIdentToAnsattIdCache = Caffeine.newBuilder()
@@ -93,7 +93,7 @@ class ArrangorAnsattTilgangServiceImpl(
 
 	private fun hentGjennomforingerForAnsatt(ansattId: UUID): List<UUID> {
 		return tryCacheFirstNotNull(ansattIdToGjennomforingIdListCache, ansattId) {
-			gjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
+			arrangorAnsattGjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
 				.map { it.gjennomforingId }
 		}
 	}
