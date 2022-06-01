@@ -8,6 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
+import no.nav.amt.tiltak.core.port.DeltakerService
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
 import java.time.ZonedDateTime
@@ -18,6 +19,8 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 	lateinit var arrangorAnsattService: ArrangorAnsattService
 
 	lateinit var ansattRolleRepository: AnsattRolleRepository
+
+	lateinit var deltakerService: DeltakerService
 
 	lateinit var arrangorAnsattTilgangServiceImpl: ArrangorAnsattTilgangServiceImpl
 
@@ -36,10 +39,12 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		ansattRolleRepository = mockk()
 
+		deltakerService = mockk()
+
 		gjennomforingTilgangRepository = mockk()
 
 		arrangorAnsattTilgangServiceImpl = ArrangorAnsattTilgangServiceImpl(
-			arrangorAnsattService, ansattRolleRepository, gjennomforingTilgangRepository
+			arrangorAnsattService, ansattRolleRepository, deltakerService, gjennomforingTilgangRepository
 		)
 
 		every {

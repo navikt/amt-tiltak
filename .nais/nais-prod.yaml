@@ -21,8 +21,8 @@ spec:
     path: /internal/health/liveness
     initialDelay: 20
   replicas:
-    min: 1
-    max: 2
+    min: 2
+    max: 3
     cpuThresholdPercentage: 75
   resources:
     limits:
@@ -34,10 +34,7 @@ spec:
   azure:
     application:
       enabled: true
-      allowAllUsers: false
       claims:
-        groups:
-          - id: "ace70121-3382-47b0-a91d-f20a6b481a70"
         extra:
           - "NAVident"
   tokenx:
@@ -51,6 +48,9 @@ spec:
       rules:
         - application: amt-enhetsregister
           namespace: amt
+          cluster: prod-gcp
+        - application: poao-tilgang
+          namespace: poao
           cluster: prod-gcp
   kafka:
     pool: nav-prod
@@ -83,6 +83,10 @@ spec:
       value: api://prod-fss.pto.poao-gcp-proxy/.default
     - name: POAO_GCP_PROXY_URL
       value: https://poao-gcp-proxy.prod-fss-pub.nais.io
+    - name: POAO_TILGANG_URL
+      value: http://poao-tilgang.poao.svc.cluster.local
+    - name: POAO_TILGANG_SCOPE
+      value: api://prod-gcp.poao.poao-tilgang/.default
     # Kafka topics
     - name: SISTE_TILORDNET_VEILEDER_TOPIC
       value: pto.siste-tilordnet-veileder-v1

@@ -20,7 +20,7 @@ open class DeltakerServiceImpl(
 	private val transactionTemplate: TransactionTemplate
 ) : DeltakerService {
 
-	private val log = LoggerFactory.getLogger(DeltakerService::class.java)
+	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun upsertDeltaker(fodselsnummer: String, deltaker: Deltaker) {
 		val lagretDeltakerDbo = deltakerRepository.get(deltaker.id)

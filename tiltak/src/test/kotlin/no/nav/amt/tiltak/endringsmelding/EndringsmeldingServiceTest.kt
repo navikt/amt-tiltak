@@ -53,7 +53,7 @@ class EndringsmeldingServiceTest {
 		val nyStartDato = LocalDate.now().plusDays(3)
 		endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, nyStartDato, ARRANGOR_ANSATT_1.id)
 
-		val endringsmeldinger = endringsmeldingService.hentEndringsmeldinger(DELTAKER_1.gjennomforing_id)
+		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(DELTAKER_1.gjennomforing_id)
 		val endringsmelding = endringsmeldinger.get(0)
 
 		endringsmeldinger.size shouldBe 1
@@ -78,7 +78,7 @@ class EndringsmeldingServiceTest {
 		endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, nyStartDato, ARRANGOR_ANSATT_1.id)
 		endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, nyStartDato, ARRANGOR_ANSATT_1.id)
 
-		val endringsmeldinger = endringsmeldingService.hentEndringsmeldinger(DELTAKER_1.gjennomforing_id)
+		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(DELTAKER_1.gjennomforing_id)
 		val aktivEndringsmelding = endringsmeldinger.filter { it.aktiv }
 		val arkiverteEndringsmeldinger = endringsmeldinger.filter { it.arkivert }
 
@@ -96,7 +96,7 @@ class EndringsmeldingServiceTest {
 		endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, nyStartDato, ARRANGOR_ANSATT_1.id)
 		endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, nyStartDato, ARRANGOR_ANSATT_1.id)
 
-		val endringsmeldinger = endringsmeldingService.hentEndringsmeldinger(GJENNOMFORING_2.id)
+		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(GJENNOMFORING_2.id)
 
 		endringsmeldinger.size shouldBe 0
 

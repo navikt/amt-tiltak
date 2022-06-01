@@ -6,6 +6,12 @@ import org.springframework.stereotype.Component
 
 typealias StatusStatistikk = Pair<String, Int>
 
+data class GjennomforingMetrikker(
+	val status: String,
+	val synligHosArrangor: Boolean,
+	val antall: Int
+)
+
 @Component
 class DeltakerStatistikkRepository(
 	private val template: NamedParameterJdbcTemplate
@@ -14,18 +20,20 @@ class DeltakerStatistikkRepository(
 	fun antallDeltakere() = template.queryForObject(
 		"SELECT count(*) FROM deltaker;",
 		MapSqlParameterSource(),
-		Int::class.java)
+		Int::class.java
+	)
 
 	fun antallDeltakerePerStatus() = template.query(
 		"SELECT status, count(id) AS antall FROM deltaker_status WHERE aktiv = true GROUP BY status;"
-	) {
-			rs, _ -> StatusStatistikk(rs.getString("status"), rs.getInt("antall"))
+	) { rs, _ ->
+		StatusStatistikk(rs.getString("status"), rs.getInt("antall"))
 	}
 
 	fun antallArrangorer() = template.queryForObject(
 		"SELECT count(*) FROM arrangor;",
 		MapSqlParameterSource(),
-		Int::class.java)
+		Int::class.java
+	)
 
 	fun antallAktiveArrangorerMedBrukere() = template.queryForObject(
 		"""
@@ -36,7 +44,8 @@ class DeltakerStatistikkRepository(
 			where g.status = 'GJENNOMFORES';
 		""".trimMargin(),
 		MapSqlParameterSource(),
-		Int::class.java)
+		Int::class.java
+	)
 
 	fun antallAktiveArrangorer() = template.queryForObject(
 		"""
@@ -46,22 +55,42 @@ class DeltakerStatistikkRepository(
 			where g.status = 'GJENNOMFORES';
 		""".trimMargin(),
 		MapSqlParameterSource(),
-		Int::class.java)
+		Int::class.java
+	)
 
 	fun antallArrangorerMedBrukere() = template.queryForObject(
 		"SELECT count(distinct arrangor_id) FROM arrangor a join arrangor_ansatt_rolle aar on a.id = aar.arrangor_id;",
 		MapSqlParameterSource(),
-		Int::class.java)
+		Int::class.java
+	)
 
+	@Deprecated("Bør kunne erstattes med antallGjennomforingerMedGrupperinger")
 	fun antallGjennomforinger() = template.queryForObject(
 		"SELECT count(*) FROM gjennomforing;",
 		MapSqlParameterSource(),
-		Int::class.java)
+		Int::class.java
+	)
 
+	@Deprecated("Bør kunne erstattes med antallGjennomforingerMedGrupperinger")
 	fun antallGjennomforingerPrStatus() = template.query(
 		"SELECT status, count(*) as antall FROM gjennomforing GROUP BY status;"
-	) {
-			rs, _ -> StatusStatistikk(rs.getString("status"), rs.getInt("antall"))
+	) { rs, _ ->
+		StatusStatistikk(rs.getString("status"), rs.getInt("antall"))
+	}
+
+	fun antallGjennomforingerGruppert() = template.query(
+		"""
+			SELECT g.status as status, aagt.id is not null as gjennomforing_med_bruker_hos_arrangor, count(*) as antall
+			FROM gjennomforing g
+			left join arrangor_ansatt_gjennomforing_tilgang aagt on g.id = aagt.gjennomforing_id
+			group by g.status, gjennomforing_med_bruker_hos_arrangor;
+		""".trimMargin()
+	) { rs, _ ->
+		GjennomforingMetrikker(
+			rs.getString("status"),
+			rs.getBoolean("gjennomforing_med_bruker_hos_arrangor"),
+			rs.getInt("antall")
+		)
 	}
 
 	fun eksponerteBrukere(): Int {
