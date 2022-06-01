@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.tilgangskontroll.invitasjon
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
+import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -67,7 +68,7 @@ class NavAnsattArrangorAnsattTilgangInvitasjonController(
 
 	private fun verifisierTilgangTilGjennomforing(navIdent: String, gjennomforingId: UUID) {
 		if (!tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navIdent, gjennomforingId)) {
-			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Har ikke tilgang til gjennomføring")
+			throw UnauthorizedException("Har ikke tilgang til gjennomføring")
 		}
 	}
 

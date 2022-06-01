@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
+import kotlin.NoSuchElementException
 
 @Service
 open class TiltakDeltakerPresentationService(
@@ -18,7 +19,7 @@ open class TiltakDeltakerPresentationService(
 
 	open fun getDeltakerDetaljerById(deltakerId: UUID): TiltakDeltakerDetaljerDto {
 		val deltaker = GetDeltakerDetaljerQuery(template).query(deltakerId)
-			?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Deltaker med id $deltakerId finnes ikke")
+			?: throw NoSuchElementException("Deltaker med id $deltakerId finnes ikke")
 
 		val erSkjermet = skjermetPersonService.erSkjermet(deltaker.fodselsnummer)
 

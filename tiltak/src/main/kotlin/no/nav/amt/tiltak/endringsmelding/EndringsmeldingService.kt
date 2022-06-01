@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.endringsmelding
 
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.core.exceptions.EndringsmeldingIkkeAktivException
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
@@ -25,8 +26,7 @@ open class EndringsmeldingService(
 		val endringsmelding = endringsmeldingRepository.get(endringsmeldingId)
 
 		if (!endringsmelding.aktiv) {
-			// Kast custom exception og map til 400
-			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Endringsmelding er ikke aktiv")
+			throw EndringsmeldingIkkeAktivException("Endringsmelding er ikke aktiv")
 		}
 
 		endringsmeldingRepository.markerSomFerdig(endringsmeldingId, navAnsattId)

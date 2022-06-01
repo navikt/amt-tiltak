@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.common.auth
 
+import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -28,13 +29,11 @@ open class AuthService(
 		)
 	}
 
-	open fun hentNavIdentTilInnloggetBruker() : String = tokenValidationContextHolder
+	open fun hentNavIdentTilInnloggetBruker(): String = tokenValidationContextHolder
 		.tokenValidationContext
 		.getClaims(Issuer.AZURE_AD)
 		.get("NAVident")
-		?.toString() ?: throw ResponseStatusException(
-			HttpStatus.UNAUTHORIZED,
-			"NAV ident is missing"
-		)
+		?.toString()
+		?: throw UnauthorizedException("NAV ident is missing")
 
 }

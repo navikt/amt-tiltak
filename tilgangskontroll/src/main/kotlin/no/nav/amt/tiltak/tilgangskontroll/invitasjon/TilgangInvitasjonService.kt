@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.tilgangskontroll.invitasjon
 
+import no.nav.amt.tiltak.core.exceptions.ValidationException
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.tilgangskontroll.foresporsel.OpprettForesporselInput
 import no.nav.amt.tiltak.tilgangskontroll.foresporsel.TilgangForesporselService
@@ -48,13 +49,11 @@ open class TilgangInvitasjonService(
 		val invitasjon = tilgangInvitasjonRepository.get(invitasjonId)
 
 		if (invitasjon.erBrukt) {
-			// Bruk heller custom exception og map med controller advice
-			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Kan ikke akseptere invitasjon som er brukt")
+			throw ValidationException("Kan ikke akseptere invitasjon som er brukt")
 		}
 
 		if (ZonedDateTime.now().isAfter(invitasjon.gyldigTil)) {
-			// Bruk heller custom exception og map med controller advice
-			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Kan ikke akseptere invitasjon som er utgått")
+			throw ValidationException("Kan ikke akseptere invitasjon som er utgått")
 		}
 
 		val person = personService.hentPerson(arrangorAnsattPersonligIdent)
@@ -81,8 +80,7 @@ open class TilgangInvitasjonService(
 		val invitasjon = tilgangInvitasjonRepository.get(invitasjonId)
 
 		if (invitasjon.erBrukt) {
-			// Bruk heller custom exception og map med controller advice
-			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Kan ikke slette invitasjon som er brukt")
+			throw ValidationException("Kan ikke slette invitasjon som er brukt")
 		}
 
 		tilgangInvitasjonRepository.slettInvitasjon(invitasjonId)

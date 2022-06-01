@@ -55,7 +55,7 @@ class EndringsmeldingArrangorController(
 		val erSkjermet = skjermetPersonService.erSkjermet(deltaker.bruker!!.fodselsnummer)
 
 		if (erSkjermet) {
-			throw ResponseStatusException(HttpStatus.BAD_REQUEST)
+			throw NotImplementedError("Støtte for denne personen er ikke implementert")
 		}
 
 		endringsmeldingService.opprettMedStartDato(deltakerId, startDato, ansattId)
