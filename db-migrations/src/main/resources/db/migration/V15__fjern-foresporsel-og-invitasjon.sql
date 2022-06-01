@@ -1,0 +1,3 @@
+DROP TABLE gjennomforing_tilgang_invitasjon;
+
+DROP TABLE gjennomforing_tilgang_foresporsel;
