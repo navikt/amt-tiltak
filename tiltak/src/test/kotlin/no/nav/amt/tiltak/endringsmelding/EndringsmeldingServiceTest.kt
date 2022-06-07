@@ -1,12 +1,20 @@
 package no.nav.amt.tiltak.endringsmelding
 
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import no.nav.amt.tiltak.core.port.AuditEventSeverity
+import no.nav.amt.tiltak.core.port.AuditEventType
+import no.nav.amt.tiltak.core.port.AuditLoggerService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,17 +25,23 @@ import java.time.LocalDate
 
 class EndringsmeldingServiceTest {
 	lateinit var endringsmeldingService: EndringsmeldingService
+
 	var dataSource = SingletonPostgresContainer.getDataSource()
+
 	var jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
+
 	var repository = EndringsmeldingRepository(
 		jdbcTemplate,
 		TransactionTemplate(DataSourceTransactionManager(dataSource))
 	)
+
+	val auditLoggerService: AuditLoggerService = mockk()
+
 	var endringsmeldingForGjennomforingQuery = EndringsmeldingForGjennomforingQuery(jdbcTemplate)
 
 	@BeforeEach
 	fun beforeEach() {
-		endringsmeldingService = EndringsmeldingService(repository, endringsmeldingForGjennomforingQuery)
+		endringsmeldingService = EndringsmeldingService(repository, endringsmeldingForGjennomforingQuery, auditLoggerService)
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
@@ -38,14 +52,13 @@ class EndringsmeldingServiceTest {
 		var result1 = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, dato, ARRANGOR_ANSATT_1.id)
 
 		val result2 = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, dato.minusDays(2), ARRANGOR_ANSATT_1.id)
-		result1 = repository.get(result1.id)!!
+		result1 = repository.get(result1.id)
 
 		result1.aktiv shouldBe false
 		result1.startDato shouldBe dato
 
 		result2.aktiv shouldBe true
 		result2.startDato shouldBe dato.minusDays(2)
-
 	}
 
 	@Test
@@ -67,7 +80,6 @@ class EndringsmeldingServiceTest {
 		endringsmelding.opprettetAvArrangorAnsatt.fornavn shouldBe ARRANGOR_ANSATT_1.fornavn
 		endringsmelding.opprettetAvArrangorAnsatt.etternavn shouldBe ARRANGOR_ANSATT_1.etternavn
 		endringsmelding.bruker.navEnhet?.navn shouldBe NAV_ENHET_1.navn
-
 	}
 
 	@Test
@@ -85,7 +97,6 @@ class EndringsmeldingServiceTest {
 		endringsmeldinger.size shouldBe 3
 		aktivEndringsmelding.size shouldBe 1
 		arkiverteEndringsmeldinger.size shouldBe 2
-
 	}
 
 	@Test
@@ -99,7 +110,33 @@ class EndringsmeldingServiceTest {
 		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(GJENNOMFORING_2.id)
 
 		endringsmeldinger.size shouldBe 0
+	}
 
+	@Test
+	fun `markerSomFerdig - skal markere melding som ferdig og audit logge`() {
+		val endringsmelding = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, LocalDate.now(), ARRANGOR_ANSATT_1.id)
+
+		every {
+			auditLoggerService.navAnsattAuditLog(any(), any(), any(), any(), any())
+		} returns Unit
+
+		endringsmeldingService.markerSomFerdig(endringsmelding.id, NAV_ANSATT_1.id)
+
+		val ferdigMelding = endringsmeldingService.hentEndringsmelding(endringsmelding.id)
+
+		ferdigMelding.aktiv shouldBe false
+		ferdigMelding.ferdiggjortAvNavAnsattId shouldBe NAV_ANSATT_1.id
+		ferdigMelding.ferdiggjortTidspunkt shouldNotBe null
+
+		verify(exactly = 1) {
+			auditLoggerService.navAnsattAuditLog(
+				NAV_ANSATT_1.id,
+				DELTAKER_1.id,
+				AuditEventType.ACCESS,
+				AuditEventSeverity.INFO,
+				"NAV-ansatt har lest melding fra tiltaksarrangør om oppstartsdato på tiltak for å registrere dette."
+			)
+		}
 	}
 
 }

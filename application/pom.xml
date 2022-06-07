@@ -82,6 +82,10 @@
 
         <dependency>
             <groupId>no.nav.common</groupId>
+            <artifactId>audit-log</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.common</groupId>
             <artifactId>token-client</artifactId>
         </dependency>
         <dependency>

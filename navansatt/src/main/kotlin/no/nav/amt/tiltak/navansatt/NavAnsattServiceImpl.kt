@@ -16,6 +16,10 @@ internal class NavAnsattServiceImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
+	override fun getNavAnsatt(navAnsattId: UUID): NavAnsatt {
+		return navAnsattRepository.get(navAnsattId).toNavAnsatt()
+	}
+
 	override fun getNavAnsatt(navIdent: String): NavAnsatt {
 		val navAnsatt = navAnsattRepository.getNavAnsattWithIdent(navIdent)
 
