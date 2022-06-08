@@ -5,9 +5,9 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatuser
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.TiltakService
@@ -97,10 +97,23 @@ class GjennomforingServiceImplTest : FunSpec({
 			deltakerService.hentDeltakerePaaGjennomforing(GJENNOMFORING_1.id)
 		} returns listOf(Deltaker(
 			id = DELTAKER_1.id,
-			bruker = null,
+			bruker = Bruker(
+				id = UUID.randomUUID(),
+				fornavn = "Fornavn2",
+				mellomnavn = null,
+				etternavn = "Etternavn",
+				fodselsnummer = "12121231123",
+				navEnhet = null
+			),
 			startDato = null,
 			sluttDato = null,
-			statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(Deltaker.Status.DELTAR))),
+			status = DeltakerStatus(
+				UUID.randomUUID(),
+				Deltaker.Status.VENTER_PA_OPPSTART,
+				LocalDateTime.now(),
+				LocalDateTime.now(),
+				true
+			),
 			registrertDato = LocalDateTime.now(),
 			dagerPerUke = null,
 			prosentStilling = null,

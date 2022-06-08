@@ -122,7 +122,7 @@ class TestDataRepository(
 			sql, parameters(
 				"id" to cmd.id,
 				"deltaker_id" to cmd.deltaker_id,
-				"gyldigFra" to cmd.gyldigFra.toOffsetDateTime(),
+				"gyldigFra" to cmd.gyldigFra,
 				"status" to cmd.status,
 				"aktiv" to cmd.aktiv
 			)
