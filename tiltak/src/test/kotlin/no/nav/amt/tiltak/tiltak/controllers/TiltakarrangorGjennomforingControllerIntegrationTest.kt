@@ -6,25 +6,28 @@ import no.nav.amt.tiltak.arrangor.ArrangorRepository
 import no.nav.amt.tiltak.arrangor.ArrangorServiceImpl
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.*
-import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
+import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
+import no.nav.amt.tiltak.test.database.data.TestData.createBrukerCommand
+import no.nav.amt.tiltak.test.database.data.TestData.createDeltakerCommand
+import no.nav.amt.tiltak.test.database.data.TestData.createGjennomforingCommand
+import no.nav.amt.tiltak.test.database.data.TestData.createStatusCommand
+import no.nav.amt.tiltak.test.database.data.TestDataRepository
+import no.nav.amt.tiltak.test.database.data.TestDataSeeder
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
 import no.nav.amt.tiltak.tiltak.services.GjennomforingServiceImpl
 import no.nav.amt.tiltak.tiltak.services.TiltakServiceImpl
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -56,8 +59,7 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 	private lateinit var arrangorService: ArrangorService
 	private lateinit var authService: AuthService
 	private lateinit var controller: TiltakarrangorGjennomforingController
-	private var tiltakKode = "GRUPPEAMO"
-	private var epost = "bla@bla.com"
+	private lateinit var testDataRepository: TestDataRepository
 
 	@BeforeEach
 	fun before() {
@@ -96,7 +98,8 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 			authService, mock(ArrangorAnsattTilgangService::class.java)
 		)
 
-		DbTestDataUtils.cleanDatabase(dataSource)
+		testDataRepository = TestDataRepository(namedJdbcTemplate)
+		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource, TestDataSeeder::insertMinimum)
 	}
 
 	@Test
@@ -105,150 +108,90 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 		val exception = assertThrows(ResponseStatusException::class.java) {
 			controller.hentGjennomforing(id)
 		}
-		assertEquals("404 NOT_FOUND", exception.status.toString())
+		exception.status.toString() shouldBe "404 NOT_FOUND"
 	}
 
 	@Test
 	fun `hentGjennomforinger - tiltak finnes - skal returnere gjennomføring med tiltak`() {
-		val tiltakNavn = "Gruppe amo"
-		val orgNavn = "orgnavn"
-		val gjennomforingNavn = "Gjennomføringnavn"
-		val arrangor = insertArrangor(orgNavn)
-		val tiltak = tiltakRepository.insert(UUID.randomUUID(), tiltakNavn, "kode")
-		val gjennomforing = insertGjennomforing(tiltak.id, arrangor, gjennomforingNavn)
+		val gjennomforingCmd = createGjennomforingCommand(TILTAK_1, ARRANGOR_1, NAV_ENHET_1)
+		testDataRepository.insertGjennomforing(gjennomforingCmd)
 
-		val resultat = controller.hentGjennomforing(gjennomforing.id)
+		val resultat = controller.hentGjennomforing(gjennomforingCmd.id)
 
-		assertEquals(gjennomforing.id, resultat.id)
-		assertEquals(gjennomforingNavn, resultat.navn)
-		assertEquals(tiltakNavn, resultat.tiltak.tiltaksnavn)
-		assertEquals(orgNavn, resultat.arrangor.organisasjonNavn)
+		resultat.id shouldBe gjennomforingCmd.id
+		resultat.navn shouldBe gjennomforingCmd.navn
+		resultat.tiltak.tiltaksnavn shouldBe TILTAK_1.navn
+		resultat.arrangor.organisasjonNavn shouldBe ARRANGOR_1.overordnet_enhet_navn
 
 	}
 
 	@Test
-	fun `hentDeltakere - En deltaker på tiltak`() {
-		val arrangorId = insertArrangor()
-		val tiltak = tiltakRepository.insert(UUID.randomUUID(), tiltakKode, tiltakKode)
+	fun `hentDeltakere - En deltaker på tiltak - returnerer deltaker`() {
+		val bruker = BRUKER_1
+		val gjennomforingCmd = createGjennomforingCommand(TILTAK_1, ARRANGOR_1, NAV_ENHET_1)
+		val deltakerCmd = createDeltakerCommand(bruker, gjennomforingCmd)
+		testDataRepository.insertGjennomforing(gjennomforingCmd)
+		testDataRepository.insertDeltaker(deltakerCmd)
+		testDataRepository.insertDeltakerStatus(createStatusCommand(deltakerCmd))
 
-		val gjennomforing = insertGjennomforing(tiltak.id, arrangorId)
-		val bruker1 = BrukerInsertDbo("12128673847", "Person", "En", "To", "123", epost, null, null)
-		val startDato = LocalDate.now().minusDays(5)
-		val sluttDato = LocalDate.now().plusDays(3)
-		val regDato = LocalDateTime.now().minusDays(10)
-		insertDeltaker(gjennomforing.id, bruker1, startDato, sluttDato, regDato)
-
-		val deltakere = controller.hentDeltakere(gjennomforing.id)
-		val deltaker1 = deltakere.get(0)
-
+		val deltakere = controller.hentDeltakere(gjennomforingCmd.id)
 		deltakere.size shouldBe 1
-		deltaker1.fodselsnummer shouldBe bruker1.fodselsnummer
-		deltaker1.fornavn shouldBe bruker1.fornavn
-		deltaker1.etternavn shouldBe bruker1.etternavn
 
-		deltaker1.startDato shouldBe startDato
-		deltaker1.sluttDato shouldBe sluttDato
-		deltaker1.registrertDato.truncatedTo(ChronoUnit.MINUTES) shouldBe regDato.truncatedTo(ChronoUnit.MINUTES)
+		val deltaker1 = deltakere[0]
+
+		deltaker1.fodselsnummer shouldBe bruker.fodselsnummer
+		deltaker1.fornavn shouldBe bruker.fornavn
+		deltaker1.etternavn shouldBe bruker.etternavn
+
+		deltaker1.startDato shouldBe deltakerCmd.start_dato
+		deltaker1.sluttDato shouldBe deltakerCmd.slutt_dato
+		deltaker1.registrertDato.truncatedTo(ChronoUnit.MINUTES) shouldBe deltaker1.registrertDato.truncatedTo(ChronoUnit.MINUTES)
 
 	}
 
 	@Test
-	fun `hentDeltakere - Flere deltakere finnes`() {
-		val arrangorId = insertArrangor()
-		val tiltak = tiltakRepository.insert(UUID.randomUUID(), tiltakKode, tiltakKode)
+	fun `hentDeltakere - Flere deltakere finnes - henter alle`() {
+		val gjennomforingCmd = createGjennomforingCommand(TILTAK_1, ARRANGOR_1, NAV_ENHET_1)
+		val deltakerCmd = createDeltakerCommand(BRUKER_1, gjennomforingCmd)
+		val bruker2Cmd = createBrukerCommand(NAV_ENHET_1)
+		val deltaker2Cmd = createDeltakerCommand(bruker2Cmd, gjennomforingCmd)
 
-		val gjennomforing = insertGjennomforing(tiltak.id, arrangorId)
-		val bruker1 = BrukerInsertDbo("12128673847", "Person", "En", "To", "123", epost, null, null)
-		val bruker2 = BrukerInsertDbo("12128674909", "Person", "En", "To", "123", epost, null, null)
+		testDataRepository.insertGjennomforing(gjennomforingCmd)
 
-		insertDeltaker(
-			gjennomforing.id,
-			bruker1,
-			LocalDate.now().minusDays(3),
-			LocalDate.now().plusDays(1),
-			LocalDateTime.now().minusDays(10)
-		)
-		insertDeltaker(
-			gjennomforing.id,
-			bruker2,
-			LocalDate.now().minusDays(3),
-			LocalDate.now().plusDays(1),
-			LocalDateTime.now().minusDays(10)
-		)
+		testDataRepository.insertDeltaker(deltakerCmd)
+		testDataRepository.insertDeltakerStatus(createStatusCommand(deltakerCmd))
+		testDataRepository.insertBruker(bruker2Cmd)
+		testDataRepository.insertDeltaker(deltaker2Cmd)
+		testDataRepository.insertDeltakerStatus(createStatusCommand(deltaker2Cmd))
 
-		val deltakere = controller.hentDeltakere(gjennomforing.id)
-		val deltaker1 = deltakere.get(0)
-		val deltaker2 = deltakere.get(1)
+
+		val deltakere = controller.hentDeltakere(gjennomforingCmd.id)
 
 		deltakere.size shouldBe 2
-		deltaker1.fodselsnummer shouldBe bruker1.fodselsnummer
-		deltaker2.fodselsnummer shouldBe bruker2.fodselsnummer
+
 	}
 
-	private fun insertDeltaker(
-		gjennomforingId: UUID,
-		bruker: BrukerInsertDbo,
-		startDato: LocalDate,
-		sluttDato: LocalDate,
-		regDato: LocalDateTime
-	): DeltakerDbo {
-		val bruker = brukerRepository.insert(bruker)
-		val deltakerInsertDbo = DeltakerInsertDbo(
-			id = UUID.randomUUID(),
-			brukerId = bruker.id,
-			gjennomforingId = gjennomforingId,
-			startDato = startDato,
-			sluttDato = sluttDato,
-			dagerPerUke = 5,
-			prosentStilling = 10f,
-			registrertDato = regDato
-		)
-		deltakerRepository.insert(deltakerInsertDbo)
-		insertStatus(deltakerInsertDbo.id)
-		return deltakerRepository.get(deltakerInsertDbo.id)!!
-	}
+	@Test
+	fun `hentDeltakere - Utdatert status på deltaker - filtreres bort `() {
+		val gjennomforingCmd = createGjennomforingCommand(TILTAK_1, ARRANGOR_1, NAV_ENHET_1)
+		val deltakerCmd = createDeltakerCommand(BRUKER_1, gjennomforingCmd)
+		val bruker2Cmd = createBrukerCommand(NAV_ENHET_1)
+		val deltaker2Cmd = createDeltakerCommand(bruker2Cmd, gjennomforingCmd)
+		val gammelStatus = createStatusCommand(deltaker2Cmd)
+			.copy(status = Deltaker.Status.HAR_SLUTTET.name, gyldigFra = LocalDateTime.now().minusDays(15))
+		testDataRepository.insertGjennomforing(gjennomforingCmd)
 
-	private fun insertStatus(
-		deltakerId: UUID,
-	) {
-		val deltakerInsertDbo = DeltakerStatusInsertDbo(
-			id = UUID.randomUUID(),
-			deltakerId = deltakerId,
-			gyldigFra = LocalDateTime.now().minusDays(1),
-			type = Deltaker.Status.DELTAR,
-		)
-		deltakerStatusRepository.insert(deltakerInsertDbo)
-	}
+		testDataRepository.insertDeltaker(deltakerCmd)
+		testDataRepository.insertDeltakerStatus(createStatusCommand(deltakerCmd))
+		testDataRepository.insertBruker(bruker2Cmd)
+		testDataRepository.insertDeltaker(deltaker2Cmd)
+		testDataRepository.insertDeltakerStatus(gammelStatus)
 
+		val deltakere = controller.hentDeltakere(gjennomforingCmd.id)
 
-	private fun insertGjennomforing(tiltakId: UUID, arrangorId: UUID, navn: String = "Kaffekurs"): GjennomforingDbo {
-		val id = UUID.randomUUID()
-		return gjennomforingRepository.insert(
-			id = id,
-			tiltakId = tiltakId,
-			arrangorId = arrangorId,
-			navn = navn,
-			status = Gjennomforing.Status.GJENNOMFORES,
-			startDato = null,
-			sluttDato = null,
-			registrertDato = LocalDateTime.now(),
-			fremmoteDato = null,
-			navEnhetId = null,
-			lopenr = 123,
-			opprettetAar = 2020
-		)
-	}
+		deltakere.size shouldBe 1
+		deltakere.first().id shouldBe deltakerCmd.id
 
-	private fun insertArrangor(orgNavn: String? = "Et Orgnavn"): UUID {
-		val id = UUID.randomUUID()
-		val orgnr = (1000..9999).random()
-		val insert = """
-			INSERT INTO arrangor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer,navn)
-			VALUES ('$id', '12345678', '$orgNavn', '$orgnr', 'Virksomhetsnavn1')
-		""".trimIndent()
-		namedJdbcTemplate.jdbcTemplate.update(insert)
-
-		return id
 	}
 
 }

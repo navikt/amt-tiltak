@@ -64,7 +64,7 @@ class DeltakerProcessor(
 			gyldigFra = deltakerDto.statusEndretDato,
 		)
 
-		transactionTemplate.executeWithoutResult{
+		transactionTemplate.executeWithoutResult {
 			deltakerService.upsertDeltaker(deltakerDto.personIdent, deltakerUpsert)
 			deltakerService.insertStatus(status)
 		}

@@ -8,7 +8,7 @@ import no.nav.amt.tiltak.application.audit_logger.AuditLoggerServiceImpl
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatuser
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.port.AuditEventSeverity
 import no.nav.amt.tiltak.core.port.AuditEventType
 import no.nav.amt.tiltak.core.port.DeltakerService
@@ -63,7 +63,7 @@ class AuditLoggerServiceImplTest {
 			),
 			startDato = null,
 			sluttDato = null,
-			statuser = DeltakerStatuser.settAktivStatus(Deltaker.Status.DELTAR, LocalDateTime.now()),
+			status = DeltakerStatus(UUID.randomUUID(), Deltaker.Status.DELTAR, LocalDateTime.now(), LocalDateTime.now(), true),
 			registrertDato = LocalDateTime.now(),
 		)
 

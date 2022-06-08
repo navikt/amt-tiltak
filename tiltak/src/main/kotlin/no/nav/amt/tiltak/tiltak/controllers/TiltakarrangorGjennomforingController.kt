@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.tiltak.controllers
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
+import java.time.LocalDateTime
 import java.util.*
 
 @RestController
@@ -64,7 +66,14 @@ class TiltakarrangorGjennomforingController(
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
 
 		return deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
+			.filter { !it.utdatert()}
 			.map { it.toDto() }
+	}
+
+	private fun Deltaker.utdatert() : Boolean {
+		val skalSkjulesFra = status.gyldigFra.plusWeeks(2)
+		return (status.type == Deltaker.Status.HAR_SLUTTET || status.type == Deltaker.Status.IKKE_AKTUELL)
+			&& LocalDateTime.now().isAfter(skalSkjulesFra)
 	}
 
 }
