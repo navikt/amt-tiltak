@@ -61,7 +61,7 @@ class ArrangorAnsattTilgangServiceImpl(
 	}
 
 	override fun verifiserTilgangTilDeltaker(ansattPersonligIdent: String, deltakerId: UUID) {
-		val deltaker = deltakerService.hentDeltaker(deltakerId)
+		val deltaker = deltakerService.hentDeltaker(deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 
 		verifiserTilgangTilGjennomforing(ansattPersonligIdent, deltaker.gjennomforingId)
 	}

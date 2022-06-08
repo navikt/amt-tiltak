@@ -22,7 +22,7 @@ data class DeltakerDetaljerDbo(
 	val registrertDato: LocalDateTime,
 	var status: Deltaker.Status,
 	val statusOpprettet: LocalDateTime,
-	val statusGjelderFra: LocalDateTime,
+	val statusGyldigFra: LocalDateTime,
 	val navEnhetNavn: String?,
 	val gjennomforingId: UUID,
 	val gjennomforingNavn: String,

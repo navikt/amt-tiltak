@@ -1,16 +1,23 @@
 package no.nav.amt.tiltak.deltaker.service
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpdateDbo
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
+import java.time.LocalDateTime
 import java.util.*
+import kotlin.NoSuchElementException
 
 @Service
 open class DeltakerServiceImpl(
@@ -22,61 +29,81 @@ open class DeltakerServiceImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	override fun upsertDeltaker(fodselsnummer: String, deltaker: Deltaker) {
-		val lagretDeltakerDbo = deltakerRepository.get(deltaker.id)
+	override fun upsertDeltaker(fodselsnummer: String, deltaker: DeltakerUpsert) {
+		val lagretDeltaker = hentDeltaker(deltaker.id)
 
-		if (lagretDeltakerDbo == null) {
-			createDeltaker(fodselsnummer, deltaker.gjennomforingId, deltaker)
-		} else {
-			val lagretDeltaker = lagretDeltakerDbo.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker)
-			val oppdatertDeltaker = lagretDeltaker.oppdater(deltaker)
-
-			if (lagretDeltaker != oppdatertDeltaker) {
-				deltakerStatusRepository.upsert(DeltakerStatusInsertDbo.fromDeltaker(oppdatertDeltaker))
-				update(oppdatertDeltaker)
-			}
+		if (lagretDeltaker == null) {
+			insertDeltaker(fodselsnummer, deltaker)
+		} else if(!deltaker.compareTo(lagretDeltaker)){
+			update(deltaker)
 		}
 	}
 
+	override fun insertStatus(status: DeltakerStatusInsert) {
+		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(status.deltakerId)
+		if(forrigeStatus?.status == status.type) return
 
-	private fun update(deltaker: Deltaker): Deltaker {
-
-		return deltakerRepository.update(DeltakerDbo(deltaker))
-			.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker)
+		val nyStatus = DeltakerStatusInsertDbo(
+			id = status.id,
+			deltakerId = status.deltakerId,
+			type = status.type,
+			gyldigFra = status.gyldigFra?: LocalDateTime.now()
+		)
+		transactionTemplate.executeWithoutResult {
+			forrigeStatus?.let { deltakerStatusRepository.deaktiver(it.id) }
+			deltakerStatusRepository.insert(nyStatus)
+		}
 	}
 
-	private fun createDeltaker(fodselsnummer: String, gjennomforingId: UUID, deltaker: Deltaker): DeltakerDbo {
-		val brukerId = brukerService.getOrCreate(fodselsnummer)
-
-		val dbo = deltakerRepository.insert(
+	private fun update(deltaker: DeltakerUpsert) {
+		val toUpdate = DeltakerUpdateDbo(
 			id = deltaker.id,
-			brukerId = brukerId,
-			gjennomforingId = gjennomforingId,
 			startDato = deltaker.startDato,
 			sluttDato = deltaker.sluttDato,
+			registrertDato = deltaker.registrertDato,
 			dagerPerUke = deltaker.dagerPerUke,
-			prosentStilling = deltaker.prosentStilling,
-			registrertDato = deltaker.registrertDato
+			prosentStilling = deltaker.prosentStilling
 		)
 
-		deltakerStatusRepository.upsert(DeltakerStatusInsertDbo.fromDeltaker(deltaker) )
+		deltakerRepository.update(toUpdate)
+	}
 
-		return dbo
+	private fun insertDeltaker(fodselsnummer: String, deltaker: DeltakerUpsert) {
+		val brukerId = brukerService.getOrCreate(fodselsnummer)
+		val toInsert = DeltakerInsertDbo(
+				id = deltaker.id,
+				brukerId = brukerId,
+				gjennomforingId = deltaker.gjennomforingId,
+				startDato = deltaker.startDato,
+				sluttDato = deltaker.sluttDato,
+				dagerPerUke = deltaker.dagerPerUke,
+				prosentStilling = deltaker.prosentStilling,
+				registrertDato = deltaker.registrertDato
+		)
+
+		deltakerRepository.insert(toInsert)
 	}
 
 	override fun hentDeltakerePaaGjennomforing(gjennomforingId: UUID): List<Deltaker> {
 		return deltakerRepository.getDeltakerePaaTiltak(gjennomforingId)
-			.map { it.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker) }
+			.map { it.toDeltaker(hentStatusOrThrow(it.id)) }
 	}
 
-	override fun hentDeltaker(deltakerId: UUID): Deltaker {
-		return deltakerRepository.get(deltakerId)?.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker)
-			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
+	override fun hentDeltaker(deltakerId: UUID): Deltaker? {
+		return deltakerRepository.get(deltakerId)?.toDeltaker(hentStatusOrThrow(deltakerId))
+	}
+
+	fun hentStatusOrThrow(deltakerId: UUID) : DeltakerStatus {
+		return hentStatus(deltakerId)?: throw NoSuchElementException("Fant ikke status på deltaker med id $deltakerId")
+	}
+
+	fun hentStatus(deltakerId: UUID) : DeltakerStatus? {
+		return deltakerStatusRepository.getStatusForDeltaker(deltakerId)?.toDeltakerStatus() ?: return null
 	}
 
 	override fun oppdaterStatuser() {
-		progressStatuser(deltakerRepository::potensieltHarSlutta)
-		progressStatuser(deltakerRepository::potensieltDeltar)
+		progressStatuser(deltakerRepository.potensieltHarSlutta())
+		progressStatuser(deltakerRepository.potensieltDeltar())
 	}
 
 	override fun slettDeltaker(deltakerId: UUID) {
@@ -88,11 +115,19 @@ open class DeltakerServiceImpl(
 		log.info("Deltaker med id=$deltakerId er slettet")
 	}
 
-	private fun progressStatuser(kandidatProvider: () -> List<DeltakerDbo>) = kandidatProvider()
-		.also { log.info("Oppdaterer status på ${it.size} deltakere ") }
-		.map { it.toDeltaker(deltakerStatusRepository::getStatuserForDeltaker) }
-		.map { it.progressStatus() }
-		.forEach { deltakerStatusRepository.upsert( DeltakerStatusInsertDbo.fromDeltaker(it)) }
+	private fun progressStatuser(kandidater: List<DeltakerDbo>) = kandidater
+		.also { log.info("Oppdaterer status på ${it.size} deltakere") }
+		.map { it.toDeltaker(hentStatusOrThrow(it.id)) }
+		.forEach {
+			insertStatus(DeltakerStatusInsert(
+				id = UUID.randomUUID(),
+				deltakerId = it.id,
+				type = it.utledStatus(),
+				gyldigFra = LocalDateTime.now()
+			))
+		}
+
 
 }
+
 

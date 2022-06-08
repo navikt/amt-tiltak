@@ -7,6 +7,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.*
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -170,10 +171,10 @@ class EndringsmeldingNavControllerTest {
 			.thenReturn(Deltaker(
 				id = UUID.randomUUID(),
 				gjennomforingId = gjennomforingId,
-				bruker = null,
+				bruker = Bruker(BRUKER_1.id, BRUKER_1.fornavn, null, BRUKER_1.etternavn, BRUKER_1.fodselsnummer, null),
 				startDato = null,
 				sluttDato = null,
-				statuser = DeltakerStatuser(listOf(DeltakerStatus.nyAktiv(Deltaker.Status.DELTAR))),
+				status = DeltakerStatus(UUID.randomUUID(), Deltaker.Status.DELTAR, LocalDateTime.now(), LocalDateTime.now(), true),
 				registrertDato = LocalDateTime.now(),
 				dagerPerUke = null,
 				prosentStilling = null,

@@ -18,7 +18,7 @@ class DeltakerProcessorTest : StringSpec({
 		val deltakerService: DeltakerService = mockk()
 		val personService: PersonService = mockk()
 
-		val processor = DeltakerProcessor(gjennomforingService, deltakerService, personService)
+		val processor = DeltakerProcessor(gjennomforingService, deltakerService, personService, mockk())
 
 		every {
 			personService.hentPerson("1234")
@@ -60,7 +60,7 @@ class DeltakerProcessorTest : StringSpec({
 		val deltakerService: DeltakerService = mockk()
 		val personService: PersonService = mockk()
 
-		val processor = DeltakerProcessor(gjennomforingService, deltakerService, personService)
+		val processor = DeltakerProcessor(gjennomforingService, deltakerService, personService, mockk())
 
 		every {
 			personService.hentPerson("1234")
@@ -106,7 +106,7 @@ class DeltakerProcessorTest : StringSpec({
 		val deltakerService: DeltakerService = mockk()
 		val personService: PersonService = mockk()
 
-		val processor = DeltakerProcessor(gjennomforingService, deltakerService, personService)
+		val processor = DeltakerProcessor(gjennomforingService, deltakerService, personService, mockk())
 
 		every {
 			deltakerService.slettDeltaker(any())

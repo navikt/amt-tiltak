@@ -10,6 +10,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
@@ -192,7 +193,7 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 		regDato: LocalDateTime
 	): DeltakerDbo {
 		val bruker = brukerRepository.insert(bruker)
-		val deltaker = deltakerRepository.insert(
+		val deltakerInsertDbo = DeltakerInsertDbo(
 			id = UUID.randomUUID(),
 			brukerId = bruker.id,
 			gjennomforingId = gjennomforingId,
@@ -202,23 +203,21 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 			prosentStilling = 10f,
 			registrertDato = regDato
 		)
-		insertStatus(deltaker.id)
-		return deltaker
+		deltakerRepository.insert(deltakerInsertDbo)
+		insertStatus(deltakerInsertDbo.id)
+		return deltakerRepository.get(deltakerInsertDbo.id)!!
 	}
 
 	private fun insertStatus(
 		deltakerId: UUID,
 	) {
-		deltakerStatusRepository.upsert(
-			listOf(
-				DeltakerStatusInsertDbo(
-					id = UUID.randomUUID(),
-					deltakerId = deltakerId,
-					gyldigFra = LocalDateTime.now().minusDays(1),
-					status = Deltaker.Status.DELTAR,
-					aktiv = true
-				)
-			))
+		val deltakerInsertDbo = DeltakerStatusInsertDbo(
+			id = UUID.randomUUID(),
+			deltakerId = deltakerId,
+			gyldigFra = LocalDateTime.now().minusDays(1),
+			type = Deltaker.Status.DELTAR,
+		)
+		deltakerStatusRepository.insert(deltakerInsertDbo)
 	}
 
 

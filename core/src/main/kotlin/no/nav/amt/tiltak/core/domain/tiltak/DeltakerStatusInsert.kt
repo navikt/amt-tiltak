@@ -1,10 +1,9 @@
-package no.nav.amt.tiltak.deltaker.dbo
+package no.nav.amt.tiltak.core.domain.tiltak
 
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import java.time.LocalDateTime
 import java.util.*
 
-data class DeltakerStatusInsertDbo(
+data class DeltakerStatusInsert(
 	val id: UUID,
 	val deltakerId: UUID,
 	val type: Deltaker.Status,

@@ -2,7 +2,6 @@ package no.nav.amt.tiltak.deltaker.dbo
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatuser
 import java.time.LocalDateTime
 import java.util.*
 
@@ -16,5 +15,3 @@ data class DeltakerStatusDbo(
 ) {
 	fun toDeltakerStatus(): DeltakerStatus = DeltakerStatus(id, status, gyldigFra, opprettetDato, aktiv)
 }
-
-fun List<DeltakerStatusDbo>.toDeltakerStatuser() = DeltakerStatuser(map { it.toDeltakerStatus() } )
