@@ -7,13 +7,28 @@ import java.util.*
 
 object TestData {
 
+	fun createGjennomforingCommand(tiltak: InsertTiltakCommand, arrangor: InsertArrangorCommand, enhet: InsertNavEnhetCommand) = InsertGjennomforingCommand(
+		id = UUID.randomUUID(),
+		tiltak_id = tiltak.id,
+		arrangor_id = arrangor.id,
+		navn = "Tiltaksgjennomforing1",
+		status = "GJENNOMFORES",
+		start_dato = LocalDate.now().minusWeeks(3),
+		slutt_dato = LocalDate.now().plusYears(3),
+		nav_enhet_id = enhet.id,
+		registrert_dato = LocalDate.now().minusWeeks(4),
+		fremmote_dato = LocalDate.of(2022, 2, 1),
+		opprettet_aar = 2020,
+		lopenr = 123
+	)
+
 	fun createDeltakerCommand(bruker: InsertBrukerCommand, gjennomforing: InsertGjennomforingCommand) =
 		InsertDeltakerCommand(
 			id = UUID.randomUUID(),
 			bruker_id = bruker.id,
 			gjennomforing_id = gjennomforing.id,
-			start_dato = LocalDate.of(2022, 2, 13),
-			slutt_dato = LocalDate.of(2030, 2, 14),
+			start_dato = LocalDate.now().plusDays(5),
+			slutt_dato = LocalDate.now().plusDays(30),
 			dager_per_uke = 5,
 			prosent_stilling = 100f,
 			registrert_dato = LocalDateTime.now()
