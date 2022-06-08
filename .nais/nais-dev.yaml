@@ -34,10 +34,7 @@ spec:
   azure:
     application:
       enabled: true
-      allowAllUsers: false
       claims:
-        groups:
-          - id: "f12fa5d6-ef0c-41db-80c9-5c9696bb5c14" # 0000-GA-Tiltaksansvarlig, NAV Preprod
         extra:
           - "NAVident"
   tokenx:
@@ -51,6 +48,9 @@ spec:
       rules:
         - application: amt-enhetsregister
           namespace: amt
+          cluster: dev-gcp
+        - application: poao-tilgang
+          namespace: poao
           cluster: dev-gcp
   kafka:
     pool: nav-dev
@@ -83,6 +83,10 @@ spec:
       value: api://dev-fss.pto.poao-gcp-proxy/.default
     - name: POAO_GCP_PROXY_URL
       value: https://poao-gcp-proxy.dev-fss-pub.nais.io
+    - name: POAO_TILGANG_URL
+      value: http://poao-tilgang.poao.svc.cluster.local
+    - name: POAO_TILGANG_SCOPE
+      value: api://dev-gcp.poao.poao-tilgang/.default
     # Kafka topics
     - name: SISTE_TILORDNET_VEILEDER_TOPIC
       value: pto.siste-tilordnet-veileder-v1

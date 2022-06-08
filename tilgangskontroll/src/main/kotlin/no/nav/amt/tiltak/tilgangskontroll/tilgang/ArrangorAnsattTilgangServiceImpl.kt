@@ -4,9 +4,9 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.log.SecureLog.secureLog
 import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils.tryCacheFirstNotNull
 import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils.tryCacheFirstNullable
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
@@ -18,10 +18,8 @@ class ArrangorAnsattTilgangServiceImpl(
 	private val arrangorAnsattService: ArrangorAnsattService,
 	private val ansattRolleRepository: AnsattRolleRepository,
 	private val deltakerService: DeltakerService,
-	private val gjennomforingTilgangRepository: GjennomforingTilgangRepository,
+	private val arrangorAnsattGjennomforingTilgangRepository: ArrangorAnsattGjennomforingTilgangRepository,
 ) : ArrangorAnsattTilgangService {
-
-	private val secureLog = LoggerFactory.getLogger("SecureLog")
 
 	private val personligIdentToAnsattIdCache = Caffeine.newBuilder()
 		.expireAfterWrite(Duration.ofHours(12))
@@ -95,7 +93,7 @@ class ArrangorAnsattTilgangServiceImpl(
 
 	private fun hentGjennomforingerForAnsatt(ansattId: UUID): List<UUID> {
 		return tryCacheFirstNotNull(ansattIdToGjennomforingIdListCache, ansattId) {
-			gjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
+			arrangorAnsattGjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
 				.map { it.gjennomforingId }
 		}
 	}

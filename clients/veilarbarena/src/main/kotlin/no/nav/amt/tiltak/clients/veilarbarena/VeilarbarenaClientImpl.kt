@@ -1,10 +1,10 @@
 package no.nav.amt.tiltak.clients.veilarbarena
 
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
+import no.nav.amt.tiltak.log.SecureLog.secureLog
 import no.nav.common.rest.client.RestClient.baseClient
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.slf4j.LoggerFactory
 import java.util.function.Supplier
 
 class VeilarbarenaClientImpl(
@@ -14,8 +14,6 @@ class VeilarbarenaClientImpl(
 	private val httpClient: OkHttpClient = baseClient(),
 	private val consumerId: String = "amt-tiltak",
 ) : VeilarbarenaClient {
-
-	private val secureLog = LoggerFactory.getLogger("SecureLog")
 
 	override fun hentBrukerOppfolgingsenhetId(fnr: String): String? {
 		val request = Request.Builder()

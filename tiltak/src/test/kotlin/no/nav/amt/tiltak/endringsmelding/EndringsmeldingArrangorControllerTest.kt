@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.endringsmelding
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.SkjermetPersonService
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import org.junit.jupiter.api.AfterAll
@@ -40,6 +41,9 @@ class EndringsmeldingArrangorControllerTest {
 	@MockBean
 	private lateinit var deltakerService: DeltakerService
 
+	@MockBean
+	private lateinit var skjermetPersonService: SkjermetPersonService
+
 	companion object : MockOAuthServer() {
 		@AfterAll
 		@JvmStatic
@@ -58,7 +62,7 @@ class EndringsmeldingArrangorControllerTest {
 	}
 
 	@Test
-	fun `hentEndringsmeldinger() - skal hvis token mangler`() {
+	fun `hentEndringsmeldinger() - skal returnere 200 med korrekt respons`() {
 		val endringsmeldingId = UUID.fromString("42f4c78c-4f70-489f-aa13-4b13a755d05b")
 		val deltakerId = UUID.randomUUID()
 		val ansattPersonligIdent = "1234567"
@@ -71,9 +75,10 @@ class EndringsmeldingArrangorControllerTest {
 				id = endringsmeldingId,
 				deltakerId = deltakerId,
 				startDato = LocalDate.parse("2022-09-05"),
-				godkjentAvNavAnsatt = null,
+				ferdiggjortAvNavAnsattId = null,
+				ferdiggjortTidspunkt = null,
 				aktiv = false,
-				opprettetAvId = ARRANGOR_ANSATT_1.id,
+				opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
 				createdAt = LocalDateTime.now(),
 				modifiedAt = LocalDateTime.now()
 			)))

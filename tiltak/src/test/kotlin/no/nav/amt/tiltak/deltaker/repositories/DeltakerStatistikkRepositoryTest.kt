@@ -64,19 +64,20 @@ class DeltakerStatistikkRepositoryTest : FunSpec({
 		repository.antallArrangorerMedBrukere() shouldBe 2
 	}
 
-
-	test("antallGjennomforinger - returnerer 2") {
-		repository.antallGjennomforinger() shouldBe 3
+	test("antallGjennomforingerGruppert - summerer antall - blir 3") {
+		repository.antallGjennomforingerGruppert().map { it.antall }.sum() shouldBe 3
 	}
 
-	test("antallGjennomforingerPrStatus - returnerer rett fordeling") {
-		repository.antallGjennomforingerPrStatus() shouldHaveSize 2
+	test("antallGjennomforingerGruppert - summerer antall på status - returnerer rett fordeling") {
+		repository.antallGjennomforingerGruppert()
+			.filter { it.status == Gjennomforing.Status.GJENNOMFORES.name }
+			.map { it.antall }
+			.sum() shouldBe 2
 
-		repository.antallGjennomforingerPrStatus() shouldContain
-			StatusStatistikk(Gjennomforing.Status.GJENNOMFORES.name, 2)
-
-		repository.antallGjennomforingerPrStatus() shouldContain
-			StatusStatistikk(Gjennomforing.Status.AVSLUTTET.name, 1)
+		repository.antallGjennomforingerGruppert()
+			.filter { it.status == Gjennomforing.Status.AVSLUTTET.name }
+			.map { it.antall }
+			.sum() shouldBe 1
 	}
 
 	test("antallAktiveArrangorer - returnerer 3") {

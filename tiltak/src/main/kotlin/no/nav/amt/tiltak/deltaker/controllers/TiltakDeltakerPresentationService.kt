@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.deltaker.controllers
 
+import no.nav.amt.tiltak.core.port.SkjermetPersonService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDetaljerDbo
 import no.nav.amt.tiltak.deltaker.repositories.GetDeltakerDetaljerQuery
 import no.nav.amt.tiltak.tiltak.dto.*
@@ -11,17 +12,20 @@ import java.util.*
 
 @Service
 open class TiltakDeltakerPresentationService(
-	private val template: NamedParameterJdbcTemplate
+	private val template: NamedParameterJdbcTemplate,
+	private val skjermetPersonService: SkjermetPersonService
 ) {
 
 	open fun getDeltakerDetaljerById(deltakerId: UUID): TiltakDeltakerDetaljerDto {
 		val deltaker = GetDeltakerDetaljerQuery(template).query(deltakerId)
 			?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Deltaker med id $deltakerId finnes ikke")
 
-		return deltaker.toDto()
+		val erSkjermet = skjermetPersonService.erSkjermet(deltaker.fodselsnummer)
+
+		return deltaker.toDto(erSkjermet)
 	}
 
-	private fun DeltakerDetaljerDbo.toDto(): TiltakDeltakerDetaljerDto {
+	private fun DeltakerDetaljerDbo.toDto(erSkjermet: Boolean): TiltakDeltakerDetaljerDto {
 		val hasVeileder = veilederNavn != null
 
 		val veileder: NavVeilederDto? = if (hasVeileder) {
@@ -42,6 +46,7 @@ open class TiltakDeltakerPresentationService(
 			epost = epost,
 			navEnhet = navEnhetNavn?.let { NavEnhetDto(it) },
 			navVeileder = veileder,
+			erSkjermetPerson = erSkjermet,
 			startDato = startDato,
 			sluttDato = sluttDato,
 			registrertDato = registrertDato,

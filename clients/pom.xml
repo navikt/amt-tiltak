@@ -20,6 +20,7 @@
         <module>pdl</module>
         <module>veilarbarena</module>
         <module>veilarboppfolging</module>
+        <module>poao-tilgang</module>
     </modules>
 
 </project>
