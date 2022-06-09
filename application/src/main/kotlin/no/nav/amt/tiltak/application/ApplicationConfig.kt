@@ -1,5 +1,7 @@
 package no.nav.amt.tiltak.application
 
+import no.nav.common.audit_log.log.AuditLogger
+import no.nav.common.audit_log.log.AuditLoggerImpl
 import no.nav.common.log.LogFilter
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder
 import no.nav.common.token_client.client.MachineToMachineTokenClient
@@ -20,6 +22,11 @@ open class ApplicationConfig {
 		return AzureAdTokenClientBuilder.builder()
 			.withNaisDefaults()
 			.buildMachineToMachineTokenClient()
+	}
+
+	@Bean
+	open fun auditLogger(): AuditLogger {
+		return AuditLoggerImpl()
 	}
 
 	@Bean

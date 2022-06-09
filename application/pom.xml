@@ -82,6 +82,10 @@
 
         <dependency>
             <groupId>no.nav.common</groupId>
+            <artifactId>audit-log</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.common</groupId>
             <artifactId>token-client</artifactId>
         </dependency>
         <dependency>
@@ -168,6 +172,11 @@
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>database</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.mockk</groupId>
+            <artifactId>mockk</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

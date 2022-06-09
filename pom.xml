@@ -50,7 +50,7 @@
         <okhttp.version>4.9.3</okhttp.version>
         <token-support.version>2.0.21</token-support.version>
         <mock-oauth2-server.version>0.3.5</mock-oauth2-server.version>
-        <common.version>2.2022.04.25_07.40-4817e6acf914</common.version>
+        <common.version>2.2022.06.07_04.41-d48e48efb9b3</common.version>
         <logstash.version>7.1.1</logstash.version>
     </properties>
 
@@ -251,6 +251,11 @@
                 <version>${logstash.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>no.nav.common</groupId>
+                <artifactId>audit-log</artifactId>
+                <version>${common.version}</version>
+            </dependency>
             <dependency>
                 <groupId>no.nav.common</groupId>
                 <artifactId>kafka</artifactId>
