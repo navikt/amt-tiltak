@@ -22,7 +22,7 @@ open class InternalNavEnhetController(
 	@PostMapping("/publiser-alle-enheter")
 	fun publiserAlleEnheter(httpServletRequest: HttpServletRequest) {
 		if (!authService.isInternalRequest(httpServletRequest)) {
-			throw UnauthorizedException("Not an internal request")
+			throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not an internal request")
 		}
 
 		JobRunner.runAsync("publiser_alle_nav_enheter", publiserNavEnhetService::publiserAlleNavEnheter)

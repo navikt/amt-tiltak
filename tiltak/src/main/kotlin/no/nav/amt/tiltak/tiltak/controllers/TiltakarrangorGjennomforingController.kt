@@ -53,7 +53,7 @@ class TiltakarrangorGjennomforingController(
 			return gjennomforingService.getGjennomforing(gjennomforingId).toDto()
 		} catch (e: NoSuchElementException) {
 			log.error("Fant ikke gjennomforing", e)
-			throw NoSuchElementException("Fant ikke gjennomforingId")
+			throw NoSuchElementException("Fant ikke gjennomforing med id $gjennomforingId")
 		}
 	}
 

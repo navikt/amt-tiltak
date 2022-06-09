@@ -37,6 +37,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
+import kotlin.NoSuchElementException
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TiltakarrangorGjennomforingControllerIntegrationTest {
@@ -101,10 +102,10 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 	@Test
 	fun `hentGjennomforing - tiltaksgjennomføring finnes ikke - skal returnere NOT FOUND`() {
 		val id = UUID.randomUUID()
-		val exception = assertThrows(ResponseStatusException::class.java) {
+		val exception = assertThrows(NoSuchElementException::class.java) {
 			controller.hentGjennomforing(id)
 		}
-		assertEquals("404 NOT_FOUND", exception.status.toString())
+		assertEquals("Fant ikke gjennomforing med id $id", exception.message)
 	}
 
 	@Test
