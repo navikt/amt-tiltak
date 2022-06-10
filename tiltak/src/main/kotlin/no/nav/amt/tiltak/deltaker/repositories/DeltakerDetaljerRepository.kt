@@ -18,6 +18,7 @@ class GetDeltakerDetaljerQuery(
 	private val rowMapper = RowMapper { rs, _ ->
 		DeltakerDetaljerDbo(
 			deltakerId = rs.getUUID("deltaker_id"),
+			brukerId = rs.getUUID("bruker_id"),
 			fornavn = rs.getString("fornavn"),
 			mellomnavn = rs.getString("mellomnavn"),
 			etternavn = rs.getString("etternavn"),
@@ -30,9 +31,12 @@ class GetDeltakerDetaljerQuery(
 			startDato = rs.getNullableLocalDate("start_dato"),
 			sluttDato = rs.getNullableLocalDate("slutt_dato"),
 			registrertDato = rs.getLocalDateTime("registrert_dato"),
+			statusId = rs.getUUID("status_id"),
 			status = Deltaker.Status.valueOf(rs.getString("status")),
 			statusGyldigFra = rs.getLocalDateTime("status_gyldig_fra"),
 			statusOpprettet = rs.getLocalDateTime("status_opprettet"),
+			navEnhetId = rs.getUUID("nav_enhet_id"),
+			navEnhetEnhetId = rs.getString("nav_enhet_enhet_id"),
 			navEnhetNavn = rs.getString("nav_enhet_navn"),
 			gjennomforingId = rs.getUUID("gjennomforing_id"),
 			gjennomforingNavn = rs.getString("gjennomforing_navn"),
@@ -42,7 +46,9 @@ class GetDeltakerDetaljerQuery(
 			tiltakNavn = rs.getString("tiltak_navn"),
 			tiltakKode = rs.getString("tiltak_kode"),
 			virksomhetNavn = rs.getString("virksomhet_navn"),
-			organisasjonNavn = rs.getString("organisasjon_navn")
+			organisasjonNavn = rs.getString("organisasjon_navn"),
+			dagerPerUke = rs.getInt("dager_per_uke"),
+			prosentStilling = rs.getFloat("prosent_stilling"),
 		)
 	}
 
@@ -50,10 +56,14 @@ class GetDeltakerDetaljerQuery(
 		SELECT deltaker.id                  	AS deltaker_id,
 			   deltaker.start_dato          	AS start_dato,
 			   deltaker.slutt_dato          	AS slutt_dato,
+			   deltaker_status.id       		AS status_id,
 			   deltaker_status.status       	AS status,
 			   deltaker_status.gyldig_fra 		AS status_gyldig_fra,
 			   deltaker_status.created_at		AS status_opprettet,
+			   deltaker.dager_per_uke			AS dager_per_uke,
+			   deltaker.prosent_stilling		AS prosent_stilling,
 			   deltaker.registrert_dato     	AS registrert_dato,
+			   bruker.id						AS bruker_id,
 			   bruker.fornavn               	AS fornavn,
 			   bruker.mellomnavn            	AS mellomnavn,
 			   bruker.etternavn             	AS etternavn,
@@ -61,6 +71,7 @@ class GetDeltakerDetaljerQuery(
 			   bruker.telefonnummer         	AS telefonnummer,
 			   bruker.epost                 	AS epost,
 			   bruker.nav_enhet_id         		AS nav_enhet_id,
+			   nav_enhet.enhet_id				AS nav_enhet_enhet_id,
 			   nav_enhet.navn					AS nav_enhet_navn,
 			   nav_ansatt.navn           		AS veileder_navn,
 			   nav_ansatt.telefonnummer     	AS veileder_telefonnummer,

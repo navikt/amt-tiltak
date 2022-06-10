@@ -19,7 +19,8 @@ data class TiltakDeltakerDetaljerDto(
 	val sluttDato: LocalDate?,
 	val registrertDato: LocalDateTime,
 	val status: DeltakerStatusDto,
-	val gjennomforing: GjennomforingDto
+	val gjennomforing: GjennomforingDto,
+	val fjernesDato: LocalDateTime?,
 )
 
 data class NavEnhetDto(
