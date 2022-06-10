@@ -64,6 +64,7 @@ class TiltakarrangorGjennomforingController(
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
 
 		return deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
+			.filter { !it.erUtdatert}
 			.map { it.toDto() }
 	}
 

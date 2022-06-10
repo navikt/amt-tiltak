@@ -79,7 +79,8 @@ class TiltakarrangorDeltakerControllerTest {
 				virksomhetNavn = "",
 				organisasjonNavn = null
 			)
-		)
+		),
+		fjernesDato = null
 	)
 
 	@BeforeEach

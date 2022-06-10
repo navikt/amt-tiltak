@@ -1,7 +1,6 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatuser
+import no.nav.amt.tiltak.core.domain.tiltak.*
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.PersonService
@@ -9,12 +8,15 @@ import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.support.TransactionTemplate
+import java.util.*
 
 @Service
 class DeltakerProcessor(
 	private val gjennomforingService: GjennomforingService,
 	private val deltakerService: DeltakerService,
-	private val personService: PersonService
+	private val personService: PersonService,
+	private val transactionTemplate: TransactionTemplate
 ) : GenericProcessor<DeltakerPayload>() {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -46,26 +48,28 @@ class DeltakerProcessor(
 
 		val tiltaksgjennomforing = gjennomforingService.getGjennomforing(deltakerDto.gjennomforingId)
 
-		val deltaker = Deltaker(
+		val deltakerUpsert = DeltakerUpsert(
 			id = deltakerDto.id,
 			startDato = deltakerDto.startDato,
 			sluttDato = deltakerDto.sluttDato,
-			statuser = DeltakerStatuser.settAktivStatus(
-				tilDeltakerStatus(deltakerDto.status),
-				endretDato = deltakerDto.statusEndretDato
-			),
 			dagerPerUke = deltakerDto.dagerPerUke,
 			prosentStilling = deltakerDto.prosentDeltid,
 			registrertDato = deltakerDto.registrertDato,
 			gjennomforingId = tiltaksgjennomforing.id
 		)
-
-		deltakerService.upsertDeltaker(
-			fodselsnummer =  deltakerDto.personIdent,
-			deltaker = deltaker,
+		val status = DeltakerStatusInsert(
+			id = UUID.randomUUID(),
+			deltakerId = deltakerDto.id,
+			type = tilDeltakerStatus(deltakerDto.status),
+			gyldigFra = deltakerDto.statusEndretDato,
 		)
 
-		log.info("Fullført upsert av deltaker id=${deltaker.id} gjennomforingId=${tiltaksgjennomforing.id}")
+		transactionTemplate.executeWithoutResult {
+			deltakerService.upsertDeltaker(deltakerDto.personIdent, deltakerUpsert)
+			deltakerService.insertStatus(status)
+		}
+
+		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=${tiltaksgjennomforing.id}")
 	}
 
 	private fun tilDeltakerStatus(status: DeltakerPayload.Status): Deltaker.Status {

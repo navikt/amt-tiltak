@@ -5,5 +5,5 @@ import java.time.LocalDateTime
 
 data class DeltakerStatusDto(
 	val type: Deltaker.Status,
-	val endretDato: LocalDateTime
+	val endretDato: LocalDateTime //== createdAt
 )

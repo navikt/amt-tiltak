@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -17,15 +18,16 @@ open class TiltakDeltakerPresentationService(
 ) {
 
 	open fun getDeltakerDetaljerById(deltakerId: UUID): TiltakDeltakerDetaljerDto {
-		val deltaker = GetDeltakerDetaljerQuery(template).query(deltakerId)
+		val deltakerDbo = GetDeltakerDetaljerQuery(template).query(deltakerId)
 			?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Deltaker med id $deltakerId finnes ikke")
 
-		val erSkjermet = skjermetPersonService.erSkjermet(deltaker.fodselsnummer)
+		val fjernesDato = deltakerDbo.toDeltaker().skalFjernesDato
+		val erSkjermet = skjermetPersonService.erSkjermet(deltakerDbo.fodselsnummer)
 
-		return deltaker.toDto(erSkjermet)
+		return deltakerDbo.toDto(erSkjermet, fjernesDato)
 	}
 
-	private fun DeltakerDetaljerDbo.toDto(erSkjermet: Boolean): TiltakDeltakerDetaljerDto {
+	private fun DeltakerDetaljerDbo.toDto(erSkjermet: Boolean, fjernesDato: LocalDateTime?): TiltakDeltakerDetaljerDto {
 		val hasVeileder = veilederNavn != null
 
 		val veileder: NavVeilederDto? = if (hasVeileder) {
@@ -50,7 +52,8 @@ open class TiltakDeltakerPresentationService(
 			startDato = startDato,
 			sluttDato = sluttDato,
 			registrertDato = registrertDato,
-			status = DeltakerStatusDto(status, statusEndretDato),
+			status = DeltakerStatusDto(type = status, endretDato = statusOpprettet),
+			fjernesDato = fjernesDato,
 			gjennomforing = GjennomforingDto(
 				id = gjennomforingId,
 				navn = gjennomforingNavn,

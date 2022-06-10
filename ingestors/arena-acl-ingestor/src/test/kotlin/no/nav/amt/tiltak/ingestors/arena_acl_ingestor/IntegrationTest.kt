@@ -59,7 +59,7 @@ class IntegrationTest {
 	private lateinit var veilarbarenaClient: VeilarbarenaClient
 	private lateinit var navEnhetService: NavEnhetService
 
-	private lateinit var gjennomforingProcessor: GjennomforingProcessor;
+	private lateinit var gjennomforingProcessor: GjennomforingProcessor
 	private lateinit var deltakerProcessor: DeltakerProcessor
 
 	private lateinit var enhetsregisterClient: EnhetsregisterClient
@@ -99,7 +99,7 @@ class IntegrationTest {
 		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, transactionTemplate)
 		arrangorService = ArrangorServiceImpl(enhetsregisterClient, arrangorRepository)
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, arrangorService, transactionTemplate)
-		deltakerProcessor = DeltakerProcessor(gjennomforingService, deltakerService, personService)
+		deltakerProcessor = DeltakerProcessor(gjennomforingService, deltakerService, personService, transactionTemplate)
 
 		gjennomforingProcessor = GjennomforingProcessor(arrangorService, gjennomforingService, tiltakService, navEnhetService)
 		ingestor = ArenaAclIngestorImpl(deltakerProcessor, gjennomforingProcessor)
@@ -140,14 +140,14 @@ class IntegrationTest {
 		val inserted = deltakerService.hentDeltaker(deltakerToInsert.id)
 
 		inserted shouldNotBe null
-		inserted.bruker shouldNotBe null
+		inserted!!.bruker shouldNotBe null
 
 		val uuid = UUID.randomUUID()
 		val expected = deltakerToInsert.copy(
-			bruker = deltakerToInsert.bruker?.copy(id= inserted.bruker!!.id),
-			statuser = DeltakerStatuser(deltakerToInsert.statuser.statuser.map { it.copy(id = uuid) })
+			bruker = deltakerToInsert.bruker.copy(id= inserted.bruker.id),
+			status = deltakerToInsert.status.copy(id = uuid, opprettetDato = now)
 		)
-		val actual = inserted.copy(statuser = DeltakerStatuser(inserted.statuser.statuser.map { it.copy(id = uuid) }))
+		val actual = inserted.copy(status = inserted.status.copy(id = uuid, opprettetDato = now))
 		actual shouldBe expected
 
 	}
@@ -161,15 +161,15 @@ class IntegrationTest {
 		val inserted = deltakerService.hentDeltaker(deltakerOppdatert.id)
 
 		inserted shouldNotBe null
-		inserted.bruker shouldNotBe null
+		inserted!!.bruker shouldNotBe null
 
 		val uuid = UUID.randomUUID()
 		val expected = deltakerOppdatert.copy(
-			bruker = deltakerOppdatert.bruker?.copy(id= inserted.bruker!!.id),
-			statuser = DeltakerStatuser(deltakerOppdatert.statuser.statuser.map { it.copy(id = uuid) })
+			bruker = deltakerOppdatert.bruker.copy(id= inserted.bruker.id),
+			status = deltakerOppdatert.status.copy(id = uuid, opprettetDato = now)
 		)
-		val actual = inserted.copy(statuser = DeltakerStatuser(inserted.statuser.statuser.map { it.copy(id = uuid) }))
-		actual.statuser shouldBe expected.statuser
+		val actual = inserted.copy(status = inserted.status.copy(id = uuid, opprettetDato = now))
+		actual.status shouldBe expected.status
 		actual shouldBe expected
 
 	}
@@ -243,13 +243,13 @@ class IntegrationTest {
 		),
 		startDato = null,
 		sluttDato = null,
-		statuser = DeltakerStatuser(listOf(
-			DeltakerStatus(
+		status = DeltakerStatus(
 				id = UUID.randomUUID(),
-				status =  Deltaker.Status.VENTER_PA_OPPSTART,
-				endretDato =  now.minusHours(1),
+				type =  Deltaker.Status.VENTER_PA_OPPSTART,
+				gyldigFra =  now.minusHours(1),
+				opprettetDato = now,
 				aktiv = true
-			))),
+		),
 		registrertDato = now,
 		dagerPerUke = 5,
 		prosentStilling = 100F,
@@ -261,7 +261,7 @@ class IntegrationTest {
 		bruker = deltakerToInsert.bruker,
 		startDato = LocalDate.now().minusDays(1),
 		sluttDato = LocalDate.now().plusDays(1),
-		statuser = deltakerToInsert.statuser.medNy(Deltaker.Status.DELTAR, now),
+		status = DeltakerStatus(id= UUID.randomUUID(), Deltaker.Status.DELTAR, now, now, true),
 		registrertDato = now,
 		dagerPerUke = 3,
 		prosentStilling = 50F,
@@ -278,13 +278,13 @@ class IntegrationTest {
 			    "id": "${deltakerOppdatert.id}",
 			    "gjennomforingId": "${gjennomforingId}",
 			    "personIdent": "$personIdent",
-			    "status": "${deltakerOppdatert.status}",
+			    "status": "${deltakerOppdatert.status.type.name}",
 				"startDato": "${deltakerOppdatert.startDato}",
 				"sluttDato": "${deltakerOppdatert.sluttDato}",
 			    "dagerPerUke": "${deltakerOppdatert.dagerPerUke}",
 			    "prosentDeltid": ${deltakerOppdatert.prosentStilling},
 			    "registrertDato": "${deltakerOppdatert.registrertDato}",
-				"statusEndretDato": "${deltakerOppdatert.statuser.statuser.last().endretDato}"
+				"statusEndretDato": "${deltakerOppdatert.status.gyldigFra}"
 			  }
 			}
 		""".trimIndent()
@@ -299,11 +299,11 @@ class IntegrationTest {
 			    "id": "${deltakerToInsert.id}",
 			    "gjennomforingId": "${gjennomforingId}",
 			    "personIdent": "$personIdent",
-			    "status": "VENTER_PA_OPPSTART",
+			    "status": "${deltakerToInsert.status.type.name}",
 			    "dagerPerUke": ${deltakerToInsert.dagerPerUke},
 			    "prosentDeltid": ${deltakerToInsert.prosentStilling},
 			    "registrertDato": "${deltakerToInsert.registrertDato}",
-				"statusEndretDato": "${deltakerToInsert.statuser.statuser.last().endretDato}"
+				"statusEndretDato": "${deltakerToInsert.status.gyldigFra}"
 			  }
 			}
 		""".trimIndent()

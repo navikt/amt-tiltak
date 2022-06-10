@@ -61,6 +61,25 @@ object TestDataSeeder {
 		repository.insertBruker(BRUKER_3)
 	}
 
+	fun insertMinimum(repository: TestDataRepository){
+		repository.insertNavEnhet(NAV_ENHET_1)
+
+		repository.insertArrangor(ARRANGOR_1)
+
+		repository.insertArrangorAnsatt(ARRANGOR_ANSATT_1)
+		repository.insertArrangorAnsattRolle(ARRANGOR_ANSATT_1_ROLLE_1)
+
+		repository.insertTiltak(TILTAK_1)
+		repository.insertGjennomforing(GJENNOMFORING_1)
+
+		repository.insertArrangorAnsattGjennomforingTilgang(GJENNOMFORING_TILGANG_1)
+
+		repository.insertNavAnsatt(NAV_ANSATT_1)
+
+		repository.insertBruker(BRUKER_1)
+
+	}
+
 	fun seed(dataSource: DataSource, testDataInserter: (TestDataRepository) -> Unit = {}) =
 		testDataInserter(TestDataRepository(NamedParameterJdbcTemplate(dataSource)))
 

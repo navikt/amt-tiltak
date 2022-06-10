@@ -2,10 +2,57 @@ package no.nav.amt.tiltak.test.database.data
 
 import no.nav.amt.tiltak.test.database.data.commands.*
 import java.time.LocalDate
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 import java.util.*
 
 object TestData {
+
+	fun createGjennomforingCommand(tiltak: InsertTiltakCommand, arrangor: InsertArrangorCommand, enhet: InsertNavEnhetCommand) = InsertGjennomforingCommand(
+		id = UUID.randomUUID(),
+		tiltak_id = tiltak.id,
+		arrangor_id = arrangor.id,
+		navn = "Tiltaksgjennomforing1",
+		status = "GJENNOMFORES",
+		start_dato = LocalDate.now().minusWeeks(3),
+		slutt_dato = LocalDate.now().plusYears(3),
+		nav_enhet_id = enhet.id,
+		registrert_dato = LocalDate.now().minusWeeks(4),
+		fremmote_dato = LocalDate.of(2022, 2, 1),
+		opprettet_aar = 2020,
+		lopenr = 123
+	)
+
+	fun createDeltakerCommand(bruker: InsertBrukerCommand, gjennomforing: InsertGjennomforingCommand) =
+		InsertDeltakerCommand(
+			id = UUID.randomUUID(),
+			bruker_id = bruker.id,
+			gjennomforing_id = gjennomforing.id,
+			start_dato = LocalDate.now().plusDays(5),
+			slutt_dato = LocalDate.now().plusDays(30),
+			dager_per_uke = 5,
+			prosent_stilling = 100f,
+			registrert_dato = LocalDateTime.now()
+		)
+
+	fun createBrukerCommand(navEnhet: InsertNavEnhetCommand) =
+		InsertBrukerCommand(
+			id = UUID.randomUUID(),
+			fodselsnummer = (1000..9999).random().toString(),
+			fornavn = "Fornavn",
+			etternavn = "Etternavn",
+			telefonnummer = (1000..9999).random().toString(),
+			epost = "bruker@example.com",
+			ansvarlig_veileder_id = null,
+			nav_enhet_id = navEnhet.id
+		)
+
+	fun createStatusCommand(deltaker: InsertDeltakerCommand) = InsertDeltakerStatusCommand(
+		id = UUID.randomUUID(),
+		deltaker_id = deltaker.id,
+		gyldigFra = LocalDateTime.now(),
+		status = "DELTAR",
+		aktiv = true
+	)
 
 	val NAV_ENHET_1 = InsertNavEnhetCommand(
 		id = UUID.fromString("09405517-99c0-49e5-9eb3-31c61b9579cf"),
@@ -161,14 +208,15 @@ object TestData {
 		start_dato = LocalDate.of(2022, 2, 13),
 		slutt_dato = LocalDate.of(2030, 2, 14),
 		dager_per_uke = 5,
-		prosent_stilling = 100,
-		registrert_dato = LocalDate.of(2022, 2, 13)
+		prosent_stilling = 100f,
+		registrert_dato = LocalDateTime.of(2022, 2, 13, 12, 12)
 	)
+
 
 	val DELTAKER_1_STATUS_1 = InsertDeltakerStatusCommand(
 		id = UUID.fromString("d6770809-29e3-47e0-8cc2-4fa667d1a756"),
 		deltaker_id = DELTAKER_1.id,
-		endret_dato = ZonedDateTime.now(),
+		gyldigFra = LocalDateTime.now(),
 		status = "DELTAR",
 		aktiv = true
 	)
@@ -194,14 +242,14 @@ object TestData {
 		start_dato = LocalDate.of(2022, 2, 10),
 		slutt_dato = LocalDate.of(2022, 2, 12),
 		dager_per_uke = 5,
-		prosent_stilling = 100,
-		registrert_dato = LocalDate.of(2022, 2, 10)
+		prosent_stilling = 100f,
+		registrert_dato = LocalDateTime.of(2022, 2, 10, 12, 12)
 	)
 
 	val DELTAKER_2_STATUS_1 = InsertDeltakerStatusCommand(
 		id = UUID.fromString("227b67ea-92ca-4b94-9588-89209b01c0e5"),
 		deltaker_id = DELTAKER_2.id,
-		endret_dato = ZonedDateTime.now(),
+		gyldigFra = LocalDateTime.now(),
 		status = "DELTAR",
 		aktiv = true
 	)
@@ -240,14 +288,14 @@ object TestData {
 		start_dato = LocalDate.of(2022, 2, 10),
 		slutt_dato = LocalDate.of(2022, 2, 12),
 		dager_per_uke = 5,
-		prosent_stilling = 100,
-		registrert_dato = LocalDate.of(2022, 2, 10)
+		prosent_stilling = 100f,
+		registrert_dato = LocalDateTime.of(2022, 2, 10, 12, 12)
 	)
 
 	val DELTAKER_4_STATUS_1 = InsertDeltakerStatusCommand(
 		id = UUID.fromString("b9cb7403-fda6-42d9-a011-8712f4a37801"),
 		deltaker_id = DELTAKER_4.id,
-		endret_dato = ZonedDateTime.now(),
+		gyldigFra = LocalDateTime.now(),
 		status = "VENTER_PA_OPPSTART",
 		aktiv = true
 	)

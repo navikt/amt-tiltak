@@ -19,12 +19,12 @@ data class TiltakDeltakerDto(
 
 fun Deltaker.toDto() = TiltakDeltakerDto(
 	id = id,
-	fornavn = requireNotNull(bruker).fornavn,
-	mellomnavn = requireNotNull(bruker).mellomnavn,
-	etternavn = requireNotNull(bruker).etternavn,
-	fodselsnummer = requireNotNull(bruker).fodselsnummer,
+	fornavn = bruker.fornavn,
+	mellomnavn = bruker.mellomnavn,
+	etternavn = bruker.etternavn,
+	fodselsnummer = bruker.fodselsnummer,
 	startDato = startDato,
 	sluttDato = sluttDato,
-	status = DeltakerStatusDto(statuser.current.status, statuser.current.endretDato),
+	status = DeltakerStatusDto(type=status.type, endretDato = status.opprettetDato),
 	registrertDato = registrertDato
 )

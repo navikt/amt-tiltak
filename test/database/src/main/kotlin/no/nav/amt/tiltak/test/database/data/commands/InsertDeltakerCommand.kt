@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.test.database.data.commands
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 data class InsertDeltakerCommand(
@@ -10,6 +11,6 @@ data class InsertDeltakerCommand(
 	val start_dato: LocalDate,
 	val slutt_dato: LocalDate,
 	val dager_per_uke: Int,
-	val prosent_stilling: Int,
-	val registrert_dato: LocalDate
+	val prosent_stilling: Float,
+	val registrert_dato: LocalDateTime
 )

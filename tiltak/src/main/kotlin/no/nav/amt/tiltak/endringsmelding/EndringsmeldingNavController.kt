@@ -36,7 +36,7 @@ class EndringsmeldingNavController(
 	fun markerFerdig(@PathVariable("endringsmeldingId") endringsmeldingId: UUID) {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
 		val endringsmelding = endringsmeldingService.hentEndringsmelding(endringsmeldingId)
-		val deltaker = deltakerService.hentDeltaker(endringsmelding.deltakerId)
+		val deltaker = deltakerService.hentDeltaker(endringsmelding.deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id ${endringsmelding.deltakerId}")
 
 		tiltaksansvarligAutoriseringService.verifiserTilgangTilEndringsmelding(navIdent)
 		tiltaksansvarligAutoriseringService.verifiserTilgangTilGjennomforing(navIdent, deltaker.gjennomforingId)

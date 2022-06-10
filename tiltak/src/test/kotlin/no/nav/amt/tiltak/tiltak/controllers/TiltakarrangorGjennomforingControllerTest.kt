@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.tiltak.controllers
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
@@ -51,14 +52,13 @@ class TiltakarrangorGjennomforingControllerTest {
 	@Autowired
 	private lateinit var mockMvc: MockMvc
 
-	val statusConverterMock = fun (id: UUID) =
-		listOf(
-			DeltakerStatusDbo(
-				deltakerId = id,
-				status = Deltaker.Status.DELTAR,
-				endretDato = LocalDateTime.now(),
-				aktiv = true)
-		)
+	val status = DeltakerStatus(
+				id = UUID.randomUUID(),
+				type = Deltaker.Status.DELTAR,
+				gyldigFra = LocalDateTime.now(),
+				aktiv = true,
+				opprettetDato = LocalDateTime.now()
+			)
 
 	val deltakerDbo = DeltakerDbo(
 		id = UUID.randomUUID(),
@@ -185,7 +185,7 @@ class TiltakarrangorGjennomforingControllerTest {
 
 	@Test
 	fun `hentDeltakere() should return 200 when authenticated`() {
-		val deltaker = deltakerDbo.toDeltaker(statusConverterMock)
+		val deltaker = deltakerDbo.toDeltaker(status)
 
 		val token = tokenXToken("test", "test")
 
@@ -201,7 +201,7 @@ class TiltakarrangorGjennomforingControllerTest {
 
 	@Test
 	fun `hentDeltakere() should perform authorization check`() {
-		val deltaker = deltakerDbo.toDeltaker(statusConverterMock)
+		val deltaker = deltakerDbo.toDeltaker(status)
 
 		val token = tokenXToken("test", "test")
 
