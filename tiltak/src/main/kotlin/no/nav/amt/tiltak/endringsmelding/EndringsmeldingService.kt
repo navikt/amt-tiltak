@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.endringsmelding
 
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.core.exceptions.EndringsmeldingIkkeAktivException
 import no.nav.amt.tiltak.core.port.AuditEventSeverity
 import no.nav.amt.tiltak.core.port.AuditEventType
 import no.nav.amt.tiltak.core.port.AuditLoggerService
