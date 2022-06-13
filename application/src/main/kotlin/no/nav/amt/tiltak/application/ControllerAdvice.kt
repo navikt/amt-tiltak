@@ -43,13 +43,13 @@ open class ControllerAdvice(
 		)
 	}
 
-	@ResponseStatus(HttpStatus.FORBIDDEN)
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	@ExceptionHandler(NotAuthenticatedException::class)
 	fun handleNotAuthenticatedException(e: NotAuthenticatedException): ResponseEntity<Response> {
 		logger.info(e.message, e)
 
 		return buildResponse(
-			status = HttpStatus.FORBIDDEN,
+			status = HttpStatus.UNAUTHORIZED,
 			exception = e
 		)
 	}
