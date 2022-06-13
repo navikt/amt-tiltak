@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.common.auth
 
+import no.nav.amt.tiltak.core.exceptions.NotAuthenticatedException
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import org.springframework.http.HttpStatus
@@ -34,6 +35,6 @@ open class AuthService(
 		.getClaims(Issuer.AZURE_AD)
 		.get("NAVident")
 		?.toString()
-		?: throw UnauthorizedException("NAV ident is missing")
+		?: throw NotAuthenticatedException("NAV ident is missing")
 
 }

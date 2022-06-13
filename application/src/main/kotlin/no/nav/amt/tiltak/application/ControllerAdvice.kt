@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.application
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.amt.tiltak.core.exceptions.EndringsmeldingIkkeAktivException
+import no.nav.amt.tiltak.core.exceptions.NotAuthenticatedException
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.exceptions.ValidationException
 import org.apache.commons.lang3.exception.ExceptionUtils
@@ -42,13 +43,24 @@ open class ControllerAdvice(
 		)
 	}
 
-	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	@ResponseStatus(HttpStatus.FORBIDDEN)
+	@ExceptionHandler(NotAuthenticatedException::class)
+	fun handleNotAuthenticatedException(e: NotAuthenticatedException): ResponseEntity<Response> {
+		logger.info(e.message, e)
+
+		return buildResponse(
+			status = HttpStatus.FORBIDDEN,
+			exception = e
+		)
+	}
+
+	@ResponseStatus(HttpStatus.FORBIDDEN)
 	@ExceptionHandler(UnauthorizedException::class)
 	fun handleUnauthorizedException(e: UnauthorizedException): ResponseEntity<Response> {
 		logger.info(e.message, e)
 
 		return buildResponse(
-			status = HttpStatus.UNAUTHORIZED,
+			status = HttpStatus.FORBIDDEN,
 			exception = e
 		)
 	}
