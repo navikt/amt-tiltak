@@ -18,7 +18,7 @@ class ArrangorAnsattTilgangServiceImpl(
 	private val arrangorAnsattService: ArrangorAnsattService,
 	private val ansattRolleRepository: AnsattRolleRepository,
 	private val deltakerService: DeltakerService,
-	private val gjennomforingTilgangRepository: GjennomforingTilgangRepository,
+	private val arrangorAnsattGjennomforingTilgangRepository: ArrangorAnsattGjennomforingTilgangRepository,
 ) : ArrangorAnsattTilgangService {
 
 	private val personligIdentToAnsattIdCache = Caffeine.newBuilder()
@@ -61,7 +61,7 @@ class ArrangorAnsattTilgangServiceImpl(
 	}
 
 	override fun verifiserTilgangTilDeltaker(ansattPersonligIdent: String, deltakerId: UUID) {
-		val deltaker = deltakerService.hentDeltaker(deltakerId)
+		val deltaker = deltakerService.hentDeltaker(deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 
 		verifiserTilgangTilGjennomforing(ansattPersonligIdent, deltaker.gjennomforingId)
 	}
@@ -93,7 +93,7 @@ class ArrangorAnsattTilgangServiceImpl(
 
 	private fun hentGjennomforingerForAnsatt(ansattId: UUID): List<UUID> {
 		return tryCacheFirstNotNull(ansattIdToGjennomforingIdListCache, ansattId) {
-			gjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
+			arrangorAnsattGjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
 				.map { it.gjennomforingId }
 		}
 	}

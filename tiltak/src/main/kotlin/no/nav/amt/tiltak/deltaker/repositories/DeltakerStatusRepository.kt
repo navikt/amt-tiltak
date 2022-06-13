@@ -1,7 +1,10 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
+import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
+import no.nav.amt.tiltak.utils.getLocalDateTime
 import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -19,44 +22,42 @@ open class DeltakerStatusRepository(
 		DeltakerStatusDbo(
 			id = rs.getUUID("id"),
 			deltakerId = rs.getUUID("deltaker_id"),
-			endretDato = rs.getTimestamp("endret_dato").toLocalDateTime(),
 			status = Deltaker.Status.valueOf(rs.getString("status")),
 			aktiv = rs.getBoolean("aktiv"),
+			gyldigFra = rs.getLocalDateTime("gyldig_fra"),
+			opprettetDato = rs.getTimestamp("created_at").toLocalDateTime(),
 		)
 
 	}
 
-	open fun upsert(deltakerStatuser: List<DeltakerStatusDbo>) = deltakerStatuser.forEach { upsert(it) }
-
-	private fun upsert(dbo: DeltakerStatusDbo) {
+	fun deaktiver(id: UUID) {
 		val sql = """
-			INSERT INTO deltaker_status(id, deltaker_id, endret_dato, status, aktiv)
-			VALUES (:id,
-					:deltakerId,
-					:endretDato,
-					:status,
-					:aktiv)
-			ON CONFLICT (id) DO UPDATE SET endret_dato  = :endretDato,
-										   status = :status,
-										   aktiv  = :aktiv
+			UPDATE deltaker_status SET aktiv = false WHERE id = :id
 		""".trimIndent()
+		val params = sqlParameters("id" to id)
+		template.update(sql, params)
+	}
 
-		val parameters = MapSqlParameterSource().addValues(
-			mapOf(
-				"id" to dbo.id,
-				"deltakerId" to dbo.deltakerId,
-				"endretDato" to dbo.endretDato,
-				"status" to dbo.status.name,
-				"aktiv" to dbo.aktiv,
+	fun insert(status: DeltakerStatusInsertDbo) {
+		val sql = """
+			INSERT INTO deltaker_status (id, deltaker_id, gyldig_fra, status, aktiv)
+			VALUES (
+				:id, :deltaker_id, :gyldig_fra, :status, true
 			)
+		""".trimIndent()
+		val params = sqlParameters(
+			"id" to status.id,
+			"deltaker_id" to status.deltakerId,
+			"gyldig_fra" to status.gyldigFra,
+			"status" to status.type.name
 		)
 
-		template.update(sql, parameters)
+		template.update(sql, params)
 	}
 
 	fun getStatuserForDeltaker(deltakerId: UUID): List<DeltakerStatusDbo> {
 		val sql = """
-			SELECT id, deltaker_id, endret_dato, status, aktiv
+			SELECT id, deltaker_id, gyldig_fra, status, aktiv, created_at
 			FROM deltaker_status
 			WHERE deltaker_id = :deltakerId;
 		""".trimIndent()
@@ -66,6 +67,21 @@ open class DeltakerStatusRepository(
 		)
 
 		return template.query(sql, parameters, rowMapper)
+	}
+
+	fun getStatusForDeltaker(deltakerId: UUID): DeltakerStatusDbo? {
+		val sql = """
+			SELECT id, deltaker_id, gyldig_fra, status, aktiv, created_at
+			FROM deltaker_status
+			WHERE deltaker_id = :deltakerId
+			AND aktiv = true
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf("deltakerId" to deltakerId)
+		)
+
+		return template.query(sql, parameters, rowMapper).firstOrNull()
 	}
 
 	fun slettDeltakerStatus(deltakerId: UUID) {

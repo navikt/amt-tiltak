@@ -24,10 +24,10 @@ class EndringsmeldingForGjennomforingQuery(
 
 			brukerFnr = rs.getString("fodselsnummer"),
 			startDato = rs.getDate("start_dato")?.toLocalDate(),
-			godkjentAvNavAnsatt = rs.getNullableUUID("godkjent_av_nav_ansatt"),
+			ferdiggjortAvNavAnsattId = rs.getNullableUUID("ferdiggjort_av_nav_ansatt_id"),
 			aktiv = rs.getBoolean("aktiv"),
 
-			opprettetAvId = rs.getUUID("opprettet_av_id"),
+			opprettetAvArrangorAnsattId = rs.getUUID("opprettet_av_id"),
 			opprettetAvFornavn = rs.getString("opprettet_av_fornavn"),
 			opprettetAvEtternavn = rs.getString("opprettet_av_etternavn"),
 			opprettetAvMellomnavn = rs.getString("opprettet_av_mellomnavn"),
@@ -61,7 +61,7 @@ class EndringsmeldingForGjennomforingQuery(
 			deltaker.id as deltaker_id
 			FROM endringsmelding
 			JOIN deltaker on endringsmelding.deltaker_id = deltaker.id
-			JOIN arrangor_ansatt on endringsmelding.opprettet_av = arrangor_ansatt.id
+			JOIN arrangor_ansatt on endringsmelding.opprettet_av_arrangor_ansatt_id = arrangor_ansatt.id
 			JOIN bruker on deltaker.bruker_id = bruker.id
 			LEFT JOIN nav_enhet on bruker.nav_enhet_id = nav_enhet.id
 			WHERE deltaker.gjennomforing_id = :gjennomforing_id

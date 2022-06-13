@@ -2,4 +2,5 @@
 <configuration>
     <include resource="no/nav/common/log/logback-stdout-json.xml"/>
     <include resource="no/nav/common/log/logback-securelogs.xml"/>
+    <include resource="no/nav/common/audit_log/logback-naudit.xml"/>
 </configuration>

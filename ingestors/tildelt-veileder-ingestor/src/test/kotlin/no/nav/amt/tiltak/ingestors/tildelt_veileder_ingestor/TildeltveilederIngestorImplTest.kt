@@ -78,7 +78,7 @@ class TildeltveilederIngestorImplTest : StringSpec({
 		""".trimIndent())
 
 		verify(exactly = 0) {
-			navAnsattService.getNavAnsatt(any())
+			navAnsattService.getNavAnsatt(any<String>())
 		}
 
 		verify(exactly = 0) {

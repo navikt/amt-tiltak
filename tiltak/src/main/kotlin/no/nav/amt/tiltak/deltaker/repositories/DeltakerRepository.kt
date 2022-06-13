@@ -1,12 +1,12 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpdateDbo
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.*
 
 @Component
@@ -33,16 +33,7 @@ open class DeltakerRepository(
 		)
 	}
 
-	fun insert(
-		id: UUID,
-		brukerId: UUID,
-		gjennomforingId: UUID,
-		startDato: LocalDate?,
-		sluttDato: LocalDate?,
-		dagerPerUke: Int?,
-		prosentStilling: Float?,
-		registrertDato: LocalDateTime
-	): DeltakerDbo {
+	fun insert(deltaker: DeltakerInsertDbo) {
 		val sql = """
 			INSERT INTO deltaker(id, bruker_id, gjennomforing_id, start_dato, slutt_dato,
 								 dager_per_uke, prosent_stilling, registrert_dato)
@@ -58,22 +49,18 @@ open class DeltakerRepository(
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"id" to id,
-				"brukerId" to brukerId,
-				"gjennomforingId" to gjennomforingId,
-				"startdato" to startDato,
-				"sluttdato" to sluttDato,
-				"dagerPerUke" to dagerPerUke,
-				"prosentStilling" to prosentStilling,
-				"registrertDato" to registrertDato
+				"id" to deltaker.id,
+				"brukerId" to deltaker.brukerId,
+				"gjennomforingId" to deltaker.gjennomforingId,
+				"startdato" to deltaker.startDato,
+				"sluttdato" to deltaker.sluttDato,
+				"dagerPerUke" to deltaker.dagerPerUke,
+				"prosentStilling" to deltaker.prosentStilling,
+				"registrertDato" to deltaker.registrertDato
 			)
 		)
 
 		template.update(sql, parameters)
-
-		return get(id)
-			?: throw NoSuchElementException("Deltaker $brukerId finnes ikke på tiltaksgjennomføring $gjennomforingId")
-
 	}
 
 	fun getDeltakerePaaTiltak(id: UUID): List<DeltakerDbo> {
@@ -95,15 +82,15 @@ open class DeltakerRepository(
 		return template.query(sql, parameters, rowMapper)
 	}
 
-	fun update(deltaker: DeltakerDbo): DeltakerDbo {
+	fun update(deltaker: DeltakerUpdateDbo): DeltakerDbo {
 		val sql = """
 			UPDATE deltaker
 			SET start_dato = :startDato,
 				slutt_dato    = :sluttDato,
 				dager_per_uke = :dagerPerUke,
 				prosent_stilling = :prosentStilling,
-				modified_at   = :modifiedAt
-			WHERE id = :deltakerInternalId
+				modified_at = CURRENT_TIMESTAMP
+			WHERE id = :deltakerId
 	""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
@@ -112,15 +99,14 @@ open class DeltakerRepository(
 				"sluttDato" to deltaker.sluttDato,
 				"dagerPerUke" to deltaker.dagerPerUke,
 				"prosentStilling" to deltaker.prosentStilling,
-				"modifiedAt" to deltaker.modifiedAt,
-				"deltakerInternalId" to deltaker.id
+				"deltakerId" to deltaker.id
 			)
 		)
 
 		template.update(sql, parameters)
 
 		return get(deltaker.id)
-			?: throw NoSuchElementException("Deltaker ${deltaker.id} finnes ikke på tiltaksgjennomføring ${deltaker.gjennomforingId}")
+			?: throw NoSuchElementException("Kan ikke oppdatere deltaker:${deltaker.id} fordi den finnes ikke")
 	}
 
 	fun get(id: UUID): DeltakerDbo? {

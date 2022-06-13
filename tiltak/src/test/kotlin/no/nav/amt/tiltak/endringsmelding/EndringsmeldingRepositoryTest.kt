@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.DbUtils.shouldBeCloseTo
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
@@ -18,6 +19,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
+import java.time.ZonedDateTime
 
 class EndringsmeldingRepositoryTest : FunSpec({
 
@@ -44,7 +46,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		melding shouldNotBe null
 		melding.deltakerId shouldBe DELTAKER_1.id
 		melding.aktiv shouldBe true
-		melding.opprettetAvId shouldBe ARRANGOR_ANSATT_1.id
+		melding.opprettetAvArrangorAnsattId shouldBe ARRANGOR_ANSATT_1.id
 		melding.startDato shouldBe now
 	}
 
@@ -62,7 +64,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		melding2 shouldNotBe null
 		melding2.startDato shouldBe nyDato
 		melding2.aktiv shouldBe true
-		melding2.opprettetAvId shouldBe TestData.ARRANGOR_ANSATT_2.id
+		melding2.opprettetAvArrangorAnsattId shouldBe TestData.ARRANGOR_ANSATT_2.id
 
 		val forrigeMelding = repository.get(melding1.id)
 
@@ -97,7 +99,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		val meldinger = repository.getByDeltaker(DELTAKER_1.id)
 
 		meldinger.size shouldBe 1
-		meldinger[0].opprettetAvId shouldBe ARRANGOR_ANSATT_1.id
+		meldinger[0].opprettetAvArrangorAnsattId shouldBe ARRANGOR_ANSATT_1.id
 	}
 
 	test("markerSomFerdig - skal sette aktiv=false og nav ansatt") {
@@ -109,7 +111,8 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		val oppdatertMelding = repository.get(melding.id)
 
 		oppdatertMelding.aktiv shouldBe false
-		oppdatertMelding.godkjentAvNavAnsatt shouldBe NAV_ANSATT_1.id
+		oppdatertMelding.ferdiggjortAvNavAnsattId shouldBe NAV_ANSATT_1.id
+		oppdatertMelding.ferdiggjortTidspunkt!! shouldBeCloseTo ZonedDateTime.now()
 	}
 
 })

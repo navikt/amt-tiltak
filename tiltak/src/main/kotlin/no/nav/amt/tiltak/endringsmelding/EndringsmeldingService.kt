@@ -1,7 +1,9 @@
 package no.nav.amt.tiltak.endringsmelding
 
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
-import no.nav.amt.tiltak.core.exceptions.EndringsmeldingIkkeAktivException
+import no.nav.amt.tiltak.core.port.AuditEventSeverity
+import no.nav.amt.tiltak.core.port.AuditEventType
+import no.nav.amt.tiltak.core.port.AuditLoggerService
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
@@ -12,7 +14,12 @@ import java.util.*
 open class EndringsmeldingService(
 	private val endringsmeldingRepository: EndringsmeldingRepository,
 	private val endringsmeldingQuery: EndringsmeldingForGjennomforingQuery,
+	private val auditLoggerService: AuditLoggerService
 ) {
+
+	companion object {
+		const val AUDIT_LOG_REASON = "NAV-ansatt har lest melding fra tiltaksarrangør om oppstartsdato på tiltak for å registrere dette."
+	}
 
 	open fun hentEndringsmelding(id: UUID): EndringsmeldingDbo {
 		return endringsmeldingRepository.get(id)
@@ -30,6 +37,14 @@ open class EndringsmeldingService(
 		}
 
 		endringsmeldingRepository.markerSomFerdig(endringsmeldingId, navAnsattId)
+
+		auditLoggerService.navAnsattAuditLog(
+			navAnsattId,
+			endringsmelding.deltakerId,
+			AuditEventType.ACCESS,
+			AuditEventSeverity.INFO,
+			AUDIT_LOG_REASON
+		)
 	}
 
 	open fun hentEndringsmeldingerForGjennomforing(gjennomforingId: UUID) : List<Endringsmelding> {

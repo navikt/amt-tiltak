@@ -47,12 +47,12 @@ class EndringsmeldingArrangorController(
 		@RequestParam("startDato") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startDato: LocalDate
 	) {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-		val deltaker = deltakerService.hentDeltaker(deltakerId)
+		val deltaker = deltakerService.hentDeltaker(deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 		val ansattId = arrangorTilgangService.hentAnsattId(ansattPersonligIdent)
 
 		arrangorTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, deltaker.gjennomforingId)
 
-		val erSkjermet = skjermetPersonService.erSkjermet(deltaker.bruker!!.fodselsnummer)
+		val erSkjermet = skjermetPersonService.erSkjermet(deltaker.bruker.fodselsnummer)
 
 		if (erSkjermet) {
 			throw NotImplementedError("Støtte for denne personen er ikke implementert")
