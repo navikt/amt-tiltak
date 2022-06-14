@@ -26,9 +26,9 @@ class NavAnsattGjennomforingController(
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@GetMapping
 	fun hentGjennomforinger(): List<HentGjennomforingerDto> {
-		val navIdent = authService.hentAzureIdTilInnloggetBruker()
-
-		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navIdent)
+		val navIdent = authService.hentNavIdentTilInnloggetBruker()
+		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()
+		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navAnsattAzureId)
 
 		val tilganger = tiltaksansvarligTilgangService.hentAktiveTilganger(navIdent)
 			.map { it.gjennomforingId }
