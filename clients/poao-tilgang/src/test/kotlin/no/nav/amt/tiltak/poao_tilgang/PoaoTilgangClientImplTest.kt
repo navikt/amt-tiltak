@@ -24,7 +24,7 @@ class PoaoTilgangClientImplTest : FunSpec({
 			tokenProvider = { "TOKEN" },
 		)
 
-		val navIdent = "Z12312"
+		val azureId = UUID.randomUUID()
 
 		val gruppe1Id = UUID.randomUUID()
 		val gruppe2Id = UUID.randomUUID()
@@ -40,7 +40,7 @@ class PoaoTilgangClientImplTest : FunSpec({
 			)
 		)
 
-		val adGrupper = client.hentAdGrupper(navIdent)
+		val adGrupper = client.hentAdGrupper(azureId)
 
 		adGrupper shouldHaveSize 2
 		adGrupper.any { it.id == gruppe1Id && it.name == "Gruppe1" }
@@ -49,7 +49,7 @@ class PoaoTilgangClientImplTest : FunSpec({
 		val request = server.takeRequest()
 
 		val expectedJson = """
-			{"navIdent":"Z12312"}
+			{"navAnsattAzureId":"$azureId"}
 		""".trimIndent()
 
 		request.path shouldBe "/api/v1/ad-gruppe"

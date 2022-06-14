@@ -15,7 +15,7 @@ class AdGruppeServiceTest : FunSpec({
 		val client = mockk<PoaoTilgangClient>()
 		val service = AdGruppeService(client)
 
-		val norskIdent = "21354354"
+		val norskIdent = UUID.randomUUID()
 
 		val adGruppeId = UUID.randomUUID()
 		val adGrupper = listOf(AdGruppe(adGruppeId, "Gruppe1"))
@@ -36,18 +36,18 @@ class AdGruppeServiceTest : FunSpec({
 		val client = mockk<PoaoTilgangClient>()
 		val service = AdGruppeService(client)
 
-		val norskIdent = "21354354"
+		val azureId = UUID.randomUUID()
 
 		val adGruppeId = UUID.randomUUID()
 		val adGruppeNavn = "Gruppe1"
 		val adGrupper = listOf(AdGruppe(adGruppeId, adGruppeNavn))
 
 		every {
-			client.hentAdGrupper(norskIdent)
+			client.hentAdGrupper(azureId)
 		} returns adGrupper
 
-		service.erMedlemAvGruppe(norskIdent, adGruppeNavn) shouldBe true
-		service.erMedlemAvGruppe(norskIdent, "Gruppe2") shouldBe false
+		service.erMedlemAvGruppe(azureId, adGruppeNavn) shouldBe true
+		service.erMedlemAvGruppe(azureId, "Gruppe2") shouldBe false
 	}
 
 })

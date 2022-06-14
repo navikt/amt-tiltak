@@ -23,9 +23,10 @@ class EndringsmeldingNavController(
 	@GetMapping
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	fun hentEndringsmeldinger(@RequestParam("gjennomforingId") gjennomforingId: UUID) : List<EndringsmeldingDto> {
+		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
 
-		tiltaksansvarligAutoriseringService.verifiserTilgangTilEndringsmelding(navIdent)
+		tiltaksansvarligAutoriseringService.verifiserTilgangTilEndringsmelding(navAnsattAzureId)
 		tiltaksansvarligAutoriseringService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId)
 
 		return endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId).map { it.toDto() }
@@ -34,11 +35,12 @@ class EndringsmeldingNavController(
 	@PatchMapping("/{endringsmeldingId}/ferdig")
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	fun markerFerdig(@PathVariable("endringsmeldingId") endringsmeldingId: UUID) {
+		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
 		val endringsmelding = endringsmeldingService.hentEndringsmelding(endringsmeldingId)
 		val deltaker = deltakerService.hentDeltaker(endringsmelding.deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id ${endringsmelding.deltakerId}")
 
-		tiltaksansvarligAutoriseringService.verifiserTilgangTilEndringsmelding(navIdent)
+		tiltaksansvarligAutoriseringService.verifiserTilgangTilEndringsmelding(navAnsattAzureId)
 		tiltaksansvarligAutoriseringService.verifiserTilgangTilGjennomforing(navIdent, deltaker.gjennomforingId)
 
 		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)

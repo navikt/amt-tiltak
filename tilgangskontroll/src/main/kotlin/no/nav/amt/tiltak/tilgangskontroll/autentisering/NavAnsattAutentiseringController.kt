@@ -23,9 +23,10 @@ open class NavAnsattAutentiseringController(
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@GetMapping("/meg")
 	fun me(): MegDto {
+		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()
+		val adGrupper = adGruppeService.hentAdGrupper(navAnsattAzureId)
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
 		val veileder = navAnsattService.getNavAnsatt(navIdent)
-		val adGrupper = adGruppeService.hentAdGrupper(navIdent)
 
 		return MegDto(
 			navIdent = veileder.navIdent,

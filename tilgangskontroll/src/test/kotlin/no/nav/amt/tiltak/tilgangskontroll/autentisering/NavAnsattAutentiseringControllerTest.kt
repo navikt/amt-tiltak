@@ -53,8 +53,12 @@ class NavAnsattAutentiseringControllerTest {
 
 	@Test
 	fun `meg() - skal returnere 200 med korrekt response`() {
+		val azureId = UUID.randomUUID()
 		val navIdent = "Z1234"
 		val navn = "Veileder Veiledersen"
+
+		`when`(authService.hentAzureIdTilInnloggetBruker())
+			.thenReturn(azureId)
 
 		`when`(authService.hentNavIdentTilInnloggetBruker())
 			.thenReturn(navIdent)
@@ -68,7 +72,7 @@ class NavAnsattAutentiseringControllerTest {
 				""
 			))
 
-		`when`(adGruppeService.hentAdGrupper(navIdent))
+		`when`(adGruppeService.hentAdGrupper(azureId))
 			.thenReturn(listOf(
 				AdGruppe(UUID.randomUUID(), "0000-GA-TILTAK-ANSVARLIG"),
 				AdGruppe(UUID.randomUUID(), "0000-GA-TILTAK-ENDRINGSMELDING"),

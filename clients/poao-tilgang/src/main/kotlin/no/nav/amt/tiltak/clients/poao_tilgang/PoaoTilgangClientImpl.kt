@@ -18,11 +18,11 @@ class PoaoTilgangClientImpl(
 
 	private val mediaTypeJson = "application/json".toMediaType()
 
-	override fun hentAdGrupper(navIdent: String): List<AdGruppe> {
+	override fun hentAdGrupper(navAnsattAzureId: UUID): List<AdGruppe> {
 		val request = Request.Builder()
 			.url("$baseUrl/api/v1/ad-gruppe")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
-			.post(toJsonString(HentAdGrupper.Request(navIdent)).toRequestBody(mediaTypeJson))
+			.post(toJsonString(HentAdGrupper.Request(navAnsattAzureId)).toRequestBody(mediaTypeJson))
 			.build()
 
 		httpClient.newCall(request).execute().use { response ->
@@ -57,7 +57,7 @@ class PoaoTilgangClientImpl(
 
 	object HentAdGrupper {
 		data class Request(
-			val navIdent: String
+			val navAnsattAzureId: UUID
 		)
 
 		data class AdGruppeDto(
