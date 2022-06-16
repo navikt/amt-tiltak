@@ -52,6 +52,9 @@ spec:
         - application: poao-tilgang
           namespace: poao
           cluster: dev-gcp
+        - application: amt-altinn-acl
+          namespace: amt
+          cluster: dev-gcp
   kafka:
     pool: nav-dev
   secureLogs:
@@ -61,6 +64,10 @@ spec:
       value: api://dev-fss.pdl.pdl-api/.default
     - name: PDL_URL
       value: https://pdl-api.dev-fss-pub.nais.io
+    - name: AMT_ALTINN_ACL_SCOPE
+      value: api://dev-gcp.amt.amt-altinn-acl/.default
+    - name: AMT_ALTINN_ACL_URL
+      value: http://amt-altinn-acl.amt.svc.cluster.local
     - name: AMT_ENHETSREGISTER_SCOPE
       value: api://dev-gcp.amt.amt-enhetsregister/.default
     - name: AMT_ENHETSREGISTER_URL
