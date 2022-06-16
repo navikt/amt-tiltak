@@ -18,7 +18,7 @@ open class EndringsmeldingService(
 ) {
 
 	companion object {
-		const val AUDIT_LOG_REASON = "NAV-ansatt har lest melding fra tiltaksarrangør om oppstartsdato på tiltak for å registrere dette."
+		const val AUDIT_LOG_REASON = "NAV-ansatt har lest melding fra tiltaksarrangoer om oppstartsdato paa tiltak for aa registrere dette."
 	}
 
 	open fun hentEndringsmelding(id: UUID): EndringsmeldingDbo {
