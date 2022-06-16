@@ -27,8 +27,8 @@ class NavAnsattGjennomforingController(
 	@GetMapping
 	fun hentGjennomforinger(): List<HentGjennomforingerDto> {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-
-		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navIdent)
+		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()
+		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navAnsattAzureId)
 
 		val tilganger = tiltaksansvarligTilgangService.hentAktiveTilganger(navIdent)
 			.map { it.gjennomforingId }
@@ -48,9 +48,10 @@ class NavAnsattGjennomforingController(
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@GetMapping("/{gjennomforingId}")
 	fun hentGjennomforing(@PathVariable gjennomforingId: UUID): GjennomforingDto {
+		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
 
-		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navIdent)
+		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navAnsattAzureId)
 		tiltaksansvarligAutoriseringService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId)
 
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
@@ -74,9 +75,9 @@ class NavAnsattGjennomforingController(
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@GetMapping(params = ["lopenr"])
 	fun hentGjennomforingerMedLopenr(@RequestParam("lopenr") lopenr: Int): List<HentGjennomforingMedLopenrDto> {
-		val navIdent = authService.hentNavIdentTilInnloggetBruker()
+		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()
 
-		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navIdent)
+		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navAnsattAzureId)
 
 		return hentGjennomforingMedLopenrQuery.query(lopenr)
 			.map {

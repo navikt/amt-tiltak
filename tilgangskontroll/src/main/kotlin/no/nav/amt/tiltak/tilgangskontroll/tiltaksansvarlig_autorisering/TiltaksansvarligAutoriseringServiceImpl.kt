@@ -16,14 +16,14 @@ class TiltaksansvarligAutoriseringServiceImpl(
 	private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService
 ) : TiltaksansvarligAutoriseringService {
 
-	override fun verifiserTilgangTilFlate(navIdent: String) {
-		val harTilgang = adGruppeService.hentAdGrupper(navIdent)
+	override fun verifiserTilgangTilFlate(navAnsattAzureId: UUID) {
+		val harTilgang = adGruppeService.hentAdGrupper(navAnsattAzureId)
 			.any { it.name == AdGrupper.TILTAKSANSVARLIG_FLATE_GRUPPE }
 
 		if (!harTilgang) {
 			secureLog.warn(
 				"""
-					$navIdent har ikke tilgang til tiltaksansvarlig flate. Er ikke medlem av
+					$navAnsattAzureId har ikke tilgang til tiltaksansvarlig flate. Er ikke medlem av
 					${AdGrupper.TILTAKSANSVARLIG_FLATE_GRUPPE}
 				""".trimIndent()
 			)
@@ -32,14 +32,14 @@ class TiltaksansvarligAutoriseringServiceImpl(
 		}
 	}
 
-	override fun verifiserTilgangTilEndringsmelding(navIdent: String) {
-		val harTilgang = adGruppeService.hentAdGrupper(navIdent)
+	override fun verifiserTilgangTilEndringsmelding(navAnsattAzureId: UUID) {
+		val harTilgang = adGruppeService.hentAdGrupper(navAnsattAzureId)
 			.any { it.name == AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE }
 
 		if (!harTilgang) {
 			secureLog.warn(
 				"""
-					$navIdent har ikke tilgang til endringsmeldinger. Er ikke medlem av
+					$navAnsattAzureId har ikke tilgang til endringsmeldinger. Er ikke medlem av
 					${AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE}
 				""".trimIndent()
 			)
