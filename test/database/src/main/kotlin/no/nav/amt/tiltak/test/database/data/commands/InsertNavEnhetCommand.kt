@@ -4,6 +4,6 @@ import java.util.*
 
 data class InsertNavEnhetCommand(
 	val id: UUID,
-	val enhet_id: String,
+	val enhetId: String,
 	val navn: String
 )

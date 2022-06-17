@@ -74,7 +74,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 	test("getByGjennomforing - en endringsmelding - henter endringsmelding") {
 		val now = LocalDate.now()
 		repository.insertOgInaktiverStartDato(now, DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
-		val meldinger = repository.getByGjennomforing(DELTAKER_1.gjennomforing_id)
+		val meldinger = repository.getByGjennomforing(DELTAKER_1.gjennomforingId)
 
 		meldinger.size shouldBe 1
 		meldinger[0].aktiv shouldBe true
@@ -85,7 +85,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		repository.insertOgInaktiverStartDato(now, DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
 		repository.insertOgInaktiverStartDato(now.minusDays(1), DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
 
-		val meldinger = repository.getByGjennomforing(DELTAKER_1.gjennomforing_id)
+		val meldinger = repository.getByGjennomforing(DELTAKER_1.gjennomforingId)
 
 		meldinger.size shouldBe 2
 		meldinger[0].aktiv shouldBe false

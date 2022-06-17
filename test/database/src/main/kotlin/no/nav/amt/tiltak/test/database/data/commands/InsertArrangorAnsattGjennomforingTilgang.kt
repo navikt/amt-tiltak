@@ -4,6 +4,6 @@ import java.util.*
 
 data class InsertArrangorAnsattGjennomforingTilgang(
 	val id: UUID,
-	val ansatt_id: UUID,
-	val gjennomforing_id: UUID,
+	val ansattId: UUID,
+	val gjennomforingId: UUID,
 )

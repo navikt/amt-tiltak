@@ -3,7 +3,9 @@ package no.nav.amt.tiltak.deltaker
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
-import no.nav.amt.tiltak.core.domain.tiltak.*
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
@@ -136,7 +138,7 @@ class DeltakerServiceImplTest {
 		val deltakerCmd = createDeltakerCommand(BRUKER_1, GJENNOMFORING_1)
 		testDataRepository.insertDeltaker(deltakerCmd)
 
-		val nyDeltaker = deltakerRepository.get(deltakerCmd.bruker_id, deltakerCmd.gjennomforing_id)
+		val nyDeltaker = deltakerRepository.get(deltakerCmd.brukerId, deltakerCmd.gjennomforingId)
 
 		nyDeltaker shouldNotBe null
 

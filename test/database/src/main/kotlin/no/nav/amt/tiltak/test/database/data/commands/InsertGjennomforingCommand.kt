@@ -8,16 +8,16 @@ import java.util.*
 
 data class InsertGjennomforingCommand(
 	val id: UUID,
-	val tiltak_id: UUID,
-	val arrangor_id: UUID,
+	val tiltakId: UUID,
+	val arrangorId: UUID,
 	val navn: String,
 	val status: String,
-	val start_dato: LocalDate,
-	val slutt_dato: LocalDate,
-	val registrert_dato: LocalDate,
-	val fremmote_dato: LocalDate,
-	val nav_enhet_id: UUID?,
-	val opprettet_aar: Int?,
+	val startDato: LocalDate,
+	val sluttDato: LocalDate,
+	val registrertDato: LocalDate,
+	val fremmoteDato: LocalDate,
+	val navEnhetId: UUID?,
+	val opprettetAar: Int?,
 	val lopenr: Int?,
 ) {
 	fun toGjennomforing(tiltak: Tiltak, arrangor: Arrangor): Gjennomforing {
@@ -27,12 +27,12 @@ data class InsertGjennomforingCommand(
 			arrangor = arrangor,
 			navn = this.navn,
 			status = Gjennomforing.Status.valueOf(this.status),
-			startDato = this.start_dato,
-			sluttDato = this.slutt_dato,
-			registrertDato = this.registrert_dato.atStartOfDay(),
-			fremmoteDato = this.fremmote_dato.atStartOfDay(),
-			navEnhetId = this.nav_enhet_id,
-			opprettetAar = this.opprettet_aar,
+			startDato = this.startDato,
+			sluttDato = this.sluttDato,
+			registrertDato = this.registrertDato.atStartOfDay(),
+			fremmoteDato = this.fremmoteDato.atStartOfDay(),
+			navEnhetId = this.navEnhetId,
+			opprettetAar = this.opprettetAar,
 			lopenr = this.lopenr
 		)
 	}

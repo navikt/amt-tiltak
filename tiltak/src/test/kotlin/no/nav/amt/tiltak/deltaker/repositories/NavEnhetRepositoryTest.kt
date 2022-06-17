@@ -52,10 +52,10 @@ class NavEnhetRepositoryTest : FunSpec({
 	}
 
 	test("Endring av navn fører til endring av navn") {
-		val oppdatertEnhet = repository.upsert(NAV_ENHET_1.enhet_id, "Nytt navn")
+		val oppdatertEnhet = repository.upsert(NAV_ENHET_1.enhetId, "Nytt navn")
 
 		oppdatertEnhet.id shouldBe NAV_ENHET_1.id
-		oppdatertEnhet.enhetId shouldBe NAV_ENHET_1.enhet_id
+		oppdatertEnhet.enhetId shouldBe NAV_ENHET_1.enhetId
 		oppdatertEnhet.navn shouldBe "Nytt navn"
 	}
 
