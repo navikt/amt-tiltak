@@ -17,11 +17,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.util.*
 
-class AntallEndringsmeldingerQueryTest : FunSpec({
+class AntallAktiveEndringsmeldingerQueryTest : FunSpec({
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 
-	lateinit var query: AntallEndringsmeldingerQuery
+	lateinit var query: AntallAktiveEndringsmeldingerQuery
 
 	lateinit var testRepository: TestDataRepository
 
@@ -29,7 +29,7 @@ class AntallEndringsmeldingerQueryTest : FunSpec({
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 		rootLogger.level = Level.WARN
 
-		query = AntallEndringsmeldingerQuery(NamedParameterJdbcTemplate(dataSource))
+		query = AntallAktiveEndringsmeldingerQuery(NamedParameterJdbcTemplate(dataSource))
 
 		testRepository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
 

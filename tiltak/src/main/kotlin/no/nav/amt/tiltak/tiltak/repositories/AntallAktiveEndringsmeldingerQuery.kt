@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class AntallEndringsmeldingerQuery(
+open class AntallAktiveEndringsmeldingerQuery(
 	private val template: NamedParameterJdbcTemplate
 ) {
 

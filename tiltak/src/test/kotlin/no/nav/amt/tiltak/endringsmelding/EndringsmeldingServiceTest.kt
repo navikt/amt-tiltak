@@ -134,7 +134,7 @@ class EndringsmeldingServiceTest {
 				DELTAKER_1.id,
 				AuditEventType.ACCESS,
 				AuditEventSeverity.INFO,
-				"NAV-ansatt har lest melding fra tiltaksarrangør om oppstartsdato på tiltak for å registrere dette."
+				"NAV-ansatt har lest melding fra tiltaksarrangoer om oppstartsdato paa tiltak for aa registrere dette."
 			)
 		}
 	}
