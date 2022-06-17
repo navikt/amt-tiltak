@@ -6,11 +6,11 @@ import java.util.*
 
 data class InsertDeltakerCommand(
 	val id: UUID,
-	val bruker_id: UUID,
-	val gjennomforing_id: UUID,
-	val start_dato: LocalDate,
-	val slutt_dato: LocalDate,
-	val dager_per_uke: Int,
-	val prosent_stilling: Float,
-	val registrert_dato: LocalDateTime
+	val brukerId: UUID,
+	val gjennomforingId: UUID,
+	val startDato: LocalDate,
+	val sluttDato: LocalDate,
+	val dagerPerUke: Int,
+	val prosentStilling: Float,
+	val registrertDato: LocalDateTime
 )

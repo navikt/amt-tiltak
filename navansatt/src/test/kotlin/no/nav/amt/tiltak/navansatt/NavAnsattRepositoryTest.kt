@@ -60,14 +60,14 @@ class NavAnsattRepositoryTest : FunSpec({
 		repository.upsert(
 			UpsertNavAnsattInput(
 				id = UUID.randomUUID(),
-				navIdent = NAV_ANSATT_1.nav_ident,
+				navIdent = NAV_ANSATT_1.navIdent,
 				navn = "Nytt navn",
 				epost = "Ny epost",
 				telefonnummer = "Nytt telefonnummer",
 			)
 		)
 
-		val updatedDbo = repository.getNavAnsattWithIdent(NAV_ANSATT_1.nav_ident)
+		val updatedDbo = repository.getNavAnsattWithIdent(NAV_ANSATT_1.navIdent)
 
 		updatedDbo!!.navn shouldBe "Nytt navn"
 		updatedDbo.epost shouldBe "Ny epost"

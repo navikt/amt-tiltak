@@ -4,7 +4,7 @@ import java.util.*
 
 data class InsertArrangorAnsattRolleCommand(
 	val id: UUID,
-	val arrangor_id: UUID,
-	val ansatt_id: UUID,
+	val arrangorId: UUID,
+	val ansattId: UUID,
 	val rolle: String
 )

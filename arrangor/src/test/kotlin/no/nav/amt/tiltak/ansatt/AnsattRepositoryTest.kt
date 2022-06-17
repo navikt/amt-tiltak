@@ -36,10 +36,10 @@ class AnsattRepositoryTest {
 
 	@Test
 	internal fun `getByPersonligIdent skal returnere ansatt hvis ident finnes`() {
-		val ansatt = repository.getByPersonligIdent(ARRANGOR_ANSATT_1.personlig_ident) ?: fail("Ansatt er null")
+		val ansatt = repository.getByPersonligIdent(ARRANGOR_ANSATT_1.personligIdent) ?: fail("Ansatt er null")
 
 		assertEquals(ARRANGOR_ANSATT_1.id, ansatt.id)
-		assertEquals(ARRANGOR_ANSATT_1.personlig_ident, ansatt.personligIdent)
+		assertEquals(ARRANGOR_ANSATT_1.personligIdent, ansatt.personligIdent)
 		assertEquals("Ansatt 1 fornavn", ansatt.fornavn)
 		assertEquals("Ansatt 1 mellomnavn", ansatt.mellomnavn)
 		assertEquals("Ansatt 1 etternavn", ansatt.etternavn)

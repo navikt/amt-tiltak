@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
+import no.nav.amt.tiltak.tiltak.repositories.AntallAktiveEndringsmeldingerQuery
 import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingMedLopenrQuery
 import no.nav.amt.tiltak.tiltak.repositories.HentTiltaksoversiktQuery
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -21,6 +22,7 @@ class NavAnsattGjennomforingController(
 	private val hentGjennomforingMedLopenrQuery: HentGjennomforingMedLopenrQuery,
 	private val hentTiltaksoversiktQuery: HentTiltaksoversiktQuery,
 	private val tiltaksansvarligAutoriseringService: TiltaksansvarligAutoriseringService,
+	private val antallAktiveEndringsmeldingerQuery: AntallAktiveEndringsmeldingerQuery
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
@@ -33,6 +35,8 @@ class NavAnsattGjennomforingController(
 		val tilganger = tiltaksansvarligTilgangService.hentAktiveTilganger(navIdent)
 			.map { it.gjennomforingId }
 
+		val antallEndringsmeldinger = antallAktiveEndringsmeldingerQuery.query(tilganger)
+
 		return hentTiltaksoversiktQuery.query(tilganger)
 			.map {
 				HentGjennomforingerDto(
@@ -40,7 +44,9 @@ class NavAnsattGjennomforingController(
 					navn = it.navn,
 					lopenr = it.lopenr,
 					opprettetAar = it.opprettetAar,
-					arrangorNavn = it.arrangorOrganisasjonsnavn ?: it.arrangorVirksomhetsnavn
+					arrangorNavn = it.arrangorOrganisasjonsnavn ?: it.arrangorVirksomhetsnavn,
+					antallAktiveEndringsmeldinger =
+						antallEndringsmeldinger.find { a -> a.gjennomforingId == it.id }?.antallMeldinger ?: 0
 				)
 			}
 	}
@@ -97,6 +103,7 @@ class NavAnsattGjennomforingController(
 		val arrangorNavn: String,
 		val lopenr: Int,
 		val opprettetAar: Int,
+		val antallAktiveEndringsmeldinger: Int
 	)
 
 	data class HentGjennomforingMedLopenrDto(

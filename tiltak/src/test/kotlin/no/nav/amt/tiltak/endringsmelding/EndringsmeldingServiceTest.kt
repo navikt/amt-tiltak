@@ -66,7 +66,7 @@ class EndringsmeldingServiceTest {
 		val nyStartDato = LocalDate.now().plusDays(3)
 		endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, nyStartDato, ARRANGOR_ANSATT_1.id)
 
-		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(DELTAKER_1.gjennomforing_id)
+		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(DELTAKER_1.gjennomforingId)
 		val endringsmelding = endringsmeldinger.get(0)
 
 		endringsmeldinger.size shouldBe 1
@@ -90,7 +90,7 @@ class EndringsmeldingServiceTest {
 		endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, nyStartDato, ARRANGOR_ANSATT_1.id)
 		endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, nyStartDato, ARRANGOR_ANSATT_1.id)
 
-		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(DELTAKER_1.gjennomforing_id)
+		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(DELTAKER_1.gjennomforingId)
 		val aktivEndringsmelding = endringsmeldinger.filter { it.aktiv }
 		val arkiverteEndringsmeldinger = endringsmeldinger.filter { it.arkivert }
 
@@ -134,7 +134,7 @@ class EndringsmeldingServiceTest {
 				DELTAKER_1.id,
 				AuditEventType.ACCESS,
 				AuditEventSeverity.INFO,
-				"NAV-ansatt har lest melding fra tiltaksarrangør om oppstartsdato på tiltak for å registrere dette."
+				"NAV-ansatt har lest melding fra tiltaksarrangoer om oppstartsdato paa tiltak for aa registrere dette."
 			)
 		}
 	}

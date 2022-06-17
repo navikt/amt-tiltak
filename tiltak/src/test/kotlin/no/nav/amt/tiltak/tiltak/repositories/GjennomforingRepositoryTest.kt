@@ -144,17 +144,17 @@ internal class GjennomforingRepositoryTest : FunSpec({
 
 		val gjennomforing = InsertGjennomforingCommand(
 			id = id,
-			tiltak_id = TILTAK_1.id,
-			arrangor_id = ARRANGOR_1.id,
+			tiltakId = TILTAK_1.id,
+			arrangorId = ARRANGOR_1.id,
 			navn = "Tiltaksgjennomforing",
 			status = "GJENNOMFORES",
-			start_dato = LocalDate.of(2022, 2, 1),
-			slutt_dato = LocalDate.of(2050, 12, 30),
-			registrert_dato = LocalDate.of(2022, 1, 1),
-			fremmote_dato = LocalDate.of(2022, 2, 1),
-			nav_enhet_id = null,
+			startDato = LocalDate.of(2022, 2, 1),
+			sluttDato = LocalDate.of(2050, 12, 30),
+			registrertDato = LocalDate.of(2022, 1, 1),
+			fremmoteDato = LocalDate.of(2022, 2, 1),
+			navEnhetId = null,
 			lopenr = 123,
-			opprettet_aar = 2020
+			opprettetAar = 2020
 		)
 
 		TestDataRepository(NamedParameterJdbcTemplate(dataSource))

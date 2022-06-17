@@ -97,23 +97,23 @@ class DeltakerStatistikkRepositoryTest : FunSpec({
 
 private val AKTIV_ARRANGOR_UTEN_BRUKERE = InsertArrangorCommand(
 	id = UUID.fromString("d8949bb0-2fc1-47f0-a198-2ffbb1c572d7"),
-	overordnet_enhet_organisasjonsnummer = "944444444",
-	overordnet_enhet_navn = "Org Tiltaksarrangør 3",
+	overordnetEnhetOrganisasjonsnummer = "944444444",
+	overordnetEnhetNavn = "Org Tiltaksarrangør 3",
 	organisasjonsnummer = "444444444",
 	navn = "Tiltaksarrangør uten brukere"
 )
 
 private val AKTIV_GJENNOMFORING_UTEN_BRUKERE = InsertGjennomforingCommand(
 	id = UUID.fromString("c1de261e-deb1-4894-8984-cdb3d3c19740"),
-	tiltak_id = TestData.TILTAK_1.id,
-	arrangor_id = AKTIV_ARRANGOR_UTEN_BRUKERE.id,
+	tiltakId = TestData.TILTAK_1.id,
+	arrangorId = AKTIV_ARRANGOR_UTEN_BRUKERE.id,
 	navn = "Tiltaksgjennomforing1",
 	status = "GJENNOMFORES",
-	start_dato = LocalDate.of(2022, 2, 1),
-	slutt_dato = LocalDate.of(2050, 12, 30),
-	nav_enhet_id = TestData.NAV_ENHET_1.id,
-	registrert_dato = LocalDate.of(2022, 1, 1),
-	fremmote_dato = LocalDate.of(2022, 2, 1),
-	opprettet_aar = 2020,
+	startDato = LocalDate.of(2022, 2, 1),
+	sluttDato = LocalDate.of(2050, 12, 30),
+	navEnhetId = TestData.NAV_ENHET_1.id,
+	registrertDato = LocalDate.of(2022, 1, 1),
+	fremmoteDato = LocalDate.of(2022, 2, 1),
+	opprettetAar = 2020,
 	lopenr = 123
 )

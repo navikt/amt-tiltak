@@ -5,7 +5,7 @@ import java.util.*
 
 data class InsertDeltakerStatusCommand(
 	val id: UUID,
-	val deltaker_id: UUID,
+	val deltakerId: UUID,
 	val gyldigFra: LocalDateTime,
 	val status: String,
 	val aktiv: Boolean

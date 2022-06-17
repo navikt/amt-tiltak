@@ -49,12 +49,12 @@ class DeltakerDetaljerRepositoryTest : FunSpec({
 		deltakerDetaljer.veilederNavn shouldBe NAV_ANSATT_1.navn
 		deltakerDetaljer.veilederTelefonnummer shouldBe NAV_ANSATT_1.telefonnummer
 		deltakerDetaljer.veilederEpost shouldBe NAV_ANSATT_1.epost
-		deltakerDetaljer.startDato shouldBe DELTAKER_1.start_dato
-		deltakerDetaljer.sluttDato shouldBe DELTAKER_1.slutt_dato
+		deltakerDetaljer.startDato shouldBe DELTAKER_1.startDato
+		deltakerDetaljer.sluttDato shouldBe DELTAKER_1.sluttDato
 		deltakerDetaljer.status shouldBe Deltaker.Status.DELTAR
 		deltakerDetaljer.gjennomforingId shouldBe GJENNOMFORING_1.id
-		deltakerDetaljer.gjennomforingStartDato shouldBe GJENNOMFORING_1.start_dato
-		deltakerDetaljer.gjennomforingSluttDato shouldBe GJENNOMFORING_1.slutt_dato
+		deltakerDetaljer.gjennomforingStartDato shouldBe GJENNOMFORING_1.startDato
+		deltakerDetaljer.gjennomforingSluttDato shouldBe GJENNOMFORING_1.sluttDato
 		deltakerDetaljer.tiltakNavn shouldBe TILTAK_1.navn
 		deltakerDetaljer.tiltakKode shouldBe TILTAK_1.type
 	}
