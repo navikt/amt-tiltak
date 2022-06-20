@@ -1,10 +1,12 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
+import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDetaljerDbo
 import no.nav.amt.tiltak.utils.getLocalDateTime
 import no.nav.amt.tiltak.utils.getNullableLocalDate
+import no.nav.amt.tiltak.utils.getNullableUUID
 import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -35,9 +37,9 @@ class GetDeltakerDetaljerQuery(
 			status = Deltaker.Status.valueOf(rs.getString("status")),
 			statusGyldigFra = rs.getLocalDateTime("status_gyldig_fra"),
 			statusOpprettet = rs.getLocalDateTime("status_opprettet"),
-			navEnhetId = rs.getUUID("nav_enhet_id"),
-			navEnhetEnhetId = rs.getString("nav_enhet_enhet_id"),
-			navEnhetNavn = rs.getString("nav_enhet_navn"),
+			navEnhetId = rs.getNullableUUID("nav_enhet_id"),
+			navEnhetEnhetId = rs.getNullableString("nav_enhet_enhet_id"),
+			navEnhetNavn = rs.getNullableString("nav_enhet_navn"),
 			gjennomforingId = rs.getUUID("gjennomforing_id"),
 			gjennomforingNavn = rs.getString("gjennomforing_navn"),
 			gjennomforingStartDato = rs.getNullableLocalDate("gjennomforing_start_dato"),
