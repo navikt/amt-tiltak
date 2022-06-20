@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
+import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpdateDbo
@@ -29,14 +30,15 @@ open class DeltakerRepository(
 			prosentStilling = rs.getFloat("prosent_stilling"),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime(),
-			registrertDato = rs.getTimestamp("registrert_dato").toLocalDateTime()
+			registrertDato = rs.getTimestamp("registrert_dato").toLocalDateTime(),
+			begrunnelseForDeltakelse = rs.getNullableString("begrunnelse_for_deltakelse")
 		)
 	}
 
 	fun insert(deltaker: DeltakerInsertDbo) {
 		val sql = """
 			INSERT INTO deltaker(id, bruker_id, gjennomforing_id, start_dato, slutt_dato,
-								 dager_per_uke, prosent_stilling, registrert_dato)
+								 dager_per_uke, prosent_stilling, registrert_dato, begrunnelse_for_deltakelse)
 			VALUES (:id,
 					:brukerId,
 					:gjennomforingId,
@@ -44,7 +46,8 @@ open class DeltakerRepository(
 					:sluttdato,
 					:dagerPerUke,
 					:prosentStilling,
-					:registrertDato)
+					:registrertDato,
+					:begrunnelseForDeltakelse)
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
@@ -56,7 +59,8 @@ open class DeltakerRepository(
 				"sluttdato" to deltaker.sluttDato,
 				"dagerPerUke" to deltaker.dagerPerUke,
 				"prosentStilling" to deltaker.prosentStilling,
-				"registrertDato" to deltaker.registrertDato
+				"registrertDato" to deltaker.registrertDato,
+				"begrunnelseForDeltakelse" to deltaker.begrunnelseForDeltakelse
 			)
 		)
 
@@ -89,6 +93,7 @@ open class DeltakerRepository(
 				slutt_dato    = :sluttDato,
 				dager_per_uke = :dagerPerUke,
 				prosent_stilling = :prosentStilling,
+				begrunnelse_for_deltakelse = :begrunnelseForDeltakelse,
 				modified_at = CURRENT_TIMESTAMP
 			WHERE id = :deltakerId
 	""".trimIndent()
@@ -99,7 +104,8 @@ open class DeltakerRepository(
 				"sluttDato" to deltaker.sluttDato,
 				"dagerPerUke" to deltaker.dagerPerUke,
 				"prosentStilling" to deltaker.prosentStilling,
-				"deltakerId" to deltaker.id
+				"deltakerId" to deltaker.id,
+				"begrunnelseForDeltakelse" to deltaker.begrunnelseForDeltakelse
 			)
 		)
 

@@ -1,12 +1,12 @@
 package no.nav.amt.tiltak.deltaker.controllers
 
+import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import no.nav.amt.tiltak.tiltak.dto.*
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
@@ -34,8 +34,6 @@ class TiltakarrangorDeltakerControllerTest {
 		}
 	}
 
-	private val deltakerId = UUID.fromString("0d5190f8-a6c2-48ff-84b9-6b835664c099")
-
 	@Autowired
 	private lateinit var mockMvc: MockMvc
 
@@ -48,14 +46,18 @@ class TiltakarrangorDeltakerControllerTest {
 	@MockBean
 	private lateinit var arrangorAnsattTilgangService: ArrangorAnsattTilgangService
 
+	private val deltakerId = UUID.fromString("0d5190f8-a6c2-48ff-84b9-6b835664c099")
+
+	private val gjennomforingId = UUID.fromString("7187e487-bdb4-43bc-9d17-a3ad0f400897")
+
 	private val tiltakDeltakerDetaljerDto = TiltakDeltakerDetaljerDto(
 		id = deltakerId,
-		fornavn = "",
+		fornavn = "Test",
 		mellomnavn = null,
-		etternavn = "",
-		fodselsnummer = "",
-		telefonnummer = "",
-		epost = "",
+		etternavn = "Testersen",
+		fodselsnummer = "12344543",
+		telefonnummer = "9083423423",
+		epost = "test@test.test",
 		navEnhet = NavEnhetDto(
 			navn = "NAV Testheim",
 		),
@@ -63,10 +65,11 @@ class TiltakarrangorDeltakerControllerTest {
 		erSkjermetPerson = false,
 		startDato = null,
 		sluttDato = null,
-		registrertDato = LocalDateTime.now(),
-		status = DeltakerStatusDto(Deltaker.Status.DELTAR, LocalDateTime.now()),
+		registrertDato = LocalDateTime.parse("2022-06-20T07:02:35.269658"),
+		status = DeltakerStatusDto(Deltaker.Status.DELTAR, LocalDateTime.parse("2022-06-20T07:02:35.269658")),
+		begrunnelseForDeltakelse = "begrunnelse",
 		gjennomforing = GjennomforingDto(
-			id = UUID.randomUUID(),
+			id = gjennomforingId,
 			navn = "",
 			startDato = null,
 			sluttDato = null,
@@ -76,7 +79,7 @@ class TiltakarrangorDeltakerControllerTest {
 				tiltaksnavn = ""
 			),
 			arrangor = ArrangorDto(
-				virksomhetNavn = "",
+				virksomhetNavn = "Virksomhet AS",
 				organisasjonNavn = null
 			)
 		),
@@ -94,7 +97,7 @@ class TiltakarrangorDeltakerControllerTest {
 			MockMvcRequestBuilders.get("/api/tiltaksarrangor/tiltak-deltaker/$deltakerId")
 		).andReturn().response
 
-		Assertions.assertEquals(401, response.status)
+		response.status shouldBe 401
 	}
 
 	@Test
@@ -129,7 +132,12 @@ class TiltakarrangorDeltakerControllerTest {
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
-		Assertions.assertEquals(200, response.status)
+		val expectedJson = """
+			{"id":"0d5190f8-a6c2-48ff-84b9-6b835664c099","fornavn":"Test","mellomnavn":null,"etternavn":"Testersen","fodselsnummer":"12344543","telefonnummer":"9083423423","epost":"test@test.test","navEnhet":{"navn":"NAV Testheim"},"navVeileder":null,"erSkjermetPerson":false,"startDato":null,"sluttDato":null,"registrertDato":"2022-06-20T07:02:35.269658","status":{"type":"DELTAR","endretDato":"2022-06-20T07:02:35.269658"},"gjennomforing":{"id":"7187e487-bdb4-43bc-9d17-a3ad0f400897","navn":"","startDato":null,"sluttDato":null,"status":null,"tiltak":{"tiltakskode":"","tiltaksnavn":""},"arrangor":{"virksomhetNavn":"Virksomhet AS","organisasjonNavn":null}},"fjernesDato":null,"begrunnelseForDeltakelse":"begrunnelse"}
+		""".trimIndent()
+
+		response.status shouldBe 200
+		response.contentAsString shouldBe expectedJson
 	}
 
 }

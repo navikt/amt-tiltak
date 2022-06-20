@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
+import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDetaljerDbo
@@ -49,6 +50,7 @@ class GetDeltakerDetaljerQuery(
 			organisasjonNavn = rs.getString("organisasjon_navn"),
 			dagerPerUke = rs.getInt("dager_per_uke"),
 			prosentStilling = rs.getFloat("prosent_stilling"),
+			begrunnelseForDeltakelse = rs.getNullableString("begrunnelse_for_deltakelse")
 		)
 	}
 
@@ -63,6 +65,7 @@ class GetDeltakerDetaljerQuery(
 			   deltaker.dager_per_uke			AS dager_per_uke,
 			   deltaker.prosent_stilling		AS prosent_stilling,
 			   deltaker.registrert_dato     	AS registrert_dato,
+			   deltaker.begrunnelse_for_deltakelse AS begrunnelse_for_deltakelse,
 			   bruker.id						AS bruker_id,
 			   bruker.fornavn               	AS fornavn,
 			   bruker.mellomnavn            	AS mellomnavn,

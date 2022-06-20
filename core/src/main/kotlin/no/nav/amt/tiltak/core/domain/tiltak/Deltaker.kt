@@ -14,6 +14,7 @@ data class Deltaker(
 	val registrertDato: LocalDateTime,
 	val dagerPerUke: Int? = null,
 	val prosentStilling: Float? = null,
+	val begrunnelseForDeltakelse: String? = null
 ) {
 	val skalFjernesDato = if(status.type == Status.HAR_SLUTTET || status.type == Status.IKKE_AKTUELL) status.gyldigFra.plusWeeks(2) else null
 	val erUtdatert = skalFjernesDato != null && LocalDateTime.now().isAfter(skalFjernesDato)

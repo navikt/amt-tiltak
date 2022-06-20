@@ -23,7 +23,8 @@ data class DeltakerDbo(
 	// Setter modified til nå. Dersom oppretter objektet, så er det to grunner til det.
 	// Enten hentes fra db og man leser verdi fra db, ellers oppretter man dbo-objektet for å oppdatere/inserte i db
 	val modifiedAt: LocalDateTime? = LocalDateTime.now(),
-	val registrertDato: LocalDateTime
+	val registrertDato: LocalDateTime,
+	val begrunnelseForDeltakelse: String?
 ) {
 
 	fun toDeltaker(status: DeltakerStatus): Deltaker {
@@ -43,7 +44,8 @@ data class DeltakerDbo(
 			dagerPerUke = dagerPerUke,
 			prosentStilling = prosentStilling,
 			registrertDato = registrertDato,
-			status = status
+			status = status,
+			begrunnelseForDeltakelse = begrunnelseForDeltakelse
 		)
 	}
 
