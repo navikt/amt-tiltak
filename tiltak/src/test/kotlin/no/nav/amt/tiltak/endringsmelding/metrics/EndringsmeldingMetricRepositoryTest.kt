@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
@@ -48,6 +49,25 @@ class EndringsmeldingMetricRepositoryTest : FunSpec({
 		endringsmeldingRepository.insertOgInaktiverStartDato(LocalDate.now(), DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
 
 		repository.antallAktiveEndringsmeldinger() shouldBe 1
+	}
+
+	test("antallAutomatiskFerdigEndringsmeldinger - skal hente antall automatisk ferdiggjorte endringsmeldinger") {
+		endringsmeldingRepository.insertOgInaktiverStartDato(LocalDate.now(), DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+		endringsmeldingRepository.insertOgInaktiverStartDato(LocalDate.now(), DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+
+		val endringsmelding = endringsmeldingRepository.insertOgInaktiverStartDato(LocalDate.now(), DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+		endringsmeldingRepository.markerSomFerdig(endringsmelding.id, NAV_ANSATT_1.id)
+
+		repository.antallAutomatiskFerdigEndringsmeldinger() shouldBe 2
+	}
+
+	test("antallManueltFerdigEndringsmeldinger - skal hente antall manuelt ferdiggjorte endringsmeldinger") {
+		endringsmeldingRepository.insertOgInaktiverStartDato(LocalDate.now(), DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+		val endringsmelding = endringsmeldingRepository.insertOgInaktiverStartDato(LocalDate.now(), DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+
+		endringsmeldingRepository.markerSomFerdig(endringsmelding.id, NAV_ANSATT_1.id)
+
+		repository.antallManueltFerdigEndringsmeldinger() shouldBe 1
 	}
 
 })
