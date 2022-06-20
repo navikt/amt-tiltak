@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.nav_enhet
 import no.nav.amt.tiltak.clients.veilarbarena.VeilarbarenaClient
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.port.NavEnhetService
+import no.nav.amt.tiltak.log.SecureLog.secureLog
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -22,8 +23,13 @@ open class NavEnhetServiceImpl(
 	}
 
 	override fun getNavEnhetForBruker(fodselsnummer: String): NavEnhet? {
-		return veilarbarenaClient.hentBrukerOppfolgingsenhetId(fodselsnummer)?.let {
-			navEnhetRepository.hentEnhet(it) ?: throw IllegalStateException("Ugyldig kontor for bruker ($it")
+		return veilarbarenaClient.hentBrukerOppfolgingsenhetId(fodselsnummer)?.let { enhetId ->
+			return@let navEnhetRepository.hentEnhet(enhetId)
+				.also {
+					if (it == null) {
+						secureLog.warn("Bruker med fnr=$fodselsnummer har enhetId=$enhetId som ikke finnes i databasen/norg")
+					}
+				}
 		}?.toNavEnhet()
 	}
 
