@@ -19,4 +19,14 @@ class EndringsmeldingMetricRepository(
 		MapSqlParameterSource(),
 		Int::class.java) ?: 0
 
+	fun antallManueltFerdigEndringsmeldinger(): Int = template.queryForObject(
+		"SELECT COUNT(*) FROM endringsmelding WHERE aktiv = false AND ferdiggjort_av_nav_ansatt_id IS NOT NULL",
+		MapSqlParameterSource(),
+		Int::class.java) ?: 0
+
+	fun antallAutomatiskFerdigEndringsmeldinger(): Int = template.queryForObject(
+		"SELECT COUNT(*) FROM endringsmelding WHERE aktiv = false AND ferdiggjort_av_nav_ansatt_id IS NULL",
+		MapSqlParameterSource(),
+		Int::class.java) ?: 0
+
 }
