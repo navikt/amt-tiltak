@@ -52,7 +52,7 @@ class DeltakerProcessorTest : StringSpec({
 				prosentDeltid = null,
 				registrertDato = LocalDateTime.now(),
 				statusEndretDato = LocalDateTime.now(),
-				begrunnelseForDeltakelse = null
+				innsokBegrunnelse = null
 			)
 		))
 
@@ -99,7 +99,7 @@ class DeltakerProcessorTest : StringSpec({
 				prosentDeltid = null,
 				registrertDato = LocalDateTime.now(),
 				statusEndretDato = LocalDateTime.now(),
-				begrunnelseForDeltakelse = null
+				innsokBegrunnelse = null
 			)
 		))
 
@@ -136,7 +136,7 @@ class DeltakerProcessorTest : StringSpec({
 				prosentDeltid = null,
 				registrertDato = LocalDateTime.now(),
 				statusEndretDato = LocalDateTime.now(),
-				begrunnelseForDeltakelse = null
+				innsokBegrunnelse = null
 			)
 		))
 
@@ -168,7 +168,7 @@ class DeltakerProcessorTest : StringSpec({
 				prosentDeltid = null,
 				registrertDato = LocalDateTime.now(),
 				statusEndretDato = LocalDateTime.now(),
-				begrunnelseForDeltakelse = null
+				innsokBegrunnelse = null
 			)
 		)
 

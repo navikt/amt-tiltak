@@ -86,7 +86,7 @@ class DeltakerServiceTest: StringSpec ({
 			dagerPerUke = deltaker.dagerPerUke,
 			prosentStilling = deltaker.prosentStilling,
 			registrertDato = deltaker.registrertDato,
-			begrunnelseForDeltakelse = deltaker.begrunnelseForDeltakelse
+			innsokBegrunnelse = deltaker.innsokBegrunnelse
 		)
 		every { deltakerRepository.get(deltaker.id) } returns null
 		every { brukerService.getOrCreate(fodselsnummer) } returns defaultBruker.id

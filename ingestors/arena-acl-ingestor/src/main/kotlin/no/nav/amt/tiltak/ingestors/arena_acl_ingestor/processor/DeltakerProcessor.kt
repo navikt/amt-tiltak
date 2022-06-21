@@ -58,7 +58,7 @@ class DeltakerProcessor(
 			prosentStilling = deltakerDto.prosentDeltid,
 			registrertDato = deltakerDto.registrertDato,
 			gjennomforingId = tiltaksgjennomforing.id,
-			begrunnelseForDeltakelse = deltakerDto.begrunnelseForDeltakelse
+			innsokBegrunnelse = deltakerDto.innsokBegrunnelse
 		)
 		val status = DeltakerStatusInsert(
 			id = UUID.randomUUID(),

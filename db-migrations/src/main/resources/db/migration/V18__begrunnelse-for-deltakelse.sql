@@ -1,1 +1,0 @@
-ALTER TABLE deltaker ADD COLUMN begrunnelse_for_deltakelse TEXT;

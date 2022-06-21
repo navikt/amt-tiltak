@@ -38,7 +38,7 @@ data class DeltakerDetaljerDbo(
 	val organisasjonNavn: String?,
 	val dagerPerUke: Int?,
 	val prosentStilling: Float?,
-	val begrunnelseForDeltakelse: String?
+	val innsokBegrunnelse: String?
 ) {
 	fun toDeltaker() = Deltaker(
 		id = deltakerId,
@@ -69,6 +69,6 @@ data class DeltakerDetaljerDbo(
 			registrertDato = registrertDato,
 			dagerPerUke = dagerPerUke,
 			prosentStilling = prosentStilling,
-			begrunnelseForDeltakelse = begrunnelseForDeltakelse
+			innsokBegrunnelse = innsokBegrunnelse
 	)
 }

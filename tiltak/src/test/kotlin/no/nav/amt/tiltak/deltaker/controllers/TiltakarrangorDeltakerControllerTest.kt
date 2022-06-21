@@ -67,7 +67,7 @@ class TiltakarrangorDeltakerControllerTest {
 		sluttDato = null,
 		registrertDato = LocalDateTime.parse("2022-06-20T07:02:35.269658"),
 		status = DeltakerStatusDto(Deltaker.Status.DELTAR, LocalDateTime.parse("2022-06-20T07:02:35.269658")),
-		begrunnelseForDeltakelse = "begrunnelse",
+		innsokBegrunnelse = "begrunnelse",
 		gjennomforing = GjennomforingDto(
 			id = gjennomforingId,
 			navn = "",
@@ -133,7 +133,7 @@ class TiltakarrangorDeltakerControllerTest {
 		).andReturn().response
 
 		val expectedJson = """
-			{"id":"0d5190f8-a6c2-48ff-84b9-6b835664c099","fornavn":"Test","mellomnavn":null,"etternavn":"Testersen","fodselsnummer":"12344543","telefonnummer":"9083423423","epost":"test@test.test","navEnhet":{"navn":"NAV Testheim"},"navVeileder":null,"erSkjermetPerson":false,"startDato":null,"sluttDato":null,"registrertDato":"2022-06-20T07:02:35.269658","status":{"type":"DELTAR","endretDato":"2022-06-20T07:02:35.269658"},"gjennomforing":{"id":"7187e487-bdb4-43bc-9d17-a3ad0f400897","navn":"","startDato":null,"sluttDato":null,"status":null,"tiltak":{"tiltakskode":"","tiltaksnavn":""},"arrangor":{"virksomhetNavn":"Virksomhet AS","organisasjonNavn":null}},"fjernesDato":null,"begrunnelseForDeltakelse":"begrunnelse"}
+			{"id":"0d5190f8-a6c2-48ff-84b9-6b835664c099","fornavn":"Test","mellomnavn":null,"etternavn":"Testersen","fodselsnummer":"12344543","telefonnummer":"9083423423","epost":"test@test.test","navEnhet":{"navn":"NAV Testheim"},"navVeileder":null,"erSkjermetPerson":false,"startDato":null,"sluttDato":null,"registrertDato":"2022-06-20T07:02:35.269658","status":{"type":"DELTAR","endretDato":"2022-06-20T07:02:35.269658"},"gjennomforing":{"id":"7187e487-bdb4-43bc-9d17-a3ad0f400897","navn":"","startDato":null,"sluttDato":null,"status":null,"tiltak":{"tiltakskode":"","tiltaksnavn":""},"arrangor":{"virksomhetNavn":"Virksomhet AS","organisasjonNavn":null}},"fjernesDato":null,"innsokBegrunnelse":"begrunnelse"}
 		""".trimIndent()
 
 		response.status shouldBe 200

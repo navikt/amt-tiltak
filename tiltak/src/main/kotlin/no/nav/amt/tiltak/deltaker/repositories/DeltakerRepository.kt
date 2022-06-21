@@ -31,14 +31,14 @@ open class DeltakerRepository(
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime(),
 			registrertDato = rs.getTimestamp("registrert_dato").toLocalDateTime(),
-			begrunnelseForDeltakelse = rs.getNullableString("begrunnelse_for_deltakelse")
+			innsokBegrunnelse = rs.getNullableString("innsok_begrunnelse")
 		)
 	}
 
 	fun insert(deltaker: DeltakerInsertDbo) {
 		val sql = """
 			INSERT INTO deltaker(id, bruker_id, gjennomforing_id, start_dato, slutt_dato,
-								 dager_per_uke, prosent_stilling, registrert_dato, begrunnelse_for_deltakelse)
+								 dager_per_uke, prosent_stilling, registrert_dato, innsok_begrunnelse)
 			VALUES (:id,
 					:brukerId,
 					:gjennomforingId,
@@ -47,7 +47,7 @@ open class DeltakerRepository(
 					:dagerPerUke,
 					:prosentStilling,
 					:registrertDato,
-					:begrunnelseForDeltakelse)
+					:innsokBegrunnelse)
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
@@ -60,7 +60,7 @@ open class DeltakerRepository(
 				"dagerPerUke" to deltaker.dagerPerUke,
 				"prosentStilling" to deltaker.prosentStilling,
 				"registrertDato" to deltaker.registrertDato,
-				"begrunnelseForDeltakelse" to deltaker.begrunnelseForDeltakelse
+				"innsokBegrunnelse" to deltaker.innsokBegrunnelse
 			)
 		)
 
@@ -93,7 +93,7 @@ open class DeltakerRepository(
 				slutt_dato    = :sluttDato,
 				dager_per_uke = :dagerPerUke,
 				prosent_stilling = :prosentStilling,
-				begrunnelse_for_deltakelse = :begrunnelseForDeltakelse,
+				innsok_begrunnelse = :innsokBegrunnelse,
 				modified_at = CURRENT_TIMESTAMP
 			WHERE id = :deltakerId
 	""".trimIndent()
@@ -105,7 +105,7 @@ open class DeltakerRepository(
 				"dagerPerUke" to deltaker.dagerPerUke,
 				"prosentStilling" to deltaker.prosentStilling,
 				"deltakerId" to deltaker.id,
-				"begrunnelseForDeltakelse" to deltaker.begrunnelseForDeltakelse
+				"innsokBegrunnelse" to deltaker.innsokBegrunnelse
 			)
 		)
 

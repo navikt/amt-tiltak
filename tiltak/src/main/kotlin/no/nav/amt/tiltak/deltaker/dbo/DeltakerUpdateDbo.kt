@@ -11,5 +11,5 @@ data class DeltakerUpdateDbo(
 	val registrertDato: LocalDateTime,
 	val dagerPerUke: Int? = null,
 	val prosentStilling: Float? = null,
-	val begrunnelseForDeltakelse: String? = null
+	val innsokBegrunnelse: String? = null
 )

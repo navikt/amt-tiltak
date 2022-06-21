@@ -12,7 +12,7 @@ data class DeltakerUpsert(
 	val registrertDato: LocalDateTime,
 	val dagerPerUke: Int? = null,
 	val prosentStilling: Float? = null,
-	val begrunnelseForDeltakelse: String?
+	val innsokBegrunnelse: String?
 ) {
 	fun compareTo(deltaker: Deltaker) = this == DeltakerUpsert(
 			id = deltaker.id,
@@ -22,7 +22,7 @@ data class DeltakerUpsert(
 			registrertDato = deltaker.registrertDato,
 			dagerPerUke = deltaker.dagerPerUke,
 			prosentStilling = deltaker.prosentStilling,
-			begrunnelseForDeltakelse = deltaker.begrunnelseForDeltakelse
+			innsokBegrunnelse = deltaker.innsokBegrunnelse
 		)
 
 }

@@ -40,7 +40,7 @@ open class TiltakDeltakerPresentationService(
 
 		val erIProd = System.getenv()["NAIS_CLUSTER_NAME"] == "prod-gcp"
 
-		val begrunnelse = if (erIProd) null else begrunnelseForDeltakelse
+		val begrunnelse = if (erIProd) null else innsokBegrunnelse
 
 		return TiltakDeltakerDetaljerDto(
 			id = deltakerId,
@@ -58,7 +58,7 @@ open class TiltakDeltakerPresentationService(
 			registrertDato = registrertDato,
 			status = DeltakerStatusDto(type = status, endretDato = statusOpprettet),
 			fjernesDato = fjernesDato,
-			begrunnelseForDeltakelse = begrunnelse,
+			innsokBegrunnelse = begrunnelse,
 			gjennomforing = GjennomforingDto(
 				id = gjennomforingId,
 				navn = gjennomforingNavn,

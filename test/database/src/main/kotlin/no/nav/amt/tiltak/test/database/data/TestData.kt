@@ -32,7 +32,7 @@ object TestData {
 			dagerPerUke = 5,
 			prosentStilling = 100f,
 			registrertDato = LocalDateTime.now(),
-			begrunnelseForDeltakelse = null
+			innsokBegrunnelse = null
 		)
 
 	fun createBrukerCommand(navEnhet: InsertNavEnhetCommand) =
@@ -211,7 +211,7 @@ object TestData {
 		dagerPerUke = 5,
 		prosentStilling = 100f,
 		registrertDato = LocalDateTime.of(2022, 2, 13, 12, 12),
-		begrunnelseForDeltakelse = "begrunnelse deltaker 1"
+		innsokBegrunnelse = "begrunnelse deltaker 1"
 	)
 
 
@@ -246,7 +246,7 @@ object TestData {
 		dagerPerUke = 5,
 		prosentStilling = 100f,
 		registrertDato = LocalDateTime.of(2022, 2, 10, 12, 12),
-		begrunnelseForDeltakelse = "begrunnelse deltaker 2"
+		innsokBegrunnelse = "begrunnelse deltaker 2"
 	)
 
 	val DELTAKER_2_STATUS_1 = InsertDeltakerStatusCommand(
@@ -293,7 +293,7 @@ object TestData {
 		dagerPerUke = 5,
 		prosentStilling = 100f,
 		registrertDato = LocalDateTime.of(2022, 2, 10, 12, 12),
-		begrunnelseForDeltakelse = "begrunnelse deltaker 4"
+		innsokBegrunnelse = "begrunnelse deltaker 4"
 	)
 
 	val DELTAKER_4_STATUS_1 = InsertDeltakerStatusCommand(

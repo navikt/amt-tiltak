@@ -77,7 +77,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		dbo.createdAt shouldNotBe null
 		dbo.modifiedAt shouldNotBe null
 		dbo.registrertDato.truncatedTo(ChronoUnit.MINUTES) shouldBe registrertDato.truncatedTo(ChronoUnit.MINUTES)
-		dbo.begrunnelseForDeltakelse shouldBe begrunnelse
+		dbo.innsokBegrunnelse shouldBe begrunnelse
 	}
 
 	test("Update should update Deltaker and return the updated Deltaker") {
@@ -90,13 +90,13 @@ internal class DeltakerRepositoryTest : FunSpec({
 				startDato = nyStartdato,
 				sluttDato = nySluttdato,
 				registrertDato = LocalDateTime.now(),
-				begrunnelseForDeltakelse = nyBegrunnelse
+				innsokBegrunnelse = nyBegrunnelse
 		))
 
 		updatedDeltaker.id shouldBe DELTAKER_1.id
 		updatedDeltaker.startDato shouldBe nyStartdato
 		updatedDeltaker.sluttDato shouldBe nySluttdato
-		updatedDeltaker.begrunnelseForDeltakelse shouldBe nyBegrunnelse
+		updatedDeltaker.innsokBegrunnelse shouldBe nyBegrunnelse
 	}
 
 	test("Get by id") {

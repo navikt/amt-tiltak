@@ -15,7 +15,7 @@ data class DeltakerPayload(
 	val prosentDeltid: Float?,
 	val registrertDato: LocalDateTime,
 	val statusEndretDato: LocalDateTime,
-	val begrunnelseForDeltakelse: String?
+	val innsokBegrunnelse: String?
 ) {
 	enum class Status {
 		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, FEILREGISTRERT

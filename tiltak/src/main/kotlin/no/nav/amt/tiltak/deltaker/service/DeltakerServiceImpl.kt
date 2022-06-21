@@ -85,7 +85,7 @@ open class DeltakerServiceImpl(
 			registrertDato = deltaker.registrertDato,
 			dagerPerUke = deltaker.dagerPerUke,
 			prosentStilling = deltaker.prosentStilling,
-			begrunnelseForDeltakelse = deltaker.begrunnelseForDeltakelse
+			innsokBegrunnelse = deltaker.innsokBegrunnelse
 		)
 
 		deltakerRepository.update(toUpdate)
@@ -102,7 +102,7 @@ open class DeltakerServiceImpl(
 			dagerPerUke = deltaker.dagerPerUke,
 			prosentStilling = deltaker.prosentStilling,
 			registrertDato = deltaker.registrertDato,
-			begrunnelseForDeltakelse = deltaker.begrunnelseForDeltakelse
+			innsokBegrunnelse = deltaker.innsokBegrunnelse
 		)
 
 		deltakerRepository.insert(toInsert)

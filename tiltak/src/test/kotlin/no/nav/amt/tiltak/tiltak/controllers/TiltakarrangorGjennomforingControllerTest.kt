@@ -73,7 +73,7 @@ class TiltakarrangorGjennomforingControllerTest {
 		createdAt = LocalDateTime.now(),
 		modifiedAt = LocalDateTime.now(),
 		registrertDato = LocalDateTime.now(),
-		begrunnelseForDeltakelse = null
+		innsokBegrunnelse = null
 	)
 
 	val tiltak = Tiltak(
