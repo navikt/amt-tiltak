@@ -15,7 +15,6 @@ import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_3
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
-import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
@@ -49,6 +48,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val sluttDato = null
 		val dagerPerUke = 2
 		val prosentStilling = 20.0f
+		val begrunnelse = "begrunnelse"
 
 		repository.insert(
 			DeltakerInsertDbo(
@@ -59,7 +59,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 				sluttDato,
 				dagerPerUke,
 				prosentStilling,
-				registrertDato
+				registrertDato,
+				begrunnelse
 			)
 		)
 		val dbo = repository.get(id)
@@ -76,22 +77,26 @@ internal class DeltakerRepositoryTest : FunSpec({
 		dbo.createdAt shouldNotBe null
 		dbo.modifiedAt shouldNotBe null
 		dbo.registrertDato.truncatedTo(ChronoUnit.MINUTES) shouldBe registrertDato.truncatedTo(ChronoUnit.MINUTES)
+		dbo.innsokBegrunnelse shouldBe begrunnelse
 	}
 
 	test("Update should update Deltaker and return the updated Deltaker") {
 		val nyStartdato = LocalDate.now().plusDays(1)
 		val nySluttdato = LocalDate.now().plusDays(14)
+		val nyBegrunnelse = "ny begrunnelse"
 
 		val updatedDeltaker = repository.update(DeltakerUpdateDbo(
 				id = DELTAKER_1.id,
 				startDato = nyStartdato,
 				sluttDato = nySluttdato,
-				registrertDato = LocalDateTime.now()
+				registrertDato = LocalDateTime.now(),
+				innsokBegrunnelse = nyBegrunnelse
 		))
 
 		updatedDeltaker.id shouldBe DELTAKER_1.id
 		updatedDeltaker.startDato shouldBe nyStartdato
 		updatedDeltaker.sluttDato shouldBe nySluttdato
+		updatedDeltaker.innsokBegrunnelse shouldBe nyBegrunnelse
 	}
 
 	test("Get by id") {

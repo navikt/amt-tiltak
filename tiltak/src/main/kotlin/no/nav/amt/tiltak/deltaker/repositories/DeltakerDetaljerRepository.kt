@@ -51,6 +51,7 @@ class GetDeltakerDetaljerQuery(
 			organisasjonNavn = rs.getString("organisasjon_navn"),
 			dagerPerUke = rs.getInt("dager_per_uke"),
 			prosentStilling = rs.getFloat("prosent_stilling"),
+			innsokBegrunnelse = rs.getNullableString("innsok_begrunnelse")
 		)
 	}
 
@@ -65,6 +66,7 @@ class GetDeltakerDetaljerQuery(
 			   deltaker.dager_per_uke			AS dager_per_uke,
 			   deltaker.prosent_stilling		AS prosent_stilling,
 			   deltaker.registrert_dato     	AS registrert_dato,
+			   deltaker.innsok_begrunnelse 		AS innsok_begrunnelse,
 			   bruker.id						AS bruker_id,
 			   bruker.fornavn               	AS fornavn,
 			   bruker.mellomnavn            	AS mellomnavn,

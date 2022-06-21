@@ -57,6 +57,7 @@ class DeltakerDetaljerRepositoryTest : FunSpec({
 		deltakerDetaljer.gjennomforingSluttDato shouldBe GJENNOMFORING_1.sluttDato
 		deltakerDetaljer.tiltakNavn shouldBe TILTAK_1.navn
 		deltakerDetaljer.tiltakKode shouldBe TILTAK_1.type
+		deltakerDetaljer.innsokBegrunnelse shouldBe DELTAKER_1.innsokBegrunnelse
 	}
 
 	test("Should get deltaker detaljer if nav ansatt is null") {

@@ -1,6 +1,8 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 
-import no.nav.amt.tiltak.core.domain.tiltak.*
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.PersonService
@@ -55,7 +57,8 @@ class DeltakerProcessor(
 			dagerPerUke = deltakerDto.dagerPerUke,
 			prosentStilling = deltakerDto.prosentDeltid,
 			registrertDato = deltakerDto.registrertDato,
-			gjennomforingId = tiltaksgjennomforing.id
+			gjennomforingId = tiltaksgjennomforing.id,
+			innsokBegrunnelse = deltakerDto.innsokBegrunnelse
 		)
 		val status = DeltakerStatusInsert(
 			id = UUID.randomUUID(),

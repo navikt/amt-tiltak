@@ -94,8 +94,14 @@ class TestDataRepository(
 
 	fun insertDeltaker(cmd: InsertDeltakerCommand) {
 		val sql = """
-			INSERT INTO deltaker (id, bruker_id, gjennomforing_id, start_dato, slutt_dato, dager_per_uke, prosent_stilling, registrert_dato)
-			VALUES (:id, :bruker_id, :gjennomforing_id, :start_dato, :slutt_dato, :dager_per_uke, :prosent_stilling, :registrert_dato);
+			INSERT INTO deltaker (
+				id, bruker_id, gjennomforing_id, start_dato,
+				slutt_dato, dager_per_uke, prosent_stilling, registrert_dato, innsok_begrunnelse
+			 )
+			VALUES (
+				:id, :bruker_id, :gjennomforing_id, :start_dato,
+				:slutt_dato, :dager_per_uke, :prosent_stilling, :registrert_dato, :innsok_begrunnelse
+			);
 		""".trimIndent()
 
 		template.update(
@@ -107,7 +113,8 @@ class TestDataRepository(
 				"slutt_dato" to cmd.sluttDato,
 				"dager_per_uke" to cmd.dagerPerUke,
 				"prosent_stilling" to cmd.prosentStilling,
-				"registrert_dato" to cmd.registrertDato
+				"registrert_dato" to cmd.registrertDato,
+				"innsok_begrunnelse" to cmd.innsokBegrunnelse
 			)
 		)
 	}

@@ -182,7 +182,6 @@ class DeltakerServiceImplTest {
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldBe null
 	}
 
-
 	val deltaker = DeltakerUpsert(
 		id =  deltakerId,
 		startDato = null,
@@ -190,7 +189,7 @@ class DeltakerServiceImplTest {
 		registrertDato =  LocalDateTime.now(),
 		dagerPerUke = null,
 		prosentStilling = null,
-		gjennomforingId = GJENNOMFORING_1.id
-
+		gjennomforingId = GJENNOMFORING_1.id,
+		innsokBegrunnelse = null
 	)
 }

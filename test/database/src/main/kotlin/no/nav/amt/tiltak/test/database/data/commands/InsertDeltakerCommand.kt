@@ -12,5 +12,6 @@ data class InsertDeltakerCommand(
 	val sluttDato: LocalDate,
 	val dagerPerUke: Int,
 	val prosentStilling: Float,
-	val registrertDato: LocalDateTime
+	val registrertDato: LocalDateTime,
+	val innsokBegrunnelse: String?
 )
