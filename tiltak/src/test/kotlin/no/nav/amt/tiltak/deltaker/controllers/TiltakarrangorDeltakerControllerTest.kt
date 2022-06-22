@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.deltaker.controllers
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import no.nav.amt.tiltak.tiltak.dto.*
@@ -73,7 +74,7 @@ class TiltakarrangorDeltakerControllerTest {
 			navn = "",
 			startDato = null,
 			sluttDato = null,
-			status = null,
+			status = Gjennomforing.Status.GJENNOMFORES,
 			tiltak = TiltakDto(
 				tiltakskode = "",
 				tiltaksnavn = ""
@@ -133,7 +134,7 @@ class TiltakarrangorDeltakerControllerTest {
 		).andReturn().response
 
 		val expectedJson = """
-			{"id":"0d5190f8-a6c2-48ff-84b9-6b835664c099","fornavn":"Test","mellomnavn":null,"etternavn":"Testersen","fodselsnummer":"12344543","telefonnummer":"9083423423","epost":"test@test.test","navEnhet":{"navn":"NAV Testheim"},"navVeileder":null,"erSkjermetPerson":false,"startDato":null,"sluttDato":null,"registrertDato":"2022-06-20T07:02:35.269658","status":{"type":"DELTAR","endretDato":"2022-06-20T07:02:35.269658"},"gjennomforing":{"id":"7187e487-bdb4-43bc-9d17-a3ad0f400897","navn":"","startDato":null,"sluttDato":null,"status":null,"tiltak":{"tiltakskode":"","tiltaksnavn":""},"arrangor":{"virksomhetNavn":"Virksomhet AS","organisasjonNavn":null}},"fjernesDato":null,"innsokBegrunnelse":"begrunnelse"}
+			{"id":"0d5190f8-a6c2-48ff-84b9-6b835664c099","fornavn":"Test","mellomnavn":null,"etternavn":"Testersen","fodselsnummer":"12344543","telefonnummer":"9083423423","epost":"test@test.test","navEnhet":{"navn":"NAV Testheim"},"navVeileder":null,"erSkjermetPerson":false,"startDato":null,"sluttDato":null,"registrertDato":"2022-06-20T07:02:35.269658","status":{"type":"DELTAR","endretDato":"2022-06-20T07:02:35.269658"},"gjennomforing":{"id":"7187e487-bdb4-43bc-9d17-a3ad0f400897","navn":"","startDato":null,"sluttDato":null,"status":"GJENNOMFORES","tiltak":{"tiltakskode":"","tiltaksnavn":""},"arrangor":{"virksomhetNavn":"Virksomhet AS","organisasjonNavn":null}},"fjernesDato":null,"innsokBegrunnelse":"begrunnelse"}
 		""".trimIndent()
 
 		response.status shouldBe 200

@@ -44,7 +44,7 @@ class GetDeltakerDetaljerQuery(
 			gjennomforingNavn = rs.getString("gjennomforing_navn"),
 			gjennomforingStartDato = rs.getNullableLocalDate("gjennomforing_start_dato"),
 			gjennomforingSluttDato = rs.getNullableLocalDate("gjennomforing_slutt_dato"),
-			gjennomforingStatus = rs.getString("gjennomforing_status")?.let { Gjennomforing.Status.valueOf(it) },
+			gjennomforingStatus = Gjennomforing.Status.valueOf(rs.getString("gjennomforing_status")),
 			tiltakNavn = rs.getString("tiltak_navn"),
 			tiltakKode = rs.getString("tiltak_kode"),
 			virksomhetNavn = rs.getString("virksomhet_navn"),
