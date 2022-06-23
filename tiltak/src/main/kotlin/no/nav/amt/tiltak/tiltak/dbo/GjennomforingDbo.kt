@@ -26,7 +26,7 @@ data class GjennomforingDbo(
 	val modifiedAt: LocalDateTime
 ) {
 
-	fun toGjennomforing(tiltak: Tiltak, arrangor: Arrangor): Gjennomforing {
+	fun toGjennomforing(tiltak: Tiltak, arrangor: Arrangor, koordinatorer: List<String> = emptyList()): Gjennomforing {
 		return Gjennomforing(
 			id = id,
 			tiltak = tiltak,
@@ -39,7 +39,8 @@ data class GjennomforingDbo(
 			registrertDato = registrertDato,
 			fremmoteDato = fremmoteDato,
 			lopenr = lopenr,
-			opprettetAar = opprettetAar
+			opprettetAar = opprettetAar,
+			koordinatorer = koordinatorer
 		)
 	}
 

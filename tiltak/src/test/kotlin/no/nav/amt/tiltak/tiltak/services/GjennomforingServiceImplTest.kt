@@ -26,6 +26,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
+import no.nav.amt.tiltak.tiltak.repositories.HentKoordinatorerForGjennomforingQuery
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
@@ -72,7 +73,8 @@ class GjennomforingServiceImplTest : FunSpec({
 				transactionTemplate
 			),
 			arrangorService = arrangorService,
-			transactionTemplate = transactionTemplate
+			transactionTemplate = transactionTemplate,
+			koordinatorerForGjennomforing = HentKoordinatorerForGjennomforingQuery(parameterTemplate)
 		)
 
 		DbTestDataUtils.cleanDatabase(dataSource)

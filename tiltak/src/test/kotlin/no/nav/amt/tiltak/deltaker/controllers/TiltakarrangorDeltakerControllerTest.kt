@@ -82,7 +82,8 @@ class TiltakarrangorDeltakerControllerTest {
 			arrangor = ArrangorDto(
 				virksomhetNavn = "Virksomhet AS",
 				organisasjonNavn = null
-			)
+			),
+			koordinatorer = emptyList()
 		),
 		fjernesDato = null
 	)

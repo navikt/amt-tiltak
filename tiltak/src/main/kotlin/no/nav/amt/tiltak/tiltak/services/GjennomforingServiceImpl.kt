@@ -7,6 +7,7 @@ import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
+import no.nav.amt.tiltak.tiltak.repositories.HentKoordinatorerForGjennomforingQuery
 import no.nav.amt.tiltak.utils.UpdateStatus
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -19,7 +20,8 @@ class GjennomforingServiceImpl(
 	private val tiltakService: TiltakService,
 	private val deltakerService: DeltakerService,
 	private val arrangorService: ArrangorService,
-	private val transactionTemplate: TransactionTemplate
+	private val transactionTemplate: TransactionTemplate,
+	private val koordinatorerForGjennomforing: HentKoordinatorerForGjennomforingQuery
 ) : GjennomforingService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -88,7 +90,8 @@ class GjennomforingServiceImpl(
 		return gjennomforingRepository.get(id)?.let { gjennomforingDbo ->
 			val tiltak = tiltakService.getTiltakById(gjennomforingDbo.tiltakId)
 			val arrangor = arrangorService.getArrangorById(gjennomforingDbo.arrangorId)
-			return gjennomforingDbo.toGjennomforing(tiltak, arrangor)
+			val koordinatorer = koordinatorerForGjennomforing.query(id)
+			return gjennomforingDbo.toGjennomforing(tiltak, arrangor, koordinatorer)
 		} ?: throw NoSuchElementException("Fant ikke gjennomforing")
 	}
 
