@@ -11,7 +11,7 @@ interface NavEnhetService {
 
 	fun getNavEnhetForBruker(fodselsnummer: String): NavEnhet?
 
-	fun getNavEnhet(enhetId: String): NavEnhet
+	fun getNavEnhet(enhetId: String): NavEnhet?
 
 	fun getNavEnhet(id: UUID): NavEnhet
 

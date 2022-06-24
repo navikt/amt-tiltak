@@ -98,7 +98,7 @@ open class BrukerRepository(
 		template.update(sql, parameters)
 	}
 
-	fun oppdaterNavEnhet(fodselsnummer: String, navEnhetId: UUID) {
+	fun oppdaterNavEnhet(fodselsnummer: String, navEnhetId: UUID?) {
 		val sql = """
 			UPDATE bruker SET nav_enhet_id = :navEnhetId WHERE fodselsnummer = :fodselsnummer
 		""".trimIndent()

@@ -71,9 +71,9 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 		testDataRepository.insertNavEnhet(InsertNavEnhetCommand(navEnhet.id, navEnhet.enhetId, navEnhet.navn))
 		brukerRepository.insert(bruker)
 
-		every { navEnhetService.getNavEnhet(expectedNyEnhet) }.returns(
-			navEnhet
-		)
+		every {
+			navEnhetService.getNavEnhet(expectedNyEnhet)
+		} returns navEnhet
 
 		endringPaaBrukerIngestorImpl.ingestKafkaRecord("""
 			{
