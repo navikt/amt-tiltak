@@ -12,8 +12,8 @@ interface BrukerService {
 
 	fun finnesBruker(fodselsnummer: String): Boolean
 
-	fun oppdaterAnsvarligVeileder(brukerPersonligIdent: String, veilederId: UUID)
+	fun oppdaterAnsvarligVeileder(fodselsnummer: String, navAnsattId: UUID)
 
-	fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet)
+	fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet?)
 
 }
