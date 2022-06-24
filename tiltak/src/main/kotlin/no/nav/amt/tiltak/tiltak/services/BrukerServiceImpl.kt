@@ -36,12 +36,12 @@ class BrukerServiceImpl(
 		return brukerRepository.get(fodselsnummer) != null
 	}
 
-	override fun oppdaterAnsvarligVeileder(brukerPersonligIdent: String, navAnsattId: UUID) {
-		brukerRepository.oppdaterVeileder(brukerPersonligIdent, navAnsattId)
+	override fun oppdaterAnsvarligVeileder(fodselsnummer: String, navAnsattId: UUID) {
+		brukerRepository.oppdaterVeileder(fodselsnummer, navAnsattId)
 	}
 
-	override fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet) {
-		brukerRepository.oppdaterNavEnhet(fodselsnummer, navEnhet.id)
+	override fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet?) {
+		brukerRepository.oppdaterNavEnhet(fodselsnummer, navEnhet?.id)
 	}
 
 	private fun createBruker(fodselsnummer: String): BrukerDbo {

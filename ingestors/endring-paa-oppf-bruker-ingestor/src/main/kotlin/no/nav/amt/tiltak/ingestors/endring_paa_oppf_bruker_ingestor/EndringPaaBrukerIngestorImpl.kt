@@ -26,6 +26,6 @@ class EndringPaaBrukerIngestorImpl(
 		val navEnhet = navEnhetService.getNavEnhet(brukerRecord.oppfolgingsenhet)
 
 		brukerService.oppdaterNavEnhet(bruker.fodselsnummer, navEnhet)
-
 	}
+
 }
