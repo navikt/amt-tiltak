@@ -4,9 +4,9 @@ import java.util.*
 
 interface TiltaksansvarligAutoriseringService {
 
-	fun verifiserTilgangTilFlate(navIdent: String)
+	fun verifiserTilgangTilFlate(navAnsattAzureId: UUID)
 
-	fun verifiserTilgangTilEndringsmelding(navIdent: String)
+	fun verifiserTilgangTilEndringsmelding(navAnsattAzureId: UUID)
 
 	fun verifiserTilgangTilGjennomforing(navIdent: String, gjennomforingId: UUID)
 

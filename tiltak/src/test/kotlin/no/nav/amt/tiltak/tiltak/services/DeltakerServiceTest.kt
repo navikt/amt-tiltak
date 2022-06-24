@@ -2,7 +2,10 @@ package no.nav.amt.tiltak.tiltak.services
 
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.StringSpec
-import io.mockk.*
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
@@ -82,7 +85,8 @@ class DeltakerServiceTest: StringSpec ({
 			sluttDato = deltaker.sluttDato,
 			dagerPerUke = deltaker.dagerPerUke,
 			prosentStilling = deltaker.prosentStilling,
-			registrertDato = deltaker.registrertDato
+			registrertDato = deltaker.registrertDato,
+			innsokBegrunnelse = deltaker.innsokBegrunnelse
 		)
 		every { deltakerRepository.get(deltaker.id) } returns null
 		every { brukerService.getOrCreate(fodselsnummer) } returns defaultBruker.id

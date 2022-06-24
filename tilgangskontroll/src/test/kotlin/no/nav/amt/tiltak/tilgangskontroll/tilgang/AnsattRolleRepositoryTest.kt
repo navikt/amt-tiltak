@@ -41,7 +41,7 @@ class AnsattRolleRepositoryTest : FunSpec({
 		testDataRepository.insertArrangorAnsatt(
 			InsertArrangorAnsattCommand(
 				id = ansattId,
-				personlig_ident = "",
+				personligIdent = "",
 				fornavn = "",
 				etternavn = ""
 			)
@@ -69,7 +69,7 @@ class AnsattRolleRepositoryTest : FunSpec({
 		testDataRepository.insertArrangorAnsatt(
 			InsertArrangorAnsattCommand(
 				id = ansattId,
-				personlig_ident = "",
+				personligIdent = "",
 				fornavn = "",
 				etternavn = ""
 			)

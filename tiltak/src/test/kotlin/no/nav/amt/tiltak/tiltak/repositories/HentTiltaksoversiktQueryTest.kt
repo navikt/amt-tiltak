@@ -38,8 +38,8 @@ class HentTiltaksoversiktQueryTest : FunSpec({
 		gjennomforing.id shouldBe GJENNOMFORING_1.id
 		gjennomforing.navn shouldBe GJENNOMFORING_1.navn
 		gjennomforing.lopenr shouldBe GJENNOMFORING_1.lopenr
-		gjennomforing.opprettetAar shouldBe GJENNOMFORING_1.opprettet_aar
-		gjennomforing.arrangorOrganisasjonsnavn shouldBe ARRANGOR_1.overordnet_enhet_navn
+		gjennomforing.opprettetAar shouldBe GJENNOMFORING_1.opprettetAar
+		gjennomforing.arrangorOrganisasjonsnavn shouldBe ARRANGOR_1.overordnetEnhetNavn
 		gjennomforing.arrangorVirksomhetsnavn shouldBe ARRANGOR_1.navn
 	}
 

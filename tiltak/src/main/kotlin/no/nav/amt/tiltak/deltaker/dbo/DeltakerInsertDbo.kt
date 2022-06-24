@@ -13,4 +13,5 @@ data class DeltakerInsertDbo(
 	val dagerPerUke: Int? = null,
 	val prosentStilling: Float? = null,
 	val registrertDato: LocalDateTime,
+	val innsokBegrunnelse: String? = null
 )

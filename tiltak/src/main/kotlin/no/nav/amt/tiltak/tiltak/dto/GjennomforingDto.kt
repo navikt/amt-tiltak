@@ -9,7 +9,7 @@ data class GjennomforingDto(
 	val navn: String,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
-	val status: Gjennomforing.Status?,
+	val status: Gjennomforing.Status,
 	val tiltak: TiltakDto,
 	val arrangor: ArrangorDto
 )

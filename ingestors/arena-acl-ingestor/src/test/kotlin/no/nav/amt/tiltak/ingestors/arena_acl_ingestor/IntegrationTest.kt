@@ -9,7 +9,10 @@ import no.nav.amt.tiltak.arrangor.ArrangorServiceImpl
 import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.clients.amt_enhetsregister.Virksomhet
 import no.nav.amt.tiltak.clients.veilarbarena.VeilarbarenaClient
-import no.nav.amt.tiltak.core.domain.tiltak.*
+import no.nav.amt.tiltak.core.domain.tiltak.Bruker
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
 import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
@@ -212,7 +215,7 @@ class IntegrationTest {
 				"registrertDato": "${toInsertGjennomforing.registrertDato}",
 				"opprettetAar": ${toInsertGjennomforing.opprettetAar},
 				"lopenr": ${toInsertGjennomforing.lopenr},
-				"ansvarligNavEnhetId": "${NAV_ENHET_1.enhet_id}"
+				"ansvarligNavEnhetId": "${NAV_ENHET_1.enhetId}"
 			  }
 			}
 		""".trimIndent()

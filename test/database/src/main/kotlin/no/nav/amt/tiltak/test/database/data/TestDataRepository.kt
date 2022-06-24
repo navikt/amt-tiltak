@@ -17,7 +17,7 @@ class TestDataRepository(
 		template.update(
 			sql, parameters(
 				"id" to cmd.id,
-				"personlig_ident" to cmd.personlig_ident,
+				"personlig_ident" to cmd.personligIdent,
 				"fornavn" to cmd.fornavn,
 				"mellomnavn" to cmd.mellomnavn,
 				"etternavn" to cmd.etternavn
@@ -34,8 +34,8 @@ class TestDataRepository(
 		template.update(
 			sql, parameters(
 				"id" to cmd.id,
-				"ansatt_id" to cmd.ansatt_id,
-				"gjennomforing_id" to cmd.gjennomforing_id,
+				"ansatt_id" to cmd.ansattId,
+				"gjennomforing_id" to cmd.gjennomforingId,
 			)
 		)
 	}
@@ -49,8 +49,8 @@ class TestDataRepository(
 		template.jdbcTemplate.update(
 			sql,
 			cmd.id,
-			cmd.arrangor_id,
-			cmd.ansatt_id,
+			cmd.arrangorId,
+			cmd.ansattId,
 			cmd.rolle
 		)
 	}
@@ -64,8 +64,8 @@ class TestDataRepository(
 		template.update(
 			sql, parameters(
 				"id" to cmd.id,
-				"overordnet_enhet_organisasjonsnummer" to cmd.overordnet_enhet_organisasjonsnummer,
-				"overordnet_enhet_navn" to cmd.overordnet_enhet_navn,
+				"overordnet_enhet_organisasjonsnummer" to cmd.overordnetEnhetOrganisasjonsnummer,
+				"overordnet_enhet_navn" to cmd.overordnetEnhetNavn,
 				"organisasjonsnummer" to cmd.organisasjonsnummer,
 				"navn" to cmd.navn,
 			)
@@ -86,28 +86,35 @@ class TestDataRepository(
 				"etternavn" to cmd.etternavn,
 				"telefonnummer" to cmd.telefonnummer,
 				"epost" to cmd.epost,
-				"ansvarlig_veileder_id" to cmd.ansvarlig_veileder_id,
-				"nav_enhet_id" to cmd.nav_enhet_id
+				"ansvarlig_veileder_id" to cmd.ansvarligVeilederId,
+				"nav_enhet_id" to cmd.navEnhetId
 			)
 		)
 	}
 
 	fun insertDeltaker(cmd: InsertDeltakerCommand) {
 		val sql = """
-			INSERT INTO deltaker (id, bruker_id, gjennomforing_id, start_dato, slutt_dato, dager_per_uke, prosent_stilling, registrert_dato)
-			VALUES (:id, :bruker_id, :gjennomforing_id, :start_dato, :slutt_dato, :dager_per_uke, :prosent_stilling, :registrert_dato);
+			INSERT INTO deltaker (
+				id, bruker_id, gjennomforing_id, start_dato,
+				slutt_dato, dager_per_uke, prosent_stilling, registrert_dato, innsok_begrunnelse
+			 )
+			VALUES (
+				:id, :bruker_id, :gjennomforing_id, :start_dato,
+				:slutt_dato, :dager_per_uke, :prosent_stilling, :registrert_dato, :innsok_begrunnelse
+			);
 		""".trimIndent()
 
 		template.update(
 			sql, parameters(
 				"id" to cmd.id,
-				"bruker_id" to cmd.bruker_id,
-				"gjennomforing_id" to cmd.gjennomforing_id,
-				"start_dato" to cmd.start_dato,
-				"slutt_dato" to cmd.slutt_dato,
-				"dager_per_uke" to cmd.dager_per_uke,
-				"prosent_stilling" to cmd.prosent_stilling,
-				"registrert_dato" to cmd.registrert_dato
+				"bruker_id" to cmd.brukerId,
+				"gjennomforing_id" to cmd.gjennomforingId,
+				"start_dato" to cmd.startDato,
+				"slutt_dato" to cmd.sluttDato,
+				"dager_per_uke" to cmd.dagerPerUke,
+				"prosent_stilling" to cmd.prosentStilling,
+				"registrert_dato" to cmd.registrertDato,
+				"innsok_begrunnelse" to cmd.innsokBegrunnelse
 			)
 		)
 	}
@@ -121,7 +128,7 @@ class TestDataRepository(
 		template.update(
 			sql, parameters(
 				"id" to cmd.id,
-				"deltaker_id" to cmd.deltaker_id,
+				"deltaker_id" to cmd.deltakerId,
 				"gyldigFra" to cmd.gyldigFra,
 				"status" to cmd.status,
 				"aktiv" to cmd.aktiv
@@ -138,16 +145,16 @@ class TestDataRepository(
 		template.update(
 			sql, parameters(
 				"id" to cmd.id,
-				"tiltak_id" to cmd.tiltak_id,
-				"arrangor_id" to cmd.arrangor_id,
+				"tiltak_id" to cmd.tiltakId,
+				"arrangor_id" to cmd.arrangorId,
 				"navn" to cmd.navn,
 				"status" to cmd.status,
-				"start_dato" to cmd.start_dato,
-				"slutt_dato" to cmd.slutt_dato,
-				"registrert_dato" to cmd.registrert_dato,
-				"fremmote_dato" to cmd.fremmote_dato,
-				"nav_enhet_id" to cmd.nav_enhet_id,
-				"opprettet_aar" to cmd.opprettet_aar,
+				"start_dato" to cmd.startDato,
+				"slutt_dato" to cmd.sluttDato,
+				"registrert_dato" to cmd.registrertDato,
+				"fremmote_dato" to cmd.fremmoteDato,
+				"nav_enhet_id" to cmd.navEnhetId,
+				"opprettet_aar" to cmd.opprettetAar,
 				"lopenr" to cmd.lopenr,
 			)
 		)
@@ -162,7 +169,7 @@ class TestDataRepository(
 		template.update(
 			sql, parameters(
 				"id" to cmd.id,
-				"nav_ident" to cmd.nav_ident,
+				"nav_ident" to cmd.navIdent,
 				"navn" to cmd.navn,
 				"telefonnummer" to cmd.telefonnummer,
 				"epost" to cmd.epost
@@ -179,7 +186,7 @@ class TestDataRepository(
 		template.update(
 			sql, parameters(
 				"id" to cmd.id,
-				"enhet_id" to cmd.enhet_id,
+				"enhet_id" to cmd.enhetId,
 				"navn" to cmd.navn
 			)
 		)
@@ -201,55 +208,21 @@ class TestDataRepository(
 		)
 	}
 
-	fun insertTilgangForesporsel(cmd: InsertTilgangForesporselCommand) {
+	fun insertEndringsmelding(cmd: InsertEndringsmeldingCommand) {
 		val sql = """
-			INSERT INTO gjennomforing_tilgang_foresporsel(
-				id, personlig_ident, fornavn, mellomnavn, etternavn, gjennomforing_id,
-				beslutning_av_nav_ansatt_id, tidspunkt_beslutning, beslutning, gjennomforing_tilgang_id
-			)
-			VALUES (
-				:id, :personligIdent, :fornavn, :mellomnavn, :etternavn, :gjennomforingId,
-				:beslutningAvNavAnsattId, :tidspunktBeslutning, :beslutning, :gjennomforingTilgangId
-			)
+			INSERT INTO endringsmelding(id, deltaker_id, start_dato, aktiv, opprettet_av_arrangor_ansatt_id)
+				VALUES (:id, :deltakerId, :startDato, :aktiv, :opprettetAvArrangorAnsattId)
 		""".trimIndent()
 
-		template.update(
-			sql, parameters(
-				"id" to cmd.id,
-				"personligIdent" to cmd.personligIdent,
-				"fornavn" to cmd.fornavn,
-				"mellomnavn" to cmd.mellomnavn,
-				"etternavn" to cmd.etternavn,
-				"gjennomforingId" to cmd.gjennomforingId,
-				"beslutningAvNavAnsattId" to cmd.beslutningAvNavAnsattId,
-				"tidspunktBeslutning" to cmd.tidspunktBeslutning?.toOffsetDateTime(),
-				"beslutning" to cmd.beslutning,
-				"gjennomforingTilgangId" to cmd.gjennomforingTilgangId
-			)
+		val sqlParameters = parameters(
+			"id" to cmd.id,
+			"deltakerId" to cmd.deltakerId,
+			"startDato" to cmd.startDato,
+			"aktiv" to cmd.aktiv,
+			"opprettetAvArrangorAnsattId" to cmd.opprettetAvArrangorAnsattId
 		)
-	}
 
-	fun insertTilgangInvitasjon(cmd: InsertTilgangInvitasjonCommand) {
-		val sql = """
-			INSERT INTO gjennomforing_tilgang_invitasjon(
-				id, gjennomforing_id, gyldig_til, opprettet_av_nav_ansatt_id, er_brukt, tidspunkt_brukt, tilgang_foresporsel_id
-			)
-			VALUES (
-				:id, :gjennomforingId, :gyldigTil, :opprettetAvNavAnsattId, :erBrukt, :tidspunktBrukt, :tilgangForesporselId
-			)
-		""".trimIndent()
-
-		template.update(
-			sql, parameters(
-				"id" to cmd.id,
-				"gjennomforingId" to cmd.gjennomforingId,
-				"gyldigTil" to cmd.gyldigTil.toOffsetDateTime(),
-				"opprettetAvNavAnsattId" to cmd.opprettetAvNavAnsattId,
-				"erBrukt" to cmd.erBrukt,
-				"tidspunktBrukt" to cmd.tidspunktBrukt?.toOffsetDateTime(),
-				"tilgangForesporselId" to cmd.tilgangForesporselId,
-			)
-		)
+		template.update(sql, sqlParameters)
 	}
 
 	fun insertTiltaksansvarligGjennomforingTilgang(cmd: InsertTiltaksansvarligGjennomforingTilgangCommand) {

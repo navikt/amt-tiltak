@@ -37,9 +37,9 @@ class HentGjennomforingMedLopenrQueryTest : FunSpec({
 
 		gjennomforing.id shouldBe GJENNOMFORING_1.id
 		gjennomforing.lopenr shouldBe GJENNOMFORING_1.lopenr
-		gjennomforing.opprettetAr shouldBe GJENNOMFORING_1.opprettet_aar
+		gjennomforing.opprettetAr shouldBe GJENNOMFORING_1.opprettetAar
 		gjennomforing.navn shouldBe GJENNOMFORING_1.navn
-		gjennomforing.arrangorOrganisasjonsnavn shouldBe ARRANGOR_1.overordnet_enhet_navn
+		gjennomforing.arrangorOrganisasjonsnavn shouldBe ARRANGOR_1.overordnetEnhetNavn
 		gjennomforing.arrangorVirksomhetsnavn shouldBe ARRANGOR_1.navn
 	}
 

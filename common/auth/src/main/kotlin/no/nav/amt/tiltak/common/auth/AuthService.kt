@@ -6,6 +6,7 @@ import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
+import java.util.*
 import javax.servlet.http.HttpServletRequest
 
 @Service
@@ -36,5 +37,14 @@ open class AuthService(
 		.get("NAVident")
 		?.toString()
 		?: throw NotAuthenticatedException("NAV ident is missing")
+
+	open fun hentAzureIdTilInnloggetBruker() : UUID = tokenValidationContextHolder
+		.tokenValidationContext
+		.getClaims(Issuer.AZURE_AD)
+		.getStringClaim("oid").let { UUID.fromString(it) }
+		?: throw ResponseStatusException(
+		HttpStatus.UNAUTHORIZED,
+		"oid is missing"
+	)
 
 }

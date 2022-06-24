@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDateTime
 import java.util.*
-import kotlin.NoSuchElementException
 
 @Service
 open class DeltakerServiceImpl(
@@ -55,35 +54,6 @@ open class DeltakerServiceImpl(
 		}
 	}
 
-	private fun update(deltaker: DeltakerUpsert) {
-		val toUpdate = DeltakerUpdateDbo(
-			id = deltaker.id,
-			startDato = deltaker.startDato,
-			sluttDato = deltaker.sluttDato,
-			registrertDato = deltaker.registrertDato,
-			dagerPerUke = deltaker.dagerPerUke,
-			prosentStilling = deltaker.prosentStilling
-		)
-
-		deltakerRepository.update(toUpdate)
-	}
-
-	private fun insertDeltaker(fodselsnummer: String, deltaker: DeltakerUpsert) {
-		val brukerId = brukerService.getOrCreate(fodselsnummer)
-		val toInsert = DeltakerInsertDbo(
-				id = deltaker.id,
-				brukerId = brukerId,
-				gjennomforingId = deltaker.gjennomforingId,
-				startDato = deltaker.startDato,
-				sluttDato = deltaker.sluttDato,
-				dagerPerUke = deltaker.dagerPerUke,
-				prosentStilling = deltaker.prosentStilling,
-				registrertDato = deltaker.registrertDato
-		)
-
-		deltakerRepository.insert(toInsert)
-	}
-
 	override fun hentDeltakerePaaGjennomforing(gjennomforingId: UUID): List<Deltaker> {
 		return deltakerRepository.getDeltakerePaaTiltak(gjennomforingId)
 			.map { it.toDeltaker(hentStatusOrThrow(it.id)) }
@@ -91,14 +61,6 @@ open class DeltakerServiceImpl(
 
 	override fun hentDeltaker(deltakerId: UUID): Deltaker? {
 		return deltakerRepository.get(deltakerId)?.toDeltaker(hentStatusOrThrow(deltakerId))
-	}
-
-	fun hentStatusOrThrow(deltakerId: UUID) : DeltakerStatus {
-		return hentStatus(deltakerId)?: throw NoSuchElementException("Fant ikke status på deltaker med id $deltakerId")
-	}
-
-	fun hentStatus(deltakerId: UUID) : DeltakerStatus? {
-		return deltakerStatusRepository.getStatusForDeltaker(deltakerId)?.toDeltakerStatus() ?: return null
 	}
 
 	override fun oppdaterStatuser() {
@@ -113,6 +75,45 @@ open class DeltakerServiceImpl(
 		}
 
 		log.info("Deltaker med id=$deltakerId er slettet")
+	}
+
+	private fun update(deltaker: DeltakerUpsert) {
+		val toUpdate = DeltakerUpdateDbo(
+			id = deltaker.id,
+			startDato = deltaker.startDato,
+			sluttDato = deltaker.sluttDato,
+			registrertDato = deltaker.registrertDato,
+			dagerPerUke = deltaker.dagerPerUke,
+			prosentStilling = deltaker.prosentStilling,
+			innsokBegrunnelse = deltaker.innsokBegrunnelse
+		)
+
+		deltakerRepository.update(toUpdate)
+	}
+
+	private fun insertDeltaker(fodselsnummer: String, deltaker: DeltakerUpsert) {
+		val brukerId = brukerService.getOrCreate(fodselsnummer)
+		val toInsert = DeltakerInsertDbo(
+			id = deltaker.id,
+			brukerId = brukerId,
+			gjennomforingId = deltaker.gjennomforingId,
+			startDato = deltaker.startDato,
+			sluttDato = deltaker.sluttDato,
+			dagerPerUke = deltaker.dagerPerUke,
+			prosentStilling = deltaker.prosentStilling,
+			registrertDato = deltaker.registrertDato,
+			innsokBegrunnelse = deltaker.innsokBegrunnelse
+		)
+
+		deltakerRepository.insert(toInsert)
+	}
+
+	private fun hentStatusOrThrow(deltakerId: UUID) : DeltakerStatus {
+		return hentStatus(deltakerId)?: throw NoSuchElementException("Fant ikke status på deltaker med id $deltakerId")
+	}
+
+	private fun hentStatus(deltakerId: UUID) : DeltakerStatus? {
+		return deltakerStatusRepository.getStatusForDeltaker(deltakerId)?.toDeltakerStatus() ?: return null
 	}
 
 	private fun progressStatuser(kandidater: List<DeltakerDbo>) = kandidater

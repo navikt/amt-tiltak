@@ -5,8 +5,8 @@ import java.util.*
 
 data class InsertArrangorCommand(
 	val id: UUID,
-	val overordnet_enhet_organisasjonsnummer: String?,
-	val overordnet_enhet_navn: String?,
+	val overordnetEnhetOrganisasjonsnummer: String?,
+	val overordnetEnhetNavn: String?,
 	val organisasjonsnummer: String,
 	val navn: String
 ) {
@@ -15,8 +15,8 @@ data class InsertArrangorCommand(
 			id = this.id,
 			navn = this.navn,
 			organisasjonsnummer = this.organisasjonsnummer,
-			overordnetEnhetOrganisasjonsnummer = this.overordnet_enhet_organisasjonsnummer,
-			overordnetEnhetNavn = this.overordnet_enhet_navn
+			overordnetEnhetOrganisasjonsnummer = this.overordnetEnhetOrganisasjonsnummer,
+			overordnetEnhetNavn = this.overordnetEnhetNavn
 		)
 	}
 

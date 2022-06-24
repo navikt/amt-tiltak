@@ -7,10 +7,7 @@ import java.util.*
 
 interface DeltakerService {
 
-	fun upsertDeltaker(
-		fodselsnummer: String,
-		deltaker: DeltakerUpsert,
-	)
+	fun upsertDeltaker(fodselsnummer: String, deltaker: DeltakerUpsert)
 
 	fun insertStatus(status: DeltakerStatusInsert)
 

@@ -11,6 +11,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
+import no.nav.amt.tiltak.tiltak.repositories.AntallAktiveEndringsmeldingerQuery
 import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingMedLopenrQuery
 import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingMedLopenrQueryDbo
 import no.nav.amt.tiltak.tiltak.repositories.HentTiltaksoversiktQuery
@@ -57,6 +58,9 @@ class NavAnsattGjennomforingControllerTest {
 
 	@MockBean
 	private lateinit var tiltaksansvarligAutoriseringService: TiltaksansvarligAutoriseringService
+
+	@MockBean
+	private lateinit var antallAktiveEndringsmeldingerQuery: AntallAktiveEndringsmeldingerQuery
 
 	companion object : MockOAuthServer() {
 		@AfterAll

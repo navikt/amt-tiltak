@@ -29,7 +29,7 @@ class ArrangorerForAnsattQueryTest : FunSpec({
 	}
 
 	test("Should get arrangorer for ansatt") {
-		val arrangorer = arrangorerForAnsattQuery.query(ARRANGOR_ANSATT_2.personlig_ident)
+		val arrangorer = arrangorerForAnsattQuery.query(ARRANGOR_ANSATT_2.personligIdent)
 
 		arrangorer shouldHaveSize 1
 
@@ -38,8 +38,8 @@ class ArrangorerForAnsattQueryTest : FunSpec({
 		arrangor.id shouldBe ARRANGOR_1.id
 		arrangor.navn shouldBe ARRANGOR_1.navn
 		arrangor.organisasjonsnummer shouldBe ARRANGOR_1.organisasjonsnummer
-		arrangor.overordnetEnhetNavn shouldBe ARRANGOR_1.overordnet_enhet_navn
-		arrangor.overordnetEnhetOrganisasjonsnummer shouldBe ARRANGOR_1.overordnet_enhet_organisasjonsnummer
+		arrangor.overordnetEnhetNavn shouldBe ARRANGOR_1.overordnetEnhetNavn
+		arrangor.overordnetEnhetOrganisasjonsnummer shouldBe ARRANGOR_1.overordnetEnhetOrganisasjonsnummer
 		arrangor.rolle shouldBe ARRANGOR_ANSATT_2_ROLLE_1.rolle
 	}
 

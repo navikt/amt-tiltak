@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
+import no.nav.amt.tiltak.tiltak.repositories.AntallAktiveEndringsmeldingerQuery
 import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingMedLopenrQuery
 import no.nav.amt.tiltak.tiltak.repositories.HentTiltaksoversiktQuery
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -21,17 +22,20 @@ class NavAnsattGjennomforingController(
 	private val hentGjennomforingMedLopenrQuery: HentGjennomforingMedLopenrQuery,
 	private val hentTiltaksoversiktQuery: HentTiltaksoversiktQuery,
 	private val tiltaksansvarligAutoriseringService: TiltaksansvarligAutoriseringService,
+	private val antallAktiveEndringsmeldingerQuery: AntallAktiveEndringsmeldingerQuery
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@GetMapping
 	fun hentGjennomforinger(): List<HentGjennomforingerDto> {
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-
-		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navIdent)
+		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()
+		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navAnsattAzureId)
 
 		val tilganger = tiltaksansvarligTilgangService.hentAktiveTilganger(navIdent)
 			.map { it.gjennomforingId }
+
+		val antallEndringsmeldinger = antallAktiveEndringsmeldingerQuery.query(tilganger)
 
 		return hentTiltaksoversiktQuery.query(tilganger)
 			.map {
@@ -40,7 +44,9 @@ class NavAnsattGjennomforingController(
 					navn = it.navn,
 					lopenr = it.lopenr,
 					opprettetAar = it.opprettetAar,
-					arrangorNavn = it.arrangorOrganisasjonsnavn ?: it.arrangorVirksomhetsnavn
+					arrangorNavn = it.arrangorOrganisasjonsnavn ?: it.arrangorVirksomhetsnavn,
+					antallAktiveEndringsmeldinger =
+						antallEndringsmeldinger.find { a -> a.gjennomforingId == it.id }?.antallMeldinger ?: 0
 				)
 			}
 	}
@@ -48,9 +54,10 @@ class NavAnsattGjennomforingController(
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@GetMapping("/{gjennomforingId}")
 	fun hentGjennomforing(@PathVariable gjennomforingId: UUID): GjennomforingDto {
+		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
 
-		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navIdent)
+		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navAnsattAzureId)
 		tiltaksansvarligAutoriseringService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId)
 
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
@@ -74,9 +81,9 @@ class NavAnsattGjennomforingController(
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@GetMapping(params = ["lopenr"])
 	fun hentGjennomforingerMedLopenr(@RequestParam("lopenr") lopenr: Int): List<HentGjennomforingMedLopenrDto> {
-		val navIdent = authService.hentNavIdentTilInnloggetBruker()
+		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()
 
-		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navIdent)
+		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navAnsattAzureId)
 
 		return hentGjennomforingMedLopenrQuery.query(lopenr)
 			.map {
@@ -96,6 +103,7 @@ class NavAnsattGjennomforingController(
 		val arrangorNavn: String,
 		val lopenr: Int,
 		val opprettetAar: Int,
+		val antallAktiveEndringsmeldinger: Int
 	)
 
 	data class HentGjennomforingMedLopenrDto(

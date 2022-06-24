@@ -31,13 +31,14 @@ data class DeltakerDetaljerDbo(
 	val gjennomforingNavn: String,
 	val gjennomforingStartDato: LocalDate?,
 	val gjennomforingSluttDato: LocalDate?,
-	val gjennomforingStatus: Gjennomforing.Status?,
+	val gjennomforingStatus: Gjennomforing.Status,
 	val tiltakNavn: String,
 	val tiltakKode: String,
 	val virksomhetNavn: String,
 	val organisasjonNavn: String?,
 	val dagerPerUke: Int?,
-	val prosentStilling: Float?
+	val prosentStilling: Float?,
+	val innsokBegrunnelse: String?
 ) {
 	fun toDeltaker() = Deltaker(
 		id = deltakerId,
@@ -67,6 +68,7 @@ data class DeltakerDetaljerDbo(
 			),
 			registrertDato = registrertDato,
 			dagerPerUke = dagerPerUke,
-			prosentStilling = prosentStilling
+			prosentStilling = prosentStilling,
+			innsokBegrunnelse = innsokBegrunnelse
 	)
 }

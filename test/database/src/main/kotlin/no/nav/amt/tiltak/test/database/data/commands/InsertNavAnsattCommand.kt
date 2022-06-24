@@ -4,7 +4,7 @@ import java.util.*
 
 data class InsertNavAnsattCommand(
 	val id: UUID,
-	val nav_ident: String,
+	val navIdent: String,
 	val navn: String,
 	val telefonnummer: String,
 	val epost: String

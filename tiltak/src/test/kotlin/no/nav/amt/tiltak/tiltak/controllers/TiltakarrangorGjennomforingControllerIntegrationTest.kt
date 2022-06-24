@@ -38,7 +38,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 import org.springframework.web.server.ResponseStatusException
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -123,7 +122,7 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 		resultat.id shouldBe gjennomforingCmd.id
 		resultat.navn shouldBe gjennomforingCmd.navn
 		resultat.tiltak.tiltaksnavn shouldBe TILTAK_1.navn
-		resultat.arrangor.organisasjonNavn shouldBe ARRANGOR_1.overordnet_enhet_navn
+		resultat.arrangor.organisasjonNavn shouldBe ARRANGOR_1.overordnetEnhetNavn
 
 	}
 
@@ -145,8 +144,8 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 		deltaker1.fornavn shouldBe bruker.fornavn
 		deltaker1.etternavn shouldBe bruker.etternavn
 
-		deltaker1.startDato shouldBe deltakerCmd.start_dato
-		deltaker1.sluttDato shouldBe deltakerCmd.slutt_dato
+		deltaker1.startDato shouldBe deltakerCmd.startDato
+		deltaker1.sluttDato shouldBe deltakerCmd.sluttDato
 		deltaker1.registrertDato.truncatedTo(ChronoUnit.MINUTES) shouldBe deltaker1.registrertDato.truncatedTo(ChronoUnit.MINUTES)
 
 	}
