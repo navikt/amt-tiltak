@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
+import kotlin.NoSuchElementException
 
 @RestController
 @RequestMapping(value = [ "/api/gjennomforing", "/api/tiltaksarrangor/gjennomforing" ])
@@ -52,7 +53,7 @@ class TiltakarrangorGjennomforingController(
 			return gjennomforingService.getGjennomforing(gjennomforingId).toDto()
 		} catch (e: NoSuchElementException) {
 			log.error("Fant ikke gjennomforing", e)
-			throw ResponseStatusException(HttpStatus.NOT_FOUND, "Fant ikke gjennomforingId")
+			throw NoSuchElementException("Fant ikke gjennomforing med id $gjennomforingId")
 		}
 	}
 

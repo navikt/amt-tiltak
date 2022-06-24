@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.nav_enhet
 
 import no.nav.amt.tiltak.common.auth.AuthService
+import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.common.job.JobRunner
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.HttpStatus

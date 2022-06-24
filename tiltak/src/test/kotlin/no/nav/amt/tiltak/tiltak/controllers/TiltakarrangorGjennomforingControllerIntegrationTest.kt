@@ -29,6 +29,7 @@ import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
 import no.nav.amt.tiltak.tiltak.services.GjennomforingServiceImpl
 import no.nav.amt.tiltak.tiltak.services.TiltakServiceImpl
 import org.junit.Assert.assertThrows
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -40,6 +41,7 @@ import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
+import kotlin.NoSuchElementException
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TiltakarrangorGjennomforingControllerIntegrationTest {
@@ -104,10 +106,10 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 	@Test
 	fun `hentGjennomforing - tiltaksgjennomføring finnes ikke - skal returnere NOT FOUND`() {
 		val id = UUID.randomUUID()
-		val exception = assertThrows(ResponseStatusException::class.java) {
+		val exception = assertThrows(NoSuchElementException::class.java) {
 			controller.hentGjennomforing(id)
 		}
-		exception.status.toString() shouldBe "404 NOT_FOUND"
+		assertEquals("Fant ikke gjennomforing med id $id", exception.message)
 	}
 
 	@Test
