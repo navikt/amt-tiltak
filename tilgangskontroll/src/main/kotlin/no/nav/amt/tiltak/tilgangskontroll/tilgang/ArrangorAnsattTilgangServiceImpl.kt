@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.log.SecureLog.secureLog
+import no.nav.amt.tiltak.tilgangskontroll.altinn.AltinnService
 import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils.tryCacheFirstNotNull
 import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils.tryCacheFirstNullable
 import org.springframework.http.HttpStatus
@@ -18,6 +19,7 @@ class ArrangorAnsattTilgangServiceImpl(
 	private val arrangorAnsattService: ArrangorAnsattService,
 	private val ansattRolleRepository: AnsattRolleRepository,
 	private val deltakerService: DeltakerService,
+	private val altinnService: AltinnService,
 	private val arrangorAnsattGjennomforingTilgangRepository: ArrangorAnsattGjennomforingTilgangRepository,
 ) : ArrangorAnsattTilgangService {
 
@@ -64,6 +66,10 @@ class ArrangorAnsattTilgangServiceImpl(
 		val deltaker = deltakerService.hentDeltaker(deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 
 		verifiserTilgangTilGjennomforing(ansattPersonligIdent, deltaker.gjennomforingId)
+	}
+
+	override fun hentVirksomhetsnummereMedKoordinatorRettighet(ansattPersonligIdent: String): List<String> {
+		return altinnService.hentVirksomehterMedKoordinatorRettighet(ansattPersonligIdent)
 	}
 
 	override fun hentAnsattId(ansattPersonligIdent: String): UUID {

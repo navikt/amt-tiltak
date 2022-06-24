@@ -12,6 +12,7 @@ open class ArrangorAnsattGjennomforingTilgangService(
 
 	private val defaultGyldigTil = ZonedDateTime.parse("3000-01-01T00:00:00.00000+00:00")
 
+	// TODO: Bruk denne
 	open fun opprettTilgang(id: UUID, arrangorAnsattId: UUID, gjennomforingId: UUID) {
 		arrangorAnsattGjennomforingTilgangRepository.opprettTilgang(
 			id = id,
