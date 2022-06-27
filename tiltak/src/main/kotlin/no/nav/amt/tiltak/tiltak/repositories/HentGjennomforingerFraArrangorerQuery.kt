@@ -1,15 +1,13 @@
 package no.nav.amt.tiltak.tiltak.repositories
 
 import no.nav.amt.tiltak.common.db_utils.DbUtils
-import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getUUID
-import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class HentTilgjengeligGjennomforingerQuery(
+open class HentGjennomforingerFraArrangorerQuery(
 	private val template: NamedParameterJdbcTemplate
 )  {
 
@@ -20,7 +18,7 @@ class HentTilgjengeligGjennomforingerQuery(
 		val sql = """
 			SELECT g.id as gjennomforing_id FROM gjennomforing g
 				JOIN arrangor a on a.id = g.arrangor_id
-			WHERE a.organisasjonsnummer in(:arrangorVirksomhetsnummere)
+			WHERE g.status = 'GJENNOMFORES' AND a.organisasjonsnummer in(:arrangorVirksomhetsnummere)
 		""".trimIndent()
 
 		val parameters = DbUtils.sqlParameters(

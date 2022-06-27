@@ -15,12 +15,12 @@ import java.time.Duration
 import java.util.*
 
 @Service
-class ArrangorAnsattTilgangServiceImpl(
+open class ArrangorAnsattTilgangServiceImpl(
 	private val arrangorAnsattService: ArrangorAnsattService,
 	private val ansattRolleRepository: AnsattRolleRepository,
 	private val deltakerService: DeltakerService,
 	private val altinnService: AltinnService,
-	private val arrangorAnsattGjennomforingTilgangRepository: ArrangorAnsattGjennomforingTilgangRepository,
+	private val arrangorAnsattGjennomforingTilgangService: ArrangorAnsattGjennomforingTilgangService,
 ) : ArrangorAnsattTilgangService {
 
 	private val personligIdentToAnsattIdCache = Caffeine.newBuilder()
@@ -33,15 +33,10 @@ class ArrangorAnsattTilgangServiceImpl(
 		.maximumSize(100_000)
 		.build<UUID, List<UUID>>()
 
-	private val ansattIdToGjennomforingIdListCache = Caffeine.newBuilder()
-		.expireAfterWrite(Duration.ofMinutes(5))
-		.maximumSize(100_000)
-		.build<UUID, List<UUID>>()
-
 	override fun verifiserTilgangTilGjennomforing(ansattPersonligIdent: String, gjennomforingId: UUID) {
 		val ansattId = hentAnsattId(ansattPersonligIdent)
 
-		val gjennomforinger = hentGjennomforingerForAnsatt(ansattId)
+		val gjennomforinger = arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
 
 		val harTilgang = gjennomforinger.contains(gjennomforingId)
 
@@ -85,6 +80,19 @@ class ArrangorAnsattTilgangServiceImpl(
 		return ansattId
 	}
 
+	override fun opprettTilgang(ansattPersonligIdent: String, gjennomforingId: UUID) {
+		val ansatt = arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
+			?: throw IllegalStateException(
+				"Kan ikke opprette gjennomføring tilgang på ansatt som ikke er lagret"
+			)
+
+		arrangorAnsattGjennomforingTilgangService.opprettTilgang(
+			UUID.randomUUID(),
+			ansatt.id,
+			gjennomforingId
+		)
+	}
+
 	private fun hentArrangorIderForAnsatt(ansattId: UUID): List<UUID> {
 		return tryCacheFirstNotNull(ansattIdToArrangorIdListCache, ansattId) {
 			ansattRolleRepository.hentArrangorIderForAnsatt(ansattId)
@@ -94,14 +102,7 @@ class ArrangorAnsattTilgangServiceImpl(
 	override fun hentGjennomforingIder(ansattPersonligIdent: String): List<UUID> {
 		val ansattId = hentAnsattId(ansattPersonligIdent)
 
-		return hentGjennomforingerForAnsatt(ansattId)
-	}
-
-	private fun hentGjennomforingerForAnsatt(ansattId: UUID): List<UUID> {
-		return tryCacheFirstNotNull(ansattIdToGjennomforingIdListCache, ansattId) {
-			arrangorAnsattGjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
-				.map { it.gjennomforingId }
-		}
+		return arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
 	}
 
 }

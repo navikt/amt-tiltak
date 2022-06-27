@@ -10,15 +10,15 @@ import java.time.Duration
 
 @Service
 class AltinnService(
+	@Value("\${altinn-koordinator-rettighetid}") private val altinnKoordinatorRettighetId: String,
 	private val amtAltinnAclClient: AmtAltinnAclClient
 ) {
+
+	private val alleRettigheter = listOf(altinnKoordinatorRettighetId)
 
 	private val personligIdentToAltinnRettigheterCache = Caffeine.newBuilder()
 		.expireAfterWrite(Duration.ofHours(1))
 		.build<String, List<Rettighet>>()
-
-	@Value("\${altinn-koordinator-rettighetid}")
-	lateinit var altinnKoordinatorRettighetId: String
 
 	fun hentVirksomehterMedKoordinatorRettighet(ansattPersonligIdent: String): List<String> {
 		return hentAlleRettigheter(ansattPersonligIdent)
@@ -30,13 +30,9 @@ class AltinnService(
 		return CacheUtils.tryCacheFirstNotNull(personligIdentToAltinnRettigheterCache, ansattPersonligIdent) {
 			return@tryCacheFirstNotNull amtAltinnAclClient.hentRettigheter(
 				ansattPersonligIdent,
-				alleRettigheter()
+				alleRettigheter
 			)
 		}
-	}
-
-	private fun alleRettigheter(): List<String> {
-		return listOf(altinnKoordinatorRettighetId)
 	}
 
 }
