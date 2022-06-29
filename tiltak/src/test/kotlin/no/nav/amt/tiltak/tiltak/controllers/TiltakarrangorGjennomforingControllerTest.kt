@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.tiltak.controllers
 
+import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
@@ -12,13 +13,14 @@ import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.endringsmelding.HentAktivEndringsmeldingForDeltakereQuery
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
+import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingerFraArrangorerQuery
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -51,6 +53,9 @@ class TiltakarrangorGjennomforingControllerTest {
 
 	@MockBean
 	private lateinit var hentAktivEndringsmeldingForDeltakereQuery: HentAktivEndringsmeldingForDeltakereQuery
+
+	@MockBean
+	private lateinit var hentGjennomforingerFraArrangorerQuery: HentGjennomforingerFraArrangorerQuery
 
 	@Autowired
 	private lateinit var mockMvc: MockMvc
@@ -86,15 +91,15 @@ class TiltakarrangorGjennomforingControllerTest {
 		kode = "kode"
 	)
 	val gjennomforing = Gjennomforing(
-		id = UUID.randomUUID(),
+		id = gjennomforingId,
 		tiltak = tiltak,
 		arrangor = Arrangor(UUID.randomUUID(), "", "", "", ""),
 		navn = "tiltaksnavn",
 		fremmoteDato = LocalDateTime.now(),
-		startDato = LocalDate.now(),
+		startDato = LocalDate.parse("2022-06-27"),
 		registrertDato = LocalDateTime.now(),
 		navEnhetId = null,
-		sluttDato = LocalDate.now(),
+		sluttDato = LocalDate.parse("2022-06-28"),
 		status = Gjennomforing.Status.GJENNOMFORES,
 		lopenr = 123,
 		opprettetAar = 2020
@@ -117,13 +122,19 @@ class TiltakarrangorGjennomforingControllerTest {
 	}
 
 	@Test
-	fun `hentGjennomforingerByArrangorId() should return 401 when not authenticated`() {
-		val response = mockMvc.perform(
+	fun `should return 401 for all endpoints when not authenticated`() {
+		val requests = listOf(
 			MockMvcRequestBuilders.get("/api/tiltaksarrangor/gjennomforing")
-				.queryParam("arrangorId", "test")
-		).andReturn().response
+				.queryParam("arrangorId", "test"),
 
-		assertEquals(401, response.status)
+			MockMvcRequestBuilders.get("/api/tiltaksarrangor/gjennomforing/$gjennomforingId"),
+
+			MockMvcRequestBuilders.get("/api/tiltaksarrangor/gjennomforing/ID/deltakere")
+		)
+
+		requests
+			.map { mockMvc.perform(it).andReturn().response }
+			.forEach { it.status shouldBe 401 }
 	}
 
 	@Test
@@ -136,16 +147,86 @@ class TiltakarrangorGjennomforingControllerTest {
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
-		assertEquals(200, response.status)
+		response.status shouldBe 200
 	}
 
 	@Test
-	fun `hentGjennomforing() should return 401 when not authenticated`() {
+	fun `hentTilgjengeligeGjennomforinger() should return 200 with correct response`() {
+		val token = tokenXToken("test", "test")
+
+		val virksomhetsnummere = listOf("123543")
+
+		Mockito.`when`(
+			arrangorAnsattTilgangService.hentVirksomhetsnummereMedKoordinatorRettighet(fnr)
+		).thenReturn(virksomhetsnummere)
+
+		Mockito.`when`(
+			hentGjennomforingerFraArrangorerQuery.query(virksomhetsnummere)
+		).thenReturn(listOf(gjennomforingId))
+
+		Mockito.`when`(
+			gjennomforingService.getGjennomforinger(listOf(gjennomforingId))
+		).thenReturn(listOf(gjennomforing))
+
 		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltaksarrangor/gjennomforing/$gjennomforingId")
+			MockMvcRequestBuilders.get("/api/tiltaksarrangor/gjennomforing/tilgjengelig")
+				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
-		assertEquals(401, response.status)
+		val expectedJson = """
+			[{"id":"e68d54e2-47b5-11ec-81d3-0242ac130003","navn":"tiltaksnavn","startDato":"2022-06-27","sluttDato":"2022-06-28","status":"GJENNOMFORES","tiltak":{"tiltakskode":"kode","tiltaksnavn":"tiltaksnavn"},"arrangor":{"virksomhetNavn":"","organisasjonNavn":""}}]
+		""".trimIndent()
+
+		response.status shouldBe 200
+		response.contentAsString shouldBe expectedJson
+	}
+
+	@Test
+	fun `opprettTilgangTilGjennomforing() should return 200`() {
+		val token = tokenXToken("test", "test")
+
+		val virksomhetsnummere = listOf("123543")
+
+		Mockito.`when`(
+			arrangorAnsattTilgangService.hentVirksomhetsnummereMedKoordinatorRettighet(fnr)
+		).thenReturn(virksomhetsnummere)
+
+		Mockito.`when`(
+			hentGjennomforingerFraArrangorerQuery.query(virksomhetsnummere)
+		).thenReturn(listOf(gjennomforingId))
+
+		val response = mockMvc.perform(
+			MockMvcRequestBuilders.post("/api/tiltaksarrangor/gjennomforing/$gjennomforingId/tilgang")
+				.header("Authorization", "Bearer $token")
+		).andReturn().response
+
+		response.status shouldBe 200
+		response.contentAsString shouldBe ""
+
+		verify(arrangorAnsattTilgangService, times(1)).opprettTilgang(fnr, gjennomforingId)
+	}
+
+	@Test
+	fun `opprettTilgangTilGjennomforing() should return 403 if not authorized`() {
+		val token = tokenXToken("test", "test")
+
+		val virksomhetsnummere = listOf("123543")
+
+		Mockito.`when`(
+			arrangorAnsattTilgangService.hentVirksomhetsnummereMedKoordinatorRettighet(fnr)
+		).thenReturn(virksomhetsnummere)
+
+		Mockito.`when`(
+			hentGjennomforingerFraArrangorerQuery.query(virksomhetsnummere)
+		).thenReturn(emptyList())
+
+		val response = mockMvc.perform(
+			MockMvcRequestBuilders.post("/api/tiltaksarrangor/gjennomforing/$gjennomforingId/tilgang")
+				.header("Authorization", "Bearer $token")
+		).andReturn().response
+
+		response.status shouldBe 403
+		response.contentAsString shouldBe ""
 	}
 
 	@Test
@@ -159,7 +240,7 @@ class TiltakarrangorGjennomforingControllerTest {
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
-		assertEquals(200, response.status)
+		response.status shouldBe 200
 	}
 
 	@Test
@@ -179,15 +260,6 @@ class TiltakarrangorGjennomforingControllerTest {
 	}
 
 	@Test
-	fun `hentDeltakere() should return 401 when not authenticated`() {
-		val response = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/tiltaksarrangor/gjennomforing/ID/deltakere")
-		).andReturn().response
-
-		assertEquals(401, response.status)
-	}
-
-	@Test
 	fun `hentDeltakere() should return 200 when authenticated`() {
 		val deltaker = deltakerDbo.toDeltaker(status)
 
@@ -200,7 +272,7 @@ class TiltakarrangorGjennomforingControllerTest {
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
 
-		assertEquals(200, response.status)
+		response.status shouldBe 200
 	}
 
 	@Test
