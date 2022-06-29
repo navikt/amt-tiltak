@@ -5,19 +5,18 @@ import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.endringsmelding.HentAktivEndringsmeldingForDeltakereQuery
+import no.nav.amt.tiltak.tiltak.dto.AktivEndringsmeldingDto
 import no.nav.amt.tiltak.tiltak.dto.GjennomforingDto
 import no.nav.amt.tiltak.tiltak.dto.TiltakDeltakerDto
 import no.nav.amt.tiltak.tiltak.dto.toDto
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.server.ResponseStatusException
 import java.util.*
-import kotlin.NoSuchElementException
 
 @RestController
 @RequestMapping(value = [ "/api/gjennomforing", "/api/tiltaksarrangor/gjennomforing" ])
@@ -25,7 +24,8 @@ class TiltakarrangorGjennomforingController(
 	private val gjennomforingService: GjennomforingService,
 	private val deltakerService: DeltakerService,
 	private val authService: AuthService,
-	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService
+	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
+	private val hentAktivEndringsmeldingForDeltakereQuery: HentAktivEndringsmeldingForDeltakereQuery
 ) {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -64,9 +64,15 @@ class TiltakarrangorGjennomforingController(
 
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
 
-		return deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
+		val deltakere = deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
 			.filter { !it.erUtdatert}
-			.map { it.toDto() }
+
+		val aktiveEndringsmeldinger = hentAktivEndringsmeldingForDeltakereQuery.query(deltakere.map { it.id })
+
+		return deltakere
+			.map { d ->
+				d.toDto(AktivEndringsmeldingDto(aktiveEndringsmeldinger.find { it.deltakerId == d.id }?.startDato))
+			}
 	}
 
 }

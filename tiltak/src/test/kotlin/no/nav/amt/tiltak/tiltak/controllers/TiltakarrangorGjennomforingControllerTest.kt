@@ -10,6 +10,7 @@ import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
+import no.nav.amt.tiltak.endringsmelding.HentAktivEndringsmeldingForDeltakereQuery
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -47,6 +48,9 @@ class TiltakarrangorGjennomforingControllerTest {
 
 	@MockBean
 	private lateinit var arrangorAnsattTilgangService: ArrangorAnsattTilgangService
+
+	@MockBean
+	private lateinit var hentAktivEndringsmeldingForDeltakereQuery: HentAktivEndringsmeldingForDeltakereQuery
 
 	@Autowired
 	private lateinit var mockMvc: MockMvc
