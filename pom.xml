@@ -17,7 +17,6 @@
         <module>connectors</module>
         <module>core</module>
         <module>db-migrations</module>
-        <module>ingestors</module>
         <module>kafka</module>
         <module>mocks</module>
         <module>navansatt</module>
@@ -110,7 +109,7 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>kafka</artifactId>
+                <artifactId>kafka-config</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
