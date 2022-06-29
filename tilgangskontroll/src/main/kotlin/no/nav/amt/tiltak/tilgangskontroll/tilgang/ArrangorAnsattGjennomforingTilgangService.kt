@@ -28,6 +28,8 @@ open class ArrangorAnsattGjennomforingTilgangService(
 			gyldigFra = ZonedDateTime.now(),
 			gyldigTil = defaultGyldigTil
 		)
+
+		ansattIdToGjennomforingIdListCache.invalidate(arrangorAnsattId)
 	}
 
 	open fun hentTilgang(id: UUID): ArrangorAnsattGjennomforingTilgang {
@@ -36,6 +38,7 @@ open class ArrangorAnsattGjennomforingTilgangService(
 
 	open fun stopTilgang(id: UUID) {
 		arrangorAnsattGjennomforingTilgangRepository.oppdaterGyldigTil(id, ZonedDateTime.now())
+		// Should invalidate cache
 	}
 
 	fun hentGjennomforingerForAnsatt(ansattId: UUID): List<UUID> {
