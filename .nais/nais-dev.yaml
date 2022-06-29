@@ -60,6 +60,8 @@ spec:
   secureLogs:
     enabled: true
   env:
+    - name: ALTINN_KOORDINATOR_RETTIGHET_ID
+      value: "9999999"
     - name: PDL_SCOPE
       value: api://dev-fss.pdl.pdl-api/.default
     - name: PDL_URL

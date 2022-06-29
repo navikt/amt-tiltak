@@ -1,7 +1,10 @@
 package no.nav.amt.tiltak.tilgangskontroll.tilgang
 
+import com.github.benmanes.caffeine.cache.Caffeine
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattGjennomforingTilgang
+import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils
 import org.springframework.stereotype.Service
+import java.time.Duration
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -11,6 +14,11 @@ open class ArrangorAnsattGjennomforingTilgangService(
 ) {
 
 	private val defaultGyldigTil = ZonedDateTime.parse("3000-01-01T00:00:00.00000+00:00")
+
+	private val ansattIdToGjennomforingIdListCache = Caffeine.newBuilder()
+		.expireAfterWrite(Duration.ofMinutes(5))
+		.maximumSize(100_000)
+		.build<UUID, List<UUID>>()
 
 	open fun opprettTilgang(id: UUID, arrangorAnsattId: UUID, gjennomforingId: UUID) {
 		arrangorAnsattGjennomforingTilgangRepository.opprettTilgang(
@@ -28,6 +36,13 @@ open class ArrangorAnsattGjennomforingTilgangService(
 
 	open fun stopTilgang(id: UUID) {
 		arrangorAnsattGjennomforingTilgangRepository.oppdaterGyldigTil(id, ZonedDateTime.now())
+	}
+
+	fun hentGjennomforingerForAnsatt(ansattId: UUID): List<UUID> {
+		return CacheUtils.tryCacheFirstNotNull(ansattIdToGjennomforingIdListCache, ansattId) {
+			arrangorAnsattGjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
+				.map { it.gjennomforingId }
+		}
 	}
 
 	private fun mapGjennomforingTilgang(dbo: ArrangorAnsattGjennomforingTilgangDbo): ArrangorAnsattGjennomforingTilgang {
