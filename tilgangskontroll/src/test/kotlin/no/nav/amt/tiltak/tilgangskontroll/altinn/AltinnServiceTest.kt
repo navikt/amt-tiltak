@@ -6,8 +6,8 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.amt_tiltak.clients.amt_altinn_acl.AmtAltinnAclClient
-import no.nav.amt_tiltak.clients.amt_altinn_acl.Rettighet
+import no.nav.amt.tiltak.clients.amt_altinn_acl.AmtAltinnAclClient
+import no.nav.amt.tiltak.clients.amt_altinn_acl.Rettighet
 
 class AltinnServiceTest : FunSpec( {
 

@@ -1,4 +1,4 @@
-package no.nav.amt_tiltak.clients.amt_altinn_acl
+package no.nav.amt.tiltak.clients.amt_altinn_acl
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize

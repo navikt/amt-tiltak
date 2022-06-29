@@ -1,9 +1,9 @@
 package no.nav.amt.tiltak.tilgangskontroll.altinn
 
 import com.github.benmanes.caffeine.cache.Caffeine
+import no.nav.amt.tiltak.clients.amt_altinn_acl.AmtAltinnAclClient
+import no.nav.amt.tiltak.clients.amt_altinn_acl.Rettighet
 import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils
-import no.nav.amt_tiltak.clients.amt_altinn_acl.AmtAltinnAclClient
-import no.nav.amt_tiltak.clients.amt_altinn_acl.Rettighet
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.Duration
