@@ -3,10 +3,6 @@ on:
   pull_request_target:
     branches:
       - workflow-experiment
-env:
-  IMAGE_TAG: ${{ github.sha }}
-  IMAGE: ghcr.io/${{ github.repository }}/amt-tiltak
-  PRINT_PAYLOAD: true
 
 jobs:
   verify-branch:
