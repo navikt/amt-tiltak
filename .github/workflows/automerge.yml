@@ -5,18 +5,28 @@ on:
       - workflow-experiment
 
 jobs:
-  merge-branch:
-    name: Merge branch
+  find_automerge_candidate:
+    name: 'Check if PR is eligible for automatic merging'
     if:
       ${{ github.event.pull_request.base.ref == 'workflow-experiment' && github.event.pull_request.user.login == 'einarbj' }}
     runs-on: ubuntu-latest
     steps:
-      - name: "Merge pullrequest"
+      - name: 'Branch is eligible for automatic merging'
+        run: echo '${{ github.event.pull_request.html_url }}'
+      - name: Log GitHub context
+        id: github_context_step
+        run: echo '${{ toJSON(github.event) }}'
+  run_tests:
+    needs: find_automerge_candidate
+    name: 'Trigging test workflow'
+    uses: ./.github/workflows/test.yaml
+  merge_candidate:
+    name: 'Merge pull-request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Merging'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR: ${{ github.event.pull_request.html_url }}
         run:
           gh pr view $PR
-      - name: Log GitHub context
-        id: github_context_step
-        run: echo '${{ toJSON(github.event) }}'
