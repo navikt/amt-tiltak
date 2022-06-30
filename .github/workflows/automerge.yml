@@ -5,8 +5,8 @@ on:
       - workflow-experiment
 
 jobs:
-  verify-branch:
-    name: Verify branch
+  merge-branch:
+    name: Merge branch
     if: >-
       github.base-ref == 'workflow-experiment' &&
       github.event.pull_request.sender.login == 'einarbj'
