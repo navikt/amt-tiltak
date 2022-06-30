@@ -7,9 +7,6 @@ on:
 jobs:
   verify-branch:
     name: Verify branch
-    if: >-
-      github.base-ref == 'workflow-experiment' &&
-      github.event.pull_request.sender.login == 'einarbj'
     runs-on: ubuntu-latest
     steps:
       - name: "Merge pullrequest"
