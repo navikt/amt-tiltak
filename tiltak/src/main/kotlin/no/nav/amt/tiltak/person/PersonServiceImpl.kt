@@ -1,8 +1,7 @@
-package no.nav.amt.tiltak.connectors.person
+package no.nav.amt.tiltak.person
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import no.nav.amt.tiltak.clients.dkif.DkifClient
 import no.nav.amt.tiltak.clients.pdl.AdressebeskyttelseGradering
 import no.nav.amt.tiltak.clients.pdl.PdlClient
@@ -14,11 +13,11 @@ import no.nav.amt.tiltak.core.port.PersonService
 import org.springframework.stereotype.Service
 
 @Service
-class PersonFacade(
+class PersonServiceImpl(
 	private val pdlClient: PdlClient,
 	private val dkifClient: DkifClient,
 	private val veilarboppfolgingClient: VeilarboppfolgingClient,
-	private val meterRegistry: MeterRegistry = SimpleMeterRegistry()
+	private val meterRegistry: MeterRegistry
 ) : PersonService {
 
 	private val diskresjonskodeCounters = mapOf<Diskresjonskode, Counter>()

@@ -14,7 +14,6 @@
         <module>arrangor</module>
         <module>clients</module>
         <module>common</module>
-        <module>connectors</module>
         <module>core</module>
         <module>db-migrations</module>
         <module>ingestors</module>
@@ -216,11 +215,6 @@
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>veilarboppfolging</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>person</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
