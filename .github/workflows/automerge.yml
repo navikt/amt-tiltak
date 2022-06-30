@@ -1,8 +1,6 @@
 name: Merge security updates
 on:
   pull_request_target:
-    branches:
-      - workflow-experiment
 
 jobs:
   merge-branch:
