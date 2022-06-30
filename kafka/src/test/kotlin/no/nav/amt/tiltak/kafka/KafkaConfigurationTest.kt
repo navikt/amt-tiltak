@@ -27,7 +27,6 @@ class KafkaConfigurationTest {
 	private val amtTiltakTopic = "amt-tiltak"
 	private val sisteTilordnetVeilederTopic = "siste-tilordnet-veileder-v1"
 	private val endringPaaBrukerTopic = "pto.endring-paa-oppfolgingsbruker-v2"
-	private val navEnhetTopic = "amt.nav-enhet-v1"
 
 	@Container
 	var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.4.3"))
@@ -41,7 +40,6 @@ class KafkaConfigurationTest {
 			amtTiltakTopic = amtTiltakTopic,
 			sisteTilordnetVeilederTopic = sisteTilordnetVeilederTopic,
 			endringPaaBrukerTopic = endringPaaBrukerTopic,
-			navEnhetTopic = navEnhetTopic
 		)
 
 		val kafkaProperties = object : KafkaProperties {
@@ -97,7 +95,6 @@ class KafkaConfigurationTest {
 			arenaAclIngestor,
 			tildeltVeilederIngestor,
 			endringPaaBrukerIngestor,
-			navEnhetIngestor
 		)
 
 		config.onApplicationEvent(null)
@@ -108,7 +105,6 @@ class KafkaConfigurationTest {
 		kafkaProducer.sendSync(toJsonProducerRecord(amtTiltakTopic, "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord(sisteTilordnetVeilederTopic, "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord(endringPaaBrukerTopic, "1", value))
-		kafkaProducer.sendSync(toJsonProducerRecord(navEnhetTopic, "1", value))
 
 		kafkaProducer.close()
 
@@ -116,7 +112,7 @@ class KafkaConfigurationTest {
 
 		Thread.sleep(3000)
 
-		assertEquals(4, counter.get())
+		assertEquals(3, counter.get())
 	}
 
 }

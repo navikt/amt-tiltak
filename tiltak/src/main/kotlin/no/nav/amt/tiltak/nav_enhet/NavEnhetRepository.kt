@@ -3,7 +3,6 @@ package no.nav.amt.tiltak.nav_enhet
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 import java.util.*
@@ -21,47 +20,29 @@ open class NavEnhetRepository(
 		)
 	}
 
-	fun upsert(enhetId: String, navn: String): NavEnhetDbo {
+	fun insert(id: UUID, enhetId: String, navn: String) {
 		val sql = """
-			INSERT INTO nav_enhet(id, enhet_id, navn)
-			VALUES (:id,
-					:enhetId,
-					:navn)
-			ON CONFLICT (enhet_id) DO UPDATE SET navn = :navn
+			INSERT INTO nav_enhet(id, enhet_id, navn) VALUES (:id, :enhetId, :navn)
 		""".trimIndent()
 
-		val id = UUID.randomUUID()
-
-		val parameters = MapSqlParameterSource().addValues(
-			mapOf(
-				"id" to id,
-				"enhetId" to enhetId,
-				"navn" to navn
-			)
+		val parameters = sqlParameters(
+			"id" to id,
+			"enhetId" to enhetId,
+			"navn" to navn
 		)
 
 		template.update(sql, parameters)
-		return hentEnhet(enhetId) ?: throw NoSuchElementException("Enhet med enhetId $enhetId eksisterer ikke.")
 	}
 
 	fun get(id: UUID): NavEnhetDbo {
-		return template.query(
-			"SELECT * FROM nav_enhet WHERE id = :id",
-			MapSqlParameterSource().addValues(mapOf("id" to id)),
-			rowMapper
-		).firstOrNull() ?: throw NoSuchElementException("Enhet med id $id eksisterer ikke.")
-	}
-
-	fun hentEnheter(enhetIder: List<String>): List<NavEnhetDbo> {
 		val sql = """
-			SELECT * FROM nav_enhet WHERE enhet_id in(:enhetIder)
+			SELECT * FROM nav_enhet WHERE id = :id
 		""".trimIndent()
 
-		return template.query(
-			sql,
-			sqlParameters("enhetIder" to enhetIder),
-			rowMapper
-		)
+		val parameters = sqlParameters("id" to id)
+
+		return template.query(sql, parameters, rowMapper).firstOrNull()
+			?: throw NoSuchElementException("Enhet med id $id eksisterer ikke.")
 	}
 
 	fun hentEnhet(enhetId: String): NavEnhetDbo? {

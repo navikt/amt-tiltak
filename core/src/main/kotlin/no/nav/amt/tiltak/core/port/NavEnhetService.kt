@@ -5,15 +5,11 @@ import java.util.*
 
 interface NavEnhetService {
 
-	fun hentNavEnheter(enhetIder: List<String>): List<NavEnhet>
-
-	fun upsertNavEnhet(enhetId: String, navn: String)
-
-	fun getNavEnhetForBruker(fodselsnummer: String): NavEnhet?
+	fun getNavEnhet(id: UUID): NavEnhet
 
 	fun getNavEnhet(enhetId: String): NavEnhet?
 
-	fun getNavEnhet(id: UUID): NavEnhet
+	fun getNavEnhetForBruker(fodselsnummer: String): NavEnhet?
 
 }
 

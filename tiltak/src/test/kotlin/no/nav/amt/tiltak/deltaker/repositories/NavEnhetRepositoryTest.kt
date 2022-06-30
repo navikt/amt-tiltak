@@ -5,7 +5,6 @@ import ch.qos.logback.classic.Logger
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.nav_enhet.NavEnhetRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
@@ -28,6 +27,22 @@ class NavEnhetRepositoryTest : FunSpec({
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
+	test("get() - skal hente enhet") {
+		val enhet = repository.get(NAV_ENHET_1.id)
+
+		enhet.id shouldBe NAV_ENHET_1.id
+		enhet.enhetId shouldBe NAV_ENHET_1.enhetId
+		enhet.navn shouldBe NAV_ENHET_1.navn
+	}
+
+	test("hentEnhet() - skal hente enhet") {
+		val enhet = repository.hentEnhet(NAV_ENHET_1.enhetId)
+
+		enhet?.id shouldBe NAV_ENHET_1.id
+		enhet?.enhetId shouldBe NAV_ENHET_1.enhetId
+		enhet?.navn shouldBe NAV_ENHET_1.navn
+	}
+
 	test("Get NAV-kontor med id bør kaste NoSuchElementException om det ikke eksisterer") {
 		val id = UUID.randomUUID()
 
@@ -38,25 +53,18 @@ class NavEnhetRepositoryTest : FunSpec({
 		exception.message shouldBe "Enhet med id $id eksisterer ikke."
 	}
 
-	test("Legg til NAV-Kontor legger til og returnerer nav enhet") {
+	test("insert() - skal inserte ny nav enhet") {
+		val id = UUID.randomUUID()
 		val enhetId = "ENHET_001"
 		val navn = "ENHET_001_NAVN"
 
-		val lagretEnhet = repository.upsert(enhetId, navn)
+		repository.insert(id, enhetId, navn)
 
-		lagretEnhet.id shouldNotBe null
+		val hentetEnhet = repository.get(id)
 
-		val hentetEnhet = repository.get(lagretEnhet.id)
-
-		lagretEnhet shouldBe hentetEnhet
-	}
-
-	test("Endring av navn fører til endring av navn") {
-		val oppdatertEnhet = repository.upsert(NAV_ENHET_1.enhetId, "Nytt navn")
-
-		oppdatertEnhet.id shouldBe NAV_ENHET_1.id
-		oppdatertEnhet.enhetId shouldBe NAV_ENHET_1.enhetId
-		oppdatertEnhet.navn shouldBe "Nytt navn"
+		hentetEnhet.id shouldBe id
+		hentetEnhet.enhetId shouldBe enhetId
+		hentetEnhet.navn shouldBe navn
 	}
 
 })
