@@ -1,6 +1,6 @@
 name: Merge security updates
 on:
-  pull_request_target:
+  pull_request:
 
 jobs:
   find_automerge_candidate:
