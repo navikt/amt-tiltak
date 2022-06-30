@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.deltaker.repositories
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
+import io.kotest.assertions.fail
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -31,6 +32,7 @@ class BrukerRepositoryTest : FunSpec({
 	}
 
 	test("Insert should insert bruker and return BrukerDbo") {
+		fail("tester feilende test")
 		val fodselsnummer = "64798632"
 		val fornavn = "Per"
 		val mellomnavn = null
