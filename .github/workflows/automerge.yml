@@ -1,6 +1,8 @@
 name: Merge security updates
 on:
-  pull_request:
+  pull_request_target:
+    branches:
+      - workflow-experiment
 
 jobs:
   merge-branch:
@@ -15,6 +17,6 @@ jobs:
           PR: ${{ github.event.pull_request.html_url }}
         run:
           gh pr view $PR
-      - name: "Log GitHub context"
+      - name: Log GitHub context
         id: github_context_step
         run: echo '${{ toJSON(github.event) }}'
