@@ -1,12 +1,10 @@
 name: Merge security updates
 on:
   pull_request_target:
-    branches:
-      - workflow-experiment
 
 jobs:
   verify-branch:
-    name: Verify branch
+    name: Merge branch
     runs-on: ubuntu-latest
     steps:
       - name: "Merge pullrequest"
