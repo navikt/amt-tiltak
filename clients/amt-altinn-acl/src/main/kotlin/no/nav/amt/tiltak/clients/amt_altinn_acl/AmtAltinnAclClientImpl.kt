@@ -1,4 +1,4 @@
-package no.nav.amt_tiltak.clients.amt_altinn_acl
+package no.nav.amt.tiltak.clients.amt_altinn_acl
 
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.common.json.JsonUtils.toJsonString

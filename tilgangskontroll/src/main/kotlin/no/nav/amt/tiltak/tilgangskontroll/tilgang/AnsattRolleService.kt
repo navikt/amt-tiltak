@@ -16,8 +16,7 @@ class AnsattRolleService(
 		val rolleFinnes = roller.any { it.rolle == rolle }
 
 		if (!rolleFinnes) {
-			val nyRolleId = UUID.randomUUID()
-			ansattRolleRepository.opprettRolle(nyRolleId, ansattId, arrangorId, rolle)
+			ansattRolleRepository.opprettRolle(UUID.randomUUID(), ansattId, arrangorId, rolle)
 		}
 	}
 

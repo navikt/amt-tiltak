@@ -9,9 +9,9 @@ import io.mockk.mockk
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.tilgangskontroll.altinn.AltinnService
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
-import java.time.ZonedDateTime
 import java.util.*
 
 class ArrangorAnsattTilgangServiceImplTest : FunSpec({
@@ -24,7 +24,9 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	lateinit var arrangorAnsattTilgangServiceImpl: ArrangorAnsattTilgangServiceImpl
 
-	lateinit var arrangorAnsattGjennomforingTilgangRepository: ArrangorAnsattGjennomforingTilgangRepository
+	lateinit var arrangorAnsattGjennomforingTilgangService: ArrangorAnsattGjennomforingTilgangService
+
+	lateinit var altinnService: AltinnService
 
 	val personligIdent = "fnr"
 
@@ -41,10 +43,13 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		deltakerService = mockk()
 
-		arrangorAnsattGjennomforingTilgangRepository = mockk()
+		arrangorAnsattGjennomforingTilgangService = mockk()
+
+		altinnService = mockk()
 
 		arrangorAnsattTilgangServiceImpl = ArrangorAnsattTilgangServiceImpl(
-			arrangorAnsattService, ansattRolleRepository, deltakerService, arrangorAnsattGjennomforingTilgangRepository
+			arrangorAnsattService, ansattRolleRepository,
+			deltakerService, altinnService, arrangorAnsattGjennomforingTilgangService
 		)
 
 		every {
@@ -61,7 +66,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	test("verifiserTilgangTilGjennomforing skal kaste exception hvis ikke tilgang") {
 		every {
-			arrangorAnsattGjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
+			arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
 		} returns emptyList()
 
 		val exception = shouldThrowExactly<ResponseStatusException> {
@@ -73,15 +78,8 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	test("verifiserTilgangTilGjennomforing skal ikke kaste exception hvis tilgang") {
 		every {
-			arrangorAnsattGjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
-		} returns listOf(ArrangorAnsattGjennomforingTilgangDbo(
-			id = UUID.randomUUID(),
-			ansattId = ansattId,
-			gjennomforingId = gjennomforingId,
-			gyldigFra = ZonedDateTime.now(),
-			gyldigTil = ZonedDateTime.now().plusHours(1),
-			createdAt = ZonedDateTime.now()
-		))
+			arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
+		} returns listOf(gjennomforingId)
 
 		shouldNotThrow<Throwable> {
 			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(personligIdent, gjennomforingId)

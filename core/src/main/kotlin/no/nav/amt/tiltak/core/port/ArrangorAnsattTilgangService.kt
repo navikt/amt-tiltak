@@ -10,8 +10,12 @@ interface ArrangorAnsattTilgangService {
 
 	fun verifiserTilgangTilDeltaker(ansattPersonligIdent: String, deltakerId: UUID)
 
+	fun hentVirksomhetsnummereMedKoordinatorRettighet(ansattPersonligIdent: String): List<String>
+
 	fun hentGjennomforingIder(ansattPersonligIdent: String): List<UUID>
 
 	fun hentAnsattId(ansattPersonligIdent: String): UUID
+
+	fun opprettTilgang(ansattPersonligIdent: String, gjennomforingId: UUID)
 
 }

@@ -24,6 +24,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.createStatusCommand
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.TestDataSeeder
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
+import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingerFraArrangorerQuery
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
 import no.nav.amt.tiltak.tiltak.services.GjennomforingServiceImpl
@@ -37,11 +38,9 @@ import org.mockito.Mockito.mock
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
-import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
-import kotlin.NoSuchElementException
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TiltakarrangorGjennomforingControllerIntegrationTest {
@@ -55,6 +54,7 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 	private lateinit var brukerService: BrukerServiceImpl
 	private lateinit var deltakerStatusRepository: DeltakerStatusRepository
 	private lateinit var gjennomforingRepository: GjennomforingRepository
+	private lateinit var hentGjennomforingerFraArrangorerQuery: HentGjennomforingerFraArrangorerQuery
 	private lateinit var gjennomforingService: GjennomforingService
 	private lateinit var deltakerService: DeltakerService
 	private lateinit var arrangorService: ArrangorService
@@ -67,26 +67,31 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 		val transactionTemplate = TransactionTemplate(DataSourceTransactionManager(dataSource))
 
 		namedJdbcTemplate = NamedParameterJdbcTemplate(dataSource)
-
 		gjennomforingRepository = GjennomforingRepository(namedJdbcTemplate)
 		tiltakRepository = TiltakRepository(namedJdbcTemplate)
 		deltakerRepository = DeltakerRepository(namedJdbcTemplate)
 		brukerRepository = BrukerRepository(namedJdbcTemplate)
+		hentGjennomforingerFraArrangorerQuery = HentGjennomforingerFraArrangorerQuery(namedJdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(namedJdbcTemplate)
+
 		authService = mock(AuthService::class.java)
+
 		arrangorService = ArrangorServiceImpl(mockk(), ArrangorRepository(namedJdbcTemplate))
+
 		brukerService = BrukerServiceImpl(
 			brukerRepository,
 			mock(PersonService::class.java),
 			mock(NavAnsattService::class.java),
 			mock(NavEnhetService::class.java)
 		)
+
 		deltakerService = DeltakerServiceImpl(
 			deltakerRepository,
 			deltakerStatusRepository,
 			brukerService,
 			transactionTemplate
 		)
+
 		gjennomforingService = GjennomforingServiceImpl(
 			gjennomforingRepository,
 			TiltakServiceImpl(tiltakRepository),
@@ -94,9 +99,11 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 			arrangorService,
 			transactionTemplate
 		)
+
 		controller = TiltakarrangorGjennomforingController(
 			gjennomforingService, deltakerService,
-			authService, mock(ArrangorAnsattTilgangService::class.java)
+			authService, mock(ArrangorAnsattTilgangService::class.java),
+			hentGjennomforingerFraArrangorerQuery
 		)
 
 		testDataRepository = TestDataRepository(namedJdbcTemplate)

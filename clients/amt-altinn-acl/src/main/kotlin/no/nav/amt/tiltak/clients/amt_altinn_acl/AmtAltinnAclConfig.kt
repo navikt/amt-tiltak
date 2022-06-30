@@ -1,4 +1,4 @@
-package no.nav.amt_tiltak.clients.amt_altinn_acl
+package no.nav.amt.tiltak.clients.amt_altinn_acl
 
 import no.nav.common.token_client.client.MachineToMachineTokenClient
 import org.springframework.beans.factory.annotation.Value
