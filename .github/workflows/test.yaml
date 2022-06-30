@@ -4,7 +4,8 @@ on:
   push:
     branches-ignore:
       - main
-      - workflow-experiment
+      - workflow-experiment@
+      - testbranch
 jobs:
   test:
     name: Run tests
