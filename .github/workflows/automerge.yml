@@ -21,6 +21,7 @@ jobs:
     name: 'Trigging test workflow'
     uses: ./.github/workflows/test.yaml
   merge_candidate:
+    needs: [find_automerge_candidate, run_tests]
     name: 'Merge pull-request'
     runs-on: ubuntu-latest
     steps:
