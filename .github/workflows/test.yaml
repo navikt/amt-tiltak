@@ -3,6 +3,7 @@ on:
   push:
     branches-ignore:
       - main
+      - workflow-experiment
 jobs:
   test:
     name: Run tests
