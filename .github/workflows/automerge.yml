@@ -8,7 +8,7 @@ jobs:
   find_automerge_candidate:
     name: 'Check if PR is eligible for automatic merging'
     if:
-      ${{ github.event.pull_request.base.ref == 'tullenavn' && github.event.pull_request.user.login == 'einarbj' }}
+      ${{ github.event.pull_request.base.ref == 'workflow-experiment' && github.event.pull_request.user.login == 'einarbj' }}
     runs-on: ubuntu-latest
     steps:
       - name: 'Branch is eligible for automatic merging'
