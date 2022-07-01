@@ -15,7 +15,7 @@ data class GjennomforingDto(
 	val koordinatorer: List<String>
 )
 
-fun Gjennomforing.toDto() = GjennomforingDto(
+fun Gjennomforing.toDto(koordinatorer: List<String>) = GjennomforingDto(
 	id = this.id,
 	navn = this.navn,
 	startDato = this.startDato,
@@ -23,5 +23,5 @@ fun Gjennomforing.toDto() = GjennomforingDto(
 	status = this.status,
 	tiltak = this.tiltak.toDto(),
 	arrangor = this.arrangor.toDto(),
-	koordinatorer = this.koordinatorer
+	koordinatorer = koordinatorer
 )

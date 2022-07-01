@@ -19,7 +19,7 @@ import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController
-@RequestMapping(value = [ "/api/gjennomforing", "/api/tiltaksarrangor/gjennomforing" ])
+@RequestMapping(value = ["/api/gjennomforing", "/api/tiltaksarrangor/gjennomforing"])
 class TiltakarrangorGjennomforingController(
 	private val gjennomforingService: GjennomforingService,
 	private val deltakerService: DeltakerService,
@@ -37,8 +37,14 @@ class TiltakarrangorGjennomforingController(
 		val gjennomforingIder = arrangorAnsattTilgangService
 			.hentGjennomforingIder(ansattPersonligIdent)
 
+		val koordinatorer = gjennomforingService.getKoordinatorerForGjennomforinger(gjennomforingIder)
+
 		return gjennomforingService.getGjennomforinger(gjennomforingIder)
-			.map { it.toDto() }
+			.map {
+				it.toDto(
+					koordinatorer = koordinatorer[it.id] ?: emptyList()
+				)
+			}
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -49,7 +55,8 @@ class TiltakarrangorGjennomforingController(
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
 
 		try {
-			return gjennomforingService.getGjennomforing(gjennomforingId).toDto()
+			val koordinatorerForGjennomforing = gjennomforingService.getKoordinatorerForGjennomforing(gjennomforingId)
+			return gjennomforingService.getGjennomforing(gjennomforingId).toDto(koordinatorerForGjennomforing)
 		} catch (e: NoSuchElementException) {
 			log.error("Fant ikke gjennomforing", e)
 			throw ResponseStatusException(HttpStatus.NOT_FOUND, "Fant ikke gjennomforingId")
@@ -64,7 +71,7 @@ class TiltakarrangorGjennomforingController(
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
 
 		return deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
-			.filter { !it.erUtdatert}
+			.filter { !it.erUtdatert }
 			.map { it.toDto() }
 	}
 

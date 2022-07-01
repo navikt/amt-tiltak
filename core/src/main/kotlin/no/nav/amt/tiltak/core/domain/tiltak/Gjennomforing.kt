@@ -18,7 +18,6 @@ data class Gjennomforing(
 	val navEnhetId: UUID?,
 	val opprettetAar: Int?,
 	val lopenr: Int?,
-	val koordinatorer: List<String> = emptyList()
 ) {
 	enum class Status {
 		IKKE_STARTET, GJENNOMFORES, AVSLUTTET
