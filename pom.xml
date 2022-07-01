@@ -168,11 +168,6 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>nav-enhet-ingestor</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>db-migrations</artifactId>
                 <version>${project.version}</version>
             </dependency>

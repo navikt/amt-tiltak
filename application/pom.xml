@@ -71,10 +71,6 @@
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>endring-paa-oppf-bruker-ingestor</artifactId>
         </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>nav-enhet-ingestor</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>no.nav.common</groupId>

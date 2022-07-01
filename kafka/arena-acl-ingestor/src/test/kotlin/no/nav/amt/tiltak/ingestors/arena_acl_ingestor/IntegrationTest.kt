@@ -8,6 +8,7 @@ import no.nav.amt.tiltak.arrangor.ArrangorRepository
 import no.nav.amt.tiltak.arrangor.ArrangorServiceImpl
 import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.clients.amt_enhetsregister.Virksomhet
+import no.nav.amt.tiltak.clients.norg.NorgClient
 import no.nav.amt.tiltak.clients.veilarbarena.VeilarbarenaClient
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
@@ -56,6 +57,7 @@ class IntegrationTest {
 	private lateinit var brukerService: BrukerService
 	private lateinit var deltakerService: DeltakerService
 	private lateinit var personService: PersonService
+	private lateinit var norgClient: NorgClient
 
 	private lateinit var brukerRepository: BrukerRepository
 	private lateinit var navEnhetRepository: NavEnhetRepository
@@ -92,11 +94,12 @@ class IntegrationTest {
 		arrangorRepository = ArrangorRepository(jdbcTemplate)
 		brukerRepository = BrukerRepository(jdbcTemplate)
 
+		norgClient = mockk()
 		veilarbarenaClient = mockk()
 		personService = mockk()
 		enhetsregisterClient = mockk()
 
-		navEnhetService = NavEnhetServiceImpl(navEnhetRepository, veilarbarenaClient)
+		navEnhetService = NavEnhetServiceImpl(norgClient, navEnhetRepository, veilarbarenaClient)
 		tiltakService = TiltakServiceImpl(tiltakRepository)
 		brukerService = BrukerServiceImpl(brukerRepository, personService, mockk(), navEnhetService)
 		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, transactionTemplate)

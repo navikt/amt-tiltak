@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.clients.norg
 
 interface NorgClient {
 
-	fun hentNavEnhetNavn(enhetId: String): String
+	fun hentNavEnhet(enhetId: String): NorgNavEnhet?
 
 	fun hentAlleNavEnheter(): List<NorgNavEnhet>
 

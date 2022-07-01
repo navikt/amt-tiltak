@@ -103,8 +103,6 @@ spec:
       value: amt.amt-tiltak-v1
     - name: ENDRING_PAA_OPPF_BRUKER_TOPIC
       value: pto.endring-paa-oppfolgingsbruker-v2
-    - name: NAV_ENHET_TOPIC
-      value: amt.nav-enhet-v1
   gcp:
     sqlInstances:
       - name: amt-tiltak-v1

@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-open class NorgConnectorConfig {
+open class NorgClientConfig {
 
 	@Value("\${poao-gcp-proxy.url}")
 	lateinit var url: String

@@ -16,7 +16,6 @@
         <module>arena-acl-ingestor</module>
         <module>kafka-config</module>
         <module>endring-paa-oppf-bruker-ingestor</module>
-        <module>nav-enhet-ingestor</module>
         <module>tildelt-veileder-ingestor</module>
     </modules>
 </project>
