@@ -39,6 +39,10 @@ class HentKoordinatorerForGjennomforingQuery(
 	}
 
 	fun query(gjennomforingIds: List<UUID>): Map<UUID, List<String>> {
+		if(gjennomforingIds.isEmpty()) {
+			return emptyMap()
+		}
+
 		val data = template.query(
 			sql,
 			sqlParameters("gjennomforingIds" to gjennomforingIds),
