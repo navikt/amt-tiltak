@@ -12,11 +12,11 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_TILGANG_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.commands.InsertArrangorAnsattCommand
-import no.nav.amt.tiltak.test.database.data.commands.InsertArrangorAnsattGjennomforingTilgang
 import no.nav.amt.tiltak.test.database.data.commands.InsertArrangorAnsattRolleCommand
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -76,7 +76,7 @@ class HentKoordinatorerForGjennomforingQueryTest : FunSpec({
 
 	fun createGjennomforingTilgang(ansattId: UUID = ARRANGOR_ANSATT_1.id) {
 		testDataRepository.insertArrangorAnsattGjennomforingTilgang(
-			InsertArrangorAnsattGjennomforingTilgang(
+			GJENNOMFORING_TILGANG_1.copy(
 				id = UUID.randomUUID(),
 				ansattId = ansattId,
 				gjennomforingId = GJENNOMFORING_1.id
