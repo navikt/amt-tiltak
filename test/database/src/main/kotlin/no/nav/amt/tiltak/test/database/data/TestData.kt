@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.test.database.data
 import no.nav.amt.tiltak.test.database.data.commands.*
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.util.*
 
 object TestData {
@@ -184,7 +185,9 @@ object TestData {
 	val GJENNOMFORING_TILGANG_1 = InsertArrangorAnsattGjennomforingTilgang(
 		id = UUID.randomUUID(),
 		ansattId = ARRANGOR_ANSATT_1.id,
-		gjennomforingId = GJENNOMFORING_1.id
+		gjennomforingId = GJENNOMFORING_1.id,
+		gyldigFra = ZonedDateTime.now().minusHours(1),
+		gyldigTil = ZonedDateTime.now().plusHours(1)
 	)
 
 	val NAV_ANSATT_1 = InsertNavAnsattCommand(
