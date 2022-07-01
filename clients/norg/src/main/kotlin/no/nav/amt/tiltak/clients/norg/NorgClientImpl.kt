@@ -12,7 +12,7 @@ class NorgClientImpl(
 	private val httpClient: OkHttpClient = baseClient(),
 ) : NorgClient {
 
-	override fun hentNavEnhetNavn(enhetId: String): String {
+	override fun hentNavEnhet(enhetId: String): NorgNavEnhet? {
 		val request = Request.Builder()
 			.url("$url/api/v1/enhet/$enhetId")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
@@ -20,15 +20,18 @@ class NorgClientImpl(
 			.build()
 
 		httpClient.newCall(request).execute().use { response ->
+			if (response.code == 404) {
+				return null
+			}
+
 			if (!response.isSuccessful) {
 				throw RuntimeException("Klarte ikke å hente enhet enhetId=$enhetId fra norg status=${response.code}")
 			}
 
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
 
-			val responseDto = fromJsonString<NavEnhetDto>(body)
-
-			return responseDto.navn
+			return fromJsonString<NavEnhetDto>(body)
+				.let { NorgNavEnhet(it.enhetNr, it.navn) }
 		}
 	}
 

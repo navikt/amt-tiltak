@@ -27,27 +27,21 @@ open class NavEnhetServiceImpl(
 			}
 	}
 
-	override fun getNavEnhet(enhetId: String): NavEnhet? {
-		val enhet = navEnhetRepository.hentEnhet(enhetId)?.toNavEnhet()
-
-		if (enhet != null) {
-			return enhet
-		}
-
-		return opprettEnhet(enhetId)
-	}
+	override fun getNavEnhet(enhetId: String) =
+		navEnhetRepository.hentEnhet(enhetId)?.toNavEnhet()
+			?: opprettEnhet(enhetId)
 
 	override fun getNavEnhet(id: UUID) = navEnhetRepository.get(id).toNavEnhet()
 
-	private fun opprettEnhet(enhetId: String): NavEnhet {
-		val enhetNavn = norgClient.hentNavEnhetNavn(enhetId)
+	private fun opprettEnhet(enhetId: String): NavEnhet? {
+		val norgEnhet = norgClient.hentNavEnhet(enhetId) ?: return null
 
 		val id = UUID.randomUUID()
 
 		val insertInput = NavEnhetInsertInput(
 			id = id,
 			enhetId = enhetId,
-			navn = enhetNavn
+			navn = norgEnhet.navn
 		)
 
 		navEnhetRepository.insert(insertInput)

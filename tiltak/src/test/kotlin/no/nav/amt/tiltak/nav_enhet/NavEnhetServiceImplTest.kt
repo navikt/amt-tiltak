@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.amt.tiltak.clients.norg.NorgClient
+import no.nav.amt.tiltak.clients.norg.NorgNavEnhet
 import no.nav.amt.tiltak.clients.veilarbarena.VeilarbarenaClient
 import java.util.*
 
@@ -39,8 +40,8 @@ class NavEnhetServiceImplTest : FunSpec({
 		} returns NavEnhetDbo(id, enhetId, enhetNavn)
 
 		every {
-			norgClient.hentNavEnhetNavn(enhetId)
-		} returns enhetNavn
+			norgClient.hentNavEnhet(enhetId)
+		} returns NorgNavEnhet(enhetId, enhetNavn)
 
 		every {
 			navEnhetRepositoy.insert(any())
