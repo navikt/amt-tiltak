@@ -18,4 +18,6 @@ interface ArrangorAnsattTilgangService {
 
 	fun opprettTilgang(ansattPersonligIdent: String, gjennomforingId: UUID)
 
+	fun fjernTilgang(ansattPersonligIdent: String, gjennomforingId: UUID)
+
 }

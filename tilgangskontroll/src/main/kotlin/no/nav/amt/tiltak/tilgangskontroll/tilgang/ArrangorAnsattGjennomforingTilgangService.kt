@@ -4,13 +4,15 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattGjennomforingTilgang
 import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils
 import org.springframework.stereotype.Service
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.Duration
 import java.time.ZonedDateTime
 import java.util.*
 
 @Service
 open class ArrangorAnsattGjennomforingTilgangService(
-	private val arrangorAnsattGjennomforingTilgangRepository: ArrangorAnsattGjennomforingTilgangRepository
+	private val arrangorAnsattGjennomforingTilgangRepository: ArrangorAnsattGjennomforingTilgangRepository,
+	private val transactionTemplate: TransactionTemplate
 ) {
 
 	private val defaultGyldigTil = ZonedDateTime.parse("3000-01-01T00:00:00.00000+00:00")
@@ -32,13 +34,19 @@ open class ArrangorAnsattGjennomforingTilgangService(
 		ansattIdToGjennomforingIdListCache.invalidate(arrangorAnsattId)
 	}
 
-	open fun hentTilgang(id: UUID): ArrangorAnsattGjennomforingTilgang {
-		return mapGjennomforingTilgang(arrangorAnsattGjennomforingTilgangRepository.get(id))
-	}
+	open fun fjernTilgang(arrangorAnsattId: UUID, gjennomforingId: UUID) {
+		val tilganger = arrangorAnsattGjennomforingTilgangRepository
+			.hentAktiveGjennomforingTilgangerForAnsatt(arrangorAnsattId)
 
-	open fun stopTilgang(id: UUID) {
-		arrangorAnsattGjennomforingTilgangRepository.oppdaterGyldigTil(id, ZonedDateTime.now())
-		// Should invalidate cache
+		val gyldigTil = ZonedDateTime.now()
+
+		transactionTemplate.executeWithoutResult {
+			tilganger
+				.filter { it.gjennomforingId == gjennomforingId }
+				.forEach { arrangorAnsattGjennomforingTilgangRepository.oppdaterGyldigTil(it.id, gyldigTil)  }
+		}
+
+		ansattIdToGjennomforingIdListCache.invalidate(arrangorAnsattId)
 	}
 
 	fun hentGjennomforingerForAnsatt(ansattId: UUID): List<UUID> {
@@ -46,15 +54,6 @@ open class ArrangorAnsattGjennomforingTilgangService(
 			arrangorAnsattGjennomforingTilgangRepository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
 				.map { it.gjennomforingId }
 		}
-	}
-
-	private fun mapGjennomforingTilgang(dbo: ArrangorAnsattGjennomforingTilgangDbo): ArrangorAnsattGjennomforingTilgang {
-		return ArrangorAnsattGjennomforingTilgang(
-			id = dbo.id,
-			ansattId = dbo.ansattId,
-			gjennomforingId = dbo.gjennomforingId,
-			createdAt = dbo.createdAt
-		)
 	}
 
 }

@@ -27,8 +27,8 @@ class TestDataRepository(
 
 	fun insertArrangorAnsattGjennomforingTilgang(cmd: InsertArrangorAnsattGjennomforingTilgang) {
 		val sql = """
-			INSERT INTO arrangor_ansatt_gjennomforing_tilgang(id, ansatt_id, gjennomforing_id)
-			VALUES(:id, :ansatt_id, :gjennomforing_id)
+			INSERT INTO arrangor_ansatt_gjennomforing_tilgang(id, ansatt_id, gjennomforing_id, gyldig_fra, gyldig_til)
+			VALUES(:id, :ansatt_id, :gjennomforing_id, :gyldig_fra, :gyldig_til)
 		""".trimIndent()
 
 		template.update(
@@ -36,6 +36,8 @@ class TestDataRepository(
 				"id" to cmd.id,
 				"ansatt_id" to cmd.ansattId,
 				"gjennomforing_id" to cmd.gjennomforingId,
+				"gyldig_fra" to cmd.gyldigFra.toOffsetDateTime(),
+				"gyldig_til" to cmd.gyldigTil.toOffsetDateTime()
 			)
 		)
 	}

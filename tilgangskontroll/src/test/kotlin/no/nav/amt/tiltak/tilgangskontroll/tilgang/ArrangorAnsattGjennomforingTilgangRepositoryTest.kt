@@ -7,12 +7,14 @@ import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.DbUtils.shouldBeEqualTo
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_TILGANG_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_2
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
@@ -83,13 +85,21 @@ class ArrangorAnsattGjennomforingTilgangRepositoryTest : FunSpec({
 		val tilgangId1 = UUID.randomUUID()
 		val tilgangId2 = UUID.randomUUID()
 
-		testRepository.insertArrangorAnsattGjennomforingTilgang(InsertArrangorAnsattGjennomforingTilgang(
-			tilgangId1, ansattId, gjennomforing1Id
-		))
+		testRepository.insertArrangorAnsattGjennomforingTilgang(
+			GJENNOMFORING_TILGANG_1.copy(
+				id = tilgangId1,
+				ansattId = ansattId,
+				gjennomforingId = gjennomforing1Id
+			)
+		)
 
-		testRepository.insertArrangorAnsattGjennomforingTilgang(InsertArrangorAnsattGjennomforingTilgang(
-			tilgangId2, ansattId, gjennomforing2Id
-		))
+		testRepository.insertArrangorAnsattGjennomforingTilgang(
+			GJENNOMFORING_TILGANG_1.copy(
+				id = tilgangId2,
+				ansattId = ansattId,
+				gjennomforingId = gjennomforing2Id
+			)
+		)
 
 		repository.oppdaterGyldigTil(tilgangId2, ZonedDateTime.now().minusMinutes(1))
 
@@ -115,9 +125,13 @@ class ArrangorAnsattGjennomforingTilgangRepositoryTest : FunSpec({
 		val gjennomforingId = GJENNOMFORING_1.id
 		val tilgangId = UUID.randomUUID()
 
-		testRepository.insertArrangorAnsattGjennomforingTilgang(InsertArrangorAnsattGjennomforingTilgang(
-			tilgangId, ansattId, gjennomforingId
-		))
+		testRepository.insertArrangorAnsattGjennomforingTilgang(
+			GJENNOMFORING_TILGANG_1.copy(
+				id = tilgangId,
+				ansattId = ansattId,
+				gjennomforingId = gjennomforingId
+			)
+		)
 
 		val stopTidspunkt = ZonedDateTime.now()
 

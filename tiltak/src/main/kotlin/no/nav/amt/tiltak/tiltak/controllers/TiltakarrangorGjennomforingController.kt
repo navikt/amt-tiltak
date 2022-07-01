@@ -78,6 +78,14 @@ class TiltakarrangorGjennomforingController(
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
+	@DeleteMapping("/{gjennomforingId}/tilgang")
+	fun fjernTilgangTilGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID) {
+		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
+
+		arrangorAnsattTilgangService.fjernTilgang(ansattPersonligIdent, gjennomforingId)
+	}
+
+	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/{gjennomforingId}")
 	fun hentGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID): GjennomforingDto {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()

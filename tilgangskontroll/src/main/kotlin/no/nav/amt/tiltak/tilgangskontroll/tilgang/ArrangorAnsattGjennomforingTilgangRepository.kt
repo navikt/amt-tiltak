@@ -68,7 +68,8 @@ open class ArrangorAnsattGjennomforingTilgangRepository(
 
 	internal fun hentAktiveGjennomforingTilgangerForAnsatt(ansattId: UUID): List<ArrangorAnsattGjennomforingTilgangDbo> {
 		val sql = """
-			SELECT * FROM arrangor_ansatt_gjennomforing_tilgang WHERE ansatt_id = :ansattId AND gyldig_til > current_timestamp
+			SELECT * FROM arrangor_ansatt_gjennomforing_tilgang
+				WHERE ansatt_id = :ansattId AND gyldig_fra < current_timestamp AND gyldig_til > current_timestamp
 		""".trimIndent()
 
 		val parameters = sqlParameters("ansattId" to ansattId)

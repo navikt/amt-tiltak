@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.tilgangskontroll.tilgang
 
 import com.github.benmanes.caffeine.cache.Caffeine
+import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
@@ -81,10 +82,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 	}
 
 	override fun opprettTilgang(ansattPersonligIdent: String, gjennomforingId: UUID) {
-		val ansatt = arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
-			?: throw IllegalStateException(
-				"Kan ikke opprette gjennomføring tilgang på ansatt som ikke er lagret"
-			)
+		val ansatt = hentAnsatt(ansattPersonligIdent)
 
 		arrangorAnsattGjennomforingTilgangService.opprettTilgang(
 			UUID.randomUUID(),
@@ -93,16 +91,27 @@ open class ArrangorAnsattTilgangServiceImpl(
 		)
 	}
 
-	private fun hentArrangorIderForAnsatt(ansattId: UUID): List<UUID> {
-		return tryCacheFirstNotNull(ansattIdToArrangorIdListCache, ansattId) {
-			ansattRolleRepository.hentArrangorIderForAnsatt(ansattId)
-		}
+	override fun fjernTilgang(ansattPersonligIdent: String, gjennomforingId: UUID) {
+		val ansatt = hentAnsatt(ansattPersonligIdent)
+
+		arrangorAnsattGjennomforingTilgangService.fjernTilgang(ansatt.id, gjennomforingId)
 	}
 
 	override fun hentGjennomforingIder(ansattPersonligIdent: String): List<UUID> {
 		val ansattId = hentAnsattId(ansattPersonligIdent)
 
 		return arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
+	}
+
+	private fun hentAnsatt(ansattPersonligIdent: String): Ansatt {
+		return arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
+			?: throw IllegalStateException("Fant ingen arrangør ansatt med personlig ident")
+	}
+
+	private fun hentArrangorIderForAnsatt(ansattId: UUID): List<UUID> {
+		return tryCacheFirstNotNull(ansattIdToArrangorIdListCache, ansattId) {
+			ansattRolleRepository.hentArrangorIderForAnsatt(ansattId)
+		}
 	}
 
 }
