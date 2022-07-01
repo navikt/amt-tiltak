@@ -25,6 +25,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.createStatusCommand
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.TestDataSeeder
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
+import no.nav.amt.tiltak.tiltak.repositories.HentKoordinatorerForGjennomforingQuery
 import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingerFraArrangorerQuery
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
@@ -99,7 +100,8 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 			TiltakServiceImpl(tiltakRepository),
 			deltakerService,
 			arrangorService,
-			transactionTemplate
+			transactionTemplate,
+			HentKoordinatorerForGjennomforingQuery(namedJdbcTemplate)
 		)
 
 		controller = TiltakarrangorGjennomforingController(

@@ -39,8 +39,14 @@ class TiltakarrangorGjennomforingController(
 		val gjennomforingIder = arrangorAnsattTilgangService
 			.hentGjennomforingIder(ansattPersonligIdent)
 
+		val koordinatorer = gjennomforingService.getKoordinatorerForGjennomforinger(gjennomforingIder)
+
 		return gjennomforingService.getGjennomforinger(gjennomforingIder)
-			.map { it.toDto() }
+			.map {
+				it.toDto(
+					koordinatorer = koordinatorer[it.id] ?: emptyList()
+				)
+			}
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -56,8 +62,10 @@ class TiltakarrangorGjennomforingController(
 
 		val filtrerteGjennomforinger = gjennomforingProdFilter(gjennomforingIder)
 
+		val koordinatorer = gjennomforingService.getKoordinatorerForGjennomforinger(gjennomforingIder)
+
 		return gjennomforingService.getGjennomforinger(filtrerteGjennomforinger)
-			.map { it.toDto() }
+			.map { it.toDto(koordinatorer[it.id] ?: emptyList()) }
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -85,7 +93,8 @@ class TiltakarrangorGjennomforingController(
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
 
 		try {
-			return gjennomforingService.getGjennomforing(gjennomforingId).toDto()
+			val koordinatorerForGjennomforing = gjennomforingService.getKoordinatorerForGjennomforing(gjennomforingId)
+			return gjennomforingService.getGjennomforing(gjennomforingId).toDto(koordinatorerForGjennomforing)
 		} catch (e: NoSuchElementException) {
 			log.error("Fant ikke gjennomforing", e)
 			throw NoSuchElementException("Fant ikke gjennomforing med id $gjennomforingId")

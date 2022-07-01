@@ -73,7 +73,8 @@ open class TiltakDeltakerPresentationService(
 				arrangor = ArrangorDto(
 					virksomhetNavn = virksomhetNavn,
 					organisasjonNavn = organisasjonNavn
-				)
+				),
+				koordinatorer = emptyList()
 			)
 		)
 	}

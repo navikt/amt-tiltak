@@ -30,6 +30,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
+import no.nav.amt.tiltak.tiltak.repositories.HentKoordinatorerForGjennomforingQuery
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
 import no.nav.amt.tiltak.tiltak.services.GjennomforingServiceImpl
@@ -104,7 +105,7 @@ class IntegrationTest {
 		brukerService = BrukerServiceImpl(brukerRepository, personService, mockk(), navEnhetService)
 		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, transactionTemplate)
 		arrangorService = ArrangorServiceImpl(enhetsregisterClient, arrangorRepository)
-		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, arrangorService, transactionTemplate)
+		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, arrangorService, transactionTemplate, HentKoordinatorerForGjennomforingQuery(jdbcTemplate))
 		deltakerProcessor = DeltakerProcessor(gjennomforingService, deltakerService, personService, transactionTemplate)
 
 		gjennomforingProcessor = GjennomforingProcessor(arrangorService, gjennomforingService, tiltakService, navEnhetService)

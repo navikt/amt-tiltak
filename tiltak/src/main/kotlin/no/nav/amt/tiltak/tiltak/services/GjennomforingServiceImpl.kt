@@ -7,6 +7,7 @@ import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
+import no.nav.amt.tiltak.tiltak.repositories.HentKoordinatorerForGjennomforingQuery
 import no.nav.amt.tiltak.utils.UpdateStatus
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -19,7 +20,8 @@ class GjennomforingServiceImpl(
 	private val tiltakService: TiltakService,
 	private val deltakerService: DeltakerService,
 	private val arrangorService: ArrangorService,
-	private val transactionTemplate: TransactionTemplate
+	private val transactionTemplate: TransactionTemplate,
+	private val koordinatorerForGjennomforing: HentKoordinatorerForGjennomforingQuery
 ) : GjennomforingService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -96,6 +98,14 @@ class GjennomforingServiceImpl(
 		return gjennomforingRepository
 			.get(gjennomforingIder)
 			.map{ getGjennomforing(it.id) }
+	}
+
+	override fun getKoordinatorerForGjennomforing(gjennomforingId: UUID): List<String> {
+		return koordinatorerForGjennomforing.query(gjennomforingId)
+	}
+
+	override fun getKoordinatorerForGjennomforinger(gjennomforingIder: List<UUID>): Map<UUID, List<String>> {
+		return koordinatorerForGjennomforing.query(gjennomforingIder)
 	}
 
 }

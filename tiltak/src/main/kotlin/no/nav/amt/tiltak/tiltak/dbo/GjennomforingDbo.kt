@@ -39,7 +39,7 @@ data class GjennomforingDbo(
 			registrertDato = registrertDato,
 			fremmoteDato = fremmoteDato,
 			lopenr = lopenr,
-			opprettetAar = opprettetAar
+			opprettetAar = opprettetAar,
 		)
 	}
 
