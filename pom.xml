@@ -14,10 +14,8 @@
         <module>arrangor</module>
         <module>clients</module>
         <module>common</module>
-        <module>connectors</module>
         <module>core</module>
         <module>db-migrations</module>
-        <module>ingestors</module>
         <module>kafka</module>
         <module>mocks</module>
         <module>navansatt</module>
@@ -43,7 +41,7 @@
 
         <testcontainers.version>1.16.0</testcontainers.version>
         <mockito-kotlin.version>3.2.0</mockito-kotlin.version>
-        <schedlock.version>4.35.0</schedlock.version>
+        <schedlock.version>4.36.0</schedlock.version>
         <nimbus.version>9.22.2</nimbus.version>
         <mockk.version>1.12.0</mockk.version>
         <kotest.version>5.1.0</kotest.version>
@@ -110,7 +108,7 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>kafka</artifactId>
+                <artifactId>kafka-config</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -170,11 +168,6 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>nav-enhet-ingestor</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>db-migrations</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -216,11 +209,6 @@
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>veilarboppfolging</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>person</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

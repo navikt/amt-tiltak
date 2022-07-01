@@ -11,6 +11,7 @@ import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
+import no.nav.amt.tiltak.endringsmelding.HentAktivEndringsmeldingForDeltakereQuery
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
@@ -25,11 +26,13 @@ import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.TestDataSeeder
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.tiltak.repositories.HentKoordinatorerForGjennomforingQuery
+import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingerFraArrangorerQuery
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
 import no.nav.amt.tiltak.tiltak.services.GjennomforingServiceImpl
 import no.nav.amt.tiltak.tiltak.services.TiltakServiceImpl
 import org.junit.Assert.assertThrows
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -37,7 +40,6 @@ import org.mockito.Mockito.mock
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
-import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -54,6 +56,8 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 	private lateinit var brukerService: BrukerServiceImpl
 	private lateinit var deltakerStatusRepository: DeltakerStatusRepository
 	private lateinit var gjennomforingRepository: GjennomforingRepository
+	private lateinit var hentAktivEndringsmeldingForDeltakereQuery: HentAktivEndringsmeldingForDeltakereQuery
+	private lateinit var hentGjennomforingerFraArrangorerQuery: HentGjennomforingerFraArrangorerQuery
 	private lateinit var gjennomforingService: GjennomforingService
 	private lateinit var deltakerService: DeltakerService
 	private lateinit var arrangorService: ArrangorService
@@ -66,26 +70,31 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 		val transactionTemplate = TransactionTemplate(DataSourceTransactionManager(dataSource))
 
 		namedJdbcTemplate = NamedParameterJdbcTemplate(dataSource)
-
 		gjennomforingRepository = GjennomforingRepository(namedJdbcTemplate)
 		tiltakRepository = TiltakRepository(namedJdbcTemplate)
 		deltakerRepository = DeltakerRepository(namedJdbcTemplate)
 		brukerRepository = BrukerRepository(namedJdbcTemplate)
+		hentGjennomforingerFraArrangorerQuery = HentGjennomforingerFraArrangorerQuery(namedJdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(namedJdbcTemplate)
+		hentAktivEndringsmeldingForDeltakereQuery = HentAktivEndringsmeldingForDeltakereQuery(namedJdbcTemplate)
 		authService = mock(AuthService::class.java)
+
 		arrangorService = ArrangorServiceImpl(mockk(), ArrangorRepository(namedJdbcTemplate))
+
 		brukerService = BrukerServiceImpl(
 			brukerRepository,
 			mock(PersonService::class.java),
 			mock(NavAnsattService::class.java),
 			mock(NavEnhetService::class.java)
 		)
+
 		deltakerService = DeltakerServiceImpl(
 			deltakerRepository,
 			deltakerStatusRepository,
 			brukerService,
 			transactionTemplate
 		)
+
 		gjennomforingService = GjennomforingServiceImpl(
 			gjennomforingRepository,
 			TiltakServiceImpl(tiltakRepository),
@@ -94,9 +103,12 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 			transactionTemplate,
 			HentKoordinatorerForGjennomforingQuery(namedJdbcTemplate)
 		)
+
 		controller = TiltakarrangorGjennomforingController(
 			gjennomforingService, deltakerService,
-			authService, mock(ArrangorAnsattTilgangService::class.java)
+			authService, mock(ArrangorAnsattTilgangService::class.java),
+			hentAktivEndringsmeldingForDeltakereQuery,
+			hentGjennomforingerFraArrangorerQuery,
 		)
 
 		testDataRepository = TestDataRepository(namedJdbcTemplate)
@@ -106,10 +118,10 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 	@Test
 	fun `hentGjennomforing - tiltaksgjennomføring finnes ikke - skal returnere NOT FOUND`() {
 		val id = UUID.randomUUID()
-		val exception = assertThrows(ResponseStatusException::class.java) {
+		val exception = assertThrows(NoSuchElementException::class.java) {
 			controller.hentGjennomforing(id)
 		}
-		exception.status.toString() shouldBe "404 NOT_FOUND"
+		assertEquals("Fant ikke gjennomforing med id $id", exception.message)
 	}
 
 	@Test

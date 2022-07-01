@@ -166,6 +166,21 @@ object TestData {
 		lopenr = 124
 	)
 
+	val GJENNOMFORING_3 = InsertGjennomforingCommand(
+		id = UUID.fromString("44dacce9-3a2f-49b7-aaf1-e2c3dc4984a4"),
+		tiltakId = TILTAK_1.id,
+		arrangorId = ARRANGOR_2.id,
+		navn = "Tiltaksgjennomforing2",
+		status = "GJENNOMFORES",
+		startDato = LocalDate.of(2022, 3, 5),
+		sluttDato = LocalDate.of(2022, 7, 12),
+		navEnhetId = NAV_ENHET_2.id,
+		registrertDato = LocalDate.of(2022, 1, 1),
+		fremmoteDato = LocalDate.of(2022, 2, 1),
+		opprettetAar = 2022,
+		lopenr = 439823
+	)
+
 	val GJENNOMFORING_TILGANG_1 = InsertArrangorAnsattGjennomforingTilgang(
 		id = UUID.randomUUID(),
 		ansattId = ARRANGOR_ANSATT_1.id,

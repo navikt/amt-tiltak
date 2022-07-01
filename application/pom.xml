@@ -52,16 +52,12 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>person</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>db-migrations</artifactId>
         </dependency>
 
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>kafka</artifactId>
+            <artifactId>kafka-config</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
@@ -74,10 +70,6 @@
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>endring-paa-oppf-bruker-ingestor</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>nav-enhet-ingestor</artifactId>
         </dependency>
 
         <dependency>

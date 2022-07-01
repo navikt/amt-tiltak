@@ -46,9 +46,10 @@ class NorgClientImplTest : FunSpec({
 			)
 		)
 
-		val enhetNavn = client.hentNavEnhetNavn("1234")
+		val enhet = client.hentNavEnhet("1234")
 
-		enhetNavn shouldBe "NAV Testheim"
+		enhet?.enhetId shouldBe "1234"
+		enhet?.navn shouldBe "NAV Testheim"
 
 		val request = server.takeRequest()
 
