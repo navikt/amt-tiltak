@@ -5,6 +5,8 @@ import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.endringsmelding.HentAktivEndringsmeldingForDeltakereQuery
+import no.nav.amt.tiltak.tiltak.dto.AktivEndringsmeldingDto
 import no.nav.amt.tiltak.tiltak.dto.GjennomforingDto
 import no.nav.amt.tiltak.tiltak.dto.TiltakDeltakerDto
 import no.nav.amt.tiltak.tiltak.dto.toDto
@@ -23,6 +25,7 @@ class TiltakarrangorGjennomforingController(
 	private val deltakerService: DeltakerService,
 	private val authService: AuthService,
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
+	private val hentAktivEndringsmeldingForDeltakereQuery: HentAktivEndringsmeldingForDeltakereQuery,
 	private val hentGjennomforingerFraArrangorerQuery: HentGjennomforingerFraArrangorerQuery
 ) {
 
@@ -96,9 +99,15 @@ class TiltakarrangorGjennomforingController(
 
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
 
-		return deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
-			.filter { !it.erUtdatert }
-			.map { it.toDto() }
+		val deltakere = deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
+			.filter { !it.erUtdatert}
+
+		val aktiveEndringsmeldinger = hentAktivEndringsmeldingForDeltakereQuery.query(deltakere.map { it.id })
+
+		return deltakere
+			.map { d ->
+				d.toDto(AktivEndringsmeldingDto(aktiveEndringsmeldinger.find { it.deltakerId == d.id }?.startDato))
+			}
 	}
 
 	// Dette er et midlertidig filter som skal fjernes snart™

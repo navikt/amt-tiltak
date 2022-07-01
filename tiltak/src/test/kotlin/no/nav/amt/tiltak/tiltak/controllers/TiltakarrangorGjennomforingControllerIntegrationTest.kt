@@ -11,6 +11,7 @@ import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
+import no.nav.amt.tiltak.endringsmelding.HentAktivEndringsmeldingForDeltakereQuery
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
@@ -54,6 +55,7 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 	private lateinit var brukerService: BrukerServiceImpl
 	private lateinit var deltakerStatusRepository: DeltakerStatusRepository
 	private lateinit var gjennomforingRepository: GjennomforingRepository
+	private lateinit var hentAktivEndringsmeldingForDeltakereQuery: HentAktivEndringsmeldingForDeltakereQuery
 	private lateinit var hentGjennomforingerFraArrangorerQuery: HentGjennomforingerFraArrangorerQuery
 	private lateinit var gjennomforingService: GjennomforingService
 	private lateinit var deltakerService: DeltakerService
@@ -73,7 +75,7 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 		brukerRepository = BrukerRepository(namedJdbcTemplate)
 		hentGjennomforingerFraArrangorerQuery = HentGjennomforingerFraArrangorerQuery(namedJdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(namedJdbcTemplate)
-
+		hentAktivEndringsmeldingForDeltakereQuery = HentAktivEndringsmeldingForDeltakereQuery(namedJdbcTemplate)
 		authService = mock(AuthService::class.java)
 
 		arrangorService = ArrangorServiceImpl(mockk(), ArrangorRepository(namedJdbcTemplate))
@@ -103,7 +105,8 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 		controller = TiltakarrangorGjennomforingController(
 			gjennomforingService, deltakerService,
 			authService, mock(ArrangorAnsattTilgangService::class.java),
-			hentGjennomforingerFraArrangorerQuery
+			hentAktivEndringsmeldingForDeltakereQuery,
+			hentGjennomforingerFraArrangorerQuery,
 		)
 
 		testDataRepository = TestDataRepository(namedJdbcTemplate)

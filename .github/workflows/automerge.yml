@@ -1,0 +1,30 @@
+name: Merge snyk security updates automatically
+on:
+  pull_request_target:
+    branches:
+      - main
+
+jobs:
+  find_automerge_candidate:
+    name: 'Check if pull-request is eligible for automatic merging'
+    if:
+      ${{ github.event.pull_request.base.ref == 'main' && github.event.pull_request.user.login == 'snyk-bot' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Pull request is eligible for automatic merging'
+        run: echo '${{ github.event.pull_request.html_url }}'
+  run_tests:
+    needs: find_automerge_candidate
+    name: 'Trigging test workflow'
+    uses: ./.github/workflows/test.yaml
+  merge_candidate:
+    needs: [find_automerge_candidate, run_tests]
+    name: 'Merge pull-request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Merging'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.html_url }}
+        run:
+          gh pr merge $PR --rebase

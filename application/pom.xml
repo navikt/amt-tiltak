@@ -52,16 +52,12 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>person</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>db-migrations</artifactId>
         </dependency>
 
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>kafka</artifactId>
+            <artifactId>kafka-config</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>

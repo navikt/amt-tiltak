@@ -14,10 +14,15 @@ data class TiltakDeltakerDto(
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val status: DeltakerStatusDto,
-	val registrertDato: LocalDateTime
+	val registrertDato: LocalDateTime,
+	val aktivEndringsmelding: AktivEndringsmeldingDto?
 )
 
-fun Deltaker.toDto() = TiltakDeltakerDto(
+data class AktivEndringsmeldingDto(
+	val startDato: LocalDate?
+)
+
+fun Deltaker.toDto(aktivEndringsmeldingDto: AktivEndringsmeldingDto?) = TiltakDeltakerDto(
 	id = id,
 	fornavn = bruker.fornavn,
 	mellomnavn = bruker.mellomnavn,
@@ -26,5 +31,6 @@ fun Deltaker.toDto() = TiltakDeltakerDto(
 	startDato = startDato,
 	sluttDato = sluttDato,
 	status = DeltakerStatusDto(type=status.type, endretDato = status.opprettetDato),
-	registrertDato = registrertDato
+	registrertDato = registrertDato,
+	aktivEndringsmelding = aktivEndringsmeldingDto
 )
