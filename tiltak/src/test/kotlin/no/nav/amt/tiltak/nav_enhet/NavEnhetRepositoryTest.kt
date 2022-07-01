@@ -1,11 +1,10 @@
-package no.nav.amt.tiltak.deltaker.repositories
+package no.nav.amt.tiltak.nav_enhet
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import no.nav.amt.tiltak.nav_enhet.NavEnhetRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
@@ -58,7 +57,9 @@ class NavEnhetRepositoryTest : FunSpec({
 		val enhetId = "ENHET_001"
 		val navn = "ENHET_001_NAVN"
 
-		repository.insert(id, enhetId, navn)
+		repository.insert(NavEnhetInsertInput(
+			id, enhetId, navn
+		))
 
 		val hentetEnhet = repository.get(id)
 

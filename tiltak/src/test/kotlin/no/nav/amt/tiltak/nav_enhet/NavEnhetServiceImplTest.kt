@@ -43,7 +43,7 @@ class NavEnhetServiceImplTest : FunSpec({
 		} returns enhetNavn
 
 		every {
-			navEnhetRepositoy.insert(any(), any(), any())
+			navEnhetRepositoy.insert(any())
 		} returns Unit
 
 		val navEnhet = service.getNavEnhetForBruker(fodselsenummer)

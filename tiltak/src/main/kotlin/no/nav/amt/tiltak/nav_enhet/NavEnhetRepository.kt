@@ -20,15 +20,15 @@ open class NavEnhetRepository(
 		)
 	}
 
-	fun insert(id: UUID, enhetId: String, navn: String) {
+	fun insert(input: NavEnhetInsertInput) {
 		val sql = """
 			INSERT INTO nav_enhet(id, enhet_id, navn) VALUES (:id, :enhetId, :navn)
 		""".trimIndent()
 
 		val parameters = sqlParameters(
-			"id" to id,
-			"enhetId" to enhetId,
-			"navn" to navn
+			"id" to input.id,
+			"enhetId" to input.enhetId,
+			"navn" to input.navn
 		)
 
 		template.update(sql, parameters)
@@ -58,3 +58,9 @@ open class NavEnhetRepository(
 	}
 
 }
+
+data class NavEnhetInsertInput(
+	val id: UUID,
+	val enhetId: String,
+	val navn: String
+)

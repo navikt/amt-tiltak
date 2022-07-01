@@ -44,11 +44,13 @@ open class NavEnhetServiceImpl(
 
 		val id = UUID.randomUUID()
 
-		navEnhetRepository.insert(
+		val insertInput = NavEnhetInsertInput(
 			id = id,
 			enhetId = enhetId,
 			navn = enhetNavn
 		)
+
+		navEnhetRepository.insert(insertInput)
 
 		return getNavEnhet(id)
 	}
