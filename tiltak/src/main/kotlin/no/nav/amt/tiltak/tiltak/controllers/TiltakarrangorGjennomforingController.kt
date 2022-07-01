@@ -62,8 +62,10 @@ class TiltakarrangorGjennomforingController(
 
 		val filtrerteGjennomforinger = gjennomforingProdFilter(gjennomforingIder)
 
+		val koordinatorer = gjennomforingService.getKoordinatorerForGjennomforinger(gjennomforingIder)
+
 		return gjennomforingService.getGjennomforinger(filtrerteGjennomforinger)
-			.map { it.toDto() }
+			.map { it.toDto(koordinatorer[it.id] ?: emptyList()) }
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -106,9 +108,6 @@ class TiltakarrangorGjennomforingController(
 
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
 
-		return deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
-			.filter { !it.erUtdatert }
-			.map { it.toDto() }
 		val deltakere = deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
 			.filter { !it.erUtdatert}
 

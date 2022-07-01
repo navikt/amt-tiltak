@@ -174,7 +174,7 @@ class TiltakarrangorGjennomforingControllerTest {
 		).andReturn().response
 
 		val expectedJson = """
-			[{"id":"e68d54e2-47b5-11ec-81d3-0242ac130003","navn":"tiltaksnavn","startDato":"2022-06-27","sluttDato":"2022-06-28","status":"GJENNOMFORES","tiltak":{"tiltakskode":"kode","tiltaksnavn":"tiltaksnavn"},"arrangor":{"virksomhetNavn":"","organisasjonNavn":""}}]
+			[{"id":"e68d54e2-47b5-11ec-81d3-0242ac130003","navn":"tiltaksnavn","startDato":"2022-06-27","sluttDato":"2022-06-28","status":"GJENNOMFORES","tiltak":{"tiltakskode":"kode","tiltaksnavn":"tiltaksnavn"},"arrangor":{"virksomhetNavn":"","organisasjonNavn":""},"koordinatorer":[]}]
 		""".trimIndent()
 
 		response.status shouldBe 200
