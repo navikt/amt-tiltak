@@ -1,7 +1,6 @@
 package no.nav.amt.tiltak.tilgangskontroll.tilgang
 
 import com.github.benmanes.caffeine.cache.Caffeine
-import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattGjennomforingTilgang
 import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
@@ -23,6 +22,15 @@ open class ArrangorAnsattGjennomforingTilgangService(
 		.build<UUID, List<UUID>>()
 
 	open fun opprettTilgang(id: UUID, arrangorAnsattId: UUID, gjennomforingId: UUID) {
+		val harAlleredeTilgang = hentGjennomforingerForAnsatt(arrangorAnsattId)
+			.contains(gjennomforingId)
+
+		if (harAlleredeTilgang) {
+			throw IllegalStateException(
+				"Kan ikke opprette tilgang på gjennomføring siden arrangør ansatt allerede har tilgang"
+			)
+		}
+
 		arrangorAnsattGjennomforingTilgangRepository.opprettTilgang(
 			id = id,
 			arrangorAnsattId = arrangorAnsattId,

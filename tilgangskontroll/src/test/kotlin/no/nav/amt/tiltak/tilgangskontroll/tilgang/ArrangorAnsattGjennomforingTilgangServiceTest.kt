@@ -2,15 +2,13 @@ package no.nav.amt.tiltak.tilgangskontroll.tilgang
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
+import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.assertions.timing.eventually
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import io.mockk.spyk
-import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattGjennomforingTilgang
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
@@ -101,6 +99,20 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 
 			aktiveTilganger shouldHaveSize 1
 			aktiveTilganger.first().gjennomforingId shouldBe GJENNOMFORING_2.id
+		}
+	}
+
+	test("opprettTilgang - skal kaste exception hvis tilgang er allerede opprettet") {
+		testRepository.insertArrangorAnsattGjennomforingTilgang(
+			GJENNOMFORING_TILGANG_1.copy(
+				id = UUID.randomUUID(),
+				ansattId = ARRANGOR_ANSATT_1.id,
+				gjennomforingId = GJENNOMFORING_1.id
+			)
+		)
+
+		shouldThrowExactly<IllegalStateException> {
+			service.opprettTilgang(UUID.randomUUID(), ARRANGOR_ANSATT_1.id, GJENNOMFORING_1.id)
 		}
 	}
 
