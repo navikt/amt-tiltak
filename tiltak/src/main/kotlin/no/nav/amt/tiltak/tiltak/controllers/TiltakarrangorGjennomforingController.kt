@@ -106,7 +106,8 @@ class TiltakarrangorGjennomforingController(
 
 		return deltakere
 			.map { d ->
-				d.toDto(AktivEndringsmeldingDto(aktiveEndringsmeldinger.find { it.deltakerId == d.id }?.startDato))
+				val endringsmelding = aktiveEndringsmeldinger.find { it.deltakerId == d.id }
+				d.toDto(endringsmelding?.let { AktivEndringsmeldingDto(endringsmelding.startDato) })
 			}
 	}
 
