@@ -20,7 +20,8 @@ private const val aktiveArrangorerMedBrukere = "amt.tiltak.antall.aktive.arrango
 private const val gjennomforing = "amt.tiltak.antall.gjennomforing"
 private const val gjennomforinger = "amt.tiltak.antall.gjennomforinger"
 private const val gjennomforingerPrStatus = "amt.tiltak.antall.gjennomforinger.pr.status"
-private const val eksponerteBrukere = "amt.tiltak.antall.brukere.eksponerte"
+private const val eksponerteBrukere = "amt.tiltak.antall.brukere.eksponerte" // erstattes av eksponerteBrukerePrStatus
+private const val eksponerteBrukerePrStatus = "amt.tiltak.antall.brukere.eksponerte.pr.status"
 
 @Component
 class DeltakerStatistikkUpdater(
@@ -46,10 +47,16 @@ class DeltakerStatistikkUpdater(
 			it.name to registry.gauge(deltakerePrStatus, Tags.of("status", it.name), AtomicInteger(0))!!
 		}
 
+	private val eksponterteBrukereStatusGauges: Map<String, AtomicInteger> =
+		Deltaker.Status.values().associate {
+			it.name to registry.gauge(eksponerteBrukerePrStatus, Tags.of("status", it.name), AtomicInteger(0))!!
+		}
+
 	private val gjennomforingStatusGauges: Map<String, AtomicInteger> =
 		Gjennomforing.Status.values().associate {
 			it.name to registry.gauge(gjennomforingerPrStatus, Tags.of("status", it.name), AtomicInteger(0))!!
 		}
+
 
 	fun oppdater() {
 		simpleGauges.getValue(deltakere).set(deltakerStatistikkRepository.antallDeltakere()!!)
@@ -66,6 +73,7 @@ class DeltakerStatistikkUpdater(
 		}
 		simpleGauges.getValue(eksponerteBrukere).set(deltakerStatistikkRepository.eksponerteBrukere()!!)
 		oppdaterGjennomforingMaalinger()
+		oppdaterEksponterteBrukerePerStatus()
 	}
 
 
@@ -80,5 +88,12 @@ class DeltakerStatistikkUpdater(
 		}
 
 		gjennomforingGauge.register(rows)
+	}
+
+	fun oppdaterEksponterteBrukerePerStatus() {
+
+		val rows = deltakerStatistikkRepository.eksponerteBrukerePrStatus().map {
+			eksponterteBrukereStatusGauges.getValue(it.first).set(it.second)
+		}
 	}
 }
