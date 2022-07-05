@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.DELTAR
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.VENTER_PA_OPPSTART
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
@@ -90,6 +91,12 @@ class DeltakerStatistikkRepositoryTest : FunSpec({
 
 	test("eksponerteBrukere - returnerer 3") {
 		repository.eksponerteBrukere() shouldBe 3
+	}
+
+	test("eksponerteBrukerePerStatus - returnerer 3") {
+		repository.eksponerteBrukerePrStatus() shouldHaveSize 2
+		repository.eksponerteBrukerePrStatus() shouldContain StatusStatistikk("DELTAR", 2)
+		repository.eksponerteBrukerePrStatus() shouldContain StatusStatistikk("VENTER_PA_OPPSTART", 1)
 	}
 })
 

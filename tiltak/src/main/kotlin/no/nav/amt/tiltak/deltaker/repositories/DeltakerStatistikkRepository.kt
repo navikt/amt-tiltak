@@ -105,6 +105,23 @@ class DeltakerStatistikkRepository(
 		return template.queryForObject(query, MapSqlParameterSource(), Int::class.java)!!
 	}
 
+	fun eksponerteBrukerePrStatus(): List<StatusStatistikk> {
+		val query = """
+			select ds.status as status, count(distinct d.bruker_id) as antall
+			from deltaker d
+			inner join deltaker_status ds on d.id = ds.deltaker_id
+			where d.gjennomforing_id in (
+				select gjennomforing_id
+				from arrangor_ansatt_gjennomforing_tilgang tilgang
+				where d.gjennomforing_id = tilgang.gjennomforing_id)
+			and ds.aktiv = true
+			group by ds.status;
+		""".trimIndent()
+		return template.query(query) { rs, _ ->
+			StatusStatistikk(rs.getString("status"), rs.getInt("antall"))
+		}
+	}
+
 }
 
 
