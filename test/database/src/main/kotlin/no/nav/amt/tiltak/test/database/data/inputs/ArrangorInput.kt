@@ -1,9 +1,9 @@
-package no.nav.amt.tiltak.test.database.data.commands
+package no.nav.amt.tiltak.test.database.data.inputs
 
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import java.util.*
 
-data class InsertArrangorCommand(
+data class ArrangorInput(
 	val id: UUID,
 	val overordnetEnhetOrganisasjonsnummer: String?,
 	val overordnetEnhetNavn: String?,

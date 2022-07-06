@@ -1,9 +1,9 @@
-package no.nav.amt.tiltak.test.database.data.commands
+package no.nav.amt.tiltak.test.database.data.inputs
 
 import java.time.LocalDate
 import java.util.*
 
-data class InsertEndringsmeldingCommand(
+data class EndringsmeldingInput(
 	val id: UUID,
 	val deltakerId: UUID,
 	val startDato: LocalDate,

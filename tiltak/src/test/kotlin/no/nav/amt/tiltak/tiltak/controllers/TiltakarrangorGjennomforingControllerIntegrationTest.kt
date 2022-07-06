@@ -18,10 +18,10 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
-import no.nav.amt.tiltak.test.database.data.TestData.createBrukerCommand
-import no.nav.amt.tiltak.test.database.data.TestData.createDeltakerCommand
-import no.nav.amt.tiltak.test.database.data.TestData.createGjennomforingCommand
-import no.nav.amt.tiltak.test.database.data.TestData.createStatusCommand
+import no.nav.amt.tiltak.test.database.data.TestData.createBrukerInput
+import no.nav.amt.tiltak.test.database.data.TestData.createDeltakerInput
+import no.nav.amt.tiltak.test.database.data.TestData.createGjennomforingInput
+import no.nav.amt.tiltak.test.database.data.TestData.createStatusInput
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.TestDataSeeder
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
@@ -126,7 +126,7 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 
 	@Test
 	fun `hentGjennomforinger - tiltak finnes - skal returnere gjennomføring med tiltak`() {
-		val gjennomforingCmd = createGjennomforingCommand(TILTAK_1, ARRANGOR_1, NAV_ENHET_1)
+		val gjennomforingCmd = createGjennomforingInput(TILTAK_1, ARRANGOR_1, NAV_ENHET_1)
 		testDataRepository.insertGjennomforing(gjennomforingCmd)
 
 		val resultat = controller.hentGjennomforing(gjennomforingCmd.id)
@@ -141,11 +141,11 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 	@Test
 	fun `hentDeltakere - En deltaker på tiltak - returnerer deltaker`() {
 		val bruker = BRUKER_1
-		val gjennomforingCmd = createGjennomforingCommand(TILTAK_1, ARRANGOR_1, NAV_ENHET_1)
-		val deltakerCmd = createDeltakerCommand(bruker, gjennomforingCmd)
+		val gjennomforingCmd = createGjennomforingInput(TILTAK_1, ARRANGOR_1, NAV_ENHET_1)
+		val deltakerCmd = createDeltakerInput(bruker, gjennomforingCmd)
 		testDataRepository.insertGjennomforing(gjennomforingCmd)
 		testDataRepository.insertDeltaker(deltakerCmd)
-		testDataRepository.insertDeltakerStatus(createStatusCommand(deltakerCmd))
+		testDataRepository.insertDeltakerStatus(createStatusInput(deltakerCmd))
 
 		val deltakere = controller.hentDeltakere(gjennomforingCmd.id)
 		deltakere.size shouldBe 1
@@ -164,18 +164,18 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 
 	@Test
 	fun `hentDeltakere - Flere deltakere finnes - henter alle`() {
-		val gjennomforingCmd = createGjennomforingCommand(TILTAK_1, ARRANGOR_1, NAV_ENHET_1)
-		val deltakerCmd = createDeltakerCommand(BRUKER_1, gjennomforingCmd)
-		val bruker2Cmd = createBrukerCommand(NAV_ENHET_1)
-		val deltaker2Cmd = createDeltakerCommand(bruker2Cmd, gjennomforingCmd)
+		val gjennomforingCmd = createGjennomforingInput(TILTAK_1, ARRANGOR_1, NAV_ENHET_1)
+		val deltakerCmd = createDeltakerInput(BRUKER_1, gjennomforingCmd)
+		val bruker2Cmd = createBrukerInput(NAV_ENHET_1)
+		val deltaker2Cmd = createDeltakerInput(bruker2Cmd, gjennomforingCmd)
 
 		testDataRepository.insertGjennomforing(gjennomforingCmd)
 
 		testDataRepository.insertDeltaker(deltakerCmd)
-		testDataRepository.insertDeltakerStatus(createStatusCommand(deltakerCmd))
+		testDataRepository.insertDeltakerStatus(createStatusInput(deltakerCmd))
 		testDataRepository.insertBruker(bruker2Cmd)
 		testDataRepository.insertDeltaker(deltaker2Cmd)
-		testDataRepository.insertDeltakerStatus(createStatusCommand(deltaker2Cmd))
+		testDataRepository.insertDeltakerStatus(createStatusInput(deltaker2Cmd))
 
 
 		val deltakere = controller.hentDeltakere(gjennomforingCmd.id)
@@ -186,16 +186,16 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 
 	@Test
 	fun `hentDeltakere - Utdatert status på deltaker - filtreres bort `() {
-		val gjennomforingCmd = createGjennomforingCommand(TILTAK_1, ARRANGOR_1, NAV_ENHET_1)
-		val deltakerCmd = createDeltakerCommand(BRUKER_1, gjennomforingCmd)
-		val bruker2Cmd = createBrukerCommand(NAV_ENHET_1)
-		val deltaker2Cmd = createDeltakerCommand(bruker2Cmd, gjennomforingCmd)
-		val gammelStatus = createStatusCommand(deltaker2Cmd)
+		val gjennomforingCmd = createGjennomforingInput(TILTAK_1, ARRANGOR_1, NAV_ENHET_1)
+		val deltakerCmd = createDeltakerInput(BRUKER_1, gjennomforingCmd)
+		val bruker2Cmd = createBrukerInput(NAV_ENHET_1)
+		val deltaker2Cmd = createDeltakerInput(bruker2Cmd, gjennomforingCmd)
+		val gammelStatus = createStatusInput(deltaker2Cmd)
 			.copy(status = Deltaker.Status.HAR_SLUTTET.name, gyldigFra = LocalDateTime.now().minusDays(15))
 		testDataRepository.insertGjennomforing(gjennomforingCmd)
 
 		testDataRepository.insertDeltaker(deltakerCmd)
-		testDataRepository.insertDeltakerStatus(createStatusCommand(deltakerCmd))
+		testDataRepository.insertDeltakerStatus(createStatusInput(deltakerCmd))
 		testDataRepository.insertBruker(bruker2Cmd)
 		testDataRepository.insertDeltaker(deltaker2Cmd)
 		testDataRepository.insertDeltakerStatus(gammelStatus)

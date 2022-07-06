@@ -14,7 +14,7 @@ import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.nav_enhet.NavEnhetRepository
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
-import no.nav.amt.tiltak.test.database.data.commands.InsertNavEnhetCommand
+import no.nav.amt.tiltak.test.database.data.inputs.NavEnhetInput
 import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -68,7 +68,7 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 			navEnhetId = null
 		)
 
-		testDataRepository.insertNavEnhet(InsertNavEnhetCommand(navEnhet.id, navEnhet.enhetId, navEnhet.navn))
+		testDataRepository.insertNavEnhet(NavEnhetInput(navEnhet.id, navEnhet.enhetId, navEnhet.navn))
 		brukerRepository.insert(bruker)
 
 		every {

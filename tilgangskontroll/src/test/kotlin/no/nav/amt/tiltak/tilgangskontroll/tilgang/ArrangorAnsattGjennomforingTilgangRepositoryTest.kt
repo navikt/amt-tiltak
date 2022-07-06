@@ -7,7 +7,6 @@ import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.DbUtils.shouldBeEqualTo
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
@@ -19,7 +18,6 @@ import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_2
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
-import no.nav.amt.tiltak.test.database.data.commands.InsertArrangorAnsattGjennomforingTilgang
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.ZonedDateTime

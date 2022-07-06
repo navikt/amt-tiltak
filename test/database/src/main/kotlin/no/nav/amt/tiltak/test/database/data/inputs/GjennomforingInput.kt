@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.test.database.data.commands
+package no.nav.amt.tiltak.test.database.data.inputs
 
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
@@ -6,7 +6,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import java.time.LocalDate
 import java.util.*
 
-data class InsertGjennomforingCommand(
+data class GjennomforingInput(
 	val id: UUID,
 	val tiltakId: UUID,
 	val arrangorId: UUID,
