@@ -11,7 +11,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
-import no.nav.amt.tiltak.test.database.data.commands.InsertArrangorAnsattCommand
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.util.*
@@ -39,7 +39,7 @@ class AnsattRolleRepositoryTest : FunSpec({
 		val ansattId = UUID.randomUUID()
 
 		testDataRepository.insertArrangorAnsatt(
-			InsertArrangorAnsattCommand(
+			ArrangorAnsattInput(
 				id = ansattId,
 				personligIdent = "",
 				fornavn = "",
@@ -67,7 +67,7 @@ class AnsattRolleRepositoryTest : FunSpec({
 		val ansattId = UUID.randomUUID()
 
 		testDataRepository.insertArrangorAnsatt(
-			InsertArrangorAnsattCommand(
+			ArrangorAnsattInput(
 				id = ansattId,
 				personligIdent = "",
 				fornavn = "",

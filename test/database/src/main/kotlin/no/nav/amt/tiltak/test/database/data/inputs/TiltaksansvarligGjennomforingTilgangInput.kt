@@ -1,9 +1,9 @@
-package no.nav.amt.tiltak.test.database.data.commands
+package no.nav.amt.tiltak.test.database.data.inputs
 
 import java.time.ZonedDateTime
 import java.util.*
 
-data class InsertTiltaksansvarligGjennomforingTilgangCommand(
+data class TiltaksansvarligGjennomforingTilgangInput(
 	val id: UUID,
 	val navAnsattId: UUID,
 	val gjennomforingId: UUID,

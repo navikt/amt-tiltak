@@ -11,7 +11,7 @@ import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
-import no.nav.amt.tiltak.test.database.data.commands.InsertEndringsmeldingCommand
+import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
@@ -52,7 +52,7 @@ class AntallAktiveEndringsmeldingerQueryTest : FunSpec({
 		testRepository.insertDeltaker(deltaker1)
 		testRepository.insertDeltaker(deltaker2)
 
-		testRepository.insertEndringsmelding(InsertEndringsmeldingCommand(
+		testRepository.insertEndringsmelding(EndringsmeldingInput(
 			id = UUID.randomUUID(),
 			deltakerId = deltaker1.id,
 			startDato = LocalDate.now(),
@@ -60,7 +60,7 @@ class AntallAktiveEndringsmeldingerQueryTest : FunSpec({
 			opprettetAvArrangorAnsattId = TestData.ARRANGOR_ANSATT_1.id,
 		))
 
-		testRepository.insertEndringsmelding(InsertEndringsmeldingCommand(
+		testRepository.insertEndringsmelding(EndringsmeldingInput(
 			id = UUID.randomUUID(),
 			deltakerId = deltaker2.id,
 			startDato = LocalDate.now(),

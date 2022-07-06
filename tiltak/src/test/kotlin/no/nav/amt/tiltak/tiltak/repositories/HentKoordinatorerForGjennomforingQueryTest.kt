@@ -16,8 +16,8 @@ import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_TILGANG_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
-import no.nav.amt.tiltak.test.database.data.commands.InsertArrangorAnsattCommand
-import no.nav.amt.tiltak.test.database.data.commands.InsertArrangorAnsattRolleCommand
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattRolleInput
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.util.*
@@ -46,13 +46,13 @@ class HentKoordinatorerForGjennomforingQueryTest : FunSpec({
 	}
 
 	fun createAnsatt(
-		baseCommand: InsertArrangorAnsattCommand = ARRANGOR_ANSATT_1,
+		baseInput: ArrangorAnsattInput = ARRANGOR_ANSATT_1,
 		fornavn: String = "Steve",
 		mellomnavn: String? = null,
 		etternavn: String = "Mc Guffin"
 	) {
 		testDataRepository.insertArrangorAnsatt(
-			baseCommand.copy(
+			baseInput.copy(
 				fornavn = fornavn,
 				mellomnavn = mellomnavn,
 				etternavn = etternavn
@@ -65,7 +65,7 @@ class HentKoordinatorerForGjennomforingQueryTest : FunSpec({
 		ansattId: UUID = ARRANGOR_ANSATT_1.id
 	) {
 		testDataRepository.insertArrangorAnsattRolle(
-			InsertArrangorAnsattRolleCommand(
+			ArrangorAnsattRolleInput(
 				id = UUID.randomUUID(),
 				arrangorId = ARRANGOR_1.id,
 				ansattId = ansattId,
@@ -130,7 +130,7 @@ class HentKoordinatorerForGjennomforingQueryTest : FunSpec({
 		createGjennomforingTilgang()
 
 		createAnsatt(
-			baseCommand = ARRANGOR_ANSATT_2,
+			baseInput = ARRANGOR_ANSATT_2,
 			fornavn = "Jane",
 			etternavn = "Doe"
 		)

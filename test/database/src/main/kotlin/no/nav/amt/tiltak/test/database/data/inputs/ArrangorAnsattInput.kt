@@ -1,8 +1,8 @@
-package no.nav.amt.tiltak.test.database.data.commands
+package no.nav.amt.tiltak.test.database.data.inputs
 
 import java.util.*
 
-data class InsertArrangorAnsattCommand(
+data class ArrangorAnsattInput(
 	val id: UUID,
 	val personligIdent: String,
 	val fornavn: String,

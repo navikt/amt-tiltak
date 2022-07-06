@@ -11,7 +11,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
-import no.nav.amt.tiltak.test.database.data.commands.InsertEndringsmeldingCommand
+import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
@@ -44,7 +44,7 @@ class HentAktivEndringsmeldingForDeltakereQueryTest : FunSpec({
 		val localDate1 = LocalDate.parse("2022-09-04")
 		val localDate2 = LocalDate.parse("2022-12-14")
 
-		testRepository.insertEndringsmelding(InsertEndringsmeldingCommand(
+		testRepository.insertEndringsmelding(EndringsmeldingInput(
 			id = UUID.randomUUID(),
 			deltakerId = DELTAKER_1.id,
 			startDato = localDate1,
@@ -52,7 +52,7 @@ class HentAktivEndringsmeldingForDeltakereQueryTest : FunSpec({
 			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
 		))
 
-		testRepository.insertEndringsmelding(InsertEndringsmeldingCommand(
+		testRepository.insertEndringsmelding(EndringsmeldingInput(
 			id = UUID.randomUUID(),
 			deltakerId = DELTAKER_2.id,
 			startDato = localDate2,

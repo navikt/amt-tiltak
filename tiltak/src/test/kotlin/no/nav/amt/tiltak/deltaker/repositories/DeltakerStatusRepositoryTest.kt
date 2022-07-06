@@ -10,8 +10,8 @@ import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
-import no.nav.amt.tiltak.test.database.data.TestData.createDeltakerCommand
-import no.nav.amt.tiltak.test.database.data.TestData.createStatusCommand
+import no.nav.amt.tiltak.test.database.data.TestData.createDeltakerInput
+import no.nav.amt.tiltak.test.database.data.TestData.createStatusInput
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.TestDataSeeder
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -35,7 +35,7 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 	}
 
 	test("insert - 2 statuser knyttet til deltaker - begge hentes") {
-		val deltakerCmd = createDeltakerCommand(BRUKER_1, GJENNOMFORING_1)
+		val deltakerCmd = createDeltakerInput(BRUKER_1, GJENNOMFORING_1)
 		testDataRepository.insertDeltaker(deltakerCmd)
 		val status1 = DeltakerStatusInsertDbo(id = UUID.randomUUID(), deltakerId = deltakerCmd.id, type = VENTER_PA_OPPSTART, gyldigFra = lastweek)
 		val status2 = DeltakerStatusInsertDbo(id = UUID.randomUUID(), deltakerId = deltakerCmd.id, type = DELTAR, gyldigFra = yesterday)
@@ -63,9 +63,9 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 
 
 	test("slettDeltakerStatus - skal slette status") {
-		val deltakerCmd = createDeltakerCommand(BRUKER_1, GJENNOMFORING_1)
+		val deltakerCmd = createDeltakerInput(BRUKER_1, GJENNOMFORING_1)
 		testDataRepository.insertDeltaker(deltakerCmd)
-		val statusCmd = createStatusCommand(deltakerCmd)
+		val statusCmd = createStatusInput(deltakerCmd)
 		testDataRepository.insertDeltakerStatus(statusCmd)
 
 		repository.getStatuserForDeltaker(deltakerCmd.id) shouldHaveSize 1
