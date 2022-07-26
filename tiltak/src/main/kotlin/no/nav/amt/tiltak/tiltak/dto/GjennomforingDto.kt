@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.tiltak.dto
 
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.port.Person
 import java.time.LocalDate
 import java.util.*
 
@@ -12,10 +13,9 @@ data class GjennomforingDto(
 	val status: Gjennomforing.Status,
 	val tiltak: TiltakDto,
 	val arrangor: ArrangorDto,
-	val koordinatorer: List<String>
 )
 
-fun Gjennomforing.toDto(koordinatorer: List<String>) = GjennomforingDto(
+fun Gjennomforing.toDto() = GjennomforingDto(
 	id = this.id,
 	navn = this.navn,
 	startDato = this.startDato,
@@ -23,5 +23,4 @@ fun Gjennomforing.toDto(koordinatorer: List<String>) = GjennomforingDto(
 	status = this.status,
 	tiltak = this.tiltak.toDto(),
 	arrangor = this.arrangor.toDto(),
-	koordinatorer = koordinatorer
 )
