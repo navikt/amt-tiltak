@@ -151,6 +151,30 @@ class HentKoordinatorerForGjennomforingQueryTest : FunSpec({
 		koordinatorer.first() shouldBe person("Steve", "mellomnavn", "Mc Guffin")
 	}
 
+	test("Duplikater blir fjernet") {
+		createAnsatt()
+		createRolleForAnsatt("KOORDINATOR")
+		createGjennomforingTilgang()
+
+		val ansattId2 = UUID.randomUUID()
+
+		testDataRepository.insertArrangorAnsatt(
+			ARRANGOR_ANSATT_1.copy(
+				id = ansattId2,
+				personligIdent = UUID.randomUUID().toString(),
+				fornavn = "Steve",
+				mellomnavn = null,
+				etternavn = "Mc Guffin"
+			)
+		)
+
+		createRolleForAnsatt("KOORDINATOR", ansattId2)
+		createGjennomforingTilgang(ansattId2)
+
+		val koordinatorer = query.query(GJENNOMFORING_1.id)
+		koordinatorer.size shouldBe 1
+	}
+
 	test("Returnerer alle koordinatoerer for en gjennomføring") {
 		createAnsatt()
 		createRolleForAnsatt("KOORDINATOR")
