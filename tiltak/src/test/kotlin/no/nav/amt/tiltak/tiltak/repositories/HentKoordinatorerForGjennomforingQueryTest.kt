@@ -5,6 +5,7 @@ import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
+import no.nav.amt.tiltak.core.port.Person
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
@@ -84,15 +85,35 @@ class HentKoordinatorerForGjennomforingQueryTest : FunSpec({
 		)
 	}
 
+	fun person(fornavn: String, mellomnavn: String, etternavn: String): Person {
+		return Person(
+			fornavn = fornavn,
+			mellomnavn = mellomnavn,
+			etternavn = etternavn,
+			telefonnummer = null,
+			diskresjonskode = null
+		)
+	}
+
+	fun person(fornavn: String, etternavn: String): Person {
+		return Person(
+			fornavn = fornavn,
+			mellomnavn = null,
+			etternavn = etternavn,
+			telefonnummer = null,
+			diskresjonskode = null
+		)
+
+	}
 
 	test("Returnerer tomt array om gjennomføring ikke eksisterer") {
 		val koordinatorer = query.query(UUID.randomUUID())
-		koordinatorer shouldBe emptyList()
+		koordinatorer shouldBe emptySet()
 	}
 
 	test("Returnerer tomt array om gjennomføring ikke har koordinator") {
 		val koordinatorer = query.query(GJENNOMFORING_2.id)
-		koordinatorer shouldBe emptyList()
+		koordinatorer shouldBe emptySet()
 	}
 
 	test("Returnerer ikke personer som ikke er koordinatorer") {
@@ -101,7 +122,7 @@ class HentKoordinatorerForGjennomforingQueryTest : FunSpec({
 		createGjennomforingTilgang()
 
 		val koordinatorer = query.query(GJENNOMFORING_1.id)
-		koordinatorer shouldBe emptyList()
+		koordinatorer shouldBe emptySet()
 	}
 
 	test("Returnerer koordinator om gjennomføringen har en koordinator") {
@@ -111,7 +132,13 @@ class HentKoordinatorerForGjennomforingQueryTest : FunSpec({
 
 		val koordinatorer = query.query(GJENNOMFORING_1.id)
 		koordinatorer.size shouldBe 1
-		koordinatorer[0] shouldBe "Steve Mc Guffin"
+		koordinatorer.first() shouldBe Person(
+			fornavn = "Steve",
+			etternavn = "Mc Guffin",
+			mellomnavn = null,
+			telefonnummer = null,
+			diskresjonskode = null
+		)
 	}
 
 	test("Returnerer koordinator med mellomnavn om gjennomføringen har en koordinator") {
@@ -121,7 +148,31 @@ class HentKoordinatorerForGjennomforingQueryTest : FunSpec({
 
 		val koordinatorer = query.query(GJENNOMFORING_1.id)
 		koordinatorer.size shouldBe 1
-		koordinatorer[0] shouldBe "Steve mellomnavn Mc Guffin"
+		koordinatorer.first() shouldBe person("Steve", "mellomnavn", "Mc Guffin")
+	}
+
+	test("Duplikater blir fjernet") {
+		createAnsatt()
+		createRolleForAnsatt("KOORDINATOR")
+		createGjennomforingTilgang()
+
+		val ansattId2 = UUID.randomUUID()
+
+		testDataRepository.insertArrangorAnsatt(
+			ARRANGOR_ANSATT_1.copy(
+				id = ansattId2,
+				personligIdent = UUID.randomUUID().toString(),
+				fornavn = "Steve",
+				mellomnavn = null,
+				etternavn = "Mc Guffin"
+			)
+		)
+
+		createRolleForAnsatt("KOORDINATOR", ansattId2)
+		createGjennomforingTilgang(ansattId2)
+
+		val koordinatorer = query.query(GJENNOMFORING_1.id)
+		koordinatorer.size shouldBe 1
 	}
 
 	test("Returnerer alle koordinatoerer for en gjennomføring") {
@@ -140,9 +191,9 @@ class HentKoordinatorerForGjennomforingQueryTest : FunSpec({
 
 		val koordinatorer = query.query(GJENNOMFORING_1.id)
 		koordinatorer.size shouldBe 2
-		koordinatorer shouldContainAll listOf(
-			"Jane Doe",
-			"Steve Mc Guffin"
+		koordinatorer shouldContainAll setOf(
+			person("Steve", "Mc Guffin"),
+			person("Jane", "Doe")
 		)
 
 	}

@@ -74,7 +74,6 @@ open class TiltakDeltakerPresentationService(
 					virksomhetNavn = virksomhetNavn,
 					organisasjonNavn = organisasjonNavn
 				),
-				koordinatorer = emptyList()
 			)
 		)
 	}
