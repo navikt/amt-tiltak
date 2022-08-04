@@ -4,10 +4,8 @@ import no.nav.amt.tiltak.core.port.SkjermetPersonService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDetaljerDbo
 import no.nav.amt.tiltak.deltaker.repositories.GetDeltakerDetaljerQuery
 import no.nav.amt.tiltak.tiltak.dto.*
-import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.NoSuchElementException
@@ -39,10 +37,6 @@ open class TiltakDeltakerPresentationService(
 			)
 		} else null
 
-		val erIProd = System.getenv()["NAIS_CLUSTER_NAME"] == "prod-gcp"
-
-		val begrunnelse = if (erIProd) null else innsokBegrunnelse
-
 		return TiltakDeltakerDetaljerDto(
 			id = deltakerId,
 			fornavn = fornavn,
@@ -59,7 +53,7 @@ open class TiltakDeltakerPresentationService(
 			registrertDato = registrertDato,
 			status = DeltakerStatusDto(type = status, endretDato = statusOpprettet),
 			fjernesDato = fjernesDato,
-			innsokBegrunnelse = begrunnelse,
+			innsokBegrunnelse = innsokBegrunnelse,
 			gjennomforing = GjennomforingDto(
 				id = gjennomforingId,
 				navn = gjennomforingNavn,
