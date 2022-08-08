@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.ansatt
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
+import no.nav.amt.tiltak.tilgangskontroll.altinn.AltinnService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping(value = ["/api/arrangor/ansatt", "/api/tiltaksarrangor/ansatt"])
 class TiltakarrangorAnsattController(
 	private val authService: AuthService,
+	private val altinnService: AltinnService,
 	private val arrangorAnsattService: ArrangorAnsattService
 ) {
 
@@ -19,8 +21,9 @@ class TiltakarrangorAnsattController(
 	@GetMapping("/meg")
 	fun getInnloggetAnsatt(): AnsattDto {
 		val personligIdent = authService.hentPersonligIdentTilInnloggetBruker()
+		val virksomheterSomKoordinator = altinnService.hentVirksomehterMedKoordinatorRettighet(personligIdent)
 
-		return arrangorAnsattService.getAnsattByPersonligIdent(personligIdent)?.toDto()
+		return arrangorAnsattService.getAnsattByPersonligIdent(personligIdent)?.toDto(virksomheterSomKoordinator)
 			?: throw NoSuchElementException("Fant ikke arrangor ansatt")
 	}
 

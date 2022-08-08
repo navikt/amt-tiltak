@@ -18,26 +18,32 @@ data class TilknyttetArrangorDto(
 	val organisasjonsnummer: String,
 	val overordnetEnhetOrganisasjonsnummer: String?,
 	val overordnetEnhetNavn: String?,
-	val roller: List<String>
+	val roller: List<String>,
+	val harAltinnKoordinatorRettighet: Boolean
 )
 
-fun Ansatt.toDto(): AnsattDto {
+fun Ansatt.toDto(virksomheterMedKoordinatorretigheter: List<String>): AnsattDto {
 	return AnsattDto(
 		id = this.id,
 		personligIdent = this.personligIdent,
 		fornavn = this.fornavn,
 		etternavn = this.etternavn,
-		arrangorer = this.arrangorer.map { it.toDto() }
+		arrangorer = this.arrangorer.map { arr ->
+			arr.toDto(
+				harAltinnKoordinatorRettighet = virksomheterMedKoordinatorretigheter.any { arr.organisasjonsnummer == it }
+			)
+		}
 	)
 }
 
-fun TilknyttetArrangor.toDto(): TilknyttetArrangorDto {
+fun TilknyttetArrangor.toDto(harAltinnKoordinatorRettighet: Boolean): TilknyttetArrangorDto {
 	return TilknyttetArrangorDto(
 		id = this.id,
 		navn = this.navn,
 		organisasjonsnummer = this.organisasjonsnummer,
 		overordnetEnhetOrganisasjonsnummer = this.overordnetEnhetOrganisasjonsnummer,
 		overordnetEnhetNavn = this.overordnetEnhetNavn,
-		roller = this.roller
+		roller = this.roller,
+		harAltinnKoordinatorRettighet = harAltinnKoordinatorRettighet
 	)
 }

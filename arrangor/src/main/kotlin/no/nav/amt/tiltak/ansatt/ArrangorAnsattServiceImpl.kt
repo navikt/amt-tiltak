@@ -31,8 +31,7 @@ class ArrangorAnsattServiceImpl(
 	}
 
 	override fun getAnsattByPersonligIdent(personIdent: String): Ansatt? {
-		val ansattDbo =
-			arrangorAnsattRepository.getByPersonligIdent(personIdent) ?: return null
+		val ansattDbo = arrangorAnsattRepository.getByPersonligIdent(personIdent) ?: return null
 
 		val ansattesVirksomheter = mapTilknyttedeArrangorerTilAnsatt(
 			ArrangorerForAnsattQuery(template).query(personIdent)
