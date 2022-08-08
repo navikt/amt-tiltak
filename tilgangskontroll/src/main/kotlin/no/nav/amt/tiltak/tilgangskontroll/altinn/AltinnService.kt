@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 import java.time.Duration
 
 @Service
-class AltinnService(
+open class AltinnService(
 	@Value("\${altinn-koordinator-rettighetid}") private val altinnKoordinatorRettighetId: String,
 	private val amtAltinnAclClient: AmtAltinnAclClient
 ) {
