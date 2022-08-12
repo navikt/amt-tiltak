@@ -18,6 +18,6 @@ data class DeltakerPayload(
 	val innsokBegrunnelse: String?
 ) {
 	enum class Status {
-		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, FEILREGISTRERT
+		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, FEILREGISTRERT, PABEGYNT
 	}
 }

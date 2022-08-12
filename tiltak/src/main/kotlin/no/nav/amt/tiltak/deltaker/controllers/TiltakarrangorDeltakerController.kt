@@ -2,6 +2,8 @@ package no.nav.amt.tiltak.deltaker.controllers
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.tiltak.dto.TiltakDeltakerDetaljerDto
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -23,6 +25,9 @@ class TiltakarrangorDeltakerController(
 	@GetMapping("/{tiltakDeltakerId}")
 	fun hentTiltakDeltakerDetaljer(@PathVariable("tiltakDeltakerId") deltakerId: UUID): TiltakDeltakerDetaljerDto {
 		val deltakerDetaljer = deltakerPresentationService.getDeltakerDetaljerById(deltakerId)
+
+		if(deltakerDetaljer.status.type == Deltaker.Status.PABEGYNT)
+			throw UnauthorizedException("Har ikke tilgang til id $deltakerId")
 
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 
