@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.tiltak.controllers
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
@@ -110,6 +111,7 @@ class TiltakarrangorGjennomforingController(
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
 
 		val deltakere = deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
+			.filter { it.status.type != Deltaker.Status.PABEGYNT}
 			.filter { !it.erUtdatert }
 
 		val aktiveEndringsmeldinger = hentAktivEndringsmeldingForDeltakereQuery.query(deltakere.map { it.id })
