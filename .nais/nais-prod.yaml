@@ -84,6 +84,8 @@ spec:
       value: api://prod-fss.pto.veilarbarena/.default
     - name: VEILARBOPPFOLGING_SCOPE
       value: api://prod-fss.pto.veilarboppfolging/.default
+    - name: VEILARBOPPFOLGING_URL
+      value: https://veilarboppfolging.prod-fss-pub.nais.io
     - name: DIGDIR_KRR_PROXY_SCOPE
       value: api://prod-gcp.team-rocket.digdir-krr-proxy/.default
     - name: DIGDIR_KRR_PROXY_URL

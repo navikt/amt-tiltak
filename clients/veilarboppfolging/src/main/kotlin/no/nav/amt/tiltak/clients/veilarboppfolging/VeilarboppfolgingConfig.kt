@@ -8,11 +8,8 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 open class VeilarboppfolgingConfig {
 
-	@Value("\${poao-gcp-proxy.url}")
+	@Value("\${veilarboppfolging.url}")
 	lateinit var url: String
-
-	@Value("\${poao-gcp-proxy.scope}")
-	lateinit var poaoGcpProxyScope: String
 
 	@Value("\${veilarboppfolging.scope}")
 	lateinit var veilarboppfolgingScope: String
@@ -20,8 +17,7 @@ open class VeilarboppfolgingConfig {
 	@Bean
 	open fun veilarboppfolgingClient(machineToMachineTokenClient: MachineToMachineTokenClient): VeilarboppfolgingClient {
 		return VeilarboppfolgingClientImpl(
-			apiUrl = "$url/proxy/veilarboppfolging",
-			proxyTokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(poaoGcpProxyScope) },
+			apiUrl = "$url/veilarboppfolging",
 			veilarboppfolgingTokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(veilarboppfolgingScope) }
 		)
 	}

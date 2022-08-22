@@ -19,9 +19,19 @@ class VeilarboppfolgingClientTest: StringSpec({
 		val serverUrl = server.url("/api").toString()
         client = VeilarboppfolgingClientImpl(
 			apiUrl = serverUrl,
-			proxyTokenProvider = { proxyToken },
 			veilarboppfolgingTokenProvider = { veilarboppfolgingToken }
 		)
+	}
+
+	"HentVeilederIdent - Skal sende med authorization" {
+		val jsonRepons = """{"veilederIdent":"V123"}""".trimIndent()
+		server.enqueue(MockResponse().setBody(jsonRepons))
+
+		client.hentVeilederIdent(fnr)
+
+		val request = server.takeRequest()
+
+		request.getHeader("Authorization") shouldBe "Bearer VEILARBOPPFOLGING_TOKEN"
 	}
 
     "HentVeilederIdent - Bruker finnes - Returnerer veileder ident" {
