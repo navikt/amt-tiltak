@@ -7,7 +7,6 @@ import java.util.function.Supplier
 
 class VeilarboppfolgingClientImpl(
 	private val apiUrl: String,
-	private val proxyTokenProvider: Supplier<String>,
 	private val veilarboppfolgingTokenProvider: Supplier<String>,
 	private val httpClient: OkHttpClient = baseClient(),
 ) : VeilarboppfolgingClient {
@@ -16,8 +15,7 @@ class VeilarboppfolgingClientImpl(
 		val request = Request.Builder()
 			.url("$apiUrl/api/v2/veileder?fnr=$fnr")
 			.header("Accept", "application/json; charset=utf-8")
-			.header("Downstream-Authorization", "Bearer ${veilarboppfolgingTokenProvider.get()}")
-			.header("Authorization", "Bearer ${proxyTokenProvider.get()}")
+			.header("Authorization", "Bearer ${veilarboppfolgingTokenProvider.get()}")
 			.get()
 			.build()
 
