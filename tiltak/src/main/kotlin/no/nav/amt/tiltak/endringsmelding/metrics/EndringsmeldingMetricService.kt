@@ -5,13 +5,11 @@ import org.springframework.stereotype.Service
 import java.util.concurrent.atomic.AtomicInteger
 
 private const val antallTotalEndringsmeldinger = "amt_tiltak_endringsmelding_totalt_antall"
-
 private const val antallAktivEndringsmeldinger = "amt_tiltak_endringsmelding_aktiv_antall"
-
-
 private const val antallManueltFerdigEndringsmeldinger = "amt_tiltak_endringsmelding_manuelt_ferdig_antall"
-
 private const val antallAutomatiskFerdigEndringsmeldinger = "amt_tiltak_endringsmelding_automatisk_ferdig_antall"
+private const val eldsteAktiveIMinutter = "amt_tiltak_endringsmelding_eldste_aktive_i_timer"
+private const val gjennomsnitteligTidIMinutter = "amt_tiltak_endringsmelding_gjennomsnittelig_tid_i_timer"
 
 @Service
 class EndringsmeldingMetricService(
@@ -39,20 +37,32 @@ class EndringsmeldingMetricService(
 			antallAutomatiskFerdigEndringsmeldinger,
 			registry.gauge(antallAutomatiskFerdigEndringsmeldinger, AtomicInteger(0))!!
 		),
+
+		Pair(
+			eldsteAktiveIMinutter,
+			registry.gauge(eldsteAktiveIMinutter, AtomicInteger(0))!!
+		),
+
+		Pair(
+			gjennomsnitteligTidIMinutter,
+			registry.gauge(gjennomsnitteligTidIMinutter, AtomicInteger(0))!!
+		)
 	)
 
 	fun oppdaterMetrikker() {
+		val metrics = endringsmeldingMetricRepository.getMetrics()
+
 		simpleGauges.getValue(antallAktivEndringsmeldinger)
-			.set(endringsmeldingMetricRepository.antallAktiveEndringsmeldinger())
+			.set(metrics?.antallAktive ?: 0)
 
 		simpleGauges.getValue(antallTotalEndringsmeldinger)
-			.set(endringsmeldingMetricRepository.totaltAntallEndringsmeldinger())
+			.set(metrics?.antallTotalt ?: 0)
 
 		simpleGauges.getValue(antallManueltFerdigEndringsmeldinger)
-			.set(endringsmeldingMetricRepository.antallManueltFerdigEndringsmeldinger())
+			.set(metrics?.manueltFerdige ?: 0)
 
 		simpleGauges.getValue(antallAutomatiskFerdigEndringsmeldinger)
-			.set(endringsmeldingMetricRepository.antallAutomatiskFerdigEndringsmeldinger())
+			.set(metrics?.automatiskFerdige ?: 0)
 	}
 
 }
