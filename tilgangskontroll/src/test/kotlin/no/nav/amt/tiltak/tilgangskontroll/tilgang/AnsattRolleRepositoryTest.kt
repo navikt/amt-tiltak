@@ -6,6 +6,8 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.DbUtils.shouldBeCloseTo
+import no.nav.amt.tiltak.test.database.DbUtils.shouldBeEqualTo
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2
@@ -14,6 +16,7 @@ import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import java.time.ZonedDateTime
 import java.util.*
 
 class AnsattRolleRepositoryTest : FunSpec({
@@ -48,10 +51,12 @@ class AnsattRolleRepositoryTest : FunSpec({
 		)
 
 		val id = UUID.randomUUID()
+		val gyldigFra = ZonedDateTime.now().minusSeconds(10)
+		val gyldigTil = ZonedDateTime.now().plusDays(1)
 
-		repository.opprettRolle(id, ansattId, ARRANGOR_1.id, AnsattRolle.VEILEDER)
+		repository.opprettRolle(id, ansattId, ARRANGOR_1.id, AnsattRolle.VEILEDER, gyldigFra, gyldigTil)
 
-		val roller = repository.hentRoller(ansattId, ARRANGOR_1.id)
+		val roller = repository.hentAktiveRoller(ansattId, ARRANGOR_1.id)
 
 		roller shouldHaveSize 1
 
@@ -61,9 +66,11 @@ class AnsattRolleRepositoryTest : FunSpec({
 		rolle.rolle shouldBe AnsattRolle.VEILEDER
 		rolle.arrangorId shouldBe ARRANGOR_1.id
 		rolle.ansattId shouldBe ansattId
+		rolle.gyldigFra shouldBeEqualTo gyldigFra
+		rolle.gyldigTil shouldBeEqualTo gyldigTil
 	}
 
-	test("hentRoller skal returnere roller") {
+	test("hentAktiveRoller - skal returnere aktive roller") {
 		val ansattId = UUID.randomUUID()
 
 		testDataRepository.insertArrangorAnsatt(
@@ -74,17 +81,28 @@ class AnsattRolleRepositoryTest : FunSpec({
 				etternavn = ""
 			)
 		)
+		val gyldigFra1 = ZonedDateTime.now().minusSeconds(5)
+		val gyldigTil1 = ZonedDateTime.now().plusDays(1)
 
-		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, AnsattRolle.KOORDINATOR)
-		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, AnsattRolle.VEILEDER)
-		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_2.id, AnsattRolle.VEILEDER)
+		val gyldigFra2 = ZonedDateTime.now().plusDays(5)
+		val gyldigTil2 = ZonedDateTime.now().plusDays(8)
 
-		val roller = repository.hentRoller(ansattId, ARRANGOR_1.id)
+		val gyldigFra3 = ZonedDateTime.now().minusDays(5)
+		val gyldigTil3 = ZonedDateTime.now().minusDays(3)
 
-		roller.size shouldBe 2
+		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, AnsattRolle.KOORDINATOR, gyldigFra1, gyldigTil1)
+		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, AnsattRolle.VEILEDER, gyldigFra2, gyldigTil2)
+		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, AnsattRolle.VEILEDER, gyldigFra3, gyldigTil3)
 
-		roller.any { it.rolle == AnsattRolle.KOORDINATOR } shouldBe true
-		roller.any { it.rolle == AnsattRolle.VEILEDER } shouldBe true
+		val roller = repository.hentAktiveRoller(ansattId, ARRANGOR_1.id)
+
+		roller.size shouldBe 1
+
+		val rolle = roller.first()
+
+		rolle.rolle shouldBe AnsattRolle.KOORDINATOR
+		rolle.arrangorId shouldBe ARRANGOR_1.id
+		rolle.ansattId shouldBe ansattId
 	}
 
 	test("hentArrangorIderForAnsatt skal returnere ider") {
@@ -101,6 +119,29 @@ class AnsattRolleRepositoryTest : FunSpec({
 		val ider = repository.hentArrangorIderForAnsatt(ansattId)
 
 		ider.isEmpty() shouldBe true
+	}
+
+	test("deaktiverRolleHosArrangor - skal deaktivere roller hos arrangor") {
+		val ansattId = UUID.randomUUID()
+
+		testDataRepository.insertArrangorAnsatt(
+			ArrangorAnsattInput(
+				id = ansattId,
+				personligIdent = "",
+				fornavn = "",
+				etternavn = ""
+			)
+		)
+
+		val gyldigFra1 = ZonedDateTime.now().minusSeconds(5)
+		val gyldigTil1 = ZonedDateTime.now().plusDays(1)
+
+		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, AnsattRolle.KOORDINATOR, gyldigFra1, gyldigTil1)
+		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, AnsattRolle.KOORDINATOR, gyldigFra1, gyldigTil1)
+		repository.deaktiverRolleHosArrangor(ansattId, ARRANGOR_1.id, AnsattRolle.KOORDINATOR)
+
+		repository.hentAktiveRoller(ansattId, ARRANGOR_1.id) shouldHaveSize 0
+
 	}
 
 })
