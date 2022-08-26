@@ -9,4 +9,6 @@ data class AnsattRolleDbo(
 	val arrangorId: UUID,
 	val rolle: AnsattRolle,
 	val createdAt: ZonedDateTime,
+	val gyldigFra: ZonedDateTime,
+	val gyldigTil: ZonedDateTime,
 )
