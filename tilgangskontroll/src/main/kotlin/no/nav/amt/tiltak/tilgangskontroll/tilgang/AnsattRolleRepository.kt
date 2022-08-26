@@ -45,30 +45,16 @@ class AnsattRolleRepository(
 		template.update(sql, parameters)
 	}
 
-	internal fun hentAktiveRoller(ansattId: UUID, arrangorId: UUID): List<AnsattRolleDbo> {
+	internal fun hentAktiveRoller(ansattId: UUID): List<AnsattRolleDbo> {
 		val sql = """
-			SELECT * FROM arrangor_ansatt_rolle WHERE ansatt_id = :ansattId AND arrangor_id = :arrangorId AND gyldig_fra < current_timestamp AND gyldig_til > current_timestamp
+			SELECT * FROM arrangor_ansatt_rolle WHERE ansatt_id = :ansattId AND gyldig_fra < current_timestamp AND gyldig_til > current_timestamp
 		""".trimIndent()
 
 		val parameters = sqlParameters(
 			"ansattId" to ansattId,
-			"arrangorId" to arrangorId,
 		)
 
 		return template.query(sql, parameters, rowMapper)
-	}
-
-	internal fun hentArrangorIderForAnsatt(ansattId: UUID): List<UUID> {
-		val parameters = MapSqlParameterSource().addValues(mapOf(
-			"ansattId" to ansattId
-		))
-
-		return template.query(
-			"SELECT arrangor_id FROM arrangor_ansatt_rolle WHERE ansatt_id = :ansattId",
-			parameters
-		) { rs, _ ->
-			rs.getUUID("arrangor_id")
-		}
 	}
 
 	internal fun deaktiverRolleHosArrangor(ansattId: UUID, arrangorId: UUID, ansattRolle: AnsattRolle) {

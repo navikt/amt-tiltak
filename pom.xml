@@ -39,7 +39,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
 
-        <testcontainers.version>1.16.0</testcontainers.version>
+        <testcontainers.version>1.17.3</testcontainers.version>
         <mockito-kotlin.version>3.2.0</mockito-kotlin.version>
         <schedlock.version>4.36.0</schedlock.version>
         <nimbus.version>9.22.2</nimbus.version>

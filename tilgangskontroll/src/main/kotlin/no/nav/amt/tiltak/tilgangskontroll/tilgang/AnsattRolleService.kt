@@ -10,16 +10,20 @@ class AnsattRolleService(
 ) {
 	private val defaultGyldigTil = ZonedDateTime.parse("3000-01-01T00:00:00.00000+00:00")
 
-	fun opprettRolleHvisIkkeFinnes(ansattId: UUID, arrangorId: UUID, rolle: AnsattRolle) {
-		// Kan også bli løst med ON CONFLICT, men trenger index
+	fun opprettRolle(id: UUID, ansattId: UUID, arrangorId: UUID, rolle: AnsattRolle) {
+		ansattRolleRepository.opprettRolle(id, ansattId, arrangorId, rolle, ZonedDateTime.now(), defaultGyldigTil)
+	}
 
-		val roller = ansattRolleRepository.hentAktiveRoller(ansattId, arrangorId)
+	fun hentAktiveRoller(ansattId: UUID): List<AnsattRolleDbo> {
+		return ansattRolleRepository.hentAktiveRoller(ansattId)
+	}
 
-		val rolleFinnes = roller.any { it.rolle == rolle }
+	fun deaktiverRolleHosArrangor(ansattId: UUID, arrangorId: UUID, rolle: AnsattRolle) {
+		ansattRolleRepository.deaktiverRolleHosArrangor(ansattId, arrangorId, rolle)
+	}
 
-		if (!rolleFinnes) {
-			ansattRolleRepository.opprettRolle(UUID.randomUUID(), ansattId, arrangorId, rolle, ZonedDateTime.now(), defaultGyldigTil)
-		}
+	fun hentArrangorIderForAnsatt(ansattId: UUID): List<UUID> {
+		return ansattRolleRepository.hentAktiveRoller(ansattId).distinctBy { it.arrangorId }.map { it.arrangorId }
 	}
 
 }

@@ -56,7 +56,7 @@ class AnsattRolleRepositoryTest : FunSpec({
 
 		repository.opprettRolle(id, ansattId, ARRANGOR_1.id, AnsattRolle.VEILEDER, gyldigFra, gyldigTil)
 
-		val roller = repository.hentAktiveRoller(ansattId, ARRANGOR_1.id)
+		val roller = repository.hentAktiveRoller(ansattId)
 
 		roller shouldHaveSize 1
 
@@ -94,7 +94,7 @@ class AnsattRolleRepositoryTest : FunSpec({
 		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, AnsattRolle.VEILEDER, gyldigFra2, gyldigTil2)
 		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, AnsattRolle.VEILEDER, gyldigFra3, gyldigTil3)
 
-		val roller = repository.hentAktiveRoller(ansattId, ARRANGOR_1.id)
+		val roller = repository.hentAktiveRoller(ansattId)
 
 		roller.size shouldBe 1
 
@@ -103,22 +103,6 @@ class AnsattRolleRepositoryTest : FunSpec({
 		rolle.rolle shouldBe AnsattRolle.KOORDINATOR
 		rolle.arrangorId shouldBe ARRANGOR_1.id
 		rolle.ansattId shouldBe ansattId
-	}
-
-	test("hentArrangorIderForAnsatt skal returnere ider") {
-		val ider = repository.hentArrangorIderForAnsatt(ARRANGOR_ANSATT_1.id)
-
-		ider.size shouldBe 2
-		ider.contains(ARRANGOR_1.id) shouldBe true
-		ider.contains(ARRANGOR_2.id) shouldBe true
-	}
-
-	test("hentArrangorIderForAnsatt skal returnere tom liste hvis ansatt ikke finnes") {
-		val ansattId = UUID.randomUUID()
-
-		val ider = repository.hentArrangorIderForAnsatt(ansattId)
-
-		ider.isEmpty() shouldBe true
 	}
 
 	test("deaktiverRolleHosArrangor - skal deaktivere roller hos arrangor") {
@@ -140,7 +124,7 @@ class AnsattRolleRepositoryTest : FunSpec({
 		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, AnsattRolle.KOORDINATOR, gyldigFra1, gyldigTil1)
 		repository.deaktiverRolleHosArrangor(ansattId, ARRANGOR_1.id, AnsattRolle.KOORDINATOR)
 
-		repository.hentAktiveRoller(ansattId, ARRANGOR_1.id) shouldHaveSize 0
+		repository.hentAktiveRoller(ansattId) shouldHaveSize 0
 
 	}
 

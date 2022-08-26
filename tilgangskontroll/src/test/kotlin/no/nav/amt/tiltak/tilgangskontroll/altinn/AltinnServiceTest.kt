@@ -7,7 +7,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.clients.amt_altinn_acl.AmtAltinnAclClient
-import no.nav.amt.tiltak.clients.amt_altinn_acl.Rettighet
+import no.nav.amt.tiltak.clients.amt_altinn_acl.AltinnRettighet
 
 class AltinnServiceTest : FunSpec( {
 
@@ -24,8 +24,8 @@ class AltinnServiceTest : FunSpec( {
 		every {
 			amtAltinnAclClient.hentRettigheter(personligIdent, listOf(rettighetId))
 		} returns listOf(
-			Rettighet(rettighetId, virksomhet),
-			Rettighet("34890874", "783290723"),
+			AltinnRettighet(rettighetId, virksomhet),
+			AltinnRettighet("34890874", "783290723"),
 		)
 
 		val virksomheter = altinnService.hentVirksomehterMedKoordinatorRettighet(personligIdent)
@@ -41,8 +41,8 @@ class AltinnServiceTest : FunSpec( {
 		every {
 			amtAltinnAclClient.hentRettigheter(personligIdent, listOf(rettighetId))
 		} returns listOf(
-			Rettighet(rettighetId, virksomhet),
-			Rettighet("34890874", "783290723"),
+			AltinnRettighet(rettighetId, virksomhet),
+			AltinnRettighet("34890874", "783290723"),
 		)
 
 		altinnService.hentVirksomehterMedKoordinatorRettighet(personligIdent)

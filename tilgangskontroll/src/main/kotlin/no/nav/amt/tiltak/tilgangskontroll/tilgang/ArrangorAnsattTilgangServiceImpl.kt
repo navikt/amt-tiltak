@@ -2,11 +2,14 @@ package no.nav.amt.tiltak.tilgangskontroll.tilgang
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
+import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
+import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.log.SecureLog.secureLog
 import no.nav.amt.tiltak.tilgangskontroll.altinn.AltinnService
+import no.nav.amt.tiltak.tilgangskontroll.altinn.Rettighet
 import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils.tryCacheFirstNotNull
 import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils.tryCacheFirstNullable
 import org.springframework.http.HttpStatus
@@ -18,10 +21,11 @@ import java.util.*
 @Service
 open class ArrangorAnsattTilgangServiceImpl(
 	private val arrangorAnsattService: ArrangorAnsattService,
-	private val ansattRolleRepository: AnsattRolleRepository,
+	private val ansattRolleService: AnsattRolleService,
 	private val deltakerService: DeltakerService,
 	private val altinnService: AltinnService,
 	private val arrangorAnsattGjennomforingTilgangService: ArrangorAnsattGjennomforingTilgangService,
+	private val arrangorService: ArrangorService
 ) : ArrangorAnsattTilgangService {
 
 	private val personligIdentToAnsattIdCache = Caffeine.newBuilder()
@@ -65,7 +69,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 	}
 
 	override fun hentVirksomhetsnummereMedKoordinatorRettighet(ansattPersonligIdent: String): List<String> {
-		return altinnService.hentVirksomehterMedKoordinatorRettighet(ansattPersonligIdent)
+		return altinnService.hentVirksomheterMedKoordinatorRettighet(ansattPersonligIdent)
 	}
 
 	override fun hentAnsattId(ansattPersonligIdent: String): UUID {
@@ -97,6 +101,32 @@ open class ArrangorAnsattTilgangServiceImpl(
 		arrangorAnsattGjennomforingTilgangService.fjernTilgang(ansatt.id, gjennomforingId)
 	}
 
+	override fun synkroniserRettigheterMedAltinn(ansattPersonligIdent: String) {
+		val altinnRoller = altinnService.hentAltinnRettigheter(ansattPersonligIdent)
+		val maybeAnsatt = arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
+		if (altinnRoller.isEmpty() && maybeAnsatt == null) {
+			// TODO: Log
+			return
+		}
+
+		val ansatt = arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent)
+		val ansattRoller = ansattRolleService.hentAktiveRoller(ansatt.id)
+		val arrangorer = altinnRoller
+			.distinctBy { it.organisasjonsnummer }
+			.map { arrangorService.upsertArrangor(it.organisasjonsnummer) }
+
+		val rollerSomSkalLeggesTil = finnRollerSomSkalLeggesTil(altinnRoller, ansattRoller, arrangorer)
+		val rollerSomSkalFjernes = finnRollerSomSkalFjernes(altinnRoller, ansattRoller, arrangorer)
+
+		rollerSomSkalLeggesTil.forEach {
+			ansattRolleService.opprettRolle(UUID.randomUUID(), ansatt.id, it.first, it.second)
+		}
+		rollerSomSkalFjernes.forEach {
+			ansattRolleService.deaktiverRolleHosArrangor(ansatt.id, it.first, it.second)
+		}
+		// TODO: "Fjern gjennomføring"
+	}
+
 	override fun hentGjennomforingIder(ansattPersonligIdent: String): List<UUID> {
 		val ansattId = hentAnsattId(ansattPersonligIdent)
 
@@ -110,8 +140,29 @@ open class ArrangorAnsattTilgangServiceImpl(
 
 	private fun hentArrangorIderForAnsatt(ansattId: UUID): List<UUID> {
 		return tryCacheFirstNotNull(ansattIdToArrangorIdListCache, ansattId) {
-			ansattRolleRepository.hentArrangorIderForAnsatt(ansattId)
+			ansattRolleService.hentArrangorIderForAnsatt(ansattId)
 		}
 	}
+	 private fun finnRollerSomSkalLeggesTil(altinnRettigheter: List<Rettighet>, ansattRoller: List<AnsattRolleDbo>, arrangorer: List<Arrangor>): List<Pair<UUID, AnsattRolle>> {
+		 return altinnRettigheter.map { rettighet ->
+			 val arrangorId = arrangorer.find { it.organisasjonsnummer == rettighet.organisasjonsnummer }?.id
+				 ?: throw IllegalStateException("Fant ikke arrangor med organisasjonsnummer ${rettighet.organisasjonsnummer}")
+			 val harAlleredeRole = ansattRoller.any { it.arrangorId == arrangorId && it.rolle == rettighet.rolle }
+
+			 return@map if (harAlleredeRole) null else Pair(arrangorId, rettighet.rolle)
+		 }.filterNotNull()
+	 }
+
+	private fun finnRollerSomSkalFjernes(altinnRettigheter: List<Rettighet>, ansattRoller: List<AnsattRolleDbo>, arrangorer: List<Arrangor>): List<Pair<UUID, AnsattRolle>> {
+		return ansattRoller.map {rolle ->
+			val harRolleIAltinn = altinnRettigheter.any { altinnRettighet ->
+				val arrangorId = arrangorer.find { it.organisasjonsnummer == altinnRettighet.organisasjonsnummer }?.id
+					?: throw IllegalStateException("Fant ikke arrangor med organisasjonsnummer ${altinnRettighet.organisasjonsnummer}")
+				arrangorId == rolle.arrangorId && rolle.rolle == altinnRettighet.rolle
+			}
+			return@map if (harRolleIAltinn) null else Pair(rolle.arrangorId, rolle.rolle)
+		}.filterNotNull()
+	}
+
 
 }
