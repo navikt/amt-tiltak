@@ -229,7 +229,7 @@ class TestDataRepository(
 
 	fun insertTiltaksansvarligGjennomforingTilgang(cmd: TiltaksansvarligGjennomforingTilgangInput) {
 		val sql = """
-			INSERT INTO tiltaksansavarlig_gjennomforing_tilgang(id, nav_ansatt_id, gjennomforing_id, gyldig_til, created_at)
+			INSERT INTO tiltaksansvarlig_gjennomforing_tilgang(id, nav_ansatt_id, gjennomforing_id, gyldig_til, created_at)
 			 VALUES(:id, :navAnsattId, :gjennomforingId, :gyldigTil, :createdAt)
 		""".trimIndent()
 

@@ -26,7 +26,7 @@ class TiltaksansvarligGjennomforingTilgangRepository(
 
 	fun hentTilgang(id:  UUID): TiltaksansvarligGjennomforingTilgangDbo {
 		val sql = """
-			SELECT * FROM tiltaksansavarlig_gjennomforing_tilgang WHERE id = :id
+			SELECT * FROM tiltaksansvarlig_gjennomforing_tilgang WHERE id = :id
 		""".trimIndent()
 
 		val parameters = sqlParameters("id" to id)
@@ -37,7 +37,7 @@ class TiltaksansvarligGjennomforingTilgangRepository(
 
 	fun hentAktiveTilganger(navAnsattId: UUID): List<TiltaksansvarligGjennomforingTilgangDbo> {
 		val sql = """
-			SELECT * FROM tiltaksansavarlig_gjennomforing_tilgang
+			SELECT * FROM tiltaksansvarlig_gjennomforing_tilgang
 				WHERE nav_ansatt_id = :navAnsattId AND gyldig_til > current_timestamp
 		""".trimIndent()
 
@@ -48,7 +48,7 @@ class TiltaksansvarligGjennomforingTilgangRepository(
 
 	fun opprettTilgang(id: UUID, navAnsattId: UUID, gjennomforingId: UUID, gyldigTil: ZonedDateTime) {
 		val sql = """
-			INSERT INTO tiltaksansavarlig_gjennomforing_tilgang(id, nav_ansatt_id, gjennomforing_id, gyldig_til)
+			INSERT INTO tiltaksansvarlig_gjennomforing_tilgang(id, nav_ansatt_id, gjennomforing_id, gyldig_til)
 			 VALUES(:id, :navAnsattId, :gjennomforingId, :gyldigTil)
 		""".trimIndent()
 
@@ -64,7 +64,7 @@ class TiltaksansvarligGjennomforingTilgangRepository(
 
 	fun stopTilgang(id: UUID) {
 		val sql = """
-			UPDATE tiltaksansavarlig_gjennomforing_tilgang SET gyldig_til = current_timestamp WHERE id = :id
+			UPDATE tiltaksansvarlig_gjennomforing_tilgang SET gyldig_til = current_timestamp WHERE id = :id
 		""".trimIndent()
 
 		val parameters = sqlParameters("id" to id)
