@@ -11,8 +11,8 @@ private const val antallTotalEndringsmeldinger = "amt_tiltak_endringsmelding_tot
 private const val antallAktivEndringsmeldinger = "amt_tiltak_endringsmelding_aktiv_antall"
 private const val antallManueltFerdigEndringsmeldinger = "amt_tiltak_endringsmelding_manuelt_ferdig_antall"
 private const val antallAutomatiskFerdigEndringsmeldinger = "amt_tiltak_endringsmelding_automatisk_ferdig_antall"
-private const val eldsteAktiveIMinutter = "amt_tiltak_endringsmelding_eldste_aktive_i_timer"
-private const val gjennomsnitteligTidIMinutter = "amt_tiltak_endringsmelding_gjennomsnittelig_tid_i_timer"
+private const val eldsteAktiveIMinutter = "amt_tiltak_endringsmelding_eldste_aktive_i_minutter"
+private const val gjennomsnitteligTidIMinutter = "amt_tiltak_endringsmelding_gjennomsnittelig_tid_i_minutter"
 
 @Service
 class EndringsmeldingMetricService(
@@ -73,7 +73,7 @@ class EndringsmeldingMetricService(
 				.set(durationInMinutes.toInt())
 		}
 
-		simpleGauges.getValue(eldsteAktiveIMinutter)
+		simpleGauges.getValue(gjennomsnitteligTidIMinutter)
 			.set(metrics?.gjennomsnitteligTidIMinutter?.roundToInt() ?: 0)
 	}
 
