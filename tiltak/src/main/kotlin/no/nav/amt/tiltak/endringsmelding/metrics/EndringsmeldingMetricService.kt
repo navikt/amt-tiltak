@@ -2,7 +2,10 @@ package no.nav.amt.tiltak.endringsmelding.metrics
 
 import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.stereotype.Service
+import java.time.Duration
+import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.math.roundToInt
 
 private const val antallTotalEndringsmeldinger = "amt_tiltak_endringsmelding_totalt_antall"
 private const val antallAktivEndringsmeldinger = "amt_tiltak_endringsmelding_aktiv_antall"
@@ -63,6 +66,15 @@ class EndringsmeldingMetricService(
 
 		simpleGauges.getValue(antallAutomatiskFerdigEndringsmeldinger)
 			.set(metrics?.automatiskFerdige ?: 0)
+
+		if (metrics != null) {
+			val durationInMinutes = Duration.between(metrics.eldsteAktive, LocalDateTime.now()).toMinutes()
+			simpleGauges.getValue(eldsteAktiveIMinutter)
+				.set(durationInMinutes.toInt())
+		}
+
+		simpleGauges.getValue(eldsteAktiveIMinutter)
+			.set(metrics?.gjennomsnitteligTidIMinutter?.roundToInt() ?: 0)
 	}
 
 }
