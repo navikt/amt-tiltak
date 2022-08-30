@@ -7,7 +7,6 @@ import no.nav.amt.tiltak.tilgangskontroll.tilgang.AnsattRolle
 import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.lang.IllegalArgumentException
 import java.time.Duration
 import kotlin.IllegalArgumentException
 

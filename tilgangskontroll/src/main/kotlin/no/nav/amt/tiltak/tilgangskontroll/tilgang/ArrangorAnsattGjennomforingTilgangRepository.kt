@@ -53,14 +53,16 @@ open class ArrangorAnsattGjennomforingTilgangRepository(
 		template.update(sql, parameters)
 	}
 
-	internal fun oppdaterGyldigTil(id: UUID, gyldigTil: ZonedDateTime) {
+	internal fun fjernTilgang(arrangorAnsattId: UUID, gjennomforingId: UUID) {
 		val sql = """
-			update arrangor_ansatt_gjennomforing_tilgang set gyldig_til = :gyldigTil where id = :id
+			UPDATE arrangor_ansatt_gjennomforing_tilgang
+			SET gyldig_til = current_timestamp
+			WHERE ansatt_id = :ansattId AND gjennomforing_id = :gjennomforingId AND gyldig_til > current_timestamp
 		""".trimIndent()
 
 		val parameters = sqlParameters(
-			"id" to id,
-			"gyldigTil" to gyldigTil.toOffsetDateTime(),
+			"ansattId" to arrangorAnsattId,
+			"gjennomforingId" to gjennomforingId,
 		)
 
 		template.update(sql, parameters)

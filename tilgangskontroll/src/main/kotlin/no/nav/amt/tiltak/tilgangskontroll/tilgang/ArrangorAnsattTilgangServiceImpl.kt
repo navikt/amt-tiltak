@@ -12,8 +12,10 @@ import no.nav.amt.tiltak.tilgangskontroll.altinn.AltinnService
 import no.nav.amt.tiltak.tilgangskontroll.altinn.Rettighet
 import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils.tryCacheFirstNotNull
 import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils.tryCacheFirstNullable
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.transaction.support.TransactionTemplate
 import org.springframework.web.server.ResponseStatusException
 import java.time.Duration
 import java.util.*
@@ -25,8 +27,11 @@ open class ArrangorAnsattTilgangServiceImpl(
 	private val deltakerService: DeltakerService,
 	private val altinnService: AltinnService,
 	private val arrangorAnsattGjennomforingTilgangService: ArrangorAnsattGjennomforingTilgangService,
-	private val arrangorService: ArrangorService
+	private val arrangorService: ArrangorService,
+	private val transactionTemplate: TransactionTemplate
 ) : ArrangorAnsattTilgangService {
+
+	private val log = LoggerFactory.getLogger(javaClass)
 
 	private val personligIdentToAnsattIdCache = Caffeine.newBuilder()
 		.expireAfterWrite(Duration.ofHours(12))
@@ -105,26 +110,46 @@ open class ArrangorAnsattTilgangServiceImpl(
 		val altinnRoller = altinnService.hentAltinnRettigheter(ansattPersonligIdent)
 		val maybeAnsatt = arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
 		if (altinnRoller.isEmpty() && maybeAnsatt == null) {
-			// TODO: Log
+			log.warn("En ikke-ansatt har logget inn, men hadde ikke tilganger i Altinn.")
 			return
 		}
 
 		val ansatt = arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent)
 		val ansattRoller = ansattRolleService.hentAktiveRoller(ansatt.id)
-		val arrangorer = altinnRoller
-			.distinctBy { it.organisasjonsnummer }
-			.map { arrangorService.upsertArrangor(it.organisasjonsnummer) }
+		val altinnTilganger = altinnRoller
+			.map {
+				val arrangor = arrangorService.getOrCreateArrangor(it.organisasjonsnummer)
+				return@map AnsattTilgang(arrangor.id, it.rolle)
+			}
 
-		val rollerSomSkalLeggesTil = finnRollerSomSkalLeggesTil(altinnRoller, ansattRoller, arrangorer)
-		val rollerSomSkalFjernes = finnRollerSomSkalFjernes(altinnRoller, ansattRoller, arrangorer)
+		val tilgangerSomSkalLeggesTil = finnTilgangerSomSkalLeggesTil(altinnTilganger, ansattRoller)
+		val tilgangerSomSkalFjernes = finnTilgangerSomSkalFjernes(altinnTilganger, ansattRoller)
 
-		rollerSomSkalLeggesTil.forEach {
-			ansattRolleService.opprettRolle(UUID.randomUUID(), ansatt.id, it.first, it.second)
+		tilgangerSomSkalLeggesTil.forEach {
+			ansattRolleService.opprettRolle(UUID.randomUUID(), ansatt.id, it.arrangorId, it.ansattRolle)
 		}
-		rollerSomSkalFjernes.forEach {
-			ansattRolleService.deaktiverRolleHosArrangor(ansatt.id, it.first, it.second)
+		tilgangerSomSkalFjernes.forEach { tilgang ->
+			transactionTemplate.executeWithoutResult {
+				ansattRolleService.deaktiverRolleHosArrangor(ansatt.id, tilgang.arrangorId, tilgang.ansattRolle)
+				arrangorAnsattGjennomforingTilgangService.fjernTilgangTilGjennomforinger(ansatt.id, tilgang.arrangorId)
+			}
 		}
-		// TODO: "Fjern gjennomføring"
+	}
+
+	private fun finnTilgangerSomSkalLeggesTil(altinnTilganger: List<AnsattTilgang>, ansattRoller: List<AnsattRolleDbo>): List<AnsattTilgang> {
+		return altinnTilganger.filter { altinnTilgang ->
+			val harTilgangAllerede = ansattRoller.any { it.arrangorId == altinnTilgang.arrangorId && it.rolle == altinnTilgang.ansattRolle }
+			return@filter !harTilgangAllerede
+		}
+	}
+
+	private fun finnTilgangerSomSkalFjernes(altinnTilganger: List<AnsattTilgang>, ansattRoller: List<AnsattRolleDbo>): List<AnsattTilgang> {
+		return ansattRoller.filter { rolle ->
+			val harRolleIAltinn = altinnTilganger.any { altinnTilgang ->
+				 altinnTilgang.arrangorId == rolle.arrangorId && rolle.rolle == altinnTilgang.ansattRolle
+			}
+			return@filter !harRolleIAltinn
+		}.map { AnsattTilgang(it.arrangorId, it.rolle) }
 	}
 
 	override fun hentGjennomforingIder(ansattPersonligIdent: String): List<UUID> {
@@ -143,26 +168,11 @@ open class ArrangorAnsattTilgangServiceImpl(
 			ansattRolleService.hentArrangorIderForAnsatt(ansattId)
 		}
 	}
-	 private fun finnRollerSomSkalLeggesTil(altinnRettigheter: List<Rettighet>, ansattRoller: List<AnsattRolleDbo>, arrangorer: List<Arrangor>): List<Pair<UUID, AnsattRolle>> {
-		 return altinnRettigheter.map { rettighet ->
-			 val arrangorId = arrangorer.find { it.organisasjonsnummer == rettighet.organisasjonsnummer }?.id
-				 ?: throw IllegalStateException("Fant ikke arrangor med organisasjonsnummer ${rettighet.organisasjonsnummer}")
-			 val harAlleredeRole = ansattRoller.any { it.arrangorId == arrangorId && it.rolle == rettighet.rolle }
 
-			 return@map if (harAlleredeRole) null else Pair(arrangorId, rettighet.rolle)
-		 }.filterNotNull()
-	 }
-
-	private fun finnRollerSomSkalFjernes(altinnRettigheter: List<Rettighet>, ansattRoller: List<AnsattRolleDbo>, arrangorer: List<Arrangor>): List<Pair<UUID, AnsattRolle>> {
-		return ansattRoller.map {rolle ->
-			val harRolleIAltinn = altinnRettigheter.any { altinnRettighet ->
-				val arrangorId = arrangorer.find { it.organisasjonsnummer == altinnRettighet.organisasjonsnummer }?.id
-					?: throw IllegalStateException("Fant ikke arrangor med organisasjonsnummer ${altinnRettighet.organisasjonsnummer}")
-				arrangorId == rolle.arrangorId && rolle.rolle == altinnRettighet.rolle
-			}
-			return@map if (harRolleIAltinn) null else Pair(rolle.arrangorId, rolle.rolle)
-		}.filterNotNull()
-	}
-
-
+	private data class AnsattTilgang(
+		val arrangorId: UUID,
+		val ansattRolle: AnsattRolle
+	)
 }
+
+

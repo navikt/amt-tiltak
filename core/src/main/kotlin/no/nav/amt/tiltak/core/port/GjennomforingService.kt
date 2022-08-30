@@ -13,6 +13,8 @@ interface GjennomforingService {
 
 	fun getKoordinatorerForGjennomforinger(gjennomforingIder: List<UUID>): Map<UUID, Set<Person>>
 
+	fun getByArrangorId(arrangorId: UUID): List<Gjennomforing>
+
 	fun upsert(gjennomforing: Gjennomforing): Gjennomforing
 
 	fun slettGjennomforing(gjennomforingId: UUID)

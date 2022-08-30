@@ -7,6 +7,8 @@ import io.kotest.assertions.timing.eventually
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import io.mockk.mockk
+import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
@@ -36,6 +38,8 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 
 	lateinit var service: ArrangorAnsattGjennomforingTilgangService
 
+	lateinit var gjennomforingService: GjennomforingService
+
 	beforeEach {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 		rootLogger.level = Level.WARN
@@ -48,7 +52,9 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 
 		transactionTemplate = TransactionTemplate(DataSourceTransactionManager(dataSource))
 
-		service = ArrangorAnsattGjennomforingTilgangService(repository, transactionTemplate)
+		gjennomforingService = mockk()
+
+		service = ArrangorAnsattGjennomforingTilgangService(repository, gjennomforingService, transactionTemplate)
 
 
 		DbTestDataUtils.cleanDatabase(dataSource)

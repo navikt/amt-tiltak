@@ -181,5 +181,7 @@ internal class GjennomforingRepositoryTest : FunSpec({
 		gjennomforinger shouldHaveSize 0
 	}
 
+	test("getByArrangorId - skal hente gjennomforinger hos arrangor") {
+	}
 })
 

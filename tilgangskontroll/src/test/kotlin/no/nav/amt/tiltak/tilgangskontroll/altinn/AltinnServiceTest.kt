@@ -28,7 +28,7 @@ class AltinnServiceTest : FunSpec( {
 			AltinnRettighet("34890874", "783290723"),
 		)
 
-		val virksomheter = altinnService.hentVirksomehterMedKoordinatorRettighet(personligIdent)
+		val virksomheter = altinnService.hentVirksomheterMedKoordinatorRettighet(personligIdent)
 
 		virksomheter shouldHaveSize 1
 		virksomheter.first() shouldBe virksomhet
@@ -45,8 +45,8 @@ class AltinnServiceTest : FunSpec( {
 			AltinnRettighet("34890874", "783290723"),
 		)
 
-		altinnService.hentVirksomehterMedKoordinatorRettighet(personligIdent)
-		altinnService.hentVirksomehterMedKoordinatorRettighet(personligIdent)
+		altinnService.hentVirksomheterMedKoordinatorRettighet(personligIdent)
+		altinnService.hentVirksomheterMedKoordinatorRettighet(personligIdent)
 
 		verify(exactly = 1) {
 			amtAltinnAclClient.hentRettigheter(any(), any())

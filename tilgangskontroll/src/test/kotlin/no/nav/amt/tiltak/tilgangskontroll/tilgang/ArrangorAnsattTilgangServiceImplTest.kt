@@ -8,9 +8,13 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
+import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tilgangskontroll.altinn.AltinnService
 import org.springframework.http.HttpStatus
+import org.springframework.jdbc.datasource.DataSourceTransactionManager
+import org.springframework.transaction.support.TransactionTemplate
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
@@ -18,7 +22,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	lateinit var arrangorAnsattService: ArrangorAnsattService
 
-	lateinit var ansattRolleRepository: AnsattRolleRepository
+	lateinit var ansattRolleService: AnsattRolleService
 
 	lateinit var deltakerService: DeltakerService
 
@@ -28,6 +32,8 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	lateinit var altinnService: AltinnService
 
+	lateinit var arrangorService: ArrangorService
+
 	val personligIdent = "fnr"
 
 	val ansattId = UUID.randomUUID()
@@ -36,10 +42,12 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	val arrangorId = UUID.randomUUID()
 
+	val datasource = SingletonPostgresContainer.getDataSource()
+
 	beforeEach {
 		arrangorAnsattService = mockk()
 
-		ansattRolleRepository = mockk()
+		ansattRolleService = mockk()
 
 		deltakerService = mockk()
 
@@ -47,9 +55,12 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		altinnService = mockk()
 
+		arrangorService = mockk()
+
 		arrangorAnsattTilgangServiceImpl = ArrangorAnsattTilgangServiceImpl(
-			arrangorAnsattService, ansattRolleRepository,
-			deltakerService, altinnService, arrangorAnsattGjennomforingTilgangService
+			arrangorAnsattService, ansattRolleService,
+			deltakerService, altinnService, arrangorAnsattGjennomforingTilgangService,
+			arrangorService, TransactionTemplate(DataSourceTransactionManager(datasource))
 		)
 
 		every {
@@ -88,7 +99,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	test("verifiserTilgangTilArrangor skal kaste exception hvis ikke tilgang") {
 		every {
-			ansattRolleRepository.hentArrangorIderForAnsatt(ansattId)
+			ansattRolleService.hentArrangorIderForAnsatt(ansattId)
 		} returns listOf(UUID.randomUUID())
 
 		val exception = shouldThrowExactly<ResponseStatusException> {
@@ -100,7 +111,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	test("verifiserTilgangTilArrangor skal ikke kaste exception hvis tilgang") {
 		every {
-			ansattRolleRepository.hentArrangorIderForAnsatt(ansattId)
+			ansattRolleService.hentArrangorIderForAnsatt(ansattId)
 		} returns listOf(arrangorId)
 
 		shouldNotThrow<Throwable> {
