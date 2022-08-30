@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import java.util.UUID
 
 internal class ArrangorRepositoryTest {
 
@@ -28,7 +29,7 @@ internal class ArrangorRepositoryTest {
 	}
 
 	@Test
-	internal fun `insert() should insert arrangor and return the object`() {
+	internal fun `upsert() should insert arrangor and return the object`() {
 		val organisasjonsnavn = "Test Organisasjon"
 		val organisasjonsnummer = "483726374"
 		val virksomhetsnavn = "Test Virksomhet"
@@ -50,7 +51,7 @@ internal class ArrangorRepositoryTest {
 	}
 
 	@Test
-	internal fun `insert() same virksomhet twice will return same object`() {
+	internal fun `upsert() same virksomhet twice will return same object`() {
 		val overordnetEnhetNavn = "Test Organisasjon"
 		val overordnetEnhetOrganisasjonsnummer = "483726374"
 		val navn = "Test Virksomhet"
@@ -70,6 +71,31 @@ internal class ArrangorRepositoryTest {
 		)
 
 		assertEquals(savedOne.id, savedTwo.id)
+	}
+
+	@Test
+	internal fun `insert() should insert arrangor`() {
+		val organisasjonsnavn = "Test Organisasjon"
+		val organisasjonsnummer = "483726374"
+		val virksomhetsnavn = "Test Virksomhet"
+		val virksomhetsnummer = "123456798"
+		val id = UUID.randomUUID()
+
+		repository.insert(
+			id = id,
+			overordnetEnhetNavn = organisasjonsnavn,
+			overordnetEnhetOrganisasjonsnummer = organisasjonsnummer,
+			navn = virksomhetsnavn,
+			organisasjonsnummer = virksomhetsnummer
+		)
+		val nyArrangor = repository.getById(id)
+
+		assertNotNull(nyArrangor)
+		assertNotNull(nyArrangor.id)
+		assertEquals(organisasjonsnummer, nyArrangor.overordnetEnhetOrganisasjonsnummer)
+		assertEquals(organisasjonsnavn, nyArrangor.overordnetEnhetNavn)
+		assertEquals(virksomhetsnavn, nyArrangor.navn)
+		assertEquals(virksomhetsnummer, nyArrangor.organisasjonsnummer)
 	}
 
 }

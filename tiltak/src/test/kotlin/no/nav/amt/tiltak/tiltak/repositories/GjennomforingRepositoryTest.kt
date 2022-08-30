@@ -182,6 +182,10 @@ internal class GjennomforingRepositoryTest : FunSpec({
 	}
 
 	test("getByArrangorId - skal hente gjennomforinger hos arrangor") {
+		val gjennomforinger = repository.getByArrangorId(ARRANGOR_1.id)
+
+		gjennomforinger shouldHaveSize 1
+		gjennomforinger.forEach { it.arrangorId shouldBe ARRANGOR_1.id }
 	}
 })
 

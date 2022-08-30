@@ -65,7 +65,7 @@ open class ArrangorRepository(
             ?: throw NoSuchElementException("Virksomhet med organisasjonsnummer $organisasjonsnummer finnes ikke")
     }
 
-	fun insert(
+	open fun insert(
 		id: UUID,
 		navn: String,
 		organisasjonsnummer: String,
