@@ -7,6 +7,10 @@ import io.kotest.assertions.timing.eventually
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
@@ -21,6 +25,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
@@ -36,6 +41,8 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 
 	lateinit var service: ArrangorAnsattGjennomforingTilgangService
 
+	lateinit var gjennomforingService: GjennomforingService
+
 	beforeEach {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 		rootLogger.level = Level.WARN
@@ -48,7 +55,9 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 
 		transactionTemplate = TransactionTemplate(DataSourceTransactionManager(dataSource))
 
-		service = ArrangorAnsattGjennomforingTilgangService(repository, transactionTemplate)
+		gjennomforingService = mockk()
+
+		service = ArrangorAnsattGjennomforingTilgangService(repository, gjennomforingService, transactionTemplate)
 
 
 		DbTestDataUtils.cleanDatabase(dataSource)
@@ -114,6 +123,64 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 		shouldThrowExactly<IllegalStateException> {
 			service.opprettTilgang(UUID.randomUUID(), ARRANGOR_ANSATT_1.id, GJENNOMFORING_1.id)
 		}
+	}
+
+	test("fjernTilgangTilGjennomforinger - skal fjerne tilgang til gjennomforing hos arrangor") {
+		val id1 = UUID.randomUUID()
+		val id2 = UUID.randomUUID()
+
+		testRepository.insertArrangorAnsattGjennomforingTilgang(
+			GJENNOMFORING_TILGANG_1.copy(
+				id = id1,
+				ansattId = ARRANGOR_ANSATT_1.id,
+				gjennomforingId = GJENNOMFORING_1.id
+			)
+		)
+
+		testRepository.insertArrangorAnsattGjennomforingTilgang(
+			GJENNOMFORING_TILGANG_1.copy(
+				id = id2,
+				ansattId = ARRANGOR_ANSATT_1.id,
+				gjennomforingId = GJENNOMFORING_2.id
+			)
+		)
+
+		every { gjennomforingService.getByArrangorId(ARRANGOR_1.id) } returns listOf(
+			Gjennomforing(
+				id = GJENNOMFORING_1.id,
+				tiltak = mockk(),
+				arrangor = mockk(),
+				navn = "",
+				status = Gjennomforing.Status.GJENNOMFORES,
+				startDato = null,
+				sluttDato = null,
+				registrertDato = LocalDateTime.now(),
+				fremmoteDato = null,
+				navEnhetId = null,
+				opprettetAar = null,
+				lopenr = null,
+			), Gjennomforing(
+				id = GJENNOMFORING_2.id,
+				tiltak = mockk(),
+				arrangor = mockk(),
+				navn = "",
+				status = Gjennomforing.Status.GJENNOMFORES,
+				startDato = null,
+				sluttDato = null,
+				registrertDato = LocalDateTime.now(),
+				fremmoteDato = null,
+				navEnhetId = null,
+				opprettetAar = null,
+				lopenr = null,
+		))
+
+		var aktiveGjennomforingTilganger = repository.hentAktiveGjennomforingTilgangerForAnsatt(ARRANGOR_ANSATT_1.id)
+		aktiveGjennomforingTilganger shouldHaveSize 2
+
+		service.fjernTilgangTilGjennomforinger(ARRANGOR_ANSATT_1.id, ARRANGOR_1.id)
+
+		aktiveGjennomforingTilganger = repository.hentAktiveGjennomforingTilgangerForAnsatt(ARRANGOR_ANSATT_1.id)
+		aktiveGjennomforingTilganger shouldHaveSize 0
 	}
 
 })

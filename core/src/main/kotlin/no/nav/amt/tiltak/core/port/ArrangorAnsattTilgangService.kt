@@ -20,4 +20,6 @@ interface ArrangorAnsattTilgangService {
 
 	fun fjernTilgang(ansattPersonligIdent: String, gjennomforingId: UUID)
 
+	fun synkroniserRettigheterMedAltinn(ansattPersonligIdent: String)
+
 }

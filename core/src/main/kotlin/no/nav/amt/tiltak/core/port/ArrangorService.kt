@@ -13,4 +13,6 @@ interface ArrangorService {
 
 	fun getArrangorById(id: UUID): Arrangor
 
+	fun getOrCreateArrangor(virksomhetsnummer: String): Arrangor
+
 }

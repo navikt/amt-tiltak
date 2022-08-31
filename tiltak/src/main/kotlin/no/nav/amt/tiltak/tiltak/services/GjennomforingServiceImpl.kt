@@ -87,7 +87,7 @@ class GjennomforingServiceImpl(
 		return gjennomforingRepository.get(id)?.let { gjennomforingDbo ->
 			val tiltak = tiltakService.getTiltakById(gjennomforingDbo.tiltakId)
 			val arrangor = arrangorService.getArrangorById(gjennomforingDbo.arrangorId)
-			return gjennomforingDbo.toGjennomforing(tiltak, arrangor)
+			return@let gjennomforingDbo.toGjennomforing(tiltak, arrangor)
 		} ?: throw NoSuchElementException("Fant ikke gjennomforing")
 	}
 
@@ -103,6 +103,14 @@ class GjennomforingServiceImpl(
 
 	override fun getKoordinatorerForGjennomforinger(gjennomforingIder: List<UUID>): Map<UUID, Set<Person>> {
 		return koordinatorerForGjennomforing.query(gjennomforingIder)
+	}
+
+	override fun getByArrangorId(arrangorId: UUID): List<Gjennomforing> {
+		return gjennomforingRepository.getByArrangorId(arrangorId).map {
+			val tiltak = tiltakService.getTiltakById(it.tiltakId)
+			val arrangor = arrangorService.getArrangorById(it.arrangorId)
+			return@map it.toGjennomforing(tiltak, arrangor)
+		}
 	}
 
 }

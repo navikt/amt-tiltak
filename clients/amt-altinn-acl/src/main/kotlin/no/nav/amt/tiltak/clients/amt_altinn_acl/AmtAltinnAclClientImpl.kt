@@ -17,7 +17,7 @@ class AmtAltinnAclClientImpl(
 
 	private val mediaTypeJson = "application/json".toMediaType()
 
-	override fun hentRettigheter(norskIdent: String, rettighetIder: List<String>): List<Rettighet> {
+	override fun hentRettigheter(norskIdent: String, rettighetIder: List<String>): List<AltinnRettighet> {
 		val requestBody = HentRettigheter.Request(norskIdent, rettighetIder)
 
 		val request = Request.Builder()
@@ -36,7 +36,7 @@ class AmtAltinnAclClientImpl(
 			val responseBody = fromJsonString<HentRettigheter.Response>(body)
 
 			return responseBody.rettigheter
-				.map { Rettighet(it.id, it.organisasjonsnummer) }
+				.map { AltinnRettighet(it.id, it.organisasjonsnummer) }
 		}
 	}
 
