@@ -45,7 +45,7 @@
         <nimbus.version>9.22.2</nimbus.version>
         <mockk.version>1.12.0</mockk.version>
         <kotest.version>5.1.0</kotest.version>
-        <okhttp.version>4.9.3</okhttp.version>
+        <okhttp.version>4.10.0</okhttp.version>
         <token-support.version>2.1.0</token-support.version>
         <mock-oauth2-server.version>0.3.5</mock-oauth2-server.version>
         <common.version>2.2022.06.30_06.15-e67de67df422</common.version>
