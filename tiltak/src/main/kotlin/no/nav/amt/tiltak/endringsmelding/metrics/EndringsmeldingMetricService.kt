@@ -67,7 +67,7 @@ class EndringsmeldingMetricService(
 		simpleGauges.getValue(antallAutomatiskFerdigEndringsmeldinger)
 			.set(metrics?.automatiskFerdige ?: 0)
 
-		if (metrics != null) {
+		if (metrics?.eldsteAktive != null) {
 			val durationInMinutes = Duration.between(metrics.eldsteAktive, LocalDateTime.now()).toMinutes()
 			simpleGauges.getValue(eldsteAktiveIMinutter)
 				.set(durationInMinutes.toInt())

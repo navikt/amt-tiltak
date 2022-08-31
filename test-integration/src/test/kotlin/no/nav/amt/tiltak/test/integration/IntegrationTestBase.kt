@@ -1,11 +1,12 @@
 package no.nav.amt.tiltak.test.integration
 
-import IntegrationTestConfiguration
 import no.nav.amt.tiltak.application.Application
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.integration.mocks.MockMaskinportenHttpClient
 import no.nav.amt.tiltak.test.integration.mocks.MockOAuthServer3
 import no.nav.amt.tiltak.test.integration.utils.Constants.TEST_JWK
+import no.nav.amt.tiltak.test.integration.utils.KafkaMessageSender
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
@@ -19,6 +20,9 @@ import org.springframework.test.context.DynamicPropertySource
 @ActiveProfiles("integration")
 @TestConfiguration("application-integration.properties")
 abstract class IntegrationTestBase {
+
+	@Autowired
+	lateinit var kafkaMessageSender: KafkaMessageSender
 
 	companion object {
 		val oAuthServer = MockOAuthServer3()
