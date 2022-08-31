@@ -3,7 +3,6 @@ package no.nav.amt.tiltak.tilgangskontroll.tilgang
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.ints.exactly
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk

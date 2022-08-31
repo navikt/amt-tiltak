@@ -1,11 +1,8 @@
 package no.nav.amt.tiltak.tilgangskontroll.tilgang
 
-import com.github.benmanes.caffeine.cache.Caffeine
 import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
-import java.time.Duration
 import java.time.ZonedDateTime
 import java.util.*
 
