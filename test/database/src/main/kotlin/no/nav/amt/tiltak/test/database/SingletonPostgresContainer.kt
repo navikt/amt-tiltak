@@ -27,7 +27,7 @@ object SingletonPostgresContainer {
 		return containerDataSource!!
 	}
 
-	private fun getContainer(): PostgreSQLContainer<Nothing> {
+	fun getContainer(): PostgreSQLContainer<Nothing> {
 		if (postgresContainer == null) {
 			log.info("Starting new postgres database...")
 
