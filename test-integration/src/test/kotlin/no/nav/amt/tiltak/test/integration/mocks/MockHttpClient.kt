@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.test.integration.mocks
 
+import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
@@ -13,9 +14,21 @@ open class MockHttpClient {
 
 	private var lastRequestCount = 0
 
+	val responses = mutableMapOf<String, MockResponse>()
+
 	fun start() {
 		try {
-		    server.start()
+			server.start()
+
+			server.dispatcher = object : Dispatcher() {
+				override fun dispatch(request: RecordedRequest): MockResponse {
+					val response = responses[request.path] ?: MockResponse().setResponseCode(404)
+					log.info("Responding [${request.path}]: $response")
+					return response
+				}
+
+			}
+
 		} catch (e: IllegalArgumentException) {
 			log.info("${javaClass.simpleName} is already started")
 		}

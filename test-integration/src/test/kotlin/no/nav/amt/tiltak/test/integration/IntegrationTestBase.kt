@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.test.integration
 
 import no.nav.amt.tiltak.application.Application
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.integration.mocks.MockAmtEnhetsregisterClient
 import no.nav.amt.tiltak.test.integration.mocks.MockMaskinportenHttpClient
 import no.nav.amt.tiltak.test.integration.mocks.MockOAuthServer3
 import no.nav.amt.tiltak.test.integration.utils.Constants.TEST_JWK
@@ -27,6 +28,7 @@ abstract class IntegrationTestBase {
 	companion object {
 		val oAuthServer = MockOAuthServer3()
 		val mockMaskinportenHttpClient = MockMaskinportenHttpClient()
+		val mockEnhetsregisterClient = MockAmtEnhetsregisterClient()
 
 
 		@JvmStatic
@@ -36,7 +38,9 @@ abstract class IntegrationTestBase {
 
 			oAuthServer.start()
 			mockMaskinportenHttpClient.start()
+			mockEnhetsregisterClient.start()
 
+			// Sikkerhets ting
 			registry.add("no.nav.security.jwt.issuer.azuread.discovery-url", oAuthServer::getDiscoveryUrl)
 			registry.add("no.nav.security.jwt.issuer.azuread.accepted-audience") { "test-aud" }
 
@@ -49,6 +53,10 @@ abstract class IntegrationTestBase {
 			registry.add("maskinporten.token-endpoint") { mockMaskinportenHttpClient.serverUrl() }
 			registry.add("maskinporten.client-jwk") { TEST_JWK }
 
+			// Klient ting
+			registry.add("amt-enhetsregister.url") { mockEnhetsregisterClient.serverUrl() }
+
+			// Database ting
 			val container = SingletonPostgresContainer.getContainer()
 
 			registry.add("spring.datasource.url") { container.jdbcUrl }
