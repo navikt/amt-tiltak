@@ -1,0 +1,2 @@
+ALTER TABLE tiltaksansavarlig_gjennomforing_tilgang
+    RENAME TO tiltaksansvarlig_gjennomforing_tilgang;
