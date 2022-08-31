@@ -1,8 +1,8 @@
-package no.nav.amt.tiltak.test.database.data.commands
+package no.nav.amt.tiltak.test.database.data.inputs
 
 import java.util.*
 
-data class InsertBrukerCommand(
+data class BrukerInput(
 	val id: UUID,
 	val fodselsnummer: String,
 	val fornavn: String,

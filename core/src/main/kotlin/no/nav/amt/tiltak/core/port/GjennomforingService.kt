@@ -9,9 +9,9 @@ interface GjennomforingService {
 
 	fun getGjennomforinger(gjennomforingIder: List<UUID>): List<Gjennomforing>
 
-	fun getKoordinatorerForGjennomforing(gjennomforingId: UUID): List<String>
+	fun getKoordinatorerForGjennomforing(gjennomforingId: UUID): Set<Person>
 
-	fun getKoordinatorerForGjennomforinger(gjennomforingIder: List<UUID>): Map<UUID, List<String>>
+	fun getKoordinatorerForGjennomforinger(gjennomforingIder: List<UUID>): Map<UUID, Set<Person>>
 
 	fun upsert(gjennomforing: Gjennomforing): Gjennomforing
 

@@ -16,7 +16,7 @@ import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
-import no.nav.amt.tiltak.test.database.data.TestData.createDeltakerCommand
+import no.nav.amt.tiltak.test.database.data.TestData.createDeltakerInput
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.TestDataSeeder
 import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
@@ -135,7 +135,7 @@ class DeltakerServiceImplTest {
 
 	@Test
 	fun `insertStatus - deltaker ny status - setter ny og deaktiverer den gamle`() {
-		val deltakerCmd = createDeltakerCommand(BRUKER_1, GJENNOMFORING_1)
+		val deltakerCmd = createDeltakerInput(BRUKER_1, GJENNOMFORING_1)
 		testDataRepository.insertDeltaker(deltakerCmd)
 
 		val nyDeltaker = deltakerRepository.get(deltakerCmd.brukerId, deltakerCmd.gjennomforingId)

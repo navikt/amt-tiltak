@@ -1,14 +1,14 @@
 package no.nav.amt.tiltak.test.database.data
 
 import no.nav.amt.tiltak.test.database.DbTestDataUtils.parameters
-import no.nav.amt.tiltak.test.database.data.commands.*
+import no.nav.amt.tiltak.test.database.data.inputs.*
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 class TestDataRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
 
-	fun insertArrangorAnsatt(cmd: InsertArrangorAnsattCommand) {
+	fun insertArrangorAnsatt(cmd: ArrangorAnsattInput) {
 		val sql = """
 			INSERT INTO arrangor_ansatt(id, personlig_ident, fornavn, mellomnavn, etternavn)
 			VALUES(:id, :personlig_ident, :fornavn, :mellomnavn, :etternavn)
@@ -25,7 +25,7 @@ class TestDataRepository(
 		)
 	}
 
-	fun insertArrangorAnsattGjennomforingTilgang(cmd: InsertArrangorAnsattGjennomforingTilgang) {
+	fun insertArrangorAnsattGjennomforingTilgang(cmd: ArrangorAnsattGjennomforingTilgangInput) {
 		val sql = """
 			INSERT INTO arrangor_ansatt_gjennomforing_tilgang(id, ansatt_id, gjennomforing_id, gyldig_fra, gyldig_til)
 			VALUES(:id, :ansatt_id, :gjennomforing_id, :gyldig_fra, :gyldig_til)
@@ -42,7 +42,7 @@ class TestDataRepository(
 		)
 	}
 
-	fun insertArrangorAnsattRolle(cmd: InsertArrangorAnsattRolleCommand) {
+	fun insertArrangorAnsattRolle(cmd: ArrangorAnsattRolleInput) {
 		val sql = """
 			INSERT INTO arrangor_ansatt_rolle(id, arrangor_id, ansatt_id, rolle)
 			VALUES(?, ?, ?, ?::arrangor_rolle)
@@ -57,7 +57,7 @@ class TestDataRepository(
 		)
 	}
 
-	fun insertArrangor(cmd: InsertArrangorCommand) {
+	fun insertArrangor(cmd: ArrangorInput) {
 		val sql = """
 			INSERT INTO arrangor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer, navn)
 			VALUES (:id, :overordnet_enhet_organisasjonsnummer, :overordnet_enhet_navn, :organisasjonsnummer, :navn)
@@ -74,7 +74,7 @@ class TestDataRepository(
 		)
 	}
 
-	fun insertBruker(cmd: InsertBrukerCommand) {
+	fun insertBruker(cmd: BrukerInput) {
 		val sql = """
 			INSERT INTO bruker (id, fodselsnummer, fornavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_enhet_id)
 			VALUES (:id, :fodselsnummer, :fornavn, :etternavn, :telefonnummer, :epost, :ansvarlig_veileder_id, :nav_enhet_id);
@@ -94,7 +94,7 @@ class TestDataRepository(
 		)
 	}
 
-	fun insertDeltaker(cmd: InsertDeltakerCommand) {
+	fun insertDeltaker(cmd: DeltakerInput) {
 		val sql = """
 			INSERT INTO deltaker (
 				id, bruker_id, gjennomforing_id, start_dato,
@@ -121,7 +121,7 @@ class TestDataRepository(
 		)
 	}
 
-	fun insertDeltakerStatus(cmd: InsertDeltakerStatusCommand) {
+	fun insertDeltakerStatus(cmd: DeltakerStatusInput) {
 		val sql = """
 			INSERT INTO deltaker_status (id, deltaker_id, gyldig_fra, status, aktiv)
 			VALUES (:id, :deltaker_id, :gyldigFra, :status, :aktiv)
@@ -138,7 +138,7 @@ class TestDataRepository(
 		)
 	}
 
-	fun insertGjennomforing(cmd: InsertGjennomforingCommand) {
+	fun insertGjennomforing(cmd: GjennomforingInput) {
 		val sql = """
 			INSERT INTO gjennomforing (id, tiltak_id, arrangor_id, navn, status, start_dato, slutt_dato, registrert_dato, fremmote_dato, nav_enhet_id, opprettet_aar, lopenr)
 			VALUES (:id, :tiltak_id, :arrangor_id, :navn, :status, :start_dato, :slutt_dato, :registrert_dato, :fremmote_dato, :nav_enhet_id, :opprettet_aar, :lopenr)
@@ -162,7 +162,7 @@ class TestDataRepository(
 		)
 	}
 
-	fun insertNavAnsatt(cmd: InsertNavAnsattCommand) {
+	fun insertNavAnsatt(cmd: NavAnsattInput) {
 		val sql = """
 			INSERT INTO nav_ansatt (id, nav_ident, navn, telefonnummer, epost)
 			VALUES (:id, :nav_ident, :navn, :telefonnummer, :epost)
@@ -179,7 +179,7 @@ class TestDataRepository(
 		)
 	}
 
-	fun insertNavEnhet(cmd: InsertNavEnhetCommand) {
+	fun insertNavEnhet(cmd: NavEnhetInput) {
 		val sql = """
 			INSERT INTO nav_enhet(id, enhet_id, navn)
 			VALUES (:id, :enhet_id, :navn)
@@ -195,7 +195,7 @@ class TestDataRepository(
 	}
 
 
-	fun insertTiltak(cmd: InsertTiltakCommand) {
+	fun insertTiltak(cmd: TiltakInput) {
 		val sql = """
 			INSERT INTO tiltak(id, navn, type)
 			VALUES (:id, :navn, :type)
@@ -210,7 +210,7 @@ class TestDataRepository(
 		)
 	}
 
-	fun insertEndringsmelding(cmd: InsertEndringsmeldingCommand) {
+	fun insertEndringsmelding(cmd: EndringsmeldingInput) {
 		val sql = """
 			INSERT INTO endringsmelding(id, deltaker_id, start_dato, aktiv, opprettet_av_arrangor_ansatt_id)
 				VALUES (:id, :deltakerId, :startDato, :aktiv, :opprettetAvArrangorAnsattId)
@@ -227,9 +227,9 @@ class TestDataRepository(
 		template.update(sql, sqlParameters)
 	}
 
-	fun insertTiltaksansvarligGjennomforingTilgang(cmd: InsertTiltaksansvarligGjennomforingTilgangCommand) {
+	fun insertTiltaksansvarligGjennomforingTilgang(cmd: TiltaksansvarligGjennomforingTilgangInput) {
 		val sql = """
-			INSERT INTO tiltaksansavarlig_gjennomforing_tilgang(id, nav_ansatt_id, gjennomforing_id, gyldig_til, created_at)
+			INSERT INTO tiltaksansvarlig_gjennomforing_tilgang(id, nav_ansatt_id, gjennomforing_id, gyldig_til, created_at)
 			 VALUES(:id, :navAnsattId, :gjennomforingId, :gyldigTil, :createdAt)
 		""".trimIndent()
 

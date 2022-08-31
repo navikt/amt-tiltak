@@ -82,6 +82,7 @@ class DeltakerProcessor(
 			DeltakerPayload.Status.HAR_SLUTTET -> Deltaker.Status.HAR_SLUTTET
 			DeltakerPayload.Status.IKKE_AKTUELL -> Deltaker.Status.IKKE_AKTUELL
 			DeltakerPayload.Status.FEILREGISTRERT -> Deltaker.Status.FEILREGISTRERT
+			DeltakerPayload.Status.PABEGYNT -> Deltaker.Status.PABEGYNT
 		}
 	}
 

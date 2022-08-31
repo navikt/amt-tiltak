@@ -13,8 +13,8 @@ import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestDataSeeder
-import no.nav.amt.tiltak.test.database.data.commands.InsertArrangorCommand
-import no.nav.amt.tiltak.test.database.data.commands.InsertGjennomforingCommand
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorInput
+import no.nav.amt.tiltak.test.database.data.inputs.GjennomforingInput
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
@@ -91,11 +91,17 @@ class DeltakerStatistikkRepositoryTest : FunSpec({
 	test("eksponerteBrukere - returnerer 3") {
 		repository.eksponerteBrukere() shouldBe 3
 	}
+
+	test("eksponerteBrukerePerStatus - returnerer 3") {
+		repository.eksponerteBrukerePrStatus() shouldHaveSize 2
+		repository.eksponerteBrukerePrStatus() shouldContain StatusStatistikk("DELTAR", 2)
+		repository.eksponerteBrukerePrStatus() shouldContain StatusStatistikk("VENTER_PA_OPPSTART", 1)
+	}
 })
 
 
 
-private val AKTIV_ARRANGOR_UTEN_BRUKERE = InsertArrangorCommand(
+private val AKTIV_ARRANGOR_UTEN_BRUKERE = ArrangorInput(
 	id = UUID.fromString("d8949bb0-2fc1-47f0-a198-2ffbb1c572d7"),
 	overordnetEnhetOrganisasjonsnummer = "944444444",
 	overordnetEnhetNavn = "Org Tiltaksarrangør 3",
@@ -103,7 +109,7 @@ private val AKTIV_ARRANGOR_UTEN_BRUKERE = InsertArrangorCommand(
 	navn = "Tiltaksarrangør uten brukere"
 )
 
-private val AKTIV_GJENNOMFORING_UTEN_BRUKERE = InsertGjennomforingCommand(
+private val AKTIV_GJENNOMFORING_UTEN_BRUKERE = GjennomforingInput(
 	id = UUID.fromString("c1de261e-deb1-4894-8984-cdb3d3c19740"),
 	tiltakId = TestData.TILTAK_1.id,
 	arrangorId = AKTIV_ARRANGOR_UTEN_BRUKERE.id,

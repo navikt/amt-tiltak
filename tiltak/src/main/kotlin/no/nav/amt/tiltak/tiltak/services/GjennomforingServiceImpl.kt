@@ -1,10 +1,7 @@
 package no.nav.amt.tiltak.tiltak.services
 
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.core.port.TiltakService
+import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.tiltak.repositories.HentKoordinatorerForGjennomforingQuery
@@ -100,11 +97,11 @@ class GjennomforingServiceImpl(
 			.map{ getGjennomforing(it.id) }
 	}
 
-	override fun getKoordinatorerForGjennomforing(gjennomforingId: UUID): List<String> {
+	override fun getKoordinatorerForGjennomforing(gjennomforingId: UUID): Set<Person> {
 		return koordinatorerForGjennomforing.query(gjennomforingId)
 	}
 
-	override fun getKoordinatorerForGjennomforinger(gjennomforingIder: List<UUID>): Map<UUID, List<String>> {
+	override fun getKoordinatorerForGjennomforinger(gjennomforingIder: List<UUID>): Map<UUID, Set<Person>> {
 		return koordinatorerForGjennomforing.query(gjennomforingIder)
 	}
 

@@ -1,10 +1,10 @@
-package no.nav.amt.tiltak.test.database.data.commands
+package no.nav.amt.tiltak.test.database.data.inputs
 
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-data class InsertDeltakerCommand(
+data class DeltakerInput(
 	val id: UUID,
 	val brukerId: UUID,
 	val gjennomforingId: UUID,

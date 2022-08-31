@@ -16,7 +16,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
-import no.nav.amt.tiltak.test.database.data.commands.InsertGjennomforingCommand
+import no.nav.amt.tiltak.test.database.data.inputs.GjennomforingInput
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.assertThrows
@@ -142,7 +142,7 @@ internal class GjennomforingRepositoryTest : FunSpec({
 	test("delete should delete gjennomføring") {
 		val id = UUID.randomUUID()
 
-		val gjennomforing = InsertGjennomforingCommand(
+		val gjennomforing = GjennomforingInput(
 			id = id,
 			tiltakId = TILTAK_1.id,
 			arrangorId = ARRANGOR_1.id,

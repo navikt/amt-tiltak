@@ -13,7 +13,7 @@ import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
-import no.nav.amt.tiltak.test.database.data.commands.InsertTiltaksansvarligGjennomforingTilgangCommand
+import no.nav.amt.tiltak.test.database.data.inputs.TiltaksansvarligGjennomforingTilgangInput
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.ZonedDateTime
@@ -88,7 +88,7 @@ class TiltaksansvarligGjennomforingTilgangRepositoryTest : FunSpec({
 		val gyldigTil = ZonedDateTime.now().plusDays(1)
 
 		testDataRepository.insertTiltaksansvarligGjennomforingTilgang(
-			InsertTiltaksansvarligGjennomforingTilgangCommand(
+			TiltaksansvarligGjennomforingTilgangInput(
 				id = id,
 				navAnsattId = NAV_ANSATT_1.id,
 				gjennomforingId = GJENNOMFORING_1.id,

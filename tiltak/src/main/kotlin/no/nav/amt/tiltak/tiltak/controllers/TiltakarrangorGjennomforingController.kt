@@ -2,9 +2,11 @@ package no.nav.amt.tiltak.tiltak.controllers
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.Person
 import no.nav.amt.tiltak.endringsmelding.HentAktivEndringsmeldingForDeltakereQuery
 import no.nav.amt.tiltak.tiltak.dto.AktivEndringsmeldingDto
 import no.nav.amt.tiltak.tiltak.dto.GjennomforingDto
@@ -39,14 +41,9 @@ class TiltakarrangorGjennomforingController(
 		val gjennomforingIder = arrangorAnsattTilgangService
 			.hentGjennomforingIder(ansattPersonligIdent)
 
-		val koordinatorer = gjennomforingService.getKoordinatorerForGjennomforinger(gjennomforingIder)
 
 		return gjennomforingService.getGjennomforinger(gjennomforingIder)
-			.map {
-				it.toDto(
-					koordinatorer = koordinatorer[it.id] ?: emptyList()
-				)
-			}
+			.map { it.toDto() }
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -62,10 +59,8 @@ class TiltakarrangorGjennomforingController(
 
 		val filtrerteGjennomforinger = gjennomforingProdFilter(gjennomforingIder)
 
-		val koordinatorer = gjennomforingService.getKoordinatorerForGjennomforinger(gjennomforingIder)
-
 		return gjennomforingService.getGjennomforinger(filtrerteGjennomforinger)
-			.map { it.toDto(koordinatorer[it.id] ?: emptyList()) }
+			.map { it.toDto() }
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -101,8 +96,7 @@ class TiltakarrangorGjennomforingController(
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
 
 		try {
-			val koordinatorerForGjennomforing = gjennomforingService.getKoordinatorerForGjennomforing(gjennomforingId)
-			return gjennomforingService.getGjennomforing(gjennomforingId).toDto(koordinatorerForGjennomforing)
+			return gjennomforingService.getGjennomforing(gjennomforingId).toDto()
 		} catch (e: NoSuchElementException) {
 			log.error("Fant ikke gjennomforing", e)
 			throw NoSuchElementException("Fant ikke gjennomforing med id $gjennomforingId")
@@ -117,7 +111,8 @@ class TiltakarrangorGjennomforingController(
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
 
 		val deltakere = deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
-			.filter { !it.erUtdatert}
+			.filter { it.status.type != Deltaker.Status.PABEGYNT}
+			.filter { !it.erUtdatert }
 
 		val aktiveEndringsmeldinger = hentAktivEndringsmeldingForDeltakereQuery.query(deltakere.map { it.id })
 
@@ -127,6 +122,13 @@ class TiltakarrangorGjennomforingController(
 				d.toDto(endringsmelding?.let { AktivEndringsmeldingDto(endringsmelding.startDato) })
 			}
 	}
+
+	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
+	@GetMapping("/{gjennomforingId}/koordinatorer")
+	fun hentKoordinatorerPaGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID): Set<Person> {
+		return gjennomforingService.getKoordinatorerForGjennomforing(gjennomforingId)
+	}
+
 
 	// Dette er et midlertidig filter som skal fjernes snart™
 	private fun gjennomforingProdFilter(gjennomforingIder: List<UUID>): List<UUID> {

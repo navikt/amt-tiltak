@@ -41,14 +41,14 @@ class EndringsmeldingMetricRepositoryTest : FunSpec({
 		endringsmeldingRepository.insertOgInaktiverStartDato(LocalDate.now(), DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
 		endringsmeldingRepository.insertOgInaktiverStartDato(LocalDate.now(), DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
 
-		repository.totaltAntallEndringsmeldinger() shouldBe 2
+		repository.getMetrics()?.antallTotalt shouldBe 2
 	}
 
 	test("antallAktiveEndringsmeldinger - skal hente antall aktive endringsmeldinger") {
 		endringsmeldingRepository.insertOgInaktiverStartDato(LocalDate.now(), DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
 		endringsmeldingRepository.insertOgInaktiverStartDato(LocalDate.now(), DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
 
-		repository.antallAktiveEndringsmeldinger() shouldBe 1
+		repository.getMetrics()?.antallAktive shouldBe 1
 	}
 
 	test("antallAutomatiskFerdigEndringsmeldinger - skal hente antall automatisk ferdiggjorte endringsmeldinger") {
@@ -58,7 +58,7 @@ class EndringsmeldingMetricRepositoryTest : FunSpec({
 		val endringsmelding = endringsmeldingRepository.insertOgInaktiverStartDato(LocalDate.now(), DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
 		endringsmeldingRepository.markerSomFerdig(endringsmelding.id, NAV_ANSATT_1.id)
 
-		repository.antallAutomatiskFerdigEndringsmeldinger() shouldBe 2
+		repository.getMetrics()?.automatiskFerdige shouldBe 2
 	}
 
 	test("antallManueltFerdigEndringsmeldinger - skal hente antall manuelt ferdiggjorte endringsmeldinger") {
@@ -67,7 +67,7 @@ class EndringsmeldingMetricRepositoryTest : FunSpec({
 
 		endringsmeldingRepository.markerSomFerdig(endringsmelding.id, NAV_ANSATT_1.id)
 
-		repository.antallManueltFerdigEndringsmeldinger() shouldBe 1
+		repository.getMetrics()?.manueltFerdige shouldBe 1
 	}
 
 })

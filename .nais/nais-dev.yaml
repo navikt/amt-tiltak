@@ -82,6 +82,8 @@ spec:
       value: "true"
     - name: VEILARBARENA_SCOPE
       value: api://dev-fss.pto.veilarbarena/.default
+    - name: VEILARBOPPFOLGING_URL
+      value: https://veilarboppfolging.dev-fss-pub.nais.io
     - name: VEILARBOPPFOLGING_SCOPE
       value: api://dev-fss.pto.veilarboppfolging/.default
     - name: DIGDIR_KRR_PROXY_SCOPE
