@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.test.integration.mocks
 
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.slf4j.LoggerFactory
+import java.util.*
 
 open class MockOAuthServer3 {
 
@@ -21,7 +22,7 @@ open class MockOAuthServer3 {
 		}
 	}
 
-	fun getDiscoveryUrl(issuer: String = azureAdIssuer): String {
+	fun getDiscoveryUrl(issuer: String): String {
 		return server.wellKnownUrl(issuer).toString()
 	}
 
@@ -32,20 +33,12 @@ open class MockOAuthServer3 {
 	fun issueAzureAdToken(
 		subject: String = "test",
 		audience: String = "test-aud",
-		claims: Map<String, Any> = emptyMap()
+		claims: Map<String, Any> = mapOf(
+			"NAVident" to "Z123",
+			"oid" to UUID.randomUUID().toString()
+		)
 	): String {
 		return server.issueToken(azureAdIssuer, subject, audience, claims).serialize()
-	}
-
-	fun issueAzureAdM2MToken(
-		subject: String = "test",
-		audience: String = "test-aud",
-		claims: Map<String, Any> = emptyMap()
-	): String {
-		val claimsWithRoles = claims.toMutableMap()
-//		claimsWithRoles["roles"] = arrayOf(AuthService.ACCESS_AS_APPLICATION_ROLE)
-
-		return server.issueToken(azureAdIssuer, subject, audience, claimsWithRoles).serialize()
 	}
 
 }

@@ -3,13 +3,18 @@ package no.nav.amt.tiltak.test.integration
 import no.nav.amt.tiltak.application.Application
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.integration.mocks.MockAmtEnhetsregisterClient
-import no.nav.amt.tiltak.test.integration.mocks.MockMaskinportenHttpClient
+import no.nav.amt.tiltak.test.integration.mocks.MockNorgHttpClient
 import no.nav.amt.tiltak.test.integration.mocks.MockOAuthServer3
-import no.nav.amt.tiltak.test.integration.utils.Constants.TEST_JWK
 import no.nav.amt.tiltak.test.integration.utils.KafkaMessageSender
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.Response
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
@@ -22,13 +27,18 @@ import org.springframework.test.context.DynamicPropertySource
 @TestConfiguration("application-integration.properties")
 abstract class IntegrationTestBase {
 
+	@LocalServerPort
+	private var port: Int = 0
+
+	private val client = OkHttpClient()
+
 	@Autowired
 	lateinit var kafkaMessageSender: KafkaMessageSender
 
 	companion object {
 		val oAuthServer = MockOAuthServer3()
-		val mockMaskinportenHttpClient = MockMaskinportenHttpClient()
-		val mockEnhetsregisterClient = MockAmtEnhetsregisterClient()
+		val enhetsregisterClient = MockAmtEnhetsregisterClient()
+		val norgHttpClient = MockNorgHttpClient()
 
 
 		@JvmStatic
@@ -37,24 +47,17 @@ abstract class IntegrationTestBase {
 			System.setProperty("NAIS_APP_NAME", "amt-tiltak-integration-test")
 
 			oAuthServer.start()
-			mockMaskinportenHttpClient.start()
-			mockEnhetsregisterClient.start()
-
-			// Sikkerhets ting
-			registry.add("no.nav.security.jwt.issuer.azuread.discovery-url", oAuthServer::getDiscoveryUrl)
+			registry.add("no.nav.security.jwt.issuer.azuread.discovery-url") { oAuthServer.getDiscoveryUrl("azuread") }
 			registry.add("no.nav.security.jwt.issuer.azuread.accepted-audience") { "test-aud" }
 
-			registry.add("no.nav.security.jwt.issuer.tokenx.discovery-url", oAuthServer::getDiscoveryUrl)
+			registry.add("no.nav.security.jwt.issuer.tokenx.discovery-url") { oAuthServer.getDiscoveryUrl("tokenx") }
 			registry.add("no.nav.security.jwt.issuer.tokenx.accepted-audience") { "test-aud" }
 
-			registry.add("maskinporten.scopes") { "scope1 scope2" }
-			registry.add("maskinporten.client-id") { "abc123" }
-			registry.add("maskinporten.issuer") { "https://test-issuer" }
-			registry.add("maskinporten.token-endpoint") { mockMaskinportenHttpClient.serverUrl() }
-			registry.add("maskinporten.client-jwk") { TEST_JWK }
+			enhetsregisterClient.start()
+			registry.add("amt-enhetsregister.url") { enhetsregisterClient.serverUrl() }
 
-			// Klient ting
-			registry.add("amt-enhetsregister.url") { mockEnhetsregisterClient.serverUrl() }
+			norgHttpClient.start()
+			registry.add("poao-gcp-proxy.url") { norgHttpClient.serverUrl() }
 
 			// Database ting
 			val container = SingletonPostgresContainer.getContainer()
@@ -66,6 +69,35 @@ abstract class IntegrationTestBase {
 
 
 		}
+	}
+
+	fun resetClients() {
+		enhetsregisterClient.reset()
+		norgHttpClient.reset()
+	}
+
+	fun resetClientsAndAddDefaultData() {
+		resetClients()
+		norgHttpClient.addDefaultData()
+	}
+
+	fun serverUrl() = "http://localhost:$port"
+
+	fun sendRequest(
+		method: String,
+		path: String,
+		body: RequestBody? = null,
+		headers: Map<String, String> = emptyMap()
+	): Response {
+		val reqBuilder = Request.Builder()
+			.url("${serverUrl()}$path")
+			.method(method, body)
+
+		headers.forEach {
+			reqBuilder.addHeader(it.key, it.value)
+		}
+
+		return client.newCall(reqBuilder.build()).execute()
 	}
 
 }

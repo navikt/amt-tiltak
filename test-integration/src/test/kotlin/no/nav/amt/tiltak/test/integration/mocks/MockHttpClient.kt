@@ -6,7 +6,7 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.slf4j.LoggerFactory
 
-open class MockHttpClient {
+abstract class MockHttpClient {
 
 	private val server = MockWebServer()
 
@@ -14,7 +14,7 @@ open class MockHttpClient {
 
 	private var lastRequestCount = 0
 
-	val responses = mutableMapOf<String, MockResponse>()
+	private val responses = mutableMapOf<(request: RecordedRequest) -> Boolean, MockResponse>()
 
 	fun start() {
 		try {
@@ -22,7 +22,9 @@ open class MockHttpClient {
 
 			server.dispatcher = object : Dispatcher() {
 				override fun dispatch(request: RecordedRequest): MockResponse {
-					val response = responses[request.path] ?: MockResponse().setResponseCode(404)
+					val response = responses.entries.find { it.key.invoke(request) }?.value
+						?: throw IllegalStateException("Mock has no handler for $request")
+
 					log.info("Responding [${request.path}]: $response")
 					return response
 				}
@@ -34,32 +36,18 @@ open class MockHttpClient {
 		}
 	}
 
-	fun resetRequestCount() {
+	protected fun addResponse(path: String, response: MockResponse) {
+		val predicate = { req: RecordedRequest -> req.path == path }
+		responses[predicate] = response
+	}
+
+	protected fun resetHttpServer() {
+		responses.clear()
 		lastRequestCount = server.requestCount
 	}
 
 	fun serverUrl(): String {
 		return server.url("").toString().removeSuffix("/")
-	}
-
-	fun enqueue(response: MockResponse) {
-		server.enqueue(response)
-	}
-
-	fun enqueue(
-		responseCode: Int = 200,
-		headers: Map<String, String> = emptyMap(),
-		body: String
-	) {
-		val response = MockResponse()
-			.setBody(body)
-			.setResponseCode(responseCode)
-
-		headers.forEach {
-			response.addHeader(it.key, it.value)
-		}
-
-		server.enqueue(response)
 	}
 
 	fun latestRequest(): RecordedRequest {
