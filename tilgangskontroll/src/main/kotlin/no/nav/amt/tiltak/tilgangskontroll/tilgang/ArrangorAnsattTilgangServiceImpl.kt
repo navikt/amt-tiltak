@@ -105,7 +105,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 	}
 
 	override fun synkroniserRettigheterMedAltinn(ansattPersonligIdent: String) {
-		val altinnRoller = altinnService.hentAltinnRettigheter(ansattPersonligIdent)
+		val altinnRoller = altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent)
 		val maybeAnsatt = arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
 		if (altinnRoller.isEmpty() && maybeAnsatt == null) {
 			log.warn("En ikke-ansatt har logget inn, men hadde ikke tilganger i Altinn.")
@@ -115,9 +115,10 @@ open class ArrangorAnsattTilgangServiceImpl(
 		val ansatt = arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent)
 		val ansattRoller = ansattRolleService.hentAktiveRoller(ansatt.id)
 		val altinnTilganger = altinnRoller
-			.map {
+			.flatMap {
 				val arrangor = arrangorService.getOrCreateArrangor(it.organisasjonsnummer)
-				return@map AnsattTilgang(arrangor.id, it.rolle)
+
+				return@flatMap it.roller.map { rolle -> AnsattTilgang(arrangor.id, rolle) }
 			}
 
 		val tilgangerSomSkalLeggesTil = finnTilgangerSomSkalLeggesTil(altinnTilganger, ansattRoller)

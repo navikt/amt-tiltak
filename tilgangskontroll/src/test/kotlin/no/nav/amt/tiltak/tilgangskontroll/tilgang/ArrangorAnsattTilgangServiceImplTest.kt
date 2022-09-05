@@ -14,7 +14,7 @@ import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tilgangskontroll.altinn.AltinnService
-import no.nav.amt.tiltak.tilgangskontroll.altinn.Rettighet
+import no.nav.amt.tiltak.tilgangskontroll.altinn.ArrangorAnsattRoller
 import org.springframework.http.HttpStatus
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
@@ -130,8 +130,8 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		val arrangorId = UUID.randomUUID()
 		val organisasjonsnummer = "5678"
 
-		every { altinnService.hentAltinnRettigheter(ansattPersonligIdent) } returns listOf(
-			Rettighet(AnsattRolle.KOORDINATOR, organisasjonsnummer)
+		every { altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
+			ArrangorAnsattRoller(organisasjonsnummer, listOf(AnsattRolle.KOORDINATOR))
 		)
 		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
 		every { arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent) } returns Ansatt(
@@ -173,8 +173,8 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		val arrangorId = UUID.randomUUID()
 		val organisasjonsnummer = "5678"
 
-		every { altinnService.hentAltinnRettigheter(ansattPersonligIdent) } returns listOf(
-			Rettighet(AnsattRolle.KOORDINATOR, organisasjonsnummer)
+		every { altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
+			ArrangorAnsattRoller(organisasjonsnummer, listOf(AnsattRolle.KOORDINATOR))
 		)
 		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
 		every { arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent) } returns Ansatt(
@@ -217,8 +217,8 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		val organisasjonsnummer = "5678"
 
 		val organisasjonsnummer2 = "9999"
-		every { altinnService.hentAltinnRettigheter(ansattPersonligIdent) } returns listOf(
-			Rettighet(AnsattRolle.KOORDINATOR, organisasjonsnummer2)
+		every { altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
+			ArrangorAnsattRoller(organisasjonsnummer2, listOf(AnsattRolle.KOORDINATOR))
 		)
 		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
 		every { arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent) } returns Ansatt(
@@ -264,12 +264,8 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	test("synkroniserRettigheterMedAltinn - skal returne tidlig hvis ingen rolle og ikke ansatt") {
 		val ansattPersonligIdent = "1234"
-		val ansattId = UUID.randomUUID()
 
-		val arrangorId = UUID.randomUUID()
-		val organisasjonsnummer = "5678"
-
-		every { altinnService.hentAltinnRettigheter(ansattPersonligIdent) } returns listOf()
+		every { altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf()
 		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
 
 		arrangorAnsattTilgangServiceImpl.synkroniserRettigheterMedAltinn(ansattPersonligIdent)

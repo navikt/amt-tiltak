@@ -15,19 +15,22 @@ class AmtAltinnAclClientImplTest : FunSpec({
 		server.shutdown()
 	}
 
-	test("hentRettigheter() skal lage riktig request og parse respons") {
+	test("hentTiltaksarrangorRoller - skal lage riktig request og parse respons") {
 		val client = AmtAltinnAclClientImpl(
 			baseUrl = serverUrl,
 			tokenProvider = { "TOKEN" },
 		)
 
+		val org1 = "12345"
+		val org2 = "56789"
+
 		server.enqueue(
 			MockResponse().setBody(
 				"""
 					{
-						"rettigheter": [
-							{"id": "1233454", "organisasjonsnummer": "12345"},
-							{"id": "9875442", "organisasjonsnummer": "56789"}
+						"roller": [
+							{"organisasjonsnummer": "$org1", "roller": ["KOORDINATOR"]},
+							{"organisasjonsnummer": "$org2", "roller": ["VEILEDER"]}
 						]
 					}
 				""".trimIndent()
@@ -36,23 +39,16 @@ class AmtAltinnAclClientImplTest : FunSpec({
 
 		val norskIdent = "237912"
 
-		val rettighetIder = listOf("1233454", "9875442", "467328")
-
-		val rettigheter = client.hentRettigheter(norskIdent, rettighetIder)
+		val rettigheter = client.hentTiltaksarrangorRoller(norskIdent)
 
 		rettigheter shouldHaveSize 2
-		rettigheter.any { it.id == "1233454" && it.organisasjonsnummer == "12345" }
-		rettigheter.any { it.id == "9875442" && it.organisasjonsnummer == "56789" }
+		rettigheter.any { it.organisasjonsnummer == org1 && it.roller.contains(TiltaksarrangorAnsattRolle.KOORDINATOR) }
+		rettigheter.any { it.organisasjonsnummer == org2 && it.roller.contains(TiltaksarrangorAnsattRolle.VEILEDER) }
 
 		val request = server.takeRequest()
 
-		val expectedRequestJson = """
-			{"norskIdent":"$norskIdent","rettighetIder":["${rettighetIder[0]}","${rettighetIder[1]}","${rettighetIder[2]}"]}
-		""".trimIndent()
-
-		request.path shouldBe "/api/v1/rettighet/hent"
-		request.method shouldBe "POST"
-		request.body.readUtf8() shouldBe expectedRequestJson
+		request.path shouldBe "/api/v1/rolle/tiltaksarrangor?norskIdent=$norskIdent"
+		request.method shouldBe "GET"
 		request.getHeader("Authorization") shouldBe "Bearer TOKEN"
 	}
 
