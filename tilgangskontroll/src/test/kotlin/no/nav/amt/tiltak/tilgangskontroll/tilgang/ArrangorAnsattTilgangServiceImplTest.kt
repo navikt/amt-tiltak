@@ -9,6 +9,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
@@ -19,7 +20,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 import org.springframework.web.server.ResponseStatusException
-import java.time.ZonedDateTime
 import java.util.*
 
 class ArrangorAnsattTilgangServiceImplTest : FunSpec({
@@ -131,7 +131,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		val organisasjonsnummer = "5678"
 
 		every { altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
-			ArrangorAnsattRoller(organisasjonsnummer, listOf(AnsattRolle.KOORDINATOR))
+			ArrangorAnsattRoller(organisasjonsnummer, listOf(ArrangorAnsattRolle.KOORDINATOR))
 		)
 		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
 		every { arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent) } returns Ansatt(
@@ -143,14 +143,9 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 			arrangorer = emptyList(),
 		)
 		every { ansattRolleService.hentAktiveRoller(ansattId) } returns listOf(
-			AnsattRolleDbo(
-				id = UUID.randomUUID(),
-				ansattId = ansattId,
+			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
 				arrangorId = arrangorId,
-				rolle = AnsattRolle.VEILEDER,
-				createdAt = ZonedDateTime.now(),
-				gyldigFra = ZonedDateTime.now(),
-				gyldigTil = ZonedDateTime.now(),
+				roller = listOf(ArrangorAnsattRolle.VEILEDER)
 			)
 		)
 		every { arrangorService.getOrCreateArrangor(organisasjonsnummer) } returns Arrangor(
@@ -163,7 +158,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		arrangorAnsattTilgangServiceImpl.synkroniserRettigheterMedAltinn(ansattPersonligIdent)
 
-		verify(exactly = 1) { ansattRolleService.opprettRolle(any(), ansattId, arrangorId, AnsattRolle.KOORDINATOR) }
+		verify(exactly = 1) { ansattRolleService.opprettRolle(any(), ansattId, arrangorId, ArrangorAnsattRolle.KOORDINATOR) }
 	}
 
 	test("synkroniserRettigheterMedAltinn - skal ikke legge til rolle hvis allerede finnes") {
@@ -174,7 +169,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		val organisasjonsnummer = "5678"
 
 		every { altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
-			ArrangorAnsattRoller(organisasjonsnummer, listOf(AnsattRolle.KOORDINATOR))
+			ArrangorAnsattRoller(organisasjonsnummer, listOf(ArrangorAnsattRolle.KOORDINATOR))
 		)
 		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
 		every { arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent) } returns Ansatt(
@@ -186,14 +181,9 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 			arrangorer = emptyList(),
 		)
 		every { ansattRolleService.hentAktiveRoller(ansattId) } returns listOf(
-			AnsattRolleDbo(
-				id = UUID.randomUUID(),
-				ansattId = ansattId,
+			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
 				arrangorId = arrangorId,
-				rolle = AnsattRolle.KOORDINATOR,
-				createdAt = ZonedDateTime.now(),
-				gyldigFra = ZonedDateTime.now(),
-				gyldigTil = ZonedDateTime.now(),
+				roller = listOf(ArrangorAnsattRolle.KOORDINATOR)
 			)
 		)
 		every { arrangorService.getOrCreateArrangor(organisasjonsnummer) } returns Arrangor(
@@ -218,7 +208,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		val organisasjonsnummer2 = "9999"
 		every { altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
-			ArrangorAnsattRoller(organisasjonsnummer2, listOf(AnsattRolle.KOORDINATOR))
+			ArrangorAnsattRoller(organisasjonsnummer2, listOf(ArrangorAnsattRolle.KOORDINATOR))
 		)
 		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
 		every { arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent) } returns Ansatt(
@@ -230,14 +220,9 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 			arrangorer = emptyList(),
 		)
 		every { ansattRolleService.hentAktiveRoller(ansattId) } returns listOf(
-			AnsattRolleDbo(
-				id = UUID.randomUUID(),
-				ansattId = ansattId,
+			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
 				arrangorId = arrangorId,
-				rolle = AnsattRolle.KOORDINATOR,
-				createdAt = ZonedDateTime.now(),
-				gyldigFra = ZonedDateTime.now(),
-				gyldigTil = ZonedDateTime.now(),
+				roller = listOf(ArrangorAnsattRolle.KOORDINATOR)
 			)
 		)
 		every { arrangorService.getOrCreateArrangor(organisasjonsnummer2) } returns Arrangor(
@@ -257,7 +242,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		arrangorAnsattTilgangServiceImpl.synkroniserRettigheterMedAltinn(ansattPersonligIdent)
 
-		verify(exactly = 1) { ansattRolleService.deaktiverRolleHosArrangor(ansattId, arrangorId, AnsattRolle.KOORDINATOR) }
+		verify(exactly = 1) { ansattRolleService.deaktiverRolleHosArrangor(ansattId, arrangorId, ArrangorAnsattRolle.KOORDINATOR) }
 		verify(exactly = 1) { arrangorAnsattGjennomforingTilgangService.fjernTilgangTilGjennomforinger(ansattId, arrangorId) }
 
 	}

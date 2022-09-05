@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.core.port
 
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller
 import java.util.*
 
 interface ArrangorAnsattTilgangService {
@@ -10,7 +11,7 @@ interface ArrangorAnsattTilgangService {
 
 	fun verifiserTilgangTilDeltaker(ansattPersonligIdent: String, deltakerId: UUID)
 
-	fun hentVirksomhetsnummereMedKoordinatorRettighet(ansattPersonligIdent: String): List<String>
+	fun hentAnsattTilganger(ansattId: UUID): List<ArrangorAnsattRoller>
 
 	fun hentGjennomforingIder(ansattPersonligIdent: String): List<UUID>
 

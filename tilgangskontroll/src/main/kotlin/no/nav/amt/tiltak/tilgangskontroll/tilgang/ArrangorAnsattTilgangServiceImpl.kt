@@ -2,6 +2,8 @@ package no.nav.amt.tiltak.tilgangskontroll.tilgang
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.ArrangorService
@@ -71,8 +73,8 @@ open class ArrangorAnsattTilgangServiceImpl(
 		verifiserTilgangTilGjennomforing(ansattPersonligIdent, deltaker.gjennomforingId)
 	}
 
-	override fun hentVirksomhetsnummereMedKoordinatorRettighet(ansattPersonligIdent: String): List<String> {
-		return altinnService.hentVirksomheterMedKoordinatorRettighet(ansattPersonligIdent)
+	override fun hentAnsattTilganger(ansattId: UUID): List<ArrangorAnsattRoller> {
+		return ansattRolleService.hentAktiveRoller(ansattId)
 	}
 
 	override fun hentAnsattId(ansattPersonligIdent: String): UUID {
@@ -113,7 +115,10 @@ open class ArrangorAnsattTilgangServiceImpl(
 		}
 
 		val ansatt = arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent)
-		val ansattRoller = ansattRolleService.hentAktiveRoller(ansatt.id)
+
+		val lagredeAnsattTilganger = ansattRolleService.hentAktiveRoller(ansatt.id)
+			.flatMap { it.roller.map { r -> AnsattTilgang(it.arrangorId, r) } }
+
 		val altinnTilganger = altinnRoller
 			.flatMap {
 				val arrangor = arrangorService.getOrCreateArrangor(it.organisasjonsnummer)
@@ -121,40 +126,34 @@ open class ArrangorAnsattTilgangServiceImpl(
 				return@flatMap it.roller.map { rolle -> AnsattTilgang(arrangor.id, rolle) }
 			}
 
-		val tilgangerSomSkalLeggesTil = finnTilgangerSomSkalLeggesTil(altinnTilganger, ansattRoller)
-		val tilgangerSomSkalFjernes = finnTilgangerSomSkalFjernes(altinnTilganger, ansattRoller)
+		val tilgangerSomSkalLeggesTil = finnTilgangerSomSkalLeggesTil(altinnTilganger, lagredeAnsattTilganger)
+		val tilgangerSomSkalFjernes = finnTilgangerSomSkalFjernes(altinnTilganger, lagredeAnsattTilganger)
 
 		tilgangerSomSkalLeggesTil.forEach {
-			ansattRolleService.opprettRolle(UUID.randomUUID(), ansatt.id, it.arrangorId, it.ansattRolle)
+			ansattRolleService.opprettRolle(UUID.randomUUID(), ansatt.id, it.arrangorId, it.arrangorAnsattRolle)
 		}
 		tilgangerSomSkalFjernes.forEach { tilgang ->
 			transactionTemplate.executeWithoutResult {
-				ansattRolleService.deaktiverRolleHosArrangor(ansatt.id, tilgang.arrangorId, tilgang.ansattRolle)
+				ansattRolleService.deaktiverRolleHosArrangor(ansatt.id, tilgang.arrangorId, tilgang.arrangorAnsattRolle)
 				arrangorAnsattGjennomforingTilgangService.fjernTilgangTilGjennomforinger(ansatt.id, tilgang.arrangorId)
 			}
 		}
-	}
-
-	private fun finnTilgangerSomSkalLeggesTil(altinnTilganger: List<AnsattTilgang>, ansattRoller: List<AnsattRolleDbo>): List<AnsattTilgang> {
-		return altinnTilganger.filter { altinnTilgang ->
-			val harTilgangAllerede = ansattRoller.any { it.arrangorId == altinnTilgang.arrangorId && it.rolle == altinnTilgang.ansattRolle }
-			return@filter !harTilgangAllerede
-		}
-	}
-
-	private fun finnTilgangerSomSkalFjernes(altinnTilganger: List<AnsattTilgang>, ansattRoller: List<AnsattRolleDbo>): List<AnsattTilgang> {
-		return ansattRoller.filter { rolle ->
-			val harRolleIAltinn = altinnTilganger.any { altinnTilgang ->
-				 altinnTilgang.arrangorId == rolle.arrangorId && rolle.rolle == altinnTilgang.ansattRolle
-			}
-			return@filter !harRolleIAltinn
-		}.map { AnsattTilgang(it.arrangorId, it.rolle) }
 	}
 
 	override fun hentGjennomforingIder(ansattPersonligIdent: String): List<UUID> {
 		val ansattId = hentAnsattId(ansattPersonligIdent)
 
 		return arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
+	}
+
+	private fun finnTilgangerSomSkalLeggesTil(altinnTilganger: List<AnsattTilgang>, lagredeTilganger: List<AnsattTilgang>): List<AnsattTilgang> {
+		// Returnerer alle altinnTilganger som ikke finnes i lagredeTilganger
+		return altinnTilganger.subtract(lagredeTilganger.toSet()).toList()
+	}
+
+	private fun finnTilgangerSomSkalFjernes(altinnTilganger: List<AnsattTilgang>, lagredeTilganger: List<AnsattTilgang>): List<AnsattTilgang> {
+		// Returnerer alle lagredeTilganger som ikke finnes i altinnTilganger
+		return lagredeTilganger.subtract(altinnTilganger.toSet()).toList()
 	}
 
 	private fun hentAnsatt(ansattPersonligIdent: String): Ansatt {
@@ -170,7 +169,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 
 	private data class AnsattTilgang(
 		val arrangorId: UUID,
-		val ansattRolle: AnsattRolle
+		val arrangorAnsattRolle: ArrangorAnsattRolle
 	)
 }
 

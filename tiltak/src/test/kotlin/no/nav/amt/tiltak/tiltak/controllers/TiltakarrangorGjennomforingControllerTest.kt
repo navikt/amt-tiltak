@@ -3,6 +3,8 @@ package no.nav.amt.tiltak.tiltak.controllers
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
@@ -154,14 +156,20 @@ class TiltakarrangorGjennomforingControllerTest {
 	fun `hentTilgjengeligeGjennomforinger() should return 200 with correct response`() {
 		val token = tokenXToken("test", "test")
 
-		val virksomhetsnummere = listOf("123543")
+		val arrangorId = UUID.randomUUID()
+		val ansattId = UUID.randomUUID()
+		val gjennomforingId = UUID.randomUUID()
 
 		Mockito.`when`(
-			arrangorAnsattTilgangService.hentVirksomhetsnummereMedKoordinatorRettighet(fnr)
-		).thenReturn(virksomhetsnummere)
+			arrangorAnsattTilgangService.hentAnsattId(fnr)
+		).thenReturn(ansattId)
 
 		Mockito.`when`(
-			hentGjennomforingerFraArrangorerQuery.query(virksomhetsnummere)
+			arrangorAnsattTilgangService.hentAnsattTilganger(ansattId)
+		).thenReturn(listOf(ArrangorAnsattRoller(arrangorId, listOf(ArrangorAnsattRolle.KOORDINATOR))))
+
+		Mockito.`when`(
+			hentGjennomforingerFraArrangorerQuery.query(listOf(arrangorId))
 		).thenReturn(listOf(gjennomforingId))
 
 		Mockito.`when`(
@@ -185,14 +193,20 @@ class TiltakarrangorGjennomforingControllerTest {
 	fun `opprettTilgangTilGjennomforing() should return 200`() {
 		val token = tokenXToken("test", "test")
 
-		val virksomhetsnummere = listOf("123543")
+		val arrangorId = UUID.randomUUID()
+		val ansattId = UUID.randomUUID()
+		val gjennomforingId = UUID.randomUUID()
 
 		Mockito.`when`(
-			arrangorAnsattTilgangService.hentVirksomhetsnummereMedKoordinatorRettighet(fnr)
-		).thenReturn(virksomhetsnummere)
+			arrangorAnsattTilgangService.hentAnsattId(fnr)
+		).thenReturn(ansattId)
 
 		Mockito.`when`(
-			hentGjennomforingerFraArrangorerQuery.query(virksomhetsnummere)
+			arrangorAnsattTilgangService.hentAnsattTilganger(ansattId)
+		).thenReturn(listOf(ArrangorAnsattRoller(arrangorId, listOf(ArrangorAnsattRolle.KOORDINATOR))))
+
+		Mockito.`when`(
+			hentGjennomforingerFraArrangorerQuery.query(listOf(arrangorId))
 		).thenReturn(listOf(gjennomforingId))
 
 		val response = mockMvc.perform(
@@ -210,14 +224,10 @@ class TiltakarrangorGjennomforingControllerTest {
 	fun `opprettTilgangTilGjennomforing() should return 403 if not authorized`() {
 		val token = tokenXToken("test", "test")
 
-		val virksomhetsnummere = listOf("123543")
+		val arrangorIder = listOf(UUID.randomUUID())
 
 		Mockito.`when`(
-			arrangorAnsattTilgangService.hentVirksomhetsnummereMedKoordinatorRettighet(fnr)
-		).thenReturn(virksomhetsnummere)
-
-		Mockito.`when`(
-			hentGjennomforingerFraArrangorerQuery.query(virksomhetsnummere)
+			hentGjennomforingerFraArrangorerQuery.query(arrangorIder)
 		).thenReturn(emptyList())
 
 		val response = mockMvc.perform(

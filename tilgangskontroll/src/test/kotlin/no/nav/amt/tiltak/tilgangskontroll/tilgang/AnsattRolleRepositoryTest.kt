@@ -5,13 +5,11 @@ import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
-import no.nav.amt.tiltak.test.database.DbUtils.shouldBeCloseTo
 import no.nav.amt.tiltak.test.database.DbUtils.shouldBeEqualTo
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
-import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2
-import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
 import org.slf4j.LoggerFactory
@@ -54,7 +52,7 @@ class AnsattRolleRepositoryTest : FunSpec({
 		val gyldigFra = ZonedDateTime.now().minusSeconds(10)
 		val gyldigTil = ZonedDateTime.now().plusDays(1)
 
-		repository.opprettRolle(id, ansattId, ARRANGOR_1.id, AnsattRolle.VEILEDER, gyldigFra, gyldigTil)
+		repository.opprettRolle(id, ansattId, ARRANGOR_1.id, ArrangorAnsattRolle.VEILEDER, gyldigFra, gyldigTil)
 
 		val roller = repository.hentAktiveRoller(ansattId)
 
@@ -63,7 +61,7 @@ class AnsattRolleRepositoryTest : FunSpec({
 		val rolle = roller.first()
 
 		rolle.id shouldBe id
-		rolle.rolle shouldBe AnsattRolle.VEILEDER
+		rolle.rolle shouldBe ArrangorAnsattRolle.VEILEDER
 		rolle.arrangorId shouldBe ARRANGOR_1.id
 		rolle.ansattId shouldBe ansattId
 		rolle.gyldigFra shouldBeEqualTo gyldigFra
@@ -90,9 +88,9 @@ class AnsattRolleRepositoryTest : FunSpec({
 		val gyldigFra3 = ZonedDateTime.now().minusDays(5)
 		val gyldigTil3 = ZonedDateTime.now().minusDays(3)
 
-		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, AnsattRolle.KOORDINATOR, gyldigFra1, gyldigTil1)
-		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, AnsattRolle.VEILEDER, gyldigFra2, gyldigTil2)
-		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, AnsattRolle.VEILEDER, gyldigFra3, gyldigTil3)
+		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, ArrangorAnsattRolle.KOORDINATOR, gyldigFra1, gyldigTil1)
+		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, ArrangorAnsattRolle.VEILEDER, gyldigFra2, gyldigTil2)
+		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, ArrangorAnsattRolle.VEILEDER, gyldigFra3, gyldigTil3)
 
 		val roller = repository.hentAktiveRoller(ansattId)
 
@@ -100,7 +98,7 @@ class AnsattRolleRepositoryTest : FunSpec({
 
 		val rolle = roller.first()
 
-		rolle.rolle shouldBe AnsattRolle.KOORDINATOR
+		rolle.rolle shouldBe ArrangorAnsattRolle.KOORDINATOR
 		rolle.arrangorId shouldBe ARRANGOR_1.id
 		rolle.ansattId shouldBe ansattId
 	}
@@ -120,9 +118,9 @@ class AnsattRolleRepositoryTest : FunSpec({
 		val gyldigFra1 = ZonedDateTime.now().minusSeconds(5)
 		val gyldigTil1 = ZonedDateTime.now().plusDays(1)
 
-		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, AnsattRolle.KOORDINATOR, gyldigFra1, gyldigTil1)
-		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, AnsattRolle.KOORDINATOR, gyldigFra1, gyldigTil1)
-		repository.deaktiverRolleHosArrangor(ansattId, ARRANGOR_1.id, AnsattRolle.KOORDINATOR)
+		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, ArrangorAnsattRolle.KOORDINATOR, gyldigFra1, gyldigTil1)
+		repository.opprettRolle(UUID.randomUUID(), ansattId, ARRANGOR_1.id, ArrangorAnsattRolle.KOORDINATOR, gyldigFra1, gyldigTil1)
+		repository.deaktiverRolleHosArrangor(ansattId, ARRANGOR_1.id, ArrangorAnsattRolle.KOORDINATOR)
 
 		repository.hentAktiveRoller(ansattId) shouldHaveSize 0
 

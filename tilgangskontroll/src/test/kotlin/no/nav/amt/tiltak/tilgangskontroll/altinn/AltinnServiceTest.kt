@@ -23,8 +23,8 @@ class AltinnServiceTest : FunSpec( {
 			TiltaksarrangorAnsattRoller(virksomhet, emptyList()),
 		)
 
-		altinnService.hentVirksomheterMedKoordinatorRettighet(personligIdent)
-		altinnService.hentVirksomheterMedKoordinatorRettighet(personligIdent)
+		altinnService.hentTiltaksarrangorRoller(personligIdent)
+		altinnService.hentTiltaksarrangorRoller(personligIdent)
 
 		verify(exactly = 1) {
 			amtAltinnAclClient.hentTiltaksarrangorRoller(any())
