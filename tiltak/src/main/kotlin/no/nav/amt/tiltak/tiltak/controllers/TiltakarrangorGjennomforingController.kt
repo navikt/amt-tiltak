@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.tiltak.controllers
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
@@ -41,7 +42,6 @@ class TiltakarrangorGjennomforingController(
 		val gjennomforingIder = arrangorAnsattTilgangService
 			.hentGjennomforingIder(ansattPersonligIdent)
 
-
 		return gjennomforingService.getGjennomforinger(gjennomforingIder)
 			.map { it.toDto() }
 	}
@@ -51,11 +51,14 @@ class TiltakarrangorGjennomforingController(
 	fun hentTilgjengeligeGjennomforinger(): List<GjennomforingDto> {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 
-		val virksomheterMedKoordinatorTilgang =
-			arrangorAnsattTilgangService.hentVirksomhetsnummereMedKoordinatorRettighet(ansattPersonligIdent)
+		val ansattId = arrangorAnsattTilgangService.hentAnsattId(ansattPersonligIdent)
+
+		val tilgangTilArrangorIder = arrangorAnsattTilgangService.hentAnsattTilganger(ansattId)
+			.filter { it.roller.contains(ArrangorAnsattRolle.KOORDINATOR) }
+			.map { it.arrangorId }
 
 		val gjennomforingIder = hentGjennomforingerFraArrangorerQuery
-			.query(virksomheterMedKoordinatorTilgang)
+			.query(tilgangTilArrangorIder)
 
 		val filtrerteGjennomforinger = gjennomforingProdFilter(gjennomforingIder)
 
@@ -68,10 +71,13 @@ class TiltakarrangorGjennomforingController(
 	fun opprettTilgangTilGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID) {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 
-		val virksomheterMedKoordinatorTilgang =
-			arrangorAnsattTilgangService.hentVirksomhetsnummereMedKoordinatorRettighet(ansattPersonligIdent)
+		val ansattId = arrangorAnsattTilgangService.hentAnsattId(ansattPersonligIdent)
 
-		val gjennomforingIder = hentGjennomforingerFraArrangorerQuery.query(virksomheterMedKoordinatorTilgang)
+		val tilgangTilArrangorIder = arrangorAnsattTilgangService.hentAnsattTilganger(ansattId)
+			.filter { it.roller.contains(ArrangorAnsattRolle.KOORDINATOR) }
+			.map { it.arrangorId }
+
+		val gjennomforingIder = hentGjennomforingerFraArrangorerQuery.query(tilgangTilArrangorIder)
 
 		if (!gjennomforingIder.contains(gjennomforingId)) {
 			throw ResponseStatusException(HttpStatus.FORBIDDEN)

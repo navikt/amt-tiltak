@@ -31,9 +31,9 @@ class HentGjennomforingerFraArrangorerQueryTest : FunSpec({
 	}
 
 	test("skal hente alle gjennomføringer fra arrangører") {
-		val virksomhetsnummere = listOf(ARRANGOR_1.organisasjonsnummer, ARRANGOR_2.organisasjonsnummer)
+		val arrangorIder = listOf(ARRANGOR_1.id, ARRANGOR_2.id)
 
-		val result = query.query(virksomhetsnummere)
+		val result = query.query(arrangorIder)
 
 		result shouldHaveSize 2
 

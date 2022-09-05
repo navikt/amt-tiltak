@@ -4,7 +4,7 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import no.nav.amt.tiltak.clients.amt_altinn_acl.AmtAltinnAclClient
 import no.nav.amt.tiltak.clients.amt_altinn_acl.TiltaksarrangorAnsattRolle
 import no.nav.amt.tiltak.clients.amt_altinn_acl.TiltaksarrangorAnsattRoller
-import no.nav.amt.tiltak.tilgangskontroll.tilgang.AnsattRolle
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils
 import org.springframework.stereotype.Service
 import java.time.Duration
@@ -17,12 +17,6 @@ class AltinnService(
 	private val personligIdentToRolleCache = Caffeine.newBuilder()
 		.expireAfterWrite(Duration.ofHours(1))
 		.build<String, List<TiltaksarrangorAnsattRoller>>()
-
-	fun hentVirksomheterMedKoordinatorRettighet(ansattPersonligIdent: String): List<String> {
-		return hentAnsattRoller(ansattPersonligIdent)
-			.filter { it.roller.contains(TiltaksarrangorAnsattRolle.KOORDINATOR) }
-			.map { it.organisasjonsnummer }
-	}
 
 	fun hentTiltaksarrangorRoller(ansattPersonligIdent: String): List<ArrangorAnsattRoller> {
 		return hentAnsattRoller(ansattPersonligIdent)
@@ -40,15 +34,15 @@ class AltinnService(
 		}
 	}
 
-	private fun TiltaksarrangorAnsattRolle.mapTilAnsattRolle(): AnsattRolle {
+	private fun TiltaksarrangorAnsattRolle.mapTilAnsattRolle(): ArrangorAnsattRolle {
 		return when (this) {
-			TiltaksarrangorAnsattRolle.KOORDINATOR -> AnsattRolle.KOORDINATOR
-			TiltaksarrangorAnsattRolle.VEILEDER -> AnsattRolle.VEILEDER
+			TiltaksarrangorAnsattRolle.KOORDINATOR -> ArrangorAnsattRolle.KOORDINATOR
+			TiltaksarrangorAnsattRolle.VEILEDER -> ArrangorAnsattRolle.VEILEDER
 		}
 	}
 }
 
 data class ArrangorAnsattRoller(
 	val organisasjonsnummer: String,
-	val roller: List<AnsattRolle>,
+	val roller: List<ArrangorAnsattRolle>,
 )
