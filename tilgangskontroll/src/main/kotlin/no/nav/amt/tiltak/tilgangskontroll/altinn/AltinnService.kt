@@ -1,55 +1,54 @@
 package no.nav.amt.tiltak.tilgangskontroll.altinn
 
 import com.github.benmanes.caffeine.cache.Caffeine
-import no.nav.amt.tiltak.clients.amt_altinn_acl.AltinnRettighet
 import no.nav.amt.tiltak.clients.amt_altinn_acl.AmtAltinnAclClient
+import no.nav.amt.tiltak.clients.amt_altinn_acl.TiltaksarrangorAnsattRolle
+import no.nav.amt.tiltak.clients.amt_altinn_acl.TiltaksarrangorAnsattRoller
 import no.nav.amt.tiltak.tilgangskontroll.tilgang.AnsattRolle
 import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.Duration
 
 @Service
 class AltinnService(
-	@Value("\${altinn-koordinator-rettighetid}") private val altinnKoordinatorRettighetId: String,
 	private val amtAltinnAclClient: AmtAltinnAclClient
 ) {
 
-	private val alleRettigheter = listOf(altinnKoordinatorRettighetId)
-
-	private val personligIdentToAltinnRettigheterCache = Caffeine.newBuilder()
+	private val personligIdentToRolleCache = Caffeine.newBuilder()
 		.expireAfterWrite(Duration.ofHours(1))
-		.build<String, List<AltinnRettighet>>()
+		.build<String, List<TiltaksarrangorAnsattRoller>>()
 
 	fun hentVirksomheterMedKoordinatorRettighet(ansattPersonligIdent: String): List<String> {
-		return hentAlleRettigheter(ansattPersonligIdent)
-			.filter { it.id == altinnKoordinatorRettighetId }
+		return hentAnsattRoller(ansattPersonligIdent)
+			.filter { it.roller.contains(TiltaksarrangorAnsattRolle.KOORDINATOR) }
 			.map { it.organisasjonsnummer }
 	}
 
-	fun hentAltinnRettigheter(ansattPersonligIdent: String): List<Rettighet> {
-		return hentAlleRettigheter(ansattPersonligIdent)
-			.map { Rettighet(mapRettighetIdTilRolle(it.id), it.organisasjonsnummer) }
+	fun hentTiltaksarrangorRoller(ansattPersonligIdent: String): List<ArrangorAnsattRoller> {
+		return hentAnsattRoller(ansattPersonligIdent)
+			.map {
+				ArrangorAnsattRoller(
+					it.organisasjonsnummer,
+					it.roller.map { r -> r.mapTilAnsattRolle() }
+				)
+			}
 	}
 
-	private fun mapRettighetIdTilRolle(altinnRettighet: String): AnsattRolle {
-		return when (altinnRettighet) {
-			altinnKoordinatorRettighetId -> AnsattRolle.KOORDINATOR
-			else -> throw IllegalArgumentException("Kan ikke mappe altinnrettighet $altinnRettighet")
+	private fun hentAnsattRoller(ansattPersonligIdent: String): List<TiltaksarrangorAnsattRoller> {
+		return CacheUtils.tryCacheFirstNotNull(personligIdentToRolleCache, ansattPersonligIdent) {
+			return@tryCacheFirstNotNull amtAltinnAclClient.hentTiltaksarrangorRoller(ansattPersonligIdent)
 		}
 	}
 
-	private fun hentAlleRettigheter(ansattPersonligIdent: String): List<AltinnRettighet> {
-		return CacheUtils.tryCacheFirstNotNull(personligIdentToAltinnRettigheterCache, ansattPersonligIdent) {
-			return@tryCacheFirstNotNull amtAltinnAclClient.hentRettigheter(
-				ansattPersonligIdent,
-				alleRettigheter
-			)
+	private fun TiltaksarrangorAnsattRolle.mapTilAnsattRolle(): AnsattRolle {
+		return when (this) {
+			TiltaksarrangorAnsattRolle.KOORDINATOR -> AnsattRolle.KOORDINATOR
+			TiltaksarrangorAnsattRolle.VEILEDER -> AnsattRolle.VEILEDER
 		}
 	}
 }
 
-data class Rettighet(
-	val rolle: AnsattRolle,
-	val organisasjonsnummer: String
+data class ArrangorAnsattRoller(
+	val organisasjonsnummer: String,
+	val roller: List<AnsattRolle>,
 )

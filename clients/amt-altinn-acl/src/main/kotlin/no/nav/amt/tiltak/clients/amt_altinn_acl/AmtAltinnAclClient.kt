@@ -2,11 +2,15 @@ package no.nav.amt.tiltak.clients.amt_altinn_acl
 
 interface AmtAltinnAclClient {
 
-	fun hentRettigheter(norskIdent: String, rettighetIder: List<String>): List<AltinnRettighet>
+	fun hentTiltaksarrangorRoller(norskIdent: String): List<TiltaksarrangorAnsattRoller>
 
 }
 
-data class AltinnRettighet(
-	val id: String,
+data class TiltaksarrangorAnsattRoller(
 	val organisasjonsnummer: String,
+	val roller: List<TiltaksarrangorAnsattRolle>
 )
+
+enum class TiltaksarrangorAnsattRolle {
+	VEILEDER, KOORDINATOR
+}
