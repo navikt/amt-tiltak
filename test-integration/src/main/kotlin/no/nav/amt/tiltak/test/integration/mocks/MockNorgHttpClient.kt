@@ -27,10 +27,10 @@ class MockNorgHttpClient : MockHttpClient() {
 		""".trimIndent()
 
 		val response = MockResponse().setResponseCode(200).setBody(body)
-		addResponse("$baseUrl/${enhetNr}", response)
+		addResponseHandler("$baseUrl/${enhetNr}", response)
 
 		allResponses.add(body)
-		addResponse("$baseUrl/", MockResponse().setResponseCode(200).setBody(JsonUtils.toJsonString(allResponses)))
+		addResponseHandler("$baseUrl/", MockResponse().setResponseCode(200).setBody(JsonUtils.toJsonString(allResponses)))
 	}
 
 }

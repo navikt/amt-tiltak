@@ -41,11 +41,11 @@ abstract class MockHttpClient {
 		}
 	}
 
-	protected fun addResponse(predicate: (req: RecordedRequest) -> Boolean, response: MockResponse) {
+	protected fun addResponseHandler(predicate: (req: RecordedRequest) -> Boolean, response: MockResponse) {
 		responses[predicate] = response
 	}
 
-	protected fun addResponse(path: String, response: MockResponse) {
+	protected fun addResponseHandler(path: String, response: MockResponse) {
 		val predicate = { req: RecordedRequest -> req.path == path }
 		responses[predicate] = response
 	}

@@ -34,7 +34,7 @@ class MockNomHttpClient : MockHttpClient() {
 				&& containsIdentifier(req, input.navIdent)
 		}
 
-		addResponse(predicate, createResponse(input))
+		addResponseHandler(predicate, createResponse(input))
 	}
 
 	private fun containsIdentifier(req: RecordedRequest, identifier: String): Boolean {

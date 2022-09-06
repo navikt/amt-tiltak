@@ -17,6 +17,24 @@ class MockPoaoTilgangHttpClient : MockHttpClient() {
 		addHentAdGrupperResponse(UUID.fromString("e2bae1e5-94c8-4ef6-9d7a-4d2e04b5ae1c"))
 	}
 
+	fun addErSkjermetResponse(data: Map<String, Boolean>) {
+		val url = "/api/v1/skjermet-person/bulk"
+
+		val predicate = { req: RecordedRequest ->
+			val body = req.body.readUtf8()
+
+			req.path == url
+				&& req.method == "POST"
+				&& data.keys.map { body.contains(it) }.all { true }
+		}
+
+		val response = MockResponse()
+			.setResponseCode(200)
+			.setBody(JsonUtils.toJsonString(data))
+
+		addResponseHandler(predicate, response)
+	}
+
 	fun addHentAdGrupperResponse(navAnsattAzureId: UUID) {
 		val url = "/api/v1/ad-gruppe"
 
@@ -39,6 +57,6 @@ class MockPoaoTilgangHttpClient : MockHttpClient() {
 				)
 			)
 
-		addResponse(predicate, response)
+		addResponseHandler(predicate, response)
 	}
 }

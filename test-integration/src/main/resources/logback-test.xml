@@ -2,7 +2,7 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
-    <logger name="org.apache.kafka" level="error" additivity="false">
+    <logger name="org.apache.kafka.*" level="error" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 
@@ -15,6 +15,14 @@
     </logger>
 
     <logger name="no.nav.common.kafka.consumer.util" level="error" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <logger name="no.nav.security" level="info" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <logger name="com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.wire" level="info" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 

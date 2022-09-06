@@ -28,6 +28,6 @@ class MockAmtEnhetsregisterClient : MockHttpClient() {
 			.setResponseCode(200)
 			.setBody(JsonUtils.toJsonString(enhet))
 
-		addResponse("/api/enhet/${enhet.organisasjonsnummer}", response)
+		addResponseHandler("/api/enhet/${enhet.organisasjonsnummer}", response)
 	}
 }

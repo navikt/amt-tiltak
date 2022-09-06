@@ -92,12 +92,12 @@ abstract class IntegrationTestBase {
 
 	fun sendRequest(
 		method: String,
-		path: String,
+		url: String,
 		body: RequestBody? = null,
 		headers: Map<String, String> = emptyMap()
 	): Response {
 		val reqBuilder = Request.Builder()
-			.url("${serverUrl()}$path")
+			.url("${serverUrl()}$url")
 			.method(method, body)
 
 		headers.forEach {
