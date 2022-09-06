@@ -21,7 +21,6 @@
                     <mainClass>no.nav.amt.tiltak.application.ApplicationKt</mainClass>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 

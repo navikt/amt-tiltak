@@ -7,9 +7,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import java.util.*
-import javax.sql.DataSource
 
 class TiltakarrangorDeltakerControllerIntegrationTest : IntegrationTestBase() {
 
