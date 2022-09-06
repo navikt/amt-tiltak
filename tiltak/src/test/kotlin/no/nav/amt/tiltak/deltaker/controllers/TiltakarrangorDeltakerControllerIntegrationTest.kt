@@ -13,9 +13,6 @@ import javax.sql.DataSource
 
 class TiltakarrangorDeltakerControllerIntegrationTest : IntegrationTestBase() {
 
-	@Autowired
-	private lateinit var dataSource: DataSource
-
 	@Test
 	fun `hentTiltakDeltakerDetaljer() should return 401 when not authenticated`() {
 		val response = sendRequest(

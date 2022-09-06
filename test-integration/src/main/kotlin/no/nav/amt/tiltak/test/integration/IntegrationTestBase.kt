@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.test.integration
 
 import no.nav.amt.tiltak.application.Application
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.integration.mocks.*
 import no.nav.amt.tiltak.test.integration.utils.KafkaMessageSender
 import okhttp3.MediaType.Companion.toMediaType
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import javax.sql.DataSource
 
 
 @SpringBootTest(classes = [Application::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -34,13 +36,18 @@ abstract class IntegrationTestBase {
 	@Autowired
 	lateinit var kafkaMessageSender: KafkaMessageSender
 
+	@Autowired
+	lateinit var dataSource: DataSource
+
+	@Autowired
+	lateinit var db: TestDataRepository
+
 	companion object {
 		val oAuthServer = MockOAuthServer3()
 		val enhetsregisterClient = MockAmtEnhetsregisterClient()
 		val norgHttpClient = MockNorgHttpClient()
 		val poaoTilgangClient = MockPoaoTilgangHttpClient()
 		val nomHttpClient = MockNomHttpClient()
-
 
 		@JvmStatic
 		@DynamicPropertySource
