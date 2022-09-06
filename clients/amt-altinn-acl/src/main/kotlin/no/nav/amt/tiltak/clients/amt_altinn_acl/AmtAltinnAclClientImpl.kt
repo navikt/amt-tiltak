@@ -1,12 +1,9 @@
 package no.nav.amt.tiltak.clients.amt_altinn_acl
 
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
-import no.nav.amt.tiltak.common.json.JsonUtils.toJsonString
 import no.nav.common.rest.client.RestClient.baseClient
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.function.Supplier
 
 class AmtAltinnAclClientImpl(
@@ -15,28 +12,33 @@ class AmtAltinnAclClientImpl(
     private val httpClient: OkHttpClient = baseClient(),
 ) : AmtAltinnAclClient {
 
-	private val mediaTypeJson = "application/json".toMediaType()
-
-	override fun hentRettigheter(norskIdent: String, rettighetIder: List<String>): List<Rettighet> {
-		val requestBody = HentRettigheter.Request(norskIdent, rettighetIder)
-
+	override fun hentTiltaksarrangorRoller(norskIdent: String): List<TiltaksarrangorAnsattRoller> {
 		val request = Request.Builder()
-			.url("$baseUrl/api/v1/rettighet/hent")
+			.url("$baseUrl/api/v1/rolle/tiltaksarrangor?norskIdent=$norskIdent")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
-			.post(toJsonString(requestBody).toRequestBody(mediaTypeJson))
+			.get()
 			.build()
 
 		httpClient.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
-				throw RuntimeException("Klarte ikke å hente rettigheter fra amt-altinn-acl. status=${response.code}")
+				throw RuntimeException("Klarte ikke å hente tiltaksarrangør roller fra amt-altinn-acl. status=${response.code}")
 			}
 
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
 
-			val responseBody = fromJsonString<HentRettigheter.Response>(body)
+			val responseBody = fromJsonString<HentTiltaksarrangorRoller.Response>(body)
 
-			return responseBody.rettigheter
-				.map { Rettighet(it.id, it.organisasjonsnummer) }
+			return responseBody.roller.map {
+				TiltaksarrangorAnsattRoller(it.organisasjonsnummer, it.roller.map(::mapTiltaksarrangorRolle))
+			}
+		}
+	}
+
+	private fun mapTiltaksarrangorRolle(rolle: String): TiltaksarrangorAnsattRolle {
+		return when (rolle) {
+			"KOORDINATOR" -> TiltaksarrangorAnsattRolle.KOORDINATOR
+			"VEILEDER" -> TiltaksarrangorAnsattRolle.VEILEDER
+			else -> throw IllegalArgumentException("Ukjent tiltaksarrangør rolle $rolle")
 		}
 	}
 
@@ -54,7 +56,17 @@ class AmtAltinnAclClientImpl(
 				val organisasjonsnummer: String,
 			)
 		}
+	}
 
+	object HentTiltaksarrangorRoller {
+		data class Response(
+			val roller: List<TiltaksarrangorRoller>
+		) {
+			data class TiltaksarrangorRoller(
+				val organisasjonsnummer: String,
+				val roller: List<String>,
+			)
+		}
 	}
 
 }

@@ -23,8 +23,17 @@ class ArrangorServiceImpl(
 		).toArrangor()
 	}
 
+
+
 	override fun getArrangorById(id: UUID): Arrangor {
 		return arrangorRepository.getById(id).toArrangor()
+	}
+
+	override fun getOrCreateArrangor(virksomhetsnummer: String): Arrangor {
+		val maybeArrangor = arrangorRepository.getByOrganisasjonsnummer(virksomhetsnummer)
+		if (maybeArrangor != null) return maybeArrangor.toArrangor()
+
+		return opprettArrangor(virksomhetsnummer)
 	}
 
 	override fun getArrangorByVirksomhetsnummer(virksomhetsnummer: String): Arrangor? {
@@ -33,5 +42,19 @@ class ArrangorServiceImpl(
 
 	override fun getVirksomheterForAnsatt(ansattId: UUID): List<Arrangor> {
 		throw NotImplementedError("getVirksomheterForAnsatt in ArrangorService is not yet implemented")
+	}
+
+	private fun opprettArrangor(virksomhetsnummer: String): Arrangor {
+		val arrangor = enhetsregisterClient.hentVirksomhet(virksomhetsnummer)
+		val id = UUID.randomUUID()
+		arrangorRepository.insert(
+			id = id,
+			navn = arrangor.navn,
+			organisasjonsnummer = arrangor.organisasjonsnummer,
+			overordnetEnhetNavn = arrangor.overordnetEnhetNavn,
+			overordnetEnhetOrganisasjonsnummer = arrangor.overordnetEnhetOrganisasjonsnummer,
+		)
+
+		return arrangorRepository.getById(id).toArrangor()
 	}
 }

@@ -5,6 +5,7 @@ import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.DbUtils.shouldBeCloseTo
 import no.nav.amt.tiltak.test.database.DbUtils.shouldBeEqualTo
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
@@ -95,11 +96,11 @@ class ArrangorAnsattGjennomforingTilgangRepositoryTest : FunSpec({
 			GJENNOMFORING_TILGANG_1.copy(
 				id = tilgangId2,
 				ansattId = ansattId,
-				gjennomforingId = gjennomforing2Id
+				gjennomforingId = gjennomforing2Id,
+				gyldigTil = ZonedDateTime.now().minusMinutes(10),
+				gyldigFra = ZonedDateTime.now().minusMinutes(100)
 			)
 		)
-
-		repository.oppdaterGyldigTil(tilgangId2, ZonedDateTime.now().minusMinutes(1))
 
 		val tilganger = repository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
 
@@ -108,7 +109,7 @@ class ArrangorAnsattGjennomforingTilgangRepositoryTest : FunSpec({
 		tilganger.any { it.gjennomforingId == gjennomforing2Id } shouldBe false
 	}
 
-	test("oppdaterGyldigTil - skal sette gyldig_til") {
+	test("fjernTilgang - skal sette gyldig_til") {
 		testRepository.insertNavEnhet(NAV_ENHET_1)
 		testRepository.insertNavEnhet(NAV_ENHET_2)
 		testRepository.insertArrangor(ARRANGOR_1)
@@ -131,13 +132,11 @@ class ArrangorAnsattGjennomforingTilgangRepositoryTest : FunSpec({
 			)
 		)
 
-		val stopTidspunkt = ZonedDateTime.now()
-
-		repository.oppdaterGyldigTil(tilgangId, stopTidspunkt)
+		repository.fjernTilgang(ansattId, gjennomforingId)
 
 		val tilgang = repository.get(tilgangId)
 
-		tilgang.gyldigTil shouldBeEqualTo stopTidspunkt
+		tilgang.gyldigTil shouldBeCloseTo ZonedDateTime.now()
 	}
 
 

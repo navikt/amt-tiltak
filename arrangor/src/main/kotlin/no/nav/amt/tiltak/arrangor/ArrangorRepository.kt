@@ -65,6 +65,35 @@ open class ArrangorRepository(
             ?: throw NoSuchElementException("Virksomhet med organisasjonsnummer $organisasjonsnummer finnes ikke")
     }
 
+	open fun insert(
+		id: UUID,
+		navn: String,
+		organisasjonsnummer: String,
+		overordnetEnhetNavn: String?,
+		overordnetEnhetOrganisasjonsnummer: String?,
+	) {
+		val sql = """
+			INSERT INTO arrangor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer, navn)
+			VALUES (:id,
+					:overordnetEnhetOrganisasjonsnummer,
+					:overordnetEnhetNavn,
+					:organisasjonsnummer,
+					:navn)
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"id" to id,
+				"navn" to navn,
+				"organisasjonsnummer" to organisasjonsnummer,
+				"overordnetEnhetOrganisasjonsnummer" to overordnetEnhetOrganisasjonsnummer,
+				"overordnetEnhetNavn" to overordnetEnhetNavn,
+			)
+		)
+
+		template.update(sql, parameters)
+	}
+
     fun getByOrganisasjonsnummer(organisasjonsnummer: String): ArrangorDbo? {
         val sql = """
 			SELECT id,

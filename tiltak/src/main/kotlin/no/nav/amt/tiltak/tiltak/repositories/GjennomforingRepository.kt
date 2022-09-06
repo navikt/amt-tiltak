@@ -147,6 +147,15 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 		return template.query(sql, parameters, rowMapper)
 	}
 
+
+	fun getByArrangorId(arrangorId: UUID): List<GjennomforingDbo> {
+		val sql = "SELECT * FROM gjennomforing WHERE arrangor_id = :arrangorId"
+
+		val parameters = MapSqlParameterSource().addValues(mapOf("arrangorId" to arrangorId))
+
+		return template.query(sql, parameters, rowMapper)
+	}
+
 	fun delete(gjennomforingId: UUID) {
 		val sql = "DELETE FROM gjennomforing WHERE id = :gjennomforingId"
 
@@ -158,5 +167,6 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 
 		template.update(sql, parameters)
 	}
+
 
 }
