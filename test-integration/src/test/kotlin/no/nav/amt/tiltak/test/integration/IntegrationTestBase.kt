@@ -2,15 +2,14 @@ package no.nav.amt.tiltak.test.integration
 
 import no.nav.amt.tiltak.application.Application
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.integration.mocks.MockAmtEnhetsregisterClient
-import no.nav.amt.tiltak.test.integration.mocks.MockNorgHttpClient
-import no.nav.amt.tiltak.test.integration.mocks.MockOAuthServer3
+import no.nav.amt.tiltak.test.integration.mocks.*
 import no.nav.amt.tiltak.test.integration.utils.KafkaMessageSender
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
-import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -39,6 +38,8 @@ abstract class IntegrationTestBase {
 		val oAuthServer = MockOAuthServer3()
 		val enhetsregisterClient = MockAmtEnhetsregisterClient()
 		val norgHttpClient = MockNorgHttpClient()
+		val poaoTilgangClient = MockPoaoTilgangHttpClient()
+		val nomHttpClient = MockNomHttpClient()
 
 
 		@JvmStatic
@@ -58,6 +59,12 @@ abstract class IntegrationTestBase {
 
 			norgHttpClient.start()
 			registry.add("poao-gcp-proxy.url") { norgHttpClient.serverUrl() }
+
+			poaoTilgangClient.start()
+			registry.add("poao-tilgang.url") { poaoTilgangClient.serverUrl() }
+
+			nomHttpClient.start()
+			registry.add("nom.url") { nomHttpClient.serverUrl() }
 
 			// Database ting
 			val container = SingletonPostgresContainer.getContainer()
@@ -98,6 +105,11 @@ abstract class IntegrationTestBase {
 		}
 
 		return client.newCall(reqBuilder.build()).execute()
+	}
+
+	fun String.toJsonRequestBody(): RequestBody {
+		val mediaTypeJson = "application/json".toMediaType()
+		return this.toRequestBody(mediaTypeJson)
 	}
 
 }

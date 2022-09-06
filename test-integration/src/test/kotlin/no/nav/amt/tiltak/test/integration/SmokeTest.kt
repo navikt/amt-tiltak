@@ -1,25 +1,18 @@
 package no.nav.amt.tiltak.test.integration
 
-import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.Operation
 import no.nav.amt.tiltak.test.integration.kafka.MessageCreator
-import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
-import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import java.util.*
 
 class SmokeTest : IntegrationTestBase() {
 
-	@Autowired
-	lateinit var gjennomforingRepository: GjennomforingRepository
-
 	@BeforeEach
 	internal fun setUp() {
 		norgHttpClient.addDefaultData()
+		poaoTilgangClient.addDefaultData()
+		nomHttpClient.addDefaultData()
 	}
 
 	@Test
@@ -37,6 +30,13 @@ class SmokeTest : IntegrationTestBase() {
 
 
 		Thread.sleep(5000)
+
+		val giTilgangResponse = sendRequest(
+			method = "POST",
+			path = "/api/tiltaksansvarlig/gjennomforing-tilgang?gjennomforingId=$gjennomforingId",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueAzureAdToken()}"),
+			body = "".toJsonRequestBody()
+		)
 
 		val response = sendRequest(
 			method = "GET",

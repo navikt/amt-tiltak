@@ -37,7 +37,7 @@ class NavAnsattGjennomforingController(
 
 		val antallEndringsmeldinger = antallAktiveEndringsmeldingerQuery.query(tilganger)
 
-		return hentTiltaksoversiktQuery.query(tilganger)
+		val data = hentTiltaksoversiktQuery.query(tilganger)
 			.map {
 				HentGjennomforingerDto(
 					id = it.id,
@@ -49,6 +49,8 @@ class NavAnsattGjennomforingController(
 						antallEndringsmeldinger.find { a -> a.gjennomforingId == it.id }?.antallMeldinger ?: 0
 				)
 			}
+
+		return data
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)

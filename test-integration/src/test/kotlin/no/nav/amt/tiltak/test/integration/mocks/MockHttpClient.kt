@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.test.integration.mocks
 
+import okhttp3.Headers
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -23,7 +24,11 @@ abstract class MockHttpClient {
 			server.dispatcher = object : Dispatcher() {
 				override fun dispatch(request: RecordedRequest): MockResponse {
 					val response = responses.entries.find { it.key.invoke(request) }?.value
-						?: throw IllegalStateException("Mock has no handler for $request")
+						?: throw IllegalStateException(
+							"Mock has no handler for $request\n" +
+								"	Headers: ${printHeaders(request.headers)}\n" +
+								"	Body: ${request.body.readUtf8()}	"
+						)
 
 					log.info("Responding [${request.path}]: $response")
 					return response
@@ -34,6 +39,10 @@ abstract class MockHttpClient {
 		} catch (e: IllegalArgumentException) {
 			log.info("${javaClass.simpleName} is already started")
 		}
+	}
+
+	protected fun addResponse(predicate: (req: RecordedRequest) -> Boolean, response: MockResponse) {
+		responses[predicate] = response
 	}
 
 	protected fun addResponse(path: String, response: MockResponse) {
@@ -60,6 +69,11 @@ abstract class MockHttpClient {
 
 	fun shutdown() {
 		server.shutdown()
+	}
+
+	private fun printHeaders(headers: Headers): String {
+		return headers.map { "		${it.first} : ${it.second}" }
+			.joinToString("\n")
 	}
 
 }
