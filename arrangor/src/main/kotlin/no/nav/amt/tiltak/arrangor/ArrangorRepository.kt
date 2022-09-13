@@ -118,20 +118,8 @@ open class ArrangorRepository(
     }
 
 	fun getById(id: UUID): ArrangorDbo {
-		return getNullableArrangor(id)?: throw IllegalStateException("Arrangør med id=$id eksisterer ikke")
-	}
-
-	fun getNullableArrangor(id: UUID): ArrangorDbo? {
 		val sql = """
-			SELECT id,
-				   overordnet_enhet_organisasjonsnummer,
-				   overordnet_enhet_navn,
-				   organisasjonsnummer,
-				   navn,
-				   created_at,
-				   modified_at
-			FROM arrangor
-			WHERE id = :id
+			SELECT * FROM arrangor WHERE id = :id
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
@@ -140,7 +128,21 @@ open class ArrangorRepository(
 			)
 		)
 
+		return template.query(sql, parameters, rowMapper).firstOrNull()
+			?: throw NoSuchElementException("Fant ikke arrangor med id: $id")
+	}
+
+	fun getByIder(arrangorIder: List<UUID>): List<ArrangorDbo> {
+		val sql = """
+			SELECT * FROM arrangor WHERE id in(:ider)
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"ider" to arrangorIder
+			)
+		)
+
 		return template.query(sql, parameters, rowMapper)
-			.firstOrNull()
 	}
 }
