@@ -13,6 +13,8 @@ interface ArrangorService {
 
 	fun getArrangorById(id: UUID): Arrangor
 
+	fun getArrangorerById(arrangorIder: List<UUID>): List<Arrangor>
+
 	fun getOrCreateArrangor(virksomhetsnummer: String): Arrangor
 
 }
