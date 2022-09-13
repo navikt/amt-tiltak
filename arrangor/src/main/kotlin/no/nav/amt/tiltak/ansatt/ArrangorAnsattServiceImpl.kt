@@ -6,7 +6,8 @@ import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.PersonService
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -14,9 +15,13 @@ import java.util.*
 class ArrangorAnsattServiceImpl(
 	private val arrangorAnsattRepository: ArrangorAnsattRepository,
 	private val personService: PersonService,
-	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
 	private val arrangorService: ArrangorService,
 ) : ArrangorAnsattService {
+
+	// Forhindrer circular dependency, må fikses når vi rydder opp i arkitekturen
+	@Lazy
+	@Autowired
+	lateinit var arrangorAnsattTilgangService: ArrangorAnsattTilgangService
 
 	override fun opprettAnsattHvisIkkeFinnes(personIdent: String): Ansatt {
 		return getAnsattByPersonligIdent(personIdent)
