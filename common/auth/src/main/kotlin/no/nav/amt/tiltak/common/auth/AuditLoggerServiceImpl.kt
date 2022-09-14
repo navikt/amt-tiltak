@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.application.audit_logger
+package no.nav.amt.tiltak.common.auth
 
 import no.nav.amt.tiltak.core.port.*
 import no.nav.common.audit_log.cef.CefMessage

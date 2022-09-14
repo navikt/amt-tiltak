@@ -23,8 +23,8 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
 
-class EndringsmeldingServiceTest {
-	lateinit var endringsmeldingService: EndringsmeldingService
+class EndringsmeldingServiceImplTest {
+	lateinit var endringsmeldingService: EndringsmeldingServiceImpl
 
 	var dataSource = SingletonPostgresContainer.getDataSource()
 
@@ -41,7 +41,7 @@ class EndringsmeldingServiceTest {
 
 	@BeforeEach
 	fun beforeEach() {
-		endringsmeldingService = EndringsmeldingService(repository, endringsmeldingForGjennomforingQuery, auditLoggerService)
+		endringsmeldingService = EndringsmeldingServiceImpl(repository, endringsmeldingForGjennomforingQuery, auditLoggerService)
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 

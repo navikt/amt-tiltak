@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.endringsmelding
+package no.nav.amt.tiltak.bff.tiltaksarrangor
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
@@ -7,9 +7,7 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.SkjermetPersonService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.format.annotation.DateTimeFormat
-import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 import java.util.*
 
@@ -47,7 +45,8 @@ class EndringsmeldingArrangorController(
 		@RequestParam("startDato") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startDato: LocalDate
 	) {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-		val deltaker = deltakerService.hentDeltaker(deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
+		val deltaker = deltakerService.hentDeltaker(deltakerId)
+			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 		val ansattId = arrangorTilgangService.hentAnsattId(ansattPersonligIdent)
 
 		arrangorTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, deltaker.gjennomforingId)

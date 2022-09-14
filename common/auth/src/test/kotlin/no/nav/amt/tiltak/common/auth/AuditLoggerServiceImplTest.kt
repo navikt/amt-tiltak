@@ -1,10 +1,10 @@
-package no.nav.amt.tiltak.audit_logger
+package no.nav.amt.tiltak.common.auth
 
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
-import no.nav.amt.tiltak.application.audit_logger.AuditLoggerServiceImpl
+import no.nav.amt.tiltak.common.auth.AuditLoggerServiceImpl
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker

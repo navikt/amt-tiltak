@@ -39,7 +39,7 @@ class EndringsmeldingNavControllerTest {
 	private lateinit var tiltaksansvarligAutoriseringService: TiltaksansvarligAutoriseringService
 
 	@MockBean
-	private lateinit var endringsmeldingService: EndringsmeldingService
+	private lateinit var endringsmeldingService: EndringsmeldingServiceImpl
 
 	@MockBean
 	private lateinit var navAnsattService: NavAnsattService

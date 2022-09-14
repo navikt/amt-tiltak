@@ -1,7 +1,6 @@
 package no.nav.amt.tiltak.common.auth
 
 import no.nav.amt.tiltak.core.exceptions.NotAuthenticatedException
-import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -38,13 +37,13 @@ open class AuthService(
 		?.toString()
 		?: throw NotAuthenticatedException("NAV ident is missing")
 
-	open fun hentAzureIdTilInnloggetBruker() : UUID = tokenValidationContextHolder
+	open fun hentAzureIdTilInnloggetBruker(): UUID = tokenValidationContextHolder
 		.tokenValidationContext
 		.getClaims(Issuer.AZURE_AD)
 		.getStringClaim("oid").let { UUID.fromString(it) }
 		?: throw ResponseStatusException(
-		HttpStatus.UNAUTHORIZED,
-		"oid is missing"
-	)
+			HttpStatus.UNAUTHORIZED,
+			"oid is missing"
+		)
 
 }
