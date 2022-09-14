@@ -1,10 +1,11 @@
-package no.nav.amt.tiltak.endringsmelding
+package no.nav.amt.tiltak.bff.tiltaksarrangor
 
 import no.nav.amt.tiltak.common.auth.AuthService
+import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.SkjermetPersonService
-import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -36,7 +37,7 @@ class EndringsmeldingArrangorControllerTest {
 	private lateinit var arrangorTilgangService: ArrangorAnsattTilgangService
 
 	@MockBean
-	private lateinit var endringsmeldingService: EndringsmeldingServiceImpl
+	private lateinit var endringsmeldingService: EndringsmeldingService
 
 	@MockBean
 	private lateinit var deltakerService: DeltakerService
@@ -71,17 +72,18 @@ class EndringsmeldingArrangorControllerTest {
 			.thenReturn(ansattPersonligIdent)
 
 		Mockito.`when`(endringsmeldingService.hentEndringsmeldingerForDeltaker(deltakerId))
-			.thenReturn(listOf(EndringsmeldingDbo(
-				id = endringsmeldingId,
-				deltakerId = deltakerId,
-				startDato = LocalDate.parse("2022-09-05"),
-				ferdiggjortAvNavAnsattId = null,
-				ferdiggjortTidspunkt = null,
-				aktiv = false,
-				opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
-				createdAt = LocalDateTime.now(),
-				modifiedAt = LocalDateTime.now()
-			)))
+			.thenReturn(listOf(
+				Endringsmelding(
+					id = endringsmeldingId,
+					deltakerId = deltakerId,
+					startDato = LocalDate.parse("2022-09-05"),
+					ferdiggjortAvNavAnsattId = null,
+					ferdiggjortTidspunkt = null,
+					aktiv = false,
+					opprettetAvArrangorAnsattId = UUID.randomUUID(),
+					opprettet = LocalDateTime.now(),
+				)
+			))
 
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.get("/api/tiltaksarrangor/endringsmelding?deltakerId=$deltakerId")

@@ -23,6 +23,7 @@
         <module>tiltak</module>
         <module>tilgangskontroll</module>
         <module>bff-tiltaksarrangor</module>
+        <module>bff-nav_ansatt</module>
     </modules>
 
     <name>AMT-Tiltak</name>
