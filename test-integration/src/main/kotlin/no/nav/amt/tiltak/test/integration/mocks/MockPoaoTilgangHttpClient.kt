@@ -7,7 +7,7 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 import java.util.*
 
-class MockPoaoTilgangHttpClient : MockHttpClient() {
+class MockPoaoTilgangHttpClient : MockHttpClient(name = "MockPoaoTilgangHttpClient") {
 
 	fun reset() {
 		resetHttpServer()

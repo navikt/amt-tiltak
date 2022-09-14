@@ -6,7 +6,7 @@ import no.nav.amt.tiltak.common.json.JsonUtils
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 
-class MockNomHttpClient : MockHttpClient() {
+class MockNomHttpClient : MockHttpClient(name = "MockNomHttpClient") {
 
 	fun reset() {
 		resetHttpServer()

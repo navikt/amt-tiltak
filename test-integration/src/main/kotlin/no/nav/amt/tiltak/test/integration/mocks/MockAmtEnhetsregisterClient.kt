@@ -4,7 +4,7 @@ import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetDto
 import no.nav.amt.tiltak.common.json.JsonUtils
 import okhttp3.mockwebserver.MockResponse
 
-class MockAmtEnhetsregisterClient : MockHttpClient() {
+class MockAmtEnhetsregisterClient : MockHttpClient(name = "MockAmtEnhetsregisterClient") {
 
 	init {
 		reset()

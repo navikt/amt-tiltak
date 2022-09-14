@@ -2,70 +2,83 @@ package no.nav.amt.tiltak.deltaker
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.mockk
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
-import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
+import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
+import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
-import no.nav.amt.tiltak.test.database.data.TestData
+import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
+import no.nav.amt.tiltak.test.database.data.TestData.createDeltakerInput
+import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.TestDataSeeder
-import no.nav.amt.tiltak.test.integration.IntegrationTestBase
+import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.jdbc.datasource.DataSourceTransactionManager
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-class DeltakerServiceIntegrationTest : IntegrationTestBase() {
-
-	@Autowired
-	lateinit var deltakerService: DeltakerService
-
-	@Autowired
+class DeltakerServiceImplTest {
 	lateinit var deltakerRepository: DeltakerRepository
-
-	@Autowired
 	lateinit var deltakerStatusRepository: DeltakerStatusRepository
+	lateinit var deltakerServiceImpl: DeltakerServiceImpl
+	lateinit var brukerRepository: BrukerRepository
+	lateinit var brukerService: BrukerService
+	lateinit var testDataRepository: TestDataRepository
 
+	val dataSource = SingletonPostgresContainer.getDataSource()
+	val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
 	val deltakerId = UUID.randomUUID()
 
-	private val deltaker = DeltakerUpsert(
-		id = deltakerId,
-		startDato = null,
-		sluttDato = null,
-		registrertDato = LocalDateTime.now(),
-		dagerPerUke = null,
-		prosentStilling = null,
-		gjennomforingId = TestData.GJENNOMFORING_1.id,
-		innsokBegrunnelse = null
-	)
-
-
 	@BeforeEach
-	internal fun setUp() {
+	fun beforeEach() {
+		brukerRepository = BrukerRepository(jdbcTemplate)
+
+		brukerService = BrukerServiceImpl(brukerRepository, mockk(), mockk(), mockk())
+		deltakerRepository = DeltakerRepository(jdbcTemplate)
+		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
+		deltakerServiceImpl = DeltakerServiceImpl(
+			deltakerRepository, deltakerStatusRepository,
+			brukerService, TransactionTemplate(DataSourceTransactionManager(dataSource))
+		)
+		testDataRepository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
+
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource, TestDataSeeder::insertMinimum)
 	}
 
-	@Test
-	internal fun `upsertDeltaker - inserter ny deltaker`() {
-		deltakerService.upsertDeltaker(TestData.BRUKER_1.fodselsnummer, deltaker)
-		val nyDeltaker = deltakerRepository.get(TestData.BRUKER_1.fodselsnummer, deltaker.gjennomforingId)
+	@AfterEach
+	fun afterEach() {
+		DbTestDataUtils.cleanDatabase(dataSource)
+	}
 
+	@Test
+	fun `upsertDeltaker - inserter ny deltaker`() {
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.fodselsnummer, deltaker)
+
+		val nyDeltaker = deltakerRepository.get(BRUKER_1.fodselsnummer,deltaker.gjennomforingId)
 
 		nyDeltaker shouldNotBe null
 		nyDeltaker!!.id shouldBe deltaker.id
 		nyDeltaker.gjennomforingId shouldBe deltaker.gjennomforingId
-
 	}
 
 	@Test
-	internal fun `insertStatus - ingester status`() {
-		deltakerService.upsertDeltaker(TestData.BRUKER_1.fodselsnummer, deltaker)
-		val nyDeltaker = deltakerRepository.get(TestData.BRUKER_1.fodselsnummer, TestData.GJENNOMFORING_1.id)
+	fun `insertStatus - ingester status`() {
+
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.fodselsnummer, deltaker)
+		val nyDeltaker = deltakerRepository.get(BRUKER_1.fodselsnummer, GJENNOMFORING_1.id)
 		val now = LocalDate.now().atStartOfDay()
 
 		nyDeltaker shouldNotBe null
@@ -77,7 +90,7 @@ class DeltakerServiceIntegrationTest : IntegrationTestBase() {
 			gyldigFra = now
 		)
 
-		deltakerService.insertStatus(statusInsertDbo)
+		deltakerServiceImpl.insertStatus(statusInsertDbo)
 
 		val statusEtterEndring = deltakerStatusRepository.getStatusForDeltaker(nyDeltaker.id)
 
@@ -96,8 +109,8 @@ class DeltakerServiceIntegrationTest : IntegrationTestBase() {
 	@Test
 	fun `insertStatus - deltaker får samme status igjen - oppdaterer ikke status`() {
 
-		deltakerService.upsertDeltaker(TestData.BRUKER_1.fodselsnummer, deltaker)
-		val nyDeltaker = deltakerRepository.get(TestData.BRUKER_1.fodselsnummer, TestData.GJENNOMFORING_1.id)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.fodselsnummer, deltaker)
+		val nyDeltaker = deltakerRepository.get(BRUKER_1.fodselsnummer, GJENNOMFORING_1.id)
 
 		nyDeltaker shouldNotBe null
 
@@ -108,11 +121,11 @@ class DeltakerServiceIntegrationTest : IntegrationTestBase() {
 			gyldigFra = LocalDateTime.now()
 		)
 
-		deltakerService.insertStatus(statusInsertDbo)
+		deltakerServiceImpl.insertStatus(statusInsertDbo)
 
 		val status1 = deltakerStatusRepository.getStatusForDeltaker(nyDeltaker.id)
 
-		deltakerService.insertStatus(statusInsertDbo)
+		deltakerServiceImpl.insertStatus(statusInsertDbo)
 
 		val status2 = deltakerStatusRepository.getStatusForDeltaker(nyDeltaker.id)
 
@@ -122,8 +135,8 @@ class DeltakerServiceIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	fun `insertStatus - deltaker ny status - setter ny og deaktiverer den gamle`() {
-		val deltakerCmd = TestData.createDeltakerInput(TestData.BRUKER_1, TestData.GJENNOMFORING_1)
-		db.insertDeltaker(deltakerCmd)
+		val deltakerCmd = createDeltakerInput(BRUKER_1, GJENNOMFORING_1)
+		testDataRepository.insertDeltaker(deltakerCmd)
 
 		val nyDeltaker = deltakerRepository.get(deltakerCmd.brukerId, deltakerCmd.gjennomforingId)
 
@@ -136,14 +149,9 @@ class DeltakerServiceIntegrationTest : IntegrationTestBase() {
 			gyldigFra = LocalDateTime.now()
 		)
 
-		deltakerService.insertStatus(statusInsertDbo)
+		deltakerServiceImpl.insertStatus(statusInsertDbo)
 
-		deltakerService.insertStatus(
-			statusInsertDbo.copy(
-				id = UUID.randomUUID(),
-				type = Deltaker.Status.VENTER_PA_OPPSTART
-			)
-		)
+		deltakerServiceImpl.insertStatus(statusInsertDbo.copy(id = UUID.randomUUID(), type = Deltaker.Status.VENTER_PA_OPPSTART))
 
 		val statuser = deltakerStatusRepository.getStatuserForDeltaker(nyDeltaker.id)
 
@@ -162,17 +170,26 @@ class DeltakerServiceIntegrationTest : IntegrationTestBase() {
 			gyldigFra = LocalDateTime.now().minusDays(2)
 		)
 
-		deltakerService.upsertDeltaker(TestData.BRUKER_1.fodselsnummer, deltaker)
-		deltakerService.insertStatus(statusInsertDbo)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.fodselsnummer, deltaker)
+		deltakerServiceImpl.insertStatus(statusInsertDbo)
 
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldNotBe null
 
-		deltakerService.slettDeltaker(deltakerId)
+		deltakerServiceImpl.slettDeltaker(deltakerId)
 
 		deltakerRepository.get(deltakerId) shouldBe null
 
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldBe null
 	}
 
-
+	val deltaker = DeltakerUpsert(
+		id =  deltakerId,
+		startDato = null,
+		sluttDato = null,
+		registrertDato =  LocalDateTime.now(),
+		dagerPerUke = null,
+		prosentStilling = null,
+		gjennomforingId = GJENNOMFORING_1.id,
+		innsokBegrunnelse = null
+	)
 }

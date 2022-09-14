@@ -7,7 +7,9 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.slf4j.LoggerFactory
 
-abstract class MockHttpClient {
+abstract class MockHttpClient(
+	private val name: String
+) {
 
 	private val server = MockWebServer()
 
@@ -25,7 +27,7 @@ abstract class MockHttpClient {
 				override fun dispatch(request: RecordedRequest): MockResponse {
 					val response = responses.entries.find { it.key.invoke(request) }?.value
 						?: throw IllegalStateException(
-							"Mock has no handler for $request\n" +
+							"$name has no handler for $request\n" +
 								"	Headers: ${printHeaders(request.headers)}\n" +
 								"	Body: ${request.body.readUtf8()}	"
 						)

@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.deltaker.controllers
+package no.nav.amt.tiltak.test.integration
 
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils

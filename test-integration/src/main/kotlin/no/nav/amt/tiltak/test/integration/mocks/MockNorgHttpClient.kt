@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.test.integration.mocks
 import no.nav.amt.tiltak.common.json.JsonUtils
 import okhttp3.mockwebserver.MockResponse
 
-class MockNorgHttpClient : MockHttpClient() {
+class MockNorgHttpClient : MockHttpClient(name = "MockNorgHttpClient") {
 
 	private val baseUrl = "/proxy/norg2/api/v1/enhet"
 

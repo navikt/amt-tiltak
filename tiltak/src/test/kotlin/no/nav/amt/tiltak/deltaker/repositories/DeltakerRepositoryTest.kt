@@ -1,5 +1,8 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
+import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -8,33 +11,37 @@ import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpdateDbo
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
-import no.nav.amt.tiltak.test.database.data.TestData
-import no.nav.amt.tiltak.test.integration.IntegrationTestBase
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
+import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_3
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
+import org.slf4j.LoggerFactory
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
 
-class DeltakerRepositoryIntegrationTest : IntegrationTestBase() {
+internal class DeltakerRepositoryTest : FunSpec({
 
-	@Autowired
+	val dataSource = SingletonPostgresContainer.getDataSource()
+
 	lateinit var repository: DeltakerRepository
 
-	@Autowired
 	lateinit var deltakerStatusRepository: DeltakerStatusRepository
+	val now = LocalDate.now().atStartOfDay()
 
-	private val now = LocalDate.now().atStartOfDay()
+	beforeEach {
+		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
+		rootLogger.level = Level.WARN
 
-	@BeforeEach
-	internal fun setUp() {
+		repository = DeltakerRepository(NamedParameterJdbcTemplate(dataSource))
+		deltakerStatusRepository = DeltakerStatusRepository(NamedParameterJdbcTemplate(dataSource))
+
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
-	@Test
-	internal fun `Insert should insert Deltaker and return DeltakerDbo`() {
+	test("Insert should insert Deltaker and return DeltakerDbo") {
 		val id = UUID.randomUUID()
 		val startDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
@@ -46,8 +53,8 @@ class DeltakerRepositoryIntegrationTest : IntegrationTestBase() {
 		repository.insert(
 			DeltakerInsertDbo(
 				id,
-				TestData.BRUKER_3.id,
-				TestData.GJENNOMFORING_1.id,
+				BRUKER_3.id,
+				GJENNOMFORING_1.id,
 				startDato,
 				sluttDato,
 				dagerPerUke,
@@ -60,11 +67,11 @@ class DeltakerRepositoryIntegrationTest : IntegrationTestBase() {
 
 		dbo shouldNotBe null
 		dbo!!.id shouldBe id
-		dbo.brukerId shouldBe TestData.BRUKER_3.id
-		dbo.brukerFornavn shouldBe TestData.BRUKER_3.fornavn
-		dbo.brukerEtternavn shouldBe TestData.BRUKER_3.etternavn
-		dbo.brukerFodselsnummer shouldBe TestData.BRUKER_3.fodselsnummer
-		dbo.gjennomforingId shouldBe TestData.GJENNOMFORING_1.id
+		dbo.brukerId shouldBe BRUKER_3.id
+		dbo.brukerFornavn shouldBe BRUKER_3.fornavn
+		dbo.brukerEtternavn shouldBe BRUKER_3.etternavn
+		dbo.brukerFodselsnummer shouldBe BRUKER_3.fodselsnummer
+		dbo.gjennomforingId shouldBe GJENNOMFORING_1.id
 		dbo.startDato shouldBe startDato
 		dbo.sluttDato shouldBe sluttDato
 		dbo.createdAt shouldNotBe null
@@ -73,34 +80,30 @@ class DeltakerRepositoryIntegrationTest : IntegrationTestBase() {
 		dbo.innsokBegrunnelse shouldBe begrunnelse
 	}
 
-	@Test
-	internal fun `Update should update Deltaker and return the updated Deltaker`() {
+	test("Update should update Deltaker and return the updated Deltaker") {
 		val nyStartdato = LocalDate.now().plusDays(1)
 		val nySluttdato = LocalDate.now().plusDays(14)
 		val nyBegrunnelse = "ny begrunnelse"
 
-		val updatedDeltaker = repository.update(
-			DeltakerUpdateDbo(
-				id = TestData.DELTAKER_1.id,
-				startDato = nyStartdato,
-				sluttDato = nySluttdato,
-				registrertDato = LocalDateTime.now(),
-				innsokBegrunnelse = nyBegrunnelse
-			)
-		)
+		val updatedDeltaker = repository.update(DeltakerUpdateDbo(
+			id = DELTAKER_1.id,
+			startDato = nyStartdato,
+			sluttDato = nySluttdato,
+			registrertDato = LocalDateTime.now(),
+			innsokBegrunnelse = nyBegrunnelse
+		))
 
-		updatedDeltaker.id shouldBe TestData.DELTAKER_1.id
+		updatedDeltaker.id shouldBe DELTAKER_1.id
 		updatedDeltaker.startDato shouldBe nyStartdato
 		updatedDeltaker.sluttDato shouldBe nySluttdato
 		updatedDeltaker.innsokBegrunnelse shouldBe nyBegrunnelse
 	}
 
-	@Test
-	internal fun `Get by id`() {
+	test("Get by id") {
 		val insertDbo = DeltakerInsertDbo(
 			UUID.randomUUID(),
-			TestData.BRUKER_3.id,
-			TestData.GJENNOMFORING_1.id,
+			BRUKER_3.id,
+			GJENNOMFORING_1.id,
 			LocalDate.now().plusDays(7),
 			null,
 			2,
@@ -120,15 +123,14 @@ class DeltakerRepositoryIntegrationTest : IntegrationTestBase() {
 		gottenDbo.sluttDato shouldBe insertDbo.sluttDato
 		gottenDbo.dagerPerUke shouldBe insertDbo.dagerPerUke
 		gottenDbo.prosentStilling shouldBe insertDbo.prosentStilling
-		gottenDbo.registrertDato shouldBe insertDbo.registrertDato
-	}
+		gottenDbo.registrertDato shouldBe insertDbo.registrertDato	}
 
-	@Test
-	internal fun `Get by BrukerId and Gjennomforing`() {
+	test("Get by BrukerId and Gjennomforing") {
+
 		val insertDbo = DeltakerInsertDbo(
 			UUID.randomUUID(),
-			TestData.BRUKER_3.id,
-			TestData.GJENNOMFORING_1.id,
+			BRUKER_3.id,
+			GJENNOMFORING_1.id,
 			LocalDate.now().plusDays(7),
 			null,
 			2,
@@ -152,15 +154,14 @@ class DeltakerRepositoryIntegrationTest : IntegrationTestBase() {
 
 	}
 
-	@Test
-	internal fun `Get by Fodselsnummer and Gjennomforing`() {
+	test("Get by Fodselsnummer and Gjennomforing") {
 		val startDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
 		val sluttDato = null
 		val dagerPerUke = 2
 		val prosentStilling = 20.0f
-		val gjennomforing = TestData.GJENNOMFORING_1
-		val bruker = TestData.BRUKER_3
+		val gjennomforing = GJENNOMFORING_1
+		val bruker = BRUKER_3
 
 		val insertDbo = DeltakerInsertDbo(
 			UUID.randomUUID(),
@@ -181,16 +182,16 @@ class DeltakerRepositoryIntegrationTest : IntegrationTestBase() {
 		gottenDbo!!.gjennomforingId shouldBe gjennomforing.id
 		gottenDbo.brukerId shouldBe bruker.id
 
+
 	}
 
-	@Test
-	internal fun `potensieltHarSlutta - status DELTAR og sluttdato passert - deltaker returneres`() {
+	test("potensieltHarSlutta - status DELTAR og sluttdato passert - deltaker returneres") {
 		val deltakerId = UUID.randomUUID()
 
 		val deltakerInsertDbo = DeltakerInsertDbo(
 			deltakerId,
-			TestData.BRUKER_3.id,
-			TestData.GJENNOMFORING_1.id,
+			BRUKER_3.id,
+			GJENNOMFORING_1.id,
 			LocalDate.now().minusDays(7),
 			LocalDate.now().minusDays(2),
 			2,
@@ -211,15 +212,14 @@ class DeltakerRepositoryIntegrationTest : IntegrationTestBase() {
 
 		potensieltHarSlutta shouldHaveSize 1
 		potensieltHarSlutta[0] shouldBe deltaker
-
 	}
 
-	@Test
-	internal fun `potensieltHarSlutta - status DELTAR og sluttdato ikke passert - deltaker returneres ikke`() {
+
+	test("potensieltHarSlutta - status DELTAR og sluttdato ikke passert - deltaker returneres ikke") {
 		val deltakerInsertDbo = DeltakerInsertDbo(
 			UUID.randomUUID(),
-			TestData.BRUKER_3.id,
-			TestData.GJENNOMFORING_1.id,
+			BRUKER_3.id,
+			GJENNOMFORING_1.id,
 			LocalDate.now().minusDays(7),
 			LocalDate.now().plusDays(2),
 			2,
@@ -235,17 +235,18 @@ class DeltakerRepositoryIntegrationTest : IntegrationTestBase() {
 		repository.insert(deltakerInsertDbo)
 		deltakerStatusRepository.insert(statusInsertDbo)
 
-		val potensieltHarSlutta = repository.potensieltHarSlutta().filter { it.id == TestData.BRUKER_3.id }
+		val potensieltHarSlutta = repository.potensieltHarSlutta().filter { it.id == BRUKER_3.id }
 
 		potensieltHarSlutta shouldHaveSize 0
 	}
 
-	@Test
-	internal fun `potensieltDeltar - startdato passert og sluttdato ikke passert og status VENTER_PA_OPPSTART - deltaker returneres`() {
+
+	test("potensieltDeltar - startdato passert og sluttdato ikke passert og status VENTER_PA_OPPSTART - deltaker returneres") {
+
 		val deltakerInsertDbo = DeltakerInsertDbo(
 			UUID.randomUUID(),
-			TestData.BRUKER_3.id,
-			TestData.GJENNOMFORING_1.id,
+			BRUKER_3.id,
+			GJENNOMFORING_1.id,
 			LocalDate.now().minusDays(2),
 			LocalDate.now().plusDays(10),
 			2,
@@ -275,12 +276,12 @@ class DeltakerRepositoryIntegrationTest : IntegrationTestBase() {
 
 	}
 
-	@Test
-	internal fun `potensieltDeltar - startdato og sluttdato ikke passert og status VENTER_PA_OPPSTART - deltaker returneres ikke`() {
+
+	test("potensieltDeltar - startdato og sluttdato ikke passert og status VENTER_PA_OPPSTART - deltaker returneres ikke") {
 		val deltakerInsertDbo = DeltakerInsertDbo(
 			UUID.randomUUID(),
-			TestData.BRUKER_3.id,
-			TestData.GJENNOMFORING_1.id,
+			BRUKER_3.id,
+			GJENNOMFORING_1.id,
 			LocalDate.now().plusDays(2),
 			LocalDate.now().plusDays(10),
 			2,
@@ -300,15 +301,13 @@ class DeltakerRepositoryIntegrationTest : IntegrationTestBase() {
 		val potensieltDeltar = repository.potensieltDeltar()
 
 		potensieltDeltar shouldHaveSize 0
-
 	}
 
-	@Test
-	internal fun `slettDeltaker skal slette deltaker`() {
+	test("slettDeltaker skal slette deltaker") {
 		val deltakerInsertDbo = DeltakerInsertDbo(
 			UUID.randomUUID(),
-			TestData.BRUKER_3.id,
-			TestData.GJENNOMFORING_1.id,
+			BRUKER_3.id,
+			GJENNOMFORING_1.id,
 			LocalDate.now().plusDays(2),
 			LocalDate.now().plusDays(10),
 			2,
@@ -320,6 +319,5 @@ class DeltakerRepositoryIntegrationTest : IntegrationTestBase() {
 		repository.get(deltakerInsertDbo.id) shouldNotBe null
 		repository.slettDeltaker(deltakerInsertDbo.id)
 		repository.get(deltakerInsertDbo.id) shouldBe null
-
 	}
-}
+})
