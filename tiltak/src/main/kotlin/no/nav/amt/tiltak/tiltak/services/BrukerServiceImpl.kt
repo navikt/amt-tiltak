@@ -27,6 +27,12 @@ class BrukerServiceImpl(
 		}
 	}
 
+	override fun getBruker(id: UUID): Bruker? {
+		return brukerRepository.get(id)?.let {
+			val navEnhet = it.navEnhetId?.let(navEnhetService::getNavEnhet)
+			it.toBruker(navEnhet)
+		}
+	}
 	override fun getOrCreate(fodselsnummer: String): UUID {
 		val bruker = brukerRepository.get(fodselsnummer) ?: createBruker(fodselsnummer)
 		return bruker.id

@@ -23,7 +23,17 @@ import java.util.*
 class DeltakerServiceTest: StringSpec ({
 	val fodselsnummer = "12345678904"
 	val deltakerId = UUID.randomUUID()
-	val defaultBruker = Bruker(id = UUID.randomUUID(), "GRØNN",null,"KOPP", fodselsnummer, null)
+	val defaultBruker = Bruker(
+		id = UUID.randomUUID(),
+		fornavn = "GRØNN",
+		mellomnavn = null,
+		etternavn = "KOPP",
+		fodselsnummer = fodselsnummer,
+		telefonnummer = "1234",
+		epost = "foo@bar.baz",
+		navVeilederId = null,
+		navEnhet = null,
+	)
 
 	val defaultStatus = DeltakerStatus(
 		UUID.randomUUID(),

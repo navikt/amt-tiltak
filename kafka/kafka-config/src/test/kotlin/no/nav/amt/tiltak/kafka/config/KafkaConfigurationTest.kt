@@ -29,7 +29,7 @@ class KafkaConfigurationTest {
 	private val endringPaaBrukerTopic = "pto.endring-paa-oppfolgingsbruker-v2"
 
 	@Container
-	var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.4.3"))
+	var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.2.1"))
 		.waitingFor(HostPortWaitStrategy())
 
 	private val dataSource = SingletonPostgresContainer.getDataSource()

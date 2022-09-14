@@ -22,6 +22,8 @@
         <module>test</module>
         <module>tiltak</module>
         <module>tilgangskontroll</module>
+        <module>bff-tiltaksarrangor</module>
+        <module>bff-nav_ansatt</module>
     </modules>
 
     <name>AMT-Tiltak</name>
@@ -224,6 +226,16 @@
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>tilgangskontroll</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>bff-tiltaksarrangor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>bff-nav_ansatt</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
