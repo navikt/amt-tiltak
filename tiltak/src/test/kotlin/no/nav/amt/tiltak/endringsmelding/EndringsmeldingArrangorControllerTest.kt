@@ -36,7 +36,7 @@ class EndringsmeldingArrangorControllerTest {
 	private lateinit var arrangorTilgangService: ArrangorAnsattTilgangService
 
 	@MockBean
-	private lateinit var endringsmeldingService: EndringsmeldingService
+	private lateinit var endringsmeldingService: EndringsmeldingServiceImpl
 
 	@MockBean
 	private lateinit var deltakerService: DeltakerService

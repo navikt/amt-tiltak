@@ -13,7 +13,7 @@ import java.util.*
 @RestController
 @RequestMapping("/api/nav-ansatt/endringsmelding")
 class EndringsmeldingNavController(
-	private val endringsmeldingService: EndringsmeldingService,
+	private val endringsmeldingService: EndringsmeldingServiceImpl,
 	private val navAnsattService: NavAnsattService,
 	private val deltakerService: DeltakerService,
 	private val tiltaksansvarligAutoriseringService: TiltaksansvarligAutoriseringService,

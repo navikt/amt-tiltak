@@ -5,32 +5,32 @@ import no.nav.amt.tiltak.core.exceptions.EndringsmeldingIkkeAktivException
 import no.nav.amt.tiltak.core.port.AuditEventSeverity
 import no.nav.amt.tiltak.core.port.AuditEventType
 import no.nav.amt.tiltak.core.port.AuditLoggerService
-import org.springframework.http.HttpStatus
+import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 import java.util.*
 
 @Service
-open class EndringsmeldingService(
+open class EndringsmeldingServiceImpl(
 	private val endringsmeldingRepository: EndringsmeldingRepository,
 	private val endringsmeldingQuery: EndringsmeldingForGjennomforingQuery,
 	private val auditLoggerService: AuditLoggerService
-) {
+) : EndringsmeldingService {
 
 	companion object {
-		const val AUDIT_LOG_REASON = "NAV-ansatt har lest melding fra tiltaksarrangoer om oppstartsdato paa tiltak for aa registrere dette."
+		const val AUDIT_LOG_REASON =
+			"NAV-ansatt har lest melding fra tiltaksarrangoer om oppstartsdato paa tiltak for aa registrere dette."
 	}
 
-	open fun hentEndringsmelding(id: UUID): EndringsmeldingDbo {
-		return endringsmeldingRepository.get(id)
+	override fun hentEndringsmelding(id: UUID): Endringsmelding {
+		return endringsmeldingRepository.get(id).toModel()
 	}
 
-	open fun opprettMedStartDato(deltakerId: UUID, startDato: LocalDate, ansattId: UUID): EndringsmeldingDbo {
-		return endringsmeldingRepository.insertOgInaktiverStartDato(startDato, deltakerId, ansattId)
+	override fun opprettMedStartDato(deltakerId: UUID, startDato: LocalDate, ansattId: UUID): Endringsmelding {
+		return endringsmeldingRepository.insertOgInaktiverStartDato(startDato, deltakerId, ansattId).toModel()
 	}
 
-	open fun markerSomFerdig(endringsmeldingId: UUID, navAnsattId: UUID) {
+	override fun markerSomFerdig(endringsmeldingId: UUID, navAnsattId: UUID) {
 		val endringsmelding = endringsmeldingRepository.get(endringsmeldingId)
 
 		if (!endringsmelding.aktiv) {
@@ -48,14 +48,14 @@ open class EndringsmeldingService(
 		)
 	}
 
-	open fun hentEndringsmeldingerForGjennomforing(gjennomforingId: UUID) : List<Endringsmelding> {
+	override fun hentEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding> {
 		return endringsmeldingQuery
 			.query(gjennomforingId)
-			.map { it.toEndringsmelding()}
+			.map { it.toEndringsmelding() }
 	}
 
-	open fun hentEndringsmeldingerForDeltaker(deltakerId: UUID) : List<EndringsmeldingDbo> {
-		return endringsmeldingRepository.getByDeltaker(deltakerId)
+	override fun hentEndringsmeldingerForDeltaker(deltakerId: UUID): List<Endringsmelding> {
+		return endringsmeldingRepository.getByDeltaker(deltakerId).map { it.toModel() }
 	}
 
 }

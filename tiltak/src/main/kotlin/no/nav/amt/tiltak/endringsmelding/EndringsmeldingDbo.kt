@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.endringsmelding
 
+import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
@@ -15,4 +16,19 @@ data class EndringsmeldingDbo(
 	val opprettetAvArrangorAnsattId: UUID,
 	val createdAt: LocalDateTime,
 	val modifiedAt: LocalDateTime
-)
+) {
+
+	fun toModel(): Endringsmelding {
+		return Endringsmelding(
+			id = id,
+			deltakerId = deltakerId,
+			startDato = startDato,
+			ferdiggjortAvNavAnsattId = ferdiggjortAvNavAnsattId,
+			ferdiggjortTidspunkt = ferdiggjortTidspunkt,
+			aktiv = aktiv,
+			opprettetAvArrangorAnsattId = opprettetAvArrangorAnsattId,
+			opprettet = createdAt
+		)
+	}
+
+}
