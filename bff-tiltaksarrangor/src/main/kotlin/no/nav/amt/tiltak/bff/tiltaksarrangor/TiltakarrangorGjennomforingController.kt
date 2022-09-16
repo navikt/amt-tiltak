@@ -1,19 +1,15 @@
-package no.nav.amt.tiltak.tiltak.controllers
+package no.nav.amt.tiltak.bff.tiltaksarrangor
 
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.GjennomforingDto
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
-import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.core.port.Person
-import no.nav.amt.tiltak.endringsmelding.HentAktivEndringsmeldingForDeltakereQuery
+import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.tiltak.dto.AktivEndringsmeldingDto
-import no.nav.amt.tiltak.tiltak.dto.GjennomforingDto
 import no.nav.amt.tiltak.tiltak.dto.TiltakDeltakerDto
 import no.nav.amt.tiltak.tiltak.dto.toDto
-import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingerFraArrangorerQuery
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -28,8 +24,7 @@ class TiltakarrangorGjennomforingController(
 	private val deltakerService: DeltakerService,
 	private val authService: AuthService,
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
-	private val hentAktivEndringsmeldingForDeltakereQuery: HentAktivEndringsmeldingForDeltakereQuery,
-	private val hentGjennomforingerFraArrangorerQuery: HentGjennomforingerFraArrangorerQuery
+	private val endringsmeldingService: EndringsmeldingService,
 ) {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -46,6 +41,7 @@ class TiltakarrangorGjennomforingController(
 			.map { it.toDto() }
 	}
 
+
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/tilgjengelig")
 	fun hentTilgjengeligeGjennomforinger(): List<GjennomforingDto> {
@@ -53,17 +49,12 @@ class TiltakarrangorGjennomforingController(
 
 		val ansattId = arrangorAnsattTilgangService.hentAnsattId(ansattPersonligIdent)
 
-		val tilgangTilArrangorIder = arrangorAnsattTilgangService.hentAnsattTilganger(ansattId)
-			.filter { it.roller.contains(ArrangorAnsattRolle.KOORDINATOR) }
-			.map { it.arrangorId }
-
-		val gjennomforingIder = hentGjennomforingerFraArrangorerQuery
-			.query(tilgangTilArrangorIder)
+		val gjennomforingIder = tilgjengeligeGjennomforingIder(ansattId)
 
 		val filtrerteGjennomforinger = gjennomforingProdFilter(gjennomforingIder)
 
-		return gjennomforingService.getGjennomforinger(filtrerteGjennomforinger)
-			.map { it.toDto() }
+		val j = gjennomforingService.getGjennomforinger(filtrerteGjennomforinger)
+		return j.map { it.toDto() }
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -73,11 +64,7 @@ class TiltakarrangorGjennomforingController(
 
 		val ansattId = arrangorAnsattTilgangService.hentAnsattId(ansattPersonligIdent)
 
-		val tilgangTilArrangorIder = arrangorAnsattTilgangService.hentAnsattTilganger(ansattId)
-			.filter { it.roller.contains(ArrangorAnsattRolle.KOORDINATOR) }
-			.map { it.arrangorId }
-
-		val gjennomforingIder = hentGjennomforingerFraArrangorerQuery.query(tilgangTilArrangorIder)
+		val gjennomforingIder = tilgjengeligeGjennomforingIder(ansattId)
 
 		if (!gjennomforingIder.contains(gjennomforingId)) {
 			throw ResponseStatusException(HttpStatus.FORBIDDEN)
@@ -117,16 +104,18 @@ class TiltakarrangorGjennomforingController(
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
 
 		val deltakere = deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
-			.filter { it.status.type != Deltaker.Status.PABEGYNT}
+			.filter { it.status.type != Deltaker.Status.PABEGYNT }
 			.filter { !it.erUtdatert }
 
-		val aktiveEndringsmeldinger = hentAktivEndringsmeldingForDeltakereQuery.query(deltakere.map { it.id })
+		val aktiveEndringsmeldinger = deltakere.map { deltaker ->
+				endringsmeldingService.hentEndringsmeldingerForDeltaker(deltaker.id)
+					.filter { endringsmelding -> endringsmelding.aktiv }
+			}.flatten()
 
-		return deltakere
-			.map { d ->
-				val endringsmelding = aktiveEndringsmeldinger.find { it.deltakerId == d.id }
-				d.toDto(endringsmelding?.let { AktivEndringsmeldingDto(endringsmelding.startDato) })
-			}
+		return deltakere.map { d ->
+			val endringsmelding = aktiveEndringsmeldinger.find { it.deltakerId == d.id }
+			d.toDto(endringsmelding?.let { AktivEndringsmeldingDto(endringsmelding.startDato) })
+		}
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -155,6 +144,18 @@ class TiltakarrangorGjennomforingController(
 		).map { UUID.fromString(it) }
 
 		return gjennomforingIder.filter { allowList.contains(it) }
+	}
+
+	private fun tilgjengeligeGjennomforingIder(ansattId: UUID): List<UUID> {
+		val tilgangTilArrangorIder = arrangorAnsattTilgangService.hentAnsattTilganger(ansattId)
+			.filter { it.roller.contains(ArrangorAnsattRolle.KOORDINATOR) }
+			.map { it.arrangorId }
+
+		val ider = tilgangTilArrangorIder.map {
+			gjennomforingService.getByArrangorId(it).map { gjennomforing -> gjennomforing.id }
+		}.flatten()
+
+		return ider
 	}
 
 }

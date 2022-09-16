@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.tiltak.dto
 
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerStatusDto
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import java.time.LocalDate
 import java.time.LocalDateTime

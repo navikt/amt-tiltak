@@ -13,8 +13,7 @@ import java.util.*
 @Service
 open class EndringsmeldingServiceImpl(
 	private val endringsmeldingRepository: EndringsmeldingRepository,
-	private val endringsmeldingQuery: EndringsmeldingForGjennomforingQuery,
-	private val auditLoggerService: AuditLoggerService
+	private val auditLoggerService: AuditLoggerService,
 ) : EndringsmeldingService {
 
 	companion object {
@@ -49,9 +48,8 @@ open class EndringsmeldingServiceImpl(
 	}
 
 	override fun hentEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding> {
-		return endringsmeldingQuery
-			.query(gjennomforingId)
-			.map { it.toEndringsmelding() }
+		return endringsmeldingRepository.getByGjennomforing(gjennomforingId)
+			.map { it.toModel() }
 	}
 
 	override fun hentEndringsmeldingerForDeltaker(deltakerId: UUID): List<Endringsmelding> {

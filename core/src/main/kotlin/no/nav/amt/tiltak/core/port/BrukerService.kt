@@ -8,6 +8,7 @@ interface BrukerService {
 
 	fun getBruker(fodselsnummer: String): Bruker?
 
+	fun getBruker(id: UUID): Bruker?
 	fun getOrCreate(fodselsnummer: String): UUID
 
 	fun finnesBruker(fodselsnummer: String): Boolean

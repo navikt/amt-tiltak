@@ -4,7 +4,6 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
-import no.nav.amt.tiltak.common.auth.AuditLoggerServiceImpl
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
@@ -59,7 +58,10 @@ class AuditLoggerServiceImplTest {
 				mellomnavn = null,
 				etternavn = "",
 				fodselsnummer = "12345678900",
-				navEnhet = null
+				navEnhet = null,
+				navVeilederId = null,
+				epost = null,
+				telefonnummer = null,
 			),
 			startDato = null,
 			sluttDato = null,

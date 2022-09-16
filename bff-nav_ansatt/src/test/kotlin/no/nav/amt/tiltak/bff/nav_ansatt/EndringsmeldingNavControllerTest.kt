@@ -1,12 +1,13 @@
-package no.nav.amt.tiltak.endringsmelding
+package no.nav.amt.tiltak.bff.nav_ansatt
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
-import no.nav.amt.tiltak.core.domain.tiltak.*
-import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.NavAnsattService
-import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
+import no.nav.amt.tiltak.core.domain.tiltak.Bruker
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import org.junit.jupiter.api.AfterAll
@@ -36,10 +37,13 @@ class EndringsmeldingNavControllerTest {
 	private lateinit var authService: AuthService
 
 	@MockBean
+	private lateinit var arrangorAnsattService: ArrangorAnsattService
+
+	@MockBean
 	private lateinit var tiltaksansvarligAutoriseringService: TiltaksansvarligAutoriseringService
 
 	@MockBean
-	private lateinit var endringsmeldingService: EndringsmeldingServiceImpl
+	private lateinit var endringsmeldingService: EndringsmeldingService
 
 	@MockBean
 	private lateinit var navAnsattService: NavAnsattService
@@ -89,34 +93,68 @@ class EndringsmeldingNavControllerTest {
 		val gjennomforingId = UUID.randomUUID()
 		val endringsmeldingId = UUID.randomUUID()
 		val navIdent = "a12345"
+		val deltakerId = UUID.randomUUID()
+		val startDato = LocalDate.parse("2022-05-05")
+
+		val bruker = Bruker(
+			id = BRUKER_1.id,
+			fornavn = BRUKER_1.fornavn,
+			mellomnavn = BRUKER_1.mellomnavn,
+			etternavn = BRUKER_1.etternavn,
+			telefonnummer = BRUKER_1.telefonnummer,
+			epost = BRUKER_1.epost,
+			fodselsnummer = BRUKER_1.fodselsnummer,
+			navEnhet = null,
+			navVeilederId = UUID.randomUUID(),
+		)
+
+		val deltaker = Deltaker(
+			id = UUID.randomUUID(),
+			gjennomforingId = UUID.randomUUID(),
+			bruker = bruker,
+			startDato = null,
+			sluttDato = null,
+			status = DeltakerStatus(
+				id = UUID.randomUUID(),
+				type = Deltaker.Status.DELTAR,
+				gyldigFra = LocalDateTime.now().plusDays(1),
+				opprettetDato = LocalDateTime.now().minusDays(1),
+				aktiv = true,
+			),
+			registrertDato = LocalDateTime.now().minusDays(2),
+		    dagerPerUke = null,
+			prosentStilling = null,
+			innsokBegrunnelse = null,
+		)
+
+		val ansatt = Ansatt(
+			id = UUID.randomUUID(),
+			personligIdent = "123",
+			fornavn = "Ansatt",
+			mellomnavn = null,
+			etternavn = "Ettersatt",
+			arrangorer = emptyList(),
+		)
 
 		Mockito.`when`(authService.hentNavIdentTilInnloggetBruker())
 			.thenReturn(navIdent)
 
+		Mockito.`when`(deltakerService.hentDeltaker(deltakerId))
+			.thenReturn(deltaker)
+
+		Mockito.`when`(arrangorAnsattService.getAnsatt(ansatt.id))
+			.thenReturn(ansatt)
+
 		Mockito.`when`(endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId))
 			.thenReturn(listOf(Endringsmelding(
 				id = endringsmeldingId,
-				bruker = Bruker(
-					id = UUID.randomUUID(),
-					fornavn = "Fornavn",
-					mellomnavn = null,
-					etternavn = "Etternavn",
-					fodselsnummer = "487329",
-					navEnhet = null
-				),
-				startDato = LocalDate.parse("2022-05-05"),
+				deltakerId = deltakerId,
+				startDato = startDato,
+				ferdiggjortAvNavAnsattId = null,
+				ferdiggjortTidspunkt = null,
 				aktiv = true,
-				godkjent = false,
-				arkivert = false,
-				opprettetAvArrangorAnsatt = Ansatt(
-					id = UUID.randomUUID(),
-					personligIdent = "1234567890",
-					fornavn = "Test",
-					mellomnavn = null,
-					etternavn = "Test",
-					arrangorer = emptyList()
-				),
-				opprettetDato = LocalDateTime.parse("2022-05-05T08:52:18.314953")
+				opprettetAvArrangorAnsattId = ansatt.id,
+				opprettet = LocalDateTime.parse("2022-05-05T08:52:18.314953")
 			)))
 
 		val response = mockMvc.perform(
@@ -125,8 +163,8 @@ class EndringsmeldingNavControllerTest {
 		).andReturn().response
 
 		val expectedJson = """
-			[{"id":"$endringsmeldingId","bruker":{"fornavn":"Fornavn","mellomnavn":null,"etternavn":"Etternavn","fodselsnummer":"487329"},"startDato":"2022-05-05","aktiv":true,"godkjent":false,"arkivert":false,"opprettetAvArrangorAnsatt":{"fornavn":"Test","mellomnavn":null,"etternavn":"Test"},"opprettetDato":"2022-05-05T08:52:18.314953"}]
-		""".trimIndent()
+			[{"id":"$endringsmeldingId","bruker":{"fornavn":"${bruker.fornavn}","mellomnavn":${bruker.mellomnavn},"etternavn":"${bruker.etternavn}","fodselsnummer":"${bruker.fodselsnummer}"},"startDato":"$startDato","aktiv":true,"godkjent":false,"arkivert":false,"opprettetAvArrangorAnsatt":{"fornavn":"${ansatt.fornavn}","mellomnavn":${ansatt.mellomnavn},"etternavn":"${ansatt.etternavn}"},"opprettetDato":"2022-05-05T08:52:18.314953"}]
+			""".trimIndent()
 
 		assertEquals(expectedJson, response.contentAsString)
 		assertEquals(200, response.status)
@@ -155,7 +193,7 @@ class EndringsmeldingNavControllerTest {
 			.thenReturn(navIdent)
 
 		Mockito.`when`(endringsmeldingService.hentEndringsmelding(endringsmeldingId))
-			.thenReturn(EndringsmeldingDbo(
+			.thenReturn(Endringsmelding(
 				id = endringsmeldingId,
 				deltakerId = deltakerId,
 				startDato = null,
@@ -163,15 +201,24 @@ class EndringsmeldingNavControllerTest {
 				ferdiggjortTidspunkt = null,
 				aktiv = true,
 				opprettetAvArrangorAnsattId = UUID.randomUUID(),
-				createdAt = LocalDateTime.now(),
-				modifiedAt = LocalDateTime.now()
+				opprettet = LocalDateTime.now(),
 			))
 
 		Mockito.`when`(deltakerService.hentDeltaker(deltakerId))
 			.thenReturn(Deltaker(
 				id = UUID.randomUUID(),
 				gjennomforingId = gjennomforingId,
-				bruker = Bruker(BRUKER_1.id, BRUKER_1.fornavn, null, BRUKER_1.etternavn, BRUKER_1.fodselsnummer, null),
+				bruker = Bruker(
+					id = BRUKER_1.id,
+					fornavn = BRUKER_1.fornavn,
+					mellomnavn = null,
+					etternavn = BRUKER_1.etternavn,
+					telefonnummer = "1234",
+					epost = "foo@bar.baz",
+					fodselsnummer = BRUKER_1.fodselsnummer,
+					navEnhet = null,
+					navVeilederId = null,
+					),
 				startDato = null,
 				sluttDato = null,
 				status = DeltakerStatus(UUID.randomUUID(), Deltaker.Status.DELTAR, LocalDateTime.now(), LocalDateTime.now(), true),

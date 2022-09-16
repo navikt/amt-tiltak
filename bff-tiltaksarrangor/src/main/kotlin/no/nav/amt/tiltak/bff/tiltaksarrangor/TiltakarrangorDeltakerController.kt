@@ -1,11 +1,11 @@
-package no.nav.amt.tiltak.deltaker.controllers
+package no.nav.amt.tiltak.bff.tiltaksarrangor
 
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.TiltakDeltakerDetaljerDto
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
-import no.nav.amt.tiltak.tiltak.dto.TiltakDeltakerDetaljerDto
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
