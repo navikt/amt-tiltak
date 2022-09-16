@@ -246,7 +246,10 @@ class IntegrationTest {
 			fornavn = person.fornavn,
 			etternavn = person.etternavn,
 			fodselsnummer = personIdent,
-			navEnhet = null
+			navEnhet = null,
+			navVeilederId = UUID.randomUUID(),
+			telefonnummer = "1234",
+			epost = "foo@bar.baz",
 		),
 		startDato = null,
 		sluttDato = null,

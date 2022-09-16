@@ -1,12 +1,12 @@
-package no.nav.amt.tiltak.deltaker.controllers
+package no.nav.amt.tiltak.bff.tiltaksarrangor
 
 import io.kotest.matchers.shouldBe
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.*
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
-import no.nav.amt.tiltak.tiltak.dto.*
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

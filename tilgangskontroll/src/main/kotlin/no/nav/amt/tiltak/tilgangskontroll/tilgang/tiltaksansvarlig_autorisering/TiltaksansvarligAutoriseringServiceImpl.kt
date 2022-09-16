@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tilgangskontroll.tiltaksansvarlig_autorisering
+package no.nav.amt.tiltak.tilgangskontroll.tilgang.tiltaksansvarlig_autorisering
 
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService

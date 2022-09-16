@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tiltak.dto
+package no.nav.amt.tiltak.bff.tiltaksarrangor.dto
 
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -22,14 +22,4 @@ data class TiltakDeltakerDetaljerDto(
 	val gjennomforing: GjennomforingDto,
 	val fjernesDato: LocalDateTime?,
 	val innsokBegrunnelse: String?
-)
-
-data class NavEnhetDto(
-	val navn: String,
-)
-
-data class NavVeilederDto(
-	val navn: String,
-	val telefon: String?,
-	val epost: String?,
 )

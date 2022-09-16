@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tiltak.controllers
+package no.nav.amt.tiltak.bff.tiltaksarrangor
 
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.common.auth.AuthService
@@ -11,6 +11,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.endringsmelding.HentAktivEndringsmeldingForDeltakereQuery
@@ -52,6 +53,9 @@ class TiltakarrangorGjennomforingControllerTest {
 
 	@MockBean
 	private lateinit var arrangorAnsattTilgangService: ArrangorAnsattTilgangService
+
+	@MockBean
+	private lateinit var endringsmeldingService: EndringsmeldingService
 
 	@MockBean
 	private lateinit var hentAktivEndringsmeldingForDeltakereQuery: HentAktivEndringsmeldingForDeltakereQuery
@@ -158,7 +162,6 @@ class TiltakarrangorGjennomforingControllerTest {
 
 		val arrangorId = UUID.randomUUID()
 		val ansattId = UUID.randomUUID()
-		val gjennomforingId = UUID.randomUUID()
 
 		Mockito.`when`(
 			arrangorAnsattTilgangService.hentAnsattId(fnr)
@@ -169,8 +172,12 @@ class TiltakarrangorGjennomforingControllerTest {
 		).thenReturn(listOf(ArrangorAnsattRoller(arrangorId, listOf(ArrangorAnsattRolle.KOORDINATOR))))
 
 		Mockito.`when`(
-			hentGjennomforingerFraArrangorerQuery.query(listOf(arrangorId))
-		).thenReturn(listOf(gjennomforingId))
+			gjennomforingService.getByArrangorId(arrangorId)
+		).thenReturn(listOf(gjennomforing))
+
+		Mockito.`when`(
+			gjennomforingService.getGjennomforing(gjennomforingId)
+		).thenReturn(gjennomforing)
 
 		Mockito.`when`(
 			gjennomforingService.getGjennomforinger(listOf(gjennomforingId))
@@ -195,7 +202,6 @@ class TiltakarrangorGjennomforingControllerTest {
 
 		val arrangorId = UUID.randomUUID()
 		val ansattId = UUID.randomUUID()
-		val gjennomforingId = UUID.randomUUID()
 
 		Mockito.`when`(
 			arrangorAnsattTilgangService.hentAnsattId(fnr)
@@ -206,8 +212,8 @@ class TiltakarrangorGjennomforingControllerTest {
 		).thenReturn(listOf(ArrangorAnsattRoller(arrangorId, listOf(ArrangorAnsattRolle.KOORDINATOR))))
 
 		Mockito.`when`(
-			hentGjennomforingerFraArrangorerQuery.query(listOf(arrangorId))
-		).thenReturn(listOf(gjennomforingId))
+			gjennomforingService.getByArrangorId(arrangorId)
+		).thenReturn(listOf(gjennomforing))
 
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.post("/api/tiltaksarrangor/gjennomforing/$gjennomforingId/tilgang")

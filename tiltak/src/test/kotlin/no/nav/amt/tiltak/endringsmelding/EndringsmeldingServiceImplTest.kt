@@ -11,11 +11,9 @@ import no.nav.amt.tiltak.core.port.AuditLoggerService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
-import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -37,11 +35,9 @@ class EndringsmeldingServiceImplTest {
 
 	val auditLoggerService: AuditLoggerService = mockk()
 
-	var endringsmeldingForGjennomforingQuery = EndringsmeldingForGjennomforingQuery(jdbcTemplate)
-
 	@BeforeEach
 	fun beforeEach() {
-		endringsmeldingService = EndringsmeldingServiceImpl(repository, endringsmeldingForGjennomforingQuery, auditLoggerService)
+		endringsmeldingService = EndringsmeldingServiceImpl(repository, auditLoggerService)
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
@@ -49,10 +45,11 @@ class EndringsmeldingServiceImplTest {
 	fun `opprettMedStartDato - Inserter og inaktiverer forrige melding`() {
 		val dato = LocalDate.now()
 
-		var result1 = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, dato, ARRANGOR_ANSATT_1.id)
+		val melding1 = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, dato, ARRANGOR_ANSATT_1.id)
+		val melding2 = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, dato.minusDays(2), ARRANGOR_ANSATT_1.id)
 
-		val result2 = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, dato.minusDays(2), ARRANGOR_ANSATT_1.id)
-		result1 = repository.get(result1.id)
+		val result1 = repository.get(melding1.id)
+		val result2 = repository.get(melding2.id)
 
 		result1.aktiv shouldBe false
 		result1.startDato shouldBe dato
@@ -71,15 +68,14 @@ class EndringsmeldingServiceImplTest {
 
 		endringsmeldinger.size shouldBe 1
 
-		endringsmelding.bruker.fornavn shouldBe BRUKER_1.fornavn
-		endringsmelding.bruker.etternavn shouldBe BRUKER_1.etternavn
+		endringsmelding.deltakerId shouldBe DELTAKER_1.id
 		endringsmelding.startDato shouldBe nyStartDato
 		endringsmelding.aktiv shouldBe true
-		endringsmelding.arkivert shouldBe false
-		endringsmelding.godkjent shouldBe false
-		endringsmelding.opprettetAvArrangorAnsatt.fornavn shouldBe ARRANGOR_ANSATT_1.fornavn
-		endringsmelding.opprettetAvArrangorAnsatt.etternavn shouldBe ARRANGOR_ANSATT_1.etternavn
-		endringsmelding.bruker.navEnhet?.navn shouldBe NAV_ENHET_1.navn
+		endringsmelding.opprettetAvArrangorAnsattId shouldBe ARRANGOR_ANSATT_1.id
+		endringsmelding.ferdiggjortAvNavAnsattId shouldBe null
+		endringsmelding.ferdiggjortTidspunkt shouldBe null
+		endringsmelding.aktiv shouldBe true
+		//endringsmelding.opprettet shouldBe null
 	}
 
 	@Test
@@ -92,7 +88,7 @@ class EndringsmeldingServiceImplTest {
 
 		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(DELTAKER_1.gjennomforingId)
 		val aktivEndringsmelding = endringsmeldinger.filter { it.aktiv }
-		val arkiverteEndringsmeldinger = endringsmeldinger.filter { it.arkivert }
+		val arkiverteEndringsmeldinger = endringsmeldinger.filter { it.ferdiggjortAvNavAnsattId != null || !it.aktiv }
 
 		endringsmeldinger.size shouldBe 3
 		aktivEndringsmelding.size shouldBe 1

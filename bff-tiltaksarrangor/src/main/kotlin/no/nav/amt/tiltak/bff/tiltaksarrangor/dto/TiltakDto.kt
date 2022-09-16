@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tiltak.dto
+package no.nav.amt.tiltak.bff.tiltaksarrangor.dto
 
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 

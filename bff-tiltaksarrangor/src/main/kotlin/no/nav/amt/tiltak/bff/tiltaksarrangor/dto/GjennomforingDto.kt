@@ -1,7 +1,6 @@
-package no.nav.amt.tiltak.tiltak.dto
+package no.nav.amt.tiltak.bff.tiltaksarrangor.dto
 
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.core.port.Person
 import java.time.LocalDate
 import java.util.*
 

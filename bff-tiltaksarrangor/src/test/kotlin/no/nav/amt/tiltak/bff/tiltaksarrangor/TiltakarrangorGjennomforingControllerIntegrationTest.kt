@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tiltak.controllers
+package no.nav.amt.tiltak.bff.tiltaksarrangor
 
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
@@ -11,7 +11,8 @@ import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
-import no.nav.amt.tiltak.endringsmelding.HentAktivEndringsmeldingForDeltakereQuery
+import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
+import no.nav.amt.tiltak.endringsmelding.EndringsmeldingServiceImpl
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
@@ -26,7 +27,6 @@ import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.TestDataSeeder
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.tiltak.repositories.HentKoordinatorerForGjennomforingQuery
-import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingerFraArrangorerQuery
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
 import no.nav.amt.tiltak.tiltak.services.GjennomforingServiceImpl
@@ -56,11 +56,12 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 	private lateinit var brukerService: BrukerServiceImpl
 	private lateinit var deltakerStatusRepository: DeltakerStatusRepository
 	private lateinit var gjennomforingRepository: GjennomforingRepository
-	private lateinit var hentAktivEndringsmeldingForDeltakereQuery: HentAktivEndringsmeldingForDeltakereQuery
-	private lateinit var hentGjennomforingerFraArrangorerQuery: HentGjennomforingerFraArrangorerQuery
 	private lateinit var gjennomforingService: GjennomforingService
 	private lateinit var deltakerService: DeltakerService
 	private lateinit var arrangorService: ArrangorService
+	private lateinit var endringsmeldingService: EndringsmeldingService
+	private lateinit var endringsmeldingRepository: EndringsmeldingRepository
+	private lateinit var auditLoggerService: AuditLoggerService
 	private lateinit var authService: AuthService
 	private lateinit var controller: TiltakarrangorGjennomforingController
 	private lateinit var testDataRepository: TestDataRepository
@@ -74,10 +75,10 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 		tiltakRepository = TiltakRepository(namedJdbcTemplate)
 		deltakerRepository = DeltakerRepository(namedJdbcTemplate)
 		brukerRepository = BrukerRepository(namedJdbcTemplate)
-		hentGjennomforingerFraArrangorerQuery = HentGjennomforingerFraArrangorerQuery(namedJdbcTemplate)
+		endringsmeldingRepository = EndringsmeldingRepository(namedJdbcTemplate, transactionTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(namedJdbcTemplate)
-		hentAktivEndringsmeldingForDeltakereQuery = HentAktivEndringsmeldingForDeltakereQuery(namedJdbcTemplate)
 		authService = mock(AuthService::class.java)
+		auditLoggerService = mock(AuditLoggerService::class.java)
 
 		arrangorService = ArrangorServiceImpl(mockk(), ArrangorRepository(namedJdbcTemplate))
 
@@ -104,11 +105,15 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 			HentKoordinatorerForGjennomforingQuery(namedJdbcTemplate)
 		)
 
+		endringsmeldingService = EndringsmeldingServiceImpl(
+			endringsmeldingRepository = endringsmeldingRepository,
+			auditLoggerService = auditLoggerService,
+		)
+
 		controller = TiltakarrangorGjennomforingController(
 			gjennomforingService, deltakerService,
 			authService, mock(ArrangorAnsattTilgangService::class.java),
-			hentAktivEndringsmeldingForDeltakereQuery,
-			hentGjennomforingerFraArrangorerQuery,
+			endringsmeldingService
 		)
 
 		testDataRepository = TestDataRepository(namedJdbcTemplate)
