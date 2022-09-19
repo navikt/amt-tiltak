@@ -20,6 +20,14 @@
                 <configuration>
                     <mainClass>no.nav.amt.tiltak.application.ApplicationKt</mainClass>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>repackage</id>
+                        <configuration>
+                            <classifier>app</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
