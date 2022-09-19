@@ -27,21 +27,11 @@ data class DeltakerDbo(
 	val innsokBegrunnelse: String?
 ) {
 
-	fun toDeltaker(status: DeltakerStatus): Deltaker {
+	fun toDeltaker(status: DeltakerStatus, bruker: Bruker): Deltaker {
 		return Deltaker(
 			id = id,
 			gjennomforingId = gjennomforingId,
-			bruker = Bruker(
-				id = brukerId,
-				fornavn = brukerFornavn,
-				mellomnavn = brukerMellomnavn,
-				etternavn = brukerEtternavn,
-				fodselsnummer = brukerFodselsnummer,
-				navEnhet = null,
-				navVeilederId = null,
-				telefonnummer = null,
-				epost = null,
-			),
+			bruker = bruker,
 			startDato = startDato,
 			sluttDato = sluttDato,
 			dagerPerUke = dagerPerUke,

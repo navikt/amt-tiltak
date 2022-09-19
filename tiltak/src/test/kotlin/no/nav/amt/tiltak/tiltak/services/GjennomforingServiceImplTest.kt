@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.port.ArrangorService
+import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
@@ -47,6 +48,8 @@ class GjennomforingServiceImplTest : FunSpec({
 
 	lateinit var tiltakService: TiltakService
 
+	lateinit var brukerService: BrukerService
+
 	lateinit var service: GjennomforingServiceImpl
 
 	beforeEach {
@@ -63,13 +66,15 @@ class GjennomforingServiceImplTest : FunSpec({
 
 		tiltakService = mockk()
 
+		brukerService = mockk()
+
 		service = GjennomforingServiceImpl(
 			gjennomforingRepository = gjennomforingRepository,
 			tiltakService = tiltakService,
 			deltakerService = DeltakerServiceImpl(
 				DeltakerRepository(parameterTemplate),
 				DeltakerStatusRepository(parameterTemplate),
-				mockk(),
+				brukerService,
 				transactionTemplate
 			),
 			arrangorService = arrangorService,
@@ -91,25 +96,31 @@ class GjennomforingServiceImplTest : FunSpec({
 		testDataRepository.insertDeltaker(DELTAKER_1)
 		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1)
 
+		val bruker = Bruker(
+			id = UUID.randomUUID(),
+			fornavn = "Fornavn2",
+			mellomnavn = null,
+			etternavn = "Etternavn",
+			fodselsnummer = "12121231123",
+			navEnhet = null,
+			navVeilederId = null,
+			epost = "foo@bar.baz",
+			telefonnummer = "1234",
+		)
+
 		every {
 			deltakerService.slettDeltaker(any())
 		} returns Unit
 
 		every {
+			brukerService.getBruker(DELTAKER_1.brukerId)
+		}  returns bruker
+
+		every {
 			deltakerService.hentDeltakerePaaGjennomforing(GJENNOMFORING_1.id)
 		} returns listOf(Deltaker(
 			id = DELTAKER_1.id,
-			bruker = Bruker(
-				id = UUID.randomUUID(),
-				fornavn = "Fornavn2",
-				mellomnavn = null,
-				etternavn = "Etternavn",
-				fodselsnummer = "12121231123",
-				navEnhet = null,
-				navVeilederId = null,
-				epost = "foo@bar.baz",
-				telefonnummer = "1234",
-			),
+			bruker = bruker,
 			startDato = null,
 			sluttDato = null,
 			status = DeltakerStatus(
