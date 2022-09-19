@@ -5,16 +5,14 @@ import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
-import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
+import no.nav.amt.tiltak.core.domain.tiltak.*
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.endringsmelding.HentAktivEndringsmeldingForDeltakereQuery
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingerFraArrangorerQuery
 import org.junit.jupiter.api.AfterAll
@@ -74,9 +72,21 @@ class TiltakarrangorGjennomforingControllerTest {
 		opprettetDato = LocalDateTime.now()
 	)
 
+	val bruker = Bruker(
+		id = BRUKER_1.id,
+		fornavn = BRUKER_1.fornavn,
+		mellomnavn = BRUKER_1.mellomnavn,
+		etternavn = BRUKER_1.etternavn,
+		telefonnummer = BRUKER_1.telefonnummer,
+		epost = BRUKER_1.epost,
+		fodselsnummer = BRUKER_1.fodselsnummer,
+		navEnhet = null,
+		navVeilederId = UUID.randomUUID(),
+	)
+
 	val deltakerDbo = DeltakerDbo(
 		id = UUID.randomUUID(),
-		brukerId = UUID.randomUUID(),
+		brukerId = BRUKER_1.id,
 		brukerFodselsnummer = "12129312375",
 		brukerFornavn = "Fornavn",
 		brukerEtternavn = "Etternavn",
@@ -277,7 +287,7 @@ class TiltakarrangorGjennomforingControllerTest {
 
 	@Test
 	fun `hentDeltakere() should return 200 when authenticated`() {
-		val deltaker = deltakerDbo.toDeltaker(status)
+		val deltaker = deltakerDbo.toDeltaker(status, bruker)
 
 		val token = tokenXToken("test", "test")
 
@@ -293,7 +303,7 @@ class TiltakarrangorGjennomforingControllerTest {
 
 	@Test
 	fun `hentDeltakere() should perform authorization check`() {
-		val deltaker = deltakerDbo.toDeltaker(status)
+		val deltaker = deltakerDbo.toDeltaker(status, bruker)
 
 		val token = tokenXToken("test", "test")
 

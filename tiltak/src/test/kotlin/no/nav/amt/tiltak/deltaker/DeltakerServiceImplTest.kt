@@ -3,10 +3,12 @@ package no.nav.amt.tiltak.deltaker
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
+import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.port.BrukerService
+import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
@@ -37,16 +39,31 @@ class DeltakerServiceImplTest {
 	lateinit var brukerRepository: BrukerRepository
 	lateinit var brukerService: BrukerService
 	lateinit var testDataRepository: TestDataRepository
+	lateinit var navEnhetService: NavEnhetService
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 	val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
 	val deltakerId = UUID.randomUUID()
 
+	val bruker = Bruker(
+		id = BRUKER_1.id,
+		fornavn = BRUKER_1.fornavn,
+		mellomnavn = BRUKER_1.mellomnavn,
+		etternavn = BRUKER_1.etternavn,
+		telefonnummer = BRUKER_1.telefonnummer,
+		epost = BRUKER_1.epost,
+		fodselsnummer = BRUKER_1.fodselsnummer,
+		navEnhet = null,
+		navVeilederId = BRUKER_1.ansvarligVeilederId,
+	)
+
+
 	@BeforeEach
 	fun beforeEach() {
 		brukerRepository = BrukerRepository(jdbcTemplate)
 
-		brukerService = BrukerServiceImpl(brukerRepository, mockk(), mockk(), mockk())
+		navEnhetService = mockk()
+		brukerService = BrukerServiceImpl(brukerRepository, mockk(), mockk(), navEnhetService)
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		deltakerServiceImpl = DeltakerServiceImpl(
@@ -65,6 +82,7 @@ class DeltakerServiceImplTest {
 
 	@Test
 	fun `upsertDeltaker - inserter ny deltaker`() {
+
 		deltakerServiceImpl.upsertDeltaker(BRUKER_1.fodselsnummer, deltaker)
 
 		val nyDeltaker = deltakerRepository.get(BRUKER_1.fodselsnummer,deltaker.gjennomforingId)

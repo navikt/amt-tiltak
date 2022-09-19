@@ -56,11 +56,22 @@ open class DeltakerServiceImpl(
 
 	override fun hentDeltakerePaaGjennomforing(gjennomforingId: UUID): List<Deltaker> {
 		return deltakerRepository.getDeltakerePaaTiltak(gjennomforingId)
-			.map { it.toDeltaker(hentStatusOrThrow(it.id)) }
+			.map {
+				val bruker = brukerService.getBruker(it.brukerId)
+					?: throw NoSuchElementException("Ingen bruker med id: ${it.brukerId}")
+				return@map it.toDeltaker(hentStatusOrThrow(it.id), bruker)
+			}
 	}
 
 	override fun hentDeltaker(deltakerId: UUID): Deltaker? {
-		return deltakerRepository.get(deltakerId)?.toDeltaker(hentStatusOrThrow(deltakerId))
+		val deltaker = deltakerRepository.get(deltakerId)
+			?: return null
+
+		val bruker = brukerService.getBruker(deltaker.brukerId)
+			?: throw NoSuchElementException("Ingen bruker med id: ${deltaker.brukerId}")
+
+
+		return deltaker.toDeltaker(hentStatusOrThrow(deltakerId), bruker)
 	}
 
 	override fun oppdaterStatuser() {
@@ -118,7 +129,11 @@ open class DeltakerServiceImpl(
 
 	private fun progressStatuser(kandidater: List<DeltakerDbo>) = kandidater
 		.also { log.info("Oppdaterer status på ${it.size} deltakere") }
-		.map { it.toDeltaker(hentStatusOrThrow(it.id)) }
+		.map {
+			val bruker = brukerService.getBruker(it.brukerId)
+				?: throw NoSuchElementException("Ingen bruker med id: ${it.brukerId}")
+			it.toDeltaker(hentStatusOrThrow(it.id), bruker)
+		}
 		.forEach {
 			insertStatus(DeltakerStatusInsert(
 				id = UUID.randomUUID(),
