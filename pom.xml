@@ -228,6 +228,16 @@
                 <artifactId>tilgangskontroll</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>bff-tiltaksarrangor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>bff-nav_ansatt</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
 
             <dependency>
