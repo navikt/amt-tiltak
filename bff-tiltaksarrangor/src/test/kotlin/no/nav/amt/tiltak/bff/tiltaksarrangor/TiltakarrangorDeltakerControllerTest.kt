@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [TiltakarrangorDeltakerController::class])
+@WebMvcTest(controllers = [DeltakerController::class])
 class TiltakarrangorDeltakerControllerTest {
 
 	companion object : MockOAuthServer() {
@@ -39,7 +39,7 @@ class TiltakarrangorDeltakerControllerTest {
 	private lateinit var mockMvc: MockMvc
 
 	@MockBean
-	private lateinit var tiltakDeltakerPresentationService: TiltakDeltakerPresentationService
+	private lateinit var controllerService: ControllerService
 
 	@MockBean
 	private lateinit var authService: AuthService
@@ -108,7 +108,7 @@ class TiltakarrangorDeltakerControllerTest {
 		Mockito.`when`(authService.hentPersonligIdentTilInnloggetBruker())
 			.thenReturn("fnr")
 
-		Mockito.`when`(tiltakDeltakerPresentationService.getDeltakerDetaljerById(deltakerId))
+		Mockito.`when`(controllerService.getDeltakerDetaljerById(deltakerId))
 			.thenReturn(tiltakDeltakerDetaljerDto)
 
 		mockMvc.perform(
@@ -125,7 +125,7 @@ class TiltakarrangorDeltakerControllerTest {
 	fun `hentTiltakDeltakerDetaljer() should return 200 when authenticated`() {
 		val token = tokenXToken("test", "test")
 
-		Mockito.`when`(tiltakDeltakerPresentationService.getDeltakerDetaljerById(deltakerId))
+		Mockito.`when`(controllerService.getDeltakerDetaljerById(deltakerId))
 			.thenReturn(tiltakDeltakerDetaljerDto)
 
 		val response = mockMvc.perform(

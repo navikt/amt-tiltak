@@ -15,8 +15,8 @@ import java.util.*
 
 @RestController
 @RequestMapping(value = [ "/api/tiltak-deltaker", "/api/tiltaksarrangor/tiltak-deltaker" ])
-class TiltakarrangorDeltakerController(
-	private val deltakerPresentationService: TiltakDeltakerPresentationService,
+class DeltakerController(
+	private val controllerService: ControllerService,
 	private val authService: AuthService,
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService
 ) {
@@ -24,7 +24,7 @@ class TiltakarrangorDeltakerController(
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/{tiltakDeltakerId}")
 	fun hentTiltakDeltakerDetaljer(@PathVariable("tiltakDeltakerId") deltakerId: UUID): TiltakDeltakerDetaljerDto {
-		val deltakerDetaljer = deltakerPresentationService.getDeltakerDetaljerById(deltakerId)
+		val deltakerDetaljer = controllerService.getDeltakerDetaljerById(deltakerId)
 
 		if(deltakerDetaljer.status.type == Deltaker.Status.PABEGYNT)
 			throw UnauthorizedException("Har ikke tilgang til id $deltakerId")

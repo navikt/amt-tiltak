@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor
 
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
@@ -12,9 +13,9 @@ import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 import java.util.*
 
-@RestController
+@RestController("EndringsmeldingControllerTiltaksarrangor")
 @RequestMapping("/api/tiltaksarrangor/endringsmelding")
-class EndringsmeldingArrangorController(
+class EndringsmeldingController(
 	private val skjermetPersonService: SkjermetPersonService,
 	private val endringsmeldingService: EndringsmeldingService,
 	private val arrangorTilgangService: ArrangorAnsattTilgangService,
@@ -60,11 +61,5 @@ class EndringsmeldingArrangorController(
 
 		endringsmeldingService.opprettMedStartDato(deltakerId, startDato, ansattId)
 	}
-
-	data class EndringsmeldingDto(
-		val id: UUID,
-		val startDato: LocalDate?,
-		val aktiv: Boolean,
-	)
 
 }

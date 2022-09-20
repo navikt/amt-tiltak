@@ -19,7 +19,7 @@ import java.util.*
 
 @RestController
 @RequestMapping(value = ["/api/gjennomforing", "/api/tiltaksarrangor/gjennomforing"])
-class TiltakarrangorGjennomforingController(
+class GjennomforingController(
 	private val gjennomforingService: GjennomforingService,
 	private val deltakerService: DeltakerService,
 	private val authService: AuthService,

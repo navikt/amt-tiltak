@@ -24,8 +24,8 @@ import java.time.LocalDateTime
 import java.util.*
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [EndringsmeldingArrangorController::class])
-class EndringsmeldingArrangorControllerTest {
+@WebMvcTest(controllers = [EndringsmeldingController::class])
+class EndringsmeldingControllerTest {
 
 	@Autowired
 	private lateinit var mockMvc: MockMvc

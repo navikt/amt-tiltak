@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-open class TiltakDeltakerPresentationService(
+open class ControllerService(
 	private val deltakerService: DeltakerService,
 	private val skjermetPersonService: SkjermetPersonService,
 	private val gjennomforingService: GjennomforingService,

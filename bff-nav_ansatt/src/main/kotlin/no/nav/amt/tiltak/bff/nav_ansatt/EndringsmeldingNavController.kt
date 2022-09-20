@@ -9,7 +9,7 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
-@RestController
+@RestController("EndringsmeldingControllerNavAnsatt")
 @RequestMapping("/api/nav-ansatt/endringsmelding")
 class EndringsmeldingNavController(
 	private val arrangorAnsattService: ArrangorAnsattService,

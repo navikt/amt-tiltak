@@ -45,7 +45,7 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class TiltakarrangorGjennomforingControllerIntegrationTest {
+class GjennomforingControllerIntegrationTest {
 
 	private val dataSource = SingletonPostgresContainer.getDataSource()
 
@@ -63,7 +63,7 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 	private lateinit var endringsmeldingRepository: EndringsmeldingRepository
 	private lateinit var auditLoggerService: AuditLoggerService
 	private lateinit var authService: AuthService
-	private lateinit var controller: TiltakarrangorGjennomforingController
+	private lateinit var controller: GjennomforingController
 	private lateinit var testDataRepository: TestDataRepository
 
 	@BeforeEach
@@ -110,7 +110,7 @@ class TiltakarrangorGjennomforingControllerIntegrationTest {
 			auditLoggerService = auditLoggerService,
 		)
 
-		controller = TiltakarrangorGjennomforingController(
+		controller = GjennomforingController(
 			gjennomforingService, deltakerService,
 			authService, mock(ArrangorAnsattTilgangService::class.java),
 			endringsmeldingService
