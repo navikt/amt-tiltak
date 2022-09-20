@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor
 
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.AktivEndringsmeldingDto
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.GjennomforingDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
 import no.nav.amt.tiltak.common.auth.AuthService
@@ -8,8 +9,6 @@ import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.port.*
-import no.nav.amt.tiltak.tiltak.dto.TiltakDeltakerDto
-import no.nav.amt.tiltak.tiltak.dto.toDto
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -98,7 +97,7 @@ class GjennomforingController(
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/{gjennomforingId}/deltakere")
-	fun hentDeltakere(@PathVariable("gjennomforingId") gjennomforingId: UUID): List<TiltakDeltakerDto> {
+	fun hentDeltakere(@PathVariable("gjennomforingId") gjennomforingId: UUID): List<DeltakerDto> {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)

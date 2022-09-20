@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor
 
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.TiltakDeltakerDetaljerDto
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerDetaljerDto
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
@@ -23,7 +23,7 @@ class DeltakerController(
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/{tiltakDeltakerId}")
-	fun hentTiltakDeltakerDetaljer(@PathVariable("tiltakDeltakerId") deltakerId: UUID): TiltakDeltakerDetaljerDto {
+	fun hentTiltakDeltakerDetaljer(@PathVariable("tiltakDeltakerId") deltakerId: UUID): DeltakerDetaljerDto {
 		val deltakerDetaljer = controllerService.getDeltakerDetaljerById(deltakerId)
 
 		if(deltakerDetaljer.status.type == Deltaker.Status.PABEGYNT)

@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-data class TiltakDeltakerDetaljerDto(
+data class DeltakerDetaljerDto(
 	val id: UUID,
 	val fornavn: String,
 	val mellomnavn: String? = null,

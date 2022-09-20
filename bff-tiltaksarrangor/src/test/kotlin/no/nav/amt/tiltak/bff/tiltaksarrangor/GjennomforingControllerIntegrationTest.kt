@@ -172,16 +172,41 @@ class GjennomforingControllerIntegrationTest {
 
 	@Test
 	fun `hentDeltakere - Flere deltakere finnes - henter alle`() {
-		val endringsmeldingDato = LocalDate.now().plusDays(7)
 		val gjennomforingCmd = createGjennomforingInput(TILTAK_1, ARRANGOR_1, NAV_ENHET_1)
 		val deltakerCmd = createDeltakerInput(BRUKER_1, gjennomforingCmd)
 		val bruker2Cmd = createBrukerInput(NAV_ENHET_1)
 		val deltaker2Cmd = createDeltakerInput(bruker2Cmd, gjennomforingCmd)
-		val endringsmeldingCmd = EndringsmeldingInput(
+
+		testDataRepository.insertGjennomforing(gjennomforingCmd)
+
+		testDataRepository.insertDeltaker(deltakerCmd)
+		testDataRepository.insertDeltakerStatus(createStatusInput(deltakerCmd))
+		testDataRepository.insertBruker(bruker2Cmd)
+		testDataRepository.insertDeltaker(deltaker2Cmd)
+		testDataRepository.insertDeltakerStatus(createStatusInput(deltaker2Cmd))
+		val deltakere = controller.hentDeltakere(gjennomforingCmd.id)
+
+		deltakere.size shouldBe 2
+
+	}
+
+	@Test
+	fun `hentDeltakere - Har endringsmeldinger - finner aktiv endringsmenlding`() {
+		val endringsmeldingDato = LocalDate.now().plusDays(7)
+		val gjennomforingCmd = createGjennomforingInput(TILTAK_1, ARRANGOR_1, NAV_ENHET_1)
+		val deltakerCmd = createDeltakerInput(BRUKER_1, gjennomforingCmd)
+		val aktivEndringsmeldingCmd = EndringsmeldingInput(
 			id = UUID.randomUUID(),
 			deltakerId = deltakerCmd.id,
 			startDato = endringsmeldingDato,
 			aktiv = true,
+			opprettetAvArrangorAnsattId = TestData.ARRANGOR_ANSATT_1.id,
+		)
+		val inaktivEndringsmeldingCmd = EndringsmeldingInput(
+			id = UUID.randomUUID(),
+			deltakerId = deltakerCmd.id,
+			startDato = endringsmeldingDato.minusDays(8),
+			aktiv = false,
 			opprettetAvArrangorAnsattId = TestData.ARRANGOR_ANSATT_1.id,
 		)
 
@@ -189,36 +214,11 @@ class GjennomforingControllerIntegrationTest {
 
 		testDataRepository.insertDeltaker(deltakerCmd)
 		testDataRepository.insertDeltakerStatus(createStatusInput(deltakerCmd))
-		testDataRepository.insertBruker(bruker2Cmd)
-		testDataRepository.insertDeltaker(deltaker2Cmd)
-		testDataRepository.insertDeltakerStatus(createStatusInput(deltaker2Cmd))
-		testDataRepository.insertEndringsmelding(endringsmeldingCmd)
+		testDataRepository.insertEndringsmelding(inaktivEndringsmeldingCmd)
+		testDataRepository.insertEndringsmelding(aktivEndringsmeldingCmd)
 		val deltakere = controller.hentDeltakere(gjennomforingCmd.id)
 
-		deltakere.size shouldBe 2
 		deltakere.find { it.id == deltakerCmd.id }!!.aktivEndringsmelding!!.startDato shouldBe endringsmeldingDato
-
-	}
-
-	@Test
-	fun `hentDeltakere - Har endringsmeldinger - henter alle`() {
-		val gjennomforingCmd = createGjennomforingInput(TILTAK_1, ARRANGOR_1, NAV_ENHET_1)
-		val deltakerCmd = createDeltakerInput(BRUKER_1, gjennomforingCmd)
-		val bruker2Cmd = createBrukerInput(NAV_ENHET_1)
-		val deltaker2Cmd = createDeltakerInput(bruker2Cmd, gjennomforingCmd)
-
-		testDataRepository.insertGjennomforing(gjennomforingCmd)
-
-		testDataRepository.insertDeltaker(deltakerCmd)
-		testDataRepository.insertDeltakerStatus(createStatusInput(deltakerCmd))
-		testDataRepository.insertBruker(bruker2Cmd)
-		testDataRepository.insertDeltaker(deltaker2Cmd)
-		testDataRepository.insertDeltakerStatus(createStatusInput(deltaker2Cmd))
-
-		val deltakere = controller.hentDeltakere(gjennomforingCmd.id)
-
-		deltakere.size shouldBe 2
-
 	}
 
 	@Test
