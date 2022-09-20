@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.tiltak.dto
 
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.AktivEndringsmeldingDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerStatusDto
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import java.time.LocalDate
@@ -19,9 +20,6 @@ data class TiltakDeltakerDto(
 	val aktivEndringsmelding: AktivEndringsmeldingDto?
 )
 
-data class AktivEndringsmeldingDto(
-	val startDato: LocalDate?
-)
 
 fun Deltaker.toDto(aktivEndringsmeldingDto: AktivEndringsmeldingDto?) = TiltakDeltakerDto(
 	id = id,

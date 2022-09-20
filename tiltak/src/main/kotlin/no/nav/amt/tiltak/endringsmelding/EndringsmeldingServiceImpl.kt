@@ -56,4 +56,6 @@ open class EndringsmeldingServiceImpl(
 		return endringsmeldingRepository.getByDeltaker(deltakerId).map { it.toModel() }
 	}
 
+	override fun hentSisteAktive(deltakerId: UUID) = endringsmeldingRepository.getAktiv(deltakerId)?.toModel()
+
 }

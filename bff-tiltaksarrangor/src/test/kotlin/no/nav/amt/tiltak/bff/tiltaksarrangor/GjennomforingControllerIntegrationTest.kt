@@ -15,6 +15,7 @@ import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
 import no.nav.amt.tiltak.endringsmelding.EndringsmeldingServiceImpl
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
@@ -25,6 +26,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.createGjennomforingInput
 import no.nav.amt.tiltak.test.database.data.TestData.createStatusInput
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.TestDataSeeder
+import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.tiltak.repositories.HentKoordinatorerForGjennomforingQuery
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
@@ -40,6 +42,7 @@ import org.mockito.Mockito.mock
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -169,6 +172,36 @@ class GjennomforingControllerIntegrationTest {
 
 	@Test
 	fun `hentDeltakere - Flere deltakere finnes - henter alle`() {
+		val endringsmeldingDato = LocalDate.now().plusDays(7)
+		val gjennomforingCmd = createGjennomforingInput(TILTAK_1, ARRANGOR_1, NAV_ENHET_1)
+		val deltakerCmd = createDeltakerInput(BRUKER_1, gjennomforingCmd)
+		val bruker2Cmd = createBrukerInput(NAV_ENHET_1)
+		val deltaker2Cmd = createDeltakerInput(bruker2Cmd, gjennomforingCmd)
+		val endringsmeldingCmd = EndringsmeldingInput(
+			id = UUID.randomUUID(),
+			deltakerId = deltakerCmd.id,
+			startDato = endringsmeldingDato,
+			aktiv = true,
+			opprettetAvArrangorAnsattId = TestData.ARRANGOR_ANSATT_1.id,
+		)
+
+		testDataRepository.insertGjennomforing(gjennomforingCmd)
+
+		testDataRepository.insertDeltaker(deltakerCmd)
+		testDataRepository.insertDeltakerStatus(createStatusInput(deltakerCmd))
+		testDataRepository.insertBruker(bruker2Cmd)
+		testDataRepository.insertDeltaker(deltaker2Cmd)
+		testDataRepository.insertDeltakerStatus(createStatusInput(deltaker2Cmd))
+		testDataRepository.insertEndringsmelding(endringsmeldingCmd)
+		val deltakere = controller.hentDeltakere(gjennomforingCmd.id)
+
+		deltakere.size shouldBe 2
+		deltakere.find { it.id == deltakerCmd.id }!!.aktivEndringsmelding!!.startDato shouldBe endringsmeldingDato
+
+	}
+
+	@Test
+	fun `hentDeltakere - Har endringsmeldinger - henter alle`() {
 		val gjennomforingCmd = createGjennomforingInput(TILTAK_1, ARRANGOR_1, NAV_ENHET_1)
 		val deltakerCmd = createDeltakerInput(BRUKER_1, gjennomforingCmd)
 		val bruker2Cmd = createBrukerInput(NAV_ENHET_1)
@@ -181,7 +214,6 @@ class GjennomforingControllerIntegrationTest {
 		testDataRepository.insertBruker(bruker2Cmd)
 		testDataRepository.insertDeltaker(deltaker2Cmd)
 		testDataRepository.insertDeltakerStatus(createStatusInput(deltaker2Cmd))
-
 
 		val deltakere = controller.hentDeltakere(gjennomforingCmd.id)
 
