@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor
 
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.AktivEndringsmeldingDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.GjennomforingDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
 import no.nav.amt.tiltak.common.auth.AuthService
@@ -7,7 +8,6 @@ import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.port.*
-import no.nav.amt.tiltak.tiltak.dto.AktivEndringsmeldingDto
 import no.nav.amt.tiltak.tiltak.dto.TiltakDeltakerDto
 import no.nav.amt.tiltak.tiltak.dto.toDto
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -107,14 +107,9 @@ class GjennomforingController(
 			.filter { it.status.type != Deltaker.Status.PABEGYNT }
 			.filter { !it.erUtdatert }
 
-		val aktiveEndringsmeldinger = deltakere.map { deltaker ->
-				endringsmeldingService.hentEndringsmeldingerForDeltaker(deltaker.id)
-					.filter { endringsmelding -> endringsmelding.aktiv }
-			}.flatten()
-
-		return deltakere.map { d ->
-			val endringsmelding = aktiveEndringsmeldinger.find { it.deltakerId == d.id }
-			d.toDto(endringsmelding?.let { AktivEndringsmeldingDto(endringsmelding.startDato) })
+		return deltakere.map {
+			val endringsmelding = endringsmeldingService.hentSisteAktive(deltakerId = it.id)
+			it.toDto(endringsmelding?.toDto())
 		}
 	}
 

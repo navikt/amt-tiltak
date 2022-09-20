@@ -11,7 +11,7 @@ import java.util.*
 
 @RestController("EndringsmeldingControllerNavAnsatt")
 @RequestMapping("/api/nav-ansatt/endringsmelding")
-class EndringsmeldingNavController(
+class EndringsmeldingController(
 	private val arrangorAnsattService: ArrangorAnsattService,
 	private val endringsmeldingService: EndringsmeldingService,
 	private val navAnsattService: NavAnsattService,
