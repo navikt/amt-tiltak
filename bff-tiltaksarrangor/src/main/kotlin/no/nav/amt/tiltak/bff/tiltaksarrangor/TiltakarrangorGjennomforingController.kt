@@ -53,8 +53,8 @@ class TiltakarrangorGjennomforingController(
 
 		val filtrerteGjennomforinger = gjennomforingProdFilter(gjennomforingIder)
 
-		val j = gjennomforingService.getGjennomforinger(filtrerteGjennomforinger)
-		return j.map { it.toDto() }
+		return gjennomforingService.getGjennomforinger(filtrerteGjennomforinger)
+			.map { it.toDto() }
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -151,11 +151,11 @@ class TiltakarrangorGjennomforingController(
 			.filter { it.roller.contains(ArrangorAnsattRolle.KOORDINATOR) }
 			.map { it.arrangorId }
 
-		val ider = tilgangTilArrangorIder.map {
-			gjennomforingService.getByArrangorId(it).map { gjennomforing -> gjennomforing.id }
+		return tilgangTilArrangorIder.map { arrangorId ->
+			gjennomforingService
+				.getByArrangorId(arrangorId)
+				.map { gjennomforing -> gjennomforing.id }
 		}.flatten()
-
-		return ider
 	}
 
 }
