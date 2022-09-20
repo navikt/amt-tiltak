@@ -31,6 +31,7 @@ class EndringsmeldingNavController(
 		return endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId).map {
 			val deltaker = deltakerService.hentDeltaker(it.deltakerId)
 				?: throw NoSuchElementException("Fant ikke deltaker med id ${it.deltakerId}")
+			val opprettetAvAnsatt = arrangorAnsattService.getAnsatt(it.opprettetAvArrangorAnsattId).toDto()
 
 			return@map EndringsmeldingDto(
 				id = it.id,
@@ -38,7 +39,7 @@ class EndringsmeldingNavController(
 				aktiv = it.aktiv,
 				godkjent = it.ferdiggjortAvNavAnsattId != null,
 				arkivert = it.ferdiggjortAvNavAnsattId == null && !it.aktiv,
-				opprettetAvArrangorAnsatt = arrangorAnsattService.getAnsatt(it.opprettetAvArrangorAnsattId).toDto(),
+				opprettetAvArrangorAnsatt = opprettetAvAnsatt,
 				bruker = deltaker.bruker.toDto(),
 				opprettetDato = it.opprettet
 			)

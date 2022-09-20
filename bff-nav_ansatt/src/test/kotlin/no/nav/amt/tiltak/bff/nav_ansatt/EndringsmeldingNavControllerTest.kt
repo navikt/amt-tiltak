@@ -59,6 +59,18 @@ class EndringsmeldingNavControllerTest {
 		}
 	}
 
+	val bruker = Bruker(
+		id = BRUKER_1.id,
+		fornavn = BRUKER_1.fornavn,
+		mellomnavn = BRUKER_1.mellomnavn,
+		etternavn = BRUKER_1.etternavn,
+		telefonnummer = BRUKER_1.telefonnummer,
+		epost = BRUKER_1.epost,
+		fodselsnummer = BRUKER_1.fodselsnummer,
+		navEnhet = null,
+		navVeilederId = UUID.randomUUID(),
+	)
+
 	@Test
 	fun `hentEndringsmeldinger() - skal returnere 401 hvis token mangler`() {
 		val response = mockMvc.perform(
@@ -95,18 +107,6 @@ class EndringsmeldingNavControllerTest {
 		val navIdent = "a12345"
 		val deltakerId = UUID.randomUUID()
 		val startDato = LocalDate.parse("2022-05-05")
-
-		val bruker = Bruker(
-			id = BRUKER_1.id,
-			fornavn = BRUKER_1.fornavn,
-			mellomnavn = BRUKER_1.mellomnavn,
-			etternavn = BRUKER_1.etternavn,
-			telefonnummer = BRUKER_1.telefonnummer,
-			epost = BRUKER_1.epost,
-			fodselsnummer = BRUKER_1.fodselsnummer,
-			navEnhet = null,
-			navVeilederId = UUID.randomUUID(),
-		)
 
 		val deltaker = Deltaker(
 			id = UUID.randomUUID(),
@@ -208,17 +208,7 @@ class EndringsmeldingNavControllerTest {
 			.thenReturn(Deltaker(
 				id = UUID.randomUUID(),
 				gjennomforingId = gjennomforingId,
-				bruker = Bruker(
-					id = BRUKER_1.id,
-					fornavn = BRUKER_1.fornavn,
-					mellomnavn = null,
-					etternavn = BRUKER_1.etternavn,
-					telefonnummer = "1234",
-					epost = "foo@bar.baz",
-					fodselsnummer = BRUKER_1.fodselsnummer,
-					navEnhet = null,
-					navVeilederId = null,
-					),
+				bruker = bruker,
 				startDato = null,
 				sluttDato = null,
 				status = DeltakerStatus(UUID.randomUUID(), Deltaker.Status.DELTAR, LocalDateTime.now(), LocalDateTime.now(), true),
