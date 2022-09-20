@@ -1,13 +1,11 @@
-package no.nav.amt.tiltak.tiltak.dto
+package no.nav.amt.tiltak.bff.tiltaksarrangor.dto
 
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.AktivEndringsmeldingDto
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerStatusDto
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-data class TiltakDeltakerDto(
+data class DeltakerDto(
 	val id: UUID,
 	val fornavn: String,
 	val mellomnavn: String? = null,
@@ -21,7 +19,7 @@ data class TiltakDeltakerDto(
 )
 
 
-fun Deltaker.toDto(aktivEndringsmeldingDto: AktivEndringsmeldingDto?) = TiltakDeltakerDto(
+fun Deltaker.toDto(aktivEndringsmeldingDto: AktivEndringsmeldingDto?) = DeltakerDto(
 	id = id,
 	fornavn = bruker.fornavn,
 	mellomnavn = bruker.mellomnavn,

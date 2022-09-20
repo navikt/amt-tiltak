@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor
 
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.TiltakDeltakerDetaljerDto
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerDetaljerDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
@@ -17,7 +17,7 @@ open class ControllerService(
 	private val navAnsattService: NavAnsattService,
 ) {
 
-	open fun getDeltakerDetaljerById(deltakerId: UUID): TiltakDeltakerDetaljerDto {
+	open fun getDeltakerDetaljerById(deltakerId: UUID): DeltakerDetaljerDto {
 		val deltaker = deltakerService.hentDeltaker(deltakerId)
 			?: throw NoSuchElementException("Deltaker med id $deltakerId finnes ikke")
 		val bruker = deltaker.bruker
@@ -25,7 +25,7 @@ open class ControllerService(
 		val gjennomforing = deltaker.gjennomforingId.let { gjennomforingService.getGjennomforing(it) }
 		val erSkjermet = skjermetPersonService.erSkjermet(bruker.fodselsnummer)
 
-		return TiltakDeltakerDetaljerDto(
+		return DeltakerDetaljerDto(
 			id = deltaker.id,
 			fornavn = bruker.fornavn,
 			mellomnavn = bruker.mellomnavn,

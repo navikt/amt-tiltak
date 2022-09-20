@@ -11,10 +11,8 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
-import no.nav.amt.tiltak.endringsmelding.HentAktivEndringsmeldingForDeltakereQuery
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
-import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingerFraArrangorerQuery
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -54,12 +52,6 @@ class GjennomforingControllerTest {
 
 	@MockBean
 	private lateinit var endringsmeldingService: EndringsmeldingService
-
-	@MockBean
-	private lateinit var hentAktivEndringsmeldingForDeltakereQuery: HentAktivEndringsmeldingForDeltakereQuery
-
-	@MockBean
-	private lateinit var hentGjennomforingerFraArrangorerQuery: HentGjennomforingerFraArrangorerQuery
 
 	@Autowired
 	private lateinit var mockMvc: MockMvc
@@ -239,12 +231,6 @@ class GjennomforingControllerTest {
 	@Test
 	fun `opprettTilgangTilGjennomforing() should return 403 if not authorized`() {
 		val token = tokenXToken("test", "test")
-
-		val arrangorIder = listOf(UUID.randomUUID())
-
-		Mockito.`when`(
-			hentGjennomforingerFraArrangorerQuery.query(arrangorIder)
-		).thenReturn(emptyList())
 
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.post("/api/tiltaksarrangor/gjennomforing/$gjennomforingId/tilgang")

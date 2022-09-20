@@ -51,7 +51,7 @@ class TiltakarrangorDeltakerControllerTest {
 
 	private val gjennomforingId = UUID.fromString("7187e487-bdb4-43bc-9d17-a3ad0f400897")
 
-	private val tiltakDeltakerDetaljerDto = TiltakDeltakerDetaljerDto(
+	private val deltakerDetaljerDto = DeltakerDetaljerDto(
 		id = deltakerId,
 		fornavn = "Test",
 		mellomnavn = null,
@@ -109,7 +109,7 @@ class TiltakarrangorDeltakerControllerTest {
 			.thenReturn("fnr")
 
 		Mockito.`when`(controllerService.getDeltakerDetaljerById(deltakerId))
-			.thenReturn(tiltakDeltakerDetaljerDto)
+			.thenReturn(deltakerDetaljerDto)
 
 		mockMvc.perform(
 			MockMvcRequestBuilders.get("/api/tiltaksarrangor/tiltak-deltaker/$deltakerId")
@@ -117,7 +117,7 @@ class TiltakarrangorDeltakerControllerTest {
 		).andReturn().response
 
 		verify(arrangorAnsattTilgangService).verifiserTilgangTilGjennomforing(
-			eq("fnr"), eq(tiltakDeltakerDetaljerDto.gjennomforing.id)
+			eq("fnr"), eq(deltakerDetaljerDto.gjennomforing.id)
 		)
 	}
 
@@ -126,7 +126,7 @@ class TiltakarrangorDeltakerControllerTest {
 		val token = tokenXToken("test", "test")
 
 		Mockito.`when`(controllerService.getDeltakerDetaljerById(deltakerId))
-			.thenReturn(tiltakDeltakerDetaljerDto)
+			.thenReturn(deltakerDetaljerDto)
 
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.get("/api/tiltaksarrangor/tiltak-deltaker/$deltakerId")
