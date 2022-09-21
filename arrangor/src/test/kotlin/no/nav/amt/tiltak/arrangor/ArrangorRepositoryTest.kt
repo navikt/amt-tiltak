@@ -2,8 +2,12 @@ package no.nav.amt.tiltak.arrangor
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
+import io.kotest.matchers.collections.shouldHaveSize
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2
+import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -17,6 +21,7 @@ internal class ArrangorRepositoryTest {
 	val dataSource = SingletonPostgresContainer.getDataSource()
 
 	lateinit var repository: ArrangorRepository
+	lateinit var testDataRepository: TestDataRepository
 
 	@BeforeEach
 	fun migrate() {
@@ -24,6 +29,7 @@ internal class ArrangorRepositoryTest {
 		rootLogger.level = Level.WARN
 
 		repository = ArrangorRepository(NamedParameterJdbcTemplate(dataSource))
+		testDataRepository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
 
 		DbTestDataUtils.cleanDatabase(dataSource)
 	}
@@ -97,5 +103,18 @@ internal class ArrangorRepositoryTest {
 		assertEquals(virksomhetsnavn, nyArrangor.navn)
 		assertEquals(virksomhetsnummer, nyArrangor.organisasjonsnummer)
 	}
+
+	@Test
+	internal fun `getByIder() should return arrangorer`() {
+		testDataRepository.insertArrangor(ARRANGOR_1)
+		testDataRepository.insertArrangor(ARRANGOR_2)
+
+		val arrangorer = repository.getByIder(listOf(ARRANGOR_1.id, ARRANGOR_2.id))
+
+		arrangorer shouldHaveSize 2
+
+	}
+
+
 
 }

@@ -23,10 +23,16 @@ class ArrangorServiceImpl(
 		).toArrangor()
 	}
 
-
-
 	override fun getArrangorById(id: UUID): Arrangor {
 		return arrangorRepository.getById(id).toArrangor()
+	}
+
+	override fun getArrangorerById(arrangorIder: List<UUID>): List<Arrangor> {
+		val arrangorer = arrangorRepository.getByIder(arrangorIder).map { it.toArrangor() }
+		if (arrangorer.size != arrangorIder.size) {
+			throw IllegalStateException("Feil antall arrangorer fra database. arrangorIder.size = ${arrangorIder.size}, arrangorer.size = ${arrangorer.size}")
+		}
+		return arrangorer
 	}
 
 	override fun getOrCreateArrangor(virksomhetsnummer: String): Arrangor {

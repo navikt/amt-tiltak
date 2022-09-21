@@ -3,8 +3,11 @@ package no.nav.amt.tiltak.ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.TilknyttetArrangor
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
+import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
+import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.PersonService
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -12,8 +15,13 @@ import java.util.*
 class ArrangorAnsattServiceImpl(
 	private val arrangorAnsattRepository: ArrangorAnsattRepository,
 	private val personService: PersonService,
-	private val template: NamedParameterJdbcTemplate
+	private val arrangorService: ArrangorService,
 ) : ArrangorAnsattService {
+
+	// Forhindrer circular dependency, må fikses når vi rydder opp i arkitekturen
+	@Lazy
+	@Autowired
+	lateinit var arrangorAnsattTilgangService: ArrangorAnsattTilgangService
 
 	override fun opprettAnsattHvisIkkeFinnes(personIdent: String): Ansatt {
 		return getAnsattByPersonligIdent(personIdent)
@@ -22,23 +30,16 @@ class ArrangorAnsattServiceImpl(
 
 	override fun getAnsatt(ansattId: UUID): Ansatt {
 		val ansattDbo = arrangorAnsattRepository.get(ansattId) ?: throw NoSuchElementException("Ansatt ikke funnet")
+		val arrangorer = hentTilknyttedeArrangorer(ansattId)
 
-		val ansattesVirksomheter = mapTilknyttedeArrangorerTilAnsatt(
-			ArrangorerForAnsattQuery(template).query(ansattDbo.personligIdent)
-		)
-
-		return ansattDbo.toAnsatt(ansattesVirksomheter)
+		return ansattDbo.toAnsatt(arrangorer)
 	}
 
 	override fun getAnsattByPersonligIdent(personIdent: String): Ansatt? {
-		val ansattDbo =
-			arrangorAnsattRepository.getByPersonligIdent(personIdent) ?: return null
+		val ansattDbo = arrangorAnsattRepository.getByPersonligIdent(personIdent) ?: return null
+		val arrangorer = hentTilknyttedeArrangorer(ansattDbo.id)
 
-		val ansattesVirksomheter = mapTilknyttedeArrangorerTilAnsatt(
-			ArrangorerForAnsattQuery(template).query(personIdent)
-		)
-
-		return ansattDbo.toAnsatt(ansattesVirksomheter)
+		return ansattDbo.toAnsatt(arrangorer)
 	}
 
 	private fun createAnsatt(ansattPersonIdent: String): Ansatt {
@@ -57,21 +58,21 @@ class ArrangorAnsattServiceImpl(
 		return getAnsatt(nyAnsattId)
 	}
 
-	private fun mapTilknyttedeArrangorerTilAnsatt(ansattesVirksomheter: List<ArrangorForAnsattDbo>): List<TilknyttetArrangor> {
-		return ansattesVirksomheter
-			.distinctBy { it.id }
-			.map { arrangor ->
-				val roller = ansattesVirksomheter.filter { arrangor.id == it.id }
-					.map { it.rolle }
+	private fun hentTilknyttedeArrangorer(ansattId: UUID): List<TilknyttetArrangor> {
+		val roller = arrangorAnsattTilgangService.hentAnsattTilganger(ansattId)
+		val arrangorIder = roller.map { it.arrangorId }
 
-				TilknyttetArrangor(
-					id = arrangor.id,
-					navn = arrangor.navn,
-					organisasjonsnummer = arrangor.organisasjonsnummer,
-					overordnetEnhetNavn = arrangor.overordnetEnhetNavn,
-					overordnetEnhetOrganisasjonsnummer = arrangor.overordnetEnhetOrganisasjonsnummer,
-					roller = roller
-				)
-			}
+		return arrangorService.getArrangorerById(arrangorIder).map {
+			val arrangorRoller = roller.find { r -> r.arrangorId == it.id }
+				?: throw IllegalStateException("Fant ikke roller")
+			return@map TilknyttetArrangor(
+				id = it.id,
+				navn = it.navn,
+				organisasjonsnummer = it.organisasjonsnummer,
+				overordnetEnhetOrganisasjonsnummer = it.overordnetEnhetOrganisasjonsnummer,
+				overordnetEnhetNavn = it.overordnetEnhetNavn,
+				roller = arrangorRoller.roller.map { it.name }
+			)
+		}
 	}
 }

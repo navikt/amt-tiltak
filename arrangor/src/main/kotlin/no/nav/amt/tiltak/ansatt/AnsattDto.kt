@@ -5,8 +5,6 @@ import no.nav.amt.tiltak.core.domain.arrangor.TilknyttetArrangor
 import java.util.*
 
 data class AnsattDto(
-	val id: UUID,
-	val personligIdent: String,
 	val fornavn: String,
 	val etternavn: String,
 	val arrangorer: List<TilknyttetArrangorDto>
@@ -23,8 +21,6 @@ data class TilknyttetArrangorDto(
 
 fun Ansatt.toDto(): AnsattDto {
 	return AnsattDto(
-		id = this.id,
-		personligIdent = this.personligIdent,
 		fornavn = this.fornavn,
 		etternavn = this.etternavn,
 		arrangorer = this.arrangorer.map { it.toDto() }
