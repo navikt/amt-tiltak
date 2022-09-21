@@ -55,7 +55,7 @@ class TiltaksansvarligAutoriseringServiceImpl(
 		if (!harTilgang) {
 			secureLog.warn("$navIdent har ikke tilgang til gjennomføring med id=$gjennomforingId")
 
-			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ikke tilgang til gjennomføring")
+			throw UnauthorizedException("Ikke tilgang til gjennomføring")
 		}
 	}
 

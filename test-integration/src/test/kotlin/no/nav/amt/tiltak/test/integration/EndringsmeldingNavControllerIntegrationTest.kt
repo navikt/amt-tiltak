@@ -1,7 +1,6 @@
 package no.nav.amt.tiltak.test.integration
 
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.deltaker.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -53,6 +52,7 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 	@Test
 	fun `hentEndringsmeldinger() - skal returnere 200 med riktig response`() {
 		poaoTilgangClient.addHentAdGrupperResponse(name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE)
+
 		poaoTilgangClient.addHentAdGrupperResponse(
 			navAnsattAzureId = NAV_ANSATT_1.id,
 			name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
@@ -80,21 +80,98 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 			)
 		)
 
+		val endringsmeldingResponse = getEndringsmeldingerOnGjennomforing(
+			GJENNOMFORING_1.id,
+			oAuthServer.issueAzureAdToken(NAV_ANSATT_1.navIdent)
+		)
+
+		endringsmeldingResponse.size shouldBe 1
+		endringsmeldingResponse.first().id shouldBe endringsmeldingId
+	}
+
+	@Test
+	fun `markerFerdig() - skal returnere 401 hvis token mangler`() {
 		val response = sendRequest(
-			method = "GET",
-			url = "/api/nav-ansatt/endringsmelding?gjennomforingId=${GJENNOMFORING_1.id}",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueAzureAdToken(NAV_ANSATT_1.navIdent)}")
+			method = "PATCH",
+			url = "/api/nav-ansatt/endringsmelding/${UUID.randomUUID()}/ferdig",
+			body = "".toJsonRequestBody()
+		)
+
+		response.code shouldBe 401
+	}
+
+	@Test
+	fun `markerFerdig() - skal returnere 200 og markere som ferdig`() {
+		val token = oAuthServer.issueAzureAdToken(NAV_ANSATT_1.navIdent)
+		poaoTilgangClient.addHentAdGrupperResponse(name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE)
+
+		poaoTilgangClient.addHentAdGrupperResponse(
+			navAnsattAzureId = NAV_ANSATT_1.id,
+			name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
+		)
+
+		db.insertTiltaksansvarligGjennomforingTilgang(
+			TiltaksansvarligGjennomforingTilgangInput(
+				id = UUID.randomUUID(),
+				navAnsattId = NAV_ANSATT_1.id,
+				gjennomforingId = GJENNOMFORING_1.id,
+				gyldigTil = ZonedDateTime.now().plusDays(1),
+				createdAt = ZonedDateTime.now()
+			)
+		)
+
+		val endringsmeldingId = UUID.randomUUID()
+
+		db.insertEndringsmelding(
+			EndringsmeldingInput(
+				id = endringsmeldingId,
+				deltakerId = DELTAKER_1.id,
+				startDato = LocalDate.now().plusDays(1),
+				aktiv = true,
+				opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id
+			)
+		)
+
+
+		val endringsmeldingBefore = getEndringsmelding(
+			endringsmeldingId, getEndringsmeldingerOnGjennomforing(GJENNOMFORING_1.id, token)
+		)
+
+		endringsmeldingBefore.aktiv shouldBe true
+		endringsmeldingBefore.arkivert shouldBe false
+
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/nav-ansatt/endringsmelding/$endringsmeldingId/ferdig",
+			headers = mapOf("Authorization" to "Bearer $token"),
+			body = "".toJsonRequestBody()
 		)
 
 		response.code shouldBe 200
 
-		val body = response.body?.string()
+		val endringsmeldingAfter = getEndringsmelding(
+			endringsmeldingId, getEndringsmeldingerOnGjennomforing(GJENNOMFORING_1.id, token)
+		)
 
-		body shouldNotBe null
+		endringsmeldingAfter.aktiv shouldBe false
+		endringsmeldingAfter.arkivert shouldBe true
 
-		val responseBody: List<EndringsmeldingDto> = JsonUtils.fromJsonString(body!!)
+	}
 
-		responseBody.size shouldBe 1
-		responseBody.first().id shouldBe endringsmeldingId
+	private fun getEndringsmelding(id: UUID, meldinger: List<EndringsmeldingDto>): EndringsmeldingDto {
+		return meldinger.find { it.id == id }
+			?: throw IllegalStateException("Endringsmelding med id $id eksisterer ikke")
+	}
+
+	private fun getEndringsmeldingerOnGjennomforing(gjennomforingId: UUID, token: String): List<EndringsmeldingDto> {
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/nav-ansatt/endringsmelding?gjennomforingId=$gjennomforingId",
+			headers = mapOf("Authorization" to "Bearer $token")
+		)
+
+		response.code shouldBe 200
+
+		return JsonUtils.fromJsonString(response.body!!.string())
 	}
 }
