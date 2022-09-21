@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.tilgangskontroll.tiltaksansvarlig_autorisering
 
+import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
 import no.nav.amt.tiltak.log.SecureLog.secureLog
@@ -44,7 +45,7 @@ class TiltaksansvarligAutoriseringServiceImpl(
 				""".trimIndent()
 			)
 
-			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Mangler tilgang til AD-gruppe")
+			throw UnauthorizedException("Mangler tilgang til AD-gruppe")
 		}
 	}
 

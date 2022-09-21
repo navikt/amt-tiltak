@@ -6,6 +6,7 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.slf4j.LoggerFactory
+import java.util.*
 
 abstract class MockHttpClient(
 	private val name: String
@@ -17,7 +18,7 @@ abstract class MockHttpClient(
 
 	private var lastRequestCount = 0
 
-	private val responses = mutableMapOf<(request: RecordedRequest) -> Boolean, MockResponse>()
+	private val responses = mutableMapOf<(request: RecordedRequest) -> Boolean, ResponseHolder>()
 
 	fun start() {
 		try {
@@ -27,13 +28,15 @@ abstract class MockHttpClient(
 				override fun dispatch(request: RecordedRequest): MockResponse {
 					val response = responses.entries.find { it.key.invoke(request) }?.value
 						?: throw IllegalStateException(
-							"$name has no handler for $request\n" +
-								"	Headers: ${printHeaders(request.headers)}\n" +
-								"	Body: ${request.body.readUtf8()}	"
+							"$name: Mock has no handler for $request\n" +
+								"	Headers: \n${printHeaders(request.headers)}\n" +
+								"	Body: ${request.body.readUtf8()}"
 						)
 
-					log.info("Responding [${request.path}]: $response")
-					return response
+					response.count = response.count + 1
+
+					log.info("Responding [${request.method}: ${request.path}]: $response")
+					return response.response.invoke(request)
 				}
 
 			}
@@ -43,16 +46,25 @@ abstract class MockHttpClient(
 		}
 	}
 
-	protected fun addResponseHandler(predicate: (req: RecordedRequest) -> Boolean, response: MockResponse) {
-		responses[predicate] = response
+	fun addResponseHandler(
+		predicate: (req: RecordedRequest) -> Boolean,
+		response: (req: RecordedRequest) -> MockResponse
+	): UUID {
+		val id = UUID.randomUUID()
+		responses[predicate] = ResponseHolder(id, response)
+		return id
 	}
 
-	protected fun addResponseHandler(path: String, response: MockResponse) {
+	fun addResponseHandler(predicate: (req: RecordedRequest) -> Boolean, response: MockResponse): UUID {
+		return addResponseHandler(predicate) { response }
+	}
+
+	fun addResponseHandler(path: String, response: MockResponse): UUID {
 		val predicate = { req: RecordedRequest -> req.path == path }
-		responses[predicate] = response
+		return addResponseHandler(predicate) { response }
 	}
 
-	protected fun resetHttpServer() {
+	fun resetHttpServer() {
 		responses.clear()
 		lastRequestCount = server.requestCount
 	}
@@ -73,9 +85,21 @@ abstract class MockHttpClient(
 		server.shutdown()
 	}
 
+	fun getRequestCount(id: UUID): Int {
+		val responseCount = responses.entries.find { it.value.id == id }?.value?.count
+			?: throw IllegalStateException("No request with id $id")
+
+		return responseCount
+	}
+
 	private fun printHeaders(headers: Headers): String {
 		return headers.map { "		${it.first} : ${it.second}" }
 			.joinToString("\n")
 	}
 
+	private data class ResponseHolder(
+		val id: UUID,
+		val response: (request: RecordedRequest) -> MockResponse,
+		var count: Int = 0
+	)
 }

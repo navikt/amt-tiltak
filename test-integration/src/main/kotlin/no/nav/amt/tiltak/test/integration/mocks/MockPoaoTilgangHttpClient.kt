@@ -5,9 +5,13 @@ import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.tilgangskontroll.ad_gruppe.AdGrupper.TILTAKSANSVARLIG_FLATE_GRUPPE
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
+import org.slf4j.LoggerFactory
 import java.util.*
 
 class MockPoaoTilgangHttpClient : MockHttpClient(name = "MockPoaoTilgangHttpClient") {
+
+
+	private val logger = LoggerFactory.getLogger(javaClass)
 
 	fun reset() {
 		resetHttpServer()
@@ -35,13 +39,21 @@ class MockPoaoTilgangHttpClient : MockHttpClient(name = "MockPoaoTilgangHttpClie
 		addResponseHandler(predicate, response)
 	}
 
-	fun addHentAdGrupperResponse(navAnsattAzureId: UUID) {
+	fun addHentAdGrupperResponse(navAnsattAzureId: UUID? = null) {
 		val url = "/api/v1/ad-gruppe"
 
+		logger.info("Adding response for $url, navAnsattAzureId: $navAnsattAzureId")
+
 		val predicate = { req: RecordedRequest ->
-			req.path == url
-				&& req.method == "POST"
-				&& req.body.readUtf8() == """{"navAnsattAzureId":"$navAnsattAzureId"}"""
+			if (navAnsattAzureId != null) {
+				req.path == url
+					&& req.method == "POST"
+					&& req.body.readUtf8() == """{"navAnsattAzureId":"$navAnsattAzureId"}"""
+
+			} else {
+				req.path == url
+					&& req.method == "POST"
+			}
 		}
 
 		val response = MockResponse()
