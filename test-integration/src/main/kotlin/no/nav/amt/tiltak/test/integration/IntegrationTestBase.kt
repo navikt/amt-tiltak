@@ -85,14 +85,17 @@ abstract class IntegrationTestBase {
 		}
 	}
 
-	fun resetClients() {
+	fun resetMockServers() {
 		enhetsregisterClient.reset()
 		norgHttpClient.reset()
+		poaoTilgangClient.reset()
+		nomHttpClient.reset()
 	}
 
-	fun resetClientsAndAddDefaultData() {
-		resetClients()
+	fun resetMockServcersAndAddDefaultData() {
+		resetMockServers()
 		norgHttpClient.addDefaultData()
+		nomHttpClient.addDefaultData()
 	}
 
 	fun serverUrl() = "http://localhost:$port"

@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.test.integration.mocks
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.amt.tiltak.clients.nom.NomQueries
 import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 
@@ -15,7 +16,7 @@ class MockNomHttpClient : MockHttpClient(name = "MockNomHttpClient") {
 	fun addDefaultData() {
 		add(
 			NomClientResponseInput(
-				navIdent = "Z123",
+				navIdent = NAV_ANSATT_1.navIdent,
 				visningsNavn = "Jeg er en test",
 				fornavn = "INTEGRASJON",
 				etternavn = "TEST",

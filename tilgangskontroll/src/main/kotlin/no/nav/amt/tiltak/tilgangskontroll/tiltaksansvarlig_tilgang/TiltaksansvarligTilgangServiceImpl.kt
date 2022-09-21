@@ -20,7 +20,9 @@ open class TiltaksansvarligTilgangServiceImpl(
 	override fun harTilgangTilGjennomforing(navIdent: String, gjennomforingId: UUID): Boolean {
 		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 
-		return hentAktiveTilganger(navAnsatt.id)
+		val tilganger = hentAktiveTilganger(navAnsatt.id)
+
+		return tilganger
 			.any { it.gjennomforingId == gjennomforingId }
 	}
 

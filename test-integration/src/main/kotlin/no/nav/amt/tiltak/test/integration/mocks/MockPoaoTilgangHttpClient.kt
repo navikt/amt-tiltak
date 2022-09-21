@@ -18,7 +18,7 @@ class MockPoaoTilgangHttpClient : MockHttpClient(name = "MockPoaoTilgangHttpClie
 	}
 
 	fun addDefaultData() {
-		addHentAdGrupperResponse(UUID.fromString("e2bae1e5-94c8-4ef6-9d7a-4d2e04b5ae1c"))
+		addHentAdGrupperResponse(UUID.fromString("e2bae1e5-94c8-4ef6-9d7a-4d2e04b5ae1c"), TILTAKSANSVARLIG_FLATE_GRUPPE)
 	}
 
 	fun addErSkjermetResponse(data: Map<String, Boolean>) {
@@ -39,7 +39,7 @@ class MockPoaoTilgangHttpClient : MockHttpClient(name = "MockPoaoTilgangHttpClie
 		addResponseHandler(predicate, response)
 	}
 
-	fun addHentAdGrupperResponse(navAnsattAzureId: UUID? = null) {
+	fun addHentAdGrupperResponse(navAnsattAzureId: UUID? = null, name: String) {
 		val url = "/api/v1/ad-gruppe"
 
 		logger.info("Adding response for $url, navAnsattAzureId: $navAnsattAzureId")
@@ -63,7 +63,7 @@ class MockPoaoTilgangHttpClient : MockHttpClient(name = "MockPoaoTilgangHttpClie
 					listOf(
 						PoaoTilgangClientImpl.HentAdGrupper.AdGruppeDto(
 							id = UUID.randomUUID(),
-							name = TILTAKSANSVARLIG_FLATE_GRUPPE
+							name = name
 						)
 					)
 				)
