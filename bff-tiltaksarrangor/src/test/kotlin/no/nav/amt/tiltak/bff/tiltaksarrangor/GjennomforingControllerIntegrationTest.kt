@@ -67,6 +67,7 @@ class GjennomforingControllerIntegrationTest {
 	private lateinit var auditLoggerService: AuditLoggerService
 	private lateinit var authService: AuthService
 	private lateinit var controller: GjennomforingController
+	private lateinit var controllerService: ControllerService
 	private lateinit var testDataRepository: TestDataRepository
 
 	@BeforeEach
@@ -113,10 +114,17 @@ class GjennomforingControllerIntegrationTest {
 			auditLoggerService = auditLoggerService,
 		)
 
+		controllerService = ControllerService(
+			deltakerService,
+			mockk(),
+			gjennomforingService,
+			mockk(),
+		)
+
 		controller = GjennomforingController(
 			gjennomforingService, deltakerService,
 			authService, mock(ArrangorAnsattTilgangService::class.java),
-			endringsmeldingService
+			endringsmeldingService,
 		)
 
 		testDataRepository = TestDataRepository(namedJdbcTemplate)

@@ -232,6 +232,9 @@ class GjennomforingControllerTest {
 	fun `opprettTilgangTilGjennomforing() should return 403 if not authorized`() {
 		val token = tokenXToken("test", "test")
 
+		val ansattId = UUID.randomUUID()
+		Mockito.`when`(arrangorAnsattTilgangService.hentAnsattId(fnr)).thenReturn(ansattId)
+
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.post("/api/tiltaksarrangor/gjennomforing/$gjennomforingId/tilgang")
 				.header("Authorization", "Bearer $token")

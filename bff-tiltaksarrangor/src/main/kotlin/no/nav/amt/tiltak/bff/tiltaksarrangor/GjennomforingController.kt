@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor
 
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.AktivEndringsmeldingDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.GjennomforingDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
@@ -8,6 +7,7 @@ import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.*
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.slf4j.LoggerFactory
@@ -48,11 +48,8 @@ class GjennomforingController(
 
 		val ansattId = arrangorAnsattTilgangService.hentAnsattId(ansattPersonligIdent)
 
-		val gjennomforingIder = tilgjengeligeGjennomforingIder(ansattId)
-
-		val filtrerteGjennomforinger = gjennomforingProdFilter(gjennomforingIder)
-
-		return gjennomforingService.getGjennomforinger(filtrerteGjennomforinger)
+		return hentGjennomforingerSomKanLeggesTil(ansattId)
+			.filter { tillattIProd(it.id) }
 			.map { it.toDto() }
 	}
 
@@ -63,9 +60,9 @@ class GjennomforingController(
 
 		val ansattId = arrangorAnsattTilgangService.hentAnsattId(ansattPersonligIdent)
 
-		val gjennomforingIder = tilgjengeligeGjennomforingIder(ansattId)
+		val gjennomforinger = hentGjennomforingerSomKanLeggesTil(ansattId)
 
-		if (!gjennomforingIder.contains(gjennomforingId)) {
+		if (!gjennomforinger.map { it.id }.contains(gjennomforingId)) {
 			throw ResponseStatusException(HttpStatus.FORBIDDEN)
 		}
 
@@ -120,11 +117,10 @@ class GjennomforingController(
 
 
 	// Dette er et midlertidig filter som skal fjernes snart™
-	private fun gjennomforingProdFilter(gjennomforingIder: List<UUID>): List<UUID> {
+	private fun tillattIProd(gjennomforingId: UUID): Boolean {
 		val erIProd = System.getenv()["NAIS_CLUSTER_NAME"] == "prod-gcp"
 
-		if (!erIProd)
-			return gjennomforingIder
+		if (!erIProd) return true
 
 		val allowList = listOf(
 			"18abdf60-0c2b-40b1-a552-ffc05868d373",
@@ -137,19 +133,13 @@ class GjennomforingController(
 			"4fd30e67-0ba6-4f19-80dd-8f539b1fb3a0",
 		).map { UUID.fromString(it) }
 
-		return gjennomforingIder.filter { allowList.contains(it) }
+		return allowList.contains(gjennomforingId)
 	}
 
-	private fun tilgjengeligeGjennomforingIder(ansattId: UUID): List<UUID> {
-		val tilgangTilArrangorIder = arrangorAnsattTilgangService.hentAnsattTilganger(ansattId)
+	fun hentGjennomforingerSomKanLeggesTil(ansattId: UUID): List<Gjennomforing> {
+		return arrangorAnsattTilgangService.hentAnsattTilganger(ansattId)
 			.filter { it.roller.contains(ArrangorAnsattRolle.KOORDINATOR) }
-			.map { it.arrangorId }
-
-		return tilgangTilArrangorIder.map { arrangorId ->
-			gjennomforingService
-				.getByArrangorId(arrangorId)
-				.map { gjennomforing -> gjennomforing.id }
-		}.flatten()
+			.map { gjennomforingService.getByArrangorId(it.arrangorId) }
+			.flatten()
 	}
-
 }
