@@ -83,6 +83,22 @@ open class BrukerRepository(
             .firstOrNull()
     }
 
+	fun get(id: UUID): BrukerDbo? {
+		val sql = """
+			SELECT *
+			FROM bruker
+			WHERE id = :id
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"id" to id
+			)
+		)
+
+		return template.query(sql, parameters, rowMapper)
+			.firstOrNull()
+	}
 	fun oppdaterVeileder(fodselsnummer: String, veilederId: UUID) {
 		val sql = """
 			UPDATE bruker SET ansvarlig_veileder_id = :veilederId WHERE fodselsnummer = :fodselsnummer

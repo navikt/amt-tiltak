@@ -28,6 +28,14 @@
     <dependencies>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>bff-tiltaksarrangor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>bff-nav_ansatt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>tiltak</artifactId>
         </dependency>
         <dependency>
@@ -70,11 +78,6 @@
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>endring-paa-oppf-bruker-ingestor</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>no.nav.common</groupId>
-            <artifactId>audit-log</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.common</groupId>

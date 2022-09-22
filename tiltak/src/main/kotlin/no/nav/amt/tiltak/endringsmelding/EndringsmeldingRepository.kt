@@ -53,6 +53,24 @@ open class EndringsmeldingRepository(
 		return template.query(sql, param, rowMapper)
 	}
 
+	fun getAktiv(deltakerId: UUID): EndringsmeldingDbo? {
+		return getAktive(listOf(deltakerId)).firstOrNull()
+	}
+
+	fun getAktive(deltakerIder: List<UUID>): List<EndringsmeldingDbo> {
+		if (deltakerIder.isEmpty())
+			return emptyList()
+
+		val sql = """
+			SELECT * FROM endringsmelding
+			WHERE aktiv = true and deltaker_id in(:deltakerIder)
+		""".trimIndent()
+
+		val parameters = sqlParameters("deltakerIder" to deltakerIder)
+
+		return template.query(sql, parameters, rowMapper)
+	}
+
 	fun get(id: UUID): EndringsmeldingDbo {
 		val sql = """
 			SELECT *

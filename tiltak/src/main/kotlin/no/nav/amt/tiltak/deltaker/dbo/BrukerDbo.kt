@@ -20,12 +20,15 @@ data class BrukerDbo(
 ) {
 	fun toBruker(navEnhet: NavEnhet?): Bruker{
 		return Bruker(
-			id = this.id,
-			fornavn = this.fornavn,
-			mellomnavn = this.mellomnavn,
-			etternavn = this.etternavn,
-			fodselsnummer = this.fodselsnummer,
-			navEnhet = navEnhet
+			id = id,
+			fornavn = fornavn,
+			mellomnavn = mellomnavn,
+			etternavn = etternavn,
+			telefonnummer = telefonnummer,
+			epost = epost,
+			fodselsnummer = fodselsnummer,
+			navEnhet = navEnhet,
+			navVeilederId = ansvarligVeilederId,
 		)
 	}
 }
