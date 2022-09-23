@@ -1,20 +1,18 @@
-package no.nav.amt.tiltak.tiltak.controllers
+package no.nav.amt.tiltak.bff.nav_ansatt
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
+import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
+import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
-import no.nav.amt.tiltak.tiltak.repositories.AntallAktiveEndringsmeldingerQuery
-import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingMedLopenrQuery
-import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingMedLopenrQueryDbo
-import no.nav.amt.tiltak.tiltak.repositories.HentTiltaksoversiktQuery
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -35,8 +33,8 @@ import java.time.LocalDateTime
 import java.util.*
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [NavAnsattGjennomforingController::class])
-class NavAnsattGjennomforingControllerTest {
+@WebMvcTest(controllers = [GjennomforingController::class])
+class GjennomforingControllerTest {
 
 	@Autowired
 	private lateinit var mockMvc: MockMvc
@@ -45,22 +43,16 @@ class NavAnsattGjennomforingControllerTest {
 	private lateinit var authService: AuthService
 
 	@MockBean
+	private lateinit var endringsmeldingService: EndringsmeldingService
+
+	@MockBean
 	private lateinit var gjennomforingService: GjennomforingService
 
 	@MockBean
 	private lateinit var tiltaksansvarligTilgangService: TiltaksansvarligTilgangService
 
 	@MockBean
-	private lateinit var hentGjennomforingMedLopenrQuery: HentGjennomforingMedLopenrQuery
-
-	@MockBean
-	private lateinit var hentTiltaksoversiktQuery: HentTiltaksoversiktQuery
-
-	@MockBean
 	private lateinit var tiltaksansvarligAutoriseringService: TiltaksansvarligAutoriseringService
-
-	@MockBean
-	private lateinit var antallAktiveEndringsmeldingerQuery: AntallAktiveEndringsmeldingerQuery
 
 	companion object : MockOAuthServer() {
 		@AfterAll
@@ -123,7 +115,7 @@ class NavAnsattGjennomforingControllerTest {
 		Mockito.`when`(tiltaksansvarligTilgangService.hentAktiveTilganger(navIdent))
 			.thenReturn(emptyList())
 
-		Mockito.`when`(hentTiltaksoversiktQuery.query(any()))
+		Mockito.`when`(gjennomforingService.getGjennomforinger(any()))
 			.thenReturn(emptyList())
 
 		val response = mockMvc.perform(
@@ -203,19 +195,9 @@ class NavAnsattGjennomforingControllerTest {
 
 	@Test
 	fun `hentGjennomforingerMedLopenr() - skal returnere 200 og gjennomføringer med matchende løpenummer`() {
-		val lopenr = 123
-
-		Mockito.`when`(hentGjennomforingMedLopenrQuery.query(lopenr))
-			.thenReturn(listOf(
-				HentGjennomforingMedLopenrQueryDbo(
-					id = GJENNOMFORING_1.id,
-					navn = "navn",
-					lopenr = lopenr,
-					opprettetAr = 2020,
-					arrangorVirksomhetsnavn = "virksomhetsnavn",
-					arrangorOrganisasjonsnavn = null
-				)
-			))
+		val lopenr = GJENNOMFORING_1.lopenr ?: 123
+		Mockito.`when`(gjennomforingService.getAktiveByLopenr(lopenr))
+			.thenReturn(listOf(GJENNOMFORING_1.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor())))
 
 		val response = mockMvc.perform(
 			MockMvcRequestBuilders.get("/api/nav-ansatt/gjennomforing?lopenr=$lopenr")
@@ -223,12 +205,10 @@ class NavAnsattGjennomforingControllerTest {
 		).andReturn().response
 
 		val expectedJson = """
-			[{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"navn","lopenr":123,"opprettetAr":2020,"arrangorNavn":"virksomhetsnavn"}]
+			[{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","lopenr":123,"opprettetAr":2020,"arrangorNavn":"Org TiltaksarrangÃ¸r 1"}]
 		""".trimIndent()
 
 		assertEquals(expectedJson, response.contentAsString)
 		assertEquals(200, response.status)
 	}
-
-
 }

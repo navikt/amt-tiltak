@@ -12,6 +12,7 @@ import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import org.junit.jupiter.api.BeforeEach
@@ -134,5 +135,26 @@ class EndringsmeldingServiceImplTest {
 			)
 		}
 	}
+
+	@Test
+	fun `hentAntallAktiveForGjennomforing - teller aktive endringsmeldinger pa gjennomforing`() {
+		val dato = LocalDate.now()
+		val melding1 = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, dato, ARRANGOR_ANSATT_1.id)
+		val melding2 = endringsmeldingService.opprettMedStartDato(DELTAKER_2.id, dato.minusDays(2), ARRANGOR_ANSATT_1.id)
+		val gjennomforingId = DELTAKER_1.gjennomforingId
+
+		every {
+			auditLoggerService.navAnsattAuditLog(any(), any(), any(), any(), any())
+		} returns Unit
+
+		endringsmeldingService.hentAntallAktiveForGjennomforing(gjennomforingId) shouldBe 2
+
+		endringsmeldingService.markerSomFerdig(melding1.id, NAV_ANSATT_1.id)
+		endringsmeldingService.hentAntallAktiveForGjennomforing(gjennomforingId) shouldBe 1
+
+		endringsmeldingService.markerSomFerdig(melding2.id, NAV_ANSATT_1.id)
+		endringsmeldingService.hentAntallAktiveForGjennomforing(gjennomforingId) shouldBe 0
+	}
+
 
 }

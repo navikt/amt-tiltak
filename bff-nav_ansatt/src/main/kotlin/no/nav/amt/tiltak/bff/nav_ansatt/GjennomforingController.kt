@@ -1,28 +1,24 @@
-package no.nav.amt.tiltak.tiltak.controllers
+package no.nav.amt.tiltak.bff.nav_ansatt
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
+import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
-import no.nav.amt.tiltak.tiltak.repositories.AntallAktiveEndringsmeldingerQuery
-import no.nav.amt.tiltak.tiltak.repositories.HentGjennomforingMedLopenrQuery
-import no.nav.amt.tiltak.tiltak.repositories.HentTiltaksoversiktQuery
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 import java.util.*
 
-@RestController
+@RestController("GjennomforingControllerNavAnsatt")
 @RequestMapping("/api/nav-ansatt/gjennomforing")
-class NavAnsattGjennomforingController(
+class GjennomforingController(
 	private val authService: AuthService,
 	private val gjennomforingService: GjennomforingService,
 	private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService,
-	private val hentGjennomforingMedLopenrQuery: HentGjennomforingMedLopenrQuery,
-	private val hentTiltaksoversiktQuery: HentTiltaksoversiktQuery,
+	private val endringsmeldingService: EndringsmeldingService,
 	private val tiltaksansvarligAutoriseringService: TiltaksansvarligAutoriseringService,
-	private val antallAktiveEndringsmeldingerQuery: AntallAktiveEndringsmeldingerQuery
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
@@ -35,20 +31,18 @@ class NavAnsattGjennomforingController(
 		val tilganger = tiltaksansvarligTilgangService.hentAktiveTilganger(navIdent)
 			.map { it.gjennomforingId }
 
-		val antallEndringsmeldinger = antallAktiveEndringsmeldingerQuery.query(tilganger)
-
-		return hentTiltaksoversiktQuery.query(tilganger)
-			.map {
-				HentGjennomforingerDto(
-					id = it.id,
-					navn = it.navn,
-					lopenr = it.lopenr,
-					opprettetAar = it.opprettetAar,
-					arrangorNavn = it.arrangorOrganisasjonsnavn ?: it.arrangorVirksomhetsnavn,
-					antallAktiveEndringsmeldinger =
-						antallEndringsmeldinger.find { a -> a.gjennomforingId == it.id }?.antallMeldinger ?: 0
-				)
-			}
+		return gjennomforingService.getGjennomforinger(tilganger).map { gjennomforing ->
+			val antallAktiveEndringsmeldinger = endringsmeldingService.hentAntallAktiveForGjennomforing(gjennomforing.id)
+			val arrangor = gjennomforing.arrangor
+			return@map HentGjennomforingerDto(
+				id = gjennomforing.id,
+				navn = gjennomforing.navn,
+				lopenr = gjennomforing.lopenr ?: 0,
+				opprettetAar = gjennomforing.opprettetAar ?: 0,
+				arrangorNavn = arrangor.overordnetEnhetNavn ?: arrangor.navn,
+				antallAktiveEndringsmeldinger = antallAktiveEndringsmeldinger,
+			)
+		}
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
@@ -85,16 +79,15 @@ class NavAnsattGjennomforingController(
 
 		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navAnsattAzureId)
 
-		return hentGjennomforingMedLopenrQuery.query(lopenr)
-			.map {
-				HentGjennomforingMedLopenrDto(
-					id = it.id,
-					navn = it.navn,
-					lopenr = it.lopenr,
-					opprettetAr = it.opprettetAr,
-					arrangorNavn = it.arrangorOrganisasjonsnavn ?: it.arrangorVirksomhetsnavn
-				)
-			}
+		return gjennomforingService.getAktiveByLopenr(lopenr).map {
+			HentGjennomforingMedLopenrDto(
+				id = it.id,
+				navn = it.navn,
+				lopenr = it.lopenr ?: 0,
+				opprettetAr = it.opprettetAar ?: 0,
+				arrangorNavn = it.arrangor.overordnetEnhetNavn ?: it.arrangor.navn,
+			)
+		}
 	}
 
 	data class HentGjennomforingerDto(

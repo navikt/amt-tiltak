@@ -8,6 +8,7 @@ import io.mockk.mockk
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
@@ -157,6 +158,26 @@ class GjennomforingServiceImplTest : FunSpec({
 		val gjennomforing = service.getGjennomforing(GJENNOMFORING_1.id)
 
 		GJENNOMFORING_1.toGjennomforing(tiltakInserted, arrangorInserted) shouldBe gjennomforing
+	}
+
+	test("getByLopenr - gjennomforinger finnes - returnerer liste med gjennomforing") {
+		testDataRepository.insertNavEnhet(NAV_ENHET_1)
+		testDataRepository.insertTiltak(TILTAK_1)
+		testDataRepository.insertArrangor(ARRANGOR_1)
+		testDataRepository.insertGjennomforing(GJENNOMFORING_1)
+
+		val avsluttet = GJENNOMFORING_1.copy(id = UUID.randomUUID(), status = Gjennomforing.Status.AVSLUTTET.name)
+		testDataRepository.insertGjennomforing(avsluttet)
+
+		val tiltakInserted = TILTAK_1.toTiltak()
+		val arrangorInserted = ARRANGOR_1.toArrangor()
+		val lopenr = GJENNOMFORING_1.lopenr ?: 123
+
+		every { arrangorService.getArrangorById(ARRANGOR_1.id) } returns arrangorInserted
+		every { tiltakService.getTiltakById(TILTAK_1.id) } returns tiltakInserted
+
+		val expected = GJENNOMFORING_1.toGjennomforing(tiltakInserted, arrangorInserted)
+		service.getAktiveByLopenr(lopenr) shouldBe listOf(expected)
 	}
 
 })
