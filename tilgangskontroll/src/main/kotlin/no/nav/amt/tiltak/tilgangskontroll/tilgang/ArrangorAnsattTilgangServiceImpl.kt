@@ -107,6 +107,21 @@ open class ArrangorAnsattTilgangServiceImpl(
 	}
 
 	override fun synkroniserRettigheterMedAltinn(ansattPersonligIdent: String) {
+		try {
+		    synkroniserAltinnRettigheter(ansattPersonligIdent)
+		} catch (t: Throwable) {
+			log.error("Feil under synkronisering av altinn rettigheter", t)
+			secureLog.error("Feil under synkronisering av altinn rettigheter for fnr=$ansattPersonligIdent", t)
+		}
+	}
+
+	override fun hentGjennomforingIder(ansattPersonligIdent: String): List<UUID> {
+		val ansattId = hentAnsattId(ansattPersonligIdent)
+
+		return arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
+	}
+
+	private fun synkroniserAltinnRettigheter(ansattPersonligIdent: String) {
 		val altinnRoller = altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent)
 		val maybeAnsatt = arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
 		if (altinnRoller.isEmpty() && maybeAnsatt == null) {
@@ -138,12 +153,6 @@ open class ArrangorAnsattTilgangServiceImpl(
 				arrangorAnsattGjennomforingTilgangService.fjernTilgangTilGjennomforinger(ansatt.id, tilgang.arrangorId)
 			}
 		}
-	}
-
-	override fun hentGjennomforingIder(ansattPersonligIdent: String): List<UUID> {
-		val ansattId = hentAnsattId(ansattPersonligIdent)
-
-		return arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
 	}
 
 	private fun finnTilgangerSomSkalLeggesTil(altinnTilganger: List<AnsattTilgang>, lagredeTilganger: List<AnsattTilgang>): List<AnsattTilgang> {
