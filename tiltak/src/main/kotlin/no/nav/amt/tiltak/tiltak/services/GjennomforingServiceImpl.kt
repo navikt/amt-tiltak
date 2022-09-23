@@ -1,6 +1,8 @@
 package no.nav.amt.tiltak.tiltak.services
 
+import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
@@ -85,8 +87,7 @@ class GjennomforingServiceImpl(
 
 	override fun getGjennomforing(id: UUID): Gjennomforing {
 		return gjennomforingRepository.get(id)?.let { gjennomforingDbo ->
-			val tiltak = tiltakService.getTiltakById(gjennomforingDbo.tiltakId)
-			val arrangor = arrangorService.getArrangorById(gjennomforingDbo.arrangorId)
+			val (tiltak, arrangor) = getTiltakOgArrangor(gjennomforingDbo.tiltakId, gjennomforingDbo.arrangorId)
 			return@let gjennomforingDbo.toGjennomforing(tiltak, arrangor)
 		} ?: throw NoSuchElementException("Fant ikke gjennomforing")
 	}
@@ -107,10 +108,24 @@ class GjennomforingServiceImpl(
 
 	override fun getByArrangorId(arrangorId: UUID): List<Gjennomforing> {
 		return gjennomforingRepository.getByArrangorId(arrangorId).map {
-			val tiltak = tiltakService.getTiltakById(it.tiltakId)
-			val arrangor = arrangorService.getArrangorById(it.arrangorId)
+			val (tiltak, arrangor) = getTiltakOgArrangor(it.tiltakId, it.arrangorId)
 			return@map it.toGjennomforing(tiltak, arrangor)
 		}
+	}
+
+	override fun getAktiveByLopenr(lopenr: Int): List<Gjennomforing> {
+		return gjennomforingRepository.getByLopenr(lopenr)
+			.filter { it.status == Gjennomforing.Status.GJENNOMFORES }
+			.map {
+				val (tiltak, arrangor) = getTiltakOgArrangor(it.tiltakId, it.arrangorId)
+				return@map it.toGjennomforing(tiltak, arrangor)
+		}
+	}
+
+	private fun getTiltakOgArrangor(tiltakId: UUID, arrangorId: UUID): Pair<Tiltak, Arrangor> {
+		val tiltak = tiltakService.getTiltakById(tiltakId)
+		val arrangor = arrangorService.getArrangorById(arrangorId)
+		return Pair(tiltak, arrangor)
 	}
 
 }

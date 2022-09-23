@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
-@RestController
+@RestController("GjennomforingControllerTiltaksarrangor")
 @RequestMapping(value = ["/api/gjennomforing", "/api/tiltaksarrangor/gjennomforing"])
 class GjennomforingController(
 	private val gjennomforingService: GjennomforingService,

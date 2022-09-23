@@ -21,4 +21,6 @@ interface EndringsmeldingService {
 	fun hentEndringsmeldingerForDeltaker(deltakerId: UUID): List<Endringsmelding>
 
 	fun hentSisteAktive(deltakerId: UUID): Endringsmelding?
+
+	fun hentAntallAktiveForGjennomforing(gjennomforingId: UUID): Int
 }

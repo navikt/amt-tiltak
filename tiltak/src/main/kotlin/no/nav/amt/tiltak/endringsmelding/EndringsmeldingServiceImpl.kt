@@ -58,4 +58,8 @@ open class EndringsmeldingServiceImpl(
 
 	override fun hentSisteAktive(deltakerId: UUID) = endringsmeldingRepository.getAktiv(deltakerId)?.toModel()
 
+	override fun hentAntallAktiveForGjennomforing(gjennomforingId: UUID): Int {
+		return hentEndringsmeldingerForGjennomforing(gjennomforingId).count { it.aktiv }
+	}
+
 }
