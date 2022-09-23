@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-open class PdlConnectorConfig {
+open class PdlClientConfig {
 
 	@Value("\${pdl.url}")
 	lateinit var url: String
