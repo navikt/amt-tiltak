@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.ansatt
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
+import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.Person
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.security.mock.oauth2.MockOAuth2Server
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
+import org.mockito.Mockito.times
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -49,6 +51,9 @@ class TiltakarrangorAnsattControllerTest {
 	@MockBean
 	private lateinit var personService: PersonService
 
+	@MockBean
+	private lateinit var arrangorAnsattTilgangService: ArrangorAnsattTilgangService
+
 	@Test
 	fun `getInnloggetAnsatt() should return 401 when not authenticated`() {
 		val response = mockMvc.perform(
@@ -60,11 +65,12 @@ class TiltakarrangorAnsattControllerTest {
 
 	@Test
 	fun `getInnloggetAnsatt() should return 200 when authenticated`() {
-		val token = server.issueToken("tokenx", "test", "test", mapOf("pid" to "12345678")).serialize()
+		val ident = "12345678"
+		val token = server.issueToken("tokenx", "test", "test", mapOf("pid" to ident)).serialize()
 
-		Mockito.`when`(authService.hentPersonligIdentTilInnloggetBruker()).thenReturn("12345678")
+		Mockito.`when`(authService.hentPersonligIdentTilInnloggetBruker()).thenReturn(ident)
 
-		Mockito.`when`(arrangorAnsattService.getAnsattByPersonligIdent("12345678"))
+		Mockito.`when`(arrangorAnsattService.getAnsattByPersonligIdent(ident))
 			.thenReturn(Ansatt(
 				id = UUID.randomUUID(),
 				personligIdent = "",
@@ -78,6 +84,9 @@ class TiltakarrangorAnsattControllerTest {
 			MockMvcRequestBuilders.get("/api/tiltaksarrangor/ansatt/meg")
 				.header("Authorization", "Bearer $token")
 		).andReturn().response
+
+		Mockito.verify(arrangorAnsattTilgangService, times(1))
+			.synkroniserRettigheterMedAltinn(ident)
 
 		assertEquals(200, response.status)
 	}

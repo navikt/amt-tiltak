@@ -107,6 +107,21 @@ open class ArrangorAnsattTilgangServiceImpl(
 	}
 
 	override fun synkroniserRettigheterMedAltinn(ansattPersonligIdent: String) {
+		try {
+		    synkroniserAltinnRettigheter(ansattPersonligIdent)
+		} catch (t: Throwable) {
+			log.error("Feil under synkronisering av altinn rettigheter", t)
+			secureLog.error("Feil under synkronisering av altinn rettigheter for fnr=$ansattPersonligIdent", t)
+		}
+	}
+
+	override fun hentGjennomforingIder(ansattPersonligIdent: String): List<UUID> {
+		val ansattId = hentAnsattId(ansattPersonligIdent)
+
+		return arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
+	}
+
+	private fun synkroniserAltinnRettigheter(ansattPersonligIdent: String) {
 		val altinnRoller = altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent)
 		val maybeAnsatt = arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
 		if (altinnRoller.isEmpty() && maybeAnsatt == null) {
@@ -131,19 +146,15 @@ open class ArrangorAnsattTilgangServiceImpl(
 
 		tilgangerSomSkalLeggesTil.forEach {
 			ansattRolleService.opprettRolle(UUID.randomUUID(), ansatt.id, it.arrangorId, it.arrangorAnsattRolle)
+			log.info("La til ny tilgang under synk med Altinn. ansattId=${ansatt.id} arrangorId=${it.arrangorId} rolle=${it.arrangorAnsattRolle}")
 		}
 		tilgangerSomSkalFjernes.forEach { tilgang ->
 			transactionTemplate.executeWithoutResult {
 				ansattRolleService.deaktiverRolleHosArrangor(ansatt.id, tilgang.arrangorId, tilgang.arrangorAnsattRolle)
 				arrangorAnsattGjennomforingTilgangService.fjernTilgangTilGjennomforinger(ansatt.id, tilgang.arrangorId)
 			}
+			log.info("Fjernet tilgang under synk med Altinn. ansattId=${ansatt.id} arrangorId=${tilgang.arrangorId} rolle=${tilgang.arrangorAnsattRolle}")
 		}
-	}
-
-	override fun hentGjennomforingIder(ansattPersonligIdent: String): List<UUID> {
-		val ansattId = hentAnsattId(ansattPersonligIdent)
-
-		return arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
 	}
 
 	private fun finnTilgangerSomSkalLeggesTil(altinnTilganger: List<AnsattTilgang>, lagredeTilganger: List<AnsattTilgang>): List<AnsattTilgang> {
