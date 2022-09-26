@@ -146,12 +146,14 @@ open class ArrangorAnsattTilgangServiceImpl(
 
 		tilgangerSomSkalLeggesTil.forEach {
 			ansattRolleService.opprettRolle(UUID.randomUUID(), ansatt.id, it.arrangorId, it.arrangorAnsattRolle)
+			log.info("La til ny tilgang under synk med Altinn. ansattId=${ansatt.id} arrangorId=${it.arrangorId} rolle=${it.arrangorAnsattRolle}")
 		}
 		tilgangerSomSkalFjernes.forEach { tilgang ->
 			transactionTemplate.executeWithoutResult {
 				ansattRolleService.deaktiverRolleHosArrangor(ansatt.id, tilgang.arrangorId, tilgang.arrangorAnsattRolle)
 				arrangorAnsattGjennomforingTilgangService.fjernTilgangTilGjennomforinger(ansatt.id, tilgang.arrangorId)
 			}
+			log.info("Fjernet tilgang under synk med Altinn. ansattId=${ansatt.id} arrangorId=${tilgang.arrangorId} rolle=${tilgang.arrangorAnsattRolle}")
 		}
 	}
 
