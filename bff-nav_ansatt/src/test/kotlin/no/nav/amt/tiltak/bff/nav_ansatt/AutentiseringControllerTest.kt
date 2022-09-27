@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tilgangskontroll.autentisering
+package no.nav.amt.tiltak.bff.nav_ansatt
 
 import no.nav.amt.tiltak.clients.poao_tilgang.AdGruppe
 import no.nav.amt.tiltak.common.auth.AuthService
@@ -19,8 +19,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import java.util.*
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [NavAnsattAutentiseringController::class])
-class NavAnsattAutentiseringControllerTest {
+@WebMvcTest(controllers = [AutentiseringController::class])
+class AutentiseringControllerTest {
 
 	companion object : MockOAuthServer() {
 		@AfterAll

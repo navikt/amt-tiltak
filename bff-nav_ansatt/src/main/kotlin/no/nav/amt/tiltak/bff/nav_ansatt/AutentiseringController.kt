@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tilgangskontroll.autentisering
+package no.nav.amt.tiltak.bff.nav_ansatt
 
 import no.nav.amt.tiltak.clients.poao_tilgang.AdGruppe
 import no.nav.amt.tiltak.common.auth.AuthService
@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@RestController
+@RestController("AutentiseringControllerNavAnsatt")
 @RequestMapping("/api/nav-ansatt/autentisering")
-open class NavAnsattAutentiseringController(
+open class AutentiseringController(
     private val authService: AuthService,
     private val navAnsattService: NavAnsattService,
 	private val adGruppeService: AdGruppeService
