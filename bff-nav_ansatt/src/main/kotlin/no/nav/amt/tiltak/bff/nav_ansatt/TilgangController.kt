@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tilgangskontroll.tiltaksansvarlig_tilgang
+package no.nav.amt.tiltak.bff.nav_ansatt
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
@@ -8,9 +8,9 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
-@RestController
-@RequestMapping("/api/tiltaksansvarlig/gjennomforing-tilgang")
-class TiltaksansvarligGjennomforingTilgangController(
+@RestController("TilgangControllerNavAnsatt")
+@RequestMapping(value = ["/api/tiltaksansvarlig/gjennomforing-tilgang", "/api/nav-ansatt/gjennomforing-tilgang"])
+class TilgangController(
     private val authService: AuthService,
     private val navAnsattService: NavAnsattService,
     private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService,

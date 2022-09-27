@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.tilgangskontroll.tiltaksansvarlig_tilgang
+package no.nav.amt.tiltak.bff.nav_ansatt
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
@@ -20,8 +20,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import java.util.*
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [TiltaksansvarligGjennomforingTilgangController::class])
-class TiltaksansvarligGjennomforingTilgangControllerTest {
+@WebMvcTest(controllers = [TilgangController::class])
+class TilgangControllerTest {
 
 	companion object : MockOAuthServer() {
 		@AfterAll
