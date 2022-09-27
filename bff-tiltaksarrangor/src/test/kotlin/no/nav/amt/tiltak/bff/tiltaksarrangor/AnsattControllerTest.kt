@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.ansatt
+package no.nav.amt.tiltak.bff.tiltaksarrangor
 
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
@@ -6,7 +6,7 @@ import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.Person
 import no.nav.amt.tiltak.core.port.PersonService
-import no.nav.security.mock.oauth2.MockOAuth2Server
+import no.nav.amt.tiltak.test.mock_oauth_server.MockOAuthServer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -21,21 +21,16 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import java.util.*
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = [TiltakarrangorAnsattController::class])
-class TiltakarrangorAnsattControllerTest {
+@WebMvcTest(controllers = [AnsattController::class])
+class AnsattControllerTest {
 
 	companion object {
-		private val server = MockOAuth2Server()
-
-		init {
-			server.start()
-			System.setProperty("MOCK_TOKEN_X_DISCOVERY_URL", server.wellKnownUrl("tokenx").toString())
-		}
+		private val server = MockOAuthServer()
 
 		@AfterAll
 		@JvmStatic
 		fun cleanup() {
-			server.shutdown()
+			server.shutdownMockServer()
 		}
 	}
 
@@ -66,7 +61,7 @@ class TiltakarrangorAnsattControllerTest {
 	@Test
 	fun `getInnloggetAnsatt() should return 200 when authenticated`() {
 		val ident = "12345678"
-		val token = server.issueToken("tokenx", "test", "test", mapOf("pid" to ident)).serialize()
+		val token = server.tokenXToken(claims = mapOf("pid" to ident))
 
 		Mockito.`when`(authService.hentPersonligIdentTilInnloggetBruker()).thenReturn(ident)
 
@@ -94,7 +89,7 @@ class TiltakarrangorAnsattControllerTest {
 	@Test
 	fun `getInnloggetAnsatt() should return 200 when ansatt is not previously stored`() {
 		val personligIdent = "12345678"
-		val token = server.issueToken("tokenx", "test", "test", mapOf("pid" to personligIdent)).serialize()
+		val token = server.tokenXToken(claims = mapOf("pid" to personligIdent))
 
 		Mockito.`when`(authService.hentPersonligIdentTilInnloggetBruker()).thenReturn(personligIdent)
 

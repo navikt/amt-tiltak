@@ -1,5 +1,6 @@
-package no.nav.amt.tiltak.ansatt
+package no.nav.amt.tiltak.bff.tiltaksarrangor
 
+import no.nav.amt.tiltak.ansatt.toDto
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
@@ -10,9 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@RestController
+@RestController("AnsattControllerTiltaksarrangor")
 @RequestMapping(value = ["/api/arrangor/ansatt", "/api/tiltaksarrangor/ansatt"])
-class TiltakarrangorAnsattController(
+class AnsattController(
 	private val authService: AuthService,
 	private val arrangorAnsattService: ArrangorAnsattService,
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
@@ -21,14 +22,14 @@ class TiltakarrangorAnsattController(
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/meg")
-	fun getInnloggetAnsatt(): AnsattDto {
+	fun getInnloggetAnsatt(): no.nav.amt.tiltak.ansatt.AnsattDto {
 		val personligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 
 		arrangorAnsattTilgangService.synkroniserRettigheterMedAltinn(personligIdent)
 
 		return arrangorAnsattService.getAnsattByPersonligIdent(personligIdent)?.toDto() ?:
 			personService.hentPerson(personligIdent).let {
-				AnsattDto(
+				no.nav.amt.tiltak.ansatt.AnsattDto(
 					fornavn = it.fornavn,
 					etternavn = it.etternavn,
 					arrangorer = emptyList()
