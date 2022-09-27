@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.arrangor
 
+import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getLocalDateTime
 import no.nav.amt.tiltak.common.db_utils.getUUID
 import org.springframework.jdbc.core.RowMapper
@@ -133,15 +134,14 @@ open class ArrangorRepository(
 	}
 
 	fun getByIder(arrangorIder: List<UUID>): List<ArrangorDbo> {
+		if (arrangorIder.isEmpty())
+			return emptyList()
+
 		val sql = """
 			SELECT * FROM arrangor WHERE id in(:ider)
 		""".trimIndent()
 
-		val parameters = MapSqlParameterSource().addValues(
-			mapOf(
-				"ider" to arrangorIder
-			)
-		)
+		val parameters = sqlParameters("ider" to arrangorIder)
 
 		return template.query(sql, parameters, rowMapper)
 	}

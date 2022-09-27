@@ -8,7 +8,9 @@ import io.mockk.mockk
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.ArrangorService
+import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
@@ -47,6 +49,8 @@ class GjennomforingServiceImplTest : FunSpec({
 
 	lateinit var tiltakService: TiltakService
 
+	lateinit var brukerService: BrukerService
+
 	lateinit var service: GjennomforingServiceImpl
 
 	beforeEach {
@@ -63,13 +67,15 @@ class GjennomforingServiceImplTest : FunSpec({
 
 		tiltakService = mockk()
 
+		brukerService = mockk()
+
 		service = GjennomforingServiceImpl(
 			gjennomforingRepository = gjennomforingRepository,
 			tiltakService = tiltakService,
 			deltakerService = DeltakerServiceImpl(
 				DeltakerRepository(parameterTemplate),
 				DeltakerStatusRepository(parameterTemplate),
-				mockk(),
+				brukerService,
 				transactionTemplate
 			),
 			arrangorService = arrangorService,
@@ -91,22 +97,31 @@ class GjennomforingServiceImplTest : FunSpec({
 		testDataRepository.insertDeltaker(DELTAKER_1)
 		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1)
 
+		val bruker = Bruker(
+			id = UUID.randomUUID(),
+			fornavn = "Fornavn2",
+			mellomnavn = null,
+			etternavn = "Etternavn",
+			fodselsnummer = "12121231123",
+			navEnhet = null,
+			navVeilederId = null,
+			epost = "foo@bar.baz",
+			telefonnummer = "1234",
+		)
+
 		every {
 			deltakerService.slettDeltaker(any())
 		} returns Unit
 
 		every {
+			brukerService.getBruker(DELTAKER_1.brukerId)
+		}  returns bruker
+
+		every {
 			deltakerService.hentDeltakerePaaGjennomforing(GJENNOMFORING_1.id)
 		} returns listOf(Deltaker(
 			id = DELTAKER_1.id,
-			bruker = Bruker(
-				id = UUID.randomUUID(),
-				fornavn = "Fornavn2",
-				mellomnavn = null,
-				etternavn = "Etternavn",
-				fodselsnummer = "12121231123",
-				navEnhet = null
-			),
+			bruker = bruker,
 			startDato = null,
 			sluttDato = null,
 			status = DeltakerStatus(
@@ -143,6 +158,26 @@ class GjennomforingServiceImplTest : FunSpec({
 		val gjennomforing = service.getGjennomforing(GJENNOMFORING_1.id)
 
 		GJENNOMFORING_1.toGjennomforing(tiltakInserted, arrangorInserted) shouldBe gjennomforing
+	}
+
+	test("getByLopenr - gjennomforinger finnes - returnerer liste med gjennomforing") {
+		testDataRepository.insertNavEnhet(NAV_ENHET_1)
+		testDataRepository.insertTiltak(TILTAK_1)
+		testDataRepository.insertArrangor(ARRANGOR_1)
+		testDataRepository.insertGjennomforing(GJENNOMFORING_1)
+
+		val avsluttet = GJENNOMFORING_1.copy(id = UUID.randomUUID(), status = Gjennomforing.Status.AVSLUTTET.name)
+		testDataRepository.insertGjennomforing(avsluttet)
+
+		val tiltakInserted = TILTAK_1.toTiltak()
+		val arrangorInserted = ARRANGOR_1.toArrangor()
+		val lopenr = GJENNOMFORING_1.lopenr ?: 123
+
+		every { arrangorService.getArrangorById(ARRANGOR_1.id) } returns arrangorInserted
+		every { tiltakService.getTiltakById(TILTAK_1.id) } returns tiltakInserted
+
+		val expected = GJENNOMFORING_1.toGjennomforing(tiltakInserted, arrangorInserted)
+		service.getAktiveByLopenr(lopenr) shouldBe listOf(expected)
 	}
 
 })

@@ -80,6 +80,8 @@ class IntegrationTest {
 	private val gjennomforingId = UUID.randomUUID()
 	val personIdent = "32948329048"
 	val virksomhetsnr = "1235543432"
+	val brukerEpost = "epost"
+	val brukerTelefon = "telefon"
 	val now = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
 
 	@BeforeAll
@@ -106,14 +108,15 @@ class IntegrationTest {
 		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, transactionTemplate)
 		arrangorService = ArrangorServiceImpl(enhetsregisterClient, arrangorRepository)
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, arrangorService, transactionTemplate, HentKoordinatorerForGjennomforingQuery(jdbcTemplate))
-		deltakerProcessor = DeltakerProcessor(gjennomforingService, deltakerService, personService, transactionTemplate)
 
+		deltakerProcessor = DeltakerProcessor(gjennomforingService, deltakerService, personService, transactionTemplate)
 		gjennomforingProcessor = GjennomforingProcessor(arrangorService, gjennomforingService, tiltakService, navEnhetService)
+
 		ingestor = ArenaAclIngestorImpl(deltakerProcessor, gjennomforingProcessor)
 
 		every { enhetsregisterClient.hentVirksomhet(virksomhetsnr) } returns virksomhet
 
-		every { personService.hentPersonKontaktinformasjon(personIdent) } returns Kontaktinformasjon("epost", "telefon" )
+		every { personService.hentPersonKontaktinformasjon(personIdent) } returns Kontaktinformasjon(brukerEpost, brukerTelefon)
 		every { veilarbarenaClient.hentBrukerOppfolgingsenhetId(personIdent) } returns null
 		every { personService.hentTildeltVeilederNavIdent(personIdent) } returns null
 		every { personService.hentPerson(personIdent) } returns person
@@ -235,7 +238,7 @@ class IntegrationTest {
 		fornavn = "Fornavn",
 		mellomnavn = null,
 		etternavn = "Etternavn",
-		telefonnummer = "12345678",
+		telefonnummer = brukerTelefon,
 		diskresjonskode = null
 	)
 
@@ -246,7 +249,10 @@ class IntegrationTest {
 			fornavn = person.fornavn,
 			etternavn = person.etternavn,
 			fodselsnummer = personIdent,
-			navEnhet = null
+			navEnhet = null,
+			navVeilederId = null,
+			telefonnummer = brukerTelefon,
+			epost = brukerEpost,
 		),
 		startDato = null,
 		sluttDato = null,

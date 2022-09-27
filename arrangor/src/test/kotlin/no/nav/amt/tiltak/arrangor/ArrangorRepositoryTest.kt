@@ -14,7 +14,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.util.UUID
+import java.util.*
 
 internal class ArrangorRepositoryTest {
 
@@ -112,9 +112,11 @@ internal class ArrangorRepositoryTest {
 		val arrangorer = repository.getByIder(listOf(ARRANGOR_1.id, ARRANGOR_2.id))
 
 		arrangorer shouldHaveSize 2
-
 	}
 
-
+	@Test
+	internal fun `getByIder() should not fail with empty list`() {
+		repository.getByIder(emptyList()) shouldHaveSize 0
+	}
 
 }

@@ -54,7 +54,10 @@ class EndringPaaBrukerIngestorImplTest {
 			mellomnavn = null,
 			etternavn = "etternavn",
 			fodselsnummer = fnr,
-			navEnhet = NavEnhet(UUID.randomUUID(), enhet, "Navn")
+			navEnhet = NavEnhet(UUID.randomUUID(), enhet, "Navn"),
+			telefonnummer = "1234",
+			epost = "foo@bar.baz",
+			navVeilederId = UUID.randomUUID()
 		)
 		every { brukerService.getBruker(fnr) }.returns(bruker)
 
@@ -80,7 +83,10 @@ class EndringPaaBrukerIngestorImplTest {
 			mellomnavn = null,
 			etternavn = "etternavn",
 			fodselsnummer = fnr,
-			navEnhet = NavEnhet(UUID.randomUUID(),"enhet", "Navn")
+			telefonnummer = "1234",
+			epost = "foo@bar.baz",
+			navVeilederId = UUID.randomUUID(),
+			navEnhet = NavEnhet(UUID.randomUUID(),"enhet", "Navn"),
 		)
 
 		every { brukerService.getBruker(fnr) }.returns(bruker)
@@ -110,7 +116,10 @@ class EndringPaaBrukerIngestorImplTest {
 			mellomnavn = null,
 			etternavn = "etternavn",
 			fodselsnummer = fnr,
-			navEnhet = NavEnhet(UUID.randomUUID(),"enhet", "Navn")
+			navEnhet = NavEnhet(UUID.randomUUID(),"enhet", "Navn"),
+			telefonnummer = "1234",
+			epost = "foo@bar.baz",
+			navVeilederId = UUID.randomUUID()
 		)
 		every { brukerService.getBruker(fnr) }.returns(bruker)
 

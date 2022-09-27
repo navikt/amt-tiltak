@@ -13,9 +13,9 @@ open class PeriodicStatistikkUpdater(
 
 	/* En time etter forrige kjøring */
 	@Scheduled(fixedDelay = 60 * 60 * 1000L)
-	@SchedulerLock(name = "statusUpdater", lockAtMostFor = "120m")
+	@SchedulerLock(name = "statistikkUpdater", lockAtMostFor = "120m")
 	open fun update() {
-		JobRunner.run("oppdater_deltaker_statuser", deltakerStatistikkUpdater::oppdater)
+		JobRunner.run("oppdater_deltaker_statistikk", deltakerStatistikkUpdater::oppdater)
 	}
 
 }

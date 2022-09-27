@@ -42,22 +42,6 @@ class AmtAltinnAclClientImpl(
 		}
 	}
 
-	object HentRettigheter {
-		data class Request(
-			val norskIdent: String,
-			val rettighetIder: List<String>,
-		)
-
-		data class Response(
-			val rettigheter: List<Rettighet>
-		) {
-			data class Rettighet(
-				val id: String,
-				val organisasjonsnummer: String,
-			)
-		}
-	}
-
 	object HentTiltaksarrangorRoller {
 		data class Response(
 			val roller: List<TiltaksarrangorRoller>
