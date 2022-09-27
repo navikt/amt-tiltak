@@ -28,10 +28,10 @@ open class LocalApplicationConfig {
 		}
 	}
 
-//	@Bean TODO Ikke kommenter ut denne bønna
-//	open fun machineToMachineTokenClient(): MachineToMachineTokenClient {
-//		return MachineToMachineTokenClient { "MOCK_TOKEN" }
-//	}
+	@Bean
+	open fun machineToMachineTokenClient(): MachineToMachineTokenClient {
+		return MachineToMachineTokenClient { "MOCK_TOKEN" }
+	}
 
 	@Bean
 	open fun corsConfigurer(): WebMvcConfigurer {

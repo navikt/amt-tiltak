@@ -3,6 +3,8 @@ package no.nav.amt.tiltak.application
 import no.nav.common.audit_log.log.AuditLogger
 import no.nav.common.audit_log.log.AuditLoggerImpl
 import no.nav.common.log.LogFilter
+import no.nav.common.token_client.builder.AzureAdTokenClientBuilder
+import no.nav.common.token_client.client.MachineToMachineTokenClient
 import no.nav.common.utils.EnvironmentUtils
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import org.springframework.boot.web.servlet.FilterRegistrationBean
@@ -15,12 +17,13 @@ import org.springframework.context.annotation.Profile
 @Configuration
 open class ApplicationConfig {
 
-//	@Bean TODO Ikke kommenter ut denne bønna
-//	open fun machineToMachineTokenClient(): MachineToMachineTokenClient {
-//		return AzureAdTokenClientBuilder.builder()
-//			.withNaisDefaults()
-//			.buildMachineToMachineTokenClient()
-//	}
+	@Bean
+	@Profile("!integration")
+	open fun machineToMachineTokenClient(): MachineToMachineTokenClient {
+		return AzureAdTokenClientBuilder.builder()
+			.withNaisDefaults()
+			.buildMachineToMachineTokenClient()
+	}
 
 	@Bean
 	open fun auditLogger(): AuditLogger {
