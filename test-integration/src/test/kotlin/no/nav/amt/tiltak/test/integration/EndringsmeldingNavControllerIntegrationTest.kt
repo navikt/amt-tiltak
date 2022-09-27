@@ -1,8 +1,8 @@
 package no.nav.amt.tiltak.test.integration
 
 import io.kotest.matchers.shouldBe
+import no.nav.amt.tiltak.bff.nav_ansatt.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.common.json.JsonUtils
-import no.nav.amt.tiltak.deltaker.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
@@ -138,7 +138,7 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		endringsmeldingBefore.aktiv shouldBe true
-		endringsmeldingBefore.arkivert shouldBe false
+		endringsmeldingBefore.godkjent shouldBe false
 
 		val response = sendRequest(
 			method = "PATCH",
@@ -154,7 +154,7 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		endringsmeldingAfter.aktiv shouldBe false
-		endringsmeldingAfter.arkivert shouldBe true
+		endringsmeldingAfter.godkjent shouldBe true
 
 	}
 
