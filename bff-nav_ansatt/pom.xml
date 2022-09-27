@@ -80,6 +80,10 @@
             <artifactId>database</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>tilgangskontroll</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
