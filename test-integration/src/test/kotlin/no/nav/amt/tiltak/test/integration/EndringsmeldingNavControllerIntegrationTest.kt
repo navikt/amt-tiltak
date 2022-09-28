@@ -38,7 +38,7 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	fun `hentEndringsmeldinger() - skal returnere 403 hvis ikke tilgang til gjennomføring`() {
-		poaoTilgangClient.addHentAdGrupperResponse(name = AdGrupper.TILTAKSANSVARLIG_FLATE_GRUPPE)
+		poaoTilgangClient.addHentAdGrupperResponse(name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE)
 
 		val response = sendRequest(
 			method = "GET",

@@ -23,6 +23,6 @@ class TiltaksarrangorGjennomforingControllerIntegrationTest : IntegrationTestBas
 			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
-		response.code shouldBe 403
+		response.code shouldBe 500
 	}
 }

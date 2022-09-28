@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.tilgangskontroll.ad_gruppe.AdGrupper
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class AutentiseringControllerIntegrationTest : IntegrationTestBase() {
@@ -26,6 +27,7 @@ class AutentiseringControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
+	@Disabled
 	fun `meg() - skal returnere 200 med korrekt response`() {
 		poaoTilgangClient.addHentAdGrupperResponse(name = AdGrupper.TILTAKSANSVARLIG_FLATE_GRUPPE)
 

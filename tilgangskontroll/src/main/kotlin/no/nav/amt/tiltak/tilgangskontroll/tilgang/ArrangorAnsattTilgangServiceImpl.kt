@@ -4,7 +4,6 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller
-import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.ArrangorService
@@ -53,7 +52,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 
 		if (!harTilgang) {
 			secureLog.warn("Ansatt med id=$ansattId har ikke tilgang til gjennomføring med id=$gjennomforingId")
-			throw UnauthorizedException("Ansatt med id=$ansattId har ikke tilgang til gjennomføring med id=$gjennomforingId")
+			throw ResponseStatusException(HttpStatus.FORBIDDEN)
 		}
 	}
 
