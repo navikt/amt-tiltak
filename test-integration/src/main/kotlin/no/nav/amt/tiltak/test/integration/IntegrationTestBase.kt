@@ -48,6 +48,8 @@ abstract class IntegrationTestBase {
 		val norgHttpClient = MockNorgHttpClient()
 		val poaoTilgangClient = MockPoaoTilgangHttpClient()
 		val nomHttpClient = MockNomHttpClient()
+		val altinnAclHttpClient = MockAmtAltinnAclHttpClient()
+		val pdlHttpClient = MockPdlHttpClient()
 
 		@JvmStatic
 		@DynamicPropertySource
@@ -73,6 +75,12 @@ abstract class IntegrationTestBase {
 			nomHttpClient.start()
 			registry.add("nom.url") { nomHttpClient.serverUrl() }
 
+			altinnAclHttpClient.start()
+			registry.add("amt-altinn-acl.url") { altinnAclHttpClient.serverUrl() }
+
+			pdlHttpClient.start()
+			registry.add("pdl.url") { pdlHttpClient.serverUrl() }
+
 			// Database ting
 			val container = SingletonPostgresContainer.getContainer()
 
@@ -90,12 +98,15 @@ abstract class IntegrationTestBase {
 		norgHttpClient.reset()
 		poaoTilgangClient.reset()
 		nomHttpClient.reset()
+		altinnAclHttpClient.reset()
+		pdlHttpClient.reset()
 	}
 
 	fun resetMockServcersAndAddDefaultData() {
 		resetMockServers()
 		norgHttpClient.addDefaultData()
 		nomHttpClient.addDefaultData()
+		altinnAclHttpClient.addDefaultData()
 	}
 
 	fun serverUrl() = "http://localhost:$port"
