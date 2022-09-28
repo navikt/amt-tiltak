@@ -24,6 +24,7 @@
         <module>tilgangskontroll</module>
         <module>bff-tiltaksarrangor</module>
         <module>bff-nav_ansatt</module>
+        <module>tilgangskontroll-tiltaksansvarlig</module>
     </modules>
 
     <name>AMT-Tiltak</name>
@@ -190,6 +191,11 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>utils</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>pdl</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -226,6 +232,11 @@
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>tilgangskontroll</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>tilgangskontroll-tiltaksansvarlig</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

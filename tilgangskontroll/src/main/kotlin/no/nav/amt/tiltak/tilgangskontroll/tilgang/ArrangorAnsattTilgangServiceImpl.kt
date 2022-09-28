@@ -1,6 +1,8 @@
 package no.nav.amt.tiltak.tilgangskontroll.tilgang
 
 import com.github.benmanes.caffeine.cache.Caffeine
+import no.nav.amt.tiltak.common.utils.CacheUtils.tryCacheFirstNotNull
+import no.nav.amt.tiltak.common.utils.CacheUtils.tryCacheFirstNullable
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller
@@ -10,8 +12,6 @@ import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.log.SecureLog.secureLog
 import no.nav.amt.tiltak.tilgangskontroll.altinn.AltinnService
-import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils.tryCacheFirstNotNull
-import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils.tryCacheFirstNullable
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
