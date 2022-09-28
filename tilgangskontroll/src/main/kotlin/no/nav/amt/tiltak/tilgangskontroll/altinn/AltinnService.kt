@@ -4,8 +4,8 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import no.nav.amt.tiltak.clients.amt_altinn_acl.AmtAltinnAclClient
 import no.nav.amt.tiltak.clients.amt_altinn_acl.TiltaksarrangorAnsattRolle
 import no.nav.amt.tiltak.clients.amt_altinn_acl.TiltaksarrangorAnsattRoller
+import no.nav.amt.tiltak.common.utils.CacheUtils
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
-import no.nav.amt.tiltak.tilgangskontroll.utils.CacheUtils
 import org.springframework.stereotype.Service
 import java.time.Duration
 
