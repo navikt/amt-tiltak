@@ -21,10 +21,10 @@
         <module>navansatt</module>
         <module>test</module>
         <module>tiltak</module>
-        <module>tilgangskontroll</module>
         <module>bff-tiltaksarrangor</module>
         <module>bff-nav_ansatt</module>
         <module>tilgangskontroll-tiltaksansvarlig</module>
+        <module>tilgangskontroll-tiltaksarrangor</module>
     </modules>
 
     <name>AMT-Tiltak</name>
@@ -231,7 +231,7 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>tilgangskontroll</artifactId>
+                <artifactId>tilgangskontroll-tiltaksarrangor</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
