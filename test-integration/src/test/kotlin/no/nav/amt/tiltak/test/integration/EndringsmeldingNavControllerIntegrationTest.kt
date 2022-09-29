@@ -23,7 +23,6 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 	@BeforeEach
 	internal fun setUp() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
-		resetMockServcersAndAddDefaultData()
 	}
 
 	@Test
@@ -38,12 +37,22 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	fun `hentEndringsmeldinger() - skal returnere 403 hvis ikke tilgang til gjennomføring`() {
-		poaoTilgangClient.addHentAdGrupperResponse(name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE)
+		val oid = UUID.randomUUID()
+
+		poaoTilgangClient.addHentAdGrupperResponse(
+			navAnsattAzureId = oid,
+			name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
+		)
+
+		val token = oAuthServer.issueAzureAdToken(
+			ident = NAV_ANSATT_1.navIdent,
+			oid = oid
+		)
 
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/nav-ansatt/endringsmelding?gjennomforingId=${GJENNOMFORING_1.id}",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueAzureAdToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = mapOf("Authorization" to "Bearer $token")
 		)
 
 		Assertions.assertEquals(403, response.code)
@@ -51,10 +60,10 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	fun `hentEndringsmeldinger() - skal returnere 200 med riktig response`() {
-		poaoTilgangClient.addHentAdGrupperResponse(name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE)
+		val oid = UUID.randomUUID()
 
 		poaoTilgangClient.addHentAdGrupperResponse(
-			navAnsattAzureId = NAV_ANSATT_1.id,
+			navAnsattAzureId = oid,
 			name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
 		)
 
@@ -80,9 +89,14 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 			)
 		)
 
+		val token = oAuthServer.issueAzureAdToken(
+			ident = NAV_ANSATT_1.navIdent,
+			oid = oid
+		)
+
 		val endringsmeldingResponse = getEndringsmeldingerOnGjennomforing(
 			GJENNOMFORING_1.id,
-			oAuthServer.issueAzureAdToken(NAV_ANSATT_1.navIdent)
+			token
 		)
 
 		endringsmeldingResponse.size shouldBe 1
@@ -102,11 +116,15 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	fun `markerFerdig() - skal returnere 200 og markere som ferdig`() {
-		val token = oAuthServer.issueAzureAdToken(NAV_ANSATT_1.navIdent)
-		poaoTilgangClient.addHentAdGrupperResponse(name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE)
+		val oid = UUID.randomUUID()
+
+		val token = oAuthServer.issueAzureAdToken(
+			ident = NAV_ANSATT_1.navIdent,
+			oid = oid
+		)
 
 		poaoTilgangClient.addHentAdGrupperResponse(
-			navAnsattAzureId = NAV_ANSATT_1.id,
+			navAnsattAzureId = oid,
 			name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
 		)
 

@@ -11,11 +11,13 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+import org.junit.jupiter.api.AfterEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.context.annotation.Import
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -26,6 +28,7 @@ import javax.sql.DataSource
 @Import(IntegrationTestConfiguration::class)
 @ActiveProfiles("integration")
 @TestConfiguration("application-integration.properties")
+@DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
 abstract class IntegrationTestBase {
 
 	@LocalServerPort
@@ -91,6 +94,11 @@ abstract class IntegrationTestBase {
 
 
 		}
+	}
+
+	@AfterEach
+	fun cleanup() {
+		resetMockServers()
 	}
 
 	fun resetMockServers() {

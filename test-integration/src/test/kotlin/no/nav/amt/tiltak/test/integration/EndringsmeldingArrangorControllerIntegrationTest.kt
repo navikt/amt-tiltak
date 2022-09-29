@@ -16,6 +16,7 @@ class EndringsmeldingArrangorControllerIntegrationTest : IntegrationTestBase() {
 	@BeforeEach
 	internal fun setUp() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		resetMockServcersAndAddDefaultData()
 	}
 
 	@Test

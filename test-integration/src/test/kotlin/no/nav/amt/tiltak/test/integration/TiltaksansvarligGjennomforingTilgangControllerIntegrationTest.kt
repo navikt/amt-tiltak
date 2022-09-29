@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.test.integration
 
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import org.junit.jupiter.api.Assertions
@@ -29,10 +30,15 @@ class TiltaksansvarligGjennomforingTilgangControllerIntegrationTest : Integratio
 
 	@Test
 	fun `giTilgangTilGjennomforing() - skal returnere 200 og gi tilgang til gjennomføring`() {
+		val token = oAuthServer.issueAzureAdToken(
+			ident = TestData.NAV_ANSATT_1.navIdent,
+			oid = UUID.randomUUID()
+		)
+
 		val response = sendRequest(
 			method = "POST",
 			url = "/api/tiltaksansvarlig/gjennomforing-tilgang?gjennomforingId=${GJENNOMFORING_1.id}",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueAzureAdToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer $token"),
 			body = "".toJsonRequestBody()
 		)
 

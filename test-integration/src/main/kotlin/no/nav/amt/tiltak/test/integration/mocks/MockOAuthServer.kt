@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.test.integration.mocks
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.slf4j.LoggerFactory
+import java.util.*
 
 open class MockOAuthServer3 {
 
@@ -35,10 +36,11 @@ open class MockOAuthServer3 {
 	fun issueAzureAdToken(
 		subject: String = "test",
 		audience: String = "test-aud",
-		ident: String = NAV_ANSATT_1.navIdent,
+		ident: String,
+		oid: UUID,
 		claims: Map<String, Any> = mapOf(
 			"NAVident" to ident,
-			"oid" to "e2bae1e5-94c8-4ef6-9d7a-4d2e04b5ae1c"
+			"oid" to oid.toString()
 		)
 	): String {
 		return server.issueToken(azureAdIssuer, subject, audience, claims).serialize()
