@@ -50,7 +50,7 @@ class AnsattControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-			{"fornavn":"Integrasjon","etternavn":"Test","arrangorer":[]}
+			{"fornavn":"Integrasjon","etternavn":"Test","arrangorer":[{"id":"8a37bce6-3bc1-11ec-8d3d-0242ac130003","navn":"Tiltaksarrangør 1","organisasjonsnummer":"111111111","overordnetEnhetOrganisasjonsnummer":"911111111","overordnetEnhetNavn":"Org Tiltaksarrangør 1","roller":["KOORDINATOR"]}]}
 		""".trimIndent()
 
 		response.code shouldBe 200

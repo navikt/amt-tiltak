@@ -47,11 +47,12 @@ class AnsattRolleRepository(
 
 	internal fun hentAktiveRoller(ansattId: UUID): List<AnsattRolleDbo> {
 		val sql = """
-			SELECT * FROM arrangor_ansatt_rolle WHERE ansatt_id = :ansattId AND gyldig_fra < current_timestamp AND gyldig_til > current_timestamp
+			SELECT * FROM arrangor_ansatt_rolle WHERE ansatt_id = :ansattId AND gyldig_fra < :currentTime AND gyldig_til > :currentTime
 		""".trimIndent()
 
 		val parameters = sqlParameters(
 			"ansattId" to ansattId,
+			"currentTime" to ZonedDateTime.now().toOffsetDateTime()
 		)
 
 		return template.query(sql, parameters, rowMapper)
@@ -59,14 +60,15 @@ class AnsattRolleRepository(
 
 	internal fun deaktiverRolleHosArrangor(ansattId: UUID, arrangorId: UUID, arrangorAnsattRolle: ArrangorAnsattRolle) {
 		val sql = """
-			UPDATE arrangor_ansatt_rolle SET gyldig_til = current_timestamp
-			WHERE ansatt_id = :ansattId AND arrangor_id = :arrangorId AND rolle = CAST(:ansattRolle AS arrangor_rolle) AND gyldig_til > current_timestamp
+			UPDATE arrangor_ansatt_rolle SET gyldig_til = :currentTime
+			WHERE ansatt_id = :ansattId AND arrangor_id = :arrangorId AND rolle = CAST(:ansattRolle AS arrangor_rolle) AND gyldig_til > :currentTime
 		""".trimIndent()
 
 		val parameters = sqlParameters(
 			"ansattId" to ansattId,
 			"arrangorId" to arrangorId,
 			"ansattRolle" to arrangorAnsattRolle.name,
+			"currentTime" to ZonedDateTime.now().toOffsetDateTime()
 		)
 
 		template.update(sql, parameters)
