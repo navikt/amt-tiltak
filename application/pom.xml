@@ -47,7 +47,7 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>tilgangskontroll</artifactId>
+            <artifactId>tilgangskontroll-tiltaksarrangor</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>

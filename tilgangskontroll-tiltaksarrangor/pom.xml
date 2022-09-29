@@ -9,29 +9,40 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>bff-nav_ansatt</artifactId>
+    <artifactId>tilgangskontroll-tiltaksarrangor</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>db_utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>log</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>amt-altinn-acl</artifactId>
+        </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>core</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>auth</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>tilgangskontroll-tiltaksansvarlig</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>no.nav.security</groupId>
-            <artifactId>token-validation-spring</artifactId>
+            <artifactId>utils</artifactId>
         </dependency>
 
         <dependency>
@@ -40,8 +51,18 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>mock-oauth-server</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>db-migrations</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -52,6 +73,11 @@
         <dependency>
             <groupId>org.mockito.kotlin</groupId>
             <artifactId>mockito-kotlin</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>database</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -71,17 +97,12 @@
         </dependency>
         <dependency>
             <groupId>io.kotest</groupId>
+            <artifactId>kotest-runner-junit5-jvm</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.kotest</groupId>
             <artifactId>kotest-assertions-core-jvm</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>mock-oauth-server</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>database</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

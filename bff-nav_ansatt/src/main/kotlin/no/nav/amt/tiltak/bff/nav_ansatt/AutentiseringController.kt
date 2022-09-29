@@ -4,9 +4,9 @@ import no.nav.amt.tiltak.clients.poao_tilgang.AdGruppe
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.NavAnsattService
-import no.nav.amt.tiltak.tilgangskontroll.ad_gruppe.AdGruppeService
-import no.nav.amt.tiltak.tilgangskontroll.ad_gruppe.AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
-import no.nav.amt.tiltak.tilgangskontroll.ad_gruppe.AdGrupper.TILTAKSANSVARLIG_FLATE_GRUPPE
+import no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig.ad_gruppe.AdGruppeService
+import no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig.ad_gruppe.AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
+import no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig.ad_gruppe.AdGrupper.TILTAKSANSVARLIG_FLATE_GRUPPE
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
