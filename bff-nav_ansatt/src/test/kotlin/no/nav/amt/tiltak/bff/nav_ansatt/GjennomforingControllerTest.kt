@@ -195,7 +195,7 @@ class GjennomforingControllerTest {
 
 	@Test
 	fun `hentGjennomforingerMedLopenr() - skal returnere 200 og gjennomføringer med matchende løpenummer`() {
-		val lopenr = GJENNOMFORING_1.lopenr ?: 123
+		val lopenr = GJENNOMFORING_1.lopenr
 		Mockito.`when`(gjennomforingService.getAktiveByLopenr(lopenr))
 			.thenReturn(listOf(GJENNOMFORING_1.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor())))
 

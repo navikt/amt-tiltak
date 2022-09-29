@@ -157,8 +157,8 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 				registrertDato = LocalDateTime.now(),
 				fremmoteDato = null,
 				navEnhetId = null,
-				opprettetAar = null,
-				lopenr = null,
+				opprettetAar = 0,
+				lopenr = 1,
 			), Gjennomforing(
 				id = GJENNOMFORING_2.id,
 				tiltak = mockk(),
@@ -170,8 +170,8 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 				registrertDato = LocalDateTime.now(),
 				fremmoteDato = null,
 				navEnhetId = null,
-				opprettetAar = null,
-				lopenr = null,
+				opprettetAar = 0,
+				lopenr = 2,
 		))
 
 		var aktiveGjennomforingTilganger = repository.hentAktiveGjennomforingTilgangerForAnsatt(ARRANGOR_ANSATT_1.id)

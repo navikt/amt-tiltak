@@ -44,8 +44,8 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 		registrertDato: LocalDateTime,
 		fremmoteDato: LocalDateTime?,
 		navEnhetId: UUID?,
-		opprettetAar: Int?,
-		lopenr: Int?,
+		opprettetAar: Int,
+		lopenr: Int,
 	): GjennomforingDbo {
 
 		//language=PostgreSQL

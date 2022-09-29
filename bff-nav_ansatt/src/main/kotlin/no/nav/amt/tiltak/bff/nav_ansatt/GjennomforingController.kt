@@ -37,8 +37,8 @@ class GjennomforingController(
 			return@map HentGjennomforingerDto(
 				id = gjennomforing.id,
 				navn = gjennomforing.navn,
-				lopenr = gjennomforing.lopenr ?: 0,
-				opprettetAar = gjennomforing.opprettetAar ?: 0,
+				lopenr = gjennomforing.lopenr,
+				opprettetAar = gjennomforing.opprettetAar,
 				arrangorNavn = arrangor.overordnetEnhetNavn ?: arrangor.navn,
 				antallAktiveEndringsmeldinger = antallAktiveEndringsmeldinger,
 			)
@@ -66,9 +66,8 @@ class GjennomforingController(
 				virksomhetNavn = gjennomforing.arrangor.navn,
 				organisasjonNavn = gjennomforing.arrangor.overordnetEnhetNavn
 			),
-			// I praksis så kan ikke disse være null, når vi får SAK i prod og alle gjennomføringer har løpenr/år så kan dette forenkles
-			lopenr = gjennomforing.lopenr ?: 0,
-			opprettetAr = gjennomforing.opprettetAar ?: 0
+			lopenr = gjennomforing.lopenr,
+			opprettetAr = gjennomforing.opprettetAar,
 		)
 	}
 
@@ -83,8 +82,8 @@ class GjennomforingController(
 			HentGjennomforingMedLopenrDto(
 				id = it.id,
 				navn = it.navn,
-				lopenr = it.lopenr ?: 0,
-				opprettetAr = it.opprettetAar ?: 0,
+				lopenr = it.lopenr,
+				opprettetAr = it.opprettetAar,
 				arrangorNavn = it.arrangor.overordnetEnhetNavn ?: it.arrangor.navn,
 			)
 		}
