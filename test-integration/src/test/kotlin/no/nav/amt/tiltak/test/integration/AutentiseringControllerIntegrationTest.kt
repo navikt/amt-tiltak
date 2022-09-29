@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.test.integration
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData
-import no.nav.amt.tiltak.tilgangskontroll.ad_gruppe.AdGrupper
+import no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig.ad_gruppe.AdGrupper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.*
