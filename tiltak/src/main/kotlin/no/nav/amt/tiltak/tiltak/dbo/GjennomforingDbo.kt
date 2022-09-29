@@ -20,8 +20,8 @@ data class GjennomforingDbo(
 	val registrertDato: LocalDateTime,
 	val fremmoteDato: LocalDateTime?,
 	val navEnhetId: UUID?,
-	val opprettetAar: Int?,
-	val lopenr: Int?,
+	val opprettetAar: Int,
+	val lopenr: Int,
 	val createdAt: LocalDateTime,
 	val modifiedAt: LocalDateTime
 ) {

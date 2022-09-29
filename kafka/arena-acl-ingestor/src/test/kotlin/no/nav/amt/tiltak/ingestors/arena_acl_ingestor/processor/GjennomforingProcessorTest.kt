@@ -51,8 +51,8 @@ class GjennomforingProcessorTest : StringSpec({
 				registrertDato = LocalDateTime.now(),
 				fremmoteDato = null,
 				ansvarligNavEnhetId = null,
-				lopenr = null,
-				opprettetAar = null
+				lopenr = 0,
+				opprettetAar = 0
 			)
 		))
 

@@ -17,8 +17,8 @@ data class GjennomforingInput(
 	val registrertDato: LocalDate,
 	val fremmoteDato: LocalDate,
 	val navEnhetId: UUID?,
-	val opprettetAar: Int?,
-	val lopenr: Int?,
+	val opprettetAar: Int,
+	val lopenr: Int,
 ) {
 	fun toGjennomforing(tiltak: Tiltak, arrangor: Arrangor): Gjennomforing {
 		return Gjennomforing(

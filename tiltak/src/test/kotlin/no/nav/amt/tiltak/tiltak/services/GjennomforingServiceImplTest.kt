@@ -171,7 +171,7 @@ class GjennomforingServiceImplTest : FunSpec({
 
 		val tiltakInserted = TILTAK_1.toTiltak()
 		val arrangorInserted = ARRANGOR_1.toArrangor()
-		val lopenr = GJENNOMFORING_1.lopenr ?: 123
+		val lopenr = GJENNOMFORING_1.lopenr
 
 		every { arrangorService.getArrangorById(ARRANGOR_1.id) } returns arrangorInserted
 		every { tiltakService.getTiltakById(TILTAK_1.id) } returns tiltakInserted

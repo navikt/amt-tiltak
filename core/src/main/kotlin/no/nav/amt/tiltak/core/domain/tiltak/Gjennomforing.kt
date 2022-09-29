@@ -16,8 +16,8 @@ data class Gjennomforing(
 	val registrertDato: LocalDateTime,
 	val fremmoteDato: LocalDateTime?,
 	val navEnhetId: UUID?,
-	val opprettetAar: Int?,
-	val lopenr: Int?,
+	val opprettetAar: Int,
+	val lopenr: Int,
 ) {
 	enum class Status {
 		IKKE_STARTET, GJENNOMFORES, AVSLUTTET
