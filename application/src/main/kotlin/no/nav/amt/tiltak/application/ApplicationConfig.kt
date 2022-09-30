@@ -12,12 +12,13 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 
-@Profile("!local")
+@Profile(value = ["!local", "!integration"])
 @EnableJwtTokenValidation
 @Configuration
 open class ApplicationConfig {
 
 	@Bean
+	@Profile("!integration")
 	open fun machineToMachineTokenClient(): MachineToMachineTokenClient {
 		return AzureAdTokenClientBuilder.builder()
 			.withNaisDefaults()

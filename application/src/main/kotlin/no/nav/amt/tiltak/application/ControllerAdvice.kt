@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.core.exceptions.EndringsmeldingIkkeAktivException
 import no.nav.amt.tiltak.core.exceptions.NotAuthenticatedException
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.exceptions.ValidationException
+import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -61,6 +62,17 @@ open class ControllerAdvice(
 
 		return buildResponse(
 			status = HttpStatus.FORBIDDEN,
+			exception = e
+		)
+	}
+
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	@ExceptionHandler(JwtTokenUnauthorizedException::class)
+	fun handleJwtTokenUnauthorizedException(e: JwtTokenUnauthorizedException): ResponseEntity<Response> {
+		logger.info(e.message, e)
+
+		return buildResponse(
+			status = HttpStatus.UNAUTHORIZED,
 			exception = e
 		)
 	}

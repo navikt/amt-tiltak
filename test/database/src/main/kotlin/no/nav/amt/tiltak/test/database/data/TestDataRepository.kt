@@ -123,8 +123,8 @@ class TestDataRepository(
 
 	fun insertDeltakerStatus(cmd: DeltakerStatusInput) {
 		val sql = """
-			INSERT INTO deltaker_status (id, deltaker_id, gyldig_fra, status, aktiv)
-			VALUES (:id, :deltaker_id, :gyldigFra, :status, :aktiv)
+			INSERT INTO deltaker_status (id, deltaker_id, gyldig_fra, status, aktiv, created_at)
+			VALUES (:id, :deltaker_id, :gyldigFra, :status, :aktiv, :createdAt)
 		""".trimIndent()
 
 		template.update(
@@ -133,7 +133,8 @@ class TestDataRepository(
 				"deltaker_id" to cmd.deltakerId,
 				"gyldigFra" to cmd.gyldigFra,
 				"status" to cmd.status,
-				"aktiv" to cmd.aktiv
+				"aktiv" to cmd.aktiv,
+				"createdAt" to cmd.createdAt.toLocalDateTime()
 			)
 		)
 	}

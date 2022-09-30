@@ -3,25 +3,27 @@ package no.nav.amt.tiltak.test.database.data
 import no.nav.amt.tiltak.test.database.data.inputs.*
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
 object TestData {
 
-	fun createGjennomforingInput(tiltak: TiltakInput, arrangor: ArrangorInput, enhet: NavEnhetInput) = GjennomforingInput(
-		id = UUID.randomUUID(),
-		tiltakId = tiltak.id,
-		arrangorId = arrangor.id,
-		navn = "Tiltaksgjennomforing1",
-		status = "GJENNOMFORES",
-		startDato = LocalDate.now().minusWeeks(3),
-		sluttDato = LocalDate.now().plusYears(3),
-		navEnhetId = enhet.id,
-		registrertDato = LocalDate.now().minusWeeks(4),
-		fremmoteDato = LocalDate.of(2022, 2, 1),
-		opprettetAar = 2020,
-		lopenr = 123
-	)
+	fun createGjennomforingInput(tiltak: TiltakInput, arrangor: ArrangorInput, enhet: NavEnhetInput) =
+		GjennomforingInput(
+			id = UUID.randomUUID(),
+			tiltakId = tiltak.id,
+			arrangorId = arrangor.id,
+			navn = "Tiltaksgjennomforing1",
+			status = "GJENNOMFORES",
+			startDato = LocalDate.now().minusWeeks(3),
+			sluttDato = LocalDate.now().plusYears(3),
+			navEnhetId = enhet.id,
+			registrertDato = LocalDate.now().minusWeeks(4),
+			fremmoteDato = LocalDate.of(2022, 2, 1),
+			opprettetAar = 2020,
+			lopenr = 123
+		)
 
 	fun createDeltakerInput(bruker: BrukerInput, gjennomforing: GjennomforingInput) =
 		DeltakerInput(
@@ -53,7 +55,8 @@ object TestData {
 		deltakerId = deltaker.id,
 		gyldigFra = LocalDateTime.now(),
 		status = "DELTAR",
-		aktiv = true
+		aktiv = true,
+		createdAt = deltaker.createdAt
 	)
 
 	val NAV_ENHET_1 = NavEnhetInput(
@@ -229,7 +232,7 @@ object TestData {
 		dagerPerUke = 5,
 		prosentStilling = 100f,
 		registrertDato = LocalDateTime.of(2022, 2, 13, 12, 12),
-		innsokBegrunnelse = "begrunnelse deltaker 1"
+		innsokBegrunnelse = "begrunnelse deltaker 1",
 	)
 
 

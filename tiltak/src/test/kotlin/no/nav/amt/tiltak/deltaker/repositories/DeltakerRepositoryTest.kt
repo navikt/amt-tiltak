@@ -86,11 +86,11 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val nyBegrunnelse = "ny begrunnelse"
 
 		val updatedDeltaker = repository.update(DeltakerUpdateDbo(
-				id = DELTAKER_1.id,
-				startDato = nyStartdato,
-				sluttDato = nySluttdato,
-				registrertDato = LocalDateTime.now(),
-				innsokBegrunnelse = nyBegrunnelse
+			id = DELTAKER_1.id,
+			startDato = nyStartdato,
+			sluttDato = nySluttdato,
+			registrertDato = LocalDateTime.now(),
+			innsokBegrunnelse = nyBegrunnelse
 		))
 
 		updatedDeltaker.id shouldBe DELTAKER_1.id

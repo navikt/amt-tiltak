@@ -25,6 +25,7 @@
         <module>bff-nav_ansatt</module>
         <module>tilgangskontroll-tiltaksansvarlig</module>
         <module>tilgangskontroll-tiltaksarrangor</module>
+        <module>test-integration</module>
     </modules>
 
     <name>AMT-Tiltak</name>
@@ -330,6 +331,13 @@
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>test-integration</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>mock-oauth-server</artifactId>

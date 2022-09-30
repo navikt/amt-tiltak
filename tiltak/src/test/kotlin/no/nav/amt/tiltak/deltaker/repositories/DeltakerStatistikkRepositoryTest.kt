@@ -22,9 +22,9 @@ import java.util.*
 
 class DeltakerStatistikkRepositoryTest : FunSpec({
 
-		val dataSource = SingletonPostgresContainer.getDataSource()
+	val dataSource = SingletonPostgresContainer.getDataSource()
 
-		lateinit var repository: DeltakerStatistikkRepository
+	lateinit var repository: DeltakerStatistikkRepository
 
 	beforeEach {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
