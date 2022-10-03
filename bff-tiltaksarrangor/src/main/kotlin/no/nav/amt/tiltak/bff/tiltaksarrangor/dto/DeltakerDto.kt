@@ -21,10 +21,10 @@ data class DeltakerDto(
 
 fun Deltaker.toDto(aktivEndringsmeldingDto: AktivEndringsmeldingDto?) = DeltakerDto(
 	id = id,
-	fornavn = bruker.fornavn,
-	mellomnavn = bruker.mellomnavn,
-	etternavn = bruker.etternavn,
-	fodselsnummer = bruker.fodselsnummer,
+	fornavn = fornavn,
+	mellomnavn = mellomnavn,
+	etternavn = etternavn,
+	fodselsnummer = fodselsnummer,
 	startDato = startDato,
 	sluttDato = sluttDato,
 	status = DeltakerStatusDto(type=status.type, endretDato = status.opprettetDato),

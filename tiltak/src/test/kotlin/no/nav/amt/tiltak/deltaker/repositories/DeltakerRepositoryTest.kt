@@ -67,10 +67,9 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		dbo shouldNotBe null
 		dbo!!.id shouldBe id
-		dbo.brukerId shouldBe BRUKER_3.id
-		dbo.brukerFornavn shouldBe BRUKER_3.fornavn
-		dbo.brukerEtternavn shouldBe BRUKER_3.etternavn
-		dbo.brukerFodselsnummer shouldBe BRUKER_3.fodselsnummer
+		dbo.fornavn shouldBe BRUKER_3.fornavn
+		dbo.etternavn shouldBe BRUKER_3.etternavn
+		dbo.fodselsnummer shouldBe BRUKER_3.fodselsnummer
 		dbo.gjennomforingId shouldBe GJENNOMFORING_1.id
 		dbo.startDato shouldBe startDato
 		dbo.sluttDato shouldBe sluttDato
@@ -117,7 +116,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		gottenDbo shouldNotBe null
 		gottenDbo!!.id shouldBe insertDbo.id
-		gottenDbo.brukerId shouldBe insertDbo.brukerId
 		gottenDbo.gjennomforingId shouldBe insertDbo.gjennomforingId
 		gottenDbo.startDato shouldBe insertDbo.startDato
 		gottenDbo.sluttDato shouldBe insertDbo.sluttDato
@@ -144,7 +142,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		gottenDbo shouldNotBe null
 		gottenDbo!!.id shouldBe insertDbo.id
-		gottenDbo.brukerId shouldBe insertDbo.brukerId
 		gottenDbo.gjennomforingId shouldBe insertDbo.gjennomforingId
 		gottenDbo.startDato shouldBe insertDbo.startDato
 		gottenDbo.sluttDato shouldBe insertDbo.sluttDato
@@ -180,7 +177,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		gottenDbo shouldNotBe null
 		gottenDbo!!.gjennomforingId shouldBe gjennomforing.id
-		gottenDbo.brukerId shouldBe bruker.id
 
 
 	}
@@ -266,7 +262,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		potensieltDeltar shouldHaveSize 1
 		potensieltDeltar[0].id shouldBe deltakerInsertDbo.id
-		potensieltDeltar[0].brukerId shouldBe deltakerInsertDbo.brukerId
 		potensieltDeltar[0].gjennomforingId shouldBe deltakerInsertDbo.gjennomforingId
 		potensieltDeltar[0].startDato shouldBe deltakerInsertDbo.startDato
 		potensieltDeltar[0].sluttDato shouldBe deltakerInsertDbo.sluttDato

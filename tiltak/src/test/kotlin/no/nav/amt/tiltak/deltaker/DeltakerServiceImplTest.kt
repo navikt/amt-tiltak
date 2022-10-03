@@ -68,7 +68,7 @@ class DeltakerServiceImplTest {
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		deltakerServiceImpl = DeltakerServiceImpl(
 			deltakerRepository, deltakerStatusRepository,
-			brukerService, TransactionTemplate(DataSourceTransactionManager(dataSource))
+			brukerService, navEnhetService, TransactionTemplate(DataSourceTransactionManager(dataSource))
 		)
 		testDataRepository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
 

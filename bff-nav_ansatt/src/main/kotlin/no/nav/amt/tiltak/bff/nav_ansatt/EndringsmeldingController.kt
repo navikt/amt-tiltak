@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.bff.nav_ansatt
 
+import no.nav.amt.tiltak.bff.nav_ansatt.dto.BrukerDto
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.toDto
 import no.nav.amt.tiltak.common.auth.AuthService
@@ -40,7 +41,12 @@ class EndringsmeldingController(
 				godkjent = it.ferdiggjortAvNavAnsattId != null,
 				arkivert = it.ferdiggjortAvNavAnsattId == null && !it.aktiv,
 				opprettetAvArrangorAnsatt = opprettetAvAnsatt,
-				bruker = deltaker.bruker.toDto(),
+				bruker = BrukerDto(
+					deltaker.fornavn,
+					deltaker.mellomnavn,
+					deltaker.etternavn,
+					deltaker.fodselsnummer,
+				),
 				opprettetDato = it.opprettet
 			)
 		}

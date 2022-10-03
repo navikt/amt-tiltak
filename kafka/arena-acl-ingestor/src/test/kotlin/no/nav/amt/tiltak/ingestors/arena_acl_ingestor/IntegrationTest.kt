@@ -10,7 +10,6 @@ import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.clients.amt_enhetsregister.Virksomhet
 import no.nav.amt.tiltak.clients.norg.NorgClient
 import no.nav.amt.tiltak.clients.veilarbarena.VeilarbarenaClient
-import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
@@ -105,7 +104,7 @@ class IntegrationTest {
 		navEnhetService = NavEnhetServiceImpl(norgClient, navEnhetRepository, veilarbarenaClient)
 		tiltakService = TiltakServiceImpl(tiltakRepository)
 		brukerService = BrukerServiceImpl(brukerRepository, personService, mockk(), navEnhetService)
-		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, transactionTemplate)
+		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, navEnhetService, transactionTemplate)
 		arrangorService = ArrangorServiceImpl(enhetsregisterClient, arrangorRepository)
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, arrangorService, transactionTemplate, HentKoordinatorerForGjennomforingQuery(jdbcTemplate))
 
@@ -150,14 +149,12 @@ class IntegrationTest {
 		val inserted = deltakerService.hentDeltaker(deltakerToInsert.id)
 
 		inserted shouldNotBe null
-		inserted!!.bruker shouldNotBe null
 
 		val uuid = UUID.randomUUID()
 		val expected = deltakerToInsert.copy(
-			bruker = deltakerToInsert.bruker.copy(id= inserted.bruker.id),
 			status = deltakerToInsert.status.copy(id = uuid, opprettetDato = now)
 		)
-		val actual = inserted.copy(status = inserted.status.copy(id = uuid, opprettetDato = now))
+		val actual = inserted!!.copy(status = inserted.status.copy(id = uuid, opprettetDato = now))
 		actual shouldBe expected
 
 	}
@@ -171,14 +168,13 @@ class IntegrationTest {
 		val inserted = deltakerService.hentDeltaker(deltakerOppdatert.id)
 
 		inserted shouldNotBe null
-		inserted!!.bruker shouldNotBe null
+		//inserted!!.bruker shouldNotBe null
 
 		val uuid = UUID.randomUUID()
 		val expected = deltakerOppdatert.copy(
-			bruker = deltakerOppdatert.bruker.copy(id= inserted.bruker.id),
 			status = deltakerOppdatert.status.copy(id = uuid, opprettetDato = now)
 		)
-		val actual = inserted.copy(status = inserted.status.copy(id = uuid, opprettetDato = now))
+		val actual = inserted!!.copy(status = inserted.status.copy(id = uuid, opprettetDato = now))
 		actual.status shouldBe expected.status
 		actual shouldBe expected
 
@@ -244,16 +240,13 @@ class IntegrationTest {
 
 	val deltakerToInsert = Deltaker(
 		id = UUID.randomUUID(),
-		bruker = Bruker(
-			id = UUID.randomUUID(),
-			fornavn = person.fornavn,
-			etternavn = person.etternavn,
-			fodselsnummer = personIdent,
-			navEnhet = null,
-			navVeilederId = null,
-			telefonnummer = brukerTelefon,
-			epost = brukerEpost,
-		),
+		fornavn = person.fornavn,
+		etternavn = person.etternavn,
+		fodselsnummer = personIdent,
+		navEnhet = null,
+		navVeilederId = null,
+		telefonnummer = brukerTelefon,
+		epost = brukerEpost,
 		startDato = null,
 		sluttDato = null,
 		status = DeltakerStatus(
@@ -271,7 +264,13 @@ class IntegrationTest {
 
 	val deltakerOppdatert = Deltaker(
 		id = deltakerToInsert.id,
-		bruker = deltakerToInsert.bruker,
+		fornavn = person.fornavn,
+		etternavn = person.etternavn,
+		fodselsnummer = personIdent,
+		navEnhet = null,
+		navVeilederId = null,
+		telefonnummer = brukerTelefon,
+		epost = brukerEpost,
 		startDato = LocalDate.now().minusDays(1),
 		sluttDato = LocalDate.now().plusDays(1),
 		status = DeltakerStatus(id= UUID.randomUUID(), Deltaker.Status.DELTAR, now, now, true),

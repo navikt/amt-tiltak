@@ -69,6 +69,7 @@ class GjennomforingControllerIntegrationTest {
 	private lateinit var controller: GjennomforingController
 	private lateinit var controllerService: ControllerService
 	private lateinit var testDataRepository: TestDataRepository
+	private lateinit var navEnhetService: NavEnhetService
 
 	@BeforeEach
 	fun before() {
@@ -83,6 +84,7 @@ class GjennomforingControllerIntegrationTest {
 		deltakerStatusRepository = DeltakerStatusRepository(namedJdbcTemplate)
 		authService = mock(AuthService::class.java)
 		auditLoggerService = mock(AuditLoggerService::class.java)
+		navEnhetService = mock(NavEnhetService::class.java)
 
 		arrangorService = ArrangorServiceImpl(mockk(), ArrangorRepository(namedJdbcTemplate))
 
@@ -97,6 +99,7 @@ class GjennomforingControllerIntegrationTest {
 			deltakerRepository,
 			deltakerStatusRepository,
 			brukerService,
+			navEnhetService,
 			transactionTemplate
 		)
 

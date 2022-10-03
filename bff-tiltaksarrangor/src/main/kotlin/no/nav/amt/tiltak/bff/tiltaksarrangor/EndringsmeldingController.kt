@@ -53,7 +53,7 @@ class EndringsmeldingController(
 
 		arrangorTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, deltaker.gjennomforingId)
 
-		val erSkjermet = skjermetPersonService.erSkjermet(deltaker.bruker.fodselsnummer)
+		val erSkjermet = skjermetPersonService.erSkjermet(deltaker.fodselsnummer)
 
 		if (erSkjermet) {
 			throw NotImplementedError("Støtte for denne personen er ikke implementert")

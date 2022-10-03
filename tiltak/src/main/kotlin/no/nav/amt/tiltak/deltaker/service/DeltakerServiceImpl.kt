@@ -6,6 +6,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
@@ -23,6 +24,7 @@ open class DeltakerServiceImpl(
 	private val deltakerRepository: DeltakerRepository,
 	private val deltakerStatusRepository: DeltakerStatusRepository,
 	private val brukerService: BrukerService,
+	private val navEnhetService: NavEnhetService,
 	private val transactionTemplate: TransactionTemplate
 ) : DeltakerService {
 
@@ -56,10 +58,9 @@ open class DeltakerServiceImpl(
 
 	override fun hentDeltakerePaaGjennomforing(gjennomforingId: UUID): List<Deltaker> {
 		return deltakerRepository.getDeltakerePaaTiltak(gjennomforingId)
-			.map {
-				val bruker = brukerService.getBruker(it.brukerId)
-					?: throw NoSuchElementException("Ingen bruker med id: ${it.brukerId}")
-				return@map it.toDeltaker(hentStatusOrThrow(it.id), bruker)
+			.map {deltaker ->
+				val navEnhet = deltaker.navEnhetId?.let { navEnhetService.getNavEnhet(it) }
+				return@map deltaker.toDeltaker(hentStatusOrThrow(deltaker.id), navEnhet)
 			}
 	}
 
@@ -67,11 +68,9 @@ open class DeltakerServiceImpl(
 		val deltaker = deltakerRepository.get(deltakerId)
 			?: return null
 
-		val bruker = brukerService.getBruker(deltaker.brukerId)
-			?: throw NoSuchElementException("Ingen bruker med id: ${deltaker.brukerId}")
+		val navEnhet = deltaker.navEnhetId?.let { navEnhetService.getNavEnhet(it) }
 
-
-		return deltaker.toDeltaker(hentStatusOrThrow(deltakerId), bruker)
+		return deltaker.toDeltaker(hentStatusOrThrow(deltakerId), navEnhet)
 	}
 
 	override fun oppdaterStatuser() {
@@ -129,10 +128,9 @@ open class DeltakerServiceImpl(
 
 	private fun progressStatuser(kandidater: List<DeltakerDbo>) = kandidater
 		.also { log.info("Oppdaterer status på ${it.size} deltakere") }
-		.map {
-			val bruker = brukerService.getBruker(it.brukerId)
-				?: throw NoSuchElementException("Ingen bruker med id: ${it.brukerId}")
-			it.toDeltaker(hentStatusOrThrow(it.id), bruker)
+		.map { deltaker ->
+			val navEnhet = deltaker.navEnhetId?.let { navEnhetService.getNavEnhet(it) }
+			deltaker.toDeltaker(hentStatusOrThrow(deltaker.id), navEnhet)
 		}
 		.forEach {
 			insertStatus(DeltakerStatusInsert(

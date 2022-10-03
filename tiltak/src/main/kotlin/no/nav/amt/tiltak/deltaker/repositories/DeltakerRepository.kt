@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.common.db_utils.getNullableString
+import no.nav.amt.tiltak.common.db_utils.getNullableUUID
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpdateDbo
@@ -18,11 +19,14 @@ open class DeltakerRepository(
 
 		DeltakerDbo(
 			id = UUID.fromString(rs.getString("id")),
-			brukerId = UUID.fromString(rs.getString("bruker_id")),
-			brukerFodselsnummer = rs.getString("fodselsnummer"),
-			brukerFornavn = rs.getString("fornavn"),
-			brukerMellomnavn = rs.getString("mellomnavn"),
-			brukerEtternavn = rs.getString("etternavn"),
+			fodselsnummer = rs.getString("fodselsnummer"),
+			fornavn = rs.getString("fornavn"),
+			mellomnavn = rs.getString("mellomnavn"),
+			etternavn = rs.getString("etternavn"),
+			telefonnummer = rs.getString("telefonnummer"),
+			epost = rs.getString("epost"),
+			navEnhetId = rs.getNullableUUID("nav_enhet_id"),
+			navVeilederId = rs.getNullableUUID("ansvarlig_veileder_id"),
 			startDato = rs.getDate("start_dato")?.toLocalDate(),
 			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
 			gjennomforingId = UUID.fromString(rs.getString("gjennomforing_id")),
@@ -69,11 +73,7 @@ open class DeltakerRepository(
 
 	fun getDeltakerePaaTiltak(id: UUID): List<DeltakerDbo> {
 		val sql = """
-			SELECT deltaker.*,
-				bruker.fodselsnummer,
-				bruker.fornavn,
-				bruker.mellomnavn,
-				bruker.etternavn
+			SELECT deltaker.*, bruker.*
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 			WHERE deltaker.gjennomforing_id = :gjennomforing_id
@@ -117,11 +117,7 @@ open class DeltakerRepository(
 
 	fun get(id: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.*,
-				   bruker.fodselsnummer,
-				   bruker.fornavn,
-				   bruker.mellomnavn,
-				   bruker.etternavn
+			SELECT deltaker.*, bruker.*
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 			WHERE deltaker.id = :deltakerId
@@ -139,11 +135,7 @@ open class DeltakerRepository(
 
 	fun get(brukerId: UUID, gjennomforingId: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.*,
-				   bruker.fodselsnummer,
-				   bruker.fornavn,
-				   bruker.mellomnavn,
-				   bruker.etternavn
+			SELECT deltaker.*, bruker.*
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 			WHERE bruker.id = :brukerId
@@ -163,11 +155,7 @@ open class DeltakerRepository(
 
 	fun get(fodselsnummer: String, gjennomforingId: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.*,
-				   bruker.fodselsnummer,
-				   bruker.fornavn,
-				   bruker.mellomnavn,
-				   bruker.etternavn
+			SELECT deltaker.*, bruker.*
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 			WHERE bruker.fodselsnummer = :bruker_fodselsnummer
@@ -187,11 +175,7 @@ open class DeltakerRepository(
 
 	fun potensieltHarSlutta(): List<DeltakerDbo> {
 		val sql = """
-			SELECT deltaker.*,
-				   bruker.fodselsnummer,
-				   bruker.fornavn,
-				   bruker.mellomnavn,
-				   bruker.etternavn
+			SELECT deltaker.*, bruker.*
 			FROM deltaker_status
 					 inner join deltaker on deltaker_status.deltaker_id = deltaker.id
 					 inner join bruker on bruker.id = deltaker.bruker_id
@@ -205,11 +189,7 @@ open class DeltakerRepository(
 
 	fun potensieltDeltar(): List<DeltakerDbo> {
 		val sql = """
-			SELECT deltaker.*,
-				   bruker.fodselsnummer,
-				   bruker.fornavn,
-				   bruker.mellomnavn,
-				   bruker.etternavn
+			SELECT deltaker.*, bruker.*
 			FROM deltaker_status
 					 inner join deltaker on deltaker_status.deltaker_id = deltaker.id
 					 inner join bruker on bruker.id = deltaker.bruker_id
