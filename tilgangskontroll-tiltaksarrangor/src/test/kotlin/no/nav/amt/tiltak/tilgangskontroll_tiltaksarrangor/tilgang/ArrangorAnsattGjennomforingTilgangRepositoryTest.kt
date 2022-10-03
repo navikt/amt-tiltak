@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.DbUtils.shouldBeCloseTo
 import no.nav.amt.tiltak.test.database.DbUtils.shouldBeEqualTo
@@ -137,6 +138,16 @@ class ArrangorAnsattGjennomforingTilgangRepositoryTest : FunSpec({
 		val tilgang = repository.get(tilgangId)
 
 		tilgang.gyldigTil shouldBeCloseTo ZonedDateTime.now()
+	}
+
+	test("getAntallGjennomforingerPerAnsatt") {
+		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		val data = repository.getAntallGjennomforingerPerAnsatt()
+
+		data.size shouldBe 1
+		data[ARRANGOR_ANSATT_1.id] shouldNotBe null
+
+		data[ARRANGOR_ANSATT_1.id] shouldBe 1
 	}
 
 
