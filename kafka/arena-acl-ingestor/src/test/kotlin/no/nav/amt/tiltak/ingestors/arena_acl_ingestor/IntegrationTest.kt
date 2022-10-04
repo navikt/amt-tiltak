@@ -31,7 +31,7 @@ import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.tiltak.repositories.HentKoordinatorerForGjennomforingQuery
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
-import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
+import no.nav.amt.tiltak.tiltak.services.BrukerService
 import no.nav.amt.tiltak.tiltak.services.GjennomforingServiceImpl
 import no.nav.amt.tiltak.tiltak.services.TiltakServiceImpl
 import org.junit.jupiter.api.BeforeAll
@@ -103,7 +103,7 @@ class IntegrationTest {
 
 		navEnhetService = NavEnhetServiceImpl(norgClient, navEnhetRepository, veilarbarenaClient)
 		tiltakService = TiltakServiceImpl(tiltakRepository)
-		brukerService = BrukerServiceImpl(brukerRepository, personService, mockk(), navEnhetService)
+		brukerService = BrukerService(brukerRepository, personService, mockk(), navEnhetService)
 		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, navEnhetService, transactionTemplate)
 		arrangorService = ArrangorServiceImpl(enhetsregisterClient, arrangorRepository)
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, arrangorService, transactionTemplate, HentKoordinatorerForGjennomforingQuery(jdbcTemplate))

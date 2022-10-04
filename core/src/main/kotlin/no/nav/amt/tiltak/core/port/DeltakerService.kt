@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.core.port
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
+import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import java.util.*
 
 interface DeltakerService {
@@ -19,4 +20,11 @@ interface DeltakerService {
 
 	fun slettDeltaker(deltakerId: UUID)
 
+	fun hentDeltaker(fodselsnummer: String): Deltaker?
+
+	fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet?)
+
+	fun finnesBruker(fodselsnummer: String): Boolean
+
+	fun oppdaterAnsvarligVeileder(fodselsnummer: String, navAnsattId: UUID)
 }

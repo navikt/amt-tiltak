@@ -153,6 +153,24 @@ open class DeltakerRepository(
 			.firstOrNull()
 	}
 
+	fun get(fodselsnummer: String): DeltakerDbo? {
+		val sql = """
+			SELECT deltaker.*, bruker.*
+			FROM deltaker
+					 inner join bruker on bruker.id = deltaker.bruker_id
+			WHERE bruker.fodselsnummer = :bruker_fodselsnummer
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"bruker_fodselsnummer" to fodselsnummer,
+			)
+		)
+
+		return template.query(sql, parameters, rowMapper)
+			.firstOrNull()
+	}
+
 	fun get(fodselsnummer: String, gjennomforingId: UUID): DeltakerDbo? {
 		val sql = """
 			SELECT deltaker.*, bruker.*
@@ -213,4 +231,5 @@ open class DeltakerRepository(
 
 		template.update(sql, parameters)
 	}
+
 }

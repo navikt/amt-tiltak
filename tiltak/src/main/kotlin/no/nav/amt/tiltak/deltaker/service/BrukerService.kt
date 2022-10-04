@@ -2,7 +2,6 @@ package no.nav.amt.tiltak.tiltak.services
 
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
-import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.PersonService
@@ -13,40 +12,34 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class BrukerServiceImpl(
+class BrukerService(
 	private val brukerRepository: BrukerRepository,
 	private val personService: PersonService,
 	private val navAnsattService: NavAnsattService,
 	private val navEnhetService: NavEnhetService
-) : BrukerService {
+)  {
 
-	override fun getBruker(fodselsnummer: String): Bruker? {
+	fun getBruker(fodselsnummer: String): Bruker? {
 		return brukerRepository.get(fodselsnummer)?.let {
 			val navEnhet = it.navEnhetId?.let(navEnhetService::getNavEnhet)
 			it.toBruker(navEnhet)
 		}
 	}
 
-	override fun getBruker(id: UUID): Bruker? {
-		return brukerRepository.get(id)?.let {
-			val navEnhet = it.navEnhetId?.let(navEnhetService::getNavEnhet)
-			it.toBruker(navEnhet)
-		}
-	}
-	override fun getOrCreate(fodselsnummer: String): UUID {
+	fun getOrCreate(fodselsnummer: String): UUID {
 		val bruker = brukerRepository.get(fodselsnummer) ?: createBruker(fodselsnummer)
 		return bruker.id
 	}
 
-	override fun finnesBruker(fodselsnummer: String): Boolean {
+	fun finnesBruker(fodselsnummer: String): Boolean {
 		return brukerRepository.get(fodselsnummer) != null
 	}
 
-	override fun oppdaterAnsvarligVeileder(fodselsnummer: String, navAnsattId: UUID) {
+	fun oppdaterAnsvarligVeileder(fodselsnummer: String, navAnsattId: UUID) {
 		brukerRepository.oppdaterVeileder(fodselsnummer, navAnsattId)
 	}
 
-	override fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet?) {
+	fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet?) {
 		brukerRepository.oppdaterNavEnhet(fodselsnummer, navEnhet?.id)
 	}
 

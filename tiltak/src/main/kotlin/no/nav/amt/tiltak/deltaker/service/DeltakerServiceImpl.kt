@@ -1,10 +1,6 @@
 package no.nav.amt.tiltak.deltaker.service
 
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
-import no.nav.amt.tiltak.core.port.BrukerService
+import no.nav.amt.tiltak.core.domain.tiltak.*
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
@@ -13,6 +9,7 @@ import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpdateDbo
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
+import no.nav.amt.tiltak.tiltak.services.BrukerService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
@@ -73,6 +70,13 @@ open class DeltakerServiceImpl(
 		return deltaker.toDeltaker(hentStatusOrThrow(deltakerId), navEnhet)
 	}
 
+	override fun hentDeltaker(fodselsnummer: String): Deltaker? {
+		val deltaker = deltakerRepository.get(fodselsnummer)
+			?: return null
+		val navEnhet = deltaker.navEnhetId?.let { navEnhetService.getNavEnhet(it) }
+		return deltaker.toDeltaker(hentStatusOrThrow(deltaker.id), navEnhet)
+	}
+
 	override fun oppdaterStatuser() {
 		progressStatuser(deltakerRepository.potensieltHarSlutta())
 		progressStatuser(deltakerRepository.potensieltDeltar())
@@ -85,6 +89,10 @@ open class DeltakerServiceImpl(
 		}
 
 		log.info("Deltaker med id=$deltakerId er slettet")
+	}
+
+	override fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet?) {
+		brukerService.oppdaterNavEnhet(fodselsnummer, navEnhet)
 	}
 
 	private fun update(deltaker: DeltakerUpsert) {
@@ -140,6 +148,14 @@ open class DeltakerServiceImpl(
 				gyldigFra = LocalDateTime.now()
 			))
 		}
+
+	override fun finnesBruker(fodselsnummer: String): Boolean {
+		return brukerService.finnesBruker(fodselsnummer)
+	}
+
+	override fun oppdaterAnsvarligVeileder(fodselsnummer: String, navAnsattId: UUID) {
+		brukerService.oppdaterAnsvarligVeileder(fodselsnummer, navAnsattId)
+	}
 
 
 }

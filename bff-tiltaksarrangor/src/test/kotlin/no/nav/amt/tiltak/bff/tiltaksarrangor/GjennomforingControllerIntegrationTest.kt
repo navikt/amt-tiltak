@@ -30,7 +30,7 @@ import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.tiltak.repositories.HentKoordinatorerForGjennomforingQuery
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
-import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
+import no.nav.amt.tiltak.tiltak.services.BrukerService
 import no.nav.amt.tiltak.tiltak.services.GjennomforingServiceImpl
 import no.nav.amt.tiltak.tiltak.services.TiltakServiceImpl
 import org.junit.Assert.assertThrows
@@ -56,7 +56,7 @@ class GjennomforingControllerIntegrationTest {
 	private lateinit var tiltakRepository: TiltakRepository
 	private lateinit var deltakerRepository: DeltakerRepository
 	private lateinit var brukerRepository: BrukerRepository
-	private lateinit var brukerService: BrukerServiceImpl
+	private lateinit var brukerService: BrukerService
 	private lateinit var deltakerStatusRepository: DeltakerStatusRepository
 	private lateinit var gjennomforingRepository: GjennomforingRepository
 	private lateinit var gjennomforingService: GjennomforingService
@@ -88,7 +88,7 @@ class GjennomforingControllerIntegrationTest {
 
 		arrangorService = ArrangorServiceImpl(mockk(), ArrangorRepository(namedJdbcTemplate))
 
-		brukerService = BrukerServiceImpl(
+		brukerService = BrukerService(
 			brukerRepository,
 			mock(PersonService::class.java),
 			mock(NavAnsattService::class.java),
