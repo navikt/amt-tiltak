@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.tiltak.services
 
-import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.NavEnhetService
@@ -18,13 +17,6 @@ class BrukerService(
 	private val navAnsattService: NavAnsattService,
 	private val navEnhetService: NavEnhetService
 )  {
-
-	fun getBruker(fodselsnummer: String): Bruker? {
-		return brukerRepository.get(fodselsnummer)?.let {
-			val navEnhet = it.navEnhetId?.let(navEnhetService::getNavEnhet)
-			it.toBruker(navEnhet)
-		}
-	}
 
 	fun getOrCreate(fodselsnummer: String): UUID {
 		val bruker = brukerRepository.get(fodselsnummer) ?: createBruker(fodselsnummer)
