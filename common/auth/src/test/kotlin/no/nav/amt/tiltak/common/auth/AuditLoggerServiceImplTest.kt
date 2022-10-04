@@ -65,7 +65,7 @@ class AuditLoggerServiceImplTest {
 			),
 			startDato = null,
 			sluttDato = null,
-			status = DeltakerStatus(UUID.randomUUID(), Deltaker.Status.DELTAR, LocalDateTime.now(), LocalDateTime.now(), true),
+			status = DeltakerStatus(UUID.randomUUID(), Deltaker.Status.DELTAR, null, LocalDateTime.now(), LocalDateTime.now(), true),
 			registrertDato = LocalDateTime.now(),
 		)
 

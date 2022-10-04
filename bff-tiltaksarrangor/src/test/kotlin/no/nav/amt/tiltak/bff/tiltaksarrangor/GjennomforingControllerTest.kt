@@ -59,6 +59,7 @@ class GjennomforingControllerTest {
 	val status = DeltakerStatus(
 		id = UUID.randomUUID(),
 		type = Deltaker.Status.DELTAR,
+		aarsak = null,
 		gyldigFra = LocalDateTime.now(),
 		aktiv = true,
 		opprettetDato = LocalDateTime.now()

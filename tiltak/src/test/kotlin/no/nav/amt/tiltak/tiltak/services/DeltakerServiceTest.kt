@@ -38,6 +38,7 @@ class DeltakerServiceTest: StringSpec ({
 	val defaultStatus = DeltakerStatus(
 		UUID.randomUUID(),
 		Deltaker.Status.VENTER_PA_OPPSTART,
+		null,
 		LocalDateTime.now(),
 		LocalDateTime.now(),
 		true

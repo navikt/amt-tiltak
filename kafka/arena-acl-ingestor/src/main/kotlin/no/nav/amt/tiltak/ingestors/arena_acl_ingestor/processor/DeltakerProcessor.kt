@@ -64,6 +64,7 @@ class DeltakerProcessor(
 			id = UUID.randomUUID(),
 			deltakerId = deltakerDto.id,
 			type = tilDeltakerStatus(deltakerDto.status),
+			aarsak = tilDeltakerAarsak(deltakerDto.statusAarsak),
 			gyldigFra = deltakerDto.statusEndretDato,
 		)
 
@@ -83,6 +84,22 @@ class DeltakerProcessor(
 			DeltakerPayload.Status.IKKE_AKTUELL -> Deltaker.Status.IKKE_AKTUELL
 			DeltakerPayload.Status.FEILREGISTRERT -> Deltaker.Status.FEILREGISTRERT
 			DeltakerPayload.Status.PABEGYNT -> Deltaker.Status.PABEGYNT
+		}
+	}
+
+	private fun tilDeltakerAarsak(aarsak: DeltakerPayload.StatusAarsak?): Deltaker.StatusAarsak? {
+		return when(aarsak){
+			DeltakerPayload.StatusAarsak.SYK -> Deltaker.StatusAarsak.SYK
+			DeltakerPayload.StatusAarsak.FATT_JOBB -> Deltaker.StatusAarsak.FATT_JOBB
+			DeltakerPayload.StatusAarsak.TRENGER_ANNEN_STOTTE -> Deltaker.StatusAarsak.TRENGER_ANNEN_STOTTE
+			DeltakerPayload.StatusAarsak.FIKK_IKKE_PLASS -> Deltaker.StatusAarsak.FIKK_IKKE_PLASS
+			DeltakerPayload.StatusAarsak.UTDANNING -> Deltaker.StatusAarsak.UTDANNING
+			DeltakerPayload.StatusAarsak.FERDIG -> Deltaker.StatusAarsak.FERDIG
+			DeltakerPayload.StatusAarsak.AVLYST_KONTRAKT -> Deltaker.StatusAarsak.AVLYST_KONTRAKT
+			DeltakerPayload.StatusAarsak.IKKE_MOTT -> Deltaker.StatusAarsak.IKKE_MOTT
+			DeltakerPayload.StatusAarsak.FEILREGISTRERT -> Deltaker.StatusAarsak.FEILREGISTRERT
+			DeltakerPayload.StatusAarsak.ANNET -> Deltaker.StatusAarsak.ANNET
+			else -> null
 		}
 	}
 

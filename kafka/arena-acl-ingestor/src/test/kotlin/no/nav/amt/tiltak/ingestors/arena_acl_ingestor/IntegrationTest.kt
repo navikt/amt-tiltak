@@ -20,6 +20,7 @@ import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
+import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.DeltakerProcessor
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.GjennomforingProcessor
 import no.nav.amt.tiltak.nav_enhet.NavEnhetRepository
@@ -145,7 +146,7 @@ class IntegrationTest {
 	fun `ingestKafkaMessageValue() - Skal ingeste gyldig deltaker`() {
 
 		ingestor.ingestKafkaRecord(gjennomforingJson)
-		ingestor.ingestKafkaRecord(deltakerJson)
+		ingestor.ingestKafkaRecord(deltakerUtenAarsakJson)
 
 		val inserted = deltakerService.hentDeltaker(deltakerToInsert.id)
 
@@ -163,9 +164,30 @@ class IntegrationTest {
 	}
 
 	@Test
+	fun `ingestKafkaMessageValue() - Skal ingeste gyldig deltaker med åårsak`() {
+
+		ingestor.ingestKafkaRecord(gjennomforingJson)
+		ingestor.ingestKafkaRecord(deltakerMedAarsakJson)
+
+		val inserted = deltakerService.hentDeltaker(deltakerToInsert.id)
+
+		inserted shouldNotBe null
+		inserted!!.bruker shouldNotBe null
+
+		val uuid = UUID.randomUUID()
+		val expected = deltakerToInsert.copy(
+			bruker = deltakerToInsert.bruker.copy(id= inserted.bruker.id),
+			status = deltakerToInsert.status.copy(id = uuid, opprettetDato = now, aarsak = Deltaker.StatusAarsak.FATT_JOBB)
+		)
+		val actual = inserted.copy(status = inserted.status.copy(id = uuid, opprettetDato = now))
+		actual shouldBe expected
+
+	}
+
+	@Test
 	fun `ingestKafkaMessageValue() - Skal ingeste gyldig deltaker oppdatering`() {
 		ingestor.ingestKafkaRecord(gjennomforingJson)
-		ingestor.ingestKafkaRecord(deltakerJson)
+		ingestor.ingestKafkaRecord(deltakerUtenAarsakJson)
 		ingestor.ingestKafkaRecord(deltakerOppdatertJson)
 
 		val inserted = deltakerService.hentDeltaker(deltakerOppdatert.id)
@@ -259,6 +281,7 @@ class IntegrationTest {
 		status = DeltakerStatus(
 				id = UUID.randomUUID(),
 				type =  Deltaker.Status.VENTER_PA_OPPSTART,
+				aarsak = null,
 				gyldigFra =  now.minusHours(1),
 				opprettetDato = now,
 				aktiv = true
@@ -274,7 +297,7 @@ class IntegrationTest {
 		bruker = deltakerToInsert.bruker,
 		startDato = LocalDate.now().minusDays(1),
 		sluttDato = LocalDate.now().plusDays(1),
-		status = DeltakerStatus(id= UUID.randomUUID(), Deltaker.Status.DELTAR, now, now, true),
+		status = DeltakerStatus(id= UUID.randomUUID(), Deltaker.Status.DELTAR, null, now, now, true),
 		registrertDato = now,
 		dagerPerUke = 3,
 		prosentStilling = 50F,
@@ -302,7 +325,7 @@ class IntegrationTest {
 			}
 		""".trimIndent()
 
-	val deltakerJson = """
+	val deltakerUtenAarsakJson = """
 			{
 			  "transactionId": "0a99b548-c831-47c4-87f6-760e9800b29c",
 			  "type": "DELTAKER",
@@ -313,6 +336,26 @@ class IntegrationTest {
 			    "gjennomforingId": "${gjennomforingId}",
 			    "personIdent": "$personIdent",
 			    "status": "${deltakerToInsert.status.type.name}",
+			    "dagerPerUke": ${deltakerToInsert.dagerPerUke},
+			    "prosentDeltid": ${deltakerToInsert.prosentStilling},
+			    "registrertDato": "${deltakerToInsert.registrertDato}",
+				"statusEndretDato": "${deltakerToInsert.status.gyldigFra}"
+			  }
+			}
+		""".trimIndent()
+
+	val deltakerMedAarsakJson = """
+			{
+			  "transactionId": "0a99b548-c831-47c4-87f6-760e9800b29c",
+			  "type": "DELTAKER",
+			  "timestamp": "2022-01-10T11:46:44.799Z",
+			  "operation": "CREATED",
+			  "payload": {
+			    "id": "${deltakerToInsert.id}",
+			    "gjennomforingId": "${gjennomforingId}",
+			    "personIdent": "$personIdent",
+			    "status": "${deltakerToInsert.status.type.name}",
+				"statusAarsak": "${DeltakerPayload.StatusAarsak.FATT_JOBB}",
 			    "dagerPerUke": ${deltakerToInsert.dagerPerUke},
 			    "prosentDeltid": ${deltakerToInsert.prosentStilling},
 			    "registrertDato": "${deltakerToInsert.registrertDato}",
