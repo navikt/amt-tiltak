@@ -65,10 +65,8 @@ open class DeltakerServiceImpl(
 		return deltaker.toDeltaker(hentStatusOrThrow(deltakerId))
 	}
 
-	override fun hentDeltaker(fodselsnummer: String): Deltaker? {
-		val deltaker = deltakerRepository.get(fodselsnummer)
-			?: return null
-		return deltaker.toDeltaker(hentStatusOrThrow(deltaker.id))
+	override fun hentDeltakereMedFnr(fodselsnummer: String): List<Deltaker>{
+		return deltakerRepository.getDeltakereMedFnr(fodselsnummer).map { it.toDeltaker(hentStatusOrThrow(it.id)) }
 	}
 
 	override fun oppdaterStatuser() {

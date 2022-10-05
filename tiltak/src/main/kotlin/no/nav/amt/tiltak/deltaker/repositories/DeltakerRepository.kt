@@ -153,7 +153,7 @@ open class DeltakerRepository(
 			.firstOrNull()
 	}
 
-	fun get(fodselsnummer: String): DeltakerDbo? {
+	fun getDeltakereMedFnr(fodselsnummer: String): List<DeltakerDbo> {
 		val sql = """
 			SELECT deltaker.*, bruker.*
 			FROM deltaker
@@ -168,7 +168,6 @@ open class DeltakerRepository(
 		)
 
 		return template.query(sql, parameters, rowMapper)
-			.firstOrNull()
 	}
 
 	fun get(fodselsnummer: String, gjennomforingId: UUID): DeltakerDbo? {

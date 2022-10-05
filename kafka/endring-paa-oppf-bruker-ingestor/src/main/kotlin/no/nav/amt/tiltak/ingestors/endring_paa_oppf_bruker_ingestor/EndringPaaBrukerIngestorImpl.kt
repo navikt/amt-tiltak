@@ -17,7 +17,7 @@ class EndringPaaBrukerIngestorImpl(
 
 	override fun ingestKafkaRecord(recordValue: String) {
 		val brukerRecord = JsonUtils.fromJsonString<EndringPaaBrukerKafkaDto>(recordValue)
-		val deltaker = deltakerService.hentDeltaker(brukerRecord.fodselsnummer) ?: return
+		val deltaker = deltakerService.hentDeltakereMedFnr(brukerRecord.fodselsnummer).firstOrNull() ?: return
 		val gammelNavEnhet = deltaker.navEnhetId?.let { navEnhetService.getNavEnhet(it) }
 
 		if (gammelNavEnhet?.enhetId == brukerRecord.oppfolgingsenhet) return

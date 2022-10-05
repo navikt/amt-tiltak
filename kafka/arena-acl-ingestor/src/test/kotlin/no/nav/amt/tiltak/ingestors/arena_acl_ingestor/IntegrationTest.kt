@@ -168,7 +168,6 @@ class IntegrationTest {
 		val inserted = deltakerService.hentDeltaker(deltakerOppdatert.id)
 
 		inserted shouldNotBe null
-		//inserted!!.bruker shouldNotBe null
 
 		val uuid = UUID.randomUUID()
 		val expected = deltakerOppdatert.copy(

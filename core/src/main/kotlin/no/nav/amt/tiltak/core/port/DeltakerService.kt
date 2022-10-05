@@ -20,7 +20,7 @@ interface DeltakerService {
 
 	fun slettDeltaker(deltakerId: UUID)
 
-	fun hentDeltaker(fodselsnummer: String): Deltaker?
+	fun hentDeltakereMedFnr(fodselsnummer: String): List<Deltaker>
 
 	fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet?)
 

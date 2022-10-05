@@ -59,7 +59,7 @@ class EndringPaaBrukerIngestorImplTest {
 	@Test
 	fun `ingestKafkaRecord - bruker finnes ikke - skal returnere med en gang`() {
 		val enhet = "enhet"
-		every { deltakerService.hentDeltaker(fnr) }.returns(null)
+		every { deltakerService.hentDeltakereMedFnr(fnr) }.returns(emptyList())
 		every { navEnhetService.getNavEnhet(navEnhet.id) }.returns(navEnhet)
 
 		endringPaaBrukerIngestorImpl.ingestKafkaRecord("""
@@ -78,7 +78,7 @@ class EndringPaaBrukerIngestorImplTest {
 	fun `ingestKafkaRecord - samme nav enhet - skal returnere med en gang`() {
 		val enhet = "enhet"
 
-		every { deltakerService.hentDeltaker(fnr) }.returns(deltaker)
+		every { deltakerService.hentDeltakereMedFnr(fnr) }.returns(listOf(deltaker))
 		every { navEnhetService.getNavEnhet(navEnhet.id) }.returns(navEnhet)
 
 		endringPaaBrukerIngestorImpl.ingestKafkaRecord("""
@@ -96,7 +96,7 @@ class EndringPaaBrukerIngestorImplTest {
 	fun `ingestKafkaRecord - endret nav enhet - oppdaterer nav enhet`() {
 		val nyEnhet = "enhet2"
 		val nyttEnhetNavn = "Nytt nav enhet navn"
-		every { deltakerService.hentDeltaker(fnr) }.returns(deltaker)
+		every { deltakerService.hentDeltakereMedFnr(fnr) }.returns(listOf(deltaker))
 		every { navEnhetService.getNavEnhet(navEnhet.id) }.returns(navEnhet)
 		every { navEnhetService.getNavEnhet(nyEnhet)}.returns(NavEnhet(UUID.randomUUID(), nyEnhet, nyttEnhetNavn))
 		every { deltakerService.oppdaterNavEnhet(fnr, any())}.returns(Unit)
@@ -118,7 +118,7 @@ class EndringPaaBrukerIngestorImplTest {
 		//og derfor ikke er relevante
 		val nyEnhet = "enhet2"
 
-		every { deltakerService.hentDeltaker(fnr) }.returns(deltaker)
+		every { deltakerService.hentDeltakereMedFnr(fnr) }.returns(listOf(deltaker))
 		every { navEnhetService.getNavEnhet(navEnhet.id) }.returns(navEnhet)
 
 		endringPaaBrukerIngestorImpl.ingestKafkaRecord("""
