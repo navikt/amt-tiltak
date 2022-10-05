@@ -104,7 +104,7 @@ class IntegrationTest {
 		navEnhetService = NavEnhetServiceImpl(norgClient, navEnhetRepository, veilarbarenaClient)
 		tiltakService = TiltakServiceImpl(tiltakRepository)
 		brukerService = BrukerService(brukerRepository, personService, mockk(), navEnhetService)
-		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, navEnhetService, transactionTemplate)
+		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, transactionTemplate)
 		arrangorService = ArrangorServiceImpl(enhetsregisterClient, arrangorRepository)
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, arrangorService, transactionTemplate, HentKoordinatorerForGjennomforingQuery(jdbcTemplate))
 
@@ -243,7 +243,7 @@ class IntegrationTest {
 		fornavn = person.fornavn,
 		etternavn = person.etternavn,
 		fodselsnummer = personIdent,
-		navEnhet = null,
+		navEnhetId = null,
 		navVeilederId = null,
 		telefonnummer = brukerTelefon,
 		epost = brukerEpost,
@@ -267,7 +267,7 @@ class IntegrationTest {
 		fornavn = person.fornavn,
 		etternavn = person.etternavn,
 		fodselsnummer = personIdent,
-		navEnhet = null,
+		navEnhetId = null,
 		navVeilederId = null,
 		telefonnummer = brukerTelefon,
 		epost = brukerEpost,

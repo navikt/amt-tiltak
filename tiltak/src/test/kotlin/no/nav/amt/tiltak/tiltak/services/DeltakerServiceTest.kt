@@ -39,7 +39,7 @@ class DeltakerServiceTest: StringSpec ({
 		telefonnummer = "1234",
 		epost = "foo@bar.baz",
 		navVeilederId = null,
-		navEnhet = null,
+		navEnhetId = null,
 		startDato = LocalDate.now(),
 		sluttDato = LocalDate.now(),
 		status = defaultStatus,
@@ -62,7 +62,6 @@ class DeltakerServiceTest: StringSpec ({
 			deltakerStatusRepository,
 			brukerService,
 			mockk(),
-			mockk()
 		)
 	}
 

@@ -2,10 +2,7 @@ package no.nav.amt.tiltak.bff.tiltaksarrangor
 
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerDetaljerDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
-import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.core.port.NavAnsattService
-import no.nav.amt.tiltak.core.port.SkjermetPersonService
+import no.nav.amt.tiltak.core.port.*
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -15,12 +12,14 @@ open class ControllerService(
 	private val skjermetPersonService: SkjermetPersonService,
 	private val gjennomforingService: GjennomforingService,
 	private val navAnsattService: NavAnsattService,
+	private val navEnhetService: NavEnhetService,
 ) {
 
 	open fun getDeltakerDetaljerById(deltakerId: UUID): DeltakerDetaljerDto {
 		val deltaker = deltakerService.hentDeltaker(deltakerId)
 			?: throw NoSuchElementException("Deltaker med id $deltakerId finnes ikke")
 		val navVeileder = deltaker.navVeilederId?.let { navAnsattService.getNavAnsatt(it)}
+		val navEnhet = deltaker.navEnhetId?.let { navEnhetService.getNavEnhet(it) }
 		val gjennomforing = deltaker.gjennomforingId.let { gjennomforingService.getGjennomforing(it) }
 		val erSkjermet = skjermetPersonService.erSkjermet(deltaker.fodselsnummer)
 
@@ -32,7 +31,7 @@ open class ControllerService(
 			fodselsnummer = deltaker.fodselsnummer,
 			telefonnummer = deltaker.telefonnummer,
 			epost = deltaker.epost,
-			navEnhet = deltaker.navEnhet?.toDto(),
+			navEnhet = navEnhet?.toDto(),
 			navVeileder = navVeileder?.toDto(),
 			erSkjermetPerson = erSkjermet,
 			startDato = deltaker.startDato,

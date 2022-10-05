@@ -99,7 +99,6 @@ class GjennomforingControllerIntegrationTest {
 			deltakerRepository,
 			deltakerStatusRepository,
 			brukerService,
-			navEnhetService,
 			transactionTemplate
 		)
 
@@ -121,6 +120,7 @@ class GjennomforingControllerIntegrationTest {
 			deltakerService,
 			mockk(),
 			gjennomforingService,
+			mockk(),
 			mockk(),
 		)
 

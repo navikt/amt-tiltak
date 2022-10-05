@@ -271,7 +271,7 @@ class GjennomforingControllerTest {
 
 	@Test
 	fun `hentDeltakere() should return 200 when authenticated`() {
-		val deltaker = deltakerDbo.toDeltaker(status, null)
+		val deltaker = deltakerDbo.toDeltaker(status)
 
 		val token = tokenXToken("test", "test")
 
@@ -287,7 +287,7 @@ class GjennomforingControllerTest {
 
 	@Test
 	fun `hentDeltakere() should perform authorization check`() {
-		val deltaker = deltakerDbo.toDeltaker(status, null)
+		val deltaker = deltakerDbo.toDeltaker(status)
 
 		val token = tokenXToken("test", "test")
 

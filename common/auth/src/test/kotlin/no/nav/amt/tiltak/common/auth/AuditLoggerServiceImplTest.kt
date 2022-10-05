@@ -55,7 +55,7 @@ class AuditLoggerServiceImplTest {
 			mellomnavn = null,
 			etternavn = "",
 			fodselsnummer = "12345678900",
-			navEnhet = null,
+			navEnhetId = null,
 			navVeilederId = null,
 			epost = null,
 			telefonnummer = null,

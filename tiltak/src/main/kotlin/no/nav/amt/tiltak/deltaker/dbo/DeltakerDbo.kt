@@ -2,7 +2,6 @@ package no.nav.amt.tiltak.deltaker.dbo
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
-import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -30,7 +29,7 @@ data class DeltakerDbo(
 	val innsokBegrunnelse: String?
 ) {
 
-	fun toDeltaker(status: DeltakerStatus, navEnhet: NavEnhet?): Deltaker {
+	fun toDeltaker(status: DeltakerStatus): Deltaker {
 		return Deltaker(
 			id = id,
 			gjennomforingId = gjennomforingId,
@@ -40,7 +39,7 @@ data class DeltakerDbo(
 			telefonnummer = telefonnummer,
 			epost = epost,
 			fodselsnummer = fodselsnummer,
-			navEnhet = navEnhet,
+			navEnhetId = navEnhetId,
 			navVeilederId = navVeilederId,
 			startDato = startDato,
 			sluttDato = sluttDato,

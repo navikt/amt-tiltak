@@ -2,7 +2,6 @@ package no.nav.amt.tiltak.deltaker.service
 
 import no.nav.amt.tiltak.core.domain.tiltak.*
 import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
@@ -21,7 +20,6 @@ open class DeltakerServiceImpl(
 	private val deltakerRepository: DeltakerRepository,
 	private val deltakerStatusRepository: DeltakerStatusRepository,
 	private val brukerService: BrukerService,
-	private val navEnhetService: NavEnhetService,
 	private val transactionTemplate: TransactionTemplate
 ) : DeltakerService {
 
@@ -55,9 +53,8 @@ open class DeltakerServiceImpl(
 
 	override fun hentDeltakerePaaGjennomforing(gjennomforingId: UUID): List<Deltaker> {
 		return deltakerRepository.getDeltakerePaaTiltak(gjennomforingId)
-			.map {deltaker ->
-				val navEnhet = deltaker.navEnhetId?.let { navEnhetService.getNavEnhet(it) }
-				return@map deltaker.toDeltaker(hentStatusOrThrow(deltaker.id), navEnhet)
+			.map { deltaker ->
+				return@map deltaker.toDeltaker(hentStatusOrThrow(deltaker.id))
 			}
 	}
 
@@ -65,16 +62,13 @@ open class DeltakerServiceImpl(
 		val deltaker = deltakerRepository.get(deltakerId)
 			?: return null
 
-		val navEnhet = deltaker.navEnhetId?.let { navEnhetService.getNavEnhet(it) }
-
-		return deltaker.toDeltaker(hentStatusOrThrow(deltakerId), navEnhet)
+		return deltaker.toDeltaker(hentStatusOrThrow(deltakerId))
 	}
 
 	override fun hentDeltaker(fodselsnummer: String): Deltaker? {
 		val deltaker = deltakerRepository.get(fodselsnummer)
 			?: return null
-		val navEnhet = deltaker.navEnhetId?.let { navEnhetService.getNavEnhet(it) }
-		return deltaker.toDeltaker(hentStatusOrThrow(deltaker.id), navEnhet)
+		return deltaker.toDeltaker(hentStatusOrThrow(deltaker.id))
 	}
 
 	override fun oppdaterStatuser() {
@@ -137,8 +131,7 @@ open class DeltakerServiceImpl(
 	private fun progressStatuser(kandidater: List<DeltakerDbo>) = kandidater
 		.also { log.info("Oppdaterer status på ${it.size} deltakere") }
 		.map { deltaker ->
-			val navEnhet = deltaker.navEnhetId?.let { navEnhetService.getNavEnhet(it) }
-			deltaker.toDeltaker(hentStatusOrThrow(deltaker.id), navEnhet)
+			deltaker.toDeltaker(hentStatusOrThrow(deltaker.id))
 		}
 		.forEach {
 			insertStatus(DeltakerStatusInsert(

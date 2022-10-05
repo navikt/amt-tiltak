@@ -8,7 +8,10 @@ import io.mockk.mockk
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.ArrangorService
+import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.NavEnhetService
+import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
@@ -76,7 +79,6 @@ class GjennomforingServiceImplTest : FunSpec({
 				DeltakerRepository(parameterTemplate),
 				DeltakerStatusRepository(parameterTemplate),
 				brukerService,
-				navEnhetService,
 				transactionTemplate,
 			),
 			arrangorService = arrangorService,
@@ -115,7 +117,7 @@ class GjennomforingServiceImplTest : FunSpec({
 				mellomnavn = null,
 				etternavn = "Etternavn",
 				fodselsnummer = "12121231123",
-				navEnhet = null,
+				navEnhetId = null,
 				navVeilederId = null,
 				epost = "foo@bar.baz",
 				telefonnummer = "1234",

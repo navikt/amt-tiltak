@@ -68,7 +68,6 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 			deltakerRepository,
 			deltakerStatusRepository,
 			brukerService,
-			navEnhetService,
 			TransactionTemplate()
 		)
 		endringPaaBrukerIngestorImpl = EndringPaaBrukerIngestorImpl(deltakerService, navEnhetService)
