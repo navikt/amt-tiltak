@@ -6,6 +6,7 @@ import java.util.*
 data class DeltakerStatus(
 	val id: UUID,
 	val type: Deltaker.Status,
+	val aarsak: Deltaker.StatusAarsak?,
 	val gyldigFra: LocalDateTime,
 	val opprettetDato: LocalDateTime,
 	val aktiv: Boolean

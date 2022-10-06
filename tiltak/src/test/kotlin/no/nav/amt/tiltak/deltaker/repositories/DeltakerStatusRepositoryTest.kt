@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.deltaker.repositories
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.*
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
@@ -37,8 +38,8 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 	test("insert - 2 statuser knyttet til deltaker - begge hentes") {
 		val deltakerCmd = createDeltakerInput(BRUKER_1, GJENNOMFORING_1)
 		testDataRepository.insertDeltaker(deltakerCmd)
-		val status1 = DeltakerStatusInsertDbo(id = UUID.randomUUID(), deltakerId = deltakerCmd.id, type = VENTER_PA_OPPSTART, gyldigFra = lastweek)
-		val status2 = DeltakerStatusInsertDbo(id = UUID.randomUUID(), deltakerId = deltakerCmd.id, type = DELTAR, gyldigFra = yesterday)
+		val status1 = DeltakerStatusInsertDbo(id = UUID.randomUUID(), deltakerId = deltakerCmd.id, type = VENTER_PA_OPPSTART, aarsak=Deltaker.StatusAarsak.FERDIG, gyldigFra = lastweek)
+		val status2 = DeltakerStatusInsertDbo(id = UUID.randomUUID(), deltakerId = deltakerCmd.id, type = DELTAR, aarsak=Deltaker.StatusAarsak.ANNET, gyldigFra = yesterday)
 		val now = LocalDateTime.now()
 
 		repository.insert(status1)
@@ -52,12 +53,14 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 			status1.id,
 			status1.deltakerId,
 			status1.type,
+			status1.aarsak,
 			status1.gyldigFra!!, now, false )
 
 		persisted[1].copy(opprettetDato = now) shouldBe DeltakerStatusDbo(
 			status2.id,
 			status2.deltakerId,
 			status2.type,
+			status2.aarsak,
 			status2.gyldigFra!!, now, true)
 	}
 

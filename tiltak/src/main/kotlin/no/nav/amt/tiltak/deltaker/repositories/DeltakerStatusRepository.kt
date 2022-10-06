@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
+import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
@@ -23,6 +24,7 @@ open class DeltakerStatusRepository(
 			id = rs.getUUID("id"),
 			deltakerId = rs.getUUID("deltaker_id"),
 			status = Deltaker.Status.valueOf(rs.getString("status")),
+			aarsak = rs.getNullableString("aarsak")?.let { Deltaker.StatusAarsak.valueOf(it) },
 			aktiv = rs.getBoolean("aktiv"),
 			gyldigFra = rs.getLocalDateTime("gyldig_fra"),
 			opprettetDato = rs.getTimestamp("created_at").toLocalDateTime(),
@@ -40,16 +42,17 @@ open class DeltakerStatusRepository(
 
 	fun insert(status: DeltakerStatusInsertDbo) {
 		val sql = """
-			INSERT INTO deltaker_status (id, deltaker_id, gyldig_fra, status, aktiv)
+			INSERT INTO deltaker_status (id, deltaker_id, gyldig_fra, status, aarsak, aktiv)
 			VALUES (
-				:id, :deltaker_id, :gyldig_fra, :status, true
+				:id, :deltaker_id, :gyldig_fra, :status, :aarsak, true
 			)
 		""".trimIndent()
 		val params = sqlParameters(
 			"id" to status.id,
 			"deltaker_id" to status.deltakerId,
 			"gyldig_fra" to status.gyldigFra,
-			"status" to status.type.name
+			"status" to status.type.name,
+			"aarsak" to status.aarsak?.name
 		)
 
 		template.update(sql, params)
@@ -57,7 +60,7 @@ open class DeltakerStatusRepository(
 
 	fun getStatuserForDeltaker(deltakerId: UUID): List<DeltakerStatusDbo> {
 		val sql = """
-			SELECT id, deltaker_id, gyldig_fra, status, aktiv, created_at
+			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aktiv, created_at
 			FROM deltaker_status
 			WHERE deltaker_id = :deltakerId;
 		""".trimIndent()
@@ -71,7 +74,7 @@ open class DeltakerStatusRepository(
 
 	fun getStatusForDeltaker(deltakerId: UUID): DeltakerStatusDbo? {
 		val sql = """
-			SELECT id, deltaker_id, gyldig_fra, status, aktiv, created_at
+			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aktiv, created_at
 			FROM deltaker_status
 			WHERE deltaker_id = :deltakerId
 			AND aktiv = true

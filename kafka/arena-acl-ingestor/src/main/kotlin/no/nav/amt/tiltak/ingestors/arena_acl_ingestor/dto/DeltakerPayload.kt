@@ -11,6 +11,7 @@ data class DeltakerPayload(
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val status: Status,
+	val statusAarsak: StatusAarsak?,
 	val dagerPerUke: Int?,
 	val prosentDeltid: Float?,
 	val registrertDato: LocalDateTime,
@@ -19,5 +20,18 @@ data class DeltakerPayload(
 ) {
 	enum class Status {
 		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, FEILREGISTRERT, PABEGYNT
+	}
+
+	enum class StatusAarsak {
+		SYK,
+		FATT_JOBB,
+		TRENGER_ANNEN_STOTTE,
+		FIKK_IKKE_PLASS,
+		UTDANNING,
+		FERDIG,
+		AVLYST_KONTRAKT,
+		IKKE_MOTT,
+		FEILREGISTRERT,
+		ANNET
 	}
 }
