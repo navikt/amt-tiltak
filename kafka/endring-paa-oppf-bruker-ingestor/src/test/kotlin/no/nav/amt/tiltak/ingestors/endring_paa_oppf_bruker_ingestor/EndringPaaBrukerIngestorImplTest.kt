@@ -38,6 +38,7 @@ class EndringPaaBrukerIngestorImplTest {
 		status = DeltakerStatus(
 			id = UUID.randomUUID(),
 			type = Deltaker.Status.DELTAR,
+			aarsak = null,
 			gyldigFra = LocalDateTime.now(),
 			opprettetDato = LocalDateTime.now(),
 			aktiv = true,

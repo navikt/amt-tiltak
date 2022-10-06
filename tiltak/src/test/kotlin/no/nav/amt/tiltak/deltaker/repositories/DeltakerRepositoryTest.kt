@@ -200,6 +200,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			id = UUID.randomUUID(),
 			deltakerId = deltaker!!.id,
 			type = Deltaker.Status.DELTAR,
+			aarsak = null,
 			gyldigFra = LocalDateTime.now().minusDays(5))
 
 		deltakerStatusRepository.insert(statusInsertDbo)
@@ -226,6 +227,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			id = UUID.randomUUID(),
 			deltakerId = deltakerInsertDbo.id,
 			type = Deltaker.Status.DELTAR,
+			aarsak = null,
 			gyldigFra = LocalDateTime.now().minusDays(5),
 		)
 		repository.insert(deltakerInsertDbo)
@@ -253,6 +255,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			id = UUID.randomUUID(),
 			deltakerId = deltakerInsertDbo.id,
 			type = Deltaker.Status.VENTER_PA_OPPSTART,
+			aarsak = null,
 			gyldigFra = now.minusDays(5)
 		)
 		repository.insert(deltakerInsertDbo)
@@ -287,6 +290,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			id = UUID.randomUUID(),
 			deltakerId = deltakerInsertDbo.id,
 			type = Deltaker.Status.VENTER_PA_OPPSTART,
+			aarsak = null,
 			gyldigFra = LocalDateTime.now().minusDays(5),
 		)
 

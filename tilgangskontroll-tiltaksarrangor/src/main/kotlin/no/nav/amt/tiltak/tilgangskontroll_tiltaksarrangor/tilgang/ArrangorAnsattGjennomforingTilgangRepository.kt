@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.common.db_utils.getZonedDateTime
+import org.intellij.lang.annotations.Language
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
@@ -36,7 +37,13 @@ open class ArrangorAnsattGjennomforingTilgangRepository(
 			?: throw NoSuchElementException("Fant ikke arrangor_ansatt_gjennomforing_tilgang med id $id")
 	}
 
-	internal fun opprettTilgang(id: UUID, arrangorAnsattId: UUID, gjennomforingId: UUID, gyldigFra: ZonedDateTime, gyldigTil: ZonedDateTime) {
+	internal fun opprettTilgang(
+		id: UUID,
+		arrangorAnsattId: UUID,
+		gjennomforingId: UUID,
+		gyldigFra: ZonedDateTime,
+		gyldigTil: ZonedDateTime
+	) {
 		val sql = """
 			INSERT INTO arrangor_ansatt_gjennomforing_tilgang(id, ansatt_id, gjennomforing_id, gyldig_fra, gyldig_til)
 				VALUES(:id, :ansattId, :gjennomforingId, :gyldigFra, :gyldigTil)
@@ -77,6 +84,23 @@ open class ArrangorAnsattGjennomforingTilgangRepository(
 		val parameters = sqlParameters("ansattId" to ansattId)
 
 		return template.query(sql, parameters, rowMapper)
+	}
+
+	fun getAntallGjennomforingerPerAnsatt(): Map<UUID, Int> {
+
+		@Language("PostgreSQL")
+		val sql = """
+			select ansatt_id, count(gjennomforing_id) as gjennomforinger
+			from arrangor_ansatt_gjennomforing_tilgang
+			WHERE gyldig_fra < current_timestamp
+			  AND gyldig_til > current_timestamp
+			group by ansatt_id
+			order by gjennomforinger desc
+		""".trimIndent()
+
+		return template.query(sql) { rs, _ ->
+			Pair(rs.getUUID("ansatt_id"), rs.getInt("gjennomforinger"))
+		}.toMap()
 	}
 
 }
