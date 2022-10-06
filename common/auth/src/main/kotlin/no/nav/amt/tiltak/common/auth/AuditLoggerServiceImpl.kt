@@ -30,7 +30,7 @@ class AuditLoggerServiceImpl(
 	) {
 		sendAuditLog(
 			sourceUserIdProvider = { navAnsattService.getNavAnsatt(navAnsattId).navIdent },
-			destinationUserIdProvider = { deltakerService.hentDeltaker(deltakerId)?.bruker?.fodselsnummer?: throw NoSuchElementException("Fant ikke deltaker med id: $deltakerId") },
+			destinationUserIdProvider = { deltakerService.hentDeltaker(deltakerId)?.fodselsnummer?: throw NoSuchElementException("Fant ikke deltaker med id: $deltakerId") },
 			eventType = eventType,
 			eventSeverity = eventSeverity,
 			reason = reason

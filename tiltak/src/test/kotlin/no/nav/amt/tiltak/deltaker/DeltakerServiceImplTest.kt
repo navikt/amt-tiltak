@@ -3,11 +3,9 @@ package no.nav.amt.tiltak.deltaker
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
-import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
-import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
@@ -21,7 +19,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.createDeltakerInput
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.TestDataSeeder
-import no.nav.amt.tiltak.tiltak.services.BrukerServiceImpl
+import no.nav.amt.tiltak.tiltak.services.BrukerService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -45,25 +43,12 @@ class DeltakerServiceImplTest {
 	val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
 	val deltakerId = UUID.randomUUID()
 
-	val bruker = Bruker(
-		id = BRUKER_1.id,
-		fornavn = BRUKER_1.fornavn,
-		mellomnavn = BRUKER_1.mellomnavn,
-		etternavn = BRUKER_1.etternavn,
-		telefonnummer = BRUKER_1.telefonnummer,
-		epost = BRUKER_1.epost,
-		fodselsnummer = BRUKER_1.fodselsnummer,
-		navEnhet = null,
-		navVeilederId = BRUKER_1.ansvarligVeilederId,
-	)
-
-
 	@BeforeEach
 	fun beforeEach() {
 		brukerRepository = BrukerRepository(jdbcTemplate)
 
 		navEnhetService = mockk()
-		brukerService = BrukerServiceImpl(brukerRepository, mockk(), mockk(), navEnhetService)
+		brukerService = BrukerService(brukerRepository, mockk(), mockk(), navEnhetService)
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		deltakerServiceImpl = DeltakerServiceImpl(

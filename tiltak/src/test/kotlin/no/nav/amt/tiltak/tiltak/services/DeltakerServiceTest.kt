@@ -6,11 +6,9 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
-import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
@@ -23,17 +21,7 @@ import java.util.*
 class DeltakerServiceTest: StringSpec ({
 	val fodselsnummer = "12345678904"
 	val deltakerId = UUID.randomUUID()
-	val defaultBruker = Bruker(
-		id = UUID.randomUUID(),
-		fornavn = "GRØNN",
-		mellomnavn = null,
-		etternavn = "KOPP",
-		fodselsnummer = fodselsnummer,
-		telefonnummer = "1234",
-		epost = "foo@bar.baz",
-		navVeilederId = null,
-		navEnhet = null,
-	)
+	val brukerId = UUID.randomUUID()
 
 	val defaultStatus = DeltakerStatus(
 		UUID.randomUUID(),
@@ -45,7 +33,14 @@ class DeltakerServiceTest: StringSpec ({
 	)
 	val defaultDeltaker = Deltaker(
 		id = deltakerId,
-		bruker = defaultBruker,
+		fornavn = "GRØNN",
+		mellomnavn = null,
+		etternavn = "KOPP",
+		fodselsnummer = fodselsnummer,
+		telefonnummer = "1234",
+		epost = "foo@bar.baz",
+		navVeilederId = null,
+		navEnhetId = null,
 		startDato = LocalDate.now(),
 		sluttDato = LocalDate.now(),
 		status = defaultStatus,
@@ -67,7 +62,7 @@ class DeltakerServiceTest: StringSpec ({
 			deltakerRepository,
 			deltakerStatusRepository,
 			brukerService,
-			mockk()
+			mockk(),
 		)
 	}
 
@@ -81,7 +76,7 @@ class DeltakerServiceTest: StringSpec ({
 		val deltaker = defaultDeltaker
 		val deltakerInsertDbo = DeltakerInsertDbo(
 			id = deltaker.id,
-			brukerId = defaultBruker.id,
+			brukerId = brukerId,
 			gjennomforingId = deltaker.gjennomforingId,
 			startDato = deltaker.startDato,
 			sluttDato = deltaker.sluttDato,
@@ -100,7 +95,7 @@ class DeltakerServiceTest: StringSpec ({
 			innsokBegrunnelse = deltaker.innsokBegrunnelse
 		)
 		every { deltakerRepository.get(deltaker.id) } returns null
-		every { brukerService.getOrCreate(fodselsnummer) } returns defaultBruker.id
+		every { brukerService.getOrCreate(fodselsnummer) } returns brukerId
 		every { deltakerRepository.insert(deltakerInsertDbo)} returns Unit
 
 		service.upsertDeltaker(fodselsnummer, deltakerUpsert)

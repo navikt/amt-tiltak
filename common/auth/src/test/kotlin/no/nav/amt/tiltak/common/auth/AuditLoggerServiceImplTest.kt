@@ -5,7 +5,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
-import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.port.AuditEventSeverity
@@ -52,17 +51,14 @@ class AuditLoggerServiceImplTest {
 		} returns Deltaker(
 			id = deltakerId,
 			gjennomforingId = UUID.randomUUID(),
-			bruker = Bruker(
-				id = UUID.randomUUID(),
-				fornavn = "",
-				mellomnavn = null,
-				etternavn = "",
-				fodselsnummer = "12345678900",
-				navEnhet = null,
-				navVeilederId = null,
-				epost = null,
-				telefonnummer = null,
-			),
+			fornavn = "",
+			mellomnavn = null,
+			etternavn = "",
+			fodselsnummer = "12345678900",
+			navEnhetId = null,
+			navVeilederId = null,
+			epost = null,
+			telefonnummer = null,
 			startDato = null,
 			sluttDato = null,
 			status = DeltakerStatus(UUID.randomUUID(), Deltaker.Status.DELTAR, null, LocalDateTime.now(), LocalDateTime.now(), true),

@@ -5,7 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
-import no.nav.amt.tiltak.core.port.BrukerService
+import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.PersonService
 import java.util.*
@@ -15,9 +15,9 @@ class TildeltveilederIngestorImplTest : StringSpec({
 	"Skal ingeste kafka melding" {
 		val navAnsattService = mockk<NavAnsattService>()
 		val personService = mockk<PersonService>()
-		val brukerService = mockk<BrukerService>()
+		val deltakerService = mockk<DeltakerService>()
 
-		val ingestor = TildeltVeilederIngestorImpl(navAnsattService, personService, brukerService)
+		val ingestor = TildeltVeilederIngestorImpl(navAnsattService, personService, deltakerService)
 
 		val brukerFnr = "123454364334"
 		val veilederId = UUID.randomUUID()
@@ -36,11 +36,11 @@ class TildeltveilederIngestorImplTest : StringSpec({
 		} returns brukerFnr
 
 		every {
-			brukerService.oppdaterAnsvarligVeileder(brukerFnr, veilederId)
+			deltakerService.oppdaterAnsvarligVeileder(brukerFnr, veilederId)
 		} returns Unit
 
 		every {
-			brukerService.finnesBruker(brukerFnr)
+			deltakerService.finnesBruker(brukerFnr)
 		} returns true
 
 		ingestor.ingestKafkaRecord("""
@@ -55,9 +55,9 @@ class TildeltveilederIngestorImplTest : StringSpec({
 	"Skal ikke upserte veileder hvis bruker ikke finnes" {
 		val navAnsattService = mockk<NavAnsattService>()
 		val personService = mockk<PersonService>()
-		val brukerService = mockk<BrukerService>()
+		val deltakerService = mockk<DeltakerService>()
 
-		val ingestor = TildeltVeilederIngestorImpl(navAnsattService, personService, brukerService)
+		val ingestor = TildeltVeilederIngestorImpl(navAnsattService, personService, deltakerService)
 
 		val brukerFnr = "123454364334"
 
@@ -66,7 +66,7 @@ class TildeltveilederIngestorImplTest : StringSpec({
 		} returns brukerFnr
 
 		every {
-			brukerService.finnesBruker(brukerFnr)
+			deltakerService.finnesBruker(brukerFnr)
 		} returns false
 
 		ingestor.ingestKafkaRecord("""
@@ -82,7 +82,7 @@ class TildeltveilederIngestorImplTest : StringSpec({
 		}
 
 		verify(exactly = 0) {
-			brukerService.oppdaterAnsvarligVeileder(any(), any())
+			deltakerService.oppdaterAnsvarligVeileder(any(), any())
 		}
 
 		verify(exactly = 0) {

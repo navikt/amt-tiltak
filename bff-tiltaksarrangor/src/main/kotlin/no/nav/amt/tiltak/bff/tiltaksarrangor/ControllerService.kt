@@ -12,25 +12,26 @@ open class ControllerService(
 	private val skjermetPersonService: SkjermetPersonService,
 	private val gjennomforingService: GjennomforingService,
 	private val navAnsattService: NavAnsattService,
+	private val navEnhetService: NavEnhetService,
 ) {
 
 	open fun getDeltakerDetaljerById(deltakerId: UUID): DeltakerDetaljerDto {
 		val deltaker = deltakerService.hentDeltaker(deltakerId)
 			?: throw NoSuchElementException("Deltaker med id $deltakerId finnes ikke")
-		val bruker = deltaker.bruker
-		val navVeileder = bruker.navVeilederId?.let { navAnsattService.getNavAnsatt(it)}
+		val navVeileder = deltaker.navVeilederId?.let { navAnsattService.getNavAnsatt(it)}
+		val navEnhet = deltaker.navEnhetId?.let { navEnhetService.getNavEnhet(it) }
 		val gjennomforing = deltaker.gjennomforingId.let { gjennomforingService.getGjennomforing(it) }
-		val erSkjermet = skjermetPersonService.erSkjermet(bruker.fodselsnummer)
+		val erSkjermet = skjermetPersonService.erSkjermet(deltaker.fodselsnummer)
 
 		return DeltakerDetaljerDto(
 			id = deltaker.id,
-			fornavn = bruker.fornavn,
-			mellomnavn = bruker.mellomnavn,
-			etternavn = bruker.etternavn,
-			fodselsnummer = bruker.fodselsnummer,
-			telefonnummer = bruker.telefonnummer,
-			epost = bruker.epost,
-			navEnhet = bruker.navEnhet?.toDto(),
+			fornavn = deltaker.fornavn,
+			mellomnavn = deltaker.mellomnavn,
+			etternavn = deltaker.etternavn,
+			fodselsnummer = deltaker.fodselsnummer,
+			telefonnummer = deltaker.telefonnummer,
+			epost = deltaker.epost,
+			navEnhet = navEnhet?.toDto(),
 			navVeileder = navVeileder?.toDto(),
 			erSkjermetPerson = erSkjermet,
 			startDato = deltaker.startDato,

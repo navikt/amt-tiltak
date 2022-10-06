@@ -1,10 +1,6 @@
 package no.nav.amt.tiltak.deltaker.service
 
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
-import no.nav.amt.tiltak.core.port.BrukerService
+import no.nav.amt.tiltak.core.domain.tiltak.*
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
@@ -12,6 +8,7 @@ import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpdateDbo
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
+import no.nav.amt.tiltak.tiltak.services.BrukerService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
@@ -57,10 +54,8 @@ open class DeltakerServiceImpl(
 
 	override fun hentDeltakerePaaGjennomforing(gjennomforingId: UUID): List<Deltaker> {
 		return deltakerRepository.getDeltakerePaaTiltak(gjennomforingId)
-			.map {
-				val bruker = brukerService.getBruker(it.brukerId)
-					?: throw NoSuchElementException("Ingen bruker med id: ${it.brukerId}")
-				return@map it.toDeltaker(hentStatusOrThrow(it.id), bruker)
+			.map { deltaker ->
+				return@map deltaker.toDeltaker(hentStatusOrThrow(deltaker.id))
 			}
 	}
 
@@ -68,11 +63,11 @@ open class DeltakerServiceImpl(
 		val deltaker = deltakerRepository.get(deltakerId)
 			?: return null
 
-		val bruker = brukerService.getBruker(deltaker.brukerId)
-			?: throw NoSuchElementException("Ingen bruker med id: ${deltaker.brukerId}")
+		return deltaker.toDeltaker(hentStatusOrThrow(deltakerId))
+	}
 
-
-		return deltaker.toDeltaker(hentStatusOrThrow(deltakerId), bruker)
+	override fun hentDeltakereMedFnr(fodselsnummer: String): List<Deltaker>{
+		return deltakerRepository.getDeltakereMedFnr(fodselsnummer).map { it.toDeltaker(hentStatusOrThrow(it.id)) }
 	}
 
 	override fun oppdaterStatuser() {
@@ -87,6 +82,10 @@ open class DeltakerServiceImpl(
 		}
 
 		log.info("Deltaker med id=$deltakerId er slettet")
+	}
+
+	override fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet?) {
+		brukerService.oppdaterNavEnhet(fodselsnummer, navEnhet)
 	}
 
 	private fun update(deltaker: DeltakerUpsert) {
@@ -130,10 +129,8 @@ open class DeltakerServiceImpl(
 
 	private fun progressStatuser(kandidater: List<DeltakerDbo>) = kandidater
 		.also { log.info("Oppdaterer status på ${it.size} deltakere") }
-		.map {
-			val bruker = brukerService.getBruker(it.brukerId)
-				?: throw NoSuchElementException("Ingen bruker med id: ${it.brukerId}")
-			it.toDeltaker(hentStatusOrThrow(it.id), bruker)
+		.map { deltaker ->
+			deltaker.toDeltaker(hentStatusOrThrow(deltaker.id))
 		}
 		.forEach {
 			insertStatus(DeltakerStatusInsert(
@@ -144,6 +141,14 @@ open class DeltakerServiceImpl(
 				gyldigFra = LocalDateTime.now()
 			))
 		}
+
+	override fun finnesBruker(fodselsnummer: String): Boolean {
+		return brukerService.finnesBruker(fodselsnummer)
+	}
+
+	override fun oppdaterAnsvarligVeileder(fodselsnummer: String, navAnsattId: UUID) {
+		brukerService.oppdaterAnsvarligVeileder(fodselsnummer, navAnsattId)
+	}
 
 
 }

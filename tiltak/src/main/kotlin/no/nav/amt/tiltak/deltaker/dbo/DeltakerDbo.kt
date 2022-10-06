@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.deltaker.dbo
 
-import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import java.time.LocalDate
@@ -9,11 +8,14 @@ import java.util.*
 
 data class DeltakerDbo(
 	val id: UUID,
-	val brukerId: UUID,
-	val brukerFodselsnummer: String,
-	val brukerFornavn: String,
-	val brukerMellomnavn: String? = null,
-	val brukerEtternavn: String,
+	val fornavn: String,
+	val mellomnavn: String? = null,
+	val etternavn: String,
+	val telefonnummer: String?,
+	val epost: String?,
+	val fodselsnummer: String,
+	val navEnhetId: UUID?,
+	val navVeilederId: UUID?,
 	val gjennomforingId: UUID,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
@@ -27,11 +29,18 @@ data class DeltakerDbo(
 	val innsokBegrunnelse: String?
 ) {
 
-	fun toDeltaker(status: DeltakerStatus, bruker: Bruker): Deltaker {
+	fun toDeltaker(status: DeltakerStatus): Deltaker {
 		return Deltaker(
 			id = id,
 			gjennomforingId = gjennomforingId,
-			bruker = bruker,
+			fornavn = fornavn,
+			mellomnavn = mellomnavn,
+			etternavn = etternavn,
+			telefonnummer = telefonnummer,
+			epost = epost,
+			fodselsnummer = fodselsnummer,
+			navEnhetId = navEnhetId,
+			navVeilederId = navVeilederId,
 			startDato = startDato,
 			sluttDato = sluttDato,
 			dagerPerUke = dagerPerUke,

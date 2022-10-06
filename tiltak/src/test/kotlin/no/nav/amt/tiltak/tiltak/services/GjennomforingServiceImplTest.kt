@@ -5,13 +5,12 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
@@ -51,6 +50,8 @@ class GjennomforingServiceImplTest : FunSpec({
 
 	lateinit var brukerService: BrukerService
 
+	lateinit var navEnhetService: NavEnhetService
+
 	lateinit var service: GjennomforingServiceImpl
 
 	beforeEach {
@@ -69,6 +70,8 @@ class GjennomforingServiceImplTest : FunSpec({
 
 		brukerService = mockk()
 
+		navEnhetService = mockk()
+
 		service = GjennomforingServiceImpl(
 			gjennomforingRepository = gjennomforingRepository,
 			tiltakService = tiltakService,
@@ -76,7 +79,7 @@ class GjennomforingServiceImplTest : FunSpec({
 				DeltakerRepository(parameterTemplate),
 				DeltakerStatusRepository(parameterTemplate),
 				brukerService,
-				transactionTemplate
+				transactionTemplate,
 			),
 			arrangorService = arrangorService,
 			transactionTemplate = transactionTemplate,
@@ -97,46 +100,42 @@ class GjennomforingServiceImplTest : FunSpec({
 		testDataRepository.insertDeltaker(DELTAKER_1)
 		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1)
 
-		val bruker = Bruker(
-			id = UUID.randomUUID(),
-			fornavn = "Fornavn2",
-			mellomnavn = null,
-			etternavn = "Etternavn",
-			fodselsnummer = "12121231123",
-			navEnhet = null,
-			navVeilederId = null,
-			epost = "foo@bar.baz",
-			telefonnummer = "1234",
-		)
-
 		every {
 			deltakerService.slettDeltaker(any())
 		} returns Unit
 
 		every {
-			brukerService.getBruker(DELTAKER_1.brukerId)
-		}  returns bruker
+			navEnhetService.getNavEnhet(any<UUID>())
+		} returns NAV_ENHET_1.toNavEnhet()
 
 		every {
 			deltakerService.hentDeltakerePaaGjennomforing(GJENNOMFORING_1.id)
-		} returns listOf(Deltaker(
-			id = DELTAKER_1.id,
-			bruker = bruker,
-			startDato = null,
-			sluttDato = null,
-			status = DeltakerStatus(
-				UUID.randomUUID(),
-				Deltaker.Status.VENTER_PA_OPPSTART,
-				null,
-				LocalDateTime.now(),
-				LocalDateTime.now(),
-				true
-			),
-			registrertDato = LocalDateTime.now(),
-			dagerPerUke = null,
-			prosentStilling = null,
-			gjennomforingId = UUID.randomUUID()
-		))
+		} returns listOf(
+			Deltaker(
+				id = DELTAKER_1.id,
+				fornavn = "Fornavn2",
+				mellomnavn = null,
+				etternavn = "Etternavn",
+				fodselsnummer = "12121231123",
+				navEnhetId = null,
+				navVeilederId = null,
+				epost = "foo@bar.baz",
+				telefonnummer = "1234",
+				startDato = null,
+				sluttDato = null,
+				status = DeltakerStatus(
+					UUID.randomUUID(),
+					Deltaker.Status.VENTER_PA_OPPSTART,
+                    null,
+					LocalDateTime.now(),
+					LocalDateTime.now(),
+					true
+				),
+				registrertDato = LocalDateTime.now(),
+				dagerPerUke = null,
+				prosentStilling = null,
+				gjennomforingId = UUID.randomUUID()
+			))
 
 		gjennomforingRepository.get(GJENNOMFORING_1.id) shouldNotBe null
 
