@@ -40,12 +40,13 @@ open class DeltakerServiceImpl(
 
 	override fun insertStatus(status: DeltakerStatusInsert) {
 		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(status.deltakerId)
-		if(forrigeStatus?.status == status.type) return
+		if(forrigeStatus?.status == status.type && forrigeStatus.aarsak == status.aarsak) return
 
 		val nyStatus = DeltakerStatusInsertDbo(
 			id = status.id,
 			deltakerId = status.deltakerId,
 			type = status.type,
+			aarsak = status.aarsak,
 			gyldigFra = status.gyldigFra?: LocalDateTime.now()
 		)
 		transactionTemplate.executeWithoutResult {
@@ -139,6 +140,7 @@ open class DeltakerServiceImpl(
 				id = UUID.randomUUID(),
 				deltakerId = it.id,
 				type = it.utledStatus(),
+				aarsak = null,
 				gyldigFra = LocalDateTime.now()
 			))
 		}

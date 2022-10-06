@@ -105,6 +105,7 @@ class DeltakerServiceImplTest {
 			id = UUID.randomUUID(),
 			deltakerId = nyDeltaker!!.id,
 			type = Deltaker.Status.IKKE_AKTUELL,
+			aarsak = null,
 			gyldigFra = now
 		)
 
@@ -118,6 +119,7 @@ class DeltakerServiceImplTest {
 			deltakerId = nyDeltaker.id,
 			status = statusInsertDbo.type,
 			gyldigFra = statusInsertDbo.gyldigFra!!,
+			aarsak = statusInsertDbo.aarsak,
 			opprettetDato = now,
 			aktiv = true
 		)
@@ -136,6 +138,7 @@ class DeltakerServiceImplTest {
 			id = UUID.randomUUID(),
 			deltakerId = nyDeltaker!!.id,
 			type = Deltaker.Status.IKKE_AKTUELL,
+			aarsak = null,
 			gyldigFra = LocalDateTime.now()
 		)
 
@@ -164,6 +167,7 @@ class DeltakerServiceImplTest {
 			id = UUID.randomUUID(),
 			deltakerId = nyDeltaker!!.id,
 			type = Deltaker.Status.IKKE_AKTUELL,
+			aarsak = null,
 			gyldigFra = LocalDateTime.now()
 		)
 
@@ -185,6 +189,7 @@ class DeltakerServiceImplTest {
 			id = UUID.randomUUID(),
 			deltakerId = deltaker.id,
 			type = Deltaker.Status.DELTAR,
+			aarsak = null,
 			gyldigFra = LocalDateTime.now().minusDays(2)
 		)
 

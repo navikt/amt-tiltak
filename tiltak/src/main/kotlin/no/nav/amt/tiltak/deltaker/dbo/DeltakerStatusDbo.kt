@@ -9,9 +9,10 @@ data class DeltakerStatusDbo(
 	val id: UUID = UUID.randomUUID(),
 	val deltakerId: UUID,
 	val status: Deltaker.Status,
+	val aarsak: Deltaker.StatusAarsak?,
 	val gyldigFra: LocalDateTime,
 	val opprettetDato: LocalDateTime,
 	val aktiv: Boolean
 ) {
-	fun toDeltakerStatus(): DeltakerStatus = DeltakerStatus(id, status, gyldigFra, opprettetDato, aktiv)
+	fun toDeltakerStatus(): DeltakerStatus = DeltakerStatus(id, status, aarsak, gyldigFra, opprettetDato, aktiv)
 }
