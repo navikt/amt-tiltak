@@ -35,6 +35,7 @@ class EndringsmeldingController(
 				EndringsmeldingDto(
 					id = it.id,
 					startDato = it.startDato,
+					sluttDato = it.sluttDato,
 					aktiv = it.aktiv
 				)
 			}
@@ -46,6 +47,23 @@ class EndringsmeldingController(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestParam("startDato") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startDato: LocalDate
 	) {
+		val ansattId = ansattIdForDeltaker(deltakerId)
+
+		endringsmeldingService.opprettMedStartDato(deltakerId, startDato, ansattId)
+	}
+
+	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
+	@PostMapping("/deltaker/{deltakerId}/sluttdato")
+	fun registrerSluttDato(
+		@PathVariable("deltakerId") deltakerId: UUID,
+		@RequestParam("sluttDato") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) sluttDato: LocalDate
+	) {
+		val ansattId = ansattIdForDeltaker(deltakerId)
+
+		endringsmeldingService.opprettMedSluttDato(deltakerId, sluttDato, ansattId)
+	}
+
+	private fun ansattIdForDeltaker(deltakerId: UUID): UUID {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 		val deltaker = deltakerService.hentDeltaker(deltakerId)
 			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
@@ -58,8 +76,7 @@ class EndringsmeldingController(
 		if (erSkjermet) {
 			throw NotImplementedError("Støtte for denne personen er ikke implementert")
 		}
-
-		endringsmeldingService.opprettMedStartDato(deltakerId, startDato, ansattId)
+		return ansattId
 	}
 
 }

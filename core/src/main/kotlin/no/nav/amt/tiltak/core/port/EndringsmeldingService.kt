@@ -16,6 +16,12 @@ interface EndringsmeldingService {
 		ansattId: UUID
 	): Endringsmelding
 
+	fun opprettMedSluttDato(
+		deltakerId: UUID,
+		sluttDato: LocalDate,
+		ansattId: UUID
+	): Endringsmelding
+
 	fun hentEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding>
 
 	fun hentEndringsmeldingerForDeltaker(deltakerId: UUID): List<Endringsmelding>

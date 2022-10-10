@@ -1,8 +1,11 @@
 package no.nav.amt.tiltak.test.integration
 
 import io.kotest.matchers.shouldBe
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.EndringsmeldingDto
+import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
 import org.junit.jupiter.api.Assertions
@@ -50,11 +53,65 @@ class EndringsmeldingArrangorControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-			[{"id":"$endringsmeldingId","startDato":"2022-09-05","aktiv":false}]
+			[{"id":"$endringsmeldingId","startDato":"2022-09-05","sluttDato":null,"aktiv":false}]
 		""".trimIndent()
 
 		response.code shouldBe 200
 		response.body?.string() shouldBe expectedJson
+	}
+
+	@Test
+	fun `registrerStartDato() - skal returnere 200 og opprette ny endringsmelding`() {
+		poaoTilgangClient.addErSkjermetResponse(mapOf(BRUKER_1.fodselsnummer to false))
+		val token = oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)
+		val startDato = LocalDate.now()
+
+		val response = sendRequest(
+			method = "POST",
+			url = "/api/tiltaksarrangor/endringsmelding/deltaker/${DELTAKER_1.id}/startdato?startDato=$startDato",
+			headers = mapOf("Authorization" to "Bearer $token"),
+			body = "".toJsonRequestBody(),
+		)
+
+		response.code shouldBe 200
+
+		val endringsmelding = getEndringsmeldingerOnDeltaker(DELTAKER_1.id, token).first()
+
+		endringsmelding.startDato shouldBe startDato
+		endringsmelding.sluttDato shouldBe null
+	}
+
+	@Test
+	fun `registrerSluttDato() - skal returnere 200 og opprette ny endringsmelding`() {
+		poaoTilgangClient.addErSkjermetResponse(mapOf(BRUKER_1.fodselsnummer to false))
+		val token = oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)
+		val sluttDato = LocalDate.now()
+
+		val response = sendRequest(
+			method = "POST",
+			url = "/api/tiltaksarrangor/endringsmelding/deltaker/${DELTAKER_1.id}/sluttdato?sluttDato=$sluttDato",
+			headers = mapOf("Authorization" to "Bearer $token"),
+			body = "".toJsonRequestBody(),
+		)
+
+		response.code shouldBe 200
+
+		val endringsmelding = getEndringsmeldingerOnDeltaker(DELTAKER_1.id, token).first()
+
+		endringsmelding.startDato shouldBe null
+		endringsmelding.sluttDato shouldBe sluttDato
+	}
+
+	private fun getEndringsmeldingerOnDeltaker(deltakerId: UUID, token: String): List<EndringsmeldingDto> {
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/endringsmelding?deltakerId=${deltakerId}",
+			headers = mapOf("Authorization" to "Bearer $token")
+		)
+
+		response.code shouldBe 200
+
+		return JsonUtils.fromJsonString(response.body!!.string())
 	}
 
 

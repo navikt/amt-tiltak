@@ -29,6 +29,10 @@ open class EndringsmeldingServiceImpl(
 		return endringsmeldingRepository.insertOgInaktiverStartDato(startDato, deltakerId, ansattId).toModel()
 	}
 
+	override fun opprettMedSluttDato(deltakerId: UUID, sluttDato: LocalDate, ansattId: UUID): Endringsmelding {
+		return endringsmeldingRepository.insertOgInaktiverSluttDato(sluttDato, deltakerId, ansattId).toModel()
+	}
+
 	override fun markerSomFerdig(endringsmeldingId: UUID, navAnsattId: UUID) {
 		val endringsmelding = endringsmeldingRepository.get(endringsmeldingId)
 
