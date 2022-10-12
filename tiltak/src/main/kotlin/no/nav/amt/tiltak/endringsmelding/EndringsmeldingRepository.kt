@@ -104,27 +104,19 @@ open class EndringsmeldingRepository(
 
 	open fun insertOgInaktiverStartDato(startDato: LocalDate, deltakerId: UUID, opprettetAv: UUID): EndringsmeldingDbo {
 		return transactionTemplate.execute {
-			inaktiverMeldingerMedStartDato(deltakerId)
+			inaktiverMeldingerMedDato(deltakerId, "start_dato")
 			return@execute insertNyDato(startDato, sluttDato = null, deltakerId, opprettetAv)
 		}!!
 	}
 
 	open fun insertOgInaktiverSluttDato(sluttDato: LocalDate, deltakerId: UUID, opprettetAv: UUID): EndringsmeldingDbo {
 		return transactionTemplate.execute {
-			inaktiverMeldingerMedSluttDato(deltakerId)
+			inaktiverMeldingerMedDato(deltakerId, "slutt_dato")
 			return@execute insertNyDato(startDato = null, sluttDato,  deltakerId, opprettetAv)
 		}!!
 	}
 
-	private fun inaktiverMeldingerMedStartDato(deltakerId: UUID): Int {
-		return inaktiverMeldingerMedDato(deltakerId, "start_dato")
-	}
-
-	private fun inaktiverMeldingerMedSluttDato(deltakerId: UUID): Int {
-		return inaktiverMeldingerMedDato(deltakerId, "slutt_dato")
-	}
-
-	private fun inaktiverMeldingerMedDato(deltakerId: UUID, datoColumn: String): Int {
+	private fun inaktiverMeldingerMedDato(deltakerId: UUID, datoColumn: String) {
 		val sql = """
 				UPDATE endringsmelding
 				SET aktiv = false
@@ -133,7 +125,7 @@ open class EndringsmeldingRepository(
 
 		val params = sqlParameters("deltaker_id" to deltakerId)
 
-		return template.update(sql, params)
+		template.update(sql, params)
 	}
 
 

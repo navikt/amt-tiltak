@@ -1,8 +1,10 @@
 package no.nav.amt.tiltak.test.integration
 
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
@@ -11,10 +13,14 @@ import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.util.*
 
 class EndringsmeldingArrangorControllerIntegrationTest : IntegrationTestBase() {
+
+	@Autowired
+	lateinit var endringsmeldingRepository: EndringsmeldingRepository
 
 	@BeforeEach
 	internal fun setUp() {
@@ -75,10 +81,12 @@ class EndringsmeldingArrangorControllerIntegrationTest : IntegrationTestBase() {
 
 		response.code shouldBe 200
 
-		val endringsmelding = getEndringsmeldingerOnDeltaker(DELTAKER_1.id, token).first()
 
-		endringsmelding.startDato shouldBe startDato
-		endringsmelding.sluttDato shouldBe null
+		val endringsmeldinger = endringsmeldingRepository.getByDeltaker(DELTAKER_1.id)
+		endringsmeldinger shouldHaveSize 1
+
+		endringsmeldinger[0].startDato shouldBe startDato
+		endringsmeldinger[0].sluttDato shouldBe null
 	}
 
 	@Test
@@ -96,23 +104,10 @@ class EndringsmeldingArrangorControllerIntegrationTest : IntegrationTestBase() {
 
 		response.code shouldBe 200
 
-		val endringsmelding = getEndringsmeldingerOnDeltaker(DELTAKER_1.id, token).first()
+		val endringsmeldinger = endringsmeldingRepository.getByDeltaker(DELTAKER_1.id)
+		endringsmeldinger shouldHaveSize 1
 
-		endringsmelding.startDato shouldBe null
-		endringsmelding.sluttDato shouldBe sluttDato
+		endringsmeldinger[0].startDato shouldBe null
+		endringsmeldinger[0].sluttDato shouldBe sluttDato
 	}
-
-	private fun getEndringsmeldingerOnDeltaker(deltakerId: UUID, token: String): List<EndringsmeldingDto> {
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/tiltaksarrangor/endringsmelding?deltakerId=${deltakerId}",
-			headers = mapOf("Authorization" to "Bearer $token")
-		)
-
-		response.code shouldBe 200
-
-		return JsonUtils.fromJsonString(response.body!!.string())
-	}
-
-
 }
