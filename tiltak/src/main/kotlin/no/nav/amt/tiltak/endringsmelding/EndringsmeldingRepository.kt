@@ -21,6 +21,7 @@ open class EndringsmeldingRepository(
 			id = rs.getUUID("id"),
 			deltakerId = rs.getUUID("deltaker_id"),
 			startDato = rs.getDate("start_dato")?.toLocalDate(),
+			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
 			ferdiggjortAvNavAnsattId = rs.getNullableUUID("ferdiggjort_av_nav_ansatt_id"),
 			ferdiggjortTidspunkt = rs.getNullableZonedDateTime("ferdiggjort_tidspunkt"),
 			aktiv = rs.getBoolean("aktiv"),
@@ -103,35 +104,44 @@ open class EndringsmeldingRepository(
 
 	open fun insertOgInaktiverStartDato(startDato: LocalDate, deltakerId: UUID, opprettetAv: UUID): EndringsmeldingDbo {
 		return transactionTemplate.execute {
-			inaktiverTidligereMeldinger(deltakerId)
-			return@execute insertNyStartDato(startDato, deltakerId, opprettetAv)
+			inaktiverMeldingerMedDato(deltakerId, "start_dato")
+			return@execute insertNyDato(startDato, sluttDato = null, deltakerId, opprettetAv)
 		}!!
 	}
 
-	private fun inaktiverTidligereMeldinger(deltakerId: UUID): Int {
+	open fun insertOgInaktiverSluttDato(sluttDato: LocalDate, deltakerId: UUID, opprettetAv: UUID): EndringsmeldingDbo {
+		return transactionTemplate.execute {
+			inaktiverMeldingerMedDato(deltakerId, "slutt_dato")
+			return@execute insertNyDato(startDato = null, sluttDato,  deltakerId, opprettetAv)
+		}!!
+	}
+
+	private fun inaktiverMeldingerMedDato(deltakerId: UUID, datoColumn: String) {
 		val sql = """
-			UPDATE endringsmelding
-			SET aktiv = false
-			WHERE deltaker_id = :deltaker_id
-		""".trimIndent()
+				UPDATE endringsmelding
+				SET aktiv = false
+				WHERE deltaker_id = :deltaker_id AND $datoColumn IS NOT NULL
+			""".trimIndent()
 
 		val params = sqlParameters("deltaker_id" to deltakerId)
 
-		return template.update(sql, params)
+		template.update(sql, params)
 	}
 
-	private fun insertNyStartDato(startDato: LocalDate, deltakerId: UUID, opprettetAvArrangorAnsattId: UUID): EndringsmeldingDbo {
+
+	private fun insertNyDato(startDato: LocalDate?, sluttDato: LocalDate?, deltakerId: UUID, opprettetAvArrangorAnsattId: UUID): EndringsmeldingDbo {
 		val id = UUID.randomUUID()
 
 		val sql = """
-			INSERT INTO endringsmelding(id, deltaker_id, start_dato, aktiv, opprettet_av_arrangor_ansatt_id)
-			VALUES (:id, :deltaker_id, :start_dato, true, :opprettet_av)
+			INSERT INTO endringsmelding(id, deltaker_id, start_dato, slutt_dato, aktiv, opprettet_av_arrangor_ansatt_id)
+			VALUES (:id, :deltaker_id, :start_dato, :slutt_dato, true, :opprettet_av)
 		""".trimIndent()
 
 		val params = sqlParameters(
 			"id" to id,
 			"deltaker_id" to deltakerId,
 			"start_dato" to startDato,
+			"slutt_dato" to sluttDato,
 			"opprettet_av" to opprettetAvArrangorAnsattId
 		)
 

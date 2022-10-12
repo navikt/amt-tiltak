@@ -10,9 +10,10 @@ data class EndringsmeldingDbo(
 	val id: UUID,
 	val deltakerId: UUID,
 	val startDato: LocalDate?,
+	val sluttDato: LocalDate?,
 	val ferdiggjortAvNavAnsattId: UUID?,
 	val ferdiggjortTidspunkt: ZonedDateTime?,
-	val aktiv: Boolean, // false hvis man sletter eller kommer en ny endring
+	val aktiv: Boolean,
 	val opprettetAvArrangorAnsattId: UUID,
 	val createdAt: LocalDateTime,
 	val modifiedAt: LocalDateTime
@@ -23,6 +24,7 @@ data class EndringsmeldingDbo(
 			id = id,
 			deltakerId = deltakerId,
 			startDato = startDato,
+			sluttDato = sluttDato,
 			ferdiggjortAvNavAnsattId = ferdiggjortAvNavAnsattId,
 			ferdiggjortTidspunkt = ferdiggjortTidspunkt,
 			aktiv = aktiv,
