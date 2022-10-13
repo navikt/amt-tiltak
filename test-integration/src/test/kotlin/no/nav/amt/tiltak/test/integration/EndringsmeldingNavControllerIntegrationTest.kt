@@ -84,6 +84,7 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 				id = endringsmeldingId,
 				deltakerId = DELTAKER_1.id,
 				startDato = LocalDate.now().plusDays(1),
+				sluttDato = null,
 				aktiv = true,
 				opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id
 			)
@@ -145,6 +146,7 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 				id = endringsmeldingId,
 				deltakerId = DELTAKER_1.id,
 				startDato = LocalDate.now().plusDays(1),
+				sluttDato = null,
 				aktiv = true,
 				opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id
 			)

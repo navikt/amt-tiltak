@@ -171,6 +171,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 			id = UUID.randomUUID(),
 			deltakerId = DELTAKER_1.id,
 			startDato = localDate1,
+			sluttDato = null,
 			aktiv = true,
 			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
 		))
@@ -179,6 +180,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 			id = UUID.randomUUID(),
 			deltakerId = DELTAKER_2.id,
 			startDato = localDate2,
+			sluttDato = null,
 			aktiv = true,
 			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
 		))

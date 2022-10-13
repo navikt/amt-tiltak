@@ -6,7 +6,8 @@ import java.util.*
 data class EndringsmeldingInput(
 	val id: UUID,
 	val deltakerId: UUID,
-	val startDato: LocalDate,
+	val startDato: LocalDate?,
+	val sluttDato: LocalDate?,
 	val aktiv: Boolean,
 	val opprettetAvArrangorAnsattId: UUID,
 )
