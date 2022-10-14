@@ -210,6 +210,7 @@ class GjennomforingControllerIntegrationTest {
 			id = UUID.randomUUID(),
 			deltakerId = deltakerCmd.id,
 			startDato = endringsmeldingDato,
+			sluttDato = null,
 			aktiv = true,
 			opprettetAvArrangorAnsattId = TestData.ARRANGOR_ANSATT_1.id,
 		)
@@ -217,6 +218,7 @@ class GjennomforingControllerIntegrationTest {
 			id = UUID.randomUUID(),
 			deltakerId = deltakerCmd.id,
 			startDato = endringsmeldingDato.minusDays(8),
+			sluttDato = null,
 			aktiv = false,
 			opprettetAvArrangorAnsattId = TestData.ARRANGOR_ANSATT_1.id,
 		)

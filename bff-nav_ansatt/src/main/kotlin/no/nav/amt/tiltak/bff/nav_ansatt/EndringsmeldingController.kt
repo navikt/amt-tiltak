@@ -37,6 +37,7 @@ class EndringsmeldingController(
 			return@map EndringsmeldingDto(
 				id = it.id,
 				startDato = it.startDato,
+				sluttDato = it.sluttDato,
 				aktiv = it.aktiv,
 				godkjent = it.ferdiggjortAvNavAnsattId != null,
 				arkivert = it.ferdiggjortAvNavAnsattId == null && !it.aktiv,

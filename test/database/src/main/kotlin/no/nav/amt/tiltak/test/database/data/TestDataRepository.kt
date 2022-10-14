@@ -213,14 +213,15 @@ class TestDataRepository(
 
 	fun insertEndringsmelding(cmd: EndringsmeldingInput) {
 		val sql = """
-			INSERT INTO endringsmelding(id, deltaker_id, start_dato, aktiv, opprettet_av_arrangor_ansatt_id)
-				VALUES (:id, :deltakerId, :startDato, :aktiv, :opprettetAvArrangorAnsattId)
+			INSERT INTO endringsmelding(id, deltaker_id, start_dato, slutt_dato, aktiv, opprettet_av_arrangor_ansatt_id)
+				VALUES (:id, :deltakerId, :startDato, :sluttDato, :aktiv, :opprettetAvArrangorAnsattId)
 		""".trimIndent()
 
 		val sqlParameters = parameters(
 			"id" to cmd.id,
 			"deltakerId" to cmd.deltakerId,
 			"startDato" to cmd.startDato,
+			"sluttDato" to cmd.sluttDato,
 			"aktiv" to cmd.aktiv,
 			"opprettetAvArrangorAnsattId" to cmd.opprettetAvArrangorAnsattId
 		)

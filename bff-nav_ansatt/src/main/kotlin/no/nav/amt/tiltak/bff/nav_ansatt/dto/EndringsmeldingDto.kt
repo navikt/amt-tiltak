@@ -8,6 +8,7 @@ data class EndringsmeldingDto(
 	val id: UUID,
 	val bruker: BrukerDto,
 	val startDato: LocalDate?,
+	val sluttDato: LocalDate?,
 	val aktiv: Boolean,
 	val godkjent: Boolean,
 	val arkivert: Boolean,

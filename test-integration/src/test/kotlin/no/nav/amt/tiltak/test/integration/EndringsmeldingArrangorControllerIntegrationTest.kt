@@ -47,6 +47,7 @@ class EndringsmeldingArrangorControllerIntegrationTest : IntegrationTestBase() {
 				id = endringsmeldingId,
 				deltakerId = DELTAKER_1.id,
 				startDato = LocalDate.parse("2022-09-05"),
+				sluttDato = null,
 				aktiv = false,
 				opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id
 			)
