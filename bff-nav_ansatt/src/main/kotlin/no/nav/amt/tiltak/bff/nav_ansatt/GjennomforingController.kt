@@ -41,6 +41,10 @@ class GjennomforingController(
 				opprettetAar = gjennomforing.opprettetAar,
 				arrangorNavn = arrangor.overordnetEnhetNavn ?: arrangor.navn,
 				antallAktiveEndringsmeldinger = antallAktiveEndringsmeldinger,
+				tiltak = TiltakDto(
+					kode = gjennomforing.tiltak.kode,
+					navn = gjennomforing.tiltak.navn,
+				),
 			)
 		}
 	}
@@ -68,6 +72,10 @@ class GjennomforingController(
 			),
 			lopenr = gjennomforing.lopenr,
 			opprettetAr = gjennomforing.opprettetAar,
+			tiltak = TiltakDto(
+				kode = gjennomforing.tiltak.kode,
+				navn = gjennomforing.tiltak.navn,
+			),
 		)
 	}
 
@@ -85,6 +93,10 @@ class GjennomforingController(
 				lopenr = it.lopenr,
 				opprettetAr = it.opprettetAar,
 				arrangorNavn = it.arrangor.overordnetEnhetNavn ?: it.arrangor.navn,
+				tiltak = TiltakDto(
+					kode = it.tiltak.kode,
+					navn = it.tiltak.navn,
+				),
 			)
 		}
 	}
@@ -95,7 +107,8 @@ class GjennomforingController(
 		val arrangorNavn: String,
 		val lopenr: Int,
 		val opprettetAar: Int,
-		val antallAktiveEndringsmeldinger: Int
+		val antallAktiveEndringsmeldinger: Int,
+		val tiltak: TiltakDto,
 	)
 
 	data class HentGjennomforingMedLopenrDto(
@@ -104,6 +117,7 @@ class GjennomforingController(
 		val lopenr: Int,
 		val opprettetAr: Int,
 		val arrangorNavn: String,
+		val tiltak: TiltakDto,
 	)
 
 	data class GjennomforingDto(
@@ -114,12 +128,18 @@ class GjennomforingController(
 		val sluttDato: LocalDate?,
 		val arrangor: ArrangorDto,
 		val lopenr: Int,
-		val opprettetAr: Int
+		val opprettetAr: Int,
+		val tiltak: TiltakDto,
 	)
 
 	data class ArrangorDto(
 		val virksomhetNavn: String,
 		val organisasjonNavn: String?
+	)
+
+	data class TiltakDto(
+		val kode: String,
+		val navn: String,
 	)
 
 }

@@ -153,7 +153,7 @@ class GjennomforingControllerTest {
 		).andReturn().response
 
 		val expectedJson = """
-			{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"tiltaksnavn","tiltakNavn":"tiltaksnavn","startDato":"2022-05-03","sluttDato":"2022-05-03","arrangor":{"virksomhetNavn":"Navn","organisasjonNavn":"Orgnavn"},"lopenr":123,"opprettetAr":2020}
+			{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"tiltaksnavn","tiltakNavn":"tiltaksnavn","startDato":"2022-05-03","sluttDato":"2022-05-03","arrangor":{"virksomhetNavn":"Navn","organisasjonNavn":"Orgnavn"},"lopenr":123,"opprettetAr":2020,"tiltak":{"kode":"kode","navn":"tiltaksnavn"}}
 		""".trimIndent()
 
 		assertEquals(expectedJson, response.contentAsString)
@@ -205,7 +205,7 @@ class GjennomforingControllerTest {
 		).andReturn().response
 
 		val expectedJson = """
-			[{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","lopenr":123,"opprettetAr":2020,"arrangorNavn":"Org TiltaksarrangÃ¸r 1"}]
+			[{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","lopenr":123,"opprettetAr":2020,"arrangorNavn":"Org TiltaksarrangÃ¸r 1","tiltak":{"kode":"AMO","navn":"Tiltak1"}}]
 		""".trimIndent()
 
 		assertEquals(expectedJson, response.contentAsString)
