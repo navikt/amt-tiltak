@@ -43,7 +43,7 @@ abstract class IntegrationTestBase {
 	lateinit var dataSource: DataSource
 
 	@Autowired
-	lateinit var db: TestDataRepository
+	lateinit var testDataRepository: TestDataRepository
 
 	companion object {
 		val oAuthServer = MockOAuthServer3()
@@ -136,9 +136,19 @@ abstract class IntegrationTestBase {
 		return client.newCall(reqBuilder.build()).execute()
 	}
 
+	fun sendRequest(request: Request): Response {
+		return client.newCall(request).execute()
+	}
+
+
 	fun String.toJsonRequestBody(): RequestBody {
 		val mediaTypeJson = "application/json".toMediaType()
 		return this.toRequestBody(mediaTypeJson)
+	}
+
+	fun emptyRequest(): RequestBody {
+		val mediaTypeHtml = "text/html".toMediaType()
+		return "".toRequestBody(mediaTypeHtml)
 	}
 
 }

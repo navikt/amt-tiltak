@@ -2,8 +2,6 @@ package no.nav.amt.tiltak.test.integration
 
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.EndringsmeldingDto
-import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
@@ -42,7 +40,7 @@ class EndringsmeldingArrangorControllerIntegrationTest : IntegrationTestBase() {
 	fun `hentEndringsmeldinger() - skal returnere 200 med korrekt respons`() {
 		val endringsmeldingId = UUID.randomUUID()
 
-		db.insertEndringsmelding(
+		testDataRepository.insertEndringsmelding(
 			EndringsmeldingInput(
 				id = endringsmeldingId,
 				deltakerId = DELTAKER_1.id,
