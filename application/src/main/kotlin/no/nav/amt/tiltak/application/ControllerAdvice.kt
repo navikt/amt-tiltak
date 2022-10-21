@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.server.ResponseStatusException
 
 @ControllerAdvice
 open class ControllerAdvice(
@@ -104,17 +105,6 @@ open class ControllerAdvice(
 
 		return buildResponse(
 			status = HttpStatus.BAD_REQUEST,
-			exception = e
-		)
-	}
-
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	@ExceptionHandler(RuntimeException::class)
-	fun handleRuntimeException(e: RuntimeException): ResponseEntity<Response> {
-		logger.error(e.message, e)
-
-		return buildResponse(
-			status = HttpStatus.INTERNAL_SERVER_ERROR,
 			exception = e
 		)
 	}
