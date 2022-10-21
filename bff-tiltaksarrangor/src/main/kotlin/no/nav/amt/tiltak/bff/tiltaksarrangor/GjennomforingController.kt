@@ -37,6 +37,7 @@ class GjennomforingController(
 			.hentGjennomforingIder(ansattPersonligIdent)
 
 		return gjennomforingService.getGjennomforinger(gjennomforingIder)
+			.filter { it.status == Gjennomforing.Status.GJENNOMFORES }
 			.map { it.toDto() }
 	}
 
@@ -50,6 +51,7 @@ class GjennomforingController(
 
 		return hentGjennomforingerSomKanLeggesTil(ansattId)
 			.filter { tillattIProd(it.id) }
+			.filter { it.status == Gjennomforing.Status.GJENNOMFORES }
 			.map { it.toDto() }
 	}
 

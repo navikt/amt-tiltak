@@ -41,7 +41,7 @@ class EndringsmeldingServiceImplTest {
 	}
 
 	@Test
-	fun `opprettMedStartDato - Inserter og inaktiverer forrige melding`() {
+	fun `opprettMedStartDato - Inserter og inaktiverer forrige melding med startdato`() {
 		val dato = LocalDate.now()
 
 		val melding1 = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, dato, ARRANGOR_ANSATT_1.id)
@@ -58,9 +58,28 @@ class EndringsmeldingServiceImplTest {
 	}
 
 	@Test
+	fun `opprettMedSluttDato - Inserter og inaktiverer forrige melding med sluttdato`() {
+		val dato = LocalDate.now()
+
+		val melding1 = endringsmeldingService.opprettMedSluttDato(DELTAKER_1.id, dato, ARRANGOR_ANSATT_1.id)
+		val melding2 = endringsmeldingService.opprettMedSluttDato(DELTAKER_1.id, dato.minusDays(2), ARRANGOR_ANSATT_1.id)
+
+		val result1 = repository.get(melding1.id)
+		val result2 = repository.get(melding2.id)
+
+		result1.aktiv shouldBe false
+		result1.sluttDato shouldBe dato
+
+		result2.aktiv shouldBe true
+		result2.sluttDato shouldBe dato.minusDays(2)
+	}
+
+
+
+	@Test
 	fun `hentEndringsmeldinger - en endringsmelding på gjennomføring - returnerer dto med alle verdier satt`() {
 		val nyStartDato = LocalDate.now().plusDays(3)
-		endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, nyStartDato, ARRANGOR_ANSATT_1.id)
+		val opprettetMelding = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, nyStartDato, ARRANGOR_ANSATT_1.id)
 
 		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(DELTAKER_1.gjennomforingId)
 		val endringsmelding = endringsmeldinger.get(0)
@@ -69,12 +88,12 @@ class EndringsmeldingServiceImplTest {
 
 		endringsmelding.deltakerId shouldBe DELTAKER_1.id
 		endringsmelding.startDato shouldBe nyStartDato
-		endringsmelding.aktiv shouldBe true
+		endringsmelding.sluttDato shouldBe null
 		endringsmelding.opprettetAvArrangorAnsattId shouldBe ARRANGOR_ANSATT_1.id
 		endringsmelding.ferdiggjortAvNavAnsattId shouldBe null
 		endringsmelding.ferdiggjortTidspunkt shouldBe null
 		endringsmelding.aktiv shouldBe true
-		//endringsmelding.opprettet shouldBe null
+		endringsmelding.opprettet shouldBe opprettetMelding.opprettet
 	}
 
 	@Test

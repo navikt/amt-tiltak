@@ -67,7 +67,7 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 			name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
 		)
 
-		db.insertTiltaksansvarligGjennomforingTilgang(
+		testDataRepository.insertTiltaksansvarligGjennomforingTilgang(
 			TiltaksansvarligGjennomforingTilgangInput(
 				id = UUID.randomUUID(),
 				navAnsattId = NAV_ANSATT_1.id,
@@ -79,11 +79,12 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 
 		val endringsmeldingId = UUID.randomUUID()
 
-		db.insertEndringsmelding(
+		testDataRepository.insertEndringsmelding(
 			EndringsmeldingInput(
 				id = endringsmeldingId,
 				deltakerId = DELTAKER_1.id,
 				startDato = LocalDate.now().plusDays(1),
+				sluttDato = null,
 				aktiv = true,
 				opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id
 			)
@@ -128,7 +129,7 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 			name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
 		)
 
-		db.insertTiltaksansvarligGjennomforingTilgang(
+		testDataRepository.insertTiltaksansvarligGjennomforingTilgang(
 			TiltaksansvarligGjennomforingTilgangInput(
 				id = UUID.randomUUID(),
 				navAnsattId = NAV_ANSATT_1.id,
@@ -140,11 +141,12 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 
 		val endringsmeldingId = UUID.randomUUID()
 
-		db.insertEndringsmelding(
+		testDataRepository.insertEndringsmelding(
 			EndringsmeldingInput(
 				id = endringsmeldingId,
 				deltakerId = DELTAKER_1.id,
 				startDato = LocalDate.now().plusDays(1),
+				sluttDato = null,
 				aktiv = true,
 				opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id
 			)

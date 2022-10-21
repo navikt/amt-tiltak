@@ -9,9 +9,10 @@ data class Endringsmelding(
 	val id: UUID,
 	val deltakerId: UUID,
 	val startDato: LocalDate?,
+	val sluttDato: LocalDate?,
 	val ferdiggjortAvNavAnsattId: UUID?,
 	val ferdiggjortTidspunkt: ZonedDateTime?,
-	val aktiv: Boolean, // false hvis man sletter eller kommer en ny endring
+	val aktiv: Boolean,
 	val opprettetAvArrangorAnsattId: UUID,
 	val opprettet: LocalDateTime,
 )

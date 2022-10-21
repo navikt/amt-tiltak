@@ -9,7 +9,6 @@ import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.DbUtils.shouldBeCloseTo
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
@@ -49,7 +48,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
-	test("insertOgInaktiverStartDato - Ingen tidligere endringsmeldinger - inserter melding med alle verdier") {
+	test("insertOgInaktiverStartDato - Ingen tidligere endringsmeldinger - inserter melding med startdato") {
 		val now = LocalDate.now()
 		val melding = repository.insertOgInaktiverStartDato(now, DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
 
@@ -58,6 +57,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		melding.aktiv shouldBe true
 		melding.opprettetAvArrangorAnsattId shouldBe ARRANGOR_ANSATT_1.id
 		melding.startDato shouldBe now
+		melding.sluttDato shouldBe null
 	}
 
 	test("insertOgInaktiverStartDato - Det finnes flere endringsmeldinger - inserter melding og inaktiverer den gamle") {
@@ -69,16 +69,50 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		melding1.startDato shouldBe idag
 
 		val nyDato = LocalDate.now().minusDays(1)
-		val melding2 = repository.insertOgInaktiverStartDato(nyDato, DELTAKER_1.id, TestData.ARRANGOR_ANSATT_2.id)
+		val melding2 = repository.insertOgInaktiverStartDato(nyDato, DELTAKER_1.id, ARRANGOR_ANSATT_2.id)
 
 		melding2 shouldNotBe null
 		melding2.startDato shouldBe nyDato
 		melding2.aktiv shouldBe true
-		melding2.opprettetAvArrangorAnsattId shouldBe TestData.ARRANGOR_ANSATT_2.id
+		melding2.opprettetAvArrangorAnsattId shouldBe ARRANGOR_ANSATT_2.id
 
 		val forrigeMelding = repository.get(melding1.id)
 
 		melding1.copy(aktiv = false) shouldBe forrigeMelding
+	}
+
+	test("insertOgInaktiverSluttDato - Ingen tidligere endringsmeldinger - inserter melding med sluttdato") {
+		val now = LocalDate.now()
+		val melding = repository.insertOgInaktiverSluttDato(now, DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+
+		melding shouldNotBe null
+		melding.deltakerId shouldBe DELTAKER_1.id
+		melding.aktiv shouldBe true
+		melding.opprettetAvArrangorAnsattId shouldBe ARRANGOR_ANSATT_1.id
+		melding.startDato shouldBe null
+		melding.sluttDato shouldBe now
+	}
+
+	test("insertOgInaktiverSluttDato - Det finnes flere endringsmeldinger - inserter melding og inaktiverer ikke den med startdato") {
+		val idag = LocalDate.now()
+		val meldingMedStartDato = repository.insertOgInaktiverStartDato(idag, DELTAKER_1.id, ARRANGOR_ANSATT_1.id)
+
+		meldingMedStartDato.deltakerId shouldBe DELTAKER_1.id
+		meldingMedStartDato.aktiv shouldBe true
+		meldingMedStartDato.startDato shouldBe idag
+
+		val nyDato = LocalDate.now().plusDays(1)
+		val meldingMedSluttDato = repository.insertOgInaktiverSluttDato(nyDato, DELTAKER_1.id, ARRANGOR_ANSATT_2.id)
+
+		meldingMedSluttDato shouldNotBe null
+		meldingMedSluttDato.sluttDato shouldBe nyDato
+		meldingMedSluttDato.aktiv shouldBe true
+		meldingMedSluttDato.opprettetAvArrangorAnsattId shouldBe ARRANGOR_ANSATT_2.id
+
+		val forrigeMelding = repository.get(meldingMedStartDato.id)
+
+		forrigeMelding.aktiv shouldBe true
+		meldingMedStartDato shouldBe forrigeMelding
 	}
 
 	test("getByGjennomforing - en endringsmelding - henter endringsmelding") {
@@ -137,6 +171,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 			id = UUID.randomUUID(),
 			deltakerId = DELTAKER_1.id,
 			startDato = localDate1,
+			sluttDato = null,
 			aktiv = true,
 			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
 		))
@@ -145,6 +180,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 			id = UUID.randomUUID(),
 			deltakerId = DELTAKER_2.id,
 			startDato = localDate2,
+			sluttDato = null,
 			aktiv = true,
 			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
 		))
