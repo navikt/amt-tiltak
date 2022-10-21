@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.test.integration
+package no.nav.amt.tiltak.test.integration.tiltaksarrangor
 
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -6,19 +6,19 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
+import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
+import okhttp3.Request
 import org.junit.jupiter.api.Test
 import java.util.*
 
-class TiltakarrangorDeltakerControllerIntegrationTest : IntegrationTestBase() {
-
+class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	@Test
-	fun `hentTiltakDeltakerDetaljer() should return 401 when not authenticated`() {
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/tiltaksarrangor/tiltak-deltaker/${UUID.randomUUID()}"
-		)
+	internal fun `skal teste token autentisering`() {
 
-		response.code shouldBe 401
+		val requestBuilders = listOf(
+			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/tiltak-deltaker/${UUID.randomUUID()}"),
+		)
+		testTiltaksarrangorAutentisering(requestBuilders, client, oAuthServer)
 	}
 
 	@Test

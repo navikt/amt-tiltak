@@ -1,9 +1,12 @@
-package no.nav.amt.tiltak.test.integration
+package no.nav.amt.tiltak.test.integration.nav_ansatt
 
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData
+import no.nav.amt.tiltak.test.integration.IntegrationTestBase
+import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testNavAnsattAutentisering
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig.ad_gruppe.AdGrupper
+import okhttp3.Request
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -13,17 +16,16 @@ class AutentiseringControllerIntegrationTest : IntegrationTestBase() {
 	@BeforeEach
 	internal fun setUp() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
-		resetMockServcersAndAddDefaultData()
+		resetMockServersAndAddDefaultData()
 	}
 
-	@Test
-	fun `meg() - skal returnere 401 hvis token mangler`() {
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/nav-ansatt/autentisering/meg"
-		)
 
-		response.code shouldBe 401
+	@Test
+	internal fun `skal teste token autentisering`() {
+		val requestBuilders = listOf(
+			Request.Builder().get().url("${serverUrl()}/api/nav-ansatt/autentisering/meg"),
+		)
+		testNavAnsattAutentisering(requestBuilders, client, oAuthServer)
 	}
 
 	@Test

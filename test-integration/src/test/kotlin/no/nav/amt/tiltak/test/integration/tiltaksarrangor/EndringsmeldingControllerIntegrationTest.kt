@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.test.integration
+package no.nav.amt.tiltak.test.integration.tiltaksarrangor
 
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -8,14 +8,16 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
-import org.junit.jupiter.api.Assertions
+import no.nav.amt.tiltak.test.integration.IntegrationTestBase
+import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
+import okhttp3.Request
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.util.*
 
-class EndringsmeldingArrangorControllerIntegrationTest : IntegrationTestBase() {
+class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
 	@Autowired
 	lateinit var endringsmeldingRepository: EndringsmeldingRepository
@@ -23,17 +25,18 @@ class EndringsmeldingArrangorControllerIntegrationTest : IntegrationTestBase() {
 	@BeforeEach
 	internal fun setUp() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
-		resetMockServcersAndAddDefaultData()
+		resetMockServersAndAddDefaultData()
 	}
 
 	@Test
-	fun `hentEndringsmeldinger() - skal returnere 401 hvis token mangler`() {
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/tiltaksarrangor/endringsmelding?deltakerId=${UUID.randomUUID()}"
-		)
+	internal fun `skal teste token autentisering`() {
 
-		Assertions.assertEquals(401, response.code)
+		val requestBuilders = listOf(
+			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/endringsmelding?deltakerId=${UUID.randomUUID()}"),
+			Request.Builder().post(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/endringsmelding/deltaker/${UUID.randomUUID()}/startdato"),
+			Request.Builder().post(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/endringsmelding/deltaker/${UUID.randomUUID()}/sluttdato"),
+		)
+		testTiltaksarrangorAutentisering(requestBuilders, client, oAuthServer)
 	}
 
 	@Test

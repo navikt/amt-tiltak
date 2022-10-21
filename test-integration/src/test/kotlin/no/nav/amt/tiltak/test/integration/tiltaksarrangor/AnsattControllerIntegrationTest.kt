@@ -1,9 +1,12 @@
-package no.nav.amt.tiltak.test.integration
+package no.nav.amt.tiltak.test.integration.tiltaksarrangor
 
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
+import no.nav.amt.tiltak.test.integration.IntegrationTestBase
+import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
+import okhttp3.Request
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -12,17 +15,17 @@ class AnsattControllerIntegrationTest : IntegrationTestBase() {
 	@BeforeEach
 	internal fun setUp() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
-		resetMockServcersAndAddDefaultData()
+		resetMockServersAndAddDefaultData()
 	}
 
-	@Test
-	fun `getInnloggetAnsatt() should return 401 when not authenticated`() {
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/tiltaksarrangor/ansatt/meg"
-		)
 
-		response.code shouldBe 401
+	@Test
+	internal fun `skal teste token autentisering`() {
+
+		val requestBuilders = listOf(
+			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/ansatt/meg"),
+		)
+		testTiltaksarrangorAutentisering(requestBuilders, client, oAuthServer)
 	}
 
 	@Test

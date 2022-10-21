@@ -190,7 +190,7 @@ object TestData {
 		ansattId = ARRANGOR_ANSATT_1.id,
 		gjennomforingId = GJENNOMFORING_1.id,
 		gyldigFra = ZonedDateTime.now().minusHours(1),
-		gyldigTil = ZonedDateTime.now().plusHours(1)
+		gyldigTil = ZonedDateTime.now().plusYears(1)
 	)
 
 	val NAV_ANSATT_1 = NavAnsattInput(

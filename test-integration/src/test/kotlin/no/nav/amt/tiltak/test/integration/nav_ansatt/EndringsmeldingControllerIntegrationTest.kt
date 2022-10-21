@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.test.integration
+package no.nav.amt.tiltak.test.integration.nav_ansatt
 
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.EndringsmeldingDto
@@ -10,7 +10,11 @@ import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
 import no.nav.amt.tiltak.test.database.data.inputs.TiltaksansvarligGjennomforingTilgangInput
+import no.nav.amt.tiltak.test.integration.IntegrationTestBase
+import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testNavAnsattAutentisering
+import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig.ad_gruppe.AdGrupper
+import okhttp3.Request
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -18,7 +22,7 @@ import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.*
 
-class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
+class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
 	@BeforeEach
 	internal fun setUp() {
@@ -26,13 +30,12 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	fun `hentEndringsmeldinger() - skal returnere 401 hvis token mangler`() {
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/nav-ansatt/endringsmelding"
+	internal fun `skal teste token autentisering`() {
+		val requestBuilders = listOf(
+			Request.Builder().get().url("${serverUrl()}/api/nav-ansatt/endringsmelding"),
+			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/nav-ansatt/endringsmelding/${UUID.randomUUID()}/ferdig"),
 		)
-
-		Assertions.assertEquals(401, response.code)
+		testNavAnsattAutentisering(requestBuilders, client, oAuthServer)
 	}
 
 	@Test
@@ -102,17 +105,6 @@ class EndringsmeldingNavControllerIntegrationTest : IntegrationTestBase() {
 
 		endringsmeldingResponse.size shouldBe 1
 		endringsmeldingResponse.first().id shouldBe endringsmeldingId
-	}
-
-	@Test
-	fun `markerFerdig() - skal returnere 401 hvis token mangler`() {
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/nav-ansatt/endringsmelding/${UUID.randomUUID()}/ferdig",
-			body = "".toJsonRequestBody()
-		)
-
-		response.code shouldBe 401
 	}
 
 	@Test

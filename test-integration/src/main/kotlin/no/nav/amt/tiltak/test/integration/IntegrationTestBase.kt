@@ -21,6 +21,7 @@ import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import java.time.Duration
 import javax.sql.DataSource
 
 
@@ -34,7 +35,7 @@ abstract class IntegrationTestBase {
 	@LocalServerPort
 	private var port: Int = 0
 
-	private val client = OkHttpClient()
+	val client = OkHttpClient.Builder().callTimeout(Duration.ofMinutes(5)).build()
 
 	@Autowired
 	lateinit var kafkaMessageSender: KafkaMessageSender
@@ -46,7 +47,7 @@ abstract class IntegrationTestBase {
 	lateinit var testDataRepository: TestDataRepository
 
 	companion object {
-		val oAuthServer = MockOAuthServer3()
+		val oAuthServer = MockOAuthServer()
 		val enhetsregisterClient = MockAmtEnhetsregisterClient()
 		val norgHttpClient = MockNorgHttpClient()
 		val poaoTilgangClient = MockPoaoTilgangHttpClient()
@@ -110,7 +111,7 @@ abstract class IntegrationTestBase {
 		pdlHttpClient.reset()
 	}
 
-	fun resetMockServcersAndAddDefaultData() {
+	fun resetMockServersAndAddDefaultData() {
 		resetMockServers()
 		norgHttpClient.addDefaultData()
 		nomHttpClient.addDefaultData()
@@ -122,12 +123,13 @@ abstract class IntegrationTestBase {
 	fun sendRequest(
 		method: String,
 		url: String,
-		body: RequestBody? = null,
+		body: RequestBody = emptyRequest(),
 		headers: Map<String, String> = emptyMap()
 	): Response {
+		val requestBody = if (method.equals("GET", true)) null else body
 		val reqBuilder = Request.Builder()
 			.url("${serverUrl()}$url")
-			.method(method, body)
+			.method(method, requestBody)
 
 		headers.forEach {
 			reqBuilder.addHeader(it.key, it.value)
