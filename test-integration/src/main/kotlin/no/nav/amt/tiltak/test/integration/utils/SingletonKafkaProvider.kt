@@ -15,9 +15,10 @@ object SingletonKafkaProvider {
 	private const val consumerId = "INTEGRATION_CONSUMER"
 
 	private val log = LoggerFactory.getLogger(javaClass)
-	private const val kafkaDockerImageName = "confluentinc/cp-kafka:6.2.1"
+	private val kafkaDockerImageName = getKafkaImage()
 
 	private var kafkaContainer: KafkaContainer? = null
+
 
 	fun getKafkaProperties(): KafkaProperties {
 		val host = getHost()
@@ -62,5 +63,13 @@ object SingletonKafkaProvider {
 		})
 	}
 
+	private fun getKafkaImage(): String {
+		val tag = when (System.getProperty("os.arch")) {
+			"aarch64" -> "7.2.2-1-ubi8.arm64"
+			else -> "7.2.2"
+		}
+
+		return "confluentinc/cp-kafka:$tag"
+	}
 
 }

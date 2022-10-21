@@ -13,7 +13,7 @@ object SingletonPostgresContainer {
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	private const val postgresDockerImageName = "postgres:14-alpine"
+	private val postgresDockerImageName = getPostgresImage()
 
 	private var postgresContainer: PostgreSQLContainer<Nothing>? = null
 
@@ -56,7 +56,7 @@ object SingletonPostgresContainer {
 	}
 
 	private fun createContainer(): PostgreSQLContainer<Nothing> {
-		return PostgreSQLContainer<Nothing>(DockerImageName.parse(postgresDockerImageName))
+		return PostgreSQLContainer<Nothing>(DockerImageName.parse(postgresDockerImageName).asCompatibleSubstituteFor("postgres"))
 			.waitingFor(HostPortWaitStrategy())
 	}
 
@@ -77,6 +77,15 @@ object SingletonPostgresContainer {
 			log.info("Shutting down postgres database...")
 			postgresContainer?.stop()
 		})
+	}
+
+
+	private fun getPostgresImage(): String {
+		val digest = when (System.getProperty("os.arch")) {
+			"aarch64" -> "@sha256:58ddae4817fc2b7ed43ac43c91f3cf146290379b7b615210c33fa62a03645e70"
+			else -> ""
+		}
+		return "postgres:14-alpine$digest"
 	}
 
 }
