@@ -5,8 +5,6 @@ import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.amt.tiltak.core.port.AuditEventSeverity
-import no.nav.amt.tiltak.core.port.AuditEventType
 import no.nav.amt.tiltak.core.port.AuditLoggerService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
@@ -133,7 +131,7 @@ class EndringsmeldingServiceImplTest {
 		val endringsmelding = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, LocalDate.now(), ARRANGOR_ANSATT_1.id)
 
 		every {
-			auditLoggerService.navAnsattAuditLog(any(), any(), any(), any(), any())
+			auditLoggerService.navAnsattBehandletEndringsmeldingAuditLog(any(), any())
 		} returns Unit
 
 		endringsmeldingService.markerSomFerdig(endringsmelding.id, NAV_ANSATT_1.id)
@@ -145,13 +143,7 @@ class EndringsmeldingServiceImplTest {
 		ferdigMelding.ferdiggjortTidspunkt shouldNotBe null
 
 		verify(exactly = 1) {
-			auditLoggerService.navAnsattAuditLog(
-				NAV_ANSATT_1.id,
-				DELTAKER_1.id,
-				AuditEventType.ACCESS,
-				AuditEventSeverity.INFO,
-				"NAV-ansatt har lest melding fra tiltaksarrangoer om oppstartsdato paa tiltak for aa registrere dette."
-			)
+			auditLoggerService.navAnsattBehandletEndringsmeldingAuditLog(NAV_ANSATT_1.id, DELTAKER_1.id)
 		}
 	}
 
@@ -163,7 +155,7 @@ class EndringsmeldingServiceImplTest {
 		val gjennomforingId = DELTAKER_1.gjennomforingId
 
 		every {
-			auditLoggerService.navAnsattAuditLog(any(), any(), any(), any(), any())
+			auditLoggerService.navAnsattBehandletEndringsmeldingAuditLog(any(), any())
 		} returns Unit
 
 		endringsmeldingService.hentAntallAktiveForGjennomforing(gjennomforingId) shouldBe 2

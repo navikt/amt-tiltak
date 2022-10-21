@@ -11,29 +11,62 @@ import java.util.*
 @Service
 class AuditLoggerServiceImpl(
 	private val auditLogger: AuditLogger,
+	private val arrangorAnsattService: ArrangorAnsattService,
 	private val navAnsattService: NavAnsattService,
+	private val gjennomforingService: GjennomforingService,
 	private val deltakerService: DeltakerService
 ) : AuditLoggerService {
+
+	internal enum class AuditEventType {
+		CREATE,
+		ACCESS,
+		UPDATE,
+		DELETE
+	}
+
+	internal enum class AuditEventSeverity {
+		INFO,
+		WARN,
+	}
 
 	companion object {
 		const val APPLICATION_NAME = "amt-tiltak"
 		const val AUDIT_LOG_NAME = "Sporingslogg"
 		const val MESSAGE_EXTENSION = "msg"
+
+		const val NAV_ANSATT_ENDRINGSMELDING_AUDIT_LOG_REASON =
+			"NAV-ansatt har lest melding fra tiltaksarrangoer om oppstartsdato paa tiltak for aa registrere dette."
+
+		const val TILTAKSARRANGOR_ANSATT_DELTAKER_OPPSLAG_AUDIT_LOG_REASON =
+			"Tiltaksarrangor ansatt har gjort oppslag paa deltaker."
 	}
 
-	override fun navAnsattAuditLog(
-		navAnsattId: UUID,
-		deltakerId: UUID,
-		eventType: AuditEventType,
-		eventSeverity: AuditEventSeverity,
-		reason: String
-	) {
+	override fun navAnsattBehandletEndringsmeldingAuditLog(navAnsattId: UUID, deltakerId: UUID) {
 		sendAuditLog(
 			sourceUserIdProvider = { navAnsattService.getNavAnsatt(navAnsattId).navIdent },
-			destinationUserIdProvider = { deltakerService.hentDeltaker(deltakerId)?.fodselsnummer?: throw NoSuchElementException("Fant ikke deltaker med id: $deltakerId") },
-			eventType = eventType,
-			eventSeverity = eventSeverity,
-			reason = reason
+			destinationUserIdProvider = {
+				deltakerService.hentDeltaker(deltakerId)?.fodselsnummer
+					?: throw NoSuchElementException("Fant ikke deltaker med id: $deltakerId")
+			},
+			eventType = AuditEventType.ACCESS,
+			eventSeverity = AuditEventSeverity.INFO,
+			reason = NAV_ANSATT_ENDRINGSMELDING_AUDIT_LOG_REASON
+		)
+	}
+
+	override fun tiltaksarrangorAnsattDeltakerOppslagAuditLog(arrangorAnsattId: UUID, deltakerId: UUID) {
+		val deltaker = 	deltakerService.hentDeltaker(deltakerId)
+			?: throw NoSuchElementException("Fant ikke deltaker med id: $deltakerId")
+
+		val gjennomforing = gjennomforingService.getGjennomforing(deltaker.gjennomforingId)
+
+		sendAuditLog(
+			sourceUserIdProvider = { arrangorAnsattService.getAnsatt(arrangorAnsattId).personligIdent },
+			destinationUserIdProvider = { deltaker.fodselsnummer },
+			eventType = AuditEventType.ACCESS,
+			eventSeverity = AuditEventSeverity.INFO,
+			reason = TILTAKSARRANGOR_ANSATT_DELTAKER_OPPSLAG_AUDIT_LOG_REASON,
+			extensions = mapOf("cn1" to gjennomforing.arrangor.organisasjonsnummer)
 		)
 	}
 
@@ -42,9 +75,10 @@ class AuditLoggerServiceImpl(
 		destinationUserIdProvider: () -> String,
 		reason: String,
 		eventType: AuditEventType,
-		eventSeverity: AuditEventSeverity
+		eventSeverity: AuditEventSeverity,
+		extensions: Map<String, String> = emptyMap()
 	) {
-		val msg = CefMessage.builder()
+		val builder = CefMessage.builder()
 			.applicationName(APPLICATION_NAME)
 			.event(toCefMessageEvent(eventType))
 			.name(AUDIT_LOG_NAME)
@@ -53,13 +87,18 @@ class AuditLoggerServiceImpl(
 			.destinationUserId(destinationUserIdProvider.invoke())
 			.timeEnded(System.currentTimeMillis())
 			.extension(MESSAGE_EXTENSION, reason)
-			.build()
+
+		extensions.forEach {
+			builder.extension(it.key, it.value)
+		}
+
+		val msg = builder.build()
 
 		auditLogger.log(msg)
 	}
 
 	private fun toCefMessageEvent(auditEventType: AuditEventType): CefMessageEvent {
-		return when(auditEventType) {
+		return when (auditEventType) {
 			AuditEventType.CREATE -> CefMessageEvent.CREATE
 			AuditEventType.ACCESS -> CefMessageEvent.ACCESS
 			AuditEventType.UPDATE -> CefMessageEvent.UPDATE
@@ -68,10 +107,9 @@ class AuditLoggerServiceImpl(
 	}
 
 	private fun toCefMessageSeverity(auditEventSeverity: AuditEventSeverity): CefMessageSeverity {
-		return when(auditEventSeverity) {
+		return when (auditEventSeverity) {
 			AuditEventSeverity.INFO -> CefMessageSeverity.INFO
 			AuditEventSeverity.WARN -> CefMessageSeverity.WARN
 		}
 	}
-
 }

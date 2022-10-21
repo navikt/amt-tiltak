@@ -7,24 +7,8 @@ interface AuditLoggerService {
 	/**
 	 * Log en hendelse som en NAV ansatt har utført på en deltaker
 	 */
-	fun navAnsattAuditLog(
-		navAnsattId: UUID,
-		deltakerId: UUID,
-		eventType: AuditEventType,
-		eventSeverity: AuditEventSeverity,
-		reason: String,
-	)
+	fun navAnsattBehandletEndringsmeldingAuditLog(navAnsattId: UUID, deltakerId: UUID)
 
-}
+	fun tiltaksarrangorAnsattDeltakerOppslagAuditLog(arrangorAnsattId: UUID, deltakerId: UUID)
 
-enum class AuditEventType {
-	CREATE,
-	ACCESS,
-	UPDATE,
-	DELETE
-}
-
-enum class AuditEventSeverity {
-	INFO,
-	WARN,
 }
