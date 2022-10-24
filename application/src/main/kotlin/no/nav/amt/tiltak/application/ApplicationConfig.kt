@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.application
 
 import no.nav.common.audit_log.log.AuditLogger
 import no.nav.common.audit_log.log.AuditLoggerImpl
-import no.nav.common.log.LogFilter
+import no.nav.common.rest.filter.LogRequestFilter
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder
 import no.nav.common.token_client.client.MachineToMachineTokenClient
 import no.nav.common.utils.EnvironmentUtils
@@ -31,9 +31,9 @@ open class ApplicationConfig {
 	}
 
 	@Bean
-	open fun logFilterRegistrationBean(): FilterRegistrationBean<LogFilter> {
-		val registration = FilterRegistrationBean<LogFilter>()
-		registration.filter = LogFilter(
+	open fun logRequestFilterRegistrationBean(): FilterRegistrationBean<LogRequestFilter> {
+		val registration = FilterRegistrationBean<LogRequestFilter>()
+		registration.filter = LogRequestFilter(
 			EnvironmentUtils.requireApplicationName(), EnvironmentUtils.isDevelopment().orElse(false)
 		)
 		registration.order = 1
