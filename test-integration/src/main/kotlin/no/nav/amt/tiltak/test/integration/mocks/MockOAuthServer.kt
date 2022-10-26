@@ -1,11 +1,10 @@
 package no.nav.amt.tiltak.test.integration.mocks
 
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.slf4j.LoggerFactory
 import java.util.*
 
-open class MockOAuthServer3 {
+open class MockOAuthServer {
 
 	private val azureAdIssuer = "azuread"
 	private val tokenXIssuer = "tokenx"

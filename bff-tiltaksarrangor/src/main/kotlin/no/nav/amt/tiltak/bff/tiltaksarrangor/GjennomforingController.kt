@@ -10,7 +10,6 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.*
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
@@ -25,8 +24,6 @@ class GjennomforingController(
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
 	private val endringsmeldingService: EndringsmeldingService,
 ) {
-
-	private val log = LoggerFactory.getLogger(javaClass)
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping
@@ -84,14 +81,9 @@ class GjennomforingController(
 	fun hentGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID): GjennomforingDto {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 
+		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId).toDto()
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
-
-		try {
-			return gjennomforingService.getGjennomforing(gjennomforingId).toDto()
-		} catch (e: NoSuchElementException) {
-			log.error("Fant ikke gjennomforing", e)
-			throw NoSuchElementException("Fant ikke gjennomforing med id $gjennomforingId")
-		}
+		return gjennomforing
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -114,6 +106,10 @@ class GjennomforingController(
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/{gjennomforingId}/koordinatorer")
 	fun hentKoordinatorerPaGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID): Set<Person> {
+		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
+
+		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
+
 		return gjennomforingService.getKoordinatorerForGjennomforing(gjennomforingId)
 	}
 

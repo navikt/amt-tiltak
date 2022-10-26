@@ -1,8 +1,13 @@
 package no.nav.amt.tiltak.test.database.data
 
+import no.nav.amt.tiltak.common.db_utils.getUUID
+import no.nav.amt.tiltak.common.db_utils.getZonedDateTime
 import no.nav.amt.tiltak.test.database.DbTestDataUtils.parameters
 import no.nav.amt.tiltak.test.database.data.inputs.*
+import no.nav.amt.tiltak.test.database.data.outputs.ArrangorAnsattGjennomforingTilgangOutput
+import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import java.util.UUID
 
 class TestDataRepository(
 	private val template: NamedParameterJdbcTemplate
@@ -40,6 +45,25 @@ class TestDataRepository(
 				"gyldig_til" to cmd.gyldigTil.toOffsetDateTime()
 			)
 		)
+	}
+
+	fun getArrangorAnsattGjennomforingTilganger(arrangorAnsattId: UUID) : List<ArrangorAnsattGjennomforingTilgangOutput> {
+		val sql = """
+			SELECT * FROM arrangor_ansatt_gjennomforing_tilgang WHERE ansatt_id = :ansattId
+		""".trimIndent()
+
+		val rowMapper = RowMapper { rs, _ -> ArrangorAnsattGjennomforingTilgangOutput(
+			id = rs.getUUID("id"),
+			ansattId = rs.getUUID("ansatt_id"),
+			gjennomforingId = rs.getUUID("gjennomforing_id"),
+			gyldigFra = rs.getZonedDateTime("gyldig_fra"),
+			gyldigTil = rs.getZonedDateTime("gyldig_til"),
+			createdAt = rs.getZonedDateTime("created_at"),
+		)}
+
+		return template.query(sql, parameters(
+			"ansattId" to arrangorAnsattId,
+		), rowMapper)
 	}
 
 	fun insertArrangorAnsattRolle(cmd: ArrangorAnsattRolleInput) {
@@ -119,6 +143,14 @@ class TestDataRepository(
 				"innsok_begrunnelse" to cmd.innsokBegrunnelse
 			)
 		)
+	}
+
+	fun deleteAllDeltaker() {
+		val sql = """
+			TRUNCATE deltaker CASCADE
+		""".trimIndent()
+
+		template.jdbcTemplate.update(sql)
 	}
 
 	fun insertDeltakerStatus(cmd: DeltakerStatusInput) {
@@ -245,5 +277,6 @@ class TestDataRepository(
 
 		template.update(sql, sqlParameters)
 	}
+
 
 }

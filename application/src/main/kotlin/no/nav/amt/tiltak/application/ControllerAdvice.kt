@@ -108,17 +108,6 @@ open class ControllerAdvice(
 		)
 	}
 
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	@ExceptionHandler(RuntimeException::class)
-	fun handleRuntimeException(e: RuntimeException): ResponseEntity<Response> {
-		logger.error(e.message, e)
-
-		return buildResponse(
-			status = HttpStatus.INTERNAL_SERVER_ERROR,
-			exception = e
-		)
-	}
-
 	private fun buildResponse(
 		status: HttpStatus,
 		exception: Throwable,
