@@ -1,12 +1,18 @@
 package no.nav.amt.tiltak.test.integration.tiltaksarrangor
 
 import com.jayway.jsonpath.JsonPath
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.beInstanceOf
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING1_DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
@@ -16,14 +22,25 @@ import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTil
 import okhttp3.Request
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
 class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
+	@Autowired
+	lateinit var endringsmeldingService: EndringsmeldingService
+
+	val dato = "2022-11-01"
+	val deltakerIkkeTilgang = DELTAKER_1.copy(id = UUID.randomUUID(), gjennomforingId = GJENNOMFORING_2.id)
+	val deltakerIkkeTilgangStatus = DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerIkkeTilgang.id )
+
 	@BeforeEach
 	fun setup() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		testDataRepository.insertDeltaker(deltakerIkkeTilgang)
+		testDataRepository.insertDeltakerStatus(deltakerIkkeTilgangStatus)
 		poaoTilgangClient.addErSkjermetResponse(mapOf(BRUKER_1.fodselsnummer to false))
 	}
 
@@ -167,6 +184,165 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 		response.code shouldBe 200
 		JsonPath.parse(response.body?.string()).read<Int>("$.length()") shouldBe 1
+	}
+
+	@Test
+	fun `endreOppstartsdato() skal returnere 200 og opprette endringsmelding`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/tiltak-deltaker/${DELTAKER_1.id}/oppstartsdato",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			body = """{"oppstartsdato": "$dato"}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 200
+
+		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForDeltaker(DELTAKER_1.id)
+		endringsmeldinger shouldHaveSize 1
+
+		val endringsmelding = endringsmeldinger.first()
+		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.EndreOppstartsdatoInnhold>()
+		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
+		(endringsmelding.innhold as Endringsmelding.Innhold.EndreOppstartsdatoInnhold).oppstartsdato shouldBe LocalDate.parse(dato)
+	}
+
+	@Test
+	fun `endreOppstartsdato() skal returnere 403 hvis ikke tilgang`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/tiltak-deltaker/${deltakerIkkeTilgang.id}/oppstartsdato",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			body = """{"oppstartsdato": "$dato"}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 403
+	}
+
+	@Test
+	fun `avsluttDeltakelse() skal returnere 200 og opprette endringsmelding`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/tiltak-deltaker/${DELTAKER_1.id}/avslutt-deltakelse",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			body = """{"sluttdato": "$dato", "aarsak": "FATT_JOBB" }""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 200
+
+		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForDeltaker(DELTAKER_1.id)
+		endringsmeldinger shouldHaveSize 1
+
+		val endringsmelding = endringsmeldinger.first()
+		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.AvsluttDeltakelseInnhold>()
+		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
+		(endringsmelding.innhold as Endringsmelding.Innhold.AvsluttDeltakelseInnhold).sluttdato shouldBe LocalDate.parse(dato)
+		(endringsmelding.innhold as Endringsmelding.Innhold.AvsluttDeltakelseInnhold).aarsak shouldBe Deltaker.StatusAarsak.FATT_JOBB
+	}
+
+	@Test
+	fun `avsluttDeltakelse() skal returnere 403 hvis ikke tilgang`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/tiltak-deltaker/${deltakerIkkeTilgang.id}/avslutt-deltakelse",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			body = """{"sluttdato": "$dato", "aarsak": "FATT_JOBB" }""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 403
+	}
+	@Test
+	fun `forlengDeltakelse() skal returnere 200 og opprette endringsmelding`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/tiltak-deltaker/${DELTAKER_1.id}/forleng-deltakelse",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			body = """{"sluttdato": "$dato"}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 200
+
+		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForDeltaker(DELTAKER_1.id)
+		endringsmeldinger shouldHaveSize 1
+
+		val endringsmelding = endringsmeldinger.first()
+		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.ForlengDeltakelseInnhold>()
+		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
+		(endringsmelding.innhold as Endringsmelding.Innhold.ForlengDeltakelseInnhold).sluttdato shouldBe LocalDate.parse(dato)
+	}
+
+	@Test
+	fun `forlengDeltakelse() skal returnere 403 hvis ikke tilgang`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/tiltak-deltaker/${deltakerIkkeTilgang.id}/forleng-deltakelse",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			body = """{"sluttdato": "$dato"}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 403
+	}
+	@Test
+	fun `deltakerIkkeAktuell() skal returnere 200 og opprette endringsmelding`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/tiltak-deltaker/${DELTAKER_1.id}/ikke-aktuell",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			body = """{"aarsak": "FATT_JOBB"}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 200
+
+		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForDeltaker(DELTAKER_1.id)
+		endringsmeldinger shouldHaveSize 1
+
+		val endringsmelding = endringsmeldinger.first()
+		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold>()
+		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
+		(endringsmelding.innhold as Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold).aarsak shouldBe Deltaker.StatusAarsak.FATT_JOBB
+	}
+
+	@Test
+	fun `deltakerIkkeAktuell() skal returnere 403 hvis ikke tilgang`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/tiltak-deltaker/${deltakerIkkeTilgang.id}/ikke-aktuell",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			body = """{"aarsak": "FATT_JOBB"}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 403
+	}
+
+	@Test
+	fun `leggTilOppstartsdato() skal returnere 200 og opprette endringsmelding`() {
+		val response = sendRequest(
+			method = "POST",
+			url = "/api/tiltaksarrangor/tiltak-deltaker/${DELTAKER_1.id}/oppstartsdato",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			body = """{"oppstartsdato": "$dato"}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 200
+
+		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForDeltaker(DELTAKER_1.id)
+		endringsmeldinger shouldHaveSize 1
+
+		val endringsmelding = endringsmeldinger.first()
+		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold>()
+		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
+		(endringsmelding.innhold as Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold).oppstartsdato shouldBe LocalDate.parse(dato)
+	}
+
+	@Test
+	fun `leggTilOppstartsdato() skal returnere 403 hvis ikke tilgang`() {
+		val response = sendRequest(
+			method = "POST",
+			url = "/api/tiltaksarrangor/tiltak-deltaker/${deltakerIkkeTilgang.id}/oppstartsdato",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			body = """{"oppstartsdato": "$dato"}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 403
 	}
 
 }

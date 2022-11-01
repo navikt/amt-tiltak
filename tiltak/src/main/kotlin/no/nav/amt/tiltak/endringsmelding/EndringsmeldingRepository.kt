@@ -119,7 +119,7 @@ open class EndringsmeldingRepository(
 	fun insertEndringsmelding(id: UUID, deltakerId: UUID, opprettetAvArrangorAnsattId: UUID, type: EndringsmeldingDbo.Type, innhold: EndringsmeldingDbo.Innhold) {
 		val sql = """
 			INSERT INTO endringsmelding(id, deltaker_id, opprettet_av_arrangor_ansatt_id, type, innhold, status)
-			VALUES(:id, :deltakerId, :opprettetAvArrangorAnsattId, :type, :innhold, 'AKTIV')
+			VALUES(:id, :deltakerId, :opprettetAvArrangorAnsattId, :type, CAST(:innhold as jsonb), 'AKTIV')
 		""".trimIndent()
 
 		val params = sqlParameters(

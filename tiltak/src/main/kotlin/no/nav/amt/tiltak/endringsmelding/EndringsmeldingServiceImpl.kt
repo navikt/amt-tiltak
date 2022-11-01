@@ -117,7 +117,7 @@ open class EndringsmeldingServiceImpl(
 		arrangorAnsattId: UUID,
 		sluttdato: LocalDate
 	) {
-		val innhold = EndringsmeldingDbo.Innhold.EndreOppstartsdatoInnhold(sluttdato)
+		val innhold = EndringsmeldingDbo.Innhold.ForlengDeltakelseInnhold(sluttdato)
 		opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
