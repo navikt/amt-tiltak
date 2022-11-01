@@ -93,7 +93,6 @@ open class EndringsmeldingServiceImpl(
 		opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
-			EndringsmeldingDbo.Type.LEGG_TIL_OPPSTARTSDATO,
 			innhold,
 		)
 	}
@@ -107,7 +106,6 @@ open class EndringsmeldingServiceImpl(
 		opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
-			EndringsmeldingDbo.Type.ENDRE_OPPSTARTSDATO,
 			innhold,
 		)
 	}
@@ -121,7 +119,6 @@ open class EndringsmeldingServiceImpl(
 		opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
-			EndringsmeldingDbo.Type.FORLENG_DELTAKELSE,
 			innhold,
 		)
 	}
@@ -136,7 +133,6 @@ open class EndringsmeldingServiceImpl(
 		opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
-			EndringsmeldingDbo.Type.AVSLUTT_DELTAKELSE,
 			innhold,
 		)
 	}
@@ -150,21 +146,20 @@ open class EndringsmeldingServiceImpl(
 		opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
-			EndringsmeldingDbo.Type.DELTAKER_IKKE_AKTUELL,
 			innhold,
 		)
 	}
 
 	private fun opprettOgMarkerAktiveSomUtdatert(
-		deltakerId: UUID, opprettetAvArrangorAnsattId: UUID, type: EndringsmeldingDbo.Type, innhold: EndringsmeldingDbo.Innhold
+		deltakerId: UUID, opprettetAvArrangorAnsattId: UUID, innhold: EndringsmeldingDbo.Innhold
 	) {
 		val id = UUID.randomUUID()
 		transactionTemplate.executeWithoutResult {
-			endringsmeldingRepository.markerSomUtdatert(deltakerId, type)
-			endringsmeldingRepository.insertEndringsmelding(id, deltakerId, opprettetAvArrangorAnsattId, type, innhold)
+			endringsmeldingRepository.markerSomUtdatert(deltakerId, innhold.type())
+			endringsmeldingRepository.insert(id, deltakerId, opprettetAvArrangorAnsattId, innhold)
 		}
 
-		log.info("Endringsmelding av type ${type.name} opprettet med id $id for deltaker $deltakerId")
+		log.info("Endringsmelding av type ${innhold.type().name} opprettet med id $id for deltaker $deltakerId")
 
 	}
 

@@ -48,5 +48,15 @@ data class EndringsmeldingDbo(
 		data class DeltakerIkkeAktuellInnhold(
 			val aarsak: Deltaker.StatusAarsak,
 		) : Innhold()
+
+		fun type(): Type {
+			return when(this) {
+				is LeggTilOppstartsdatoInnhold -> Type.LEGG_TIL_OPPSTARTSDATO
+				is EndreOppstartsdatoInnhold -> Type.ENDRE_OPPSTARTSDATO
+				is ForlengDeltakelseInnhold -> Type.FORLENG_DELTAKELSE
+				is AvsluttDeltakelseInnhold -> Type.AVSLUTT_DELTAKELSE
+				is DeltakerIkkeAktuellInnhold -> Type.DELTAKER_IKKE_AKTUELL
+			}
+		}
 	}
 }

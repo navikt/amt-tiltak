@@ -7,6 +7,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.DbUtils.shouldBeCloseTo
@@ -20,6 +21,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -94,6 +96,19 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		oppdatertMelding.utfortTidspunkt!! shouldBeCloseTo ZonedDateTime.now()
 	}
 
+	test("markerSomUtdatert - skal sette status til UTDATERT") {
+		testRepository.insertEndringsmelding(ENDRINGSMELDING1_DELTAKER_1)
+
+		repository.markerSomUtdatert(
+			DELTAKER_1.id,
+			EndringsmeldingDbo.Type.valueOf(ENDRINGSMELDING1_DELTAKER_1.type)
+		)
+
+		val oppdatertMelding = repository.get(ENDRINGSMELDING1_DELTAKER_1.id)
+
+		oppdatertMelding.status shouldBe Endringsmelding.Status.UTDATERT
+	}
+
 	test("getAktive - skal returnere tom liste hvis ingen deltakerIder er sendt inn") {
 		repository.getAktive(emptyList()) shouldBe emptyList()
 	}
@@ -108,5 +123,95 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		aktiveMeldinger shouldHaveSize 2
 		aktiveMeldinger.any { it.deltakerId == DELTAKER_1.id && it.status == Endringsmelding.Status.AKTIV }
 		aktiveMeldinger.any { it.deltakerId == DELTAKER_2.id && it.status == Endringsmelding.Status.AKTIV }
+	}
+
+	test("insert - skal inserte aktiv leggTilOppstartsdatoEndringsmelding") {
+		val id = UUID.randomUUID()
+		val innhold = EndringsmeldingDbo.Innhold.LeggTilOppstartsdatoInnhold(LocalDate.now())
+
+		repository.insert(
+			id = id,
+			deltakerId = DELTAKER_1.id,
+			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+			innhold = innhold,
+		)
+
+		val endringsmelding = repository.get(id)
+
+		endringsmelding.type shouldBe EndringsmeldingDbo.Type.LEGG_TIL_OPPSTARTSDATO
+		endringsmelding.innhold shouldBe innhold
+		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
+	}
+
+	test("insert - skal inserte aktiv endreOppstartsdatoEndringsmelding") {
+		val id = UUID.randomUUID()
+		val innhold = EndringsmeldingDbo.Innhold.EndreOppstartsdatoInnhold(LocalDate.now())
+
+		repository.insert(
+			id = id,
+			deltakerId = DELTAKER_1.id,
+			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+			innhold = innhold,
+		)
+
+		val endringsmelding = repository.get(id)
+
+		endringsmelding.type shouldBe EndringsmeldingDbo.Type.ENDRE_OPPSTARTSDATO
+		endringsmelding.innhold shouldBe innhold
+		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
+	}
+
+	test("insert - skal inserte aktiv forlengDeltakelseEndringsmelding") {
+		val id = UUID.randomUUID()
+		val innhold = EndringsmeldingDbo.Innhold.ForlengDeltakelseInnhold(LocalDate.now())
+
+		repository.insert(
+			id = id,
+			deltakerId = DELTAKER_1.id,
+			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+			innhold = innhold,
+		)
+
+		val endringsmelding = repository.get(id)
+
+		endringsmelding.type shouldBe EndringsmeldingDbo.Type.FORLENG_DELTAKELSE
+		endringsmelding.innhold shouldBe innhold
+		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
+	}
+
+	test("insert - skal inserte aktiv avsluttDeltakelseEndringsmelding") {
+		val id = UUID.randomUUID()
+		val innhold = EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold(LocalDate.now(), Deltaker.StatusAarsak.UTDANNING)
+
+		repository.insert(
+			id = id,
+			deltakerId = DELTAKER_1.id,
+			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+			innhold = innhold,
+		)
+
+		val endringsmelding = repository.get(id)
+
+		endringsmelding.type shouldBe EndringsmeldingDbo.Type.AVSLUTT_DELTAKELSE
+		endringsmelding.innhold shouldBe innhold
+		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
+	}
+
+	test("insert - skal inserte aktiv deltakerIkkeAktuellEndringsmelding") {
+		val id = UUID.randomUUID()
+		val innhold = EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold(Deltaker.StatusAarsak.UTDANNING)
+
+		repository.insert(
+			id = id,
+			deltakerId = DELTAKER_1.id,
+			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+			innhold = innhold,
+		)
+
+		val endringsmelding = repository.get(id)
+
+		endringsmelding.type shouldBe EndringsmeldingDbo.Type.DELTAKER_IKKE_AKTUELL
+		endringsmelding.innhold shouldBe innhold
+		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 	}
 })

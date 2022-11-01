@@ -116,7 +116,7 @@ open class EndringsmeldingRepository(
 	}
 
 
-	fun insertEndringsmelding(id: UUID, deltakerId: UUID, opprettetAvArrangorAnsattId: UUID, type: EndringsmeldingDbo.Type, innhold: EndringsmeldingDbo.Innhold) {
+	fun insert(id: UUID, deltakerId: UUID, opprettetAvArrangorAnsattId: UUID, innhold: EndringsmeldingDbo.Innhold) {
 		val sql = """
 			INSERT INTO endringsmelding(id, deltaker_id, opprettet_av_arrangor_ansatt_id, type, innhold, status)
 			VALUES(:id, :deltakerId, :opprettetAvArrangorAnsattId, :type, CAST(:innhold as jsonb), 'AKTIV')
@@ -126,7 +126,7 @@ open class EndringsmeldingRepository(
 			"id" to id,
 			"deltakerId" to deltakerId,
 			"opprettetAvArrangorAnsattId" to opprettetAvArrangorAnsattId,
-			"type" to type.name,
+			"type" to innhold.type().name,
 			"innhold" to objectMapper.writeValueAsString(innhold),
 		)
 		template.update(sql, params)
