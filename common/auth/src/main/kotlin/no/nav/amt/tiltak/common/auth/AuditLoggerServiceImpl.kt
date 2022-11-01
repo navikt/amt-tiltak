@@ -5,16 +5,17 @@ import no.nav.common.audit_log.cef.CefMessage
 import no.nav.common.audit_log.cef.CefMessageEvent
 import no.nav.common.audit_log.cef.CefMessageSeverity
 import no.nav.common.audit_log.log.AuditLogger
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
 class AuditLoggerServiceImpl(
 	private val auditLogger: AuditLogger,
-	private val arrangorAnsattService: ArrangorAnsattService,
-	private val navAnsattService: NavAnsattService,
-	private val gjennomforingService: GjennomforingService,
-	private val deltakerService: DeltakerService
+	@Lazy private val arrangorAnsattService: ArrangorAnsattService,
+	@Lazy private val navAnsattService: NavAnsattService,
+	@Lazy private val gjennomforingService: GjennomforingService,
+	@Lazy private val deltakerService: DeltakerService
 ) : AuditLoggerService {
 
 	internal enum class AuditEventType {

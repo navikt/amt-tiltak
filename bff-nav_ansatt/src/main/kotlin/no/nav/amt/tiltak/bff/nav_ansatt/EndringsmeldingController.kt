@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.bff.nav_ansatt
 
-import no.nav.amt.tiltak.bff.nav_ansatt.dto.BrukerDto
+import no.nav.amt.tiltak.bff.nav_ansatt.dto.DeltakerDto
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.toDto
 import no.nav.amt.tiltak.common.auth.AuthService
@@ -36,19 +36,16 @@ class EndringsmeldingController(
 
 			return@map EndringsmeldingDto(
 				id = it.id,
-				startDato = it.startDato,
-				sluttDato = it.sluttDato,
-				aktiv = it.aktiv,
-				godkjent = it.ferdiggjortAvNavAnsattId != null,
-				arkivert = it.ferdiggjortAvNavAnsattId == null && !it.aktiv,
-				opprettetAvArrangorAnsatt = opprettetAvAnsatt,
-				bruker = BrukerDto(
+				deltaker = DeltakerDto(
 					deltaker.fornavn,
 					deltaker.mellomnavn,
 					deltaker.etternavn,
 					deltaker.fodselsnummer,
 				),
-				opprettetDato = it.opprettet
+				status = it.status.toDto(),
+				innhold = it.innhold.toDto(),
+				opprettetAvArrangorAnsatt = opprettetAvAnsatt,
+				opprettetDato = it.opprettet,
 			)
 		}
 	}
@@ -70,7 +67,7 @@ class EndringsmeldingController(
 
 		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 
-		endringsmeldingService.markerSomFerdig(endringsmeldingId, navAnsatt.id)
+		endringsmeldingService.markerSomUtfort(endringsmeldingId, navAnsatt.id)
 	}
 
 }

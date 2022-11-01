@@ -12,12 +12,12 @@ class EndringsmeldingMetricRepository(
 
 	fun getMetrics(): EndringsmeldingMetricHolder? {
 		val sql = """
-			select count(*)                                                                                                as antall_total,
-				   (select count(*) from endringsmelding where aktiv is true)                                              as antall_aktive,
-				   (select min(created_at) from endringsmelding where aktiv is true)                                       as eldste_aktive,
-				   (select count(*) FROM endringsmelding WHERE aktiv = false AND ferdiggjort_av_nav_ansatt_id IS NOT NULL) as manuelt_ferdige,
-				   (select count(*) FROM endringsmelding WHERE aktiv = false AND ferdiggjort_av_nav_ansatt_id IS NULL)     as automatisk_ferdige,
-				   (select avg((EXTRACT(EPOCH FROM ferdiggjort_tidspunkt) - EXTRACT(EPOCH FROM created_at)) / 60))       as gjennomsnittelig_tid_minutter
+			select count(*) as antall_total,
+				   (select count(*) from endringsmelding where status = 'AKTIV') as antall_aktive,
+				   (select min(created_at) from endringsmelding where status = 'AKTIV') as eldste_aktive,
+				   (select count(*) FROM endringsmelding WHERE status = 'UTFORT') as manuelt_ferdige,
+				   (select count(*) FROM endringsmelding WHERE status = 'UTDATERT') as automatisk_ferdige,
+				   (select avg((EXTRACT(EPOCH FROM utfort_tidspunkt) - EXTRACT(EPOCH FROM created_at)) / 60)) as gjennomsnittelig_tid_minutter
 			from endringsmelding
 		""".trimIndent()
 
@@ -30,8 +30,7 @@ class EndringsmeldingMetricRepository(
 				automatiskFerdige = rs.getInt("automatisk_ferdige"),
 				gjennomsnitteligTidIMinutter = rs.getDouble("gjennomsnittelig_tid_minutter")
 			)
-		}
-			.firstOrNull()
+		}.firstOrNull()
 
 	}
 

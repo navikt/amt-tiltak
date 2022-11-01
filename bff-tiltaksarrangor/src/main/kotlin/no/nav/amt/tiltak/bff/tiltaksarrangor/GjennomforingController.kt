@@ -1,14 +1,14 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor
 
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.GjennomforingDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
+import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.Person
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -19,10 +19,8 @@ import java.util.*
 @RequestMapping(value = ["/api/gjennomforing", "/api/tiltaksarrangor/gjennomforing"])
 class GjennomforingController(
 	private val gjennomforingService: GjennomforingService,
-	private val deltakerService: DeltakerService,
 	private val authService: AuthService,
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
-	private val endringsmeldingService: EndringsmeldingService,
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -84,23 +82,6 @@ class GjennomforingController(
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId).toDto()
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
 		return gjennomforing
-	}
-
-	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
-	@GetMapping("/{gjennomforingId}/deltakere")
-	fun hentDeltakere(@PathVariable("gjennomforingId") gjennomforingId: UUID): List<DeltakerDto> {
-		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-
-		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
-
-		val deltakere = deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
-			.filter { it.status.type != Deltaker.Status.PABEGYNT }
-			.filter { !it.erUtdatert }
-
-		return deltakere.map {
-			val endringsmelding = endringsmeldingService.hentSisteAktive(deltakerId = it.id)
-			it.toDto(endringsmelding?.toDto())
-		}
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)

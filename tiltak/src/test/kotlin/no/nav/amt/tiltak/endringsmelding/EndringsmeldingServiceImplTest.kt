@@ -1,171 +1,80 @@
 package no.nav.amt.tiltak.endringsmelding
 
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.port.AuditLoggerService
-import no.nav.amt.tiltak.test.database.DbTestDataUtils
-import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
-import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
-import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
+import java.time.ZonedDateTime
+import java.util.*
 
 class EndringsmeldingServiceImplTest {
 	lateinit var endringsmeldingService: EndringsmeldingServiceImpl
 
-	var dataSource = SingletonPostgresContainer.getDataSource()
+	lateinit var repository: EndringsmeldingRepository
 
-	var jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
+	lateinit var auditLoggerService: AuditLoggerService
 
-	var repository = EndringsmeldingRepository(
-		jdbcTemplate,
-		TransactionTemplate(DataSourceTransactionManager(dataSource))
-	)
+	lateinit var transactionTemplate: TransactionTemplate
 
-	val auditLoggerService: AuditLoggerService = mockk()
 
 	@BeforeEach
 	fun beforeEach() {
-		endringsmeldingService = EndringsmeldingServiceImpl(repository, auditLoggerService)
-		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		repository = mockk(relaxUnitFun = true)
+		auditLoggerService = mockk(relaxUnitFun = true)
+		transactionTemplate = mockk()
+		endringsmeldingService = EndringsmeldingServiceImpl(repository, auditLoggerService, transactionTemplate)
 	}
 
 	@Test
-	fun `opprettMedStartDato - Inserter og inaktiverer forrige melding med startdato`() {
-		val dato = LocalDate.now()
-
-		val melding1 = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, dato, ARRANGOR_ANSATT_1.id)
-		val melding2 = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, dato.minusDays(2), ARRANGOR_ANSATT_1.id)
-
-		val result1 = repository.get(melding1.id)
-		val result2 = repository.get(melding2.id)
-
-		result1.aktiv shouldBe false
-		result1.startDato shouldBe dato
-
-		result2.aktiv shouldBe true
-		result2.startDato shouldBe dato.minusDays(2)
-	}
-
-	@Test
-	fun `opprettMedSluttDato - Inserter og inaktiverer forrige melding med sluttdato`() {
-		val dato = LocalDate.now()
-
-		val melding1 = endringsmeldingService.opprettMedSluttDato(DELTAKER_1.id, dato, ARRANGOR_ANSATT_1.id)
-		val melding2 = endringsmeldingService.opprettMedSluttDato(DELTAKER_1.id, dato.minusDays(2), ARRANGOR_ANSATT_1.id)
-
-		val result1 = repository.get(melding1.id)
-		val result2 = repository.get(melding2.id)
-
-		result1.aktiv shouldBe false
-		result1.sluttDato shouldBe dato
-
-		result2.aktiv shouldBe true
-		result2.sluttDato shouldBe dato.minusDays(2)
-	}
-
-
-
-	@Test
-	fun `hentEndringsmeldinger - en endringsmelding på gjennomføring - returnerer dto med alle verdier satt`() {
-		val nyStartDato = LocalDate.now().plusDays(3)
-		val opprettetMelding = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, nyStartDato, ARRANGOR_ANSATT_1.id)
-
-		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(DELTAKER_1.gjennomforingId)
-		val endringsmelding = endringsmeldinger.get(0)
-
-		endringsmeldinger.size shouldBe 1
-
-		endringsmelding.deltakerId shouldBe DELTAKER_1.id
-		endringsmelding.startDato shouldBe nyStartDato
-		endringsmelding.sluttDato shouldBe null
-		endringsmelding.opprettetAvArrangorAnsattId shouldBe ARRANGOR_ANSATT_1.id
-		endringsmelding.ferdiggjortAvNavAnsattId shouldBe null
-		endringsmelding.ferdiggjortTidspunkt shouldBe null
-		endringsmelding.aktiv shouldBe true
-		endringsmelding.opprettet shouldBe opprettetMelding.opprettet
-	}
-
-	@Test
-	fun `hentEndringsmeldinger - flere endringsmeldinger på gjennomføring`() {
-		val nyStartDato = LocalDate.now().plusDays(3)
-
-		endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, nyStartDato, ARRANGOR_ANSATT_1.id)
-		endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, nyStartDato, ARRANGOR_ANSATT_1.id)
-		endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, nyStartDato, ARRANGOR_ANSATT_1.id)
-
-		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(DELTAKER_1.gjennomforingId)
-		val aktivEndringsmelding = endringsmeldinger.filter { it.aktiv }
-		val arkiverteEndringsmeldinger = endringsmeldinger.filter { it.ferdiggjortAvNavAnsattId != null || !it.aktiv }
-
-		endringsmeldinger.size shouldBe 3
-		aktivEndringsmelding.size shouldBe 1
-		arkiverteEndringsmeldinger.size shouldBe 2
-	}
-
-	@Test
-	fun `hentEndringsmeldinger - endringsmeldinger på andre gjennomføringer - returnerer ingen`() {
-		val nyStartDato = LocalDate.now().plusDays(3)
-
-		endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, nyStartDato, ARRANGOR_ANSATT_1.id)
-		endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, nyStartDato, ARRANGOR_ANSATT_1.id)
-		endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, nyStartDato, ARRANGOR_ANSATT_1.id)
-
-		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(GJENNOMFORING_2.id)
-
-		endringsmeldinger.size shouldBe 0
-	}
-
-	@Test
-	fun `markerSomFerdig - skal markere melding som ferdig og audit logge`() {
-		val endringsmelding = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, LocalDate.now(), ARRANGOR_ANSATT_1.id)
-
+	fun `markerSomUtfort - skal sette status på endringsmelding til UTFORT og audit logge`() {
 		every {
-			auditLoggerService.navAnsattBehandletEndringsmeldingAuditLog(any(), any())
-		} returns Unit
+			repository.get(endringsmeldingDbo.id)
+		} returns endringsmeldingDbo
 
-		endringsmeldingService.markerSomFerdig(endringsmelding.id, NAV_ANSATT_1.id)
-
-		val ferdigMelding = endringsmeldingService.hentEndringsmelding(endringsmelding.id)
-
-		ferdigMelding.aktiv shouldBe false
-		ferdigMelding.ferdiggjortAvNavAnsattId shouldBe NAV_ANSATT_1.id
-		ferdigMelding.ferdiggjortTidspunkt shouldNotBe null
+		endringsmeldingService.markerSomUtfort(endringsmeldingDbo.id, NAV_ANSATT_1.id)
 
 		verify(exactly = 1) {
 			auditLoggerService.navAnsattBehandletEndringsmeldingAuditLog(NAV_ANSATT_1.id, DELTAKER_1.id)
+		}
+
+		verify(exactly = 1) {
+			repository.markerSomUtfort(endringsmeldingDbo.id, NAV_ANSATT_1.id)
 		}
 	}
 
 	@Test
 	fun `hentAntallAktiveForGjennomforing - teller aktive endringsmeldinger pa gjennomforing`() {
-		val dato = LocalDate.now()
-		val melding1 = endringsmeldingService.opprettMedStartDato(DELTAKER_1.id, dato, ARRANGOR_ANSATT_1.id)
-		val melding2 = endringsmeldingService.opprettMedStartDato(DELTAKER_2.id, dato.minusDays(2), ARRANGOR_ANSATT_1.id)
-		val gjennomforingId = DELTAKER_1.gjennomforingId
-
 		every {
-			auditLoggerService.navAnsattBehandletEndringsmeldingAuditLog(any(), any())
-		} returns Unit
+			repository.getByGjennomforing(GJENNOMFORING_1.id)
+		} returns listOf(
+			endringsmeldingDbo,
+			endringsmeldingDbo.copy(status = Endringsmelding.Status.UTDATERT)
+		)
 
-		endringsmeldingService.hentAntallAktiveForGjennomforing(gjennomforingId) shouldBe 2
-
-		endringsmeldingService.markerSomFerdig(melding1.id, NAV_ANSATT_1.id)
-		endringsmeldingService.hentAntallAktiveForGjennomforing(gjennomforingId) shouldBe 1
-
-		endringsmeldingService.markerSomFerdig(melding2.id, NAV_ANSATT_1.id)
-		endringsmeldingService.hentAntallAktiveForGjennomforing(gjennomforingId) shouldBe 0
+		endringsmeldingService.hentAntallAktiveForGjennomforing(GJENNOMFORING_1.id) shouldBe 1
 	}
 
+	val endringsmeldingDbo = EndringsmeldingDbo(
+			id = UUID.randomUUID(),
+			deltakerId = DELTAKER_1.id,
+			utfortAvNavAnsattId = null,
+			utfortTidspunkt = null,
+			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+			status = Endringsmelding.Status.AKTIV,
+			type = EndringsmeldingDbo.Type.LEGG_TIL_OPPSTARTSDATO,
+			innhold = EndringsmeldingDbo.Innhold.LeggTilOppstartsdatoInnhold(LocalDate.now()),
+			createdAt = ZonedDateTime.now(),
+			modifiedAt = ZonedDateTime.now(),
+		)
 
 }

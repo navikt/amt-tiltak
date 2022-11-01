@@ -6,10 +6,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
-import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.NavAnsattService
-import no.nav.amt.tiltak.core.port.NavEnhetService
-import no.nav.amt.tiltak.core.port.PersonService
+import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
@@ -46,6 +43,7 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 	val personService: PersonService = mockk()
 	val navAnsattService: NavAnsattService = mockk()
 	val navEnhetService: NavEnhetService = mockk()
+	val endringsmeldingService: EndringsmeldingService = mockk()
 
 	lateinit var dataSource: DataSource
 	lateinit var jdbcTemplate: NamedParameterJdbcTemplate
@@ -68,6 +66,7 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 			deltakerRepository,
 			deltakerStatusRepository,
 			brukerService,
+			endringsmeldingService,
 			TransactionTemplate()
 		)
 		endringPaaBrukerIngestorImpl = EndringPaaBrukerIngestorImpl(deltakerService, navEnhetService)

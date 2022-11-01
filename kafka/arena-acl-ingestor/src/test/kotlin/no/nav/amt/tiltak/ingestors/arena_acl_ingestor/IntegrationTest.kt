@@ -59,6 +59,7 @@ class IntegrationTest {
 	private lateinit var deltakerService: DeltakerService
 	private lateinit var personService: PersonService
 	private lateinit var norgClient: NorgClient
+	private lateinit var endringsmeldingService: EndringsmeldingService
 
 	private lateinit var brukerRepository: BrukerRepository
 	private lateinit var navEnhetRepository: NavEnhetRepository
@@ -97,6 +98,8 @@ class IntegrationTest {
 		arrangorRepository = ArrangorRepository(jdbcTemplate)
 		brukerRepository = BrukerRepository(jdbcTemplate)
 
+		endringsmeldingService = mockk()
+
 		norgClient = mockk()
 		veilarbarenaClient = mockk()
 		personService = mockk()
@@ -105,7 +108,7 @@ class IntegrationTest {
 		navEnhetService = NavEnhetServiceImpl(norgClient, navEnhetRepository, veilarbarenaClient)
 		tiltakService = TiltakServiceImpl(tiltakRepository)
 		brukerService = BrukerService(brukerRepository, personService, mockk(), navEnhetService)
-		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, transactionTemplate)
+		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, endringsmeldingService, transactionTemplate)
 		arrangorService = ArrangorServiceImpl(enhetsregisterClient, arrangorRepository)
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, arrangorService, transactionTemplate, HentKoordinatorerForGjennomforingQuery(jdbcTemplate))
 

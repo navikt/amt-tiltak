@@ -3,23 +3,25 @@ package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.SkjermetPersonService
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.AltinnService
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.ArrangorAnsattRoller
-import org.springframework.http.HttpStatus
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
-import org.springframework.web.server.ResponseStatusException
+import java.time.LocalDateTime
 import java.util.*
 
 class ArrangorAnsattTilgangServiceImplTest : FunSpec({
@@ -38,9 +40,13 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	lateinit var arrangorService: ArrangorService
 
+	lateinit var skjermetPersonService: SkjermetPersonService
+
 	val personligIdent = "fnr"
 
 	val ansattId = UUID.randomUUID()
+
+	val deltakerId = UUID.randomUUID()
 
 	val gjennomforingId = UUID.randomUUID()
 
@@ -48,6 +54,30 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	val datasource = SingletonPostgresContainer.getDataSource()
 
+	val deltaker = Deltaker(
+		id = deltakerId,
+		fornavn = "fornavn",
+		etternavn = "etternavn",
+		fodselsnummer = personligIdent,
+		navEnhetId = null,
+		navVeilederId = null,
+		telefonnummer = "123",
+		epost = "foo",
+		startDato = null,
+		sluttDato = null,
+		status = DeltakerStatus(
+			id = UUID.randomUUID(),
+			type =  Deltaker.Status.VENTER_PA_OPPSTART,
+			aarsak = null,
+			gyldigFra =  LocalDateTime.now().minusHours(1),
+			opprettetDato = LocalDateTime.now(),
+			aktiv = true
+		),
+		registrertDato = LocalDateTime.now(),
+		dagerPerUke = 5,
+		prosentStilling = 100F,
+		gjennomforingId = gjennomforingId
+	)
 	beforeEach {
 		arrangorAnsattService = mockk()
 
@@ -61,10 +91,12 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		arrangorService = mockk()
 
+		skjermetPersonService = mockk()
+
 		arrangorAnsattTilgangServiceImpl = ArrangorAnsattTilgangServiceImpl(
 			arrangorAnsattService, ansattRolleService,
 			deltakerService, altinnService, arrangorAnsattGjennomforingTilgangService,
-			arrangorService, TransactionTemplate(DataSourceTransactionManager(datasource))
+			arrangorService, skjermetPersonService, TransactionTemplate(DataSourceTransactionManager(datasource))
 		)
 
 		every {
@@ -84,11 +116,9 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 			arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
 		} returns emptyList()
 
-		val exception = shouldThrowExactly<ResponseStatusException> {
+		shouldThrowExactly<UnauthorizedException> {
 			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(personligIdent, gjennomforingId)
 		}
-
-		exception.status shouldBe HttpStatus.FORBIDDEN
 	}
 
 	test("verifiserTilgangTilGjennomforing skal ikke kaste exception hvis tilgang") {
@@ -106,11 +136,9 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 			ansattRolleService.hentArrangorIderForAnsatt(ansattId)
 		} returns listOf(UUID.randomUUID())
 
-		val exception = shouldThrowExactly<ResponseStatusException> {
+		shouldThrowExactly<UnauthorizedException> {
 			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilArrangor(personligIdent, arrangorId)
 		}
-
-		exception.status shouldBe HttpStatus.FORBIDDEN
 	}
 
 	test("verifiserTilgangTilArrangor skal ikke kaste exception hvis tilgang") {
@@ -122,6 +150,62 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilArrangor(personligIdent, arrangorId)
 		}
 	}
+
+	test("verifiserTilgangTilDeltaker skal ikke kaste exception hvis tilgang") {
+		every {
+			deltakerService.hentDeltaker(deltakerId)
+		} returns deltaker
+
+		every {
+			skjermetPersonService.erSkjermet(personligIdent)
+		} returns false
+
+		every {
+			arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
+		} returns listOf(gjennomforingId)
+
+		shouldNotThrow<Throwable> {
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)
+		}
+	}
+
+	test("verifiserTilgangTilDeltaker skal kaste exception hvis deltaker er skjermet") {
+		every {
+			deltakerService.hentDeltaker(deltakerId)
+		} returns deltaker
+
+		every {
+			skjermetPersonService.erSkjermet(personligIdent)
+		} returns true
+
+		every {
+			arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
+		} returns listOf(gjennomforingId)
+
+		shouldThrowExactly<NotImplementedError> {
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)
+		}
+	}
+
+	test("verifiserTilgangTilDeltaker skal kaste exception hvis ikke tilgang til gjennomforing") {
+		every {
+			deltakerService.hentDeltaker(deltakerId)
+		} returns deltaker
+
+		every {
+			skjermetPersonService.erSkjermet(personligIdent)
+		} returns false
+
+		every {
+			arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
+		} returns emptyList()
+
+		shouldThrowExactly<UnauthorizedException> {
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)
+		}
+	}
+
+
 
 	test("synkroniserRettigheterMedAltinn - skal legge til nye roller fra Altinn") {
 		val ansattPersonligIdent = "1234"

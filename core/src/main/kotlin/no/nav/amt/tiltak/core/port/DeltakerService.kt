@@ -4,6 +4,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
+import java.time.LocalDate
 import java.util.*
 
 interface DeltakerService {
@@ -27,4 +28,15 @@ interface DeltakerService {
 	fun finnesBruker(fodselsnummer: String): Boolean
 
 	fun oppdaterAnsvarligVeileder(fodselsnummer: String, navAnsattId: UUID)
+
+	fun leggTilOppstartsdato(deltakerId: UUID, arrangorAnsattId: UUID, oppstartsdato: LocalDate)
+
+	fun endreOppstartsdato(deltakerId: UUID, arrangorAnsattId: UUID, oppstartsdato: LocalDate)
+
+	fun forlengDeltakelse(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate)
+
+	fun avsluttDeltakelse(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate, statusAarsak: Deltaker.StatusAarsak)
+
+	fun deltakerIkkeAktuell(deltakerId: UUID, arrangorAnsattId: UUID, statusAarsak: Deltaker.StatusAarsak)
+
 }

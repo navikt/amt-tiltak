@@ -1,28 +1,28 @@
 package no.nav.amt.tiltak.test.integration.nav_ansatt
 
 import io.kotest.matchers.shouldBe
-import no.nav.amt.tiltak.bff.nav_ansatt.dto.EndringsmeldingDto
-import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
-import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
-import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING1_DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
-import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
 import no.nav.amt.tiltak.test.database.data.inputs.TiltaksansvarligGjennomforingTilgangInput
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testNavAnsattAutentisering
-import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig.ad_gruppe.AdGrupper
 import okhttp3.Request
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
+import org.springframework.beans.factory.annotation.Autowired
 import java.time.ZonedDateTime
 import java.util.*
 
 class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
+
+	@Autowired
+	lateinit var endringsmeldingRepository: EndringsmeldingRepository
 
 	@BeforeEach
 	internal fun setUp() {
@@ -80,31 +80,11 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 			)
 		)
 
-		val endringsmeldingId = UUID.randomUUID()
+		testDataRepository.insertEndringsmelding(ENDRINGSMELDING1_DELTAKER_1)
 
-		testDataRepository.insertEndringsmelding(
-			EndringsmeldingInput(
-				id = endringsmeldingId,
-				deltakerId = DELTAKER_1.id,
-				startDato = LocalDate.now().plusDays(1),
-				sluttDato = null,
-				aktiv = true,
-				opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id
-			)
-		)
+		val endringsmeldingResponse = endringsmeldingRepository.get(ENDRINGSMELDING1_DELTAKER_1.id)
 
-		val token = oAuthServer.issueAzureAdToken(
-			ident = NAV_ANSATT_1.navIdent,
-			oid = oid
-		)
-
-		val endringsmeldingResponse = getEndringsmeldingerOnGjennomforing(
-			GJENNOMFORING_1.id,
-			token
-		)
-
-		endringsmeldingResponse.size shouldBe 1
-		endringsmeldingResponse.first().id shouldBe endringsmeldingId
+		endringsmeldingResponse.id shouldBe ENDRINGSMELDING1_DELTAKER_1.id
 	}
 
 	@Test
@@ -131,59 +111,24 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 			)
 		)
 
-		val endringsmeldingId = UUID.randomUUID()
+		testDataRepository.insertEndringsmelding(ENDRINGSMELDING1_DELTAKER_1)
 
-		testDataRepository.insertEndringsmelding(
-			EndringsmeldingInput(
-				id = endringsmeldingId,
-				deltakerId = DELTAKER_1.id,
-				startDato = LocalDate.now().plusDays(1),
-				sluttDato = null,
-				aktiv = true,
-				opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id
-			)
-		)
+		val endringsmeldingBefore = endringsmeldingRepository.get(ENDRINGSMELDING1_DELTAKER_1.id)
 
-
-		val endringsmeldingBefore = getEndringsmelding(
-			endringsmeldingId, getEndringsmeldingerOnGjennomforing(GJENNOMFORING_1.id, token)
-		)
-
-		endringsmeldingBefore.aktiv shouldBe true
-		endringsmeldingBefore.godkjent shouldBe false
+		endringsmeldingBefore.status shouldBe Endringsmelding.Status.AKTIV
 
 		val response = sendRequest(
 			method = "PATCH",
-			url = "/api/nav-ansatt/endringsmelding/$endringsmeldingId/ferdig",
+			url = "/api/nav-ansatt/endringsmelding/${ENDRINGSMELDING1_DELTAKER_1.id}/ferdig",
 			headers = mapOf("Authorization" to "Bearer $token"),
 			body = "".toJsonRequestBody()
 		)
 
 		response.code shouldBe 200
 
-		val endringsmeldingAfter = getEndringsmelding(
-			endringsmeldingId, getEndringsmeldingerOnGjennomforing(GJENNOMFORING_1.id, token)
-		)
+		val endringsmeldingAfter = endringsmeldingRepository.get(ENDRINGSMELDING1_DELTAKER_1.id)
 
-		endringsmeldingAfter.aktiv shouldBe false
-		endringsmeldingAfter.godkjent shouldBe true
+		endringsmeldingAfter.status shouldBe Endringsmelding.Status.UTFORT
 
-	}
-
-	private fun getEndringsmelding(id: UUID, meldinger: List<EndringsmeldingDto>): EndringsmeldingDto {
-		return meldinger.find { it.id == id }
-			?: throw IllegalStateException("Endringsmelding med id $id eksisterer ikke")
-	}
-
-	private fun getEndringsmeldingerOnGjennomforing(gjennomforingId: UUID, token: String): List<EndringsmeldingDto> {
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/nav-ansatt/endringsmelding?gjennomforingId=$gjennomforingId",
-			headers = mapOf("Authorization" to "Bearer $token")
-		)
-
-		response.code shouldBe 200
-
-		return JsonUtils.fromJsonString(response.body!!.string())
 	}
 }

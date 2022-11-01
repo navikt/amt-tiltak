@@ -1,22 +1,43 @@
 package no.nav.amt.tiltak.test.integration.tiltaksarrangor
 
+import com.jayway.jsonpath.JsonPath
 import io.kotest.matchers.shouldBe
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING1_DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
+import no.nav.amt.tiltak.test.database.data.inputs.DeltakerStatusInput
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
 import okhttp3.Request
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 import java.util.*
 
 class DeltakerControllerIntegrationTest : IntegrationTestBase() {
+
+	@BeforeEach
+	fun setup() {
+		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		poaoTilgangClient.addErSkjermetResponse(mapOf(BRUKER_1.fodselsnummer to false))
+	}
+
 	@Test
 	internal fun `skal teste token autentisering`() {
 
 		val requestBuilders = listOf(
+			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/tiltak-deltaker?gjennomforingId=${UUID.randomUUID()}"),
 			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/tiltak-deltaker/${UUID.randomUUID()}"),
+			Request.Builder().post(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/tiltak-deltaker/${UUID.randomUUID()}/oppstartsdato"),
+			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/tiltak-deltaker/${UUID.randomUUID()}/oppstartsdato"),
+			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/tiltak-deltaker/${UUID.randomUUID()}/avslutt-deltakelse"),
+			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/tiltak-deltaker/${UUID.randomUUID()}/forleng-deltakelse"),
+			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/tiltak-deltaker/${UUID.randomUUID()}/ikke-aktuell"),
 		)
 		testTiltaksarrangorAutentisering(requestBuilders, client, oAuthServer)
 	}
@@ -35,9 +56,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	fun `hentTiltakDeltakerDetaljer() should return 200 when authenticated`() {
-		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
-		poaoTilgangClient.addErSkjermetResponse(mapOf(BRUKER_1.fodselsnummer to false))
-
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/tiltak-deltaker/${DELTAKER_1.id}",
@@ -51,6 +69,104 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		response.code shouldBe 200
 		response.body?.string() shouldBe expectedBody
 
+	}
+
+	@Test
+	internal fun `hentDeltakere - har ikke tilgang til gjennomforing - skal kaste 403`() {
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/tiltak-deltaker?gjennomforingId=${GJENNOMFORING_2.id}",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+		)
+
+		response.code shouldBe 403
+	}
+
+	@Test
+	internal fun `hentDeltakere - skal ha status 200 og returnere deltakere`() {
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/tiltak-deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+		)
+
+		val expectedJson = """
+				[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-13T12:12:00","aktiveEndringsmeldinger":[]},{"id":"8a0b7158-4d5e-4563-88be-b9bce5662879","fornavn":"Bruker 2 fornavn","mellomnavn":null,"etternavn":"Bruker 2 etternavn","fodselsnummer":"7908432423","startDato":"2022-02-10","sluttDato":"2022-02-12","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-10T12:12:00","aktiveEndringsmeldinger":[]}]
+			""".trimIndent()
+		response.code shouldBe 200
+		response.body?.string() shouldBe expectedJson
+	}
+
+	@Test
+	internal fun `hentDeltakere - returnere deltakere med aktive endringsmeldinger`() {
+		testDataRepository.insertEndringsmelding(ENDRINGSMELDING1_DELTAKER_1)
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/tiltak-deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+		)
+
+		val expectedJson = """
+			[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-13T12:12:00","aktiveEndringsmeldinger":[{"id":"9830e130-b18a-46b8-8e3e-6c06734d797e","innhold":{"oppstartsdato":"2022-11-01"},"type":"LEGG_TIL_OPPSTARTSDATO"}]},{"id":"8a0b7158-4d5e-4563-88be-b9bce5662879","fornavn":"Bruker 2 fornavn","mellomnavn":null,"etternavn":"Bruker 2 etternavn","fodselsnummer":"7908432423","startDato":"2022-02-10","sluttDato":"2022-02-12","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-10T12:12:00","aktiveEndringsmeldinger":[]}]
+		""".trimIndent()
+		response.code shouldBe 200
+		response.body?.string() shouldBe expectedJson
+	}
+
+	@Test
+	internal fun `hentDeltakere - returnere ikke deltakere med status avsluttet etter 14 dager`() {
+		testDataRepository.deleteAllDeltaker()
+
+		val deltaker = DELTAKER_1.copy(id = UUID.randomUUID())
+		testDataRepository.insertDeltaker(deltaker)
+
+		testDataRepository.insertDeltakerStatus(
+			DeltakerStatusInput(
+				id = UUID.randomUUID(),
+				deltakerId = deltaker.id,
+				gyldigFra = LocalDateTime.now().minusDays(15),
+				status = Deltaker.Status.HAR_SLUTTET.name,
+				aktiv = true,
+			)
+		)
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/tiltak-deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+		)
+
+		val expectedJson = "[]"
+		response.code shouldBe 200
+		response.body?.string() shouldBe expectedJson
+	}
+
+	@Test
+	internal fun `hentDeltakere - returnerer deltakere med status avsluttet for 14 dager`() {
+		testDataRepository.deleteAllDeltaker()
+
+		val deltaker = DELTAKER_1.copy(id = UUID.randomUUID())
+		testDataRepository.insertDeltaker(deltaker)
+
+		testDataRepository.insertDeltakerStatus(
+			DeltakerStatusInput(
+				id = UUID.randomUUID(),
+				deltakerId = deltaker.id,
+				gyldigFra = LocalDateTime.now().minusDays(13),
+				status = Deltaker.Status.HAR_SLUTTET.name,
+				aktiv = true,
+			)
+		)
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/tiltak-deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+		)
+
+		response.code shouldBe 200
+		JsonPath.parse(response.body?.string()).read<Int>("$.length()") shouldBe 1
 	}
 
 }

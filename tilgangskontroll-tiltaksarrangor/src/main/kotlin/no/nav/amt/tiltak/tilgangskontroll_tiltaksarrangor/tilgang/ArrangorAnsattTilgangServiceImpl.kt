@@ -6,10 +6,8 @@ import no.nav.amt.tiltak.common.utils.CacheUtils.tryCacheFirstNullable
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller
-import no.nav.amt.tiltak.core.port.ArrangorAnsattService
-import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
-import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
+import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.log.SecureLog.secureLog
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.AltinnService
 import org.slf4j.LoggerFactory
@@ -28,6 +26,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 	private val altinnService: AltinnService,
 	private val arrangorAnsattGjennomforingTilgangService: ArrangorAnsattGjennomforingTilgangService,
 	private val arrangorService: ArrangorService,
+	private val skjermetPersonService: SkjermetPersonService,
 	private val transactionTemplate: TransactionTemplate
 ) : ArrangorAnsattTilgangService {
 
@@ -46,29 +45,53 @@ open class ArrangorAnsattTilgangServiceImpl(
 	override fun verifiserTilgangTilGjennomforing(ansattPersonligIdent: String, gjennomforingId: UUID) {
 		val ansattId = hentAnsattId(ansattPersonligIdent)
 
+		verifiserTilgangTilGjennomforing(ansattId, gjennomforingId)
+	}
+
+	override fun verifiserTilgangTilGjennomforing(ansattId: UUID, gjennomforingId: UUID) {
 		val gjennomforinger = arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
 
 		val harTilgang = gjennomforinger.contains(gjennomforingId)
 
 		if (!harTilgang) {
 			secureLog.warn("Ansatt med id=$ansattId har ikke tilgang til gjennomføring med id=$gjennomforingId")
-			throw ResponseStatusException(HttpStatus.FORBIDDEN)
+			throw UnauthorizedException("Ansatt har ikke tilgang til gjennomforing")
 		}
 	}
 
 	override fun verifiserTilgangTilArrangor(ansattPersonligIdent: String, arrangorId: UUID) {
 		val ansattId = hentAnsattId(ansattPersonligIdent)
 
+		verifiserTilgangTilArrangor(ansattId, arrangorId)
+	}
+
+	override fun verifiserTilgangTilArrangor(ansattId: UUID, arrangorId: UUID) {
 		val harTilgang = hentArrangorIderForAnsatt(ansattId).contains(arrangorId)
 
 		if (!harTilgang) {
 			secureLog.warn("Ansatt med id=$ansattId har ikke tilgang til arrangør med id=$arrangorId")
-			throw ResponseStatusException(HttpStatus.FORBIDDEN)
+			throw UnauthorizedException("Ansatt har ikke tilgang til arrangor")
 		}
+	}
+
+	override fun verifiserTilgangTilDeltaker(ansattId: UUID, deltakerId: UUID) {
+		val deltaker = deltakerService.hentDeltaker(deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
+		val erSkjermet = skjermetPersonService.erSkjermet(deltaker.fodselsnummer)
+
+		if (erSkjermet) {
+			throw NotImplementedError("Støtte for denne personen er ikke implementert")
+		}
+
+		verifiserTilgangTilGjennomforing(ansattId, deltaker.gjennomforingId)
 	}
 
 	override fun verifiserTilgangTilDeltaker(ansattPersonligIdent: String, deltakerId: UUID) {
 		val deltaker = deltakerService.hentDeltaker(deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
+		val erSkjermet = skjermetPersonService.erSkjermet(deltaker.fodselsnummer)
+
+		if (erSkjermet) {
+			throw NotImplementedError("Støtte for denne personen er ikke implementert")
+		}
 
 		verifiserTilgangTilGjennomforing(ansattPersonligIdent, deltaker.gjennomforingId)
 	}

@@ -1,9 +1,9 @@
 package no.nav.amt.tiltak.test.database.data
 
+import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.test.database.data.inputs.*
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -323,6 +323,24 @@ object TestData {
 		gyldigFra = LocalDateTime.now(),
 		status = "VENTER_PA_OPPSTART",
 		aktiv = true
+	)
+
+	val ENDRINGSMELDING1_DELTAKER_1 = EndringsmeldingInput(
+		id = UUID.fromString("9830e130-b18a-46b8-8e3e-6c06734d797e"),
+		deltakerId = DELTAKER_1.id,
+		opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+		status = Endringsmelding.Status.AKTIV,
+		type = "LEGG_TIL_OPPSTARTSDATO",
+		innhold = """{ "oppstartsdato": "${LocalDate.now()}" }""",
+	)
+
+	val ENDRINGSMELDING1_DELTAKER_2 = EndringsmeldingInput(
+		id = UUID.fromString("3fc16362-ba8b-4c0f-af93-b2ed56f12cd5"),
+		deltakerId = DELTAKER_2.id,
+		opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_2.id,
+		status = Endringsmelding.Status.AKTIV,
+		type = "LEGG_TIL_OPPSTARTSDATO",
+		innhold = """{ "oppstartsdato": "${LocalDate.now()}" }""",
 	)
 
 }

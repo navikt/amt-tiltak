@@ -1,33 +1,36 @@
 package no.nav.amt.tiltak.endringsmelding
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getNullableZonedDateTime
+import no.nav.amt.tiltak.common.db_utils.getZonedDateTime
+import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.utils.getNullableUUID
 import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
-import org.springframework.transaction.support.TransactionTemplate
-import java.time.LocalDate
 import java.util.*
 
 @Component
 open class EndringsmeldingRepository(
 	private val template: NamedParameterJdbcTemplate,
-	private val transactionTemplate: TransactionTemplate
+	private val objectMapper: ObjectMapper,
 ) {
 	private val rowMapper = RowMapper { rs, _ ->
+		val type = EndringsmeldingDbo.Type.valueOf(rs.getString("type"))
 		EndringsmeldingDbo(
 			id = rs.getUUID("id"),
 			deltakerId = rs.getUUID("deltaker_id"),
-			startDato = rs.getDate("start_dato")?.toLocalDate(),
-			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
-			ferdiggjortAvNavAnsattId = rs.getNullableUUID("ferdiggjort_av_nav_ansatt_id"),
-			ferdiggjortTidspunkt = rs.getNullableZonedDateTime("ferdiggjort_tidspunkt"),
-			aktiv = rs.getBoolean("aktiv"),
+			utfortAvNavAnsattId = rs.getNullableUUID("utfort_av_nav_ansatt_id"),
+			utfortTidspunkt = rs.getNullableZonedDateTime("utfort_tidspunkt"),
 			opprettetAvArrangorAnsattId = rs.getUUID("opprettet_av_arrangor_ansatt_id"),
-			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
-			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
+			status = Endringsmelding.Status.valueOf(rs.getString("status")),
+			type = type,
+			innhold = parseInnholdJson(rs.getString("innhold"), type),
+			createdAt = rs.getZonedDateTime("created_at"),
+			modifiedAt = rs.getZonedDateTime("modified_at"),
 		)
 	}
 
@@ -54,17 +57,13 @@ open class EndringsmeldingRepository(
 		return template.query(sql, param, rowMapper)
 	}
 
-	fun getAktiv(deltakerId: UUID): EndringsmeldingDbo? {
-		return getAktive(listOf(deltakerId)).firstOrNull()
-	}
-
 	fun getAktive(deltakerIder: List<UUID>): List<EndringsmeldingDbo> {
 		if (deltakerIder.isEmpty())
 			return emptyList()
 
 		val sql = """
 			SELECT * FROM endringsmelding
-			WHERE aktiv = true and deltaker_id in(:deltakerIder)
+			WHERE status = 'AKTIV' and deltaker_id in(:deltakerIder)
 		""".trimIndent()
 
 		val parameters = sqlParameters("deltakerIder" to deltakerIder)
@@ -85,12 +84,12 @@ open class EndringsmeldingRepository(
 			?: throw NoSuchElementException("Fant ingen endringsmelding med id=$id")
 	}
 
-	fun markerSomFerdig(endringsmeldingId: UUID, navAnsattId: UUID) {
+	fun markerSomUtfort(endringsmeldingId: UUID, navAnsattId: UUID) {
 		val sql = """
 			UPDATE endringsmelding
-				SET aktiv = false,
-					ferdiggjort_tidspunkt = current_timestamp,
-					ferdiggjort_av_nav_ansatt_id = :navAnsattId
+				SET status = 'UTFORT',
+					utfort_tidspunkt = current_timestamp,
+					utfort_av_nav_ansatt_id = :navAnsattId
 				WHERE id = :endringsmeldingId
 		""".trimIndent()
 
@@ -102,51 +101,50 @@ open class EndringsmeldingRepository(
 		template.update(sql, params)
 	}
 
-	open fun insertOgInaktiverStartDato(startDato: LocalDate, deltakerId: UUID, opprettetAv: UUID): EndringsmeldingDbo {
-		return transactionTemplate.execute {
-			inaktiverMeldingerMedDato(deltakerId, "start_dato")
-			return@execute insertNyDato(startDato, sluttDato = null, deltakerId, opprettetAv)
-		}!!
-	}
-
-	open fun insertOgInaktiverSluttDato(sluttDato: LocalDate, deltakerId: UUID, opprettetAv: UUID): EndringsmeldingDbo {
-		return transactionTemplate.execute {
-			inaktiverMeldingerMedDato(deltakerId, "slutt_dato")
-			return@execute insertNyDato(startDato = null, sluttDato,  deltakerId, opprettetAv)
-		}!!
-	}
-
-	private fun inaktiverMeldingerMedDato(deltakerId: UUID, datoColumn: String) {
+	fun markerSomUtdatert(deltakerId: UUID, type: EndringsmeldingDbo.Type) {
 		val sql = """
-				UPDATE endringsmelding
-				SET aktiv = false
-				WHERE deltaker_id = :deltaker_id AND $datoColumn IS NOT NULL
-			""".trimIndent()
+			UPDATE endringsmelding
+				SET status = 'UTDATERT'
+				WHERE deltaker_id = :deltakerId AND type = :type
+		""".trimIndent()
 
-		val params = sqlParameters("deltaker_id" to deltakerId)
-
+		val params = sqlParameters(
+			"deltakerId" to deltakerId,
+			"type" to type.name,
+		)
 		template.update(sql, params)
 	}
 
 
-	private fun insertNyDato(startDato: LocalDate?, sluttDato: LocalDate?, deltakerId: UUID, opprettetAvArrangorAnsattId: UUID): EndringsmeldingDbo {
-		val id = UUID.randomUUID()
-
+	fun insertEndringsmelding(id: UUID, deltakerId: UUID, opprettetAvArrangorAnsattId: UUID, type: EndringsmeldingDbo.Type, innhold: EndringsmeldingDbo.Innhold) {
 		val sql = """
-			INSERT INTO endringsmelding(id, deltaker_id, start_dato, slutt_dato, aktiv, opprettet_av_arrangor_ansatt_id)
-			VALUES (:id, :deltaker_id, :start_dato, :slutt_dato, true, :opprettet_av)
+			INSERT INTO endringsmelding(id, deltaker_id, opprettet_av_arrangor_ansatt_id, type, innhold, status)
+			VALUES(:id, :deltakerId, :opprettetAvArrangorAnsattId, :type, :innhold, 'AKTIV')
 		""".trimIndent()
 
 		val params = sqlParameters(
 			"id" to id,
-			"deltaker_id" to deltakerId,
-			"start_dato" to startDato,
-			"slutt_dato" to sluttDato,
-			"opprettet_av" to opprettetAvArrangorAnsattId
+			"deltakerId" to deltakerId,
+			"opprettetAvArrangorAnsattId" to opprettetAvArrangorAnsattId,
+			"type" to type.name,
+			"innhold" to objectMapper.writeValueAsString(innhold),
 		)
-
 		template.update(sql, params)
+	}
 
-		return get(id)
+	private fun parseInnholdJson(innholdJson: String, type: EndringsmeldingDbo.Type): EndringsmeldingDbo.Innhold {
+		return when(type) {
+			EndringsmeldingDbo.Type.LEGG_TIL_OPPSTARTSDATO ->
+				objectMapper.readValue<EndringsmeldingDbo.Innhold.LeggTilOppstartsdatoInnhold>(innholdJson)
+			EndringsmeldingDbo.Type.ENDRE_OPPSTARTSDATO ->
+				objectMapper.readValue<EndringsmeldingDbo.Innhold.EndreOppstartsdatoInnhold>(innholdJson)
+			EndringsmeldingDbo.Type.FORLENG_DELTAKELSE ->
+				objectMapper.readValue<EndringsmeldingDbo.Innhold.ForlengDeltakelseInnhold>(innholdJson)
+			EndringsmeldingDbo.Type.AVSLUTT_DELTAKELSE ->
+				objectMapper.readValue<EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold>(innholdJson)
+			EndringsmeldingDbo.Type.DELTAKER_IKKE_AKTUELL ->
+				objectMapper.readValue<EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold>(innholdJson)
+		}
+
 	}
 }
