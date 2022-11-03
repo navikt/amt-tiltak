@@ -47,7 +47,6 @@ class GjennomforingController(
 		val ansattId = arrangorAnsattTilgangService.hentAnsattId(ansattPersonligIdent)
 
 		return hentGjennomforingerSomKanLeggesTil(ansattId)
-			.filter { tillattIProd(it.id) }
 			.filter { it.status == Gjennomforing.Status.GJENNOMFORES }
 			.map { it.toDto() }
 	}
@@ -122,23 +121,27 @@ class GjennomforingController(
 
 		val allowList = listOf(
 			"18abdf60-0c2b-40b1-a552-ffc05868d373",
-			"84c1d59e-6b6e-440d-897b-aa063ec43b04",
-			"72e65187-f5db-4c28-b7dc-25866b7d5f2b",
 			"ea82afc3-14f3-40ef-b80b-ffd07953ef37",
-			"34dd5503-d01c-4577-afba-9b56ccbe7b33",
 			"f236ffc0-9c28-4bad-ab31-3ffc67564199",
-			"15c600c6-ed5f-4492-b7a2-e2706b66bc87",
+			"84c1d59e-6b6e-440d-897b-aa063ec43b04",
+			"b5f24f50-ff4b-42db-a7f5-0c6b4c994098",
+			"94bc335a-293c-461f-91ce-6d3af3391f25",
 			"4fd30e67-0ba6-4f19-80dd-8f539b1fb3a0",
-			"a6cd35be-e29d-4be5-8c01-346f6822c829"
+			"34dd5503-d01c-4577-afba-9b56ccbe7b33",
+			"a6cd35be-e29d-4be5-8c01-346f6822c829",
+			"72e65187-f5db-4c28-b7dc-25866b7d5f2b",
+			"15c600c6-ed5f-4492-b7a2-e2706b66bc87"
 		).map { UUID.fromString(it) }
 
 		return allowList.contains(gjennomforingId)
 	}
 
-	fun hentGjennomforingerSomKanLeggesTil(ansattId: UUID): List<Gjennomforing> {
+	private fun hentGjennomforingerSomKanLeggesTil(ansattId: UUID): List<Gjennomforing> {
 		return arrangorAnsattTilgangService.hentAnsattTilganger(ansattId)
 			.filter { it.roller.contains(ArrangorAnsattRolle.KOORDINATOR) }
 			.map { gjennomforingService.getByArrangorId(it.arrangorId) }
 			.flatten()
+			.filter { tillattIProd(it.id) }
+
 	}
 }
