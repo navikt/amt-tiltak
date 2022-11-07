@@ -15,7 +15,7 @@ data class DeltakerPayload(
 	val dagerPerUke: Int?,
 	val prosentDeltid: Float?,
 	val registrertDato: LocalDateTime,
-	val statusEndretDato: LocalDateTime,
+	val statusEndretDato: LocalDateTime?,
 	val innsokBegrunnelse: String?
 ) {
 	enum class Status {
