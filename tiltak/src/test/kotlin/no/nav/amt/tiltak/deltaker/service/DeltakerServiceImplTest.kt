@@ -7,6 +7,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
@@ -14,8 +15,16 @@ import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_2
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_2
 import no.nav.amt.tiltak.test.database.data.TestData.createDeltakerInput
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.TestDataSeeder
@@ -70,6 +79,44 @@ class DeltakerServiceImplTest {
 		DbTestDataUtils.cleanDatabase(dataSource)
 	}
 
+	@Test
+	fun `oppdaterStatuser - Avslutter aktive deltakere med passert tildato`() {
+		testDataRepository.insertBruker(BRUKER_2)
+		testDataRepository.insertDeltaker(DELTAKER_2)
+		testDataRepository.insertDeltakerStatus(DELTAKER_2_STATUS_1)
+
+		// Valider testdata tilstand
+		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
+		forrigeStatus!!.status shouldBe Deltaker.Status.DELTAR
+
+		deltakerServiceImpl.oppdaterStatuser()
+
+		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
+
+		status!!.status shouldBe Deltaker.Status.HAR_SLUTTET
+
+	}
+
+	@Test
+	fun `oppdaterStatuser - Avslutter aktive deltakere deltakere på avsluttede gjennomføringer`() {
+		testDataRepository.insertArrangor(ARRANGOR_2)
+		testDataRepository.insertNavEnhet(NAV_ENHET_2)
+		testDataRepository.insertGjennomforing(GJENNOMFORING_2)
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(gjennomforingId = GJENNOMFORING_2.id))
+		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1)
+
+		// Valider testdata tilstand
+		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
+		GJENNOMFORING_2.status shouldBe Gjennomforing.Status.AVSLUTTET.name
+		forrigeStatus!!.status shouldBe Deltaker.Status.DELTAR
+
+		deltakerServiceImpl.oppdaterStatuser()
+
+		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
+
+		status!!.status shouldBe Deltaker.Status.HAR_SLUTTET
+
+	}
 	@Test
 	fun `upsertDeltaker - inserter ny deltaker`() {
 
