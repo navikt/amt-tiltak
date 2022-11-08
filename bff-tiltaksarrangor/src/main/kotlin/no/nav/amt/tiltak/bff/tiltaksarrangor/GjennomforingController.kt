@@ -130,7 +130,8 @@ class GjennomforingController(
 			"34dd5503-d01c-4577-afba-9b56ccbe7b33",
 			"a6cd35be-e29d-4be5-8c01-346f6822c829",
 			"72e65187-f5db-4c28-b7dc-25866b7d5f2b",
-			"15c600c6-ed5f-4492-b7a2-e2706b66bc87"
+			"15c600c6-ed5f-4492-b7a2-e2706b66bc87",
+			"1b5fdc3e-356b-4fe3-a93b-384981810c12"
 		).map { UUID.fromString(it) }
 
 		return allowList.contains(gjennomforingId)
