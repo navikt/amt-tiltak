@@ -56,8 +56,9 @@ object SingletonPostgresContainer {
 	}
 
 	private fun createContainer(): PostgreSQLContainer<Nothing> {
-		return PostgreSQLContainer<Nothing>(DockerImageName.parse(postgresDockerImageName).asCompatibleSubstituteFor("postgres"))
-			.waitingFor(HostPortWaitStrategy())
+		val container = PostgreSQLContainer<Nothing>(DockerImageName.parse(postgresDockerImageName).asCompatibleSubstituteFor("postgres"))
+		container.addEnv("TZ", "europe/oslo")
+		return container.waitingFor(HostPortWaitStrategy())
 	}
 
 	private fun createDataSource(container: PostgreSQLContainer<Nothing>): DataSource {
