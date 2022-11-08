@@ -57,7 +57,7 @@ object SingletonPostgresContainer {
 
 	private fun createContainer(): PostgreSQLContainer<Nothing> {
 		val container = PostgreSQLContainer<Nothing>(DockerImageName.parse(postgresDockerImageName).asCompatibleSubstituteFor("postgres"))
-		container.addEnv("TZ", "europe/oslo")
+		container.addEnv("TZ", "Europe/Oslo")
 		return container.waitingFor(HostPortWaitStrategy())
 	}
 

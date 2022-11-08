@@ -8,6 +8,7 @@ env:
   IMAGE_TAG: ${{ github.sha }}
   IMAGE: ghcr.io/${{ github.repository }}/amt-tiltak
   PRINT_PAYLOAD: true
+  TZ: Europe/Oslo
 
 jobs:
   test-build-and-push:
