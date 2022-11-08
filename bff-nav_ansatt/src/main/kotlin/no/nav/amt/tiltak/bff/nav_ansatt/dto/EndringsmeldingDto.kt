@@ -15,6 +15,15 @@ data class EndringsmeldingDto(
 	val opprettetAvArrangorAnsatt: ArrangorAnsattDto,
 	val opprettetDato: ZonedDateTime,
 ) {
+	val type = innhold.type()
+
+	enum class Type {
+		LEGG_TIL_OPPSTARTSDATO,
+		ENDRE_OPPSTARTSDATO,
+		FORLENG_DELTAKELSE,
+		AVSLUTT_DELTAKELSE,
+		DELTAKER_IKKE_AKTUELL,
+	}
 
 	enum class Status {
 		AKTIV, UTDATERT, UTFORT
@@ -42,6 +51,15 @@ data class EndringsmeldingDto(
 			val aarsak: DeltakerStatusAarsak,
 		) : Innhold()
 
+		fun type(): Type {
+			return when(this) {
+				is LeggTilOppstartsdatoInnhold -> Type.LEGG_TIL_OPPSTARTSDATO
+				is EndreOppstartsdatoInnhold -> Type.ENDRE_OPPSTARTSDATO
+				is ForlengDeltakelseInnhold -> Type.FORLENG_DELTAKELSE
+				is AvsluttDeltakelseInnhold -> Type.AVSLUTT_DELTAKELSE
+				is DeltakerIkkeAktuellInnhold -> Type.DELTAKER_IKKE_AKTUELL
+			}
+		}
 	}
 }
 
