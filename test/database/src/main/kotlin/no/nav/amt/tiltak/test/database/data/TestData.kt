@@ -331,7 +331,7 @@ object TestData {
 		opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
 		status = Endringsmelding.Status.AKTIV,
 		type = "LEGG_TIL_OPPSTARTSDATO",
-		innhold = """{ "oppstartsdato": "${LocalDate.now()}" }""",
+		innhold = """{ "oppstartsdato": "2022-11-11" }""",
 	)
 
 	val ENDRINGSMELDING_2_DELTAKER_1 = EndringsmeldingInput(
@@ -340,7 +340,7 @@ object TestData {
 		opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
 		status = Endringsmelding.Status.AKTIV,
 		type = "AVSLUTT_DELTAKELSE",
-		innhold = """{ "sluttdato": "${LocalDate.now()}", "aarsak": "ANNET" }""",
+		innhold = """{ "sluttdato": "2022-11-10", "aarsak": "ANNET" }""",
 	)
 
 
@@ -350,7 +350,7 @@ object TestData {
 		opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_2.id,
 		status = Endringsmelding.Status.AKTIV,
 		type = "LEGG_TIL_OPPSTARTSDATO",
-		innhold = """{ "oppstartsdato": "${LocalDate.now()}" }""",
+		innhold = """{ "oppstartsdato": "2022-11-09" }""",
 	)
 
 	val NAV_ANSATT_1_GJENNOMFORING_1_TILGANG = TiltaksansvarligGjennomforingTilgangInput(
