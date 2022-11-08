@@ -14,10 +14,15 @@ import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2_STATUS_1
+import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_2
+import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_2_DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_TILGANG_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1_GJENNOMFORING_1_TILGANG
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1_GJENNOMFORING_2_TILGANG
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_2
@@ -59,6 +64,13 @@ object TestDataSeeder {
 		repository.insertDeltakerStatus(DELTAKER_2_STATUS_1)
 
 		repository.insertBruker(BRUKER_3)
+
+		repository.insertTiltaksansvarligGjennomforingTilgang(NAV_ANSATT_1_GJENNOMFORING_1_TILGANG)
+		repository.insertTiltaksansvarligGjennomforingTilgang(NAV_ANSATT_1_GJENNOMFORING_2_TILGANG)
+
+		repository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
+		repository.insertEndringsmelding(ENDRINGSMELDING_2_DELTAKER_1)
+		repository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_2)
 	}
 
 	fun insertMinimum(repository: TestDataRepository){

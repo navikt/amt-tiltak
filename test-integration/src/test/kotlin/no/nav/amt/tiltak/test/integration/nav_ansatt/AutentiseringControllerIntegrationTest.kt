@@ -32,7 +32,7 @@ class AutentiseringControllerIntegrationTest : IntegrationTestBase() {
 	fun `meg() - skal returnere 200 med korrekt response`() {
 		val oid = UUID.randomUUID()
 
-		poaoTilgangClient.addHentAdGrupperResponse(
+		poaoTilgangServer.addHentAdGrupperResponse(
 			navAnsattAzureId = oid,
 			name = AdGrupper.TILTAKSANSVARLIG_FLATE_GRUPPE
 		)

@@ -13,7 +13,8 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
-import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING1_DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.test.database.data.inputs.DeltakerStatusInput
@@ -41,7 +42,8 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 		testDataRepository.insertDeltaker(deltakerIkkeTilgang)
 		testDataRepository.insertDeltakerStatus(deltakerIkkeTilgangStatus)
-		poaoTilgangClient.addErSkjermetResponse(mapOf(BRUKER_1.fodselsnummer to false))
+		testDataRepository.deleteAllEndringsmeldinger()
+		poaoTilgangServer.addErSkjermetResponse(mapOf(BRUKER_1.fodselsnummer to false))
 	}
 
 	@Test
@@ -116,8 +118,8 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	internal fun `hentDeltakere - returnere deltakere med aktive endringsmeldinger`() {
-		testDataRepository.insertEndringsmelding(ENDRINGSMELDING1_DELTAKER_1)
-
+		testDataRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
+		testDataRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_2)
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/tiltak-deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
@@ -125,7 +127,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-			[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-13T12:12:00","aktiveEndringsmeldinger":[{"id":"9830e130-b18a-46b8-8e3e-6c06734d797e","innhold":{"oppstartsdato":"2022-11-01"},"type":"LEGG_TIL_OPPSTARTSDATO"}]},{"id":"8a0b7158-4d5e-4563-88be-b9bce5662879","fornavn":"Bruker 2 fornavn","mellomnavn":null,"etternavn":"Bruker 2 etternavn","fodselsnummer":"7908432423","startDato":"2022-02-10","sluttDato":"2022-02-12","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-10T12:12:00","aktiveEndringsmeldinger":[]}]
+			[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-13T12:12:00","aktiveEndringsmeldinger":[{"id":"9830e130-b18a-46b8-8e3e-6c06734d797e","innhold":{"oppstartsdato":"2022-11-08"},"type":"LEGG_TIL_OPPSTARTSDATO"}]},{"id":"8a0b7158-4d5e-4563-88be-b9bce5662879","fornavn":"Bruker 2 fornavn","mellomnavn":null,"etternavn":"Bruker 2 etternavn","fodselsnummer":"7908432423","startDato":"2022-02-10","sluttDato":"2022-02-12","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-10T12:12:00","aktiveEndringsmeldinger":[{"id":"3fc16362-ba8b-4c0f-af93-b2ed56f12cd5","innhold":{"oppstartsdato":"2022-11-08"},"type":"LEGG_TIL_OPPSTARTSDATO"}]}]
 		""".trimIndent()
 		response.code shouldBe 200
 		response.body?.string() shouldBe expectedJson

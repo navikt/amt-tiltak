@@ -25,7 +25,8 @@ Start applikasjonen ved å kjøre **main** funksjonen i `application/src/test/ko
 ### Token
 For å kunne gjøre requests mot endepunktene lokalt så må man først ha et gyldig JWT token.
 
-Etter å ha kjørt opp mock OAuth2 serveren med `docker-compose up -d` så gå til [http://localhost:8082/local-tokenx/debugger](http://localhost:8082/local-tokenx/debugger)
+Etter å ha kjørt opp mock OAuth2 serveren med `docker-compose up -d` så gå til [http://localhost:8082/local-tokenx/debugger](http://localhost:8082/local-tokenx/debugger) for innlogging med eksternbruker
+eller [http://localhost:8082/local-azuread/debugger](http://localhost:8082/local-azuread/debugger) for internbruker.
 
 Trykk på "Get a token"-knappen, fyll inn vilkårlig "user/subject" og "acr" og trykk på "Sign in"-knappen.
 

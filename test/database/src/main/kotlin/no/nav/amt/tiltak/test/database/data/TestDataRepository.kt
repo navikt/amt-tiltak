@@ -287,6 +287,14 @@ class TestDataRepository(
 		template.update(sql, sqlParameters)
 	}
 
+	fun deleteAllEndringsmeldinger() {
+		val sql = """
+			TRUNCATE endringsmelding CASCADE
+		""".trimIndent()
+
+		template.jdbcTemplate.update(sql)
+	}
+
 	fun insertTiltaksansvarligGjennomforingTilgang(cmd: TiltaksansvarligGjennomforingTilgangInput) {
 		val sql = """
 			INSERT INTO tiltaksansvarlig_gjennomforing_tilgang(id, nav_ansatt_id, gjennomforing_id, gyldig_til, created_at)
@@ -303,6 +311,15 @@ class TestDataRepository(
 
 		template.update(sql, sqlParameters)
 	}
+
+	fun deleteAllTiltaksansvarligGjennomforingTilgang() {
+		val sql = """
+			TRUNCATE tiltaksansvarlig_gjennomforing_tilgang CASCADE
+		""".trimIndent()
+
+		template.jdbcTemplate.update(sql)
+	}
+
 
 
 }

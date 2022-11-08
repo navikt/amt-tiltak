@@ -1,14 +1,12 @@
 package no.nav.amt.tiltak.test.integration.nav_ansatt
 
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
-import no.nav.amt.tiltak.test.database.data.TestData
-import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_3
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.inputs.TiltaksansvarligGjennomforingTilgangInput
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testNavAnsattAutentisering
-import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
 import okhttp3.Request
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -21,7 +19,7 @@ class TilgangControllerIntegrationTest : IntegrationTestBase() {
 	@BeforeEach
 	internal fun setUp() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
-		nomHttpClient.addDefaultData()
+		nomHttpServer.addDefaultData()
 	}
 
 	@Test
@@ -36,13 +34,15 @@ class TilgangControllerIntegrationTest : IntegrationTestBase() {
 	@Test
 	fun `giTilgangTilGjennomforing() - skal returnere 200 og gi tilgang til gjennomføring`() {
 		val token = oAuthServer.issueAzureAdToken(
-			ident = TestData.NAV_ANSATT_1.navIdent,
+			ident = NAV_ANSATT_1.navIdent,
 			oid = UUID.randomUUID()
 		)
 
+		testDataRepository.insertGjennomforing(GJENNOMFORING_3)
+
 		val response = sendRequest(
 			method = "POST",
-			url = "/api/tiltaksansvarlig/gjennomforing-tilgang?gjennomforingId=${GJENNOMFORING_1.id}",
+			url = "/api/tiltaksansvarlig/gjennomforing-tilgang?gjennomforingId=${GJENNOMFORING_3.id}",
 			headers = mapOf("Authorization" to "Bearer $token"),
 			body = "".toJsonRequestBody()
 		)

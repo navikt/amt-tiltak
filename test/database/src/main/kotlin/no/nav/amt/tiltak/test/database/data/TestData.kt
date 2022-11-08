@@ -325,7 +325,7 @@ object TestData {
 		aktiv = true
 	)
 
-	val ENDRINGSMELDING1_DELTAKER_1 = EndringsmeldingInput(
+	val ENDRINGSMELDING_1_DELTAKER_1 = EndringsmeldingInput(
 		id = UUID.fromString("9830e130-b18a-46b8-8e3e-6c06734d797e"),
 		deltakerId = DELTAKER_1.id,
 		opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
@@ -334,13 +334,39 @@ object TestData {
 		innhold = """{ "oppstartsdato": "${LocalDate.now()}" }""",
 	)
 
-	val ENDRINGSMELDING1_DELTAKER_2 = EndringsmeldingInput(
+	val ENDRINGSMELDING_2_DELTAKER_1 = EndringsmeldingInput(
+		id = UUID.fromString("07099997-e02e-45e3-be6f-3c1eaf694557"),
+		deltakerId = DELTAKER_1.id,
+		opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+		status = Endringsmelding.Status.AKTIV,
+		type = "AVSLUTT_DELTAKELSE",
+		innhold = """{ "sluttdato": "${LocalDate.now()}", "aarsak": "ANNET" }""",
+	)
+
+
+	val ENDRINGSMELDING_1_DELTAKER_2 = EndringsmeldingInput(
 		id = UUID.fromString("3fc16362-ba8b-4c0f-af93-b2ed56f12cd5"),
 		deltakerId = DELTAKER_2.id,
 		opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_2.id,
 		status = Endringsmelding.Status.AKTIV,
 		type = "LEGG_TIL_OPPSTARTSDATO",
 		innhold = """{ "oppstartsdato": "${LocalDate.now()}" }""",
+	)
+
+	val NAV_ANSATT_1_GJENNOMFORING_1_TILGANG = TiltaksansvarligGjennomforingTilgangInput(
+		id = UUID.randomUUID(),
+		navAnsattId = NAV_ANSATT_1.id,
+		gjennomforingId = GJENNOMFORING_1.id,
+		gyldigTil = ZonedDateTime.now().plusDays(1),
+		createdAt = ZonedDateTime.now()
+	)
+
+	val NAV_ANSATT_1_GJENNOMFORING_2_TILGANG = TiltaksansvarligGjennomforingTilgangInput(
+		id = UUID.randomUUID(),
+		navAnsattId = NAV_ANSATT_1.id,
+		gjennomforingId = GJENNOMFORING_2.id,
+		gyldigTil = ZonedDateTime.now().plusDays(1),
+		createdAt = ZonedDateTime.now()
 	)
 
 }

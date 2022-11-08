@@ -43,8 +43,8 @@ class AnsattControllerIntegrationTest : IntegrationTestBase() {
 	fun `getInnloggetAnsatt() should return 200 when ansatt is not previously stored`() {
 		val ident = "012345678912"
 
-		altinnAclHttpClient.addRoller(ident, altinnAclHttpClient.createRollerForSingleOrg(ARRANGOR_1.organisasjonsnummer, listOf("KOORDINATOR")))
-		pdlHttpClient.addPdlBruker(ident, "Integrasjon", "Test")
+		altinnAclHttpServer.addRoller(ident, altinnAclHttpServer.createRollerForSingleOrg(ARRANGOR_1.organisasjonsnummer, listOf("KOORDINATOR")))
+		pdlHttpServer.addPdlBruker(ident, "Integrasjon", "Test")
 
 		val response = sendRequest(
 			method = "GET",

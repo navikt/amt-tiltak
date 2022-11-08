@@ -4,9 +4,10 @@ import no.nav.amt.tiltak.clients.amt_altinn_acl.AmtAltinnAclClientImpl
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
+import no.nav.amt.tiltak.test.integration.utils.MockHttpServer
 import okhttp3.mockwebserver.MockResponse
 
-class MockAmtAltinnAclHttpClient : MockHttpClient(name = "AmtAltinnAclHttpClient") {
+class MockAmtAltinnAclHttpServer : MockHttpServer(name = "AmtAltinnAclHttpServer") {
 
 	fun reset() {
 		resetHttpServer()

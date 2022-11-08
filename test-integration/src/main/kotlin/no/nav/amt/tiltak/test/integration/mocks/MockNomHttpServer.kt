@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode
 import no.nav.amt.tiltak.clients.nom.NomQueries
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
+import no.nav.amt.tiltak.test.integration.utils.MockHttpServer
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 
-class MockNomHttpClient : MockHttpClient(name = "MockNomHttpClient") {
+class MockNomHttpServer : MockHttpServer(name = "MockNomHttpServer") {
 
 	fun reset() {
 		resetHttpServer()

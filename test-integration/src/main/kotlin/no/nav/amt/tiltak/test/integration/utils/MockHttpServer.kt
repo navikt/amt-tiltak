@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.test.integration.mocks
+package no.nav.amt.tiltak.test.integration.utils
 
 import okhttp3.Headers
 import okhttp3.mockwebserver.Dispatcher
@@ -8,7 +8,7 @@ import okhttp3.mockwebserver.RecordedRequest
 import org.slf4j.LoggerFactory
 import java.util.*
 
-abstract class MockHttpClient(
+abstract class MockHttpServer(
 	private val name: String
 ) {
 

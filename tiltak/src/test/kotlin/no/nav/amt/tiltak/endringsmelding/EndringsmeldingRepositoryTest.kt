@@ -15,8 +15,8 @@ import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
-import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING1_DELTAKER_1
-import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING1_DELTAKER_2
+import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import org.slf4j.LoggerFactory
@@ -49,10 +49,11 @@ class EndringsmeldingRepositoryTest : FunSpec({
 			objectMapper,
 		)
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		testRepository.deleteAllEndringsmeldinger()
 	}
 
 	test("getByGjennomforing - en endringsmelding - henter endringsmelding") {
-		testRepository.insertEndringsmelding(ENDRINGSMELDING1_DELTAKER_1)
+		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
 
 		val meldinger = repository.getByGjennomforing(DELTAKER_1.gjennomforingId)
 
@@ -61,8 +62,8 @@ class EndringsmeldingRepositoryTest : FunSpec({
 	}
 
 	test("getByGjennomforing - inaktiv endringsmelding - returnerer alle") {
-		testRepository.insertEndringsmelding(ENDRINGSMELDING1_DELTAKER_1)
-		testRepository.insertEndringsmelding(ENDRINGSMELDING1_DELTAKER_1.copy(
+		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
+		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1.copy(
 			id = UUID.randomUUID(),
 			status = Endringsmelding.Status.UTDATERT)
 		)
@@ -75,8 +76,8 @@ class EndringsmeldingRepositoryTest : FunSpec({
 	}
 
 	test("getByDeltaker - henter endringsmelding") {
-		testRepository.insertEndringsmelding(ENDRINGSMELDING1_DELTAKER_1)
-		testRepository.insertEndringsmelding(ENDRINGSMELDING1_DELTAKER_2)
+		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
+		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_2)
 
 		val meldinger = repository.getByDeltaker(DELTAKER_1.id)
 
@@ -85,11 +86,11 @@ class EndringsmeldingRepositoryTest : FunSpec({
 	}
 
 	test("markerSomUtfort - skal sette status til UTFORT og nav ansatt") {
-		testRepository.insertEndringsmelding(ENDRINGSMELDING1_DELTAKER_1)
+		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
 
-		repository.markerSomUtfort(ENDRINGSMELDING1_DELTAKER_1.id, NAV_ANSATT_1.id)
+		repository.markerSomUtfort(ENDRINGSMELDING_1_DELTAKER_1.id, NAV_ANSATT_1.id)
 
-		val oppdatertMelding = repository.get(ENDRINGSMELDING1_DELTAKER_1.id)
+		val oppdatertMelding = repository.get(ENDRINGSMELDING_1_DELTAKER_1.id)
 
 		oppdatertMelding.status shouldBe Endringsmelding.Status.UTFORT
 		oppdatertMelding.utfortAvNavAnsattId shouldBe NAV_ANSATT_1.id
@@ -97,14 +98,14 @@ class EndringsmeldingRepositoryTest : FunSpec({
 	}
 
 	test("markerSomUtdatert - skal sette status til UTDATERT") {
-		testRepository.insertEndringsmelding(ENDRINGSMELDING1_DELTAKER_1)
+		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
 
 		repository.markerSomUtdatert(
 			DELTAKER_1.id,
-			EndringsmeldingDbo.Type.valueOf(ENDRINGSMELDING1_DELTAKER_1.type)
+			EndringsmeldingDbo.Type.valueOf(ENDRINGSMELDING_1_DELTAKER_1.type)
 		)
 
-		val oppdatertMelding = repository.get(ENDRINGSMELDING1_DELTAKER_1.id)
+		val oppdatertMelding = repository.get(ENDRINGSMELDING_1_DELTAKER_1.id)
 
 		oppdatertMelding.status shouldBe Endringsmelding.Status.UTDATERT
 	}
@@ -114,9 +115,9 @@ class EndringsmeldingRepositoryTest : FunSpec({
 	}
 
 	test("getAktive - skal hente aktive endringsmeldinger for deltakere") {
-		testRepository.insertEndringsmelding(ENDRINGSMELDING1_DELTAKER_1)
+		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
 
-		testRepository.insertEndringsmelding(ENDRINGSMELDING1_DELTAKER_2)
+		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_2)
 
 		val aktiveMeldinger = repository.getAktive(listOf(DELTAKER_1.id, DELTAKER_2.id))
 

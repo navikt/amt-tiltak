@@ -6,7 +6,6 @@ import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
-import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING1_DELTAKER_1
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
 import okhttp3.Request
@@ -24,7 +23,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 	internal fun setUp() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 		resetMockServersAndAddDefaultData()
-		poaoTilgangClient.addErSkjermetResponse(mapOf(BRUKER_1.fodselsnummer to false))
+		poaoTilgangServer.addErSkjermetResponse(mapOf(BRUKER_1.fodselsnummer to false))
 	}
 
 	@Test
@@ -38,8 +37,6 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	fun `hentAktiveEndringsmeldinger() - skal returnere 200 med korrekt respons`() {
-		testDataRepository.insertEndringsmelding(ENDRINGSMELDING1_DELTAKER_1)
-
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/endringsmelding/aktiv?deltakerId=${DELTAKER_1.id}",
@@ -47,7 +44,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-			[{"id":"9830e130-b18a-46b8-8e3e-6c06734d797e","innhold":{"oppstartsdato":"2022-11-01"},"type":"LEGG_TIL_OPPSTARTSDATO"}]
+			[{"id":"9830e130-b18a-46b8-8e3e-6c06734d797e","innhold":{"oppstartsdato":"2022-11-07"},"type":"LEGG_TIL_OPPSTARTSDATO"},{"id":"07099997-e02e-45e3-be6f-3c1eaf694557","innhold":{"sluttdato":"2022-11-07","aarsak":"ANNET"},"type":"AVSLUTT_DELTAKELSE"}]
 		""".trimIndent()
 
 		response.code shouldBe 200
