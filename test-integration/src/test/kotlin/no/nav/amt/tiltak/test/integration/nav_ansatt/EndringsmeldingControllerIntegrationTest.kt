@@ -71,9 +71,23 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 			name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
 		)
 
-		val endringsmeldingResponse = endringsmeldingRepository.get(ENDRINGSMELDING_1_DELTAKER_1.id)
+		val token = oAuthServer.issueAzureAdToken(
+			ident = NAV_ANSATT_1.navIdent,
+			oid = oid
+		)
 
-		endringsmeldingResponse.id shouldBe ENDRINGSMELDING_1_DELTAKER_1.id
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/nav-ansatt/endringsmelding?gjennomforingId=${GJENNOMFORING_1.id}",
+			headers = mapOf("Authorization" to "Bearer $token")
+		)
+
+		val expectedJson = """
+			[{"id":"9830e130-b18a-46b8-8e3e-6c06734d797e","deltaker":{"fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910"},"innhold":{"oppstartsdato":"2022-11-11"},"status":"AKTIV","opprettetDato":"2022-11-08T14:00:00+01:00","type":"LEGG_TIL_OPPSTARTSDATO"},{"id":"07099997-e02e-45e3-be6f-3c1eaf694557","deltaker":{"fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910"},"innhold":{"sluttdato":"2022-11-10","aarsak":"ANNET"},"status":"AKTIV","opprettetDato":"2022-11-08T15:00:00+01:00","type":"AVSLUTT_DELTAKELSE"},{"id":"3fc16362-ba8b-4c0f-af93-b2ed56f12cd5","deltaker":{"fornavn":"Bruker 2 fornavn","mellomnavn":null,"etternavn":"Bruker 2 etternavn","fodselsnummer":"7908432423"},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","type":"LEGG_TIL_OPPSTARTSDATO"}]
+		""".trimIndent()
+
+		response.code shouldBe 200
+		response.body?.string() shouldBe expectedJson
 	}
 
 	@Test

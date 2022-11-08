@@ -332,6 +332,7 @@ object TestData {
 		status = Endringsmelding.Status.AKTIV,
 		type = "LEGG_TIL_OPPSTARTSDATO",
 		innhold = """{ "oppstartsdato": "2022-11-11" }""",
+		createdAt = ZonedDateTime.parse("2022-11-08T13:00:00.00000+00:00"),
 	)
 
 	val ENDRINGSMELDING_2_DELTAKER_1 = EndringsmeldingInput(
@@ -341,8 +342,8 @@ object TestData {
 		status = Endringsmelding.Status.AKTIV,
 		type = "AVSLUTT_DELTAKELSE",
 		innhold = """{ "sluttdato": "2022-11-10", "aarsak": "ANNET" }""",
+		createdAt = ZonedDateTime.parse("2022-11-08T14:00:00.00000+00:00"),
 	)
-
 
 	val ENDRINGSMELDING_1_DELTAKER_2 = EndringsmeldingInput(
 		id = UUID.fromString("3fc16362-ba8b-4c0f-af93-b2ed56f12cd5"),
@@ -351,6 +352,7 @@ object TestData {
 		status = Endringsmelding.Status.AKTIV,
 		type = "LEGG_TIL_OPPSTARTSDATO",
 		innhold = """{ "oppstartsdato": "2022-11-09" }""",
+		createdAt = ZonedDateTime.parse("2022-11-08T15:00:00.00000+00:00"),
 	)
 
 	val NAV_ANSATT_1_GJENNOMFORING_1_TILGANG = TiltaksansvarligGjennomforingTilgangInput(

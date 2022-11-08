@@ -276,7 +276,7 @@ class TestDataRepository(
 			"deltakerId" to cmd.deltakerId,
 			"utfortAvNavAnsattId" to cmd.utfortAvNavAnsattId,
 			"opprettetAvArrangorAnsattId" to cmd.opprettetAvArrangorAnsattId,
-			"utfortTidspunkt" to cmd.utfortTidspunkt,
+			"utfortTidspunkt" to cmd.utfortTidspunkt?.toOffsetDateTime(),
 			"status" to cmd.status.name,
 			"type" to cmd.type,
 			"innhold" to cmd.innhold,

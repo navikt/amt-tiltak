@@ -12,7 +12,6 @@ data class EndringsmeldingDto(
 	val deltaker: DeltakerDto,
 	val innhold: Innhold,
 	val status: Status,
-	val opprettetAvArrangorAnsatt: ArrangorAnsattDto,
 	val opprettetDato: ZonedDateTime,
 ) {
 	val type = innhold.type()
