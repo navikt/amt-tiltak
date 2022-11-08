@@ -4,6 +4,7 @@ import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.inputs.GjennomforingInput
 import no.nav.amt.tiltak.test.database.data.inputs.NavAnsattInput
 import no.nav.amt.tiltak.test.database.data.inputs.TiltaksansvarligGjennomforingTilgangInput
@@ -44,7 +45,9 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			headers = mapOf("Authorization" to "Bearer $token")
 		)
 
-		val expectedJson = """[{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","arrangorNavn":"Org Tiltaksarrangør 1","lopenr":123,"opprettetAar":2020,"antallAktiveEndringsmeldinger":0,"tiltak":{"kode":"AMO","navn":"Tiltak1"}}]"""
+		val expectedJson = """
+				[{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","arrangorNavn":"Org Tiltaksarrangør 1","lopenr":123,"opprettetAar":2020,"antallAktiveEndringsmeldinger":3,"tiltak":{"kode":"AMO","navn":"Tiltak1"}},{"id":"513219ca-481b-4aae-9d51-435dba9929cd","navn":"Tiltaksgjennomforing2","arrangorNavn":"Org Tiltaksarrangør 2","lopenr":124,"opprettetAar":2020,"antallAktiveEndringsmeldinger":0,"tiltak":{"kode":"AMO","navn":"Tiltak1"}}]
+			""".trimIndent()
 		response.code shouldBe 200
 		response.body?.string() shouldBe expectedJson
 	}
@@ -58,7 +61,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			oid = oid
 		)
 
-		poaoTilgangClient.addHentAdGrupperResponse(
+		poaoTilgangServer.addHentAdGrupperResponse(
 			navAnsattAzureId = oid,
 			name = "IngenNyttigGruppe"
 		)
@@ -98,7 +101,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			oid = oid
 		)
 
-		poaoTilgangClient.addHentAdGrupperResponse(
+		poaoTilgangServer.addHentAdGrupperResponse(
 			navAnsattAzureId = oid,
 			name = "IngenNyttigGruppe"
 		)
@@ -114,7 +117,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	fun `hentGjennomforing() - skal returnere 403 hvis ikke tilgang til gjennomforing`() {
-		val token = lagTokenMedAdGruppe(NAV_ANSATT_1)
+		val token = lagTokenMedAdGruppe(NAV_ANSATT_2)
 
 		val response = sendRequest(
 			method = "GET",
@@ -128,7 +131,6 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 	@Test
 	internal fun `hentGjennomforingerMedLopenr - skal ha status 200 med korrekt respons`() {
 		val token = lagTokenMedAdGruppe(NAV_ANSATT_1)
-		giTilgang(NAV_ANSATT_1, GJENNOMFORING_1)
 
 		val response = sendRequest(
 			method = "GET",
@@ -151,7 +153,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			oid = oid
 		)
 
-		poaoTilgangClient.addHentAdGrupperResponse(
+		poaoTilgangServer.addHentAdGrupperResponse(
 			navAnsattAzureId = oid,
 			name = "IngenNyttigGruppe"
 		)
@@ -180,7 +182,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 	private fun lagTokenMedAdGruppe(ansatt: NavAnsattInput): String {
 		val oid = UUID.randomUUID()
 
-		poaoTilgangClient.addHentAdGrupperResponse(
+		poaoTilgangServer.addHentAdGrupperResponse(
 			navAnsattAzureId = oid,
 			name = AdGrupper.TILTAKSANSVARLIG_FLATE_GRUPPE
 		)

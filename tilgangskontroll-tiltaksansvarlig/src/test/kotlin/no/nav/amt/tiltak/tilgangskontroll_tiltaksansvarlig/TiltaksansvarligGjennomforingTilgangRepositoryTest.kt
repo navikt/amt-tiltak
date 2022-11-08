@@ -40,6 +40,7 @@ class TiltaksansvarligGjennomforingTilgangRepositoryTest : FunSpec({
 	}
 
 	test("hentAktiveTilganger - skal hente tilganger") {
+		testDataRepository.deleteAllTiltaksansvarligGjennomforingTilgang()
 		val id = UUID.randomUUID()
 
 		repository.opprettTilgang(

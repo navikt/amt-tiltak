@@ -34,6 +34,21 @@ services:
                             }
                         }
                     ]
+                },
+                {
+                    "issuerId": "local-azuread",
+                    "tokenExpiry": 31536000,
+                    "requestMappings": [
+                        {
+                            "requestParam": "scope",
+                            "match": "*",
+                            "claims": {
+                                "oid": "d35c35b2-ec1c-48f0-98aa-b2545e3730d1",
+                                "aud": "somescope",
+                                "NAVident": "Z4321"
+                            }
+                        }
+                    ]
                 }
             ]
         }

@@ -1,11 +1,14 @@
 package no.nav.amt.tiltak.bff.nav_ansatt
 
-import no.nav.amt.tiltak.bff.nav_ansatt.dto.BrukerDto
+import no.nav.amt.tiltak.bff.nav_ansatt.dto.DeltakerDto
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.toDto
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.EndringsmeldingService
+import no.nav.amt.tiltak.core.port.NavAnsattService
+import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -13,7 +16,6 @@ import java.util.*
 @RestController("EndringsmeldingControllerNavAnsatt")
 @RequestMapping("/api/nav-ansatt/endringsmelding")
 class EndringsmeldingController(
-	private val arrangorAnsattService: ArrangorAnsattService,
 	private val endringsmeldingService: EndringsmeldingService,
 	private val navAnsattService: NavAnsattService,
 	private val deltakerService: DeltakerService,
@@ -32,23 +34,18 @@ class EndringsmeldingController(
 		return endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId).map {
 			val deltaker = deltakerService.hentDeltaker(it.deltakerId)
 				?: throw NoSuchElementException("Fant ikke deltaker med id ${it.deltakerId}")
-			val opprettetAvAnsatt = arrangorAnsattService.getAnsatt(it.opprettetAvArrangorAnsattId).toDto()
 
 			return@map EndringsmeldingDto(
 				id = it.id,
-				startDato = it.startDato,
-				sluttDato = it.sluttDato,
-				aktiv = it.aktiv,
-				godkjent = it.ferdiggjortAvNavAnsattId != null,
-				arkivert = it.ferdiggjortAvNavAnsattId == null && !it.aktiv,
-				opprettetAvArrangorAnsatt = opprettetAvAnsatt,
-				bruker = BrukerDto(
+				deltaker = DeltakerDto(
 					deltaker.fornavn,
 					deltaker.mellomnavn,
 					deltaker.etternavn,
 					deltaker.fodselsnummer,
 				),
-				opprettetDato = it.opprettet
+				status = it.status.toDto(),
+				innhold = it.innhold.toDto(),
+				opprettetDato = it.opprettet,
 			)
 		}
 	}
@@ -70,7 +67,7 @@ class EndringsmeldingController(
 
 		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 
-		endringsmeldingService.markerSomFerdig(endringsmeldingId, navAnsatt.id)
+		endringsmeldingService.markerSomUtfort(endringsmeldingId, navAnsatt.id)
 	}
 
 }

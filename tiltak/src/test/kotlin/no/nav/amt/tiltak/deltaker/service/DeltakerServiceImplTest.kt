@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.deltaker
+package no.nav.amt.tiltak.deltaker.service
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -6,12 +6,12 @@ import io.mockk.mockk
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
+import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
-import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
@@ -38,6 +38,7 @@ class DeltakerServiceImplTest {
 	lateinit var brukerService: BrukerService
 	lateinit var testDataRepository: TestDataRepository
 	lateinit var navEnhetService: NavEnhetService
+	lateinit var endringsmeldingService: EndringsmeldingService
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 	val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
@@ -48,12 +49,16 @@ class DeltakerServiceImplTest {
 		brukerRepository = BrukerRepository(jdbcTemplate)
 
 		navEnhetService = mockk()
+		endringsmeldingService = mockk()
 		brukerService = BrukerService(brukerRepository, mockk(), mockk(), navEnhetService)
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		deltakerServiceImpl = DeltakerServiceImpl(
-			deltakerRepository, deltakerStatusRepository,
-			brukerService, TransactionTemplate(DataSourceTransactionManager(dataSource))
+			deltakerRepository = deltakerRepository,
+			deltakerStatusRepository = deltakerStatusRepository,
+			brukerService = brukerService,
+			endringsmeldingService = endringsmeldingService,
+			transactionTemplate = TransactionTemplate(DataSourceTransactionManager(dataSource)),
 		)
 		testDataRepository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
 

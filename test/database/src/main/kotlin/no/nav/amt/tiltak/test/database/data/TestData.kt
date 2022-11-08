@@ -1,9 +1,9 @@
 package no.nav.amt.tiltak.test.database.data
 
+import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.test.database.data.inputs.*
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -323,6 +323,52 @@ object TestData {
 		gyldigFra = LocalDateTime.now(),
 		status = "VENTER_PA_OPPSTART",
 		aktiv = true
+	)
+
+	val ENDRINGSMELDING_1_DELTAKER_1 = EndringsmeldingInput(
+		id = UUID.fromString("9830e130-b18a-46b8-8e3e-6c06734d797e"),
+		deltakerId = DELTAKER_1.id,
+		opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+		status = Endringsmelding.Status.AKTIV,
+		type = "LEGG_TIL_OPPSTARTSDATO",
+		innhold = """{ "oppstartsdato": "2022-11-11" }""",
+		createdAt = ZonedDateTime.parse("2022-11-08T13:00:00.00000+00:00"),
+	)
+
+	val ENDRINGSMELDING_2_DELTAKER_1 = EndringsmeldingInput(
+		id = UUID.fromString("07099997-e02e-45e3-be6f-3c1eaf694557"),
+		deltakerId = DELTAKER_1.id,
+		opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+		status = Endringsmelding.Status.AKTIV,
+		type = "AVSLUTT_DELTAKELSE",
+		innhold = """{ "sluttdato": "2022-11-10", "aarsak": "ANNET" }""",
+		createdAt = ZonedDateTime.parse("2022-11-08T14:00:00.00000+00:00"),
+	)
+
+	val ENDRINGSMELDING_1_DELTAKER_2 = EndringsmeldingInput(
+		id = UUID.fromString("3fc16362-ba8b-4c0f-af93-b2ed56f12cd5"),
+		deltakerId = DELTAKER_2.id,
+		opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_2.id,
+		status = Endringsmelding.Status.AKTIV,
+		type = "LEGG_TIL_OPPSTARTSDATO",
+		innhold = """{ "oppstartsdato": "2022-11-09" }""",
+		createdAt = ZonedDateTime.parse("2022-11-08T15:00:00.00000+00:00"),
+	)
+
+	val NAV_ANSATT_1_GJENNOMFORING_1_TILGANG = TiltaksansvarligGjennomforingTilgangInput(
+		id = UUID.randomUUID(),
+		navAnsattId = NAV_ANSATT_1.id,
+		gjennomforingId = GJENNOMFORING_1.id,
+		gyldigTil = ZonedDateTime.now().plusDays(1),
+		createdAt = ZonedDateTime.now()
+	)
+
+	val NAV_ANSATT_1_GJENNOMFORING_2_TILGANG = TiltaksansvarligGjennomforingTilgangInput(
+		id = UUID.randomUUID(),
+		navAnsattId = NAV_ANSATT_1.id,
+		gjennomforingId = GJENNOMFORING_2.id,
+		gyldigTil = ZonedDateTime.now().plusDays(1),
+		createdAt = ZonedDateTime.now()
 	)
 
 }

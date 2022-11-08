@@ -48,18 +48,17 @@ abstract class IntegrationTestBase {
 
 	companion object {
 		val oAuthServer = MockOAuthServer()
-		val enhetsregisterClient = MockAmtEnhetsregisterClient()
-		val norgHttpClient = MockNorgHttpClient()
-		val poaoTilgangClient = MockPoaoTilgangHttpClient()
-		val nomHttpClient = MockNomHttpClient()
-		val altinnAclHttpClient = MockAmtAltinnAclHttpClient()
-		val pdlHttpClient = MockPdlHttpClient()
+		val enhetsregisterServer = MockAmtEnhetsregisterServer()
+		val norgHttpServer = MockNorgHttpServer()
+		val poaoTilgangServer = MockPoaoTilgangHttpServer()
+		val nomHttpServer = MockNomHttpServer()
+		val altinnAclHttpServer = MockAmtAltinnAclHttpServer()
+		val pdlHttpServer = MockPdlHttpServer()
+		val mockMachineToMachineHttpServer = MockMachineToMachineHttpServer()
 
 		@JvmStatic
 		@DynamicPropertySource
 		fun startEnvironment(registry: DynamicPropertyRegistry) {
-			System.setProperty("NAIS_APP_NAME", "amt-tiltak-integration-test")
-
 			oAuthServer.start()
 			registry.add("no.nav.security.jwt.issuer.azuread.discovery-url") { oAuthServer.getDiscoveryUrl("azuread") }
 			registry.add("no.nav.security.jwt.issuer.azuread.accepted-audience") { "test-aud" }
@@ -67,23 +66,28 @@ abstract class IntegrationTestBase {
 			registry.add("no.nav.security.jwt.issuer.tokenx.discovery-url") { oAuthServer.getDiscoveryUrl("tokenx") }
 			registry.add("no.nav.security.jwt.issuer.tokenx.accepted-audience") { "test-aud" }
 
-			enhetsregisterClient.start()
-			registry.add("amt-enhetsregister.url") { enhetsregisterClient.serverUrl() }
+			enhetsregisterServer.start()
+			registry.add("amt-enhetsregister.url") { enhetsregisterServer.serverUrl() }
 
-			norgHttpClient.start()
-			registry.add("poao-gcp-proxy.url") { norgHttpClient.serverUrl() }
+			norgHttpServer.start()
+			registry.add("poao-gcp-proxy.url") { norgHttpServer.serverUrl() }
 
-			poaoTilgangClient.start()
-			registry.add("poao-tilgang.url") { poaoTilgangClient.serverUrl() }
+			poaoTilgangServer.start()
+			registry.add("poao-tilgang.url") { poaoTilgangServer.serverUrl() }
 
-			nomHttpClient.start()
-			registry.add("nom.url") { nomHttpClient.serverUrl() }
+			nomHttpServer.start()
+			registry.add("nom.url") { nomHttpServer.serverUrl() }
 
-			altinnAclHttpClient.start()
-			registry.add("amt-altinn-acl.url") { altinnAclHttpClient.serverUrl() }
+			altinnAclHttpServer.start()
+			registry.add("amt-altinn-acl.url") { altinnAclHttpServer.serverUrl() }
 
-			pdlHttpClient.start()
-			registry.add("pdl.url") { pdlHttpClient.serverUrl() }
+			pdlHttpServer.start()
+			registry.add("pdl.url") { pdlHttpServer.serverUrl() }
+
+			mockMachineToMachineHttpServer.start()
+			registry.add("nais.env.azureOpenIdConfigTokenEndpoint") {
+				mockMachineToMachineHttpServer.serverUrl() + MockMachineToMachineHttpServer.tokenPath
+			}
 
 			// Database ting
 			val container = SingletonPostgresContainer.getContainer()
@@ -103,19 +107,19 @@ abstract class IntegrationTestBase {
 	}
 
 	fun resetMockServers() {
-		enhetsregisterClient.reset()
-		norgHttpClient.reset()
-		poaoTilgangClient.reset()
-		nomHttpClient.reset()
-		altinnAclHttpClient.reset()
-		pdlHttpClient.reset()
+		enhetsregisterServer.reset()
+		norgHttpServer.reset()
+		poaoTilgangServer.reset()
+		nomHttpServer.reset()
+		altinnAclHttpServer.reset()
+		pdlHttpServer.reset()
 	}
 
 	fun resetMockServersAndAddDefaultData() {
 		resetMockServers()
-		norgHttpClient.addDefaultData()
-		nomHttpClient.addDefaultData()
-		altinnAclHttpClient.addDefaultData()
+		norgHttpServer.addDefaultData()
+		nomHttpServer.addDefaultData()
+		altinnAclHttpServer.addDefaultData()
 	}
 
 	fun serverUrl() = "http://localhost:$port"

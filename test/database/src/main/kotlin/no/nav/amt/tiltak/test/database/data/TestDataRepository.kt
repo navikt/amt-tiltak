@@ -7,7 +7,7 @@ import no.nav.amt.tiltak.test.database.data.inputs.*
 import no.nav.amt.tiltak.test.database.data.outputs.ArrangorAnsattGjennomforingTilgangOutput
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.util.UUID
+import java.util.*
 
 class TestDataRepository(
 	private val template: NamedParameterJdbcTemplate
@@ -245,20 +245,54 @@ class TestDataRepository(
 
 	fun insertEndringsmelding(cmd: EndringsmeldingInput) {
 		val sql = """
-			INSERT INTO endringsmelding(id, deltaker_id, start_dato, slutt_dato, aktiv, opprettet_av_arrangor_ansatt_id)
-				VALUES (:id, :deltakerId, :startDato, :sluttDato, :aktiv, :opprettetAvArrangorAnsattId)
+			INSERT INTO endringsmelding(
+				id,
+				deltaker_id,
+				utfort_av_nav_ansatt_id,
+				opprettet_av_arrangor_ansatt_id,
+				utfort_tidspunkt,
+				status,
+				type,
+				innhold,
+				created_at,
+				modified_at
+			)
+			VALUES(
+				:id,
+				:deltakerId,
+				:utfortAvNavAnsattId,
+				:opprettetAvArrangorAnsattId,
+				:utfortTidspunkt,
+				:status,
+				:type,
+				CAST(:innhold as jsonb),
+				:createdAt,
+				:modifiedAt
+			)
 		""".trimIndent()
 
 		val sqlParameters = parameters(
 			"id" to cmd.id,
 			"deltakerId" to cmd.deltakerId,
-			"startDato" to cmd.startDato,
-			"sluttDato" to cmd.sluttDato,
-			"aktiv" to cmd.aktiv,
-			"opprettetAvArrangorAnsattId" to cmd.opprettetAvArrangorAnsattId
+			"utfortAvNavAnsattId" to cmd.utfortAvNavAnsattId,
+			"opprettetAvArrangorAnsattId" to cmd.opprettetAvArrangorAnsattId,
+			"utfortTidspunkt" to cmd.utfortTidspunkt?.toOffsetDateTime(),
+			"status" to cmd.status.name,
+			"type" to cmd.type,
+			"innhold" to cmd.innhold,
+			"createdAt" to cmd.createdAt.toOffsetDateTime(),
+			"modifiedAt" to cmd.modifiedAt.toOffsetDateTime(),
 		)
 
 		template.update(sql, sqlParameters)
+	}
+
+	fun deleteAllEndringsmeldinger() {
+		val sql = """
+			TRUNCATE endringsmelding CASCADE
+		""".trimIndent()
+
+		template.jdbcTemplate.update(sql)
 	}
 
 	fun insertTiltaksansvarligGjennomforingTilgang(cmd: TiltaksansvarligGjennomforingTilgangInput) {
@@ -277,6 +311,15 @@ class TestDataRepository(
 
 		template.update(sql, sqlParameters)
 	}
+
+	fun deleteAllTiltaksansvarligGjennomforingTilgang() {
+		val sql = """
+			TRUNCATE tiltaksansvarlig_gjennomforing_tilgang CASCADE
+		""".trimIndent()
+
+		template.jdbcTemplate.update(sql)
+	}
+
 
 
 }

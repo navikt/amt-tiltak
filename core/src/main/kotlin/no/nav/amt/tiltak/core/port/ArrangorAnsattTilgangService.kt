@@ -7,9 +7,15 @@ interface ArrangorAnsattTilgangService {
 
 	fun verifiserTilgangTilGjennomforing(ansattPersonligIdent: String, gjennomforingId: UUID)
 
+	fun verifiserTilgangTilGjennomforing(ansattId: UUID, gjennomforingId: UUID)
+
 	fun verifiserTilgangTilArrangor(ansattPersonligIdent: String, arrangorId: UUID)
 
+	fun verifiserTilgangTilArrangor(ansattId: UUID, arrangorId: UUID)
+
 	fun verifiserTilgangTilDeltaker(ansattPersonligIdent: String, deltakerId: UUID)
+
+	fun verifiserTilgangTilDeltaker(ansattId: UUID, deltakerId: UUID)
 
 	fun hentAnsattTilganger(ansattId: UUID): List<ArrangorAnsattRoller>
 

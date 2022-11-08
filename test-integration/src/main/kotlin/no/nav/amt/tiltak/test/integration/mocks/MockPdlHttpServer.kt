@@ -2,11 +2,12 @@ package no.nav.amt.tiltak.test.integration.mocks
 
 import no.nav.amt.tiltak.clients.pdl.PdlQueries
 import no.nav.amt.tiltak.common.json.JsonUtils.toJsonString
+import no.nav.amt.tiltak.test.integration.utils.MockHttpServer
 import no.nav.amt.tiltak.tools.graphql.Graphql
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 
-class MockPdlHttpClient : MockHttpClient(name = "PdlHttpClient") {
+class MockPdlHttpServer : MockHttpServer(name = "PdlHttpServer") {
 
 	fun reset() {
 		resetHttpServer()

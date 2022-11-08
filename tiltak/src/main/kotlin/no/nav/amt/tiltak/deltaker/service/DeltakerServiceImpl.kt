@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.deltaker.service
 
 import no.nav.amt.tiltak.core.domain.tiltak.*
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
@@ -12,6 +13,7 @@ import no.nav.amt.tiltak.tiltak.services.BrukerService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -20,6 +22,7 @@ open class DeltakerServiceImpl(
 	private val deltakerRepository: DeltakerRepository,
 	private val deltakerStatusRepository: DeltakerStatusRepository,
 	private val brukerService: BrukerService,
+	private val endringsmeldingService: EndringsmeldingService,
 	private val transactionTemplate: TransactionTemplate
 ) : DeltakerService {
 
@@ -150,7 +153,30 @@ open class DeltakerServiceImpl(
 		brukerService.oppdaterAnsvarligVeileder(fodselsnummer, navAnsattId)
 	}
 
+	override fun leggTilOppstartsdato(deltakerId: UUID, arrangorAnsattId: UUID, oppstartsdato: LocalDate) {
+		endringsmeldingService.opprettLeggTilOppstartsdatoEndringsmelding(deltakerId, arrangorAnsattId, oppstartsdato)
+	}
 
+	override fun endreOppstartsdato(deltakerId: UUID, arrangorAnsattId: UUID, oppstartsdato: LocalDate) {
+		endringsmeldingService.opprettEndreOppstartsdatoEndringsmelding(deltakerId, arrangorAnsattId, oppstartsdato)
+	}
+
+	override fun forlengDeltakelse(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate) {
+		endringsmeldingService.opprettForlengDeltakelseEndringsmelding(deltakerId, arrangorAnsattId, sluttdato)
+	}
+
+	override fun avsluttDeltakelse(
+		deltakerId: UUID,
+		arrangorAnsattId: UUID,
+		sluttdato: LocalDate,
+		statusAarsak: Deltaker.StatusAarsak
+	) {
+		endringsmeldingService.opprettAvsluttDeltakelseEndringsmelding(deltakerId, arrangorAnsattId, sluttdato, statusAarsak)
+	}
+
+	override fun deltakerIkkeAktuell(deltakerId: UUID, arrangorAnsattId: UUID, statusAarsak: Deltaker.StatusAarsak) {
+		endringsmeldingService.opprettDeltakerIkkeAktuellEndringsmelding(deltakerId, arrangorAnsattId, statusAarsak)
+	}
 }
 
 

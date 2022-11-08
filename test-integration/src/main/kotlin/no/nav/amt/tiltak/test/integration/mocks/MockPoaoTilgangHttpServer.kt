@@ -2,12 +2,13 @@ package no.nav.amt.tiltak.test.integration.mocks
 
 import no.nav.amt.tiltak.clients.poao_tilgang.PoaoTilgangClientImpl
 import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.test.integration.utils.MockHttpServer
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 import org.slf4j.LoggerFactory
 import java.util.*
 
-class MockPoaoTilgangHttpClient : MockHttpClient(name = "MockPoaoTilgangHttpClient") {
+class MockPoaoTilgangHttpServer : MockHttpServer(name = "MockPoaoTilgangHttpServer") {
 
 
 	private val logger = LoggerFactory.getLogger(javaClass)

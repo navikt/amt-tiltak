@@ -1,82 +1,41 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor
 
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.EndringsmeldingDto
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
+import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
-import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
-import no.nav.amt.tiltak.core.port.SkjermetPersonService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.format.annotation.DateTimeFormat
-import org.springframework.web.bind.annotation.*
-import java.time.LocalDate
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
 @RestController("EndringsmeldingControllerTiltaksarrangor")
 @RequestMapping("/api/tiltaksarrangor/endringsmelding")
 class EndringsmeldingController(
-	private val skjermetPersonService: SkjermetPersonService,
 	private val endringsmeldingService: EndringsmeldingService,
 	private val arrangorTilgangService: ArrangorAnsattTilgangService,
-	private val deltakerService: DeltakerService,
 	private val authService: AuthService,
 ) {
 
-	@GetMapping
+	@GetMapping("/aktiv")
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
-	fun hentEndringsmeldinger(@RequestParam("deltakerId") deltakerId: UUID): List<EndringsmeldingDto> {
+	fun hentAktiveEndringsmeldinger(@RequestParam("deltakerId") deltakerId: UUID): List<EndringsmeldingDto> {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 
 		arrangorTilgangService.verifiserTilgangTilDeltaker(ansattPersonligIdent, deltakerId)
 
 		return endringsmeldingService.hentEndringsmeldingerForDeltaker(deltakerId)
+			.filter { it.status == Endringsmelding.Status.AKTIV }
 			.map {
 				EndringsmeldingDto(
 					id = it.id,
-					startDato = it.startDato,
-					sluttDato = it.sluttDato,
-					aktiv = it.aktiv
+					innhold = it.innhold.toDto(),
 				)
 			}
 	}
-
-	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
-	@PostMapping("/deltaker/{deltakerId}/startdato")
-	fun registrerStartDato(
-		@PathVariable("deltakerId") deltakerId: UUID,
-		@RequestParam("startDato") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startDato: LocalDate
-	) {
-		val ansattId = ansattIdForDeltaker(deltakerId)
-
-		endringsmeldingService.opprettMedStartDato(deltakerId, startDato, ansattId)
-	}
-
-	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
-	@PostMapping("/deltaker/{deltakerId}/sluttdato")
-	fun registrerSluttDato(
-		@PathVariable("deltakerId") deltakerId: UUID,
-		@RequestParam("sluttDato") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) sluttDato: LocalDate
-	) {
-		val ansattId = ansattIdForDeltaker(deltakerId)
-
-		endringsmeldingService.opprettMedSluttDato(deltakerId, sluttDato, ansattId)
-	}
-
-	private fun ansattIdForDeltaker(deltakerId: UUID): UUID {
-		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-		val deltaker = deltakerService.hentDeltaker(deltakerId)
-			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
-		val ansattId = arrangorTilgangService.hentAnsattId(ansattPersonligIdent)
-
-		arrangorTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, deltaker.gjennomforingId)
-
-		val erSkjermet = skjermetPersonService.erSkjermet(deltaker.fodselsnummer)
-
-		if (erSkjermet) {
-			throw NotImplementedError("Støtte for denne personen er ikke implementert")
-		}
-		return ansattId
-	}
-
 }
