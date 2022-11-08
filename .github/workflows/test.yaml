@@ -5,6 +5,9 @@ on:
     branches-ignore:
       - main
 
+env:
+  TZ: Europe/Oslo
+
 jobs:
   test:
     name: Run tests
