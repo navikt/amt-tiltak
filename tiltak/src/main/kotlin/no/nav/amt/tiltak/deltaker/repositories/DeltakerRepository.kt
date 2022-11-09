@@ -2,6 +2,8 @@ package no.nav.amt.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getNullableUUID
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpdateDbo
@@ -190,7 +192,7 @@ open class DeltakerRepository(
 			.firstOrNull()
 	}
 
-	fun potensieltHarSlutta(): List<DeltakerDbo> {
+	fun skalAvsluttes(): List<DeltakerDbo> {
 		val sql = """
 			SELECT deltaker.*, bruker.*
 			FROM deltaker_status
@@ -204,7 +206,27 @@ open class DeltakerRepository(
 		return template.query(sql, parameters, rowMapper)
 	}
 
-	fun potensieltDeltar(): List<DeltakerDbo> {
+	fun erPaaAvsluttetGjennomforing(): List<DeltakerDbo> {
+		val sql = """
+			SELECT deltaker.*, bruker.*
+			FROM deltaker_status
+         		inner join deltaker on deltaker_status.deltaker_id = deltaker.id
+         		inner join bruker on bruker.id = deltaker.bruker_id
+         		inner join gjennomforing on deltaker.gjennomforing_id = gjennomforing.id
+			WHERE deltaker_status.aktiv = TRUE
+				AND deltaker_status.status not in (:avsluttende_statuser)
+				AND gjennomforing.status = :gjennomforing_status
+		""".trimIndent()
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"avsluttende_statuser" to listOf(Deltaker.Status.HAR_SLUTTET.name, Deltaker.Status.IKKE_AKTUELL.name),
+				"gjennomforing_status" to Gjennomforing.Status.AVSLUTTET.name
+			)
+		)
+		return template.query(sql, parameters, rowMapper)
+	}
+
+	fun skalHaStatusDeltar(): List<DeltakerDbo> {
 		val sql = """
 			SELECT deltaker.*, bruker.*
 			FROM deltaker_status

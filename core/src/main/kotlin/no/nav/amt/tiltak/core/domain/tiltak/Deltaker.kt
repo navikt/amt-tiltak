@@ -33,22 +33,5 @@ data class Deltaker(
 	enum class StatusAarsak {
 		SYK, FATT_JOBB, TRENGER_ANNEN_STOTTE, FIKK_IKKE_PLASS, UTDANNING, FERDIG, AVLYST_KONTRAKT, IKKE_MOTT, FEILREGISTRERT, ANNET
 	}
-
-	fun utledStatus(): Status {
-		val now = LocalDate.now()
-
-		val sluttDato = sluttDato ?: LocalDate.now().plusYears(1000)
-
-		if(status.type == Status.VENTER_PA_OPPSTART && startDato == null)
-			return status.type
-
-		if(status.type == Status.VENTER_PA_OPPSTART && now.isAfter(startDato!!.minusDays(1)) && now.isBefore(sluttDato.plusDays(1)))
-			return Status.DELTAR
-
-		if(listOf(Status.DELTAR, Status.VENTER_PA_OPPSTART).contains(status.type) && now.isAfter(sluttDato))
-			return Status.HAR_SLUTTET
-
-		return status.type
-	}
 }
 

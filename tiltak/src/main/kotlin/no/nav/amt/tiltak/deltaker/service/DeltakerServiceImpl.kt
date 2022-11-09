@@ -40,7 +40,7 @@ open class DeltakerServiceImpl(
 
 	override fun insertStatus(status: DeltakerStatusInsert) {
 		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(status.deltakerId)
-		if(forrigeStatus?.status == status.type && forrigeStatus.aarsak == status.aarsak) return
+		if (forrigeStatus?.status == status.type && forrigeStatus.aarsak == status.aarsak) return
 
 		val nyStatus = DeltakerStatusInsertDbo(
 			id = status.id,
@@ -74,8 +74,9 @@ open class DeltakerServiceImpl(
 	}
 
 	override fun oppdaterStatuser() {
-		progressStatuser(deltakerRepository.potensieltHarSlutta())
-		progressStatuser(deltakerRepository.potensieltDeltar())
+		oppdaterStatuser(deltakerRepository.skalAvsluttes(), Deltaker.Status.HAR_SLUTTET)
+		oppdaterStatuser(deltakerRepository.erPaaAvsluttetGjennomforing(), Deltaker.Status.HAR_SLUTTET)
+		oppdaterStatuser(deltakerRepository.skalHaStatusDeltar(), Deltaker.Status.DELTAR)
 	}
 
 	override fun slettDeltaker(deltakerId: UUID) {
@@ -130,16 +131,13 @@ open class DeltakerServiceImpl(
 		return deltakerStatusRepository.getStatusForDeltaker(deltakerId)?.toDeltakerStatus() ?: return null
 	}
 
-	private fun progressStatuser(kandidater: List<DeltakerDbo>) = kandidater
+	private fun oppdaterStatuser(deltakere: List<DeltakerDbo>, status: Deltaker.Status) = deltakere
 		.also { log.info("Oppdaterer status på ${it.size} deltakere") }
-		.map { deltaker ->
-			deltaker.toDeltaker(hentStatusOrThrow(deltaker.id))
-		}
 		.forEach {
 			insertStatus(DeltakerStatusInsert(
 				id = UUID.randomUUID(),
 				deltakerId = it.id,
-				type = it.utledStatus(),
+				type = status,
 				aarsak = null,
 				gyldigFra = LocalDateTime.now()
 			))

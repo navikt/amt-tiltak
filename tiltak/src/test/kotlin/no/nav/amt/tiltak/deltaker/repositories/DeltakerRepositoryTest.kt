@@ -15,6 +15,7 @@ import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_3
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
@@ -181,7 +182,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 	}
 
-	test("potensieltHarSlutta - status DELTAR og sluttdato passert - deltaker returneres") {
+	test("skalAvsluttes - status DELTAR og sluttdato passert - deltaker returneres") {
 		val deltakerId = UUID.randomUUID()
 
 		val deltakerInsertDbo = DeltakerInsertDbo(
@@ -205,14 +206,13 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		deltakerStatusRepository.insert(statusInsertDbo)
 
-		val potensieltHarSlutta = repository.potensieltHarSlutta().filter { it.id == deltakerId }
+		val potensieltHarSlutta = repository.skalAvsluttes().filter { it.id == deltakerId }
 
 		potensieltHarSlutta shouldHaveSize 1
 		potensieltHarSlutta[0] shouldBe deltaker
 	}
 
-
-	test("potensieltHarSlutta - status DELTAR og sluttdato ikke passert - deltaker returneres ikke") {
+	test("skalAvsluttes - status DELTAR og sluttdato ikke passert - deltaker returneres ikke") {
 		val deltakerInsertDbo = DeltakerInsertDbo(
 			UUID.randomUUID(),
 			BRUKER_3.id,
@@ -233,13 +233,43 @@ internal class DeltakerRepositoryTest : FunSpec({
 		repository.insert(deltakerInsertDbo)
 		deltakerStatusRepository.insert(statusInsertDbo)
 
-		val potensieltHarSlutta = repository.potensieltHarSlutta().filter { it.id == BRUKER_3.id }
+		val potensieltHarSlutta = repository.skalAvsluttes().filter { it.id == BRUKER_3.id }
 
 		potensieltHarSlutta shouldHaveSize 0
 	}
 
+	test("erPaaAvsluttetGjennomforing - status DELTAR og gjennomføring avslutttet - deltaker returneres") {
+		val deltakerId = UUID.randomUUID()
 
-	test("potensieltDeltar - startdato passert og sluttdato ikke passert og status VENTER_PA_OPPSTART - deltaker returneres") {
+		val deltakerInsertDbo = DeltakerInsertDbo(
+			deltakerId,
+			BRUKER_3.id,
+			GJENNOMFORING_2.id,
+			LocalDate.now().minusDays(7),
+			LocalDate.now().plusDays(2),
+			2,
+			20.0f,
+			now.minusDays(10)
+		)
+		repository.insert(deltakerInsertDbo)
+		val deltaker = repository.get(deltakerInsertDbo.id)
+		val statusInsertDbo = DeltakerStatusInsertDbo(
+			id = UUID.randomUUID(),
+			deltakerId = deltaker!!.id,
+			type = Deltaker.Status.DELTAR,
+			aarsak = null,
+			gyldigFra = LocalDateTime.now().minusDays(5))
+
+		deltakerStatusRepository.insert(statusInsertDbo)
+
+		val potensieltHarSlutta = repository.erPaaAvsluttetGjennomforing().filter { it.id == deltakerId }
+
+		potensieltHarSlutta shouldHaveSize 1
+		potensieltHarSlutta[0] shouldBe deltaker
+	}
+
+
+	test("skalHaStatusDeltar - startdato passert og sluttdato ikke passert og status VENTER_PA_OPPSTART - deltaker returneres") {
 
 		val deltakerInsertDbo = DeltakerInsertDbo(
 			UUID.randomUUID(),
@@ -261,7 +291,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		repository.insert(deltakerInsertDbo)
 		deltakerStatusRepository.insert(statusInsertDbo)
 
-		val potensieltDeltar = repository.potensieltDeltar()
+		val potensieltDeltar = repository.skalHaStatusDeltar()
 
 		potensieltDeltar shouldHaveSize 1
 		potensieltDeltar[0].id shouldBe deltakerInsertDbo.id
@@ -275,7 +305,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 	}
 
 
-	test("potensieltDeltar - startdato og sluttdato ikke passert og status VENTER_PA_OPPSTART - deltaker returneres ikke") {
+	test("skalHaStatusDeltar - startdato og sluttdato ikke passert og status VENTER_PA_OPPSTART - deltaker returneres ikke") {
 		val deltakerInsertDbo = DeltakerInsertDbo(
 			UUID.randomUUID(),
 			BRUKER_3.id,
@@ -297,7 +327,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		repository.insert(deltakerInsertDbo)
 		deltakerStatusRepository.insert(statusInsertDbo)
 
-		val potensieltDeltar = repository.potensieltDeltar()
+		val potensieltDeltar = repository.skalHaStatusDeltar()
 
 		potensieltDeltar shouldHaveSize 0
 	}
