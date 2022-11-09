@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
-import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
+import no.nav.amt.tiltak.deltaker.dbo.BrukerUpsertDbo
 import no.nav.amt.tiltak.utils.getNullableUUID
 import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
@@ -31,8 +31,7 @@ open class BrukerRepository(
         )
     }
 
-    fun insert(bruker: BrukerInsertDbo): BrukerDbo {
-
+    fun upsert(bruker: BrukerUpsertDbo): BrukerDbo {
 		val sql = """
 			INSERT INTO bruker(id, fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_enhet_id)
 			VALUES (:id,
@@ -44,6 +43,14 @@ open class BrukerRepository(
 					:epost,
 					:veileder_id,
 					:nav_enhet_id)
+			ON CONFLICT(fodselsnummer) DO UPDATE SET
+			 	fornavn = :fornavn,
+				mellomnavn = :mellomnavn,
+				etternavn = :etternavn,
+				telefonnummer = :telefonnummer,
+				epost = :epost,
+				ansvarlig_veileder_id = :veileder_id,
+				nav_enhet_id = :nav_enhet_id
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(

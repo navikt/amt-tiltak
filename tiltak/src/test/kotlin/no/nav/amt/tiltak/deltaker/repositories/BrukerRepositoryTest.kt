@@ -5,12 +5,15 @@ import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
+import no.nav.amt.tiltak.deltaker.dbo.BrukerUpsertDbo
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_2
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
+import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_2
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -30,7 +33,7 @@ class BrukerRepositoryTest : FunSpec({
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
 
-	test("Insert should insert bruker and return BrukerDbo") {
+	test("Insert - ny bruker - skal inserte bruker") {
 		val fodselsnummer = "64798632"
 		val fornavn = "Per"
 		val mellomnavn = null
@@ -38,8 +41,8 @@ class BrukerRepositoryTest : FunSpec({
 		val telefonnummer = "74635462"
 		val epost = "per.testersen@test.no"
 		val ansvarligVeilederId = NAV_ANSATT_1.id
-		val bruker = BrukerInsertDbo(fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarligVeilederId, null)
-		val dbo = repository.insert(bruker)
+		val bruker = BrukerUpsertDbo(fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarligVeilederId, null)
+		val dbo = repository.upsert(bruker)
 
 		dbo shouldNotBe null
 		dbo.id shouldNotBe null
@@ -51,6 +54,25 @@ class BrukerRepositoryTest : FunSpec({
 		dbo.ansvarligVeilederId shouldBe ansvarligVeilederId
 		dbo.createdAt shouldNotBe null
 		dbo.modifiedAt shouldNotBe null
+	}
+	test("upsert - bruker finnes - oppdaterer eksisterende bruker") {
+		repository.get(BRUKER_2.fodselsnummer) shouldNotBe null
+		val bruker = BrukerUpsertDbo(BRUKER_2.fodselsnummer,
+			"fornavn",
+			"mellomnavn",
+			"etternavn",
+			"telefonnummer",
+			"epost",
+			NAV_ANSATT_1.id,
+			NAV_ENHET_2.id)
+
+		val nyBruker = repository.upsert(bruker)
+
+		nyBruker.fornavn shouldBe bruker.fornavn
+		nyBruker.etternavn shouldBe bruker.etternavn
+		nyBruker.telefonnummer shouldBe bruker.telefonnummer
+		nyBruker.epost shouldBe bruker.epost
+		nyBruker.ansvarligVeilederId shouldBe bruker.ansvarligVeilederId
 	}
 
 	test("Get user that does not exist should be null") {
@@ -64,4 +86,5 @@ class BrukerRepositoryTest : FunSpec({
 
 		repository.get(BRUKER_1.fodselsnummer)?.ansvarligVeilederId shouldBe NAV_ANSATT_2.id
 	}
+
 })
