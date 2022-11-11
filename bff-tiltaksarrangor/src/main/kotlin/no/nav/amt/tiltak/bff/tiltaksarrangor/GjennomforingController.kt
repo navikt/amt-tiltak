@@ -13,6 +13,7 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.time.LocalDate
 import java.util.*
 
 @RestController("GjennomforingControllerTiltaksarrangor")
@@ -32,7 +33,7 @@ class GjennomforingController(
 			.hentGjennomforingIder(ansattPersonligIdent)
 
 		return gjennomforingService.getGjennomforinger(gjennomforingIder)
-			.filter { it.status == Gjennomforing.Status.GJENNOMFORES }
+			.filter(this::erSynligForArrangor)
 			.map { it.toDto() }
 	}
 
@@ -44,9 +45,7 @@ class GjennomforingController(
 
 		val ansattId = arrangorAnsattTilgangService.hentAnsattId(ansattPersonligIdent)
 
-		return hentGjennomforingerSomKanLeggesTil(ansattId)
-			.filter { it.status == Gjennomforing.Status.GJENNOMFORES }
-			.map { it.toDto() }
+		return hentGjennomforingerSomKanLeggesTil(ansattId).map { it.toDto() }
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -123,7 +122,19 @@ class GjennomforingController(
 			.filter { it.roller.contains(ArrangorAnsattRolle.KOORDINATOR) }
 			.map { gjennomforingService.getByArrangorId(it.arrangorId) }
 			.flatten()
+			.filter(this::erSynligForArrangor)
 			.filter { tillattIProd(it.id) }
+	}
 
+	private fun erSynligForArrangor(gjennomforing: Gjennomforing): Boolean {
+		if (gjennomforing.status == Gjennomforing.Status.GJENNOMFORES) return true
+		else if (
+			gjennomforing.status == Gjennomforing.Status.AVSLUTTET
+			&& gjennomforing.sluttDato != null
+			&& LocalDate.now().isBefore(gjennomforing.sluttDato!!.plusDays(15))
+			// Gjennomforing er synlig til og med 14 dager etter avslutting
+		) return true
+
+		return false
 	}
 }

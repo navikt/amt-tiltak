@@ -35,7 +35,10 @@ abstract class IntegrationTestBase {
 	@LocalServerPort
 	private var port: Int = 0
 
-	val client = OkHttpClient.Builder().callTimeout(Duration.ofMinutes(5)).build()
+	val client = OkHttpClient.Builder()
+		.callTimeout(Duration.ofMinutes(5))
+		.readTimeout(Duration.ofMinutes(5))
+		.build()
 
 	@Autowired
 	lateinit var kafkaMessageSender: KafkaMessageSender
