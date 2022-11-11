@@ -66,6 +66,14 @@ class TestDataRepository(
 		), rowMapper)
 	}
 
+	fun deleteAllArrangorAnsattGjennomforingTilganger() {
+		val sql = """
+			TRUNCATE arrangor_ansatt_gjennomforing_tilgang CASCADE
+		""".trimIndent()
+
+		template.jdbcTemplate.update(sql)
+	}
+
 	fun insertArrangorAnsattRolle(cmd: ArrangorAnsattRolleInput) {
 		val sql = """
 			INSERT INTO arrangor_ansatt_rolle(id, arrangor_id, ansatt_id, rolle)
