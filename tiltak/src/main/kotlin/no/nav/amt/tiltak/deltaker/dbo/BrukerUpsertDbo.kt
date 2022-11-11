@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.deltaker.dbo
 
 import java.util.*
 
-data class BrukerInsertDbo(
+data class BrukerUpsertDbo(
 	val fodselsnummer: String,
 	val fornavn: String,
 	val mellomnavn: String?,

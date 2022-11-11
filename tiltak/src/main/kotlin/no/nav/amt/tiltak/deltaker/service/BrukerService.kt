@@ -5,7 +5,7 @@ import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
-import no.nav.amt.tiltak.deltaker.dbo.BrukerInsertDbo
+import no.nav.amt.tiltak.deltaker.dbo.BrukerUpsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import org.springframework.stereotype.Service
 import java.util.*
@@ -46,7 +46,7 @@ class BrukerService(
 
 		val person = personService.hentPerson(fodselsnummer)
 
-		val bruker = BrukerInsertDbo(
+		val bruker = BrukerUpsertDbo(
 			fodselsnummer = fodselsnummer,
 			fornavn = person.fornavn,
 			mellomnavn = person.mellomnavn,
@@ -57,7 +57,7 @@ class BrukerService(
 			navEnhetId = navEnhet?.id
 		)
 
-		return brukerRepository.insert(bruker)
+		return brukerRepository.upsert(bruker)
 	}
 
 }
