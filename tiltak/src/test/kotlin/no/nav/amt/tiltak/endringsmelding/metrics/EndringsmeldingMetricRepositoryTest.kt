@@ -5,6 +5,7 @@ import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.endringsmelding.EndringsmeldingDbo
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_1
@@ -66,6 +67,23 @@ class EndringsmeldingMetricRepositoryTest : FunSpec({
 		))
 
 		repository.getMetrics()?.manueltFerdige shouldBe 1
+	}
+
+	test("getAntallEndringsmeldingerPerType - skal hente antall endringsmeldinger for hver type") {
+		EndringsmeldingDbo.Type.values().forEach {
+			testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1.copy(id = UUID.randomUUID(), type = it.name))
+		}
+		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
+
+		val result = repository.getAntallEndringsmeldingerPerType()
+		result.size shouldBe EndringsmeldingDbo.Type.values().size
+		result.forEach {
+			if (it.type == ENDRINGSMELDING_1_DELTAKER_1.type) {
+				it.antall shouldBe 2
+			} else {
+				it.antall shouldBe 1
+			}
+		}
 	}
 
 })
