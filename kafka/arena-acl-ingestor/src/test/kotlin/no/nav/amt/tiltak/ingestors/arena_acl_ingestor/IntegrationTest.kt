@@ -175,7 +175,11 @@ class IntegrationTest {
 
 		val uuid = UUID.randomUUID()
 		val expected = deltakerToInsert.copy(
-			status = deltakerToInsert.status.copy(id = uuid, opprettetDato = now, aarsak = DeltakerStatus.Aarsak(Deltaker.StatusAarsak.FATT_JOBB))
+			status = deltakerToInsert.status.copy(
+				id = uuid,
+				opprettetDato = now,
+				aarsak = DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.FATT_JOBB)
+			)
 		)
 		val actual = inserted!!.copy(status = inserted.status.copy(id = uuid, opprettetDato = now))
 		actual shouldBe expected
@@ -273,7 +277,7 @@ class IntegrationTest {
 		sluttDato = null,
 		status = DeltakerStatus(
 				id = UUID.randomUUID(),
-				type =  Deltaker.Status.VENTER_PA_OPPSTART,
+				type =  DeltakerStatus.Type.VENTER_PA_OPPSTART,
 				aarsak = null,
 				gyldigFra =  now.minusHours(1),
 				opprettetDato = now,
@@ -296,7 +300,14 @@ class IntegrationTest {
 		epost = brukerEpost,
 		startDato = LocalDate.now().minusDays(1),
 		sluttDato = LocalDate.now().plusDays(1),
-		status = DeltakerStatus(id= UUID.randomUUID(), Deltaker.Status.DELTAR, null, now, now, true),
+		status = DeltakerStatus(
+			id = UUID.randomUUID(),
+			type = DeltakerStatus.Type.DELTAR,
+			aarsak = null,
+			gyldigFra = now,
+			opprettetDato = now,
+			aktiv = true
+		),
 		registrertDato = now,
 		dagerPerUke = 3,
 		prosentStilling = 50F,

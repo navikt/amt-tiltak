@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.endringsmelding
 
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import java.time.LocalDate
 import java.time.ZonedDateTime
@@ -28,7 +28,7 @@ data class EndringsmeldingDbo(
 	}
 
 	data class DeltakerStatusAarsak(
-		val type: Deltaker.StatusAarsak,
+		val type: DeltakerStatus.Aarsak.Type,
 		val beskrivelse: String? = null,
 	)
 

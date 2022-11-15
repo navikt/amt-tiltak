@@ -8,7 +8,7 @@ import no.nav.amt.tiltak.bff.tiltaksarrangor.request.*
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.*
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -35,7 +35,7 @@ class DeltakerController(
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
 
 		val deltakere = deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
-			.filter { it.status.type != Deltaker.Status.PABEGYNT }
+			.filter { it.status.type != DeltakerStatus.Type.PABEGYNT }
 			.filter { !it.erUtdatert }
 
 		val endringmeldingerMap = endringsmeldingService.hentAktive(deltakere.map { it.id })
@@ -55,7 +55,7 @@ class DeltakerController(
 
 		auditLoggerService.tiltaksarrangorAnsattDeltakerOppslagAuditLog(ansatt.id, deltakerId)
 
-		if (deltakerDetaljer.status.type == Deltaker.Status.PABEGYNT)
+		if (deltakerDetaljer.status.type == DeltakerStatus.Type.PABEGYNT)
 			throw UnauthorizedException("Har ikke tilgang til id $deltakerId")
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)

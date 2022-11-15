@@ -65,7 +65,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		sluttDato = null,
 		status = DeltakerStatus(
 			id = UUID.randomUUID(),
-			type =  Deltaker.Status.VENTER_PA_OPPSTART,
+			type =  DeltakerStatus.Type.VENTER_PA_OPPSTART,
 			aarsak = null,
 			gyldigFra =  LocalDateTime.now().minusHours(1),
 			opprettetDato = LocalDateTime.now(),

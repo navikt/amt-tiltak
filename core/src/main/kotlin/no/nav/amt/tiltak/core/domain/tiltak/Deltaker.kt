@@ -23,15 +23,7 @@ data class Deltaker(
 	val prosentStilling: Float? = null,
 	val innsokBegrunnelse: String? = null
 ) {
-	val skalFjernesDato = if(status.type == Status.HAR_SLUTTET || status.type == Status.IKKE_AKTUELL) status.gyldigFra.plusWeeks(2) else null
+	val skalFjernesDato = if(status.type == DeltakerStatus.Type.HAR_SLUTTET || status.type == DeltakerStatus.Type.IKKE_AKTUELL) status.gyldigFra.plusWeeks(2) else null
 	val erUtdatert = skalFjernesDato != null && LocalDateTime.now().isAfter(skalFjernesDato)
-
-	enum class Status {
-		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, FEILREGISTRERT, PABEGYNT
-	}
-
-	enum class StatusAarsak {
-		SYK, FATT_JOBB, TRENGER_ANNEN_STOTTE, FIKK_IKKE_PLASS, UTDANNING, FERDIG, AVLYST_KONTRAKT, IKKE_MOTT, FEILREGISTRERT, ANNET
-	}
 }
 

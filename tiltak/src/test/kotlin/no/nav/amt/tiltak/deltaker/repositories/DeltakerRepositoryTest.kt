@@ -6,7 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpdateDbo
@@ -200,7 +200,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val statusInsertDbo = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
 			deltakerId = deltaker!!.id,
-			type = Deltaker.Status.DELTAR,
+			type = DeltakerStatus.Type.DELTAR,
 			aarsak = null,
 			gyldigFra = LocalDateTime.now().minusDays(5))
 
@@ -226,7 +226,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val statusInsertDbo = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
 			deltakerId = deltakerInsertDbo.id,
-			type = Deltaker.Status.DELTAR,
+			type = DeltakerStatus.Type.DELTAR,
 			aarsak = null,
 			gyldigFra = LocalDateTime.now().minusDays(5),
 		)
@@ -256,7 +256,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val statusInsertDbo = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
 			deltakerId = deltaker!!.id,
-			type = Deltaker.Status.DELTAR,
+			type = DeltakerStatus.Type.DELTAR,
 			aarsak = null,
 			gyldigFra = LocalDateTime.now().minusDays(5))
 
@@ -284,7 +284,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val statusInsertDbo = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
 			deltakerId = deltakerInsertDbo.id,
-			type = Deltaker.Status.VENTER_PA_OPPSTART,
+			type = DeltakerStatus.Type.VENTER_PA_OPPSTART,
 			aarsak = null,
 			gyldigFra = now.minusDays(5)
 		)
@@ -319,7 +319,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val statusInsertDbo = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
 			deltakerId = deltakerInsertDbo.id,
-			type = Deltaker.Status.VENTER_PA_OPPSTART,
+			type = DeltakerStatus.Type.VENTER_PA_OPPSTART,
 			aarsak = null,
 			gyldigFra = LocalDateTime.now().minusDays(5),
 		)

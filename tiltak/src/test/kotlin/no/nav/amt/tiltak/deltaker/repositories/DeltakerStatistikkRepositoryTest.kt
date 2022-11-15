@@ -6,8 +6,8 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.DELTAR
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.VENTER_PA_OPPSTART
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus.Type.DELTAR
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus.Type.VENTER_PA_OPPSTART
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer

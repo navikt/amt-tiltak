@@ -7,7 +7,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.common.json.JsonUtils
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.DbUtils.shouldBeCloseTo
@@ -182,7 +182,10 @@ class EndringsmeldingRepositoryTest : FunSpec({
 
 	test("insert - skal inserte aktiv avsluttDeltakelseEndringsmelding") {
 		val id = UUID.randomUUID()
-		val innhold = EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold(LocalDate.now(), EndringsmeldingDbo.DeltakerStatusAarsak(Deltaker.StatusAarsak.UTDANNING))
+		val innhold = EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold(
+			LocalDate.now(),
+			EndringsmeldingDbo.DeltakerStatusAarsak(DeltakerStatus.Aarsak.Type.UTDANNING)
+		)
 
 		repository.insert(
 			id = id,
@@ -200,7 +203,9 @@ class EndringsmeldingRepositoryTest : FunSpec({
 
 	test("insert - skal inserte aktiv deltakerIkkeAktuellEndringsmelding") {
 		val id = UUID.randomUUID()
-		val innhold = EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold(EndringsmeldingDbo.DeltakerStatusAarsak(Deltaker.StatusAarsak.UTDANNING))
+		val innhold = EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold(
+			EndringsmeldingDbo.DeltakerStatusAarsak(DeltakerStatus.Aarsak.Type.UTDANNING)
+		)
 
 		repository.insert(
 			id = id,

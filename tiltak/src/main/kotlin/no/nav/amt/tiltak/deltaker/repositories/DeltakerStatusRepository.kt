@@ -2,7 +2,6 @@ package no.nav.amt.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getNullableString
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
@@ -20,11 +19,11 @@ open class DeltakerStatusRepository(
 ) {
 
 	private val rowMapper = RowMapper { rs, _ ->
-		val aarsak = rs.getNullableString("aarsak")?.let { Deltaker.StatusAarsak.valueOf(it) }
+		val aarsak = rs.getNullableString("aarsak")?.let { DeltakerStatus.Aarsak.Type.valueOf(it) }
 		DeltakerStatusDbo(
 			id = rs.getUUID("id"),
 			deltakerId = rs.getUUID("deltaker_id"),
-			status = Deltaker.Status.valueOf(rs.getString("status")),
+			type = DeltakerStatus.Type.valueOf(rs.getString("status")),
 			aarsak = aarsak?.let { DeltakerStatus.Aarsak(it, null) },
 			aktiv = rs.getBoolean("aktiv"),
 			gyldigFra = rs.getLocalDateTime("gyldig_fra"),

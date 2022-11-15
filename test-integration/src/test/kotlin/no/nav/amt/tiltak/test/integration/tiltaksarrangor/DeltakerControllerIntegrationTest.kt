@@ -5,7 +5,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.beInstanceOf
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -145,7 +145,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 				id = UUID.randomUUID(),
 				deltakerId = deltaker.id,
 				gyldigFra = LocalDateTime.now().minusDays(15),
-				status = Deltaker.Status.HAR_SLUTTET.name,
+				status = DeltakerStatus.Type.HAR_SLUTTET.name,
 				aktiv = true,
 			)
 		)
@@ -173,7 +173,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 				id = UUID.randomUUID(),
 				deltakerId = deltaker.id,
 				gyldigFra = LocalDateTime.now().minusDays(13),
-				status = Deltaker.Status.HAR_SLUTTET.name,
+				status = DeltakerStatus.Type.HAR_SLUTTET.name,
 				aktiv = true,
 			)
 		)
@@ -238,7 +238,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.AvsluttDeltakelseInnhold>()
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 		(endringsmelding.innhold as Endringsmelding.Innhold.AvsluttDeltakelseInnhold).sluttdato shouldBe LocalDate.parse(dato)
-		(endringsmelding.innhold as Endringsmelding.Innhold.AvsluttDeltakelseInnhold).aarsak.type shouldBe Deltaker.StatusAarsak.FATT_JOBB
+		(endringsmelding.innhold as Endringsmelding.Innhold.AvsluttDeltakelseInnhold).aarsak.type shouldBe DeltakerStatus.Aarsak.Type.FATT_JOBB
 	}
 
 	@Test
@@ -300,7 +300,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val endringsmelding = endringsmeldinger.first()
 		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold>()
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
-		(endringsmelding.innhold as Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold).aarsak.type shouldBe Deltaker.StatusAarsak.FATT_JOBB
+		(endringsmelding.innhold as Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold).aarsak.type shouldBe DeltakerStatus.Aarsak.Type.FATT_JOBB
 	}
 
 	@Test
