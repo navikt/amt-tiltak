@@ -1,6 +1,8 @@
 package no.nav.amt.tiltak.endringsmelding.metrics
 
 import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Tags
+import no.nav.amt.tiltak.endringsmelding.EndringsmeldingDbo
 import org.springframework.stereotype.Service
 import java.time.Duration
 import java.time.LocalDateTime
@@ -13,6 +15,7 @@ private const val antallManueltFerdigEndringsmeldinger = "amt_tiltak_endringsmel
 private const val antallAutomatiskFerdigEndringsmeldinger = "amt_tiltak_endringsmelding_automatisk_ferdig_antall"
 private const val eldsteAktiveIMinutter = "amt_tiltak_endringsmelding_eldste_aktive_i_minutter"
 private const val gjennomsnitteligTidIMinutter = "amt_tiltak_endringsmelding_gjennomsnittelig_tid_i_minutter"
+private const val antallEndringsmeldingerPerType = "amt_tiltak_endringsmelding_per_type_antall"
 
 @Service
 class EndringsmeldingMetricService(
@@ -52,6 +55,11 @@ class EndringsmeldingMetricService(
 		)
 	)
 
+	private val antallEndringsmeldingerPerTypeGauges: Map<String, AtomicInteger> =
+		EndringsmeldingDbo.Type.values().associate {
+			it.name to registry.gauge(antallEndringsmeldingerPerType, Tags.of("type", it.name), AtomicInteger(0))!!
+		}
+
 	fun oppdaterMetrikker() {
 		val metrics = endringsmeldingMetricRepository.getMetrics()
 
@@ -75,6 +83,11 @@ class EndringsmeldingMetricService(
 
 		simpleGauges.getValue(gjennomsnitteligTidIMinutter)
 			.set(metrics?.gjennomsnitteligTidIMinutter?.roundToInt() ?: 0)
+
+		endringsmeldingMetricRepository.getAntallEndringsmeldingerPerType().forEach {
+			antallEndringsmeldingerPerTypeGauges[it.type]?.set(it.antall)
+		}
+
 	}
 
 }

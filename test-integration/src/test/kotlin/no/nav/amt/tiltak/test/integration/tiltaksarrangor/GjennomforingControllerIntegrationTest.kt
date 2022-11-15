@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.test.integration.tiltaksarrangor
 
+import com.jayway.jsonpath.JsonPath
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -77,18 +78,18 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	fun `hentGjennomforinger - skal hente gjennomforinger med status Gjennomfores eller status Avsluttet med sluttdato tom 14 dager`() {
-		val id1 = UUID.fromString("b49a95b9-6bde-481f-9712-c212a7a046e1")
-		val id2 = UUID.fromString("ab23909a-7512-42d1-8abd-ca4047fe2ecb")
+		val skalVareSynligId = UUID.fromString("b49a95b9-6bde-481f-9712-c212a7a046e1")
+		val skalIkkeVareSynligId = UUID.fromString("ab23909a-7512-42d1-8abd-ca4047fe2ecb")
 
 		testDataRepository.insertGjennomforing(GJENNOMFORING_1.copy(
-			id = id1,
+			id = skalVareSynligId,
 			status = Gjennomforing.Status.AVSLUTTET.name,
 			navn = "Avsluttet gjennomforing",
 			sluttDato = LocalDate.now().minusDays(14)
 		))
 
 		testDataRepository.insertGjennomforing(GJENNOMFORING_1.copy(
-			id = id2,
+			id = skalIkkeVareSynligId,
 			status = Gjennomforing.Status.AVSLUTTET.name,
 			navn = "Avsluttet gjennomforing - skal ikke vises",
 			sluttDato = LocalDate.now().minusDays(15)
@@ -98,7 +99,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			ArrangorAnsattGjennomforingTilgangInput(
 				id = UUID.randomUUID(),
 				ansattId = ARRANGOR_ANSATT_1.id,
-				gjennomforingId = id1,
+				gjennomforingId = skalVareSynligId,
 				gyldigFra = ZonedDateTime.now().minusHours(1),
 				gyldigTil = ZonedDateTime.now().plusYears(1)
 			)
@@ -108,7 +109,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			ArrangorAnsattGjennomforingTilgangInput(
 				id = UUID.randomUUID(),
 				ansattId = ARRANGOR_ANSATT_1.id,
-				gjennomforingId = id2,
+				gjennomforingId = skalIkkeVareSynligId,
 				gyldigFra = ZonedDateTime.now().minusHours(1),
 				gyldigTil = ZonedDateTime.now().plusYears(1)
 			)
@@ -119,18 +120,24 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			url = "/api/tiltaksarrangor/gjennomforing",
 			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
-		val expectedJson = """
-				[{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","startDato":"2022-02-01","sluttDato":"2050-12-30","status":"GJENNOMFORES","tiltak":{"tiltakskode":"AMO","tiltaksnavn":"Tiltak1"},"arrangor":{"virksomhetNavn":"Tiltaksarrangør 1","organisasjonNavn":"Org Tiltaksarrangør 1"}},{"id":"b49a95b9-6bde-481f-9712-c212a7a046e1","navn":"Avsluttet gjennomforing","startDato":"2022-02-01","sluttDato":"2022-10-28","status":"AVSLUTTET","tiltak":{"tiltakskode":"AMO","tiltaksnavn":"Tiltak1"},"arrangor":{"virksomhetNavn":"Tiltaksarrangør 1","organisasjonNavn":"Org Tiltaksarrangør 1"}}]
-			""".trimIndent()
+
 		response.code shouldBe 200
-		response.body?.string() shouldBe expectedJson
+
+		val jsonBody = response.body!!.string()
+
+		JsonPath.parse(jsonBody).read<Int>("$.length()") shouldBe 2
+		JsonPath.parse(jsonBody).read<String>("$.[0].id") shouldBe GJENNOMFORING_1.id.toString()
+		JsonPath.parse(jsonBody).read<String>("$.[1].id") shouldBe skalVareSynligId.toString()
+
 	}
 
 
 	@Test
 	fun `hentTilgjengeligeGjennomforinger - skal hente gjennomforinger med status Gjennomfores eller status Avsluttet med sluttdato tom 14 dager`() {
+		val skalVareSynligId = UUID.fromString("b49a95b9-6bde-481f-9712-c212a7a046e1")
+
 		testDataRepository.insertGjennomforing(GJENNOMFORING_1.copy(
-			id = UUID.fromString("b49a95b9-6bde-481f-9712-c212a7a046e1"),
+			id = skalVareSynligId,
 			status = Gjennomforing.Status.AVSLUTTET.name,
 			navn = "Avsluttet gjennomforing",
 			sluttDato = LocalDate.now().minusDays(14)
@@ -148,11 +155,15 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			url = "/api/tiltaksarrangor/gjennomforing/tilgjengelig",
 			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
-		val expectedJson = """
-				[{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","startDato":"2022-02-01","sluttDato":"2050-12-30","status":"GJENNOMFORES","tiltak":{"tiltakskode":"AMO","tiltaksnavn":"Tiltak1"},"arrangor":{"virksomhetNavn":"Tiltaksarrangør 1","organisasjonNavn":"Org Tiltaksarrangør 1"}},{"id":"b49a95b9-6bde-481f-9712-c212a7a046e1","navn":"Avsluttet gjennomforing","startDato":"2022-02-01","sluttDato":"2022-10-28","status":"AVSLUTTET","tiltak":{"tiltakskode":"AMO","tiltaksnavn":"Tiltak1"},"arrangor":{"virksomhetNavn":"Tiltaksarrangør 1","organisasjonNavn":"Org Tiltaksarrangør 1"}}]
-			""".trimIndent()
+
 		response.code shouldBe 200
-		response.body?.string() shouldBe expectedJson
+
+		val jsonBody = response.body!!.string()
+
+		JsonPath.parse(jsonBody).read<Int>("$.length()") shouldBe 2
+		JsonPath.parse(jsonBody).read<String>("$.[0].id") shouldBe GJENNOMFORING_1.id.toString()
+		JsonPath.parse(jsonBody).read<String>("$.[1].id") shouldBe skalVareSynligId.toString()
+
 	}
 
 

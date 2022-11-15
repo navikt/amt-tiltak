@@ -34,6 +34,22 @@ class EndringsmeldingMetricRepository(
 
 	}
 
+
+	fun getAntallEndringsmeldingerPerType(): List<AntallEndringsmeldingerPerType> {
+		val sql = "SELECT type, count(*) AS antall FROM endringsmelding GROUP BY type"
+	 	return template.query(sql) { rs, _ ->
+			AntallEndringsmeldingerPerType(
+				type = rs.getString("type"),
+				antall = rs.getInt("antall"),
+			)
+		}
+	}
+
+	data class AntallEndringsmeldingerPerType(
+		val type: String,
+		val antall: Int,
+	)
+
 	data class EndringsmeldingMetricHolder(
 		val antallTotalt: Int,
 		val antallAktive: Int,
