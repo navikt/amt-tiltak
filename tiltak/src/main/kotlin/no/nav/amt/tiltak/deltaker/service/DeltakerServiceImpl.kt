@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.deltaker.service
 import no.nav.amt.tiltak.core.domain.tiltak.*
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
+import no.nav.amt.tiltak.core.port.SkjermetPersonService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
@@ -23,6 +24,7 @@ open class DeltakerServiceImpl(
 	private val deltakerStatusRepository: DeltakerStatusRepository,
 	private val brukerService: BrukerService,
 	private val endringsmeldingService: EndringsmeldingService,
+	private val skjermetPersonService: SkjermetPersonService,
 	private val transactionTemplate: TransactionTemplate
 ) : DeltakerService {
 
@@ -90,6 +92,11 @@ open class DeltakerServiceImpl(
 
 	override fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet?) {
 		brukerService.oppdaterNavEnhet(fodselsnummer, navEnhet)
+	}
+
+	override fun erSkjermet(deltakerId: UUID) : Boolean {
+		val deltaker = hentDeltaker(deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
+		return skjermetPersonService.erSkjermet(deltaker.fodselsnummer)
 	}
 
 	private fun update(deltaker: DeltakerUpsert) {

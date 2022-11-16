@@ -44,6 +44,7 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 	val navAnsattService: NavAnsattService = mockk()
 	val navEnhetService: NavEnhetService = mockk()
 	val endringsmeldingService: EndringsmeldingService = mockk()
+	val skjermetPersonService: SkjermetPersonService = mockk()
 
 	lateinit var dataSource: DataSource
 	lateinit var jdbcTemplate: NamedParameterJdbcTemplate
@@ -67,6 +68,7 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 			deltakerStatusRepository,
 			brukerService,
 			endringsmeldingService,
+			skjermetPersonService,
 			TransactionTemplate()
 		)
 		endringPaaBrukerIngestorImpl = EndringPaaBrukerIngestorImpl(deltakerService, navEnhetService)

@@ -40,8 +40,6 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	lateinit var arrangorService: ArrangorService
 
-	lateinit var skjermetPersonService: SkjermetPersonService
-
 	val personligIdent = "fnr"
 
 	val ansattId = UUID.randomUUID()
@@ -91,12 +89,10 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		arrangorService = mockk()
 
-		skjermetPersonService = mockk()
-
 		arrangorAnsattTilgangServiceImpl = ArrangorAnsattTilgangServiceImpl(
 			arrangorAnsattService, ansattRolleService,
 			deltakerService, altinnService, arrangorAnsattGjennomforingTilgangService,
-			arrangorService, skjermetPersonService, TransactionTemplate(DataSourceTransactionManager(datasource))
+			arrangorService, TransactionTemplate(DataSourceTransactionManager(datasource))
 		)
 
 		every {
@@ -157,32 +153,10 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		} returns deltaker
 
 		every {
-			skjermetPersonService.erSkjermet(personligIdent)
-		} returns false
-
-		every {
 			arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
 		} returns listOf(gjennomforingId)
 
 		shouldNotThrow<Throwable> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)
-		}
-	}
-
-	test("verifiserTilgangTilDeltaker skal kaste exception hvis deltaker er skjermet") {
-		every {
-			deltakerService.hentDeltaker(deltakerId)
-		} returns deltaker
-
-		every {
-			skjermetPersonService.erSkjermet(personligIdent)
-		} returns true
-
-		every {
-			arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
-		} returns listOf(gjennomforingId)
-
-		shouldThrowExactly<NotImplementedError> {
 			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)
 		}
 	}
@@ -193,10 +167,6 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		} returns deltaker
 
 		every {
-			skjermetPersonService.erSkjermet(personligIdent)
-		} returns false
-
-		every {
 			arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
 		} returns emptyList()
 
@@ -204,8 +174,6 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)
 		}
 	}
-
-
 
 	test("synkroniserRettigheterMedAltinn - skal legge til nye roller fra Altinn") {
 		val ansattPersonligIdent = "1234"
