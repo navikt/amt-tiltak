@@ -26,7 +26,6 @@ open class ArrangorAnsattTilgangServiceImpl(
 	private val altinnService: AltinnService,
 	private val arrangorAnsattGjennomforingTilgangService: ArrangorAnsattGjennomforingTilgangService,
 	private val arrangorService: ArrangorService,
-	private val skjermetPersonService: SkjermetPersonService,
 	private val transactionTemplate: TransactionTemplate
 ) : ArrangorAnsattTilgangService {
 
@@ -76,22 +75,12 @@ open class ArrangorAnsattTilgangServiceImpl(
 
 	override fun verifiserTilgangTilDeltaker(ansattId: UUID, deltakerId: UUID) {
 		val deltaker = deltakerService.hentDeltaker(deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
-		val erSkjermet = skjermetPersonService.erSkjermet(deltaker.fodselsnummer)
-
-		if (erSkjermet) {
-			throw NotImplementedError("Støtte for denne personen er ikke implementert")
-		}
 
 		verifiserTilgangTilGjennomforing(ansattId, deltaker.gjennomforingId)
 	}
 
 	override fun verifiserTilgangTilDeltaker(ansattPersonligIdent: String, deltakerId: UUID) {
 		val deltaker = deltakerService.hentDeltaker(deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
-		val erSkjermet = skjermetPersonService.erSkjermet(deltaker.fodselsnummer)
-
-		if (erSkjermet) {
-			throw NotImplementedError("Støtte for denne personen er ikke implementert")
-		}
 
 		verifiserTilgangTilGjennomforing(ansattPersonligIdent, deltaker.gjennomforingId)
 	}

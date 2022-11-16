@@ -6,6 +6,7 @@ import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
+import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.GetMapping
@@ -19,6 +20,7 @@ import java.util.*
 class EndringsmeldingController(
 	private val endringsmeldingService: EndringsmeldingService,
 	private val arrangorTilgangService: ArrangorAnsattTilgangService,
+	private val deltakerService: DeltakerService,
 	private val authService: AuthService,
 ) {
 
@@ -26,8 +28,11 @@ class EndringsmeldingController(
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	fun hentAktiveEndringsmeldinger(@RequestParam("deltakerId") deltakerId: UUID): List<EndringsmeldingDto> {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
+		val erSkjermetDeltaker = deltakerService.erSkjermet(deltakerId)
 
 		arrangorTilgangService.verifiserTilgangTilDeltaker(ansattPersonligIdent, deltakerId)
+
+		if(erSkjermetDeltaker) return emptyList()
 
 		return endringsmeldingService.hentEndringsmeldingerForDeltaker(deltakerId)
 			.filter { it.status == Endringsmelding.Status.AKTIV }

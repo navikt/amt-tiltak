@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.NavEnhetService
+import no.nav.amt.tiltak.core.port.SkjermetPersonService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
@@ -48,6 +49,7 @@ class DeltakerServiceImplTest {
 	lateinit var testDataRepository: TestDataRepository
 	lateinit var navEnhetService: NavEnhetService
 	lateinit var endringsmeldingService: EndringsmeldingService
+	lateinit var skjermetPersonService: SkjermetPersonService
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 	val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
@@ -59,6 +61,7 @@ class DeltakerServiceImplTest {
 
 		navEnhetService = mockk()
 		endringsmeldingService = mockk()
+		skjermetPersonService = mockk()
 		brukerService = BrukerService(brukerRepository, mockk(), mockk(), navEnhetService)
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
@@ -67,6 +70,7 @@ class DeltakerServiceImplTest {
 			deltakerStatusRepository = deltakerStatusRepository,
 			brukerService = brukerService,
 			endringsmeldingService = endringsmeldingService,
+			skjermetPersonService = skjermetPersonService,
 			transactionTemplate = TransactionTemplate(DataSourceTransactionManager(dataSource)),
 		)
 		testDataRepository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
