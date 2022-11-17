@@ -226,7 +226,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/avslutt-deltakelse",
 			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
-			body = """{"sluttdato": "$dato", "aarsak": "FATT_JOBB" }""".toJsonRequestBody()
+			body = """{"sluttdato": "$dato", "aarsak": {"type": "FATT_JOBB"} }""".toJsonRequestBody()
 		)
 
 		response.code shouldBe 200
@@ -238,7 +238,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.AvsluttDeltakelseInnhold>()
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 		(endringsmelding.innhold as Endringsmelding.Innhold.AvsluttDeltakelseInnhold).sluttdato shouldBe LocalDate.parse(dato)
-		(endringsmelding.innhold as Endringsmelding.Innhold.AvsluttDeltakelseInnhold).aarsak shouldBe Deltaker.StatusAarsak.FATT_JOBB
+		(endringsmelding.innhold as Endringsmelding.Innhold.AvsluttDeltakelseInnhold).aarsak.type shouldBe Deltaker.StatusAarsak.FATT_JOBB
 	}
 
 	@Test
@@ -247,7 +247,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/avslutt-deltakelse",
 			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
-			body = """{"sluttdato": "$dato", "aarsak": "FATT_JOBB" }""".toJsonRequestBody()
+			body = """{"sluttdato": "$dato", "aarsak": {"type": "FATT_JOBB"}}""".toJsonRequestBody()
 		)
 
 		response.code shouldBe 403
@@ -289,7 +289,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/ikke-aktuell",
 			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
-			body = """{"aarsak": "FATT_JOBB"}""".toJsonRequestBody()
+			body = """{"aarsak": {"type": "FATT_JOBB"}}""".toJsonRequestBody()
 		)
 
 		response.code shouldBe 200
@@ -300,7 +300,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val endringsmelding = endringsmeldinger.first()
 		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold>()
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
-		(endringsmelding.innhold as Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold).aarsak shouldBe Deltaker.StatusAarsak.FATT_JOBB
+		(endringsmelding.innhold as Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold).aarsak.type shouldBe Deltaker.StatusAarsak.FATT_JOBB
 	}
 
 	@Test
@@ -309,7 +309,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/ikke-aktuell",
 			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
-			body = """{"aarsak": "FATT_JOBB"}""".toJsonRequestBody()
+			body = """{"aarsak": {"type": "FATT_JOBB"}}""".toJsonRequestBody()
 		)
 
 		response.code shouldBe 403

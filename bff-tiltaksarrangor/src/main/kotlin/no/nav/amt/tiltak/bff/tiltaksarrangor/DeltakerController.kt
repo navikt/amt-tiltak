@@ -96,7 +96,7 @@ class DeltakerController(
 		val ansatt = hentInnloggetAnsatt()
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		kastHvisSkjermet(deltakerId)
-		deltakerService.avsluttDeltakelse(deltakerId, ansatt.id, request.sluttdato, request.aarsak.toDeltakerStatusAarsak())
+		deltakerService.avsluttDeltakelse(deltakerId, ansatt.id, request.sluttdato, request.aarsak.toModel())
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -120,7 +120,7 @@ class DeltakerController(
 		val ansatt = hentInnloggetAnsatt()
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		kastHvisSkjermet(deltakerId)
-		deltakerService.deltakerIkkeAktuell(deltakerId, ansatt.id, request.aarsak.toDeltakerStatusAarsak())
+		deltakerService.deltakerIkkeAktuell(deltakerId, ansatt.id, request.aarsak.toModel())
 	}
 
 	private fun hentInnloggetAnsatt(): Ansatt {

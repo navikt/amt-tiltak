@@ -182,7 +182,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 
 	test("insert - skal inserte aktiv avsluttDeltakelseEndringsmelding") {
 		val id = UUID.randomUUID()
-		val innhold = EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold(LocalDate.now(), Deltaker.StatusAarsak.UTDANNING)
+		val innhold = EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold(LocalDate.now(), EndringsmeldingDbo.DeltakerStatusAarsak(Deltaker.StatusAarsak.UTDANNING))
 
 		repository.insert(
 			id = id,
@@ -200,7 +200,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 
 	test("insert - skal inserte aktiv deltakerIkkeAktuellEndringsmelding") {
 		val id = UUID.randomUUID()
-		val innhold = EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold(Deltaker.StatusAarsak.UTDANNING)
+		val innhold = EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold(EndringsmeldingDbo.DeltakerStatusAarsak(Deltaker.StatusAarsak.UTDANNING))
 
 		repository.insert(
 			id = id,

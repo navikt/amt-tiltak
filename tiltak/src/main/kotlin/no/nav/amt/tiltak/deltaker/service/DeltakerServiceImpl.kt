@@ -174,12 +174,12 @@ open class DeltakerServiceImpl(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
 		sluttdato: LocalDate,
-		statusAarsak: Deltaker.StatusAarsak
+		statusAarsak: DeltakerStatus.Aarsak
 	) {
 		endringsmeldingService.opprettAvsluttDeltakelseEndringsmelding(deltakerId, arrangorAnsattId, sluttdato, statusAarsak)
 	}
 
-	override fun deltakerIkkeAktuell(deltakerId: UUID, arrangorAnsattId: UUID, statusAarsak: Deltaker.StatusAarsak) {
+	override fun deltakerIkkeAktuell(deltakerId: UUID, arrangorAnsattId: UUID, statusAarsak: DeltakerStatus.Aarsak) {
 		endringsmeldingService.opprettDeltakerIkkeAktuellEndringsmelding(deltakerId, arrangorAnsattId, statusAarsak)
 	}
 }

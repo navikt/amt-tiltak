@@ -175,7 +175,7 @@ class IntegrationTest {
 
 		val uuid = UUID.randomUUID()
 		val expected = deltakerToInsert.copy(
-			status = deltakerToInsert.status.copy(id = uuid, opprettetDato = now, aarsak = Deltaker.StatusAarsak.FATT_JOBB)
+			status = deltakerToInsert.status.copy(id = uuid, opprettetDato = now, aarsak = DeltakerStatus.Aarsak(Deltaker.StatusAarsak.FATT_JOBB))
 		)
 		val actual = inserted!!.copy(status = inserted.status.copy(id = uuid, opprettetDato = now))
 		actual shouldBe expected

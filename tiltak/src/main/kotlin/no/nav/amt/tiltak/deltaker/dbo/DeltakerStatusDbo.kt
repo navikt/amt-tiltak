@@ -9,7 +9,7 @@ data class DeltakerStatusDbo(
 	val id: UUID = UUID.randomUUID(),
 	val deltakerId: UUID,
 	val status: Deltaker.Status,
-	val aarsak: Deltaker.StatusAarsak?,
+	val aarsak: DeltakerStatus.Aarsak?,
 	val gyldigFra: LocalDateTime,
 	val opprettetDato: LocalDateTime,
 	val aktiv: Boolean

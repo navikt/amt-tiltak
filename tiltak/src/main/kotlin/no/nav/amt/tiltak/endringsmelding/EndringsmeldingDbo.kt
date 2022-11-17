@@ -27,6 +27,11 @@ data class EndringsmeldingDbo(
 		DELTAKER_IKKE_AKTUELL,
 	}
 
+	data class DeltakerStatusAarsak(
+		val type: Deltaker.StatusAarsak,
+		val beskrivelse: String? = null,
+	)
+
 	sealed class Innhold {
 		data class LeggTilOppstartsdatoInnhold(
 			val oppstartsdato: LocalDate
@@ -42,11 +47,11 @@ data class EndringsmeldingDbo(
 
 		data class AvsluttDeltakelseInnhold(
 			val sluttdato: LocalDate,
-			val aarsak: Deltaker.StatusAarsak,
+			val aarsak: DeltakerStatusAarsak,
 		) : Innhold()
 
 		data class DeltakerIkkeAktuellInnhold(
-			val aarsak: Deltaker.StatusAarsak,
+			val aarsak: DeltakerStatusAarsak,
 		) : Innhold()
 
 		fun type(): Type {

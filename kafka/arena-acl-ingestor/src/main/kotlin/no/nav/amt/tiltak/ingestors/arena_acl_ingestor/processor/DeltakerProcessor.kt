@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.port.DeltakerService
@@ -87,18 +88,18 @@ class DeltakerProcessor(
 		}
 	}
 
-	private fun tilDeltakerAarsak(aarsak: DeltakerPayload.StatusAarsak?): Deltaker.StatusAarsak? {
+	private fun tilDeltakerAarsak(aarsak: DeltakerPayload.StatusAarsak?): DeltakerStatus.Aarsak? {
 		return when(aarsak){
-			DeltakerPayload.StatusAarsak.SYK -> Deltaker.StatusAarsak.SYK
-			DeltakerPayload.StatusAarsak.FATT_JOBB -> Deltaker.StatusAarsak.FATT_JOBB
-			DeltakerPayload.StatusAarsak.TRENGER_ANNEN_STOTTE -> Deltaker.StatusAarsak.TRENGER_ANNEN_STOTTE
-			DeltakerPayload.StatusAarsak.FIKK_IKKE_PLASS -> Deltaker.StatusAarsak.FIKK_IKKE_PLASS
-			DeltakerPayload.StatusAarsak.UTDANNING -> Deltaker.StatusAarsak.UTDANNING
-			DeltakerPayload.StatusAarsak.FERDIG -> Deltaker.StatusAarsak.FERDIG
-			DeltakerPayload.StatusAarsak.AVLYST_KONTRAKT -> Deltaker.StatusAarsak.AVLYST_KONTRAKT
-			DeltakerPayload.StatusAarsak.IKKE_MOTT -> Deltaker.StatusAarsak.IKKE_MOTT
-			DeltakerPayload.StatusAarsak.FEILREGISTRERT -> Deltaker.StatusAarsak.FEILREGISTRERT
-			DeltakerPayload.StatusAarsak.ANNET -> Deltaker.StatusAarsak.ANNET
+			DeltakerPayload.StatusAarsak.SYK -> DeltakerStatus.Aarsak(Deltaker.StatusAarsak.SYK)
+			DeltakerPayload.StatusAarsak.FATT_JOBB -> DeltakerStatus.Aarsak(Deltaker.StatusAarsak.FATT_JOBB)
+			DeltakerPayload.StatusAarsak.TRENGER_ANNEN_STOTTE -> DeltakerStatus.Aarsak(Deltaker.StatusAarsak.TRENGER_ANNEN_STOTTE)
+			DeltakerPayload.StatusAarsak.FIKK_IKKE_PLASS -> DeltakerStatus.Aarsak(Deltaker.StatusAarsak.FIKK_IKKE_PLASS)
+			DeltakerPayload.StatusAarsak.UTDANNING -> DeltakerStatus.Aarsak(Deltaker.StatusAarsak.UTDANNING)
+			DeltakerPayload.StatusAarsak.FERDIG -> DeltakerStatus.Aarsak(Deltaker.StatusAarsak.FERDIG)
+			DeltakerPayload.StatusAarsak.AVLYST_KONTRAKT -> DeltakerStatus.Aarsak(Deltaker.StatusAarsak.AVLYST_KONTRAKT)
+			DeltakerPayload.StatusAarsak.IKKE_MOTT -> DeltakerStatus.Aarsak(Deltaker.StatusAarsak.IKKE_MOTT)
+			DeltakerPayload.StatusAarsak.FEILREGISTRERT -> DeltakerStatus.Aarsak(Deltaker.StatusAarsak.FEILREGISTRERT)
+			DeltakerPayload.StatusAarsak.ANNET -> DeltakerStatus.Aarsak(Deltaker.StatusAarsak.ANNET, null)
 			else -> null
 		}
 	}
