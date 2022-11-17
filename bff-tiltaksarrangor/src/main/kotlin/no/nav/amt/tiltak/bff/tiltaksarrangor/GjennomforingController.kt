@@ -114,6 +114,9 @@ class GjennomforingController(
 			"1b5fdc3e-356b-4fe3-a93b-384981810c12",
 			"67077b36-869a-4328-9a8e-685d2bb42c14",
 			"9fc77a48-8c8c-41ec-aae1-b7c1d0710030",
+			"c8a5f4f9-d405-44ca-adc7-7acbb485666b",
+			"ffb9f511-fa69-40ef-bcd8-32040127f6e1"
+
 		).map { UUID.fromString(it) }
 
 		return allowList.contains(gjennomforingId)
@@ -134,7 +137,7 @@ class GjennomforingController(
 			gjennomforing.status == Gjennomforing.Status.AVSLUTTET
 			&& gjennomforing.sluttDato != null
 			&& LocalDate.now().isBefore(gjennomforing.sluttDato!!.plusDays(15))
-			// Gjennomforing er synlig til og med 14 dager etter avslutting
+		// Gjennomforing er synlig til og med 14 dager etter avslutting
 		) return true
 
 		return false
