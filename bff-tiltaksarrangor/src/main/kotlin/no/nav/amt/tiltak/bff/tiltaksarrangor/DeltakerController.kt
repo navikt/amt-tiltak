@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
-@RequestMapping(value = [ "/api/tiltak-deltaker", "/api/tiltaksarrangor/tiltak-deltaker" ])
+@RequestMapping("/api/tiltaksarrangor/deltaker")
 class DeltakerController(
 	private val controllerService: ControllerService,
 	private val authService: AuthService,

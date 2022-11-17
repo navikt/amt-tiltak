@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController("AnsattControllerTiltaksarrangor")
-@RequestMapping(value = ["/api/arrangor/ansatt", "/api/tiltaksarrangor/ansatt"])
+@RequestMapping("/api/tiltaksarrangor/ansatt")
 class AnsattController(
 	private val authService: AuthService,
 	private val arrangorAnsattService: ArrangorAnsattService,

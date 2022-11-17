@@ -17,7 +17,7 @@ import java.time.LocalDate
 import java.util.*
 
 @RestController("GjennomforingControllerTiltaksarrangor")
-@RequestMapping(value = ["/api/gjennomforing", "/api/tiltaksarrangor/gjennomforing"])
+@RequestMapping("/api/tiltaksarrangor/gjennomforing")
 class GjennomforingController(
 	private val gjennomforingService: GjennomforingService,
 	private val authService: AuthService,

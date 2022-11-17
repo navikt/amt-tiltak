@@ -42,7 +42,7 @@ class TilgangControllerIntegrationTest : IntegrationTestBase() {
 
 		val response = sendRequest(
 			method = "POST",
-			url = "/api/tiltaksansvarlig/gjennomforing-tilgang?gjennomforingId=${GJENNOMFORING_3.id}",
+			url = "/api/nav-ansatt/gjennomforing-tilgang?gjennomforingId=${GJENNOMFORING_3.id}",
 			headers = mapOf("Authorization" to "Bearer $token"),
 			body = "".toJsonRequestBody()
 		)
@@ -70,7 +70,7 @@ class TilgangControllerIntegrationTest : IntegrationTestBase() {
 
 		val response = sendRequest(
 			method = "PATCH",
-			url = "/api/tiltaksansvarlig/gjennomforing-tilgang/stop?gjennomforingId=${GJENNOMFORING_1.id}",
+			url = "/api/nav-ansatt/gjennomforing-tilgang/stop?gjennomforingId=${GJENNOMFORING_1.id}",
 			headers = mapOf("Authorization" to "Bearer $token"),
 			body = "".toJsonRequestBody()
 		)

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController("TilgangControllerNavAnsatt")
-@RequestMapping(value = ["/api/tiltaksansvarlig/gjennomforing-tilgang", "/api/nav-ansatt/gjennomforing-tilgang"])
+@RequestMapping("/api/nav-ansatt/gjennomforing-tilgang")
 class TilgangController(
     private val authService: AuthService,
     private val navAnsattService: NavAnsattService,
