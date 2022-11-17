@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getNullableUUID
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
@@ -219,7 +219,7 @@ open class DeltakerRepository(
 		""".trimIndent()
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"avsluttende_statuser" to listOf(Deltaker.Status.HAR_SLUTTET.name, Deltaker.Status.IKKE_AKTUELL.name),
+				"avsluttende_statuser" to listOf(DeltakerStatus.Type.HAR_SLUTTET.name, DeltakerStatus.Type.IKKE_AKTUELL.name),
 				"gjennomforing_status" to Gjennomforing.Status.AVSLUTTET.name
 			)
 		)

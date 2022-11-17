@@ -3,8 +3,9 @@ package no.nav.amt.tiltak.deltaker.repositories
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker.Status.*
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus.Type.DELTAR
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus.Type.VENTER_PA_OPPSTART
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -38,8 +39,20 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 	test("insert - 2 statuser knyttet til deltaker - begge hentes") {
 		val deltakerCmd = createDeltakerInput(BRUKER_1, GJENNOMFORING_1)
 		testDataRepository.insertDeltaker(deltakerCmd)
-		val status1 = DeltakerStatusInsertDbo(id = UUID.randomUUID(), deltakerId = deltakerCmd.id, type = VENTER_PA_OPPSTART, aarsak=Deltaker.StatusAarsak.FERDIG, gyldigFra = lastweek)
-		val status2 = DeltakerStatusInsertDbo(id = UUID.randomUUID(), deltakerId = deltakerCmd.id, type = DELTAR, aarsak=Deltaker.StatusAarsak.ANNET, gyldigFra = yesterday)
+		val status1 = DeltakerStatusInsertDbo(
+			id = UUID.randomUUID(),
+			deltakerId = deltakerCmd.id,
+			type = VENTER_PA_OPPSTART,
+			aarsak=DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.FERDIG),
+			gyldigFra = lastweek
+		)
+		val status2 = DeltakerStatusInsertDbo(
+			id = UUID.randomUUID(),
+			deltakerId = deltakerCmd.id,
+			type = DELTAR,
+			aarsak= DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.ANNET, null),
+			gyldigFra = yesterday
+		)
 		val now = LocalDateTime.now()
 
 		repository.insert(status1)

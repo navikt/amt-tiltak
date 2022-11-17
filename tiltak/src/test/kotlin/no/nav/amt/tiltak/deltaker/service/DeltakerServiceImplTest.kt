@@ -3,11 +3,8 @@ package no.nav.amt.tiltak.deltaker.service
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
+import no.nav.amt.tiltak.core.domain.tiltak.*
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
-import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.SkjermetPersonService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
@@ -91,13 +88,13 @@ class DeltakerServiceImplTest {
 
 		// Valider testdata tilstand
 		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
-		forrigeStatus!!.status shouldBe Deltaker.Status.DELTAR
+		forrigeStatus!!.type shouldBe DeltakerStatus.Type.DELTAR
 
 		deltakerServiceImpl.oppdaterStatuser()
 
 		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
 
-		status!!.status shouldBe Deltaker.Status.HAR_SLUTTET
+		status!!.type shouldBe DeltakerStatus.Type.HAR_SLUTTET
 
 	}
 
@@ -112,13 +109,13 @@ class DeltakerServiceImplTest {
 		// Valider testdata tilstand
 		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
 		GJENNOMFORING_2.status shouldBe Gjennomforing.Status.AVSLUTTET.name
-		forrigeStatus!!.status shouldBe Deltaker.Status.DELTAR
+		forrigeStatus!!.type shouldBe DeltakerStatus.Type.DELTAR
 
 		deltakerServiceImpl.oppdaterStatuser()
 
 		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
 
-		status!!.status shouldBe Deltaker.Status.HAR_SLUTTET
+		status!!.type shouldBe DeltakerStatus.Type.HAR_SLUTTET
 
 	}
 	@Test
@@ -145,7 +142,7 @@ class DeltakerServiceImplTest {
 		val statusInsertDbo = DeltakerStatusInsert(
 			id = UUID.randomUUID(),
 			deltakerId = nyDeltaker!!.id,
-			type = Deltaker.Status.IKKE_AKTUELL,
+			type = DeltakerStatus.Type.IKKE_AKTUELL,
 			aarsak = null,
 			gyldigFra = now
 		)
@@ -158,7 +155,7 @@ class DeltakerServiceImplTest {
 		statusEtterEndring!!.copy(opprettetDato = now) shouldBe DeltakerStatusDbo(
 			id = statusInsertDbo.id,
 			deltakerId = nyDeltaker.id,
-			status = statusInsertDbo.type,
+			type = statusInsertDbo.type,
 			gyldigFra = statusInsertDbo.gyldigFra!!,
 			aarsak = statusInsertDbo.aarsak,
 			opprettetDato = now,
@@ -178,7 +175,7 @@ class DeltakerServiceImplTest {
 		val statusInsertDbo = DeltakerStatusInsert(
 			id = UUID.randomUUID(),
 			deltakerId = nyDeltaker!!.id,
-			type = Deltaker.Status.IKKE_AKTUELL,
+			type = DeltakerStatus.Type.IKKE_AKTUELL,
 			aarsak = null,
 			gyldigFra = LocalDateTime.now()
 		)
@@ -207,20 +204,20 @@ class DeltakerServiceImplTest {
 		val statusInsertDbo = DeltakerStatusInsert(
 			id = UUID.randomUUID(),
 			deltakerId = nyDeltaker!!.id,
-			type = Deltaker.Status.IKKE_AKTUELL,
+			type = DeltakerStatus.Type.IKKE_AKTUELL,
 			aarsak = null,
 			gyldigFra = LocalDateTime.now()
 		)
 
 		deltakerServiceImpl.insertStatus(statusInsertDbo)
 
-		deltakerServiceImpl.insertStatus(statusInsertDbo.copy(id = UUID.randomUUID(), type = Deltaker.Status.VENTER_PA_OPPSTART))
+		deltakerServiceImpl.insertStatus(statusInsertDbo.copy(id = UUID.randomUUID(), type = DeltakerStatus.Type.VENTER_PA_OPPSTART))
 
 		val statuser = deltakerStatusRepository.getStatuserForDeltaker(nyDeltaker.id)
 
 		statuser.size shouldBe 2
 		statuser.first().aktiv shouldBe false
-		statuser.first().status shouldBe statusInsertDbo.type
+		statuser.first().type shouldBe statusInsertDbo.type
 		statuser.last().aktiv shouldBe true
 	}
 
@@ -229,7 +226,7 @@ class DeltakerServiceImplTest {
 		val statusInsertDbo = DeltakerStatusInsert(
 			id = UUID.randomUUID(),
 			deltakerId = deltaker.id,
-			type = Deltaker.Status.DELTAR,
+			type = DeltakerStatus.Type.DELTAR,
 			aarsak = null,
 			gyldigFra = LocalDateTime.now().minusDays(2)
 		)

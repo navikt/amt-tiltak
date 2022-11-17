@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.endringsmelding
 
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.exceptions.EndringsmeldingIkkeAktivException
 import no.nav.amt.tiltak.core.port.AuditLoggerService
@@ -78,9 +78,13 @@ open class EndringsmeldingServiceImpl(
 			is EndringsmeldingDbo.Innhold.ForlengDeltakelseInnhold ->
 				Endringsmelding.Innhold.ForlengDeltakelseInnhold(innhold.sluttdato)
 			is EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold ->
-				Endringsmelding.Innhold.AvsluttDeltakelseInnhold(innhold.sluttdato, innhold.aarsak)
+				Endringsmelding.Innhold.AvsluttDeltakelseInnhold(
+					innhold.sluttdato, DeltakerStatus.Aarsak(innhold.aarsak.type, innhold.aarsak.beskrivelse)
+				)
 			is EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold ->
-				Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold(innhold.aarsak)
+				Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold(
+					DeltakerStatus.Aarsak(innhold.aarsak.type, innhold.aarsak.beskrivelse)
+				)
 		}
 	}
 
@@ -127,9 +131,10 @@ open class EndringsmeldingServiceImpl(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
 		sluttdato: LocalDate,
-		statusAarsak: Deltaker.StatusAarsak
+		statusAarsak: DeltakerStatus.Aarsak
 	) {
-		val innhold = EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold(sluttdato, statusAarsak)
+		val aarsak = EndringsmeldingDbo.DeltakerStatusAarsak(statusAarsak.type, statusAarsak.beskrivelse)
+		val innhold = EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold(sluttdato, aarsak)
 		opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
@@ -140,9 +145,10 @@ open class EndringsmeldingServiceImpl(
 	override fun opprettDeltakerIkkeAktuellEndringsmelding(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
-		statusAarsak: Deltaker.StatusAarsak
+		statusAarsak: DeltakerStatus.Aarsak
 	) {
-		val innhold = EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold(statusAarsak)
+		val aarsak = EndringsmeldingDbo.DeltakerStatusAarsak(statusAarsak.type, statusAarsak.beskrivelse)
+		val innhold = EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold(aarsak)
 		opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,

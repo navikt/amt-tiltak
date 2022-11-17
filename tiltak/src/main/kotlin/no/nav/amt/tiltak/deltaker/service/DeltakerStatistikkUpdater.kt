@@ -4,7 +4,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.MultiGauge
 import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Tags
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatistikkRepository
 import org.springframework.stereotype.Component
@@ -43,12 +43,12 @@ class DeltakerStatistikkUpdater(
 
 
 	private val deltakerStatusGauges: Map<String, AtomicInteger> =
-		Deltaker.Status.values().associate {
+		DeltakerStatus.Type.values().associate {
 			it.name to registry.gauge(deltakerePrStatus, Tags.of("status", it.name), AtomicInteger(0))!!
 		}
 
 	private val eksponterteBrukereStatusGauges: Map<String, AtomicInteger> =
-		Deltaker.Status.values().associate {
+		DeltakerStatus.Type.values().associate {
 			it.name to registry.gauge(eksponerteBrukerePrStatus, Tags.of("status", it.name), AtomicInteger(0))!!
 		}
 

@@ -33,11 +33,11 @@ data class Endringsmelding(
 
 		data class AvsluttDeltakelseInnhold(
 			val sluttdato: LocalDate,
-			val aarsak: Deltaker.StatusAarsak,
+			val aarsak: DeltakerStatus.Aarsak,
 		) : Innhold()
 
 		data class DeltakerIkkeAktuellInnhold(
-			val aarsak: Deltaker.StatusAarsak,
+			val aarsak: DeltakerStatus.Aarsak,
 		) : Innhold()
 	}
 }

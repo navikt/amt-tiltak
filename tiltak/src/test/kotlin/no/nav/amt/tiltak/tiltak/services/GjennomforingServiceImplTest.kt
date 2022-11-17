@@ -127,7 +127,7 @@ class GjennomforingServiceImplTest : FunSpec({
 				sluttDato = null,
 				status = DeltakerStatus(
 					UUID.randomUUID(),
-					Deltaker.Status.VENTER_PA_OPPSTART,
+					DeltakerStatus.Type.VENTER_PA_OPPSTART,
                     null,
 					LocalDateTime.now(),
 					LocalDateTime.now(),

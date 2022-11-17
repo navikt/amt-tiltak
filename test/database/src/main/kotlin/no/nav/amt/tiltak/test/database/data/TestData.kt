@@ -341,7 +341,7 @@ object TestData {
 		opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
 		status = Endringsmelding.Status.AKTIV,
 		type = "AVSLUTT_DELTAKELSE",
-		innhold = """{ "sluttdato": "2022-11-10", "aarsak": "ANNET" }""",
+		innhold = """{ "sluttdato": "2022-11-10", "aarsak": { "type": "ANNET", "beskrivelse": "Flyttet til utland" } }""",
 		createdAt = ZonedDateTime.parse("2022-11-08T14:00:00.00000+00:00"),
 	)
 

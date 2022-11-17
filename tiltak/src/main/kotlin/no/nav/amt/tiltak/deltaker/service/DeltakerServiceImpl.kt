@@ -42,7 +42,7 @@ open class DeltakerServiceImpl(
 
 	override fun insertStatus(status: DeltakerStatusInsert) {
 		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(status.deltakerId)
-		if (forrigeStatus?.status == status.type && forrigeStatus.aarsak == status.aarsak) return
+		if (forrigeStatus?.type == status.type && forrigeStatus.aarsak == status.aarsak) return
 
 		val nyStatus = DeltakerStatusInsertDbo(
 			id = status.id,
@@ -76,9 +76,9 @@ open class DeltakerServiceImpl(
 	}
 
 	override fun oppdaterStatuser() {
-		oppdaterStatuser(deltakerRepository.skalAvsluttes(), Deltaker.Status.HAR_SLUTTET)
-		oppdaterStatuser(deltakerRepository.erPaaAvsluttetGjennomforing(), Deltaker.Status.HAR_SLUTTET)
-		oppdaterStatuser(deltakerRepository.skalHaStatusDeltar(), Deltaker.Status.DELTAR)
+		oppdaterStatuser(deltakerRepository.skalAvsluttes(), DeltakerStatus.Type.HAR_SLUTTET)
+		oppdaterStatuser(deltakerRepository.erPaaAvsluttetGjennomforing(), DeltakerStatus.Type.HAR_SLUTTET)
+		oppdaterStatuser(deltakerRepository.skalHaStatusDeltar(), DeltakerStatus.Type.DELTAR)
 	}
 
 	override fun slettDeltaker(deltakerId: UUID) {
@@ -135,16 +135,16 @@ open class DeltakerServiceImpl(
 	}
 
 	private fun hentStatus(deltakerId: UUID) : DeltakerStatus? {
-		return deltakerStatusRepository.getStatusForDeltaker(deltakerId)?.toDeltakerStatus() ?: return null
+		return deltakerStatusRepository.getStatusForDeltaker(deltakerId)?.toModel() ?: return null
 	}
 
-	private fun oppdaterStatuser(deltakere: List<DeltakerDbo>, status: Deltaker.Status) = deltakere
+	private fun oppdaterStatuser(deltakere: List<DeltakerDbo>, type: DeltakerStatus.Type) = deltakere
 		.also { log.info("Oppdaterer status på ${it.size} deltakere") }
 		.forEach {
 			insertStatus(DeltakerStatusInsert(
 				id = UUID.randomUUID(),
 				deltakerId = it.id,
-				type = status,
+				type = type,
 				aarsak = null,
 				gyldigFra = LocalDateTime.now()
 			))
@@ -174,12 +174,12 @@ open class DeltakerServiceImpl(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
 		sluttdato: LocalDate,
-		statusAarsak: Deltaker.StatusAarsak
+		statusAarsak: DeltakerStatus.Aarsak
 	) {
 		endringsmeldingService.opprettAvsluttDeltakelseEndringsmelding(deltakerId, arrangorAnsattId, sluttdato, statusAarsak)
 	}
 
-	override fun deltakerIkkeAktuell(deltakerId: UUID, arrangorAnsattId: UUID, statusAarsak: Deltaker.StatusAarsak) {
+	override fun deltakerIkkeAktuell(deltakerId: UUID, arrangorAnsattId: UUID, statusAarsak: DeltakerStatus.Aarsak) {
 		endringsmeldingService.opprettDeltakerIkkeAktuellEndringsmelding(deltakerId, arrangorAnsattId, statusAarsak)
 	}
 }

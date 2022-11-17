@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.endringsmelding
 
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import java.time.LocalDate
 import java.time.ZonedDateTime
@@ -27,6 +27,11 @@ data class EndringsmeldingDbo(
 		DELTAKER_IKKE_AKTUELL,
 	}
 
+	data class DeltakerStatusAarsak(
+		val type: DeltakerStatus.Aarsak.Type,
+		val beskrivelse: String? = null,
+	)
+
 	sealed class Innhold {
 		data class LeggTilOppstartsdatoInnhold(
 			val oppstartsdato: LocalDate
@@ -42,11 +47,11 @@ data class EndringsmeldingDbo(
 
 		data class AvsluttDeltakelseInnhold(
 			val sluttdato: LocalDate,
-			val aarsak: Deltaker.StatusAarsak,
+			val aarsak: DeltakerStatusAarsak,
 		) : Innhold()
 
 		data class DeltakerIkkeAktuellInnhold(
-			val aarsak: Deltaker.StatusAarsak,
+			val aarsak: DeltakerStatusAarsak,
 		) : Innhold()
 
 		fun type(): Type {

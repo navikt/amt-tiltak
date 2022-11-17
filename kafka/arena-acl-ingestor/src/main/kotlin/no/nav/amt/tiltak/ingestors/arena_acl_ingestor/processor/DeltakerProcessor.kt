@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.port.DeltakerService
@@ -63,7 +63,7 @@ class DeltakerProcessor(
 		val status = DeltakerStatusInsert(
 			id = UUID.randomUUID(),
 			deltakerId = deltakerDto.id,
-			type = tilDeltakerStatus(deltakerDto.status),
+			type = tilDeltakerStatusType(deltakerDto.status),
 			aarsak = tilDeltakerAarsak(deltakerDto.statusAarsak),
 			gyldigFra = deltakerDto.statusEndretDato,
 		)
@@ -76,29 +76,29 @@ class DeltakerProcessor(
 		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=${tiltaksgjennomforing.id}")
 	}
 
-	private fun tilDeltakerStatus(status: DeltakerPayload.Status): Deltaker.Status {
+	private fun tilDeltakerStatusType(status: DeltakerPayload.Status): DeltakerStatus.Type {
 		return when(status){
-			DeltakerPayload.Status.VENTER_PA_OPPSTART -> Deltaker.Status.VENTER_PA_OPPSTART
-			DeltakerPayload.Status.DELTAR -> Deltaker.Status.DELTAR
-			DeltakerPayload.Status.HAR_SLUTTET -> Deltaker.Status.HAR_SLUTTET
-			DeltakerPayload.Status.IKKE_AKTUELL -> Deltaker.Status.IKKE_AKTUELL
-			DeltakerPayload.Status.FEILREGISTRERT -> Deltaker.Status.FEILREGISTRERT
-			DeltakerPayload.Status.PABEGYNT -> Deltaker.Status.PABEGYNT
+			DeltakerPayload.Status.VENTER_PA_OPPSTART -> DeltakerStatus.Type.VENTER_PA_OPPSTART
+			DeltakerPayload.Status.DELTAR -> DeltakerStatus.Type.DELTAR
+			DeltakerPayload.Status.HAR_SLUTTET -> DeltakerStatus.Type.HAR_SLUTTET
+			DeltakerPayload.Status.IKKE_AKTUELL -> DeltakerStatus.Type.IKKE_AKTUELL
+			DeltakerPayload.Status.FEILREGISTRERT -> DeltakerStatus.Type.FEILREGISTRERT
+			DeltakerPayload.Status.PABEGYNT -> DeltakerStatus.Type.PABEGYNT
 		}
 	}
 
-	private fun tilDeltakerAarsak(aarsak: DeltakerPayload.StatusAarsak?): Deltaker.StatusAarsak? {
+	private fun tilDeltakerAarsak(aarsak: DeltakerPayload.StatusAarsak?): DeltakerStatus.Aarsak? {
 		return when(aarsak){
-			DeltakerPayload.StatusAarsak.SYK -> Deltaker.StatusAarsak.SYK
-			DeltakerPayload.StatusAarsak.FATT_JOBB -> Deltaker.StatusAarsak.FATT_JOBB
-			DeltakerPayload.StatusAarsak.TRENGER_ANNEN_STOTTE -> Deltaker.StatusAarsak.TRENGER_ANNEN_STOTTE
-			DeltakerPayload.StatusAarsak.FIKK_IKKE_PLASS -> Deltaker.StatusAarsak.FIKK_IKKE_PLASS
-			DeltakerPayload.StatusAarsak.UTDANNING -> Deltaker.StatusAarsak.UTDANNING
-			DeltakerPayload.StatusAarsak.FERDIG -> Deltaker.StatusAarsak.FERDIG
-			DeltakerPayload.StatusAarsak.AVLYST_KONTRAKT -> Deltaker.StatusAarsak.AVLYST_KONTRAKT
-			DeltakerPayload.StatusAarsak.IKKE_MOTT -> Deltaker.StatusAarsak.IKKE_MOTT
-			DeltakerPayload.StatusAarsak.FEILREGISTRERT -> Deltaker.StatusAarsak.FEILREGISTRERT
-			DeltakerPayload.StatusAarsak.ANNET -> Deltaker.StatusAarsak.ANNET
+			DeltakerPayload.StatusAarsak.SYK -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.SYK)
+			DeltakerPayload.StatusAarsak.FATT_JOBB -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.FATT_JOBB)
+			DeltakerPayload.StatusAarsak.TRENGER_ANNEN_STOTTE -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.TRENGER_ANNEN_STOTTE)
+			DeltakerPayload.StatusAarsak.FIKK_IKKE_PLASS -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.FIKK_IKKE_PLASS)
+			DeltakerPayload.StatusAarsak.UTDANNING -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.UTDANNING)
+			DeltakerPayload.StatusAarsak.FERDIG -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.FERDIG)
+			DeltakerPayload.StatusAarsak.AVLYST_KONTRAKT -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.AVLYST_KONTRAKT)
+			DeltakerPayload.StatusAarsak.IKKE_MOTT -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.IKKE_MOTT)
+			DeltakerPayload.StatusAarsak.FEILREGISTRERT -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.FEILREGISTRERT)
+			DeltakerPayload.StatusAarsak.ANNET -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.ANNET, null)
 			else -> null
 		}
 	}
