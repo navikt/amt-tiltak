@@ -8,7 +8,6 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus.Type.DELTAR
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus.Type.VENTER_PA_OPPSTART
-import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData
@@ -62,22 +61,6 @@ class DeltakerStatistikkRepositoryTest : FunSpec({
 
 	test("antallArrangorerMedBrukere - returnerer 2") {
 		repository.antallArrangorerMedBrukere() shouldBe 2
-	}
-
-	test("antallGjennomforingerGruppert - summerer antall - blir 3") {
-		repository.antallGjennomforingerGruppert().map { it.antall }.sum() shouldBe 3
-	}
-
-	test("antallGjennomforingerGruppert - summerer antall på status - returnerer rett fordeling") {
-		repository.antallGjennomforingerGruppert()
-			.filter { it.status == Gjennomforing.Status.GJENNOMFORES.name }
-			.map { it.antall }
-			.sum() shouldBe 2
-
-		repository.antallGjennomforingerGruppert()
-			.filter { it.status == Gjennomforing.Status.AVSLUTTET.name }
-			.map { it.antall }
-			.sum() shouldBe 1
 	}
 
 	test("antallAktiveArrangorer - returnerer 3") {

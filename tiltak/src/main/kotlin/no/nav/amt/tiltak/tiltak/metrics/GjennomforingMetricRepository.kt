@@ -23,8 +23,29 @@ class GjennomforingMetricRepository(
 		}
 	}
 
-	data class AntallGjennomforingerPerTypeMetric(
-		val type: String,
-		val antall: Int,
-	)
+	fun antallGjennomforingerGruppert() = template.query(
+		"""
+			SELECT g.status as status, aagt.id is not null as gjennomforing_med_bruker_hos_arrangor, count(*) as antall
+			FROM gjennomforing g
+			left join arrangor_ansatt_gjennomforing_tilgang aagt on g.id = aagt.gjennomforing_id
+			group by g.status, gjennomforing_med_bruker_hos_arrangor;
+		""".trimMargin()
+	) { rs, _ ->
+		GjennomforingMetrikker(
+			rs.getString("status"),
+			rs.getBoolean("gjennomforing_med_bruker_hos_arrangor"),
+			rs.getInt("antall")
+		)
+	}
 }
+
+data class AntallGjennomforingerPerTypeMetric(
+	val type: String,
+	val antall: Int,
+)
+
+data class GjennomforingMetrikker(
+	val status: String,
+	val synligHosArrangor: Boolean,
+	val antall: Int
+)

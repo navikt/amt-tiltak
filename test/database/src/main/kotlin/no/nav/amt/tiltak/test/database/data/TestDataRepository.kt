@@ -203,6 +203,14 @@ class TestDataRepository(
 		)
 	}
 
+	fun deleteAllGjennomforinger() {
+		val sql = """
+			TRUNCATE gjennomforing CASCADE
+		""".trimIndent()
+
+		template.jdbcTemplate.update(sql)
+	}
+
 	fun insertNavAnsatt(cmd: NavAnsattInput) {
 		val sql = """
 			INSERT INTO nav_ansatt (id, nav_ident, navn, telefonnummer, epost)
@@ -327,7 +335,5 @@ class TestDataRepository(
 
 		template.jdbcTemplate.update(sql)
 	}
-
-
 
 }

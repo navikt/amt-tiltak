@@ -2,17 +2,20 @@ package no.nav.amt.tiltak.tiltak.metrics
 
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.MultiGauge
+import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Tags
 import org.springframework.stereotype.Service
-import java.util.concurrent.atomic.AtomicInteger
 
 private const val antallGjennomforingerPerType = "amt_tiltak_gjennomforinger_per_type_antall"
+private const val gjennomforing = "amt.tiltak.antall.gjennomforing"
 
 @Service
 class GjennomforingMetricService(
 	registry: MeterRegistry,
 	private val gjennomforingMetricRepository: GjennomforingMetricRepository,
 ) {
+
+	private val gjennomforingGauge = MultiGauge.builder(gjennomforing).register(registry)
 
 	private val antallGjennomforingerPerTypeGauge = MultiGauge
 		.builder(antallGjennomforingerPerType)
@@ -23,12 +26,23 @@ class GjennomforingMetricService(
 	private fun oppdaterAntallGjennomforingerPerTypeMetric() {
 		val antallOgTyper = gjennomforingMetricRepository.antallGjennomforingerPerType()
 		antallGjennomforingerPerTypeGauge.register(
-			antallOgTyper.map { MultiGauge.Row.of(Tags.of("type", it.type), it.antall) }
+			antallOgTyper.map { MultiGauge.Row.of(Tags.of(Tag.of("type", it.type)), it.antall) }
 		)
+	}
+
+	fun oppdaterGjennomforingMaalinger() {
+		val rows = gjennomforingMetricRepository.antallGjennomforingerGruppert().map {
+			MultiGauge.Row.of(
+				Tags.of(Tag.of("status", it.status), Tag.of("synligHosArrangor", it.synligHosArrangor.toString())),
+				it.antall
+			)
+		}
+		gjennomforingGauge.register(rows)
 	}
 
 	fun oppdaterMetrikker() {
 		oppdaterAntallGjennomforingerPerTypeMetric()
+		oppdaterGjennomforingMaalinger()
 	}
 
 

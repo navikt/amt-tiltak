@@ -6,11 +6,6 @@ import org.springframework.stereotype.Component
 
 typealias StatusStatistikk = Pair<String, Int>
 
-data class GjennomforingMetrikker(
-	val status: String,
-	val synligHosArrangor: Boolean,
-	val antall: Int
-)
 
 @Component
 class DeltakerStatistikkRepository(
@@ -64,34 +59,6 @@ class DeltakerStatistikkRepository(
 		Int::class.java
 	)
 
-	@Deprecated("Bør kunne erstattes med antallGjennomforingerMedGrupperinger")
-	fun antallGjennomforinger() = template.queryForObject(
-		"SELECT count(*) FROM gjennomforing;",
-		MapSqlParameterSource(),
-		Int::class.java
-	)
-
-	@Deprecated("Bør kunne erstattes med antallGjennomforingerMedGrupperinger")
-	fun antallGjennomforingerPrStatus() = template.query(
-		"SELECT status, count(*) as antall FROM gjennomforing GROUP BY status;"
-	) { rs, _ ->
-		StatusStatistikk(rs.getString("status"), rs.getInt("antall"))
-	}
-
-	fun antallGjennomforingerGruppert() = template.query(
-		"""
-			SELECT g.status as status, aagt.id is not null as gjennomforing_med_bruker_hos_arrangor, count(*) as antall
-			FROM gjennomforing g
-			left join arrangor_ansatt_gjennomforing_tilgang aagt on g.id = aagt.gjennomforing_id
-			group by g.status, gjennomforing_med_bruker_hos_arrangor;
-		""".trimMargin()
-	) { rs, _ ->
-		GjennomforingMetrikker(
-			rs.getString("status"),
-			rs.getBoolean("gjennomforing_med_bruker_hos_arrangor"),
-			rs.getInt("antall")
-		)
-	}
 
 	fun eksponerteBrukere(): Int {
 		val query = """
