@@ -19,8 +19,7 @@ class GjennomforingMetricService(
 
 	private val antallGjennomforingerPerTypeGauge = MultiGauge
 		.builder(antallGjennomforingerPerType)
-		.baseUnit("gjennomføringer")
-		.description("Antall gjennomføringer fordelt på typer, hvor det er minst en gyldig tilgang hos arrangøren.")
+		.description("Antall gjennomføringer fordelt på typer, hvor det er minst en gyldig tilgang hos er arrangør.")
 		.register(registry)
 
 	private fun oppdaterAntallGjennomforingerPerTypeMetric() {
