@@ -10,12 +10,12 @@ class GjennomforingMetricRepository(
 
 	fun antallGjennomforingerPerType(): List<AntallGjennomforingerPerTypeMetric> {
 		val sql = """
-			select t.type, count(distinct g.id) as antall
-			from tiltak t
-				join gjennomforing g on t.id = g.tiltak_id
-				join arrangor_ansatt_gjennomforing_tilgang aagt on g.id = aagt.gjennomforing_id
-			where aagt.gyldig_til > current_timestamp
-			group by  t.type;
+			SELECT t.type, COUNT(DISTINCT g.id) AS antall
+			FROM tiltak t
+				JOIN gjennomforing g ON t.id = g.tiltak_id
+				JOIN arrangor_ansatt_gjennomforing_tilgang aagt ON g.id = aagt.gjennomforing_id
+			WHERE aagt.gyldig_til > current_timestamp
+			GROUP BY  t.type;
 		""".trimIndent()
 
 		return template.query(sql) { rs, _ ->
@@ -25,10 +25,10 @@ class GjennomforingMetricRepository(
 
 	fun antallGjennomforingerGruppert() = template.query(
 		"""
-			SELECT g.status as status, aagt.id is not null as gjennomforing_med_bruker_hos_arrangor, count(*) as antall
+			SELECT g.status AS status, aagt.id IS NOT NULL AS gjennomforing_med_bruker_hos_arrangor, COUNT(*) AS antall
 			FROM gjennomforing g
-			left join arrangor_ansatt_gjennomforing_tilgang aagt on g.id = aagt.gjennomforing_id
-			group by g.status, gjennomforing_med_bruker_hos_arrangor;
+			LEFT JOIN arrangor_ansatt_gjennomforing_tilgang aagt on g.id = aagt.gjennomforing_id
+			GROUP BY g.status, gjennomforing_med_bruker_hos_arrangor;
 		""".trimMargin()
 	) { rs, _ ->
 		GjennomforingMetrikker(
