@@ -190,6 +190,11 @@ open class DeltakerServiceImpl(
 	override fun deltakerIkkeAktuell(deltakerId: UUID, arrangorAnsattId: UUID, statusAarsak: DeltakerStatus.Aarsak) {
 		endringsmeldingService.opprettDeltakerIkkeAktuellEndringsmelding(deltakerId, arrangorAnsattId, statusAarsak)
 	}
+
+	override fun hentDeltakerMap(deltakerIder: List<UUID>): Map<UUID, Deltaker> {
+		val deltakere = deltakerRepository.getDeltakere(deltakerIder)
+		return mapDeltakereOgAktiveStatuser(deltakere).associateBy { it.id }
+	}
 }
 
 

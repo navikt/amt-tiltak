@@ -155,6 +155,26 @@ open class DeltakerRepository(
 			.firstOrNull()
 	}
 
+	fun getDeltakere(deltakerIder: List<UUID>): List<DeltakerDbo> {
+		if (deltakerIder.isEmpty()) return emptyList()
+
+		val sql = """
+			SELECT deltaker.*, bruker.*
+			FROM deltaker
+					 inner join bruker on bruker.id = deltaker.bruker_id
+			WHERE deltaker.id in (:deltakerIder)
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"deltakerIder" to deltakerIder,
+			)
+		)
+
+		return template.query(sql, parameters, rowMapper)
+	}
+
+
 	fun getDeltakereMedFnr(fodselsnummer: String): List<DeltakerDbo> {
 		val sql = """
 			SELECT deltaker.*, bruker.*

@@ -14,6 +14,7 @@ import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_3
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import org.slf4j.LoggerFactory
@@ -181,6 +182,14 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 
 	}
+
+	test("getDeltakere - finner og returnerer deltakere med id i liste") {
+		val deltakere = repository.getDeltakere(listOf(DELTAKER_1.id, DELTAKER_2.id))
+		deltakere shouldHaveSize 2
+		deltakere.any { it.id == DELTAKER_1.id }
+		deltakere.any { it.id == DELTAKER_2.id }
+	}
+
 
 	test("skalAvsluttes - status DELTAR og sluttdato passert - deltaker returneres") {
 		val deltakerId = UUID.randomUUID()
