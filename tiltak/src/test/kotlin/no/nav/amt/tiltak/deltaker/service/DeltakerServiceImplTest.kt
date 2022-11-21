@@ -3,7 +3,10 @@ package no.nav.amt.tiltak.deltaker.service
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
-import no.nav.amt.tiltak.core.domain.tiltak.*
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.SkjermetPersonService
@@ -243,6 +246,33 @@ class DeltakerServiceImplTest {
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldBe null
 	}
 
+	@Test
+	fun `hentDeltakerePaaGjennomforing - skal hente alle deltakere med riktig status pa gjennomforing`() {
+		val deltakerUpserts = listOf(
+			deltaker.copy(id = UUID.randomUUID()),
+			deltaker.copy(id = UUID.randomUUID()),
+			deltaker.copy(id = UUID.randomUUID()),
+		)
+
+		val statusInserts = listOf(
+			statusInsert.copy(id = UUID.randomUUID(), type = DeltakerStatus.Type.VENTER_PA_OPPSTART, deltakerId = deltakerUpserts[0].id),
+			statusInsert.copy(id = UUID.randomUUID(), type = DeltakerStatus.Type.DELTAR, deltakerId = deltakerUpserts[1].id),
+			statusInsert.copy(id = UUID.randomUUID(), type = DeltakerStatus.Type.HAR_SLUTTET, deltakerId = deltakerUpserts[2].id),
+		)
+
+		deltakerUpserts.forEach {
+			deltakerServiceImpl.upsertDeltaker(BRUKER_1.fodselsnummer, it)
+		}
+		statusInserts.forEach {
+			deltakerServiceImpl.insertStatus(it)
+		}
+
+		val deltakere = deltakerServiceImpl.hentDeltakerePaaGjennomforing(GJENNOMFORING_1.id)
+		deltakere.find { it.id == deltakerUpserts[0].id }!!.status.type shouldBe statusInserts[0].type
+		deltakere.find { it.id == deltakerUpserts[1].id }!!.status.type shouldBe statusInserts[1].type
+		deltakere.find { it.id == deltakerUpserts[2].id }!!.status.type shouldBe statusInserts[2].type
+	}
+
 	val deltaker = DeltakerUpsert(
 		id =  deltakerId,
 		startDato = null,
@@ -253,4 +283,13 @@ class DeltakerServiceImplTest {
 		gjennomforingId = GJENNOMFORING_1.id,
 		innsokBegrunnelse = null
 	)
+
+	val statusInsert = DeltakerStatusInsert(
+		id = UUID.randomUUID(),
+		deltakerId = UUID.randomUUID(),
+		type = DeltakerStatus.Type.DELTAR,
+		aarsak = null,
+		gyldigFra = LocalDateTime.now().minusDays(7),
+	)
+
 }
