@@ -252,7 +252,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
-		val expectedJson = """[{"fornavn":"Ansatt 1 fornavn","mellomnavn":"Ansatt 1 mellomnavn","etternavn":"Ansatt 1 etternavn","telefonnummer":null,"diskresjonskode":null}]"""
+		val expectedJson = """[{"fornavn":"Ansatt 1 fornavn","mellomnavn":"Ansatt 1 mellomnavn","etternavn":"Ansatt 1 etternavn"}]""".trimIndent()
 
 		response.code shouldBe 200
 		response.body?.string() shouldBe expectedJson

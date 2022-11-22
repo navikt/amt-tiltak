@@ -1,14 +1,15 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor
 
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.GjennomforingDto
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.KoordinatorDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.core.port.Person
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -21,6 +22,7 @@ import java.util.*
 class GjennomforingController(
 	private val gjennomforingService: GjennomforingService,
 	private val authService: AuthService,
+	private val arrangorAnsattService: ArrangorAnsattService,
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
 ) {
 
@@ -84,12 +86,19 @@ class GjennomforingController(
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/{gjennomforingId}/koordinatorer")
-	fun hentKoordinatorerPaGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID): Set<Person> {
+	fun hentKoordinatorerPaGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID): List<KoordinatorDto> {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
 
-		return gjennomforingService.getKoordinatorerForGjennomforing(gjennomforingId)
+		return arrangorAnsattService.getKoordinatorerForGjennomforing(gjennomforingId)
+			.map {
+				KoordinatorDto(
+					fornavn = it.fornavn,
+					mellomnavn = it.mellomnavn,
+					etternavn = it.etternavn,
+				)
+			}
 	}
 
 
