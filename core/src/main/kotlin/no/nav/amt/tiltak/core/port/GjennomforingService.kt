@@ -9,8 +9,6 @@ interface GjennomforingService {
 
 	fun getGjennomforinger(gjennomforingIder: List<UUID>): List<Gjennomforing>
 
-	fun getKoordinatorerForGjennomforing(gjennomforingId: UUID): Set<Person>
-
 	fun getByArrangorId(arrangorId: UUID): List<Gjennomforing>
 
 	fun getAktiveByLopenr(lopenr: Int): List<Gjennomforing>

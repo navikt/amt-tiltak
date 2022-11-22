@@ -3,10 +3,12 @@ package no.nav.amt.tiltak.tiltak.services
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.ArrangorService
+import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
-import no.nav.amt.tiltak.tiltak.repositories.HentKoordinatorerForGjennomforingQuery
 import no.nav.amt.tiltak.utils.UpdateStatus
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -20,7 +22,6 @@ class GjennomforingServiceImpl(
 	private val deltakerService: DeltakerService,
 	private val arrangorService: ArrangorService,
 	private val transactionTemplate: TransactionTemplate,
-	private val koordinatorerForGjennomforing: HentKoordinatorerForGjennomforingQuery
 ) : GjennomforingService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -96,10 +97,6 @@ class GjennomforingServiceImpl(
 		return gjennomforingRepository
 			.get(gjennomforingIder)
 			.map{ getGjennomforing(it.id) }
-	}
-
-	override fun getKoordinatorerForGjennomforing(gjennomforingId: UUID): Set<Person> {
-		return koordinatorerForGjennomforing.query(gjennomforingId)
 	}
 
 	override fun getByArrangorId(arrangorId: UUID): List<Gjennomforing> {

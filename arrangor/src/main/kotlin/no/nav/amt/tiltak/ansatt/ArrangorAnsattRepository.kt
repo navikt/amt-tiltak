@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.ansatt
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getLocalDateTime
 import no.nav.amt.tiltak.common.db_utils.getUUID
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -65,6 +66,29 @@ open class ArrangorAnsattRepository(
 			parameters,
 			rowMapper
 		).firstOrNull()
+	}
+
+
+	fun getAnsatteForGjennomforing(gjennomforingId: UUID, rolle: ArrangorAnsattRolle): List<AnsattDbo> {
+		val sql = """
+		SELECT a.*
+		FROM arrangor_ansatt a
+				 INNER JOIN arrangor_ansatt_rolle aar on a.id = aar.ansatt_id
+				 INNER JOIN arrangor_ansatt_gjennomforing_tilgang aagt on aar.ansatt_id = aagt.ansatt_id
+		WHERE aagt.gjennomforing_id = :gjennomforingId
+		  AND aar.rolle = CAST(:rolle AS arrangor_rolle)
+		  AND aagt.gyldig_fra < CURRENT_TIMESTAMP
+		  AND aagt.gyldig_til > CURRENT_TIMESTAMP
+	""".trimIndent()
+		return template.query(
+			sql,
+			sqlParameters(
+				"gjennomforingId" to gjennomforingId,
+				"rolle" to rolle.name,
+			),
+			rowMapper
+		)
+
 	}
 
 }
