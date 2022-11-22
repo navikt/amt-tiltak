@@ -102,10 +102,6 @@ class GjennomforingServiceImpl(
 		return koordinatorerForGjennomforing.query(gjennomforingId)
 	}
 
-	override fun getKoordinatorerForGjennomforinger(gjennomforingIder: List<UUID>): Map<UUID, Set<Person>> {
-		return koordinatorerForGjennomforing.query(gjennomforingIder)
-	}
-
 	override fun getByArrangorId(arrangorId: UUID): List<Gjennomforing> {
 		return gjennomforingRepository.getByArrangorId(arrangorId).map {
 			val (tiltak, arrangor) = getTiltakOgArrangor(it.tiltakId, it.arrangorId)
