@@ -4,10 +4,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.*
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.SkjermetPersonService
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpdateDbo
+import no.nav.amt.tiltak.deltaker.dbo.*
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.tiltak.services.BrukerService
@@ -58,10 +55,8 @@ open class DeltakerServiceImpl(
 	}
 
 	override fun hentDeltakerePaaGjennomforing(gjennomforingId: UUID): List<Deltaker> {
-		return deltakerRepository.getDeltakerePaaTiltak(gjennomforingId)
-			.map { deltaker ->
-				return@map deltaker.toDeltaker(hentStatusOrThrow(deltaker.id))
-			}
+		val deltakere = deltakerRepository.getDeltakerePaaTiltak(gjennomforingId)
+		return mapDeltakereOgAktiveStatuser(deltakere)
 	}
 
 	override fun hentDeltaker(deltakerId: UUID): Deltaker? {
@@ -72,7 +67,8 @@ open class DeltakerServiceImpl(
 	}
 
 	override fun hentDeltakereMedFnr(fodselsnummer: String): List<Deltaker>{
-		return deltakerRepository.getDeltakereMedFnr(fodselsnummer).map { it.toDeltaker(hentStatusOrThrow(it.id)) }
+		val deltakere =  deltakerRepository.getDeltakereMedFnr(fodselsnummer)
+		return mapDeltakereOgAktiveStatuser(deltakere)
 	}
 
 	override fun oppdaterStatuser() {
@@ -138,6 +134,18 @@ open class DeltakerServiceImpl(
 		return deltakerStatusRepository.getStatusForDeltaker(deltakerId)?.toModel() ?: return null
 	}
 
+	private fun hentAktiveStatuserForDeltakere(deltakerIder: List<UUID>): Map<UUID, DeltakerStatusDbo> {
+		return deltakerStatusRepository.getAktiveStatuserForDeltakere(deltakerIder).associateBy { it.deltakerId }
+	}
+
+	private fun mapDeltakereOgAktiveStatuser(deltakere: List<DeltakerDbo>): List<Deltaker> {
+		val statuser = hentAktiveStatuserForDeltakere(deltakere.map { it.id })
+		return deltakere.map { d ->
+			val status = statuser[d.id] ?: throw NoSuchElementException("Fant ikke status på deltaker med id ${d.id}")
+			return@map d.toDeltaker(status.toModel())
+		}
+	}
+
 	private fun oppdaterStatuser(deltakere: List<DeltakerDbo>, type: DeltakerStatus.Type) = deltakere
 		.also { log.info("Oppdaterer status på ${it.size} deltakere") }
 		.forEach {
@@ -181,6 +189,11 @@ open class DeltakerServiceImpl(
 
 	override fun deltakerIkkeAktuell(deltakerId: UUID, arrangorAnsattId: UUID, statusAarsak: DeltakerStatus.Aarsak) {
 		endringsmeldingService.opprettDeltakerIkkeAktuellEndringsmelding(deltakerId, arrangorAnsattId, statusAarsak)
+	}
+
+	override fun hentDeltakerMap(deltakerIder: List<UUID>): Map<UUID, Deltaker> {
+		val deltakere = deltakerRepository.getDeltakere(deltakerIder)
+		return mapDeltakereOgAktiveStatuser(deltakere).associateBy { it.id }
 	}
 }
 

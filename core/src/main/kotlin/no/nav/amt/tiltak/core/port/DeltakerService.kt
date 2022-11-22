@@ -37,4 +37,7 @@ interface DeltakerService {
 	fun deltakerIkkeAktuell(deltakerId: UUID, arrangorAnsattId: UUID, statusAarsak: DeltakerStatus.Aarsak)
 
 	fun erSkjermet(deltakerId: UUID): Boolean
+
+	fun hentDeltakerMap(deltakerIder: List<UUID>): Map<UUID, Deltaker>
+
 }

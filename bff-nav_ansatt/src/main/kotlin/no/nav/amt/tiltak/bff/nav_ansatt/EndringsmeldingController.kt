@@ -31,8 +31,11 @@ class EndringsmeldingController(
 		tiltaksansvarligAutoriseringService.verifiserTilgangTilEndringsmelding(navAnsattAzureId)
 		tiltaksansvarligAutoriseringService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId)
 
-		return endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId).map {
-			val deltaker = deltakerService.hentDeltaker(it.deltakerId)
+		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId)
+		val deltakerMap = deltakerService.hentDeltakerMap(endringsmeldinger.map { it.deltakerId })
+
+		return endringsmeldinger.map {
+			val deltaker = deltakerMap[it.deltakerId]
 				?: throw NoSuchElementException("Fant ikke deltaker med id ${it.deltakerId}")
 
 			return@map EndringsmeldingDto(

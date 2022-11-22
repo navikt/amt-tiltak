@@ -97,4 +97,22 @@ open class DeltakerStatusRepository(
 		template.update(sql, parameters)
 	}
 
+	fun getAktiveStatuserForDeltakere(deltakerIder: List<UUID>): List<DeltakerStatusDbo> {
+		if (deltakerIder.isEmpty()) return emptyList()
+
+		val sql = """
+			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aktiv, created_at
+			FROM deltaker_status
+			WHERE deltaker_id IN (:deltakerIder)
+			AND aktiv = true
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf("deltakerIder" to deltakerIder)
+		)
+
+		return template.query(sql, parameters, rowMapper)
+
+	}
+
 }
