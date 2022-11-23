@@ -2,15 +2,18 @@ package no.nav.amt.tiltak.ansatt
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattGjennomforingTilgangInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattRolleInput
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
@@ -59,6 +62,15 @@ class AnsattRepositoryTest {
 
 	@Test
 	internal fun `getAnsatteForGjennomforing - skal filtrere pa rolle og gjennomforing`() {
+		testRepository.insertArrangorAnsattRolle(
+			ArrangorAnsattRolleInput(
+				id = UUID.randomUUID(),
+				ARRANGOR_1.id,
+				ARRANGOR_ANSATT_1.id,
+				ArrangorAnsattRolle.KOORDINATOR.name,
+			)
+		)
+
 		testRepository.insertArrangorAnsattGjennomforingTilgang(
 			ArrangorAnsattGjennomforingTilgangInput(
 				id = UUID.randomUUID(),
@@ -70,6 +82,8 @@ class AnsattRepositoryTest {
 		)
 
 		val koordinatorer = repository.getAnsatteForGjennomforing(GJENNOMFORING_1.id, ArrangorAnsattRolle.KOORDINATOR)
+
+		koordinatorer.filter { it.id == ARRANGOR_ANSATT_1.id } shouldHaveSize 1
 
 		koordinatorer.first().id shouldBe ARRANGOR_ANSATT_1.id
 
