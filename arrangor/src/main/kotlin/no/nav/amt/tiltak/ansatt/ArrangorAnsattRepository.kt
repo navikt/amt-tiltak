@@ -71,7 +71,7 @@ open class ArrangorAnsattRepository(
 
 	fun getAnsatteForGjennomforing(gjennomforingId: UUID, rolle: ArrangorAnsattRolle): List<AnsattDbo> {
 		val sql = """
-		SELECT a.*
+		SELECT distinct a.*
 		FROM arrangor_ansatt a
 				 INNER JOIN arrangor_ansatt_rolle aar on a.id = aar.ansatt_id
 				 INNER JOIN arrangor_ansatt_gjennomforing_tilgang aagt on aar.ansatt_id = aagt.ansatt_id
