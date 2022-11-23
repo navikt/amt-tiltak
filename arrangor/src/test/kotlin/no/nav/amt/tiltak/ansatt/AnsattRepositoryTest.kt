@@ -61,7 +61,7 @@ class AnsattRepositoryTest {
 	}
 
 	@Test
-	internal fun `getAnsatteForGjennomforing - skal filtrere pa rolle og gjennomforing`() {
+	internal fun `getAnsatteForGjennomforing - skal filtrere pa rolle, gjennomforing og filtere ut duplikater`() {
 		testRepository.insertArrangorAnsattRolle(
 			ArrangorAnsattRolleInput(
 				id = UUID.randomUUID(),
@@ -83,15 +83,14 @@ class AnsattRepositoryTest {
 
 		val koordinatorer = repository.getAnsatteForGjennomforing(GJENNOMFORING_1.id, ArrangorAnsattRolle.KOORDINATOR)
 
-		koordinatorer.filter { it.id == ARRANGOR_ANSATT_1.id } shouldHaveSize 1
-
 		koordinatorer.first().id shouldBe ARRANGOR_ANSATT_1.id
+
+		koordinatorer shouldHaveSize 1
 
 		val veiledere = repository.getAnsatteForGjennomforing(GJENNOMFORING_1.id, ArrangorAnsattRolle.VEILEDER)
 
 		veiledere.any { it.id == ARRANGOR_ANSATT_1.id } shouldBe true
 		veiledere.any { it.id == ARRANGOR_ANSATT_2.id } shouldBe true
 	}
-
 
 }
