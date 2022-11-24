@@ -10,9 +10,11 @@ import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
+import no.nav.amt.tiltak.core.exceptions.ValidationException
 import no.nav.amt.tiltak.core.port.*
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.client.HttpClientErrorException.BadRequest
 import java.util.*
 
 @RestController
@@ -112,6 +114,22 @@ class DeltakerController(
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
+	@PatchMapping("/{deltakerId}/deltaker-prosent")
+	fun endreDeltakelsesprosent(
+		@PathVariable("deltakerId") deltakerId: UUID,
+		@RequestBody body: EndreDeltakelsesprosentRequestBody
+	) {
+		if(body.deltakerProsent < 0) throw ValidationException("Deltakelsesprosent kan ikke være negativ")
+		if(body.deltakerProsent > 100) throw ValidationException("Deltakelsesprosent kan ikke være over 100%")
+
+		val ansatt = hentInnloggetAnsatt()
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		kastHvisSkjermet(deltakerId)
+
+		deltakerService.endreDeltakelsesprosent(deltakerId, ansatt.id, body.deltakerProsent)
+	}
+
+	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@PatchMapping("/{deltakerId}/ikke-aktuell")
 	fun deltakerIkkeAktuell(
 		@PathVariable("deltakerId") deltakerId: UUID,
@@ -135,4 +153,7 @@ class DeltakerController(
 		if (skjermetDeltaker) throw UnauthorizedException("Kan ikke endre skjermet person")
 	}
 
+	data class EndreDeltakelsesprosentRequestBody(
+		val deltakerProsent: Int
+	)
 }

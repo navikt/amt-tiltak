@@ -22,6 +22,7 @@ data class EndringsmeldingDbo(
 	enum class Type {
 		LEGG_TIL_OPPSTARTSDATO,
 		ENDRE_OPPSTARTSDATO,
+		ENDRE_PROSENT_DELTAKELSE,
 		FORLENG_DELTAKELSE,
 		AVSLUTT_DELTAKELSE,
 		DELTAKER_IKKE_AKTUELL,
@@ -54,6 +55,11 @@ data class EndringsmeldingDbo(
 			val aarsak: DeltakerStatusAarsak,
 		) : Innhold()
 
+		data class EndreDeltakelseProsentInnhold(
+			val gammelDeltakelseProsent: Int?,
+			val nyDeltakelseProsent: Int
+		): Innhold()
+
 		fun type(): Type {
 			return when(this) {
 				is LeggTilOppstartsdatoInnhold -> Type.LEGG_TIL_OPPSTARTSDATO
@@ -61,6 +67,7 @@ data class EndringsmeldingDbo(
 				is ForlengDeltakelseInnhold -> Type.FORLENG_DELTAKELSE
 				is AvsluttDeltakelseInnhold -> Type.AVSLUTT_DELTAKELSE
 				is DeltakerIkkeAktuellInnhold -> Type.DELTAKER_IKKE_AKTUELL
+				is EndreDeltakelseProsentInnhold -> Type.ENDRE_PROSENT_DELTAKELSE
 			}
 		}
 	}

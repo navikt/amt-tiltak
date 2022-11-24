@@ -32,6 +32,8 @@ interface DeltakerService {
 
 	fun forlengDeltakelse(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate)
 
+	fun endreDeltakelsesprosent(deltakerId: UUID, id: UUID, deltakerProsent: Int)
+
 	fun avsluttDeltakelse(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate, statusAarsak: DeltakerStatus.Aarsak)
 
 	fun deltakerIkkeAktuell(deltakerId: UUID, arrangorAnsattId: UUID, statusAarsak: DeltakerStatus.Aarsak)

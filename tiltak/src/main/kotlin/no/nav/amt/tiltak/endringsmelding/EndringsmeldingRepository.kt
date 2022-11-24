@@ -144,6 +144,8 @@ open class EndringsmeldingRepository(
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold>(innholdJson)
 			EndringsmeldingDbo.Type.DELTAKER_IKKE_AKTUELL ->
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold>(innholdJson)
+			EndringsmeldingDbo.Type.ENDRE_PROSENT_DELTAKELSE ->
+				objectMapper.readValue<EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold>(innholdJson)
 		}
 
 	}

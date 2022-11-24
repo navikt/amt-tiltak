@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.deltaker.service
 
 import no.nav.amt.tiltak.core.domain.tiltak.*
+import no.nav.amt.tiltak.core.exceptions.ValidationException
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.SkjermetPersonService
@@ -176,6 +177,18 @@ open class DeltakerServiceImpl(
 
 	override fun forlengDeltakelse(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate) {
 		endringsmeldingService.opprettForlengDeltakelseEndringsmelding(deltakerId, arrangorAnsattId, sluttdato)
+	}
+
+	override fun endreDeltakelsesprosent(deltakerId: UUID, arrangorAnsattId: UUID, deltakerProsent: Int) {
+		val deltaker = deltakerRepository.get(deltakerId)
+			?: throw ValidationException("Deltaker med id $deltakerId eksisterer ikke")
+
+		endringsmeldingService.opprettEndreDeltakelseProsentEndringsmelding(
+			deltakerId = deltakerId,
+			arrangorAnsattId = arrangorAnsattId,
+			gammelDeltakelseProsent = deltaker.prosentStilling?.toInt(),
+			deltakerProsent = deltakerProsent
+		)
 	}
 
 	override fun avsluttDeltakelse(

@@ -39,6 +39,11 @@ data class Endringsmelding(
 		data class DeltakerIkkeAktuellInnhold(
 			val aarsak: DeltakerStatus.Aarsak,
 		) : Innhold()
+
+		data class EndreDeltakelseProsentInnhold(
+			val gammelDeltakelseProsent: Int?,
+			val nyDeltakelseProsent: Int
+		) : Innhold()
 	}
 }
 

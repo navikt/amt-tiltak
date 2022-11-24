@@ -57,7 +57,7 @@ open class EndringsmeldingServiceImpl(
 	override fun hentAntallAktiveForGjennomforing(gjennomforingId: UUID): Int {
 		return hentEndringsmeldingerForGjennomforing(gjennomforingId).count { it.status == Endringsmelding.Status.AKTIV }
 	}
-	 private fun EndringsmeldingDbo.toModel(): Endringsmelding {
+	private fun EndringsmeldingDbo.toModel(): Endringsmelding {
 		return Endringsmelding(
 			id = id,
 			deltakerId = deltakerId,
@@ -84,6 +84,12 @@ open class EndringsmeldingServiceImpl(
 			is EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold ->
 				Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold(
 					DeltakerStatus.Aarsak(innhold.aarsak.type, innhold.aarsak.beskrivelse)
+				)
+
+			is EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold ->
+				Endringsmelding.Innhold.EndreDeltakelseProsentInnhold(
+					gammelDeltakelseProsent = innhold.gammelDeltakelseProsent,
+					nyDeltakelseProsent = innhold.nyDeltakelseProsent
 				)
 		}
 	}
@@ -124,6 +130,24 @@ open class EndringsmeldingServiceImpl(
 			deltakerId,
 			arrangorAnsattId,
 			innhold,
+		)
+	}
+
+	override fun opprettEndreDeltakelseProsentEndringsmelding(
+		deltakerId: UUID,
+		arrangorAnsattId: UUID,
+		gammelDeltakelseProsent: Int?,
+		deltakerProsent: Int
+	) {
+		val innhold = EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold(
+			gammelDeltakelseProsent = gammelDeltakelseProsent,
+			nyDeltakelseProsent = deltakerProsent
+		)
+
+		opprettOgMarkerAktiveSomUtdatert(
+			deltakerId,
+			arrangorAnsattId,
+			innhold
 		)
 	}
 

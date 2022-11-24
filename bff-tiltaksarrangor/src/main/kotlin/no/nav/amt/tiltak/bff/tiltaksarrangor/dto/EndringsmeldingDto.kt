@@ -18,6 +18,7 @@ data class EndringsmeldingDto(
 		FORLENG_DELTAKELSE,
 		AVSLUTT_DELTAKELSE,
 		DELTAKER_IKKE_AKTUELL,
+		ENDRE_PROSENT_DELTAKELSE,
 	}
 
 	sealed class Innhold {
@@ -27,6 +28,11 @@ data class EndringsmeldingDto(
 
 		data class EndreOppstartsdatoInnhold(
 			val oppstartsdato: LocalDate,
+		) : Innhold()
+
+		data class EndreDeltakelseProsentInnhold(
+			val gammelDeltakelseProsent: Int?,
+			val nyDeltakelseProsent: Int
 		) : Innhold()
 
 		data class ForlengDeltakelseInnhold(
@@ -49,6 +55,7 @@ data class EndringsmeldingDto(
 				is ForlengDeltakelseInnhold -> Type.FORLENG_DELTAKELSE
 				is AvsluttDeltakelseInnhold -> Type.AVSLUTT_DELTAKELSE
 				is DeltakerIkkeAktuellInnhold -> Type.DELTAKER_IKKE_AKTUELL
+				is EndreDeltakelseProsentInnhold -> Type.ENDRE_PROSENT_DELTAKELSE
 			}
 		}
 
@@ -68,5 +75,10 @@ fun Endringsmelding.Innhold.toDto(): EndringsmeldingDto.Innhold {
 			EndringsmeldingDto.Innhold.AvsluttDeltakelseInnhold(this.sluttdato, this.aarsak.toDto())
 		is Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold ->
 			EndringsmeldingDto.Innhold.DeltakerIkkeAktuellInnhold(this.aarsak.toDto())
+		is Endringsmelding.Innhold.EndreDeltakelseProsentInnhold ->
+			EndringsmeldingDto.Innhold.EndreDeltakelseProsentInnhold(
+				gammelDeltakelseProsent = this.gammelDeltakelseProsent,
+				nyDeltakelseProsent = this.nyDeltakelseProsent
+			)
 	}
 }
