@@ -21,6 +21,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
@@ -119,6 +120,27 @@ class DeltakerServiceImplTest {
 		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
 
 		status!!.type shouldBe DeltakerStatus.Type.HAR_SLUTTET
+
+	}
+
+	@Test
+	fun `oppdaterStatuser - Setter til ikke aktuell, aktive deltakere deltakere på avsluttede gjennomføringer`() {
+		testDataRepository.insertArrangor(ARRANGOR_2)
+		testDataRepository.insertNavEnhet(NAV_ENHET_2)
+		testDataRepository.insertGjennomforing(GJENNOMFORING_2)
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(gjennomforingId = GJENNOMFORING_2.id))
+		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_2)
+
+		// Valider testdata tilstand
+		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
+		GJENNOMFORING_2.status shouldBe Gjennomforing.Status.AVSLUTTET.name
+		forrigeStatus!!.type shouldBe DeltakerStatus.Type.VENTER_PA_OPPSTART
+
+		deltakerServiceImpl.oppdaterStatuser()
+
+		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
+
+		status!!.type shouldBe DeltakerStatus.Type.IKKE_AKTUELL
 
 	}
 	@Test
