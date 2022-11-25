@@ -85,6 +85,16 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		meldinger[0].opprettetAvArrangorAnsattId shouldBe ARRANGOR_ANSATT_1.id
 	}
 
+	test("markerSomTilbakekalt - skal sette status til TILBAKEKALT") {
+		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
+
+		repository.markerSomTilbakekalt(ENDRINGSMELDING_1_DELTAKER_1.id)
+
+		val oppdatertMelding = repository.get(ENDRINGSMELDING_1_DELTAKER_1.id)
+
+		oppdatertMelding.status shouldBe Endringsmelding.Status.TILBAKEKALT
+	}
+
 	test("markerSomUtfort - skal sette status til UTFORT og nav ansatt") {
 		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
 

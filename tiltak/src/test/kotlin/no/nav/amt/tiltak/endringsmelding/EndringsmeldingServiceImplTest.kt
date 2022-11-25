@@ -1,10 +1,12 @@
 package no.nav.amt.tiltak.endringsmelding
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.core.exceptions.EndringsmeldingIkkeAktivException
 import no.nav.amt.tiltak.core.port.AuditLoggerService
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
@@ -12,6 +14,8 @@ import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.transaction.TransactionStatus
+import org.springframework.transaction.support.SimpleTransactionStatus
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
 import java.time.ZonedDateTime
@@ -33,6 +37,37 @@ class EndringsmeldingServiceImplTest {
 		auditLoggerService = mockk(relaxUnitFun = true)
 		transactionTemplate = mockk()
 		endringsmeldingService = EndringsmeldingServiceImpl(repository, auditLoggerService, transactionTemplate)
+	}
+
+	@Test
+	fun `markerSomTilbakekalt - skal sette status pa endringsmelding til TILBAKEKALT`() {
+		val utfortEndringsmelding = endringsmeldingDbo.copy(id = UUID.randomUUID(), status = Endringsmelding.Status.UTFORT)
+
+		every {
+			transactionTemplate.executeWithoutResult(any<java.util.function.Consumer<TransactionStatus>>())
+		} answers {
+			(firstArg() as java.util.function.Consumer<TransactionStatus>).accept(SimpleTransactionStatus())
+		}
+
+		every {
+			repository.get(endringsmeldingDbo.id)
+		} returns endringsmeldingDbo
+
+		every {
+			repository.get(utfortEndringsmelding.id)
+		} returns utfortEndringsmelding
+
+
+		shouldThrow<EndringsmeldingIkkeAktivException> {
+			endringsmeldingService.markerSomTilbakekalt(utfortEndringsmelding.id)
+		}
+
+		endringsmeldingService.markerSomTilbakekalt(endringsmeldingDbo.id)
+
+		verify(exactly = 1) {
+			repository.markerSomTilbakekalt(endringsmeldingDbo.id)
+		}
+
 	}
 
 	@Test
