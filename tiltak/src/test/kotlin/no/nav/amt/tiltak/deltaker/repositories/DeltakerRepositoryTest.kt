@@ -186,8 +186,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 	test("getDeltakere - finner og returnerer deltakere med id i liste") {
 		val deltakere = repository.getDeltakere(listOf(DELTAKER_1.id, DELTAKER_2.id))
 		deltakere shouldHaveSize 2
-		deltakere.any { it.id == DELTAKER_1.id }
-		deltakere.any { it.id == DELTAKER_2.id }
+		deltakere.any { it.id == DELTAKER_1.id } shouldBe true
+		deltakere.any { it.id == DELTAKER_2.id } shouldBe true
 	}
 
 
