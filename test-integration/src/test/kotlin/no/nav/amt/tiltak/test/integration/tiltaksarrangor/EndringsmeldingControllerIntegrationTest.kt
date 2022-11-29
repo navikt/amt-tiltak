@@ -33,7 +33,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
 		val requestBuilders = listOf(
 			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/endringsmelding/aktiv?deltakerId=${UUID.randomUUID()}"),
-			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/endringsmelding/tilbakekall?id=${UUID.randomUUID()}"),
+			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/endringsmelding/${UUID.randomUUID()}/tilbakekall/"),
 		)
 		testTiltaksarrangorAutentisering(requestBuilders, client, oAuthServer)
 	}
@@ -59,7 +59,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 	fun `tilbakekallEndringsmelding() - skal returnere 200 om endringsmeldingen ble tilbakekalt`() {
 		val response = sendRequest(
 			method = "PATCH",
-			url = "/api/tiltaksarrangor/endringsmelding/tilbakekall?id=${ENDRINGSMELDING_1_DELTAKER_1.id}",
+			url = "/api/tiltaksarrangor/endringsmelding/${ENDRINGSMELDING_1_DELTAKER_1.id}/tilbakekall/",
 			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 			body = emptyRequest(),
 		)
@@ -73,7 +73,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		testDataRepository.insertEndringsmelding(utfortEndringsmelding)
 		val response = sendRequest(
 			method = "PATCH",
-			url = "/api/tiltaksarrangor/endringsmelding/tilbakekall?id=${utfortEndringsmelding.id}",
+			url = "/api/tiltaksarrangor/endringsmelding/${utfortEndringsmelding.id}/tilbakekall/",
 			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 			body = emptyRequest(),
 		)

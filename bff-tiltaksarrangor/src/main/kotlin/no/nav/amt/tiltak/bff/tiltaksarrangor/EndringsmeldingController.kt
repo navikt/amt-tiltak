@@ -41,9 +41,9 @@ class EndringsmeldingController(
 				)
 			}
 	}
-	@PatchMapping("/tilbakekall")
+	@PatchMapping("/{id}/tilbakekall")
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
-	fun tilbakekallEndringsmelding(@RequestParam("id") id: UUID) {
+	fun tilbakekallEndringsmelding(@PathVariable("id") id: UUID) {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 
 		val endringsmelding = endringsmeldingService.hentEndringsmelding(id)
