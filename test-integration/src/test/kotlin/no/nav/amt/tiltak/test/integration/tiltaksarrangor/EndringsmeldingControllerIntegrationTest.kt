@@ -1,11 +1,13 @@
 package no.nav.amt.tiltak.test.integration.tiltaksarrangor
 
 import io.kotest.matchers.shouldBe
+import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_1
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
 import okhttp3.Request
@@ -31,6 +33,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
 		val requestBuilders = listOf(
 			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/endringsmelding/aktiv?deltakerId=${UUID.randomUUID()}"),
+			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/endringsmelding/${UUID.randomUUID()}/tilbakekall/"),
 		)
 		testTiltaksarrangorAutentisering(requestBuilders, client, oAuthServer)
 	}
@@ -50,4 +53,40 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		response.code shouldBe 200
 		response.body?.string() shouldBe expectedJson
 	}
+
+
+	@Test
+	fun `tilbakekallEndringsmelding() - skal returnere 200 om endringsmeldingen ble tilbakekalt`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/endringsmelding/${ENDRINGSMELDING_1_DELTAKER_1.id}/tilbakekall/",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			body = emptyRequest(),
+		)
+
+		response.code shouldBe 200
+
+		val oppdatertMelding = endringsmeldingRepository.get(ENDRINGSMELDING_1_DELTAKER_1.id)
+
+		oppdatertMelding.status shouldBe Endringsmelding.Status.TILBAKEKALT
+	}
+
+	@Test
+	fun `tilbakekallEndringsmelding() - skal returnere 400 om endringsmeldingen ikke ble tilbakekalt`() {
+		val utfortEndringsmelding = ENDRINGSMELDING_1_DELTAKER_1.copy(id = UUID.randomUUID(), status = Endringsmelding.Status.UTFORT)
+		testDataRepository.insertEndringsmelding(utfortEndringsmelding)
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/endringsmelding/${utfortEndringsmelding.id}/tilbakekall/",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			body = emptyRequest(),
+		)
+
+		response.code shouldBe 400
+
+		val melding = endringsmeldingRepository.get(utfortEndringsmelding.id)
+
+		melding.status shouldBe Endringsmelding.Status.UTFORT
+	}
+
 }

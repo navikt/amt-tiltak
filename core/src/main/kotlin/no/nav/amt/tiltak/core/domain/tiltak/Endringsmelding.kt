@@ -15,7 +15,7 @@ data class Endringsmelding(
 	val innhold: Innhold,
 ) {
 	enum class Status {
-		AKTIV, UTDATERT, UTFORT
+		AKTIV, TILBAKEKALT, UTDATERT, UTFORT
 	}
 
 	sealed class Innhold {

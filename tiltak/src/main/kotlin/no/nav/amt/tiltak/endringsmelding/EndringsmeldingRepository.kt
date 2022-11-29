@@ -84,6 +84,19 @@ open class EndringsmeldingRepository(
 			?: throw NoSuchElementException("Fant ingen endringsmelding med id=$id")
 	}
 
+	fun markerSomTilbakekalt(id: UUID) {
+		val sql = """
+			UPDATE endringsmelding
+				SET status = 'TILBAKEKALT'
+				WHERE id = :id AND status = 'AKTIV'
+		""".trimIndent()
+
+		val params = sqlParameters(
+			"id" to id
+		)
+		template.update(sql, params)
+	}
+
 	fun markerSomUtfort(endringsmeldingId: UUID, navAnsattId: UUID) {
 		val sql = """
 			UPDATE endringsmelding

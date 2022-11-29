@@ -25,7 +25,7 @@ data class EndringsmeldingDto(
 	}
 
 	enum class Status {
-		AKTIV, UTDATERT, UTFORT
+		AKTIV, TILBAKEKALT, UTDATERT, UTFORT
 	}
 
 	sealed class Innhold {
@@ -80,6 +80,7 @@ fun Endringsmelding.Innhold.toDto(): EndringsmeldingDto.Innhold {
 fun Endringsmelding.Status.toDto(): EndringsmeldingDto.Status {
 	return when(this) {
 		Endringsmelding.Status.AKTIV -> EndringsmeldingDto.Status.AKTIV
+		Endringsmelding.Status.TILBAKEKALT -> EndringsmeldingDto.Status.TILBAKEKALT
 		Endringsmelding.Status.UTDATERT -> EndringsmeldingDto.Status.UTDATERT
 		Endringsmelding.Status.UTFORT -> EndringsmeldingDto.Status.UTFORT
 	}

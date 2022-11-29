@@ -36,6 +36,20 @@ open class EndringsmeldingServiceImpl(
 		auditLoggerService.navAnsattBehandletEndringsmeldingAuditLog(navAnsattId, endringsmelding.deltakerId)
 	}
 
+	override fun markerSomTilbakekalt(id: UUID) {
+		val endringsmelding = hentEndringsmelding(id)
+
+		if (endringsmelding.status != Endringsmelding.Status.AKTIV) {
+			throw EndringsmeldingIkkeAktivException(
+				"Kan ikke tilbakekalle endringsmelding med id $id med status ${endringsmelding.status}"
+			)
+		}
+
+		endringsmeldingRepository.markerSomTilbakekalt(id)
+
+		log.info("Endringsmelding med id $id er tilbakekalt av arrangor ansatt")
+	}
+
 	override fun hentEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding> {
 		return endringsmeldingRepository.getByGjennomforing(gjennomforingId)
 			.map { it.toModel() }
