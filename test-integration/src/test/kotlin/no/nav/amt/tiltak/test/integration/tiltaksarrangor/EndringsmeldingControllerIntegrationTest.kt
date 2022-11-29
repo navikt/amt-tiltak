@@ -65,6 +65,10 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		response.code shouldBe 200
+
+		val oppdatertMelding = endringsmeldingRepository.get(ENDRINGSMELDING_1_DELTAKER_1.id)
+
+		oppdatertMelding.status shouldBe Endringsmelding.Status.TILBAKEKALT
 	}
 
 	@Test
@@ -79,6 +83,10 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		response.code shouldBe 400
+
+		val melding = endringsmeldingRepository.get(utfortEndringsmelding.id)
+
+		melding.status shouldBe Endringsmelding.Status.UTFORT
 	}
 
 }
