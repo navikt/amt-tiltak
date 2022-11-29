@@ -88,7 +88,7 @@ open class EndringsmeldingRepository(
 		val sql = """
 			UPDATE endringsmelding
 				SET status = 'TILBAKEKALT'
-				WHERE id = :id
+				WHERE id = :id AND status = 'AKTIV'
 		""".trimIndent()
 
 		val params = sqlParameters(

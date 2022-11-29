@@ -37,18 +37,15 @@ open class EndringsmeldingServiceImpl(
 	}
 
 	override fun markerSomTilbakekalt(id: UUID) {
-		transactionTemplate.executeWithoutResult {
-			val endringsmelding = hentEndringsmelding(id)
+		val endringsmelding = hentEndringsmelding(id)
 
-			if (endringsmelding.status != Endringsmelding.Status.AKTIV) {
-				throw EndringsmeldingIkkeAktivException(
-					"Kan ikke tilbakekalle endringsmelding med id $id med status ${endringsmelding.status}"
-				)
-			}
-
-			endringsmeldingRepository.markerSomTilbakekalt(id)
-
+		if (endringsmelding.status != Endringsmelding.Status.AKTIV) {
+			throw EndringsmeldingIkkeAktivException(
+				"Kan ikke tilbakekalle endringsmelding med id $id med status ${endringsmelding.status}"
+			)
 		}
+
+		endringsmeldingRepository.markerSomTilbakekalt(id)
 
 		log.info("Endringsmelding med id $id er tilbakekalt av arrangor ansatt")
 	}

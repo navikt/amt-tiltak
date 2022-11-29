@@ -14,8 +14,6 @@ import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.transaction.TransactionStatus
-import org.springframework.transaction.support.SimpleTransactionStatus
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
 import java.time.ZonedDateTime
@@ -44,19 +42,12 @@ class EndringsmeldingServiceImplTest {
 		val utfortEndringsmelding = endringsmeldingDbo.copy(id = UUID.randomUUID(), status = Endringsmelding.Status.UTFORT)
 
 		every {
-			transactionTemplate.executeWithoutResult(any<java.util.function.Consumer<TransactionStatus>>())
-		} answers {
-			(firstArg() as java.util.function.Consumer<TransactionStatus>).accept(SimpleTransactionStatus())
-		}
-
-		every {
 			repository.get(endringsmeldingDbo.id)
 		} returns endringsmeldingDbo
 
 		every {
 			repository.get(utfortEndringsmelding.id)
 		} returns utfortEndringsmelding
-
 
 		shouldThrow<EndringsmeldingIkkeAktivException> {
 			endringsmeldingService.markerSomTilbakekalt(utfortEndringsmelding.id)
