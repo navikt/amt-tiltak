@@ -221,6 +221,29 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
+	internal fun `endreDeltakelsesprosent skal returnere 200 og opprette endringsmelding`() {
+		val deltakelseProsent = 95
+
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/deltakelse-prosent",
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			body = """{"deltakelseProsent": $deltakelseProsent}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 200
+
+		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForDeltaker(DELTAKER_1.id)
+
+		endringsmeldinger shouldHaveSize 1
+
+		val endringsmelding = endringsmeldinger.first()
+		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.EndreDeltakelseProsentInnhold>()
+		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
+		(endringsmelding.innhold as Endringsmelding.Innhold.EndreDeltakelseProsentInnhold).deltakelseProsent shouldBe deltakelseProsent
+	}
+
+	@Test
 	fun `avsluttDeltakelse() skal returnere 200 og opprette endringsmelding`() {
 		val response = sendRequest(
 			method = "PATCH",
