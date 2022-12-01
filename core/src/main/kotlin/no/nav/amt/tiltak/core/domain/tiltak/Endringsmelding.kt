@@ -41,8 +41,7 @@ data class Endringsmelding(
 		) : Innhold()
 
 		data class EndreDeltakelseProsentInnhold(
-			val gammelDeltakelseProsent: Int?,
-			val nyDeltakelseProsent: Int
+			val deltakelseProsent: Int
 		) : Innhold()
 	}
 }

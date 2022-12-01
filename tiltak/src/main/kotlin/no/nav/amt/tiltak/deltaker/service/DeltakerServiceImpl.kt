@@ -180,13 +180,9 @@ open class DeltakerServiceImpl(
 	}
 
 	override fun endreDeltakelsesprosent(deltakerId: UUID, arrangorAnsattId: UUID, deltakerProsent: Int) {
-		val deltaker = deltakerRepository.get(deltakerId)
-			?: throw ValidationException("Deltaker med id $deltakerId eksisterer ikke")
-
 		endringsmeldingService.opprettEndreDeltakelseProsentEndringsmelding(
 			deltakerId = deltakerId,
 			arrangorAnsattId = arrangorAnsattId,
-			gammelDeltakelseProsent = deltaker.prosentStilling?.toInt(),
 			deltakerProsent = deltakerProsent
 		)
 	}

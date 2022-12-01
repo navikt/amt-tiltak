@@ -88,8 +88,7 @@ open class EndringsmeldingServiceImpl(
 
 			is EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold ->
 				Endringsmelding.Innhold.EndreDeltakelseProsentInnhold(
-					gammelDeltakelseProsent = innhold.gammelDeltakelseProsent,
-					nyDeltakelseProsent = innhold.nyDeltakelseProsent
+					deltakelseProsent = innhold.nyDeltakelseProsent
 				)
 		}
 	}
@@ -136,11 +135,9 @@ open class EndringsmeldingServiceImpl(
 	override fun opprettEndreDeltakelseProsentEndringsmelding(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
-		gammelDeltakelseProsent: Int?,
 		deltakerProsent: Int
 	) {
 		val innhold = EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold(
-			gammelDeltakelseProsent = gammelDeltakelseProsent,
 			nyDeltakelseProsent = deltakerProsent
 		)
 
