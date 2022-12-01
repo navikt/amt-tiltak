@@ -31,6 +31,7 @@ open class ControllerService(
 			fodselsnummer = deltaker.fodselsnummer,
 			telefonnummer = deltaker.telefonnummer,
 			epost = deltaker.epost,
+			deltakelseProsent = deltaker.prosentStilling?.toInt(),
 			navEnhet = navEnhet?.toDto(),
 			navVeileder = navVeileder?.toDto(),
 			erSkjermetPerson = erSkjermet,

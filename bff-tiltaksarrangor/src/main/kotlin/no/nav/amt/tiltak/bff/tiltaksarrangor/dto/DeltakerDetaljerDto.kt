@@ -12,6 +12,7 @@ data class DeltakerDetaljerDto(
 	val fodselsnummer: String,
 	val telefonnummer: String?,
 	val epost: String?,
+	val deltakelseProsent: Int?,
 	val navEnhet: NavEnhetDto?,
 	val navVeileder: NavVeilederDto?,
 	val erSkjermetPerson: Boolean,
