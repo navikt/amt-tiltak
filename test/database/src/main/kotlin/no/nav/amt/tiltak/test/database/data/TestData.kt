@@ -1,5 +1,7 @@
 package no.nav.amt.tiltak.test.database.data
 
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.test.database.data.inputs.*
 import java.time.LocalDate
@@ -241,6 +243,14 @@ object TestData {
 		deltakerId = DELTAKER_1.id,
 		gyldigFra = LocalDateTime.now(),
 		status = "DELTAR",
+		aktiv = true
+	)
+
+	val DELTAKER_1_STATUS_2 = DeltakerStatusInput(
+		id = UUID.fromString("d6770809-29e3-47e0-8cc2-4fa667d1a756"),
+		deltakerId = DELTAKER_1.id,
+		gyldigFra = LocalDateTime.now(),
+		status = DeltakerStatus.Type.VENTER_PA_OPPSTART.name,
 		aktiv = true
 	)
 

@@ -72,9 +72,15 @@ open class DeltakerServiceImpl(
 	}
 
 	override fun oppdaterStatuser() {
-		oppdaterStatuser(deltakerRepository.skalAvsluttes(), DeltakerStatus.Type.HAR_SLUTTET)
-		oppdaterStatuser(deltakerRepository.erPaaAvsluttetGjennomforing(), DeltakerStatus.Type.HAR_SLUTTET)
-		oppdaterStatuser(deltakerRepository.skalHaStatusDeltar(), DeltakerStatus.Type.DELTAR)
+		val avsluttetEllerIkkeAktuell = deltakerRepository.erPaaAvsluttetGjennomforing()
+		val deltakere = mapDeltakereOgAktiveStatuser(avsluttetEllerIkkeAktuell)
+		val skalBliIkkeAktuell = deltakere.filter { it.status.type === DeltakerStatus.Type.VENTER_PA_OPPSTART}
+		val skalBliAvsluttet = deltakere.filter { it.status.type !== DeltakerStatus.Type.VENTER_PA_OPPSTART }
+
+		oppdaterStatuser(skalBliIkkeAktuell.map { it.id }, DeltakerStatus.Type.IKKE_AKTUELL)
+		oppdaterStatuser(skalBliAvsluttet.map { it.id }, DeltakerStatus.Type.HAR_SLUTTET)
+		oppdaterStatuser(deltakerRepository.skalAvsluttes().map { it.id }, DeltakerStatus.Type.HAR_SLUTTET)
+		oppdaterStatuser(deltakerRepository.skalHaStatusDeltar().map { it.id }, DeltakerStatus.Type.DELTAR)
 	}
 
 	override fun slettDeltaker(deltakerId: UUID) {
@@ -146,12 +152,12 @@ open class DeltakerServiceImpl(
 		}
 	}
 
-	private fun oppdaterStatuser(deltakere: List<DeltakerDbo>, type: DeltakerStatus.Type) = deltakere
+	private fun oppdaterStatuser(deltakere: List<UUID>, type: DeltakerStatus.Type) = deltakere
 		.also { log.info("Oppdaterer status på ${it.size} deltakere") }
 		.forEach {
 			insertStatus(DeltakerStatusInsert(
 				id = UUID.randomUUID(),
-				deltakerId = it.id,
+				deltakerId = it,
 				type = type,
 				aarsak = null,
 				gyldigFra = LocalDateTime.now()
