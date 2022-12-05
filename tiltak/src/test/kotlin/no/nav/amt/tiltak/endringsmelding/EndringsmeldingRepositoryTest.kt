@@ -107,10 +107,10 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		oppdatertMelding.utfortTidspunkt!! shouldBeCloseTo ZonedDateTime.now()
 	}
 
-	test("markerSomUtdatert - skal sette status til UTDATERT") {
+	test("markerAktiveSomUtdatert - skal sette status til UTDATERT") {
 		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
 
-		repository.markerSomUtdatert(
+		repository.markerAktiveSomUtdatert(
 			DELTAKER_1.id,
 			EndringsmeldingDbo.Type.valueOf(ENDRINGSMELDING_1_DELTAKER_1.type)
 		)

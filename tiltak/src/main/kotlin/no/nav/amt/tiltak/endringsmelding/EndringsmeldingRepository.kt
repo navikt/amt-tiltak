@@ -114,11 +114,11 @@ open class EndringsmeldingRepository(
 		template.update(sql, params)
 	}
 
-	fun markerSomUtdatert(deltakerId: UUID, type: EndringsmeldingDbo.Type) {
+	fun markerAktiveSomUtdatert(deltakerId: UUID, type: EndringsmeldingDbo.Type) {
 		val sql = """
 			UPDATE endringsmelding
 				SET status = 'UTDATERT'
-				WHERE deltaker_id = :deltakerId AND type = :type
+				WHERE deltaker_id = :deltakerId AND type = :type AND status = 'AKTIV'
 		""".trimIndent()
 
 		val params = sqlParameters(

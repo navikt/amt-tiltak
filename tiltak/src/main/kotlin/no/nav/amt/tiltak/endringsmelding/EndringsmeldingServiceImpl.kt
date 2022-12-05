@@ -196,7 +196,7 @@ open class EndringsmeldingServiceImpl(
 	) {
 		val id = UUID.randomUUID()
 		transactionTemplate.executeWithoutResult {
-			endringsmeldingRepository.markerSomUtdatert(deltakerId, innhold.type())
+			endringsmeldingRepository.markerAktiveSomUtdatert(deltakerId, innhold.type())
 			endringsmeldingRepository.insert(id, deltakerId, opprettetAvArrangorAnsattId, innhold)
 		}
 
