@@ -118,7 +118,7 @@ class DeltakerController(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestBody body: EndreDeltakelsesprosentRequestBody
 	) {
-		if(body.deltakelseProsent < 0) throw ValidationException("Deltakelsesprosent kan ikke være negativ")
+		if(body.deltakelseProsent <= 0) throw ValidationException("Deltakelsesprosent kan ikke være mindre eller lik 0")
 		if(body.deltakelseProsent > 100) throw ValidationException("Deltakelsesprosent kan ikke være over 100%")
 
 		val ansatt = hentInnloggetAnsatt()
