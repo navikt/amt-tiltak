@@ -60,6 +60,8 @@ class GjennomforingController(
 
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
 
+		val arrangor = gjennomforing.arrangor
+
 		return GjennomforingDto(
 			id = gjennomforing.id,
 			navn = gjennomforing.navn,
@@ -67,8 +69,10 @@ class GjennomforingController(
 			sluttDato = gjennomforing.sluttDato,
 			tiltakNavn = gjennomforing.tiltak.navn,
 			arrangor = ArrangorDto(
-				virksomhetNavn = gjennomforing.arrangor.navn,
-				organisasjonNavn = gjennomforing.arrangor.overordnetEnhetNavn
+				virksomhetNavn = arrangor.navn,
+				virksomhetOrgnr = arrangor.organisasjonsnummer,
+				organisasjonNavn = arrangor.overordnetEnhetNavn,
+				organisasjonOrgnr = arrangor.overordnetEnhetOrganisasjonsnummer,
 			),
 			lopenr = gjennomforing.lopenr,
 			opprettetAr = gjennomforing.opprettetAar,
@@ -134,7 +138,9 @@ class GjennomforingController(
 
 	data class ArrangorDto(
 		val virksomhetNavn: String,
-		val organisasjonNavn: String?
+		val virksomhetOrgnr: String,
+		val organisasjonNavn: String?,
+		val organisasjonOrgnr: String?
 	)
 
 	data class TiltakDto(
