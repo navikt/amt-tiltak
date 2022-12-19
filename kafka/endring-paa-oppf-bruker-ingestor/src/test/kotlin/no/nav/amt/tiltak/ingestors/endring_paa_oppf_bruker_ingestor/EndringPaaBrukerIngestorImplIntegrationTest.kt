@@ -62,13 +62,12 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		gjennomforingRepository = GjennomforingRepository(jdbcTemplate)
 
-		brukerService = BrukerService(brukerRepository, personService, navAnsattService, navEnhetService)
+		brukerService = BrukerService(brukerRepository, personService, navAnsattService, navEnhetService, skjermetPersonService)
 		deltakerService = DeltakerServiceImpl(
 			deltakerRepository,
 			deltakerStatusRepository,
 			brukerService,
 			endringsmeldingService,
-			skjermetPersonService,
 			TransactionTemplate()
 		)
 		endringPaaBrukerIngestorImpl = EndringPaaBrukerIngestorImpl(deltakerService, navEnhetService)

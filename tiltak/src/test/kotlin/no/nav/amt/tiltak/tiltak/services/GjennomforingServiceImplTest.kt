@@ -79,7 +79,6 @@ class GjennomforingServiceImplTest : FunSpec({
 				DeltakerStatusRepository(parameterTemplate),
 				brukerService,
 				mockk(),
-				mockk(),
 				transactionTemplate,
 			),
 			arrangorService = arrangorService,

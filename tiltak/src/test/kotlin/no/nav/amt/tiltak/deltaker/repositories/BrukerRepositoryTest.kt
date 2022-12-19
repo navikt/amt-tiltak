@@ -12,7 +12,6 @@ import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_2
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_2
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -41,7 +40,7 @@ class BrukerRepositoryTest : FunSpec({
 		val telefonnummer = "74635462"
 		val epost = "per.testersen@test.no"
 		val ansvarligVeilederId = NAV_ANSATT_1.id
-		val bruker = BrukerUpsertDbo(fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarligVeilederId, null)
+		val bruker = BrukerUpsertDbo(fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarligVeilederId, null, false)
 		val dbo = repository.upsert(bruker)
 
 		dbo shouldNotBe null
@@ -52,6 +51,7 @@ class BrukerRepositoryTest : FunSpec({
 		dbo.telefonnummer shouldBe telefonnummer
 		dbo.epost shouldBe epost
 		dbo.ansvarligVeilederId shouldBe ansvarligVeilederId
+		dbo.erSkjermet shouldBe false
 		dbo.createdAt shouldNotBe null
 		dbo.modifiedAt shouldNotBe null
 	}
@@ -64,7 +64,9 @@ class BrukerRepositoryTest : FunSpec({
 			"telefonnummer",
 			"epost",
 			NAV_ANSATT_1.id,
-			NAV_ENHET_2.id)
+			NAV_ENHET_2.id,
+			false
+		)
 
 		val nyBruker = repository.upsert(bruker)
 

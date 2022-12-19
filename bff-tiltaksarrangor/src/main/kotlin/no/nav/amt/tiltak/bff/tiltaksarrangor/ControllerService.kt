@@ -9,7 +9,6 @@ import java.util.*
 @Service
 open class ControllerService(
 	private val deltakerService: DeltakerService,
-	private val skjermetPersonService: SkjermetPersonService,
 	private val gjennomforingService: GjennomforingService,
 	private val navAnsattService: NavAnsattService,
 	private val navEnhetService: NavEnhetService,
@@ -21,7 +20,7 @@ open class ControllerService(
 		val navVeileder = deltaker.navVeilederId?.let { navAnsattService.getNavAnsatt(it)}
 		val navEnhet = deltaker.navEnhetId?.let { navEnhetService.getNavEnhet(it) }
 		val gjennomforing = deltaker.gjennomforingId.let { gjennomforingService.getGjennomforing(it) }
-		val erSkjermet = skjermetPersonService.erSkjermet(deltaker.fodselsnummer)
+		val erSkjermet = deltakerService.erSkjermet(deltaker.id)
 
 		return DeltakerDetaljerDto(
 			id = deltaker.id,

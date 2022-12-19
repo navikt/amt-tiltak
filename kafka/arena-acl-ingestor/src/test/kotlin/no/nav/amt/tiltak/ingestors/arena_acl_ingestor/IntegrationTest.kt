@@ -106,8 +106,8 @@ class IntegrationTest {
 
 		navEnhetService = NavEnhetServiceImpl(norgClient, navEnhetRepository, veilarbarenaClient)
 		tiltakService = TiltakServiceImpl(tiltakRepository)
-		brukerService = BrukerService(brukerRepository, personService, mockk(), navEnhetService)
-		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, endringsmeldingService, mockk(), transactionTemplate)
+		brukerService = BrukerService(brukerRepository, personService, mockk(), navEnhetService, skjermetPersonService)
+		deltakerService = DeltakerServiceImpl(deltakerRepository, deltakerStatusRepository, brukerService, endringsmeldingService, transactionTemplate)
 		arrangorService = ArrangorServiceImpl(enhetsregisterClient, arrangorRepository)
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, arrangorService, transactionTemplate)
 
@@ -122,7 +122,7 @@ class IntegrationTest {
 		every { veilarbarenaClient.hentBrukerOppfolgingsenhetId(personIdent) } returns null
 		every { personService.hentTildeltVeilederNavIdent(personIdent) } returns null
 		every { personService.hentPerson(personIdent) } returns person
-
+		every { skjermetPersonService.erSkjermet(personIdent) } returns false
 		DbTestDataUtils.cleanDatabase(datasource)
 
 		val testDataRepository = TestDataRepository(jdbcTemplate)
