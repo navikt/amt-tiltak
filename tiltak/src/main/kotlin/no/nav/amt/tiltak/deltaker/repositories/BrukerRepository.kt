@@ -109,7 +109,8 @@ open class BrukerRepository(
 	}
 	fun oppdaterVeileder(fodselsnummer: String, veilederId: UUID) {
 		val sql = """
-			UPDATE bruker SET ansvarlig_veileder_id = :veilederId WHERE fodselsnummer = :fodselsnummer
+			UPDATE bruker SET ansvarlig_veileder_id = :veilederId, modified_at = CURRENT_TIMESTAMP
+			WHERE fodselsnummer = :fodselsnummer
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
@@ -124,7 +125,9 @@ open class BrukerRepository(
 
 	fun oppdaterNavEnhet(fodselsnummer: String, navEnhetId: UUID?) {
 		val sql = """
-			UPDATE bruker SET nav_enhet_id = :navEnhetId WHERE fodselsnummer = :fodselsnummer
+			UPDATE bruker
+			SET nav_enhet_id = :navEnhetId, modified_at = CURRENT_TIMESTAMP
+			WHERE fodselsnummer = :fodselsnummer
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
@@ -139,7 +142,8 @@ open class BrukerRepository(
 
 	fun settSkjermet(personIdent: String, erSkjermet: Boolean) {
 		val sql = """
-			UPDATE bruker SET er_skjermet = :erSkjermet WHERE fodselsnummer = :personIdent
+			UPDATE bruker SET er_skjermet = :erSkjermet, modified_at = CURRENT_TIMESTAMP
+			WHERE fodselsnummer = :personIdent
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
