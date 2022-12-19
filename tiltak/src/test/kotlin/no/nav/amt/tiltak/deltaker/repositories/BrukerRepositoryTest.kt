@@ -87,4 +87,12 @@ class BrukerRepositoryTest : FunSpec({
 		repository.get(BRUKER_1.fodselsnummer)?.ansvarligVeilederId shouldBe NAV_ANSATT_2.id
 	}
 
+	test("settSkjermet should update bruker") {
+		repository.get(BRUKER_1.fodselsnummer)?.erSkjermet shouldBe false
+
+		repository.settSkjermet(BRUKER_1.fodselsnummer, true)
+
+		repository.get(BRUKER_1.fodselsnummer)?.erSkjermet shouldBe true
+	}
+
 })

@@ -1,7 +1,6 @@
 package no.nav.amt.tiltak.deltaker.service
 
 import no.nav.amt.tiltak.core.domain.tiltak.*
-import no.nav.amt.tiltak.core.exceptions.ValidationException
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.SkjermetPersonService
@@ -100,6 +99,10 @@ open class DeltakerServiceImpl(
 	override fun erSkjermet(deltakerId: UUID) : Boolean {
 		val deltaker = hentDeltaker(deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 		return skjermetPersonService.erSkjermet(deltaker.fodselsnummer)
+	}
+
+	override fun settSkjermet(personIdent: String, erSkjermet: Boolean) {
+		brukerService.settErSkjermet(personIdent, erSkjermet)
 	}
 
 	private fun update(deltaker: DeltakerUpsert) {

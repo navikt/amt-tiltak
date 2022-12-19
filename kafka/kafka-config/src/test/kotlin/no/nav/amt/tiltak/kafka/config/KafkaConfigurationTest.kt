@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.kafka.config
 
 import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
 import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
-import no.nav.amt.tiltak.core.kafka.NavEnhetIngestor
+import no.nav.amt.tiltak.core.kafka.SkjermetPersonIngestor
 import no.nav.amt.tiltak.core.kafka.TildeltVeilederIngestor
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.common.kafka.producer.KafkaProducerClientImpl
@@ -27,6 +27,7 @@ class KafkaConfigurationTest {
 	private val amtTiltakTopic = "amt-tiltak"
 	private val sisteTilordnetVeilederTopic = "siste-tilordnet-veileder-v1"
 	private val endringPaaBrukerTopic = "pto.endring-paa-oppfolgingsbruker-v2"
+	private val skjermetPersonTopic = "nom.skjermede-personer-status-v1"
 
 	@Container
 	var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.2.1"))
@@ -40,6 +41,7 @@ class KafkaConfigurationTest {
 			amtTiltakTopic = amtTiltakTopic,
 			sisteTilordnetVeilederTopic = sisteTilordnetVeilederTopic,
 			endringPaaBrukerTopic = endringPaaBrukerTopic,
+			skjermedePersonerTopic = skjermetPersonTopic
 		)
 
 		val kafkaProperties = object : KafkaProperties {
@@ -81,9 +83,8 @@ class KafkaConfigurationTest {
 				counter.incrementAndGet()
 			}
 		}
-
-		val navEnhetIngestor = object : NavEnhetIngestor {
-			override fun ingestKafkaRecord(recordValue: String) {
+		val skjermetPersonIngestor = object : SkjermetPersonIngestor {
+			override fun ingest(recordKey: String, recordValue: String) {
 				counter.incrementAndGet()
 			}
 		}
@@ -95,6 +96,7 @@ class KafkaConfigurationTest {
 			arenaAclIngestor,
 			tildeltVeilederIngestor,
 			endringPaaBrukerIngestor,
+			skjermetPersonIngestor
 		)
 
 		config.onApplicationEvent(null)
@@ -105,6 +107,7 @@ class KafkaConfigurationTest {
 		kafkaProducer.sendSync(toJsonProducerRecord(amtTiltakTopic, "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord(sisteTilordnetVeilederTopic, "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord(endringPaaBrukerTopic, "1", value))
+		kafkaProducer.sendSync(toJsonProducerRecord(skjermetPersonTopic, "1", value))
 
 		kafkaProducer.close()
 
@@ -112,7 +115,7 @@ class KafkaConfigurationTest {
 
 		Thread.sleep(3000)
 
-		assertEquals(3, counter.get())
+		assertEquals(4, counter.get())
 	}
 
 }

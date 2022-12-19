@@ -103,6 +103,8 @@ spec:
       value: amt.amt-tiltak-v1
     - name: ENDRING_PAA_OPPF_BRUKER_TOPIC
       value: pto.endring-paa-oppfolgingsbruker-v2
+    - name: SKJERMEDE_PERSONER_STATUS_TOPIC
+      value: nom.skjermede-personer-status-v1
   gcp:
     sqlInstances:
       - name: amt-tiltak-v1

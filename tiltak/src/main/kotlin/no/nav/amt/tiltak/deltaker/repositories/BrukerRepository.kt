@@ -26,6 +26,7 @@ open class BrukerRepository(
             epost = rs.getString("epost"),
             ansvarligVeilederId = rs.getNullableUUID("ansvarlig_veileder_id"),
 			navEnhetId = rs.getNullableUUID("nav_enhet_id"),
+			erSkjermet = rs.getBoolean("er_skjermet"),
             createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
             modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
         )
@@ -108,7 +109,8 @@ open class BrukerRepository(
 	}
 	fun oppdaterVeileder(fodselsnummer: String, veilederId: UUID) {
 		val sql = """
-			UPDATE bruker SET ansvarlig_veileder_id = :veilederId WHERE fodselsnummer = :fodselsnummer
+			UPDATE bruker SET ansvarlig_veileder_id = :veilederId, modified_at = CURRENT_TIMESTAMP
+			WHERE fodselsnummer = :fodselsnummer
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
@@ -123,13 +125,31 @@ open class BrukerRepository(
 
 	fun oppdaterNavEnhet(fodselsnummer: String, navEnhetId: UUID?) {
 		val sql = """
-			UPDATE bruker SET nav_enhet_id = :navEnhetId WHERE fodselsnummer = :fodselsnummer
+			UPDATE bruker
+			SET nav_enhet_id = :navEnhetId, modified_at = CURRENT_TIMESTAMP
+			WHERE fodselsnummer = :fodselsnummer
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
 				"navEnhetId" to navEnhetId,
 				"fodselsnummer" to fodselsnummer,
+			)
+		)
+
+		template.update(sql, parameters)
+	}
+
+	fun settSkjermet(personIdent: String, erSkjermet: Boolean) {
+		val sql = """
+			UPDATE bruker SET er_skjermet = :erSkjermet, modified_at = CURRENT_TIMESTAMP
+			WHERE fodselsnummer = :personIdent
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"erSkjermet" to erSkjermet,
+				"personIdent" to personIdent,
 			)
 		)
 

@@ -40,6 +40,8 @@ interface DeltakerService {
 
 	fun erSkjermet(deltakerId: UUID): Boolean
 
+	fun settSkjermet(personIdent: String, erSkjermet: Boolean)
+
 	fun hentDeltakerMap(deltakerIder: List<UUID>): Map<UUID, Deltaker>
 
 }

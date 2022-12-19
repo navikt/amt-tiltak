@@ -13,6 +13,7 @@ data class BrukerDbo(
 	val epost: String?,
 	val ansvarligVeilederId: UUID?,
 	val navEnhetId: UUID?,
+	val erSkjermet: Boolean,
 	val createdAt: LocalDateTime,
 	val modifiedAt: LocalDateTime
 )
