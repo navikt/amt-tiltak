@@ -67,23 +67,38 @@ abstract class IntegrationTestBase {
 			registry.add("no.nav.security.jwt.issuer.tokenx.discovery-url") { oAuthServer.getDiscoveryUrl("tokenx") }
 			registry.add("no.nav.security.jwt.issuer.tokenx.accepted-audience") { "test-aud" }
 
+			registry.add("digdir-krr-proxy.url") { "TODO" }
+			registry.add("digdir-krr-proxy.scope") { "test.digdir-krr-proxy" }
+
+			registry.add("veilarboppfolging.url") { "TODO" }
+			registry.add("veilarboppfolging.scope") { "test.veilarboppfolging" }
+
+			registry.add("mr-arena-adapter.url") { "TODO" }
+			registry.add("mr-arena-adapter.scope") { "test.mr-arena-adapter" }
+
 			enhetsregisterServer.start()
 			registry.add("amt-enhetsregister.url") { enhetsregisterServer.serverUrl() }
+			registry.add("amt-enhetsregister.scope") { "test.amt-enhetsregister" }
 
 			norgHttpServer.start()
 			registry.add("poao-gcp-proxy.url") { norgHttpServer.serverUrl() }
+			registry.add("poao-gcp-proxy.scope") { "test.poao-gcp-proxy" }
 
 			poaoTilgangServer.start()
 			registry.add("poao-tilgang.url") { poaoTilgangServer.serverUrl() }
+			registry.add("poao-tilgang.scope") { "test.poao-tilgang" }
 
 			nomHttpServer.start()
 			registry.add("nom.url") { nomHttpServer.serverUrl() }
+			registry.add("nom.scope") { "test.nom" }
 
 			altinnAclHttpServer.start()
 			registry.add("amt-altinn-acl.url") { altinnAclHttpServer.serverUrl() }
+			registry.add("amt-altinn-acl.scope") { "test.amt-altinn-acl" }
 
 			pdlHttpServer.start()
 			registry.add("pdl.url") { pdlHttpServer.serverUrl() }
+			registry.add("pdl.scope") { "test.pdl" }
 
 			mockMachineToMachineHttpServer.start()
 			registry.add("nais.env.azureOpenIdConfigTokenEndpoint") {
