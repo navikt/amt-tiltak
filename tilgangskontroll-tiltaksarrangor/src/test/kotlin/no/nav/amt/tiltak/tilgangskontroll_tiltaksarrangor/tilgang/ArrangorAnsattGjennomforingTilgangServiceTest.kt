@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
-import java.time.LocalDateTime
 import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
@@ -154,8 +153,6 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 				status = Gjennomforing.Status.GJENNOMFORES,
 				startDato = null,
 				sluttDato = null,
-				registrertDato = LocalDateTime.now(),
-				fremmoteDato = null,
 				navEnhetId = null,
 				opprettetAar = 0,
 				lopenr = 1,
@@ -167,8 +164,6 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 				status = Gjennomforing.Status.GJENNOMFORES,
 				startDato = null,
 				sluttDato = null,
-				registrertDato = LocalDateTime.now(),
-				fremmoteDato = null,
 				navEnhetId = null,
 				opprettetAar = 0,
 				lopenr = 2,

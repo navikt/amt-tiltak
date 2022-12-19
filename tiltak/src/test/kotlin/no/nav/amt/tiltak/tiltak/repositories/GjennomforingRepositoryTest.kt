@@ -47,8 +47,6 @@ internal class GjennomforingRepositoryTest : FunSpec({
 		val status = Gjennomforing.Status.IKKE_STARTET
 		val startDato = LocalDate.now().plusDays(2)
 		val sluttDato = LocalDate.now().plusDays(10)
-		val registrertDato = LocalDateTime.now()
-		val fremmoteDato = LocalDateTime.now().plusDays(2).minusHours(2)
 
 		val savedGjennomforing = repository.insert(
 			id = id,
@@ -58,8 +56,6 @@ internal class GjennomforingRepositoryTest : FunSpec({
 			status = status,
 			startDato = startDato,
 			sluttDato = sluttDato,
-			registrertDato = registrertDato,
-			fremmoteDato = fremmoteDato,
 			navEnhetId = NAV_ENHET_1.id,
 			lopenr = 123,
 			opprettetAar = 2020,
@@ -75,8 +71,6 @@ internal class GjennomforingRepositoryTest : FunSpec({
 
 		assertTrue(startDato.isEqualTo(savedGjennomforing.startDato!!))
 		assertTrue(sluttDato.isEqualTo(savedGjennomforing.sluttDato!!))
-		assertTrue(registrertDato.isEqualTo(savedGjennomforing.registrertDato))
-		assertTrue(fremmoteDato.isEqualTo(savedGjennomforing.fremmoteDato!!))
 		assertEquals(2020, savedGjennomforing.opprettetAar)
 		assertEquals(123, savedGjennomforing.lopenr)
 	}
@@ -92,8 +86,6 @@ internal class GjennomforingRepositoryTest : FunSpec({
 					status = Gjennomforing.Status.IKKE_STARTET,
 					startDato = null,
 					sluttDato = null,
-					registrertDato = LocalDateTime.now(),
-					fremmoteDato = null,
 					navEnhetId = null,
 					createdAt = LocalDateTime.now(),
 					modifiedAt = LocalDateTime.now(),
@@ -109,7 +101,6 @@ internal class GjennomforingRepositoryTest : FunSpec({
 		val updatedStatus = Gjennomforing.Status.GJENNOMFORES
 		val updatedStartDato = LocalDate.now().plusDays(4)
 		val updatedSluttDato = LocalDate.now().plusDays(14)
-		val updatedFremmotedato = LocalDateTime.now().plusDays(4)
 
 		val updatedGjennomforing = repository.update(
 			GjennomforingDbo(
@@ -120,11 +111,9 @@ internal class GjennomforingRepositoryTest : FunSpec({
 				status = updatedStatus,
 				startDato = updatedStartDato,
 				sluttDato = updatedSluttDato,
-				fremmoteDato = updatedFremmotedato,
 				navEnhetId = null,
 				createdAt = LocalDateTime.now(),
 				modifiedAt = LocalDateTime.now(),
-				registrertDato = LocalDateTime.now(),
 				lopenr = 90879,
 				opprettetAar = 2030
 			)
@@ -134,7 +123,6 @@ internal class GjennomforingRepositoryTest : FunSpec({
 		assertEquals(updatedStatus, updatedGjennomforing.status)
 		assertTrue(updatedStartDato.isEqualTo(updatedGjennomforing.startDato))
 		assertTrue(updatedSluttDato.isEqualTo(updatedGjennomforing.sluttDato))
-		assertTrue(updatedFremmotedato.isEqualTo(updatedGjennomforing.fremmoteDato))
 		assertEquals(90879, updatedGjennomforing.lopenr)
 		assertEquals(2030, updatedGjennomforing.opprettetAar)
 	}
@@ -150,8 +138,6 @@ internal class GjennomforingRepositoryTest : FunSpec({
 			status = "GJENNOMFORES",
 			startDato = LocalDate.of(2022, 2, 1),
 			sluttDato = LocalDate.of(2050, 12, 30),
-			registrertDato = LocalDate.of(2022, 1, 1),
-			fremmoteDato = LocalDate.of(2022, 2, 1),
 			navEnhetId = null,
 			lopenr = 123,
 			opprettetAar = 2020

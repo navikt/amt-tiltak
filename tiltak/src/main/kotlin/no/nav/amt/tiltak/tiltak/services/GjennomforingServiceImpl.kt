@@ -41,8 +41,6 @@ class GjennomforingServiceImpl(
 			status = gjennomforing.status,
 			startDato = gjennomforing.startDato,
 			sluttDato = gjennomforing.sluttDato,
-			registrertDato = gjennomforing.registrertDato,
-			fremmoteDato = gjennomforing.fremmoteDato,
 			navEnhetId = gjennomforing.navEnhetId,
 			opprettetAar = gjennomforing.opprettetAar,
 			lopenr = gjennomforing.lopenr
@@ -56,8 +54,6 @@ class GjennomforingServiceImpl(
 				status = updatedGjennomforing.status,
 				startDato = updatedGjennomforing.startDato,
 				sluttDato = updatedGjennomforing.sluttDato,
-				registrertDato = updatedGjennomforing.registrertDato,
-				fremmoteDato = updatedGjennomforing.fremmoteDato,
 				navEnhetId = updatedGjennomforing.navEnhetId,
 				lopenr = updatedGjennomforing.lopenr,
 				opprettetAar = updatedGjennomforing.opprettetAar

@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.test.database.data
 
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.test.database.data.inputs.*
@@ -21,8 +20,6 @@ object TestData {
 			startDato = LocalDate.now().minusWeeks(3),
 			sluttDato = LocalDate.now().plusYears(3),
 			navEnhetId = enhet.id,
-			registrertDato = LocalDate.now().minusWeeks(4),
-			fremmoteDato = LocalDate.of(2022, 2, 1),
 			opprettetAar = 2020,
 			lopenr = 123
 		)
@@ -151,8 +148,6 @@ object TestData {
 		startDato = LocalDate.of(2022, 2, 1),
 		sluttDato = LocalDate.of(2050, 12, 30),
 		navEnhetId = NAV_ENHET_1.id,
-		registrertDato = LocalDate.of(2022, 1, 1),
-		fremmoteDato = LocalDate.of(2022, 2, 1),
 		opprettetAar = 2020,
 		lopenr = 123
 	)
@@ -166,8 +161,6 @@ object TestData {
 		startDato = LocalDate.of(2022, 2, 1),
 		sluttDato = LocalDate.of(2022, 2, 13),
 		navEnhetId = NAV_ENHET_2.id,
-		registrertDato = LocalDate.of(2022, 1, 1),
-		fremmoteDato = LocalDate.of(2022, 2, 1),
 		opprettetAar = 2020,
 		lopenr = 124
 	)
@@ -181,8 +174,6 @@ object TestData {
 		startDato = LocalDate.of(2022, 3, 5),
 		sluttDato = LocalDate.of(2022, 7, 12),
 		navEnhetId = NAV_ENHET_2.id,
-		registrertDato = LocalDate.of(2022, 1, 1),
-		fremmoteDato = LocalDate.of(2022, 2, 1),
 		opprettetAar = 2022,
 		lopenr = 439823
 	)

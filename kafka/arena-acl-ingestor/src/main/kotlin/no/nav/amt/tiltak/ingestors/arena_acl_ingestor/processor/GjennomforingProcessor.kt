@@ -45,8 +45,6 @@ class GjennomforingProcessor(
 				status = mapGjennomforingStatus(gjennomforing.status),
 				startDato = gjennomforing.startDato,
 				sluttDato = gjennomforing.sluttDato,
-				registrertDato = gjennomforing.registrertDato,
-				fremmoteDato = gjennomforing.fremmoteDato,
 				navEnhetId = navEnhet?.id,
 				lopenr = gjennomforing.lopenr,
 				opprettetAar = gjennomforing.opprettetAar

@@ -14,8 +14,6 @@ data class GjennomforingInput(
 	val status: String,
 	val startDato: LocalDate,
 	val sluttDato: LocalDate,
-	val registrertDato: LocalDate,
-	val fremmoteDato: LocalDate,
 	val navEnhetId: UUID?,
 	val opprettetAar: Int,
 	val lopenr: Int,
@@ -29,8 +27,6 @@ data class GjennomforingInput(
 			status = Gjennomforing.Status.valueOf(this.status),
 			startDato = this.startDato,
 			sluttDato = this.sluttDato,
-			registrertDato = this.registrertDato.atStartOfDay(),
-			fremmoteDato = this.fremmoteDato.atStartOfDay(),
 			navEnhetId = this.navEnhetId,
 			opprettetAar = this.opprettetAar,
 			lopenr = this.lopenr
