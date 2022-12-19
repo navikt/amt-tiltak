@@ -7,6 +7,7 @@ import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.deltaker.dbo.BrukerUpsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
+import no.nav.amt.tiltak.log.SecureLog.secureLog
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -36,7 +37,20 @@ class BrukerService(
 	}
 
 	fun settErSkjermet(personIdent: String, erSkjermet: Boolean) {
+		val erBrukerSkjermet = erSkjermet(personIdent)
+		if(erSkjermet == erBrukerSkjermet) return
 		brukerRepository.settSkjermet(personIdent, erSkjermet)
+	}
+
+	fun erSkjermet(personIdent: String) : Boolean {
+		val bruker =  brukerRepository.get(personIdent)
+
+		if (bruker == null) {
+			secureLog.warn("Kan ikke sjekke om bruker er skjermet. Fant ikke bruker med personIdent=$personIdent")
+			throw IllegalStateException("Kan ikke sjekke om bruker er skjermet. Fant ikke bruker")
+		}
+
+		return bruker.erSkjermet
 	}
 
 	private fun createBruker(fodselsnummer: String): BrukerDbo {
