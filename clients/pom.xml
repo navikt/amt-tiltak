@@ -22,6 +22,7 @@
         <module>veilarbarena</module>
         <module>veilarboppfolging</module>
         <module>poao-tilgang</module>
+        <module>mr-arena-adapter-client</module>
     </modules>
 
 </project>
