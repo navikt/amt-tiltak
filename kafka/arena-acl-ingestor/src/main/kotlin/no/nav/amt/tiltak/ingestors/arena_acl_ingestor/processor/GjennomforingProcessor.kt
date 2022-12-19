@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavEnhetService
@@ -37,10 +38,10 @@ class GjennomforingProcessor(
 		val navEnhet = gjennomforing.ansvarligNavEnhetId?.let { navEnhetService.getNavEnhet(it) }
 
 		gjennomforingService.upsert(
-			Gjennomforing(
+			GjennomforingUpsert(
 				id = gjennomforing.id,
-				tiltak = tiltak,
-				arrangor = arrangor,
+				tiltakId = tiltak.id,
+				arrangorId = arrangor.id,
 				navn = gjennomforing.navn,
 				status = mapGjennomforingStatus(gjennomforing.status),
 				startDato = gjennomforing.startDato,
