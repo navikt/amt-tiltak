@@ -33,6 +33,8 @@ class BrukerService(
 	}
 
 	fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet?) {
+		val bruker = brukerRepository.get(fodselsnummer) ?: throw IllegalStateException("Kan ikke oppdatere nav enhet. Fant ikke bruker")
+		if(bruker.navEnhetId == navEnhet?.id) return
 		brukerRepository.oppdaterNavEnhet(fodselsnummer, navEnhet?.id)
 	}
 
