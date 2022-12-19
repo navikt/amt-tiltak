@@ -1,0 +1,1 @@
+ALTER TABLE bruker ADD COLUMN er_skjermet BOOLEAN not null default false;

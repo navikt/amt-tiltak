@@ -26,6 +26,7 @@ open class BrukerRepository(
             epost = rs.getString("epost"),
             ansvarligVeilederId = rs.getNullableUUID("ansvarlig_veileder_id"),
 			navEnhetId = rs.getNullableUUID("nav_enhet_id"),
+			erSkjermet = rs.getBoolean("er_skjermet"),
             createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
             modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
         )
@@ -130,6 +131,21 @@ open class BrukerRepository(
 			mapOf(
 				"navEnhetId" to navEnhetId,
 				"fodselsnummer" to fodselsnummer,
+			)
+		)
+
+		template.update(sql, parameters)
+	}
+
+	fun settSkjermet(personIdent: String, erSkjermet: Boolean) {
+		val sql = """
+			UPDATE bruker SET er_skjermet = :erSkjermet WHERE fodselsnummer = :personIdent
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"erSkjermet" to erSkjermet,
+				"personIdent" to personIdent,
 			)
 		)
 

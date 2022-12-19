@@ -35,6 +35,10 @@ class BrukerService(
 		brukerRepository.oppdaterNavEnhet(fodselsnummer, navEnhet?.id)
 	}
 
+	fun settErSkjermet(personIdent: String, erSkjermet: Boolean) {
+		brukerRepository.settSkjermet(personIdent, erSkjermet)
+	}
+
 	private fun createBruker(fodselsnummer: String): BrukerDbo {
 		val tildeltVeilederNavIdent = personService.hentTildeltVeilederNavIdent(fodselsnummer)
 
@@ -59,5 +63,4 @@ class BrukerService(
 
 		return brukerRepository.upsert(bruker)
 	}
-
 }

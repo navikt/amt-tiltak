@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.kafka.config
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider
 import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
 import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
+import no.nav.amt.tiltak.core.kafka.SkjermetPersonIngestor
 import no.nav.amt.tiltak.core.kafka.TildeltVeilederIngestor
 import no.nav.common.kafka.consumer.KafkaConsumerClient
 import no.nav.common.kafka.consumer.feilhandtering.KafkaConsumerRecordProcessor
@@ -33,6 +34,7 @@ open class KafkaConfiguration(
 	arenaAclIngestor: ArenaAclIngestor,
 	tildeltVeilederIngestor: TildeltVeilederIngestor,
 	endringPaaBrukerIngestor: EndringPaaBrukerIngestor,
+	skjermetPersonIngestor: SkjermetPersonIngestor
 ) {
 	private val log = LoggerFactory.getLogger(javaClass)
     private var client: KafkaConsumerClient
@@ -42,8 +44,7 @@ open class KafkaConfiguration(
 	init {
 		val topicConfigs = mutableListOf<KafkaConsumerClientBuilder.TopicConfig<String, String>>()
 
-		topicConfigs.addAll(
-			listOf(
+		topicConfigs.add(
 				KafkaConsumerClientBuilder.TopicConfig<String, String>()
 					.withLogging()
 					.withStoreOnFailure(consumerRepository)
@@ -53,7 +54,6 @@ open class KafkaConfiguration(
 						stringDeserializer(),
 						Consumer<ConsumerRecord<String, String>> { arenaAclIngestor.ingestKafkaRecord(it.value()) }
 					)
-			)
 		)
 
 		topicConfigs.add(
@@ -77,6 +77,18 @@ open class KafkaConfiguration(
 					stringDeserializer(),
 					stringDeserializer(),
 					Consumer<ConsumerRecord<String, String>> { endringPaaBrukerIngestor.ingestKafkaRecord(it.value()) }
+				)
+		)
+
+		topicConfigs.add(
+			KafkaConsumerClientBuilder.TopicConfig<String, String>()
+				.withLogging()
+				.withStoreOnFailure(consumerRepository)
+				.withConsumerConfig(
+					kafkaTopicProperties.skjermedePersonerTopic,
+					stringDeserializer(),
+					stringDeserializer(),
+					Consumer<ConsumerRecord<String, String>> { skjermetPersonIngestor.ingest(it.key(), it.value()) }
 				)
 		)
 
