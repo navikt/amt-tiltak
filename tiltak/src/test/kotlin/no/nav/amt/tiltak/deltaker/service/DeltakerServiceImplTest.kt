@@ -63,7 +63,7 @@ class DeltakerServiceImplTest {
 		navEnhetService = mockk()
 		endringsmeldingService = mockk()
 		skjermetPersonService = mockk()
-		brukerService = BrukerService(brukerRepository, mockk(), mockk(), navEnhetService)
+		brukerService = BrukerService(brukerRepository, mockk(), mockk(), navEnhetService, skjermetPersonService)
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		deltakerServiceImpl = DeltakerServiceImpl(
@@ -71,7 +71,6 @@ class DeltakerServiceImplTest {
 			deltakerStatusRepository = deltakerStatusRepository,
 			brukerService = brukerService,
 			endringsmeldingService = endringsmeldingService,
-			skjermetPersonService = skjermetPersonService,
 			transactionTemplate = TransactionTemplate(DataSourceTransactionManager(dataSource)),
 		)
 		testDataRepository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))

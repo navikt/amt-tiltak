@@ -4,6 +4,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.PersonService
+import no.nav.amt.tiltak.core.port.SkjermetPersonService
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.deltaker.dbo.BrukerUpsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
@@ -16,7 +17,8 @@ class BrukerService(
 	private val brukerRepository: BrukerRepository,
 	private val personService: PersonService,
 	private val navAnsattService: NavAnsattService,
-	private val navEnhetService: NavEnhetService
+	private val navEnhetService: NavEnhetService,
+	private val skjermetPersonService: SkjermetPersonService
 )  {
 
 	fun getOrCreate(fodselsnummer: String): UUID {
@@ -66,6 +68,8 @@ class BrukerService(
 
 		val person = personService.hentPerson(fodselsnummer)
 
+		val erSkjermet = skjermetPersonService.erSkjermet(fodselsnummer)
+
 		val bruker = BrukerUpsertDbo(
 			fodselsnummer = fodselsnummer,
 			fornavn = person.fornavn,
@@ -74,7 +78,8 @@ class BrukerService(
 			telefonnummer = person.telefonnummer ?: personKontaktinformasjon.telefonnummer,
 			epost = personKontaktinformasjon.epost,
 			ansvarligVeilederId = veileder?.id,
-			navEnhetId = navEnhet?.id
+			navEnhetId = navEnhet?.id,
+			erSkjermet = erSkjermet
 		)
 
 		return brukerRepository.upsert(bruker)
