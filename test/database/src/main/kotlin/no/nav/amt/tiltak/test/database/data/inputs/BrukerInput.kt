@@ -11,6 +11,7 @@ data class BrukerInput(
 	val telefonnummer: String,
 	val epost: String,
 	val ansvarligVeilederId: UUID?,
-	val navEnhetId: UUID
+	val navEnhetId: UUID,
+	val erSkjermet: Boolean
 )
 

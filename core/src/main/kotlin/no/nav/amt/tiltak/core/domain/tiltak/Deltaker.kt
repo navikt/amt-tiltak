@@ -11,6 +11,7 @@ data class Deltaker(
 	val mellomnavn: String? = null,
 	val etternavn: String,
 	val telefonnummer: String?,
+	val erSkjermet: Boolean,
 	val epost: String?,
 	val fodselsnummer: String,
 	val navEnhetId: UUID?,

@@ -1,8 +1,6 @@
 package no.nav.amt.tiltak.bff.nav_ansatt
 
-import no.nav.amt.tiltak.bff.nav_ansatt.dto.DeltakerDto
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.EndringsmeldingDto
-import no.nav.amt.tiltak.bff.nav_ansatt.dto.toDto
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.DeltakerService
@@ -19,7 +17,8 @@ class EndringsmeldingController(
 	private val endringsmeldingService: EndringsmeldingService,
 	private val navAnsattService: NavAnsattService,
 	private val deltakerService: DeltakerService,
-	private val tiltaksansvarligAutoriseringService: TiltaksansvarligAutoriseringService,
+	private val controllerService: NavAnsattControllerService,
+	private val tiltaksansvarligAuthService: TiltaksansvarligAutoriseringService,
 	private val authService: AuthService,
 ) {
 
@@ -28,31 +27,13 @@ class EndringsmeldingController(
 	fun hentEndringsmeldinger(@RequestParam("gjennomforingId") gjennomforingId: UUID): List<EndringsmeldingDto> {
 		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-		tiltaksansvarligAutoriseringService.verifiserTilgangTilEndringsmelding(navAnsattAzureId)
-		tiltaksansvarligAutoriseringService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId)
+		val tilgangTilSkjermede = authService.harTilgangTilSkjermedePersoner()
 
-		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId)
-		val deltakerMap = deltakerService.hentDeltakerMap(endringsmeldinger.map { it.deltakerId })
+		tiltaksansvarligAuthService.verifiserTilgangTilEndringsmelding(navAnsattAzureId)
+		tiltaksansvarligAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId)
 
-		return endringsmeldinger.map {
-			val deltaker = deltakerMap[it.deltakerId]
-				?: throw NoSuchElementException("Fant ikke deltaker med id ${it.deltakerId}")
-
-			return@map EndringsmeldingDto(
-				id = it.id,
-				deltaker = DeltakerDto(
-					deltaker.fornavn,
-					deltaker.mellomnavn,
-					deltaker.etternavn,
-					deltaker.fodselsnummer,
-				),
-				status = it.status.toDto(),
-				innhold = it.innhold.toDto(),
-				opprettetDato = it.opprettet,
-			)
-		}
+		return controllerService.hentEndringsmeldinger(gjennomforingId, tilgangTilSkjermede)
 	}
-
 
 	@PatchMapping("/{endringsmeldingId}/ferdig")
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
@@ -65,12 +46,11 @@ class EndringsmeldingController(
 		val deltaker = deltakerService.hentDeltaker(endringsmelding.deltakerId)
 			?: throw NoSuchElementException("Fant ikke deltaker med id ${endringsmelding.deltakerId}")
 
-		tiltaksansvarligAutoriseringService.verifiserTilgangTilEndringsmelding(navAnsattAzureId)
-		tiltaksansvarligAutoriseringService.verifiserTilgangTilGjennomforing(navIdent, deltaker.gjennomforingId)
+		tiltaksansvarligAuthService.verifiserTilgangTilEndringsmelding(navAnsattAzureId)
+		tiltaksansvarligAuthService.verifiserTilgangTilGjennomforing(navIdent, deltaker.gjennomforingId)
 
 		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 
 		endringsmeldingService.markerSomUtfort(endringsmeldingId, navAnsatt.id)
 	}
-
 }
