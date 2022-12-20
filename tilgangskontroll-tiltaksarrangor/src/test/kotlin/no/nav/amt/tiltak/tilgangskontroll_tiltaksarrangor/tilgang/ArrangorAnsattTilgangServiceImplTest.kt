@@ -15,7 +15,6 @@ import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.SkjermetPersonService
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.AltinnService
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.ArrangorAnsattRoller
@@ -74,7 +73,8 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		registrertDato = LocalDateTime.now(),
 		dagerPerUke = 5,
 		prosentStilling = 100F,
-		gjennomforingId = gjennomforingId
+		gjennomforingId = gjennomforingId,
+		erSkjermet = true
 	)
 	beforeEach {
 		arrangorAnsattService = mockk()

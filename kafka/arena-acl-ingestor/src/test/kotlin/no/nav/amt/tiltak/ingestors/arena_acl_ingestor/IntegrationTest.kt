@@ -285,7 +285,8 @@ class IntegrationTest {
 		registrertDato = now,
 		dagerPerUke = 5,
 		prosentStilling = 100F,
-		gjennomforingId = gjennomforingId
+		gjennomforingId = gjennomforingId,
+		erSkjermet = false
 	)
 
 	val deltakerOppdatert = Deltaker(
@@ -310,7 +311,8 @@ class IntegrationTest {
 		registrertDato = now,
 		dagerPerUke = 3,
 		prosentStilling = 50F,
-		gjennomforingId = gjennomforingId
+		gjennomforingId = gjennomforingId,
+		erSkjermet = false
 	)
 
 	val deltakerOppdatertJson = """

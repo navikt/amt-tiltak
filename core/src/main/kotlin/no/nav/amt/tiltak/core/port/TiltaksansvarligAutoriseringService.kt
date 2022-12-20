@@ -10,4 +10,6 @@ interface TiltaksansvarligAutoriseringService {
 
 	fun verifiserTilgangTilGjennomforing(navIdent: String, gjennomforingId: UUID)
 
+	fun harTilgangTilSkjermedePersoner(navAnsattAzureId: UUID) : Boolean
+
 }
