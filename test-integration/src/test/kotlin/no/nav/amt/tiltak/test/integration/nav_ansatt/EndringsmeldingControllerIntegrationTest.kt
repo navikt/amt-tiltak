@@ -33,7 +33,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 			Request.Builder().get().url("${serverUrl()}/api/nav-ansatt/endringsmelding"),
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/nav-ansatt/endringsmelding/${UUID.randomUUID()}/ferdig"),
 		)
-		testNavAnsattAutentisering(requestBuilders, client, oAuthServer)
+		testNavAnsattAutentisering(requestBuilders, client, mockOAuthServer)
 	}
 
 	@Test
@@ -43,12 +43,12 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
 		val oid = UUID.randomUUID()
 
-		poaoTilgangServer.addHentAdGrupperResponse(
+		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
 			navAnsattAzureId = oid,
 			name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
 		)
 
-		val token = oAuthServer.issueAzureAdToken(
+		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
 			oid = oid
 		)
@@ -66,12 +66,12 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 	fun `hentEndringsmeldinger() - skal returnere 200 med riktig response`() {
 		val oid = UUID.randomUUID()
 
-		poaoTilgangServer.addHentAdGrupperResponse(
+		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
 			navAnsattAzureId = oid,
 			name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
 		)
 
-		val token = oAuthServer.issueAzureAdToken(
+		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
 			oid = oid
 		)
@@ -94,12 +94,12 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 	fun `markerFerdig() - skal returnere 200 og markere som ferdig`() {
 		val oid = UUID.randomUUID()
 
-		val token = oAuthServer.issueAzureAdToken(
+		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
 			oid = oid
 		)
 
-		poaoTilgangServer.addHentAdGrupperResponse(
+		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
 			navAnsattAzureId = oid,
 			name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
 		)

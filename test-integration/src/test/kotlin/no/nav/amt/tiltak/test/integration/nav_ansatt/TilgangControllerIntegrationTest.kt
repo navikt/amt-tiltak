@@ -19,7 +19,7 @@ class TilgangControllerIntegrationTest : IntegrationTestBase() {
 	@BeforeEach
 	internal fun setUp() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
-		nomHttpServer.addDefaultData()
+		mockNomHttpServer.addDefaultData()
 	}
 
 	@Test
@@ -28,12 +28,12 @@ class TilgangControllerIntegrationTest : IntegrationTestBase() {
 			Request.Builder().post(emptyRequest()).url("${serverUrl()}/api/nav-ansatt/gjennomforing-tilgang?gjennomforingId=${UUID.randomUUID()}"),
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/nav-ansatt/gjennomforing-tilgang/stop?gjennomforingId=${UUID.randomUUID()}"),
 		)
-		testNavAnsattAutentisering(requestBuilders, client, oAuthServer)
+		testNavAnsattAutentisering(requestBuilders, client, mockOAuthServer)
 	}
 
 	@Test
 	fun `giTilgangTilGjennomforing() - skal returnere 200 og gi tilgang til gjennomføring`() {
-		val token = oAuthServer.issueAzureAdToken(
+		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
 			oid = UUID.randomUUID()
 		)
@@ -53,7 +53,7 @@ class TilgangControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	fun `stopTilgangTilGjennomforing() - skal returnere 200 og stoppe tilgang til gjennomføring`() {
-		val token = oAuthServer.issueAzureAdToken(
+		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
 			oid = UUID.randomUUID()
 		)

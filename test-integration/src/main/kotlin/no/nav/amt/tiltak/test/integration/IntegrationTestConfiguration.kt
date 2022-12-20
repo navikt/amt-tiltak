@@ -12,16 +12,10 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 @Profile("integration")
 @TestConfiguration
-open class IntegrationTestConfiguration(
-	@Value("\${app.env.amtTiltakTopic}") private val tiltakTopic: String
-) {
+open class IntegrationTestConfiguration {
 
 	@Bean
 	open fun kafkaProperties(): KafkaProperties = SingletonKafkaProvider.getKafkaProperties()
-
-	@Bean
-	open fun kafkaMessageSender(properties: KafkaProperties): KafkaMessageSender =
-		KafkaMessageSender(properties, tiltakTopic)
 
 	@Bean
 	open fun testDataRepository(template: NamedParameterJdbcTemplate): TestDataRepository {

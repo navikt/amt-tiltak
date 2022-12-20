@@ -25,7 +25,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 	internal fun setUp() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 		resetMockServersAndAddDefaultData()
-		poaoTilgangServer.addErSkjermetResponse(mapOf(BRUKER_1.fodselsnummer to false))
+		mockPoaoTilgangHttpServer.addErSkjermetResponse(mapOf(BRUKER_1.fodselsnummer to false))
 	}
 
 	@Test
@@ -35,7 +35,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/endringsmelding/aktiv?deltakerId=${UUID.randomUUID()}"),
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/endringsmelding/${UUID.randomUUID()}/tilbakekall/"),
 		)
-		testTiltaksarrangorAutentisering(requestBuilders, client, oAuthServer)
+		testTiltaksarrangorAutentisering(requestBuilders, client, mockOAuthServer)
 	}
 
 	@Test
@@ -43,7 +43,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/endringsmelding/aktiv?deltakerId=${DELTAKER_1.id}",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 		)
 
 		val expectedJson = """
@@ -60,7 +60,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/endringsmelding/${ENDRINGSMELDING_1_DELTAKER_1.id}/tilbakekall/",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 			body = emptyRequest(),
 		)
 
@@ -78,7 +78,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/endringsmelding/${utfortEndringsmelding.id}/tilbakekall/",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 			body = emptyRequest(),
 		)
 

@@ -25,7 +25,7 @@ class AnsattControllerIntegrationTest : IntegrationTestBase() {
 		val requestBuilders = listOf(
 			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/ansatt/meg"),
 		)
-		testTiltaksarrangorAutentisering(requestBuilders, client, oAuthServer)
+		testTiltaksarrangorAutentisering(requestBuilders, client, mockOAuthServer)
 	}
 
 	@Test
@@ -33,7 +33,7 @@ class AnsattControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/ansatt/meg",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(TestData.ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(TestData.ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
 		response.code shouldBe 200
@@ -43,13 +43,13 @@ class AnsattControllerIntegrationTest : IntegrationTestBase() {
 	fun `getInnloggetAnsatt() should return 200 when ansatt is not previously stored`() {
 		val ident = "012345678912"
 
-		altinnAclHttpServer.addRoller(ident, altinnAclHttpServer.createRollerForSingleOrg(ARRANGOR_1.organisasjonsnummer, listOf("KOORDINATOR")))
-		pdlHttpServer.addPdlBruker(ident, "Integrasjon", "Test")
+		mockAmtAltinnAclHttpServer.addRoller(ident, mockAmtAltinnAclHttpServer.createRollerForSingleOrg(ARRANGOR_1.organisasjonsnummer, listOf("KOORDINATOR")))
+		mockPdlHttpServer.addPdlBruker(ident, "Integrasjon", "Test")
 
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/ansatt/meg",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ident)}")
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ident)}")
 		)
 
 		val expectedJson = """

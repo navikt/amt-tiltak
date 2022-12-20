@@ -31,7 +31,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			Request.Builder().get().url("${serverUrl()}/api/nav-ansatt/gjennomforing/${UUID.randomUUID()}"),
 			Request.Builder().get().url("${serverUrl()}/api/nav-ansatt/gjennomforing?lopenr=1234"),
 		)
-		testNavAnsattAutentisering(requestBuilders, client, oAuthServer)
+		testNavAnsattAutentisering(requestBuilders, client, mockOAuthServer)
 	}
 
 	@Test
@@ -56,12 +56,12 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 	fun `hentGjennomforinger() - skal returnere 403 hvis ikke tilgang til flate`() {
 		val oid = UUID.randomUUID()
 
-		val token = oAuthServer.issueAzureAdToken(
+		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
 			oid = oid
 		)
 
-		poaoTilgangServer.addHentAdGrupperResponse(
+		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
 			navAnsattAzureId = oid,
 			name = "IngenNyttigGruppe"
 		)
@@ -98,12 +98,12 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 	fun `hentGjennomforing() - skal returnere 403 hvis ikke tilgang til flate`() {
 		val oid = UUID.randomUUID()
 
-		val token = oAuthServer.issueAzureAdToken(
+		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
 			oid = oid
 		)
 
-		poaoTilgangServer.addHentAdGrupperResponse(
+		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
 			navAnsattAzureId = oid,
 			name = "IngenNyttigGruppe"
 		)
@@ -150,12 +150,12 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 	fun `hentGjennomforingerMedLopenr() - skal returnere 403 hvis ikke tilgang til flate`() {
 		val oid = UUID.randomUUID()
 
-		val token = oAuthServer.issueAzureAdToken(
+		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
 			oid = oid
 		)
 
-		poaoTilgangServer.addHentAdGrupperResponse(
+		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
 			navAnsattAzureId = oid,
 			name = "IngenNyttigGruppe"
 		)
@@ -184,12 +184,12 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 	private fun lagTokenMedAdGruppe(ansatt: NavAnsattInput): String {
 		val oid = UUID.randomUUID()
 
-		poaoTilgangServer.addHentAdGrupperResponse(
+		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
 			navAnsattAzureId = oid,
 			name = AdGrupper.TILTAKSANSVARLIG_FLATE_GRUPPE
 		)
 
-		val token = oAuthServer.issueAzureAdToken(
+		val token = mockOAuthServer.issueAzureAdToken(
 			ident = ansatt.navIdent,
 			oid = oid,
 		)

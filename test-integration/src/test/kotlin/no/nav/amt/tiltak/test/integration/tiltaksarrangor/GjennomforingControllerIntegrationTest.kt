@@ -38,7 +38,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			Request.Builder().delete()
 				.url("${serverUrl()}/api/tiltaksarrangor/gjennomforing/${UUID.randomUUID()}/tilgang"),
 		)
-		testTiltaksarrangorAutentisering(requestBuilders, client, oAuthServer)
+		testTiltaksarrangorAutentisering(requestBuilders, client, mockOAuthServer)
 	}
 
 	@Test
@@ -46,7 +46,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/gjennomforing/${UUID.randomUUID()}",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
 		response.code shouldBe 404
@@ -57,7 +57,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/gjennomforing/${GJENNOMFORING_2.id}",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
 		response.code shouldBe 403
@@ -68,7 +68,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/gjennomforing/${GJENNOMFORING_1.id}",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
 		val expectedJson = """{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","startDato":"2022-02-01","sluttDato":"2050-12-30","status":"GJENNOMFORES","tiltak":{"tiltakskode":"AMO","tiltaksnavn":"Tiltak1"},"arrangor":{"virksomhetNavn":"Tiltaksarrangør 1","organisasjonNavn":"Org Tiltaksarrangør 1","virksomhetOrgnr":"111111111"}}"""
@@ -118,7 +118,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/gjennomforing",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
 		response.code shouldBe 200
@@ -153,7 +153,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/gjennomforing/tilgjengelig",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
 		response.code shouldBe 200
@@ -172,7 +172,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "POST",
 			url = "/api/tiltaksarrangor/gjennomforing/${GJENNOMFORING_2.id}/tilgang",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 			body = "".toJsonRequestBody()
 		)
 
@@ -186,7 +186,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "POST",
 			url = "/api/tiltaksarrangor/gjennomforing/${GJENNOMFORING_1.id}/tilgang",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 		)
 
 		response.code shouldBe 200
@@ -211,7 +211,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "POST",
 			url = "/api/tiltaksarrangor/gjennomforing/$id/tilgang",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 		)
 
 		response.code shouldBe 403
@@ -221,7 +221,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "DELETE",
 			url = "/api/tiltaksarrangor/gjennomforing/${GJENNOMFORING_1.id}/tilgang",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 		)
 
 		response.code shouldBe 200
@@ -238,7 +238,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/gjennomforing/${GJENNOMFORING_2.id}/koordinatorer",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
 		response.code shouldBe 403
@@ -249,7 +249,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/gjennomforing/${GJENNOMFORING_1.id}/koordinatorer",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
 		val expectedJson = """[{"fornavn":"Ansatt 1 fornavn","mellomnavn":"Ansatt 1 mellomnavn","etternavn":"Ansatt 1 etternavn"}]""".trimIndent()

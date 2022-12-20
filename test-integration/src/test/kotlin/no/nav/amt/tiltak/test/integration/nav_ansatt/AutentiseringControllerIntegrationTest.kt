@@ -25,19 +25,19 @@ class AutentiseringControllerIntegrationTest : IntegrationTestBase() {
 		val requestBuilders = listOf(
 			Request.Builder().get().url("${serverUrl()}/api/nav-ansatt/autentisering/meg"),
 		)
-		testNavAnsattAutentisering(requestBuilders, client, oAuthServer)
+		testNavAnsattAutentisering(requestBuilders, client, mockOAuthServer)
 	}
 
 	@Test
 	fun `meg() - skal returnere 200 med korrekt response`() {
 		val oid = UUID.randomUUID()
 
-		poaoTilgangServer.addHentAdGrupperResponse(
+		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
 			navAnsattAzureId = oid,
 			name = AdGrupper.TILTAKSANSVARLIG_FLATE_GRUPPE
 		)
 
-		val token = oAuthServer.issueAzureAdToken(
+		val token = mockOAuthServer.issueAzureAdToken(
 			ident = TestData.NAV_ANSATT_1.navIdent,
 			oid = oid
 		)
