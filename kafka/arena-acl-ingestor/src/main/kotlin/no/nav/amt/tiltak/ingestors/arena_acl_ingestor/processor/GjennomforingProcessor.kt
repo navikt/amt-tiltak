@@ -48,7 +48,8 @@ class GjennomforingProcessor(
 				sluttDato = gjennomforing.sluttDato,
 				navEnhetId = navEnhet?.id,
 				lopenr = gjennomforing.lopenr,
-				opprettetAar = gjennomforing.opprettetAar
+				opprettetAar = gjennomforing.opprettetAar,
+				deprecated = true,
 			)
 		)
 

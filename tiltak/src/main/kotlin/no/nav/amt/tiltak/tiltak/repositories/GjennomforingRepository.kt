@@ -26,7 +26,8 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 			opprettetAar = rs.getInt("opprettet_aar"),
 			lopenr = rs.getInt("lopenr"),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
-			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
+			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime(),
+			deprecated = rs.getBoolean("deprecated"),
 		)
 	}
 
@@ -41,12 +42,13 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 		navEnhetId: UUID?,
 		opprettetAar: Int,
 		lopenr: Int,
+		deprecated: Boolean,
 	): GjennomforingDbo {
 
 		//language=PostgreSQL
 		val sql = """
 		INSERT INTO gjennomforing(id, tiltak_id, arrangor_id, navn, status, start_dato,
-                           slutt_dato, nav_enhet_id, opprettet_aar, lopenr)
+                           slutt_dato, nav_enhet_id, opprettet_aar, lopenr, deprecated)
 		VALUES (:id,
 				:tiltakId,
 				:arrangorId,
@@ -56,7 +58,9 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 				:sluttDato,
 				:navEnhetId,
 				:opprettetAar,
-				:lopenr)
+				:lopenr,
+				:deprecated
+				)
 	""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
@@ -70,7 +74,8 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 				"sluttDato" to sluttDato,
 				"navEnhetId" to navEnhetId,
 				"opprettetAar" to opprettetAar,
-				"lopenr" to lopenr
+				"lopenr" to lopenr,
+				"deprecated" to deprecated,
 			)
 		)
 

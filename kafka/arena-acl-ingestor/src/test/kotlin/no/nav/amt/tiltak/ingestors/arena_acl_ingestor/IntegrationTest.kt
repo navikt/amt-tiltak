@@ -140,6 +140,7 @@ class IntegrationTest {
 		inserted shouldNotBe null
 		val expected = toInsertGjennomforing.copy(arrangorId = inserted!!.arrangorId, createdAt = inserted.createdAt, modifiedAt = inserted.modifiedAt)
 		inserted shouldBe expected
+		inserted.deprecated shouldBe true
 
 	}
 

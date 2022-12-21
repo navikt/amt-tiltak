@@ -57,8 +57,9 @@ internal class GjennomforingRepositoryTest : FunSpec({
 			startDato = startDato,
 			sluttDato = sluttDato,
 			navEnhetId = NAV_ENHET_1.id,
-			lopenr = 123,
 			opprettetAar = 2020,
+			lopenr = 123,
+			deprecated = true,
 		)
 
 		assertNotNull(savedGjennomforing)
@@ -73,6 +74,8 @@ internal class GjennomforingRepositoryTest : FunSpec({
 		assertTrue(sluttDato.isEqualTo(savedGjennomforing.sluttDato!!))
 		assertEquals(2020, savedGjennomforing.opprettetAar)
 		assertEquals(123, savedGjennomforing.lopenr)
+
+		assertTrue(savedGjennomforing.deprecated)
 	}
 
 	test("update() should throw if gjennomforing does not exist") {

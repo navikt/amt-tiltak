@@ -21,7 +21,8 @@ data class GjennomforingDbo(
 	val opprettetAar: Int,
 	val lopenr: Int,
 	val createdAt: LocalDateTime,
-	val modifiedAt: LocalDateTime
+	val modifiedAt: LocalDateTime,
+	val deprecated: Boolean = true,
 ) {
 
 	fun toGjennomforing(tiltak: Tiltak, arrangor: Arrangor): Gjennomforing {

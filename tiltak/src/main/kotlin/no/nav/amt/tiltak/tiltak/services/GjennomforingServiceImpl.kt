@@ -47,7 +47,8 @@ class GjennomforingServiceImpl(
 			sluttDato = gjennomforing.sluttDato,
 			navEnhetId = gjennomforing.navEnhetId,
 			opprettetAar = gjennomforing.opprettetAar,
-			lopenr = gjennomforing.lopenr
+			lopenr = gjennomforing.lopenr,
+			deprecated = gjennomforing.deprecated,
 		).toGjennomforing(tiltak, arrangor)
 	}
 
