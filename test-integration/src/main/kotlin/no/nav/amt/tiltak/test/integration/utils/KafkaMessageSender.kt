@@ -19,6 +19,8 @@ class KafkaMessageSender(
 	private val arenaTiltakDeltakerTopic: String,
 	@Value("\${app.env.endringPaaBrukerTopic}")
 	private val endringPaaBrukerTopic: String,
+	@Value("\${app.env.skjermedePersonerTopic}")
+	private val skjermedePersonerTopic: String,
 ) {
 	private val kafkaProducer = KafkaProducerClientImpl<String, String>(properties.producer())
 
