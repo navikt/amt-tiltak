@@ -1,12 +1,9 @@
 package no.nav.amt.tiltak.test.integration.mocks
 
-import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetDto
 import no.nav.amt.tiltak.clients.mr_arena_adapter_client.GjennomforingArenaData
-import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.test.integration.utils.MockHttpServer
 import okhttp3.mockwebserver.MockResponse
-import org.apache.kafka.common.protocol.types.Field
-import java.util.UUID
+import java.util.*
 
 class MockMrArenaAdapterServer : MockHttpServer(name = "MockMrArenaAdapterServer") {
 

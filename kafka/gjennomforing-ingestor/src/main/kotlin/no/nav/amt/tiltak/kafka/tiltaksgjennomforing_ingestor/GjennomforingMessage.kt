@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.kafka.tiltaksgjennomforing_ingestor.dto
+package no.nav.amt.tiltak.kafka.tiltaksgjennomforing_ingestor
 
 import java.time.LocalDate
 import java.util.*

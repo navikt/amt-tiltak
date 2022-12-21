@@ -427,6 +427,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>io.kotest</groupId>
+                <artifactId>kotest-framework-concurrency-jvm</artifactId>
+                <version>${kotest.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>io.kotest.extensions</groupId>
                 <artifactId>kotest-extensions-testcontainers</artifactId>
                 <version>${kotest.version}</version>
