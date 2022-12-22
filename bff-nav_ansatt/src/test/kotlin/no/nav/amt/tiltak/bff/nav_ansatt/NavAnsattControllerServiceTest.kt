@@ -4,11 +4,9 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.DeltakerDto
-import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
-import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_SKJERMET
@@ -17,37 +15,20 @@ import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.createDeltakerInput
 import no.nav.amt.tiltak.test.database.data.TestData.createStatusInput
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.UUID
 
-class EndringsmeldingControllerTest {
-	val endringsmeldingService = mockk<EndringsmeldingService>()
-	val deltakerService = mockk<DeltakerService>()
-	val navAnsattService = mockk<NavAnsattService>()
-	val taAuthService = mockk<TiltaksansvarligAutoriseringService>()
-	val authService = mockk<AuthService>()
-	val controller = EndringsmeldingController(
+class NavAnsattControllerServiceTest {
+	private val endringsmeldingService = mockk<EndringsmeldingService>()
+	private val deltakerService = mockk<DeltakerService>()
+	private val taAuthService = mockk<TiltaksansvarligAutoriseringService>()
+	private val controller = NavAnsattControllerService(
 		endringsmeldingService,
-		navAnsattService,
-		deltakerService,
-		taAuthService,
-		authService
-	);
-	val navAnsattAzureId = UUID.randomUUID()
-	val navIdent = "z1232"
-
-	@BeforeEach
-	fun before() {
-
-		every { authService.hentAzureIdTilInnloggetBruker() } returns navAnsattAzureId
-		every { authService.hentNavIdentTilInnloggetBruker() } returns navIdent
-		every { taAuthService.harTilgangTilSkjermedePersoner(navAnsattAzureId) } returns false
-		every { taAuthService.verifiserTilgangTilEndringsmelding(navAnsattAzureId) } returns Unit
-
-	}
+		deltakerService
+	)
+	private val navIdent = "z1232"
 
 	@Test
 	fun `hentEndringsmeldinger - deltaker er ikke skjermet, nav ansatt har ikke tilgang til skjermede - returnerer umaskert bruker`() {
@@ -66,9 +47,8 @@ class EndringsmeldingControllerTest {
 		val deltaker = DELTAKER_1.toDeltaker(BRUKER_1, DELTAKER_1_STATUS_1)
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
-		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
 
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId)
+		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, false)
 
 		endringsmeldingerResult.size shouldBe 1
 		endringsmeldingerResult[0].deltaker shouldBe DeltakerDto(
@@ -101,7 +81,7 @@ class EndringsmeldingControllerTest {
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
 
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId)
+		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, false)
 
 		endringsmeldingerResult.size shouldBe 1
 		endringsmeldingerResult.get(0).deltaker shouldBe DeltakerDto(
@@ -133,9 +113,8 @@ class EndringsmeldingControllerTest {
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
-		every { taAuthService.harTilgangTilSkjermedePersoner(navAnsattAzureId) } returns true
 
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId)
+		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, true)
 
 		endringsmeldingerResult.size shouldBe 1
 		endringsmeldingerResult.get(0).deltaker shouldBe DeltakerDto(

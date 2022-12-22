@@ -50,6 +50,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: .nais/nais-dev.yaml
+          VARS: .nais/vars-dev.yaml
           VAR: version=${{ env.IMAGE_TAG }}
       - name: Create release
         uses: actions/create-release@v1
@@ -74,6 +75,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
           RESOURCE: .nais/nais-prod.yaml
+          VARS: .nais/vars-prod.yaml
           VAR: version=${{ env.IMAGE_TAG }}
       - name: Create release
         uses: actions/create-release@v1

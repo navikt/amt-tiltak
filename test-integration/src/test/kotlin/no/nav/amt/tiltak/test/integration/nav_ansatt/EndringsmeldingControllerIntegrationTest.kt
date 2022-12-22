@@ -4,9 +4,13 @@ import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.data.TestData
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_SKJERMET
 import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
+import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testNavAnsattAutentisering
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig.ad_gruppe.AdGrupper
@@ -50,7 +54,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
 		val token = oAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
-			oid = oid
+			oid = oid,
 		)
 
 		val response = sendRequest(
@@ -65,6 +69,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 	@Test
 	fun `hentEndringsmeldinger() - skal returnere 200 med riktig response`() {
 		val oid = UUID.randomUUID()
+		val endringsmeldingInput = insertSkjermetPersonMedEndringsmeldinger()
 
 		poaoTilgangServer.addHentAdGrupperResponse(
 			navAnsattAzureId = oid,
@@ -83,8 +88,8 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-			[{"id":"9830e130-b18a-46b8-8e3e-6c06734d797e","deltaker":{"fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","erSkjermet":false},"innhold":{"oppstartsdato":"2022-11-11"},"status":"AKTIV","opprettetDato":"2022-11-08T14:00:00+01:00","type":"LEGG_TIL_OPPSTARTSDATO"},{"id":"07099997-e02e-45e3-be6f-3c1eaf694557","deltaker":{"fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","erSkjermet":false},"innhold":{"sluttdato":"2022-11-10","aarsak":{"type":"ANNET","beskrivelse":"Flyttet til utland"}},"status":"AKTIV","opprettetDato":"2022-11-08T15:00:00+01:00","type":"AVSLUTT_DELTAKELSE"},{"id":"3fc16362-ba8b-4c0f-af93-b2ed56f12cd5","deltaker":{"fornavn":"Bruker 2 fornavn","mellomnavn":null,"etternavn":"Bruker 2 etternavn","fodselsnummer":"7908432423","erSkjermet":false},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","type":"LEGG_TIL_OPPSTARTSDATO"}]
-		""".trimIndent()
+			[{"id":"9830e130-b18a-46b8-8e3e-6c06734d797e","deltaker":{"fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","erSkjermet":false},"innhold":{"oppstartsdato":"2022-11-11"},"status":"AKTIV","opprettetDato":"2022-11-08T14:00:00+01:00","type":"LEGG_TIL_OPPSTARTSDATO"},{"id":"07099997-e02e-45e3-be6f-3c1eaf694557","deltaker":{"fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","erSkjermet":false},"innhold":{"sluttdato":"2022-11-10","aarsak":{"type":"ANNET","beskrivelse":"Flyttet til utland"}},"status":"AKTIV","opprettetDato":"2022-11-08T15:00:00+01:00","type":"AVSLUTT_DELTAKELSE"},{"id":"3fc16362-ba8b-4c0f-af93-b2ed56f12cd5","deltaker":{"fornavn":"Bruker 2 fornavn","mellomnavn":null,"etternavn":"Bruker 2 etternavn","fodselsnummer":"7908432423","erSkjermet":false},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","type":"LEGG_TIL_OPPSTARTSDATO"},{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":null,"mellomnavn":null,"etternavn":null,"fodselsnummer":null,"erSkjermet":true},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","type":"LEGG_TIL_OPPSTARTSDATO"}]
+			""".trimIndent()
 
 		response.code shouldBe 200
 		response.body?.string() shouldBe expectedJson
@@ -121,5 +126,17 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
 		endringsmeldingAfter.status shouldBe Endringsmelding.Status.UTFORT
 
+	}
+
+	private fun insertSkjermetPersonMedEndringsmeldinger () : EndringsmeldingInput {
+		val skjermetDeltaker = TestData.createDeltakerInput(BRUKER_SKJERMET, GJENNOMFORING_1)
+		val endringsmelding = TestData.createEndringsmelding(skjermetDeltaker, ARRANGOR_ANSATT_1)
+		val status = TestData.createStatusInput(skjermetDeltaker)
+
+		testDataRepository.insertBruker(BRUKER_SKJERMET)
+		testDataRepository.insertDeltaker(skjermetDeltaker)
+		testDataRepository.insertDeltakerStatus(status)
+		testDataRepository.insertEndringsmelding(endringsmelding)
+		return endringsmelding
 	}
 }

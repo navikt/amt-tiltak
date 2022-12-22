@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.common.auth
 
 import no.nav.amt.tiltak.core.exceptions.NotAuthenticatedException
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
@@ -11,6 +12,8 @@ import java.util.*
 open class AuthService(
 	private val tokenValidationContextHolder: TokenValidationContextHolder
 ) {
+	@Value("\${ad_gruppe_tilgang_til_egne_ansatte}")
+	lateinit var tilgangTilNavAnsattGroupId: String
 
 	open fun hentPersonligIdentTilInnloggetBruker(): String {
 		val context = tokenValidationContextHolder.tokenValidationContext
@@ -31,6 +34,11 @@ open class AuthService(
 		.get("NAVident")
 		?.toString()
 		?: throw NotAuthenticatedException("NAV ident is missing")
+
+	open fun harTilgangTilSkjermedePersoner(): Boolean = tokenValidationContextHolder
+		.tokenValidationContext
+		.getClaims(Issuer.AZURE_AD)
+		.getAsList("groups").let { groups -> groups.any { it == tilgangTilNavAnsattGroupId } }
 
 	open fun hentAzureIdTilInnloggetBruker(): UUID = tokenValidationContextHolder
 		.tokenValidationContext

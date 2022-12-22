@@ -59,10 +59,4 @@ class TiltaksansvarligAutoriseringServiceImpl(
 		}
 	}
 
-	override fun harTilgangTilSkjermedePersoner(navAnsattAzureId: UUID) : Boolean {
-		return adGruppeService.hentAdGrupper(navAnsattAzureId)
-			.any { it.id == AdGrupper.EGEN_ANSATT_GRUPPE_ID }
-
-	}
-
 }

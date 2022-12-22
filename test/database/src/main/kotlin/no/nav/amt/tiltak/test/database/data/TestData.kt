@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.test.database.data
 
-import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.test.database.data.inputs.*
@@ -60,6 +59,16 @@ object TestData {
 		status = "DELTAR",
 		aktiv = true,
 		createdAt = deltaker.createdAt
+	)
+
+	fun createEndringsmelding(deltaker: DeltakerInput, arrangorAnsattInput: ArrangorAnsattInput) = EndringsmeldingInput(
+		id = UUID.randomUUID(),
+		deltakerId = deltaker.id,
+		opprettetAvArrangorAnsattId = arrangorAnsattInput.id,
+		status = Endringsmelding.Status.AKTIV,
+		type = "LEGG_TIL_OPPSTARTSDATO",
+		innhold = """{ "oppstartsdato": "2022-11-09" }""",
+		createdAt = ZonedDateTime.parse("2022-11-08T15:00:00.00000+00:00"),
 	)
 
 	val NAV_ENHET_1 = NavEnhetInput(
