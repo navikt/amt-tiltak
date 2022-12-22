@@ -55,7 +55,7 @@ class NavAnsattControllerServiceTest {
 			fornavn = BRUKER_1.fornavn,
 			mellomnavn = BRUKER_1.mellomnavn,
 			etternavn = BRUKER_1.etternavn,
-			fodselsnummer = BRUKER_1.fodselsnummer,
+			fodselsnummer = BRUKER_1.personIdent,
 			erSkjermet = BRUKER_1.erSkjermet
 		)
 	}
@@ -121,7 +121,7 @@ class NavAnsattControllerServiceTest {
 			fornavn = BRUKER_SKJERMET.fornavn,
 			mellomnavn = BRUKER_SKJERMET.mellomnavn,
 			etternavn = BRUKER_SKJERMET.etternavn,
-			fodselsnummer = BRUKER_SKJERMET.fodselsnummer,
+			fodselsnummer = BRUKER_SKJERMET.personIdent,
 			erSkjermet = BRUKER_SKJERMET.erSkjermet
 		)
 	}

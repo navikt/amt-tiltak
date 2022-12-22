@@ -45,7 +45,7 @@ class NavAnsattControllerService(
 		fornavn = fornavn,
 		mellomnavn = mellomnavn,
 		etternavn = etternavn,
-		fodselsnummer = fodselsnummer,
+		fodselsnummer = personIdent,
 		erSkjermet = erSkjermet,
 	)
 }

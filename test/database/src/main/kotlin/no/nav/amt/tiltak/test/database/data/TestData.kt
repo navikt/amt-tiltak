@@ -230,7 +230,7 @@ object TestData {
 
 	val BRUKER_SKJERMET = BrukerInput(
 		id = UUID.fromString("2f9868a4-7fcb-11ed-a1eb-0242ac120002"),
-		fodselsnummer = "10101010101",
+		personIdent = "10101010101",
 		fornavn = "Skjermet bruker fornavn",
 		etternavn = "Skjermet bruker etternavn",
 		telefonnummer = "432432423",
