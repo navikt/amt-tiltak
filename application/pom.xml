@@ -80,6 +80,10 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>gjennomforing-ingestor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>tildelt-veileder-ingestor</artifactId>
         </dependency>
         <dependency>
@@ -89,6 +93,10 @@
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>skjermet-person-ingestor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>mr-arena-adapter-client</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.common</groupId>

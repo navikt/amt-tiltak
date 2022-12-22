@@ -140,8 +140,6 @@ class AuditLoggerServiceImplTest {
 			status = Gjennomforing.Status.GJENNOMFORES,
 			startDato = null,
 			sluttDato = null,
-			registrertDato = LocalDateTime.MAX,
-			fremmoteDato = null,
 			navEnhetId = null,
 			opprettetAar = 1,
 			lopenr = 1

@@ -17,13 +17,12 @@ data class GjennomforingDbo(
 	val status: Gjennomforing.Status,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
-	val registrertDato: LocalDateTime,
-	val fremmoteDato: LocalDateTime?,
 	val navEnhetId: UUID?,
 	val opprettetAar: Int,
 	val lopenr: Int,
 	val createdAt: LocalDateTime,
-	val modifiedAt: LocalDateTime
+	val modifiedAt: LocalDateTime,
+	val deprecated: Boolean = true,
 ) {
 
 	fun toGjennomforing(tiltak: Tiltak, arrangor: Arrangor): Gjennomforing {
@@ -36,8 +35,6 @@ data class GjennomforingDbo(
 			startDato = startDato,
 			sluttDato = sluttDato,
 			navEnhetId = navEnhetId,
-			registrertDato = registrertDato,
-			fremmoteDato = fremmoteDato,
 			lopenr = lopenr,
 			opprettetAar = opprettetAar,
 		)
@@ -50,8 +47,6 @@ data class GjennomforingDbo(
 				status = other.status,
 				startDato = other.startDato,
 				sluttDato = other.sluttDato,
-				registrertDato = other.registrertDato,
-				fremmoteDato = other.fremmoteDato,
 				navEnhetId = other.navEnhetId,
 				lopenr = other.lopenr,
 				opprettetAar = other.opprettetAar,

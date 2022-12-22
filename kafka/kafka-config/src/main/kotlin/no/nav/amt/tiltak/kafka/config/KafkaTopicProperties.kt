@@ -7,5 +7,6 @@ data class KafkaTopicProperties(
 	var amtTiltakTopic: String = "",
 	var sisteTilordnetVeilederTopic: String = "",
 	var endringPaaBrukerTopic: String = "",
-	var skjermedePersonerTopic: String = ""
+	var skjermedePersonerTopic: String = "",
+	var sisteTiltaksgjennomforingerTopic: String = "",
 )

@@ -55,6 +55,9 @@ spec:
         - application: amt-altinn-acl
           namespace: amt
           cluster: prod-gcp
+        - application: mulighetsrommet-arena-adapter
+          namespace: team-mulighetsrommet
+          cluster: prod-gcp
   kafka:
     pool: nav-prod
   secureLogs:
@@ -96,9 +99,15 @@ spec:
       value: http://poao-tilgang.poao.svc.cluster.local
     - name: POAO_TILGANG_SCOPE
       value: api://prod-gcp.poao.poao-tilgang/.default
+    - name: MR_ARENA_ADAPTER_SCOPE
+      value: api://prod-gcp.team-mulighetsrommet.mulighetsrommet-arena-adapter/.default
+    - name: MR_ARENA_ADAPTER_URL
+      value: http://mulighetsrommet-arena-adapter.team-mulighetsrommet.svc.cluster.local
     # Kafka topics
     - name: SISTE_TILORDNET_VEILEDER_TOPIC
       value: pto.siste-tilordnet-veileder-v1
+    - name: SISTE_TILTAKSGJENNOMFORINGER_TOPIC
+      value: team-mulighetsrommet.siste-tiltaksgjennomforinger-v1
     - name: AMT_TILTAK_TOPIC
       value: amt.amt-tiltak-v1
     - name: ENDRING_PAA_OPPF_BRUKER_TOPIC

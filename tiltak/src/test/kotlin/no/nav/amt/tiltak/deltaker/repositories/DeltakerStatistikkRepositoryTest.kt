@@ -101,8 +101,6 @@ private val AKTIV_GJENNOMFORING_UTEN_BRUKERE = GjennomforingInput(
 	startDato = LocalDate.of(2022, 2, 1),
 	sluttDato = LocalDate.of(2050, 12, 30),
 	navEnhetId = TestData.NAV_ENHET_1.id,
-	registrertDato = LocalDate.of(2022, 1, 1),
-	fremmoteDato = LocalDate.of(2022, 2, 1),
 	opprettetAar = 2020,
 	lopenr = 123
 )

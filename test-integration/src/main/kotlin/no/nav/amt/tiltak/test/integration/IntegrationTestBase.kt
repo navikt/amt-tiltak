@@ -48,42 +48,59 @@ abstract class IntegrationTestBase {
 	lateinit var testDataRepository: TestDataRepository
 
 	companion object {
-		val oAuthServer = MockOAuthServer()
-		val enhetsregisterServer = MockAmtEnhetsregisterServer()
-		val norgHttpServer = MockNorgHttpServer()
-		val poaoTilgangServer = MockPoaoTilgangHttpServer()
-		val nomHttpServer = MockNomHttpServer()
-		val altinnAclHttpServer = MockAmtAltinnAclHttpServer()
-		val pdlHttpServer = MockPdlHttpServer()
+		val mockOAuthServer = MockOAuthServer()
+		val mockEnhetsregisterServer = MockAmtEnhetsregisterServer()
+		val mockNorgHttpServer = MockNorgHttpServer()
+		val mockPoaoTilgangHttpServer = MockPoaoTilgangHttpServer()
+		val mockNomHttpServer = MockNomHttpServer()
+		val mockAmtAltinnAclHttpServer = MockAmtAltinnAclHttpServer()
+		val mockPdlHttpServer = MockPdlHttpServer()
 		val mockMachineToMachineHttpServer = MockMachineToMachineHttpServer()
+		val mockMrArenaAdapterServer = MockMrArenaAdapterServer()
 
 		@JvmStatic
 		@DynamicPropertySource
 		fun startEnvironment(registry: DynamicPropertyRegistry) {
-			oAuthServer.start()
-			registry.add("no.nav.security.jwt.issuer.azuread.discovery-url") { oAuthServer.getDiscoveryUrl("azuread") }
+			mockOAuthServer.start()
+			registry.add("no.nav.security.jwt.issuer.azuread.discovery-url") { mockOAuthServer.getDiscoveryUrl("azuread") }
 			registry.add("no.nav.security.jwt.issuer.azuread.accepted-audience") { "test-aud" }
 
-			registry.add("no.nav.security.jwt.issuer.tokenx.discovery-url") { oAuthServer.getDiscoveryUrl("tokenx") }
+			registry.add("no.nav.security.jwt.issuer.tokenx.discovery-url") { mockOAuthServer.getDiscoveryUrl("tokenx") }
 			registry.add("no.nav.security.jwt.issuer.tokenx.accepted-audience") { "test-aud" }
 
-			enhetsregisterServer.start()
-			registry.add("amt-enhetsregister.url") { enhetsregisterServer.serverUrl() }
+			registry.add("digdir-krr-proxy.url") { "TODO" }
+			registry.add("digdir-krr-proxy.scope") { "test.digdir-krr-proxy" }
 
-			norgHttpServer.start()
-			registry.add("poao-gcp-proxy.url") { norgHttpServer.serverUrl() }
+			registry.add("veilarboppfolging.url") { "TODO" }
+			registry.add("veilarboppfolging.scope") { "test.veilarboppfolging" }
 
-			poaoTilgangServer.start()
-			registry.add("poao-tilgang.url") { poaoTilgangServer.serverUrl() }
+			mockMrArenaAdapterServer.start()
+			registry.add("mr-arena-adapter.url") { mockMrArenaAdapterServer.serverUrl() }
+			registry.add("mr-arena-adapter.scope") { "test.mr-arena-adapter" }
 
-			nomHttpServer.start()
-			registry.add("nom.url") { nomHttpServer.serverUrl() }
+			mockEnhetsregisterServer.start()
+			registry.add("amt-enhetsregister.url") { mockEnhetsregisterServer.serverUrl() }
+			registry.add("amt-enhetsregister.scope") { "test.amt-enhetsregister" }
 
-			altinnAclHttpServer.start()
-			registry.add("amt-altinn-acl.url") { altinnAclHttpServer.serverUrl() }
+			mockNorgHttpServer.start()
+			registry.add("poao-gcp-proxy.url") { mockNorgHttpServer.serverUrl() }
+			registry.add("poao-gcp-proxy.scope") { "test.poao-gcp-proxy" }
 
-			pdlHttpServer.start()
-			registry.add("pdl.url") { pdlHttpServer.serverUrl() }
+			mockPoaoTilgangHttpServer.start()
+			registry.add("poao-tilgang.url") { mockPoaoTilgangHttpServer.serverUrl() }
+			registry.add("poao-tilgang.scope") { "test.poao-tilgang" }
+
+			mockNomHttpServer.start()
+			registry.add("nom.url") { mockNomHttpServer.serverUrl() }
+			registry.add("nom.scope") { "test.nom" }
+
+			mockAmtAltinnAclHttpServer.start()
+			registry.add("amt-altinn-acl.url") { mockAmtAltinnAclHttpServer.serverUrl() }
+			registry.add("amt-altinn-acl.scope") { "test.amt-altinn-acl" }
+
+			mockPdlHttpServer.start()
+			registry.add("pdl.url") { mockPdlHttpServer.serverUrl() }
+			registry.add("pdl.scope") { "test.pdl" }
 
 			mockMachineToMachineHttpServer.start()
 			registry.add("nais.env.azureOpenIdConfigTokenEndpoint") {
@@ -108,19 +125,20 @@ abstract class IntegrationTestBase {
 	}
 
 	fun resetMockServers() {
-		enhetsregisterServer.reset()
-		norgHttpServer.reset()
-		poaoTilgangServer.reset()
-		nomHttpServer.reset()
-		altinnAclHttpServer.reset()
-		pdlHttpServer.reset()
+		mockEnhetsregisterServer.reset()
+		mockNorgHttpServer.reset()
+		mockPoaoTilgangHttpServer.reset()
+		mockNomHttpServer.reset()
+		mockAmtAltinnAclHttpServer.reset()
+		mockPdlHttpServer.reset()
+		mockMrArenaAdapterServer.reset()
 	}
 
 	fun resetMockServersAndAddDefaultData() {
 		resetMockServers()
-		norgHttpServer.addDefaultData()
-		nomHttpServer.addDefaultData()
-		altinnAclHttpServer.addDefaultData()
+		mockNorgHttpServer.addDefaultData()
+		mockNomHttpServer.addDefaultData()
+		mockAmtAltinnAclHttpServer.addDefaultData()
 	}
 
 	fun serverUrl() = "http://localhost:$port"

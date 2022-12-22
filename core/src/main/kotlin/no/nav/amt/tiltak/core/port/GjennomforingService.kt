@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.core.port
 
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import java.util.*
 
 interface GjennomforingService {
@@ -13,7 +14,7 @@ interface GjennomforingService {
 
 	fun getAktiveByLopenr(lopenr: Int): List<Gjennomforing>
 
-	fun upsert(gjennomforing: Gjennomforing): Gjennomforing
+	fun upsert(gjennomforing: GjennomforingUpsert): Gjennomforing
 
 	fun slettGjennomforing(gjennomforingId: UUID)
 

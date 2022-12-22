@@ -1,0 +1,1 @@
+ALTER TABLE gjennomforing ADD COLUMN deprecated BOOLEAN NOT NULL DEFAULT true;

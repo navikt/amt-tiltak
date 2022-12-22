@@ -127,6 +127,11 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>mr-arena-adapter-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>amt-altinn-acl</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -148,6 +153,11 @@
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>arrangor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>gjennomforing-ingestor</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -413,6 +423,12 @@
             <dependency>
                 <groupId>io.kotest</groupId>
                 <artifactId>kotest-assertions-json-jvm</artifactId>
+                <version>${kotest.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.kotest</groupId>
+                <artifactId>kotest-framework-concurrency-jvm</artifactId>
                 <version>${kotest.version}</version>
                 <scope>test</scope>
             </dependency>

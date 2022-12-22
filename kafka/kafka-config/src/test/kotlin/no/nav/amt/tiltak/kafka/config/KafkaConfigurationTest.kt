@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.kafka.config
 import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
 import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
 import no.nav.amt.tiltak.core.kafka.SkjermetPersonIngestor
+import no.nav.amt.tiltak.core.kafka.GjennomforingIngestor
 import no.nav.amt.tiltak.core.kafka.TildeltVeilederIngestor
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.common.kafka.producer.KafkaProducerClientImpl
@@ -24,10 +25,11 @@ import java.util.concurrent.atomic.AtomicInteger
 @Testcontainers
 class KafkaConfigurationTest {
 
-	private val amtTiltakTopic = "amt-tiltak"
-	private val sisteTilordnetVeilederTopic = "siste-tilordnet-veileder-v1"
-	private val endringPaaBrukerTopic = "pto.endring-paa-oppfolgingsbruker-v2"
+	private val amtTiltakTopic = "test.amt-tiltak"
+	private val sisteTilordnetVeilederTopic = "test.siste-tilordnet-veileder"
+	private val endringPaaBrukerTopic = "test.pto.endring-paa-oppfolgingsbruker"
 	private val skjermetPersonTopic = "nom.skjermede-personer-status-v1"
+	private val sisteTiltaksgjennomforingerTopic: String = "test.siste-tiltaksgjennomforinger"
 
 	@Container
 	var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.2.1"))
@@ -41,7 +43,8 @@ class KafkaConfigurationTest {
 			amtTiltakTopic = amtTiltakTopic,
 			sisteTilordnetVeilederTopic = sisteTilordnetVeilederTopic,
 			endringPaaBrukerTopic = endringPaaBrukerTopic,
-			skjermedePersonerTopic = skjermetPersonTopic
+			skjermedePersonerTopic = skjermetPersonTopic,
+			sisteTiltaksgjennomforingerTopic = sisteTiltaksgjennomforingerTopic,
 		)
 
 		val kafkaProperties = object : KafkaProperties {
@@ -89,6 +92,12 @@ class KafkaConfigurationTest {
 			}
 		}
 
+		val gjennomforingIngestor = object : GjennomforingIngestor {
+			override fun ingestKafkaRecord(recordValue: String) {
+				counter.incrementAndGet()
+			}
+		}
+
 		val config = KafkaConfiguration(
 			kafkaTopicProperties,
 			kafkaProperties,
@@ -96,7 +105,8 @@ class KafkaConfigurationTest {
 			arenaAclIngestor,
 			tildeltVeilederIngestor,
 			endringPaaBrukerIngestor,
-			skjermetPersonIngestor
+			skjermetPersonIngestor,
+			gjennomforingIngestor,
 		)
 
 		config.onApplicationEvent(null)
@@ -108,6 +118,7 @@ class KafkaConfigurationTest {
 		kafkaProducer.sendSync(toJsonProducerRecord(sisteTilordnetVeilederTopic, "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord(endringPaaBrukerTopic, "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord(skjermetPersonTopic, "1", value))
+		kafkaProducer.sendSync(toJsonProducerRecord(sisteTiltaksgjennomforingerTopic, "1", value))
 
 		kafkaProducer.close()
 
@@ -115,7 +126,7 @@ class KafkaConfigurationTest {
 
 		Thread.sleep(3000)
 
-		assertEquals(4, counter.get())
+		assertEquals(5, counter.get())
 	}
 
 }

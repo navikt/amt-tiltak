@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.tiltak.services
 
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
@@ -26,38 +27,41 @@ class GjennomforingServiceImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	override fun upsert(gjennomforing: Gjennomforing): Gjennomforing {
+	override fun upsert(gjennomforing: GjennomforingUpsert): Gjennomforing {
 		val storedGjennomforing = gjennomforingRepository.get(gjennomforing.id)
 
+		val arrangor = arrangorService.getArrangorById(gjennomforing.arrangorId)
+		val tiltak = tiltakService.getTiltakById(gjennomforing.tiltakId)
 		if (storedGjennomforing != null) {
-			return updateGjennomforing(storedGjennomforing, gjennomforing)
+			return updateGjennomforing(storedGjennomforing, gjennomforing).toGjennomforing(tiltak, arrangor)
 		}
+
 
 		return gjennomforingRepository.insert(
 			id = gjennomforing.id,
-			tiltakId = gjennomforing.tiltak.id,
-			arrangorId = gjennomforing.arrangor.id,
+			tiltakId = gjennomforing.tiltakId,
+			arrangorId = gjennomforing.arrangorId,
 			navn = gjennomforing.navn,
 			status = gjennomforing.status,
 			startDato = gjennomforing.startDato,
 			sluttDato = gjennomforing.sluttDato,
-			registrertDato = gjennomforing.registrertDato,
-			fremmoteDato = gjennomforing.fremmoteDato,
 			navEnhetId = gjennomforing.navEnhetId,
 			opprettetAar = gjennomforing.opprettetAar,
-			lopenr = gjennomforing.lopenr
-		).toGjennomforing(gjennomforing.tiltak, gjennomforing.arrangor)
+			lopenr = gjennomforing.lopenr,
+			deprecated = gjennomforing.deprecated,
+		).toGjennomforing(tiltak, arrangor)
 	}
 
-	private fun updateGjennomforing(storedGjennomforing: GjennomforingDbo, updatedGjennomforing: Gjennomforing): Gjennomforing {
+	private fun updateGjennomforing(
+		storedGjennomforing: GjennomforingDbo,
+		updatedGjennomforing: GjennomforingUpsert,
+	): GjennomforingDbo {
 		val update = storedGjennomforing.update(
 			storedGjennomforing.copy(
 				navn = updatedGjennomforing.navn,
 				status = updatedGjennomforing.status,
 				startDato = updatedGjennomforing.startDato,
 				sluttDato = updatedGjennomforing.sluttDato,
-				registrertDato = updatedGjennomforing.registrertDato,
-				fremmoteDato = updatedGjennomforing.fremmoteDato,
 				navEnhetId = updatedGjennomforing.navEnhetId,
 				lopenr = updatedGjennomforing.lopenr,
 				opprettetAar = updatedGjennomforing.opprettetAar
@@ -67,10 +71,8 @@ class GjennomforingServiceImpl(
 		return if (update.status == UpdateStatus.UPDATED) {
 			gjennomforingRepository
 				.update(update.updatedObject!!)
-				.toGjennomforing(updatedGjennomforing.tiltak, updatedGjennomforing.arrangor)
 		} else {
 			storedGjennomforing
-				.toGjennomforing(updatedGjennomforing.tiltak, updatedGjennomforing.arrangor)
 		}
 	}
 

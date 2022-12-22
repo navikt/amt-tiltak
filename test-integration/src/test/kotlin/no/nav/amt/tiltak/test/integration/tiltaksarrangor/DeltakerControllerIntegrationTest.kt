@@ -43,7 +43,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		testDataRepository.insertDeltaker(deltakerIkkeTilgang)
 		testDataRepository.insertDeltakerStatus(deltakerIkkeTilgangStatus)
 		testDataRepository.deleteAllEndringsmeldinger()
-		poaoTilgangServer.addErSkjermetResponse(mapOf(BRUKER_1.fodselsnummer to false))
+		mockPoaoTilgangHttpServer.addErSkjermetResponse(mapOf(BRUKER_1.fodselsnummer to false))
 	}
 
 	@Test
@@ -58,7 +58,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/forleng-deltakelse"),
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/ikke-aktuell"),
 		)
-		testTiltaksarrangorAutentisering(requestBuilders, client, oAuthServer)
+		testTiltaksarrangorAutentisering(requestBuilders, client, mockOAuthServer)
 	}
 
 	@Test
@@ -66,7 +66,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
 		response.code shouldBe 404
@@ -78,7 +78,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
 		val expectedBody = """
@@ -95,7 +95,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_2.id}",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
 		response.code shouldBe 403
@@ -106,7 +106,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
 		val expectedJson = """
@@ -123,7 +123,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
 		val expectedJson = """
@@ -153,7 +153,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
 		val expectedJson = "[]"
@@ -181,7 +181,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
 		response.code shouldBe 200
@@ -193,7 +193,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/oppstartsdato",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 			body = """{"oppstartsdato": "$dato"}""".toJsonRequestBody()
 		)
 
@@ -213,7 +213,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/oppstartsdato",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 			body = """{"oppstartsdato": "$dato"}""".toJsonRequestBody()
 		)
 
@@ -227,7 +227,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/deltakelse-prosent",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 			body = """{"deltakelseProsent": $deltakelseProsent}""".toJsonRequestBody()
 		)
 
@@ -248,7 +248,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/avslutt-deltakelse",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 			body = """{"sluttdato": "$dato", "aarsak": {"type": "FATT_JOBB"} }""".toJsonRequestBody()
 		)
 
@@ -269,7 +269,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/avslutt-deltakelse",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 			body = """{"sluttdato": "$dato", "aarsak": {"type": "FATT_JOBB"}}""".toJsonRequestBody()
 		)
 
@@ -280,7 +280,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/forleng-deltakelse",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 			body = """{"sluttdato": "$dato"}""".toJsonRequestBody()
 		)
 
@@ -300,7 +300,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/forleng-deltakelse",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 			body = """{"sluttdato": "$dato"}""".toJsonRequestBody()
 		)
 
@@ -311,7 +311,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/ikke-aktuell",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 			body = """{"aarsak": {"type": "FATT_JOBB"}}""".toJsonRequestBody()
 		)
 
@@ -331,7 +331,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/ikke-aktuell",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 			body = """{"aarsak": {"type": "FATT_JOBB"}}""".toJsonRequestBody()
 		)
 
@@ -343,7 +343,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "POST",
 			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/oppstartsdato",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 			body = """{"oppstartsdato": "$dato"}""".toJsonRequestBody()
 		)
 
@@ -363,7 +363,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "POST",
 			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/oppstartsdato",
-			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
 			body = """{"oppstartsdato": "$dato"}""".toJsonRequestBody()
 		)
 

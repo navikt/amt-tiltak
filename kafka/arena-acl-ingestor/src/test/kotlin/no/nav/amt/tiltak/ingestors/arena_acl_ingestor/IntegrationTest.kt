@@ -140,6 +140,7 @@ class IntegrationTest {
 		inserted shouldNotBe null
 		val expected = toInsertGjennomforing.copy(arrangorId = inserted!!.arrangorId, createdAt = inserted.createdAt, modifiedAt = inserted.modifiedAt)
 		inserted shouldBe expected
+		inserted.deprecated shouldBe true
 
 	}
 
@@ -213,8 +214,6 @@ class IntegrationTest {
 		status =  Gjennomforing.Status.GJENNOMFORES,
 		startDato =  LocalDate.now().minusDays(3),
 		sluttDato =  LocalDate.now().minusDays(1),
-		registrertDato =  now.minusDays(5),
-		fremmoteDato =  null,
 		navEnhetId = NAV_ENHET_1.id,
 		createdAt =  now,
 		modifiedAt =  now,
@@ -240,7 +239,7 @@ class IntegrationTest {
 				"status": "${toInsertGjennomforing.status.name}",
 				"startDato": "${toInsertGjennomforing.startDato}",
 				"sluttDato": "${toInsertGjennomforing.sluttDato}",
-				"registrertDato": "${toInsertGjennomforing.registrertDato}",
+				"registrertDato": "${now.minusDays(5)}",
 				"opprettetAar": ${toInsertGjennomforing.opprettetAar},
 				"lopenr": ${toInsertGjennomforing.lopenr},
 				"ansvarligNavEnhetId": "${NAV_ENHET_1.enhetId}"
