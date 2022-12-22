@@ -39,7 +39,8 @@ open class MockOAuthServer {
 		oid: UUID,
 		claims: Map<String, Any> = mapOf(
 			"NAVident" to ident,
-			"oid" to oid.toString()
+			"oid" to oid.toString(),
+			"groups" to emptyArray<String>()
 		)
 	): String {
 		return server.issueToken(azureAdIssuer, subject, audience, claims).serialize()
