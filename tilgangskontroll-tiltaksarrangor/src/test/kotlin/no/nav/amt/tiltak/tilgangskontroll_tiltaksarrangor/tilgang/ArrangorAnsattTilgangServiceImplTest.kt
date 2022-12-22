@@ -55,7 +55,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		id = deltakerId,
 		fornavn = "fornavn",
 		etternavn = "etternavn",
-		fodselsnummer = personligIdent,
+		personIdent = personligIdent,
 		navEnhetId = null,
 		navVeilederId = null,
 		telefonnummer = "123",

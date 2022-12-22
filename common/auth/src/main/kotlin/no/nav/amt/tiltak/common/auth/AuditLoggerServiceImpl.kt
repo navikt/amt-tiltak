@@ -46,7 +46,7 @@ class AuditLoggerServiceImpl(
 		sendAuditLog(
 			sourceUserIdProvider = { navAnsattService.getNavAnsatt(navAnsattId).navIdent },
 			destinationUserIdProvider = {
-				deltakerService.hentDeltaker(deltakerId)?.fodselsnummer
+				deltakerService.hentDeltaker(deltakerId)?.personIdent
 					?: throw NoSuchElementException("Fant ikke deltaker med id: $deltakerId")
 			},
 			eventType = AuditEventType.ACCESS,
@@ -63,7 +63,7 @@ class AuditLoggerServiceImpl(
 
 		sendAuditLog(
 			sourceUserIdProvider = { arrangorAnsattService.getAnsatt(arrangorAnsattId).personligIdent },
-			destinationUserIdProvider = { deltaker.fodselsnummer },
+			destinationUserIdProvider = { deltaker.personIdent },
 			eventType = AuditEventType.ACCESS,
 			eventSeverity = AuditEventSeverity.INFO,
 			reason = TILTAKSARRANGOR_ANSATT_DELTAKER_OPPSLAG_AUDIT_LOG_REASON,

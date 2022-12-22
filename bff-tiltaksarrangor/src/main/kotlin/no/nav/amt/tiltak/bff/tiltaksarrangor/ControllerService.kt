@@ -27,7 +27,7 @@ open class ControllerService(
 			fornavn = deltaker.fornavn,
 			mellomnavn = deltaker.mellomnavn,
 			etternavn = deltaker.etternavn,
-			fodselsnummer = deltaker.fodselsnummer,
+			fodselsnummer = deltaker.personIdent,
 			telefonnummer = deltaker.telefonnummer,
 			epost = deltaker.epost,
 			deltakelseProsent = deltaker.prosentStilling?.toInt(),

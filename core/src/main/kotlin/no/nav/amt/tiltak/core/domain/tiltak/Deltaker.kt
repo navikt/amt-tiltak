@@ -13,7 +13,7 @@ data class Deltaker(
 	val telefonnummer: String?,
 	val erSkjermet: Boolean,
 	val epost: String?,
-	val fodselsnummer: String,
+	val personIdent: String,
 	val navEnhetId: UUID?,
 	val navVeilederId: UUID?,
 	val startDato: LocalDate?,

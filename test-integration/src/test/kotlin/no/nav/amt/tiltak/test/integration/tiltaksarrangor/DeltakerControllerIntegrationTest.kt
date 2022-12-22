@@ -43,7 +43,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		testDataRepository.insertDeltaker(deltakerIkkeTilgang)
 		testDataRepository.insertDeltakerStatus(deltakerIkkeTilgangStatus)
 		testDataRepository.deleteAllEndringsmeldinger()
-		mockPoaoTilgangHttpServer.addErSkjermetResponse(mapOf(BRUKER_1.fodselsnummer to false))
+		mockPoaoTilgangHttpServer.addErSkjermetResponse(mapOf(BRUKER_1.personIdent to false))
 	}
 
 	@Test

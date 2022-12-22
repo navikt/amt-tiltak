@@ -45,7 +45,7 @@ class BrukerRepositoryTest : FunSpec({
 
 		dbo shouldNotBe null
 		dbo.id shouldNotBe null
-		dbo.fodselsnummer shouldBe fodselsnummer
+		dbo.personIdent shouldBe fodselsnummer
 		dbo.fornavn shouldBe fornavn
 		dbo.etternavn shouldBe etternavn
 		dbo.telefonnummer shouldBe telefonnummer
@@ -56,8 +56,8 @@ class BrukerRepositoryTest : FunSpec({
 		dbo.modifiedAt shouldNotBe null
 	}
 	test("upsert - bruker finnes - oppdaterer eksisterende bruker") {
-		repository.get(BRUKER_2.fodselsnummer) shouldNotBe null
-		val bruker = BrukerUpsertDbo(BRUKER_2.fodselsnummer,
+		repository.get(BRUKER_2.personIdent) shouldNotBe null
+		val bruker = BrukerUpsertDbo(BRUKER_2.personIdent,
 			"fornavn",
 			"mellomnavn",
 			"etternavn",
@@ -82,19 +82,19 @@ class BrukerRepositoryTest : FunSpec({
 	}
 
 	test("oppdaterVeileder should update veileder") {
-		repository.get(BRUKER_1.fodselsnummer)?.ansvarligVeilederId shouldBe NAV_ANSATT_1.id
+		repository.get(BRUKER_1.personIdent)?.ansvarligVeilederId shouldBe NAV_ANSATT_1.id
 
-		repository.oppdaterVeileder(BRUKER_1.fodselsnummer, NAV_ANSATT_2.id)
+		repository.oppdaterVeileder(BRUKER_1.personIdent, NAV_ANSATT_2.id)
 
-		repository.get(BRUKER_1.fodselsnummer)?.ansvarligVeilederId shouldBe NAV_ANSATT_2.id
+		repository.get(BRUKER_1.personIdent)?.ansvarligVeilederId shouldBe NAV_ANSATT_2.id
 	}
 
 	test("settSkjermet should update bruker") {
-		repository.get(BRUKER_1.fodselsnummer)?.erSkjermet shouldBe false
+		repository.get(BRUKER_1.personIdent)?.erSkjermet shouldBe false
 
-		repository.settSkjermet(BRUKER_1.fodselsnummer, true)
+		repository.settSkjermet(BRUKER_1.personIdent, true)
 
-		repository.get(BRUKER_1.fodselsnummer)?.erSkjermet shouldBe true
+		repository.get(BRUKER_1.personIdent)?.erSkjermet shouldBe true
 	}
 
 })

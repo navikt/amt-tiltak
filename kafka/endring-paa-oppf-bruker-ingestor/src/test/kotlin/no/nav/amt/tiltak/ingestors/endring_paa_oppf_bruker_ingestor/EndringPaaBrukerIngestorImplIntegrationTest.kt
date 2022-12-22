@@ -92,12 +92,12 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 
 		endringPaaBrukerIngestorImpl.ingestKafkaRecord("""
 			{
-				"fodselsnummer": "${BRUKER_1.fodselsnummer}",
+				"fodselsnummer": "${BRUKER_1.personIdent}",
 				"oppfolgingsenhet": "$expectedNyEnhet"
 			}
 		""".trimIndent())
 
-		val insertedBruker = brukerRepository.get(BRUKER_1.fodselsnummer)
+		val insertedBruker = brukerRepository.get(BRUKER_1.personIdent)
 		val navEnhetId = insertedBruker?.navEnhetId
 		insertedBruker shouldNotBe null
 		navEnhetId shouldBe navEnhet.id

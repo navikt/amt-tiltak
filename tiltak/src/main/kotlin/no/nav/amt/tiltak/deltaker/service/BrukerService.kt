@@ -71,7 +71,7 @@ class BrukerService(
 		val erSkjermet = skjermetPersonService.erSkjermet(fodselsnummer)
 
 		val bruker = BrukerUpsertDbo(
-			fodselsnummer = fodselsnummer,
+			personIdent = fodselsnummer,
 			fornavn = person.fornavn,
 			mellomnavn = person.mellomnavn,
 			etternavn = person.etternavn,

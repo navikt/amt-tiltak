@@ -25,11 +25,11 @@ open class DeltakerServiceImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	override fun upsertDeltaker(fodselsnummer: String, deltaker: DeltakerUpsert) {
+	override fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert) {
 		val lagretDeltaker = hentDeltaker(deltaker.id)
 
 		if (lagretDeltaker == null) {
-			insertDeltaker(fodselsnummer, deltaker)
+			insertDeltaker(personIdent, deltaker)
 		} else if(!deltaker.compareTo(lagretDeltaker)){
 			update(deltaker)
 		}
@@ -64,8 +64,8 @@ open class DeltakerServiceImpl(
 		return deltaker.toDeltaker(hentStatusOrThrow(deltakerId))
 	}
 
-	override fun hentDeltakereMedFnr(fodselsnummer: String): List<Deltaker>{
-		val deltakere =  deltakerRepository.getDeltakereMedFnr(fodselsnummer)
+	override fun hentDeltakereMedPersonIdent(personIdent: String): List<Deltaker>{
+		val deltakere =  deltakerRepository.getDeltakereMedPersonIdent(personIdent)
 		return mapDeltakereOgAktiveStatuser(deltakere)
 	}
 
@@ -90,13 +90,13 @@ open class DeltakerServiceImpl(
 		log.info("Deltaker med id=$deltakerId er slettet")
 	}
 
-	override fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet?) {
-		brukerService.oppdaterNavEnhet(fodselsnummer, navEnhet)
+	override fun oppdaterNavEnhet(personIdent: String, navEnhet: NavEnhet?) {
+		brukerService.oppdaterNavEnhet(personIdent, navEnhet)
 	}
 
 	override fun erSkjermet(deltakerId: UUID) : Boolean {
 		val deltaker = hentDeltaker(deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
-		return brukerService.erSkjermet(deltaker.fodselsnummer)
+		return brukerService.erSkjermet(deltaker.personIdent)
 	}
 
 	override fun settSkjermet(personIdent: String, erSkjermet: Boolean) {
@@ -166,12 +166,12 @@ open class DeltakerServiceImpl(
 			))
 		}
 
-	override fun finnesBruker(fodselsnummer: String): Boolean {
-		return brukerService.finnesBruker(fodselsnummer)
+	override fun finnesBruker(personIdent: String): Boolean {
+		return brukerService.finnesBruker(personIdent)
 	}
 
-	override fun oppdaterAnsvarligVeileder(fodselsnummer: String, navAnsattId: UUID) {
-		brukerService.oppdaterAnsvarligVeileder(fodselsnummer, navAnsattId)
+	override fun oppdaterAnsvarligVeileder(personIdent: String, navAnsattId: UUID) {
+		brukerService.oppdaterAnsvarligVeileder(personIdent, navAnsattId)
 	}
 
 	override fun leggTilOppstartsdato(deltakerId: UUID, arrangorAnsattId: UUID, oppstartsdato: LocalDate) {
