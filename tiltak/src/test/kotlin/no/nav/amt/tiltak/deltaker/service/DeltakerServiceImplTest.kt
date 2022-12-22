@@ -145,9 +145,9 @@ class DeltakerServiceImplTest {
 	@Test
 	fun `upsertDeltaker - inserter ny deltaker`() {
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_1.fodselsnummer, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
 
-		val nyDeltaker = deltakerRepository.get(BRUKER_1.fodselsnummer,deltaker.gjennomforingId)
+		val nyDeltaker = deltakerRepository.get(BRUKER_1.personIdent,deltaker.gjennomforingId)
 
 		nyDeltaker shouldNotBe null
 		nyDeltaker!!.id shouldBe deltaker.id
@@ -157,8 +157,8 @@ class DeltakerServiceImplTest {
 	@Test
 	fun `insertStatus - ingester status`() {
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_1.fodselsnummer, deltaker)
-		val nyDeltaker = deltakerRepository.get(BRUKER_1.fodselsnummer, GJENNOMFORING_1.id)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
+		val nyDeltaker = deltakerRepository.get(BRUKER_1.personIdent, GJENNOMFORING_1.id)
 		val now = LocalDate.now().atStartOfDay()
 
 		nyDeltaker shouldNotBe null
@@ -191,8 +191,8 @@ class DeltakerServiceImplTest {
 	@Test
 	fun `insertStatus - deltaker får samme status igjen - oppdaterer ikke status`() {
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_1.fodselsnummer, deltaker)
-		val nyDeltaker = deltakerRepository.get(BRUKER_1.fodselsnummer, GJENNOMFORING_1.id)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
+		val nyDeltaker = deltakerRepository.get(BRUKER_1.personIdent, GJENNOMFORING_1.id)
 
 		nyDeltaker shouldNotBe null
 
@@ -255,7 +255,7 @@ class DeltakerServiceImplTest {
 			gyldigFra = LocalDateTime.now().minusDays(2)
 		)
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_1.fodselsnummer, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
 		deltakerServiceImpl.insertStatus(statusInsertDbo)
 
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldNotBe null
@@ -282,7 +282,7 @@ class DeltakerServiceImplTest {
 		)
 
 		deltakerUpserts.forEach {
-			deltakerServiceImpl.upsertDeltaker(BRUKER_1.fodselsnummer, it)
+			deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, it)
 		}
 		statusInserts.forEach {
 			deltakerServiceImpl.insertStatus(it)

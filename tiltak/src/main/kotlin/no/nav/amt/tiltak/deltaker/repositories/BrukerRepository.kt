@@ -18,7 +18,7 @@ open class BrukerRepository(
     private val rowMapper = RowMapper { rs, _ ->
         BrukerDbo(
 			id = rs.getUUID("id"),
-            fodselsnummer = rs.getString("fodselsnummer"),
+            personIdent = rs.getString("person_ident"),
             fornavn = rs.getString("fornavn"),
 			mellomnavn = rs.getString("mellomnavn"),
             etternavn = rs.getString("etternavn"),
@@ -34,9 +34,9 @@ open class BrukerRepository(
 
     fun upsert(bruker: BrukerUpsertDbo): BrukerDbo {
 		val sql = """
-			INSERT INTO bruker(id, fodselsnummer, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_enhet_id)
+			INSERT INTO bruker(id, person_ident, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_enhet_id)
 			VALUES (:id,
-					:fodselsnummer,
+					:personIdent,
 					:fornavn,
 					:mellomnavn,
 					:etternavn,
@@ -44,7 +44,7 @@ open class BrukerRepository(
 					:epost,
 					:veileder_id,
 					:nav_enhet_id)
-			ON CONFLICT(fodselsnummer) DO UPDATE SET
+			ON CONFLICT(person_ident) DO UPDATE SET
 			 	fornavn = :fornavn,
 				mellomnavn = :mellomnavn,
 				etternavn = :etternavn,
@@ -57,7 +57,7 @@ open class BrukerRepository(
 		val parameters = MapSqlParameterSource().addValues(
             mapOf(
 				"id" to UUID.randomUUID(),
-                "fodselsnummer" to bruker.fodselsnummer,
+                "personIdent" to bruker.personIdent,
                 "fornavn" to bruker.fornavn,
 				"mellomnavn" to bruker.mellomnavn,
                 "etternavn" to bruker.etternavn,
@@ -70,20 +70,20 @@ open class BrukerRepository(
 
         template.update(sql, parameters)
 
-        return get(bruker.fodselsnummer)
-            ?: throw NoSuchElementException("Bruker med id ${bruker.fodselsnummer} finnes ikke")
+        return get(bruker.personIdent)
+            ?: throw NoSuchElementException("Bruker med id ${bruker.personIdent} finnes ikke")
     }
 
-    fun get(fodselsnummer: String): BrukerDbo? {
+    fun get(personIdent: String): BrukerDbo? {
         val sql = """
 			SELECT *
 			FROM bruker
-			WHERE fodselsnummer = :fodselsnummer
+			WHERE person_ident = :personIdent
 		""".trimIndent()
 
         val parameters = MapSqlParameterSource().addValues(
             mapOf(
-                "fodselsnummer" to fodselsnummer
+                "personIdent" to personIdent
             )
         )
 
@@ -107,33 +107,33 @@ open class BrukerRepository(
 		return template.query(sql, parameters, rowMapper)
 			.firstOrNull()
 	}
-	fun oppdaterVeileder(fodselsnummer: String, veilederId: UUID) {
+	fun oppdaterVeileder(personIdent: String, veilederId: UUID) {
 		val sql = """
 			UPDATE bruker SET ansvarlig_veileder_id = :veilederId, modified_at = CURRENT_TIMESTAMP
-			WHERE fodselsnummer = :fodselsnummer
+			WHERE person_ident = :personIdent
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
 				"veilederId" to veilederId,
-				"fodselsnummer" to fodselsnummer,
+				"personIdent" to personIdent,
 			)
 		)
 
 		template.update(sql, parameters)
 	}
 
-	fun oppdaterNavEnhet(fodselsnummer: String, navEnhetId: UUID?) {
+	fun oppdaterNavEnhet(personIdent: String, navEnhetId: UUID?) {
 		val sql = """
 			UPDATE bruker
 			SET nav_enhet_id = :navEnhetId, modified_at = CURRENT_TIMESTAMP
-			WHERE fodselsnummer = :fodselsnummer
+			WHERE person_ident = :personIdent
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
 				"navEnhetId" to navEnhetId,
-				"fodselsnummer" to fodselsnummer,
+				"personIdent" to personIdent,
 			)
 		)
 
@@ -143,7 +143,7 @@ open class BrukerRepository(
 	fun settSkjermet(personIdent: String, erSkjermet: Boolean) {
 		val sql = """
 			UPDATE bruker SET er_skjermet = :erSkjermet, modified_at = CURRENT_TIMESTAMP
-			WHERE fodselsnummer = :personIdent
+			WHERE person_ident = :personIdent
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(

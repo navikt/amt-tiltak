@@ -15,14 +15,14 @@ open class NavEnhetServiceImpl(
 	private val veilarbarenaClient: VeilarbarenaClient
 ) : NavEnhetService {
 
-	override fun getNavEnhetForBruker(fodselsnummer: String): NavEnhet? {
-		val oppfolgingsenhetId = veilarbarenaClient.hentBrukerOppfolgingsenhetId(fodselsnummer)
+	override fun getNavEnhetForBruker(personIdent: String): NavEnhet? {
+		val oppfolgingsenhetId = veilarbarenaClient.hentBrukerOppfolgingsenhetId(personIdent)
 			?: return null
 
 		return getNavEnhet(oppfolgingsenhetId)
 			.also {
 				if (it == null) {
-					secureLog.warn("Bruker med fnr=$fodselsnummer har enhetId=$oppfolgingsenhetId som ikke finnes i norg")
+					secureLog.warn("Bruker med fnr=$personIdent har enhetId=$oppfolgingsenhetId som ikke finnes i norg")
 				}
 			}
 	}

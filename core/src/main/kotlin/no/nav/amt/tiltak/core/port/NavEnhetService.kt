@@ -9,7 +9,7 @@ interface NavEnhetService {
 
 	fun getNavEnhet(enhetId: String): NavEnhet?
 
-	fun getNavEnhetForBruker(fodselsnummer: String): NavEnhet?
+	fun getNavEnhetForBruker(personIdent: String): NavEnhet?
 
 }
 

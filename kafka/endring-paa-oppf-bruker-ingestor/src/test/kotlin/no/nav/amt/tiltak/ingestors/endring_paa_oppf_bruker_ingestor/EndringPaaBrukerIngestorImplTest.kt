@@ -20,7 +20,7 @@ class EndringPaaBrukerIngestorImplTest {
 	lateinit var deltakerService: DeltakerService
 	lateinit var navEnhetService: NavEnhetService
 
-	val fnr = "121234324"
+	val personIdent = "121234324"
 	val navEnhet = NavEnhet(UUID.randomUUID(),"enhet", "Navn")
 	val deltaker = Deltaker(
 		id = UUID.randomUUID(),
@@ -28,7 +28,7 @@ class EndringPaaBrukerIngestorImplTest {
 		fornavn = "fornavn",
 		mellomnavn = null,
 		etternavn = "etternavn",
-		fodselsnummer = fnr,
+		personIdent = personIdent,
 		telefonnummer = "1234",
 		epost = "foo@bar.baz",
 		navVeilederId = UUID.randomUUID(),
@@ -60,18 +60,18 @@ class EndringPaaBrukerIngestorImplTest {
 	@Test
 	fun `ingestKafkaRecord - bruker finnes ikke - skal returnere med en gang`() {
 		val enhet = "enhet"
-		every { deltakerService.hentDeltakereMedFnr(fnr) }.returns(emptyList())
+		every { deltakerService.hentDeltakereMedPersonIdent(personIdent) }.returns(emptyList())
 		every { navEnhetService.getNavEnhet(navEnhet.id) }.returns(navEnhet)
 
 		endringPaaBrukerIngestorImpl.ingestKafkaRecord("""
 			{
-				"fodselsnummer": "$fnr",
+				"fodselsnummer": "$personIdent",
 				"oppfolgingsenhet": "$enhet"
 			}
 		""".trimIndent())
 
 		verify ( exactly = 0 ) { navEnhetService.getNavEnhet(enhet) }
-		verify ( exactly = 0 ) { deltakerService.oppdaterNavEnhet(fnr, any()) }
+		verify ( exactly = 0 ) { deltakerService.oppdaterNavEnhet(personIdent, any()) }
 
 	}
 
@@ -79,38 +79,38 @@ class EndringPaaBrukerIngestorImplTest {
 	fun `ingestKafkaRecord - samme nav enhet - skal returnere med en gang`() {
 		val enhet = "enhet"
 
-		every { deltakerService.hentDeltakereMedFnr(fnr) }.returns(listOf(deltaker))
+		every { deltakerService.hentDeltakereMedPersonIdent(personIdent) }.returns(listOf(deltaker))
 		every { navEnhetService.getNavEnhet(navEnhet.id) }.returns(navEnhet)
 
 		endringPaaBrukerIngestorImpl.ingestKafkaRecord("""
 			{
-				"fodselsnummer": "$fnr",
+				"fodselsnummer": "$personIdent",
 				"oppfolgingsenhet": "$enhet"
 			}
 		""".trimIndent())
 
 		verify ( exactly = 0 ) { navEnhetService.getNavEnhet(enhet) }
-		verify ( exactly = 0 ) { deltakerService.oppdaterNavEnhet(fnr, any()) }
+		verify ( exactly = 0 ) { deltakerService.oppdaterNavEnhet(personIdent, any()) }
 	}
 
 	@Test
 	fun `ingestKafkaRecord - endret nav enhet - oppdaterer nav enhet`() {
 		val nyEnhet = "enhet2"
 		val nyttEnhetNavn = "Nytt nav enhet navn"
-		every { deltakerService.hentDeltakereMedFnr(fnr) }.returns(listOf(deltaker))
+		every { deltakerService.hentDeltakereMedPersonIdent(personIdent) }.returns(listOf(deltaker))
 		every { navEnhetService.getNavEnhet(navEnhet.id) }.returns(navEnhet)
 		every { navEnhetService.getNavEnhet(nyEnhet)}.returns(NavEnhet(UUID.randomUUID(), nyEnhet, nyttEnhetNavn))
-		every { deltakerService.oppdaterNavEnhet(fnr, any())}.returns(Unit)
+		every { deltakerService.oppdaterNavEnhet(personIdent, any())}.returns(Unit)
 
 		endringPaaBrukerIngestorImpl.ingestKafkaRecord("""
 			{
-				"fodselsnummer": "$fnr",
+				"fodselsnummer": "$personIdent",
 				"oppfolgingsenhet": "$nyEnhet"
 			}
 		""".trimIndent())
 
 		verify ( exactly = 1 ) { navEnhetService.getNavEnhet(nyEnhet) }
-		verify ( exactly = 1 ) { deltakerService.oppdaterNavEnhet(fnr, any() ) }
+		verify ( exactly = 1 ) { deltakerService.oppdaterNavEnhet(personIdent, any() ) }
 	}
 
 	@Test
@@ -119,17 +119,17 @@ class EndringPaaBrukerIngestorImplTest {
 		//og derfor ikke er relevante
 		val nyEnhet = "enhet2"
 
-		every { deltakerService.hentDeltakereMedFnr(fnr) }.returns(listOf(deltaker))
+		every { deltakerService.hentDeltakereMedPersonIdent(personIdent) }.returns(listOf(deltaker))
 		every { navEnhetService.getNavEnhet(navEnhet.id) }.returns(navEnhet)
 
 		endringPaaBrukerIngestorImpl.ingestKafkaRecord("""
 			{
-				"fodselsnummer": "$fnr",
+				"fodselsnummer": "$personIdent",
 				"oppfolgingsenhet": null
 			}
 		""".trimIndent())
 
 		verify ( exactly = 0 ) { navEnhetService.getNavEnhet(nyEnhet) }
-		verify ( exactly = 0 ) { deltakerService.oppdaterNavEnhet(fnr, any() ) }
+		verify ( exactly = 0 ) { deltakerService.oppdaterNavEnhet(personIdent, any() ) }
 	}
 }

@@ -24,7 +24,7 @@ fun Deltaker.toDto(aktiveEndringsmeldinger: List<EndringsmeldingDto>) = Deltaker
 	fornavn = fornavn,
 	mellomnavn = mellomnavn,
 	etternavn = etternavn,
-	fodselsnummer = fodselsnummer,
+	fodselsnummer = personIdent,
 	startDato = startDato,
 	sluttDato = sluttDato,
 	status = DeltakerStatusDto(type=status.type, endretDato = status.opprettetDato),

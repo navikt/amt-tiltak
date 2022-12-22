@@ -40,7 +40,7 @@ object TestData {
 	fun createBrukerInput(navEnhet: NavEnhetInput) =
 		BrukerInput(
 			id = UUID.randomUUID(),
-			fodselsnummer = (1000..9999).random().toString(),
+			personIdent = (1000..9999).random().toString(),
 			fornavn = "Fornavn",
 			etternavn = "Etternavn",
 			telefonnummer = (1000..9999).random().toString(),
@@ -207,7 +207,7 @@ object TestData {
 
 	val BRUKER_1 = BrukerInput(
 		id = UUID.fromString("23b04c3a-a36c-451f-b9cf-30b6a6b586b8"),
-		fodselsnummer = "12345678910",
+		personIdent = "12345678910",
 		fornavn = "Bruker 1 fornavn",
 		etternavn = "Bruker 1 etternavn",
 		telefonnummer = "73404782",
@@ -250,7 +250,7 @@ object TestData {
 
 	val BRUKER_2 = BrukerInput(
 		id = UUID.fromString("170a1323-03d8-4580-a1f8-bc14a0422da6"),
-		fodselsnummer = "7908432423",
+		personIdent = "7908432423",
 		fornavn = "Bruker 2 fornavn",
 		etternavn = "Bruker 2 etternavn",
 		telefonnummer = "65443532",
@@ -283,7 +283,7 @@ object TestData {
 
 	val BRUKER_3 = BrukerInput(
 		id = UUID.fromString("c74abcdd-53a7-4e22-86f3-97de9094029f"),
-		fodselsnummer = "3792473283",
+		personIdent = "3792473283",
 		fornavn = "Bruker 3 fornavn",
 		etternavn = "Bruker 3 etternavn",
 		telefonnummer = "39057809",
@@ -296,7 +296,7 @@ object TestData {
 
 	val BRUKER_4 = BrukerInput(
 		id = UUID.fromString("6b5d7600-a9a6-4918-8e8a-068d1c1f5a65"),
-		fodselsnummer = "10028029182",
+		personIdent = "10028029182",
 		fornavn = "Bruker 4 fornavn",
 		etternavn = "Bruker 4 etternavn",
 		telefonnummer = "11223344",

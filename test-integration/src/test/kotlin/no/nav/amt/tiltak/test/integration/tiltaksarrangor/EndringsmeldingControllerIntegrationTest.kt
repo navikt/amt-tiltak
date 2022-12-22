@@ -25,7 +25,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 	internal fun setUp() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 		resetMockServersAndAddDefaultData()
-		mockPoaoTilgangHttpServer.addErSkjermetResponse(mapOf(BRUKER_1.fodselsnummer to false))
+		mockPoaoTilgangHttpServer.addErSkjermetResponse(mapOf(BRUKER_1.personIdent to false))
 	}
 
 	@Test

@@ -71,7 +71,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		dbo!!.id shouldBe id
 		dbo.fornavn shouldBe BRUKER_3.fornavn
 		dbo.etternavn shouldBe BRUKER_3.etternavn
-		dbo.fodselsnummer shouldBe BRUKER_3.fodselsnummer
+		dbo.personIdent shouldBe BRUKER_3.personIdent
 		dbo.gjennomforingId shouldBe GJENNOMFORING_1.id
 		dbo.startDato shouldBe startDato
 		dbo.sluttDato shouldBe sluttDato
@@ -175,7 +175,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		repository.insert(insertDbo)
 
-		val gottenDbo = repository.get(bruker.fodselsnummer, gjennomforing.id)
+		val gottenDbo = repository.get(bruker.personIdent, gjennomforing.id)
 
 		gottenDbo shouldNotBe null
 		gottenDbo!!.gjennomforingId shouldBe gjennomforing.id

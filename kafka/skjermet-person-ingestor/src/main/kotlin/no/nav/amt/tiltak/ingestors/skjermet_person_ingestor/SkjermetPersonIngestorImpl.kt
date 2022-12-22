@@ -13,7 +13,7 @@ class SkjermetPersonIngestorImpl(
 	override fun ingest(recordKey: String, recordValue: String) {
 		val erSkjermet = JsonUtils.fromJsonString<Boolean>(recordValue)
 
-		deltakerService.hentDeltakereMedFnr(recordKey).firstOrNull() ?: return
+		deltakerService.hentDeltakereMedPersonIdent(recordKey).firstOrNull() ?: return
 
 		deltakerService.settSkjermet(recordKey, erSkjermet)
 

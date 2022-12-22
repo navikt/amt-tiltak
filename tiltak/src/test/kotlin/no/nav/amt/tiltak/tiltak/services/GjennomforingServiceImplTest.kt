@@ -115,7 +115,7 @@ class GjennomforingServiceImplTest : FunSpec({
 				fornavn = "Fornavn2",
 				mellomnavn = null,
 				etternavn = "Etternavn",
-				fodselsnummer = "12121231123",
+				personIdent = "12121231123",
 				navEnhetId = null,
 				navVeilederId = null,
 				epost = "foo@bar.baz",

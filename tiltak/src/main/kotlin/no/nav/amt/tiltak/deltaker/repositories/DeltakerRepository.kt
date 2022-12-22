@@ -21,7 +21,7 @@ open class DeltakerRepository(
 
 		DeltakerDbo(
 			id = UUID.fromString(rs.getString("id")),
-			fodselsnummer = rs.getString("fodselsnummer"),
+			personIdent = rs.getString("person_ident"),
 			fornavn = rs.getString("fornavn"),
 			mellomnavn = rs.getString("mellomnavn"),
 			etternavn = rs.getString("etternavn"),
@@ -175,35 +175,35 @@ open class DeltakerRepository(
 	}
 
 
-	fun getDeltakereMedFnr(fodselsnummer: String): List<DeltakerDbo> {
+	fun getDeltakereMedPersonIdent(personIdent: String): List<DeltakerDbo> {
 		val sql = """
 			SELECT deltaker.*, bruker.*
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
-			WHERE bruker.fodselsnummer = :bruker_fodselsnummer
+			WHERE bruker.person_ident = :bruker_person_ident
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"bruker_fodselsnummer" to fodselsnummer,
+				"bruker_person_ident" to personIdent,
 			)
 		)
 
 		return template.query(sql, parameters, rowMapper)
 	}
 
-	fun get(fodselsnummer: String, gjennomforingId: UUID): DeltakerDbo? {
+	fun get(personIdent: String, gjennomforingId: UUID): DeltakerDbo? {
 		val sql = """
 			SELECT deltaker.*, bruker.*
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
-			WHERE bruker.fodselsnummer = :bruker_fodselsnummer
+			WHERE bruker.person_ident = :bruker_person_ident
 				AND deltaker.gjennomforing_id = :gjennomforingId
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"bruker_fodselsnummer" to fodselsnummer,
+				"bruker_person_ident" to personIdent,
 				"gjennomforingId" to gjennomforingId
 			)
 		)

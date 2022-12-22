@@ -108,14 +108,14 @@ class TestDataRepository(
 
 	fun insertBruker(cmd: BrukerInput) {
 		val sql = """
-			INSERT INTO bruker (id, fodselsnummer, fornavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_enhet_id)
-			VALUES (:id, :fodselsnummer, :fornavn, :etternavn, :telefonnummer, :epost, :ansvarlig_veileder_id, :nav_enhet_id);
+			INSERT INTO bruker (id, person_ident, fornavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_enhet_id)
+			VALUES (:id, :person_ident, :fornavn, :etternavn, :telefonnummer, :epost, :ansvarlig_veileder_id, :nav_enhet_id);
 		""".trimIndent()
 
 		template.update(
 			sql, parameters(
 				"id" to cmd.id,
-				"fodselsnummer" to cmd.fodselsnummer,
+				"person_ident" to cmd.personIdent,
 				"fornavn" to cmd.fornavn,
 				"etternavn" to cmd.etternavn,
 				"telefonnummer" to cmd.telefonnummer,

@@ -44,7 +44,7 @@ class EndringsmeldingController(
 					deltaker.fornavn,
 					deltaker.mellomnavn,
 					deltaker.etternavn,
-					deltaker.fodselsnummer,
+					deltaker.personIdent,
 				),
 				status = it.status.toDto(),
 				innhold = it.innhold.toDto(),

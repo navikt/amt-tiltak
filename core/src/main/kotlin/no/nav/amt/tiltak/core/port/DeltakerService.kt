@@ -6,7 +6,7 @@ import java.util.*
 
 interface DeltakerService {
 
-	fun upsertDeltaker(fodselsnummer: String, deltaker: DeltakerUpsert)
+	fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert)
 
 	fun insertStatus(status: DeltakerStatusInsert)
 
@@ -18,13 +18,13 @@ interface DeltakerService {
 
 	fun slettDeltaker(deltakerId: UUID)
 
-	fun hentDeltakereMedFnr(fodselsnummer: String): List<Deltaker>
+	fun hentDeltakereMedPersonIdent(personIdent: String): List<Deltaker>
 
-	fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet?)
+	fun oppdaterNavEnhet(personIdent: String, navEnhet: NavEnhet?)
 
-	fun finnesBruker(fodselsnummer: String): Boolean
+	fun finnesBruker(personIdent: String): Boolean
 
-	fun oppdaterAnsvarligVeileder(fodselsnummer: String, navAnsattId: UUID)
+	fun oppdaterAnsvarligVeileder(personIdent: String, navAnsattId: UUID)
 
 	fun leggTilOppstartsdato(deltakerId: UUID, arrangorAnsattId: UUID, oppstartsdato: LocalDate)
 

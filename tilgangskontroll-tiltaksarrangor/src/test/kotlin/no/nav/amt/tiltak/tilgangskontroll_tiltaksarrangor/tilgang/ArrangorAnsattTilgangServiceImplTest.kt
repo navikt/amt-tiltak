@@ -15,7 +15,6 @@ import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.SkjermetPersonService
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.AltinnService
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.ArrangorAnsattRoller
@@ -56,7 +55,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		id = deltakerId,
 		fornavn = "fornavn",
 		etternavn = "etternavn",
-		fodselsnummer = personligIdent,
+		personIdent = personligIdent,
 		navEnhetId = null,
 		navVeilederId = null,
 		telefonnummer = "123",
