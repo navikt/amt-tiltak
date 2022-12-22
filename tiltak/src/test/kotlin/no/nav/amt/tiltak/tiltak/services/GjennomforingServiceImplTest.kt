@@ -133,7 +133,8 @@ class GjennomforingServiceImplTest : FunSpec({
 				registrertDato = LocalDateTime.now(),
 				dagerPerUke = null,
 				prosentStilling = null,
-				gjennomforingId = UUID.randomUUID()
+				gjennomforingId = UUID.randomUUID(),
+				erSkjermet = false
 			))
 
 		gjennomforingRepository.get(GJENNOMFORING_1.id) shouldNotBe null

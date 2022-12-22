@@ -46,7 +46,8 @@ object TestData {
 			telefonnummer = (1000..9999).random().toString(),
 			epost = "bruker@example.com",
 			ansvarligVeilederId = null,
-			navEnhetId = navEnhet.id
+			navEnhetId = navEnhet.id,
+			erSkjermet = false
 		)
 
 	fun createStatusInput(deltaker: DeltakerInput) = DeltakerStatusInput(
@@ -56,6 +57,16 @@ object TestData {
 		status = "DELTAR",
 		aktiv = true,
 		createdAt = deltaker.createdAt
+	)
+
+	fun createEndringsmelding(deltaker: DeltakerInput, arrangorAnsattInput: ArrangorAnsattInput) = EndringsmeldingInput(
+		id = UUID.randomUUID(),
+		deltakerId = deltaker.id,
+		opprettetAvArrangorAnsattId = arrangorAnsattInput.id,
+		status = Endringsmelding.Status.AKTIV,
+		type = "LEGG_TIL_OPPSTARTSDATO",
+		innhold = """{ "oppstartsdato": "2022-11-09" }""",
+		createdAt = ZonedDateTime.parse("2022-11-08T15:00:00.00000+00:00"),
 	)
 
 	val NAV_ENHET_1 = NavEnhetInput(
@@ -213,7 +224,20 @@ object TestData {
 		telefonnummer = "73404782",
 		epost = "bruker1@example.com",
 		ansvarligVeilederId = NAV_ANSATT_1.id,
-		navEnhetId = NAV_ENHET_1.id
+		navEnhetId = NAV_ENHET_1.id,
+		erSkjermet = false
+	)
+
+	val BRUKER_SKJERMET = BrukerInput(
+		id = UUID.fromString("2f9868a4-7fcb-11ed-a1eb-0242ac120002"),
+		fodselsnummer = "10101010101",
+		fornavn = "Skjermet bruker fornavn",
+		etternavn = "Skjermet bruker etternavn",
+		telefonnummer = "432432423",
+		epost = "skjermet@example.com",
+		ansvarligVeilederId = NAV_ANSATT_1.id,
+		navEnhetId = NAV_ENHET_1.id,
+		erSkjermet = true
 	)
 
 	val DELTAKER_1 = DeltakerInput(
@@ -256,7 +280,8 @@ object TestData {
 		telefonnummer = "65443532",
 		epost = "bruker2@example.com",
 		ansvarligVeilederId = null,
-		navEnhetId = NAV_ENHET_1.id
+		navEnhetId = NAV_ENHET_1.id,
+		erSkjermet = false
 	)
 
 	val DELTAKER_2 = DeltakerInput(
@@ -289,7 +314,8 @@ object TestData {
 		telefonnummer = "39057809",
 		epost = "bruker3@example.com",
 		ansvarligVeilederId = null,
-		navEnhetId = NAV_ENHET_1.id
+		navEnhetId = NAV_ENHET_1.id,
+		erSkjermet = false
 	)
 
 	// Bruker 4
@@ -302,7 +328,8 @@ object TestData {
 		telefonnummer = "11223344",
 		epost = "bruker4@example.com",
 		ansvarligVeilederId = null,
-		navEnhetId = NAV_ENHET_1.id
+		navEnhetId = NAV_ENHET_1.id,
+		erSkjermet = false
 	)
 
 

@@ -108,8 +108,8 @@ class TestDataRepository(
 
 	fun insertBruker(cmd: BrukerInput) {
 		val sql = """
-			INSERT INTO bruker (id, person_ident, fornavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_enhet_id)
-			VALUES (:id, :person_ident, :fornavn, :etternavn, :telefonnummer, :epost, :ansvarlig_veileder_id, :nav_enhet_id);
+			INSERT INTO bruker (id, person_ident, fornavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_enhet_id, er_skjermet)
+			VALUES (:id, :person_ident, :fornavn, :etternavn, :telefonnummer, :epost, :ansvarlig_veileder_id, :nav_enhet_id, :er_skjermet);
 		""".trimIndent()
 
 		template.update(
@@ -121,7 +121,8 @@ class TestDataRepository(
 				"telefonnummer" to cmd.telefonnummer,
 				"epost" to cmd.epost,
 				"ansvarlig_veileder_id" to cmd.ansvarligVeilederId,
-				"nav_enhet_id" to cmd.navEnhetId
+				"nav_enhet_id" to cmd.navEnhetId,
+				"er_skjermet" to cmd.erSkjermet
 			)
 		)
 	}

@@ -47,6 +47,7 @@ class EndringPaaBrukerIngestorImplTest {
 		dagerPerUke = null,
 		prosentStilling = null,
 		innsokBegrunnelse = null,
+		erSkjermet = false
 	)
 
 

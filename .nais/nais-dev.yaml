@@ -34,9 +34,12 @@ spec:
   azure:
     application:
       enabled: true
+      allowAllUsers: true
       claims:
         extra:
           - "NAVident"
+        groups:
+          - id: {{ad_gruppe_egne_ansatte}}
   tokenx:
     enabled: true
   accessPolicy:
@@ -63,6 +66,8 @@ spec:
   secureLogs:
     enabled: true
   env:
+    - name: AD_GRUPPE_ID_TILGANG_TIL_EGNE_ANSATTE
+      value: {{ad_gruppe_egne_ansatte}}
     - name: PDL_SCOPE
       value: api://dev-fss.pdl.pdl-api/.default
     - name: PDL_URL

@@ -27,6 +27,7 @@ open class DeltakerRepository(
 			etternavn = rs.getString("etternavn"),
 			telefonnummer = rs.getString("telefonnummer"),
 			epost = rs.getString("epost"),
+			erSkjermet = rs.getBoolean("er_skjermet"),
 			navEnhetId = rs.getNullableUUID("nav_enhet_id"),
 			navVeilederId = rs.getNullableUUID("ansvarlig_veileder_id"),
 			startDato = rs.getDate("start_dato")?.toLocalDate(),

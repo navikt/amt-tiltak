@@ -73,7 +73,8 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		registrertDato = LocalDateTime.now(),
 		dagerPerUke = 5,
 		prosentStilling = 100F,
-		gjennomforingId = gjennomforingId
+		gjennomforingId = gjennomforingId,
+		erSkjermet = true
 	)
 	beforeEach {
 		arrangorAnsattService = mockk()
