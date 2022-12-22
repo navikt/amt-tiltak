@@ -199,7 +199,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 		response.code shouldBe 200
 
-		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForDeltaker(DELTAKER_1.id)
+		val endringsmeldinger = endringsmeldingService.hentAktiveEndringsmeldingerForDeltaker(DELTAKER_1.id)
 		endringsmeldinger shouldHaveSize 1
 
 		val endringsmelding = endringsmeldinger.first()
@@ -233,7 +233,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 		response.code shouldBe 200
 
-		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForDeltaker(DELTAKER_1.id)
+		val endringsmeldinger = endringsmeldingService.hentAktiveEndringsmeldingerForDeltaker(DELTAKER_1.id)
 
 		endringsmeldinger shouldHaveSize 1
 
@@ -254,7 +254,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 		response.code shouldBe 200
 
-		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForDeltaker(DELTAKER_1.id)
+		val endringsmeldinger = endringsmeldingService.hentAktiveEndringsmeldingerForDeltaker(DELTAKER_1.id)
 		endringsmeldinger shouldHaveSize 1
 
 		val endringsmelding = endringsmeldinger.first()
@@ -286,7 +286,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 		response.code shouldBe 200
 
-		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForDeltaker(DELTAKER_1.id)
+		val endringsmeldinger = endringsmeldingService.hentAktiveEndringsmeldingerForDeltaker(DELTAKER_1.id)
 		endringsmeldinger shouldHaveSize 1
 
 		val endringsmelding = endringsmeldinger.first()
@@ -317,7 +317,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 		response.code shouldBe 200
 
-		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForDeltaker(DELTAKER_1.id)
+		val endringsmeldinger = endringsmeldingService.hentAktiveEndringsmeldingerForDeltaker(DELTAKER_1.id)
 		endringsmeldinger shouldHaveSize 1
 
 		val endringsmelding = endringsmeldinger.first()
@@ -349,7 +349,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 		response.code shouldBe 200
 
-		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForDeltaker(DELTAKER_1.id)
+		val endringsmeldinger = endringsmeldingService.hentAktiveEndringsmeldingerForDeltaker(DELTAKER_1.id)
 		endringsmeldinger shouldHaveSize 1
 
 		val endringsmelding = endringsmeldinger.first()

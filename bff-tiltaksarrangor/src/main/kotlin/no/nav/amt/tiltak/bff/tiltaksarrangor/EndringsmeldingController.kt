@@ -4,7 +4,6 @@ import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
-import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
@@ -32,8 +31,7 @@ class EndringsmeldingController(
 
 		if(erSkjermetDeltaker) return emptyList()
 
-		return endringsmeldingService.hentEndringsmeldingerForDeltaker(deltakerId)
-			.filter { it.status == Endringsmelding.Status.AKTIV }
+		return endringsmeldingService.hentAktiveEndringsmeldingerForDeltaker(deltakerId)
 			.map {
 				EndringsmeldingDto(
 					id = it.id,

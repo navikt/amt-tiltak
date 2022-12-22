@@ -46,8 +46,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-				[{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","arrangorNavn":"Org Tiltaksarrangør 1","lopenr":123,"opprettetAar":2020,"antallAktiveEndringsmeldinger":3,"tiltak":{"kode":"AMO","navn":"Tiltak1"}},{"id":"513219ca-481b-4aae-9d51-435dba9929cd","navn":"Tiltaksgjennomforing2","arrangorNavn":"Org Tiltaksarrangør 2","lopenr":124,"opprettetAar":2020,"antallAktiveEndringsmeldinger":0,"tiltak":{"kode":"AMO","navn":"Tiltak1"}}]
-			""".trimIndent()
+			[{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","arrangorNavn":"Org Tiltaksarrangør 1","lopenr":123,"opprettetAar":2020,"antallAktiveEndringsmeldinger":3,"harSkjermedeDeltakere":false,"tiltak":{"kode":"AMO","navn":"Tiltak1"}},{"id":"513219ca-481b-4aae-9d51-435dba9929cd","navn":"Tiltaksgjennomforing2","arrangorNavn":"Org Tiltaksarrangør 2","lopenr":124,"opprettetAar":2020,"antallAktiveEndringsmeldinger":0,"harSkjermedeDeltakere":false,"tiltak":{"kode":"AMO","navn":"Tiltak1"}}]""".trimIndent()
 		response.code shouldBe 200
 		response.body?.string() shouldBe expectedJson
 	}

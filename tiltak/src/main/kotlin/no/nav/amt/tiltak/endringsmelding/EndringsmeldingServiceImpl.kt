@@ -24,6 +24,29 @@ open class EndringsmeldingServiceImpl(
 		return endringsmeldingRepository.get(id).toModel()
 	}
 
+	override fun hentEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding> {
+		return endringsmeldingRepository.getByGjennomforing(gjennomforingId)
+			.map { it.toModel() }
+	}
+
+	override fun hentAktiveEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding> {
+		return hentEndringsmeldingerForGjennomforing(gjennomforingId)
+			.filter { it.status == Endringsmelding.Status.AKTIV }
+	}
+
+	override fun hentAktiveEndringsmeldingerForDeltaker(deltakerId: UUID): List<Endringsmelding> {
+		return hentAktiveEndringsmeldingerForDeltakere(listOf(deltakerId))
+			.getOrDefault(deltakerId, emptyList())
+
+	}
+
+	override fun hentAktiveEndringsmeldingerForDeltakere(deltakerIder: List<UUID>): Map<UUID, List<Endringsmelding>> {
+		val endringsmeldinger = endringsmeldingRepository.getAktive(deltakerIder).map { it.toModel() }
+
+		return deltakerIder.associateWith { endringsmeldinger.filter { e -> e.deltakerId == it } }
+
+	}
+
 	override fun markerSomUtfort(endringsmeldingId: UUID, navAnsattId: UUID) {
 		val endringsmelding = endringsmeldingRepository.get(endringsmeldingId)
 
@@ -48,63 +71,6 @@ open class EndringsmeldingServiceImpl(
 		endringsmeldingRepository.markerSomTilbakekalt(id)
 
 		log.info("Endringsmelding med id $id er tilbakekalt av arrangor ansatt")
-	}
-
-	override fun hentEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding> {
-		return endringsmeldingRepository.getByGjennomforing(gjennomforingId)
-			.map { it.toModel() }
-	}
-
-	override fun hentEndringsmeldingerForDeltaker(deltakerId: UUID): List<Endringsmelding> {
-		return endringsmeldingRepository.getByDeltaker(deltakerId).map { it.toModel() }
-	}
-
-	override fun hentAktive(deltakerIder: List<UUID>): Map<UUID, List<Endringsmelding>> {
-		val endringsmeldinger = endringsmeldingRepository.getAktive(deltakerIder).map { it.toModel() }
-		val map = mutableMapOf<UUID, List<Endringsmelding>>()
-		deltakerIder.forEach {
-			map.put(it, endringsmeldinger.filter { e -> e.deltakerId == it })
-		}
-		return map
-	}
-
-	override fun hentAntallAktiveForGjennomforing(gjennomforingId: UUID): Int {
-		return hentEndringsmeldingerForGjennomforing(gjennomforingId).count { it.status == Endringsmelding.Status.AKTIV }
-	}
-	private fun EndringsmeldingDbo.toModel(): Endringsmelding {
-		return Endringsmelding(
-			id = id,
-			deltakerId = deltakerId,
-			utfortAvNavAnsattId = utfortAvNavAnsattId,
-			utfortTidspunkt = utfortTidspunkt,
-			opprettetAvArrangorAnsattId = opprettetAvArrangorAnsattId,
-			status = status,
-			innhold = mapEndringsmeldingInnhold(innhold),
-			opprettet = createdAt,
-		)
-	}
-	private fun mapEndringsmeldingInnhold(innhold: EndringsmeldingDbo.Innhold): Endringsmelding.Innhold {
-		return when(innhold) {
-			is EndringsmeldingDbo.Innhold.LeggTilOppstartsdatoInnhold ->
-				Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(innhold.oppstartsdato)
-			is EndringsmeldingDbo.Innhold.EndreOppstartsdatoInnhold ->
-				Endringsmelding.Innhold.EndreOppstartsdatoInnhold(innhold.oppstartsdato)
-			is EndringsmeldingDbo.Innhold.ForlengDeltakelseInnhold ->
-				Endringsmelding.Innhold.ForlengDeltakelseInnhold(innhold.sluttdato)
-			is EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold ->
-				Endringsmelding.Innhold.AvsluttDeltakelseInnhold(
-					innhold.sluttdato, DeltakerStatus.Aarsak(innhold.aarsak.type, innhold.aarsak.beskrivelse)
-				)
-			is EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold ->
-				Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold(
-					DeltakerStatus.Aarsak(innhold.aarsak.type, innhold.aarsak.beskrivelse)
-				)
-
-			is EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold ->
-				Endringsmelding.Innhold.EndreDeltakelseProsentInnhold(
-					deltakelseProsent = innhold.nyDeltakelseProsent
-				)
-		}
 	}
 
 	override fun opprettLeggTilOppstartsdatoEndringsmelding(
@@ -189,6 +155,43 @@ open class EndringsmeldingServiceImpl(
 			arrangorAnsattId,
 			innhold,
 		)
+	}
+
+	private fun EndringsmeldingDbo.toModel(): Endringsmelding {
+		return Endringsmelding(
+			id = id,
+			deltakerId = deltakerId,
+			utfortAvNavAnsattId = utfortAvNavAnsattId,
+			utfortTidspunkt = utfortTidspunkt,
+			opprettetAvArrangorAnsattId = opprettetAvArrangorAnsattId,
+			status = status,
+			innhold = mapEndringsmeldingInnhold(innhold),
+			opprettet = createdAt,
+		)
+	}
+
+	private fun mapEndringsmeldingInnhold(innhold: EndringsmeldingDbo.Innhold): Endringsmelding.Innhold {
+		return when(innhold) {
+			is EndringsmeldingDbo.Innhold.LeggTilOppstartsdatoInnhold ->
+				Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(innhold.oppstartsdato)
+			is EndringsmeldingDbo.Innhold.EndreOppstartsdatoInnhold ->
+				Endringsmelding.Innhold.EndreOppstartsdatoInnhold(innhold.oppstartsdato)
+			is EndringsmeldingDbo.Innhold.ForlengDeltakelseInnhold ->
+				Endringsmelding.Innhold.ForlengDeltakelseInnhold(innhold.sluttdato)
+			is EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold ->
+				Endringsmelding.Innhold.AvsluttDeltakelseInnhold(
+					innhold.sluttdato, DeltakerStatus.Aarsak(innhold.aarsak.type, innhold.aarsak.beskrivelse)
+				)
+			is EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold ->
+				Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold(
+					DeltakerStatus.Aarsak(innhold.aarsak.type, innhold.aarsak.beskrivelse)
+				)
+
+			is EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold ->
+				Endringsmelding.Innhold.EndreDeltakelseProsentInnhold(
+					deltakelseProsent = innhold.nyDeltakelseProsent
+				)
+		}
 	}
 
 	private fun opprettOgMarkerAktiveSomUtdatert(

@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.exceptions.ValidationException
 import no.nav.amt.tiltak.core.port.*
@@ -39,11 +40,12 @@ class DeltakerController(
 			.filter { it.status.type != DeltakerStatus.Type.PABEGYNT }
 			.filter { !it.erUtdatert }
 
-		val endringmeldingerMap = endringsmeldingService.hentAktive(deltakere.map { it.id })
+		val endringmeldingerMap = endringsmeldingService.hentAktiveEndringsmeldingerForDeltakere(deltakere.map { it.id })
 
 		return deltakere.map {
 			val endringsmeldinger = endringmeldingerMap.getOrDefault(it.id, emptyList())
-				.map { e -> EndringsmeldingDto(id = e.id, innhold = e.innhold.toDto()) }
+				.map { e -> e.toDto() }
+
 			return@map it.toDto(endringsmeldinger)
 		}
 	}
@@ -155,4 +157,7 @@ class DeltakerController(
 	data class EndreDeltakelsesprosentRequestBody(
 		val deltakelseProsent: Int
 	)
+
+	private fun Endringsmelding.toDto() = EndringsmeldingDto(id = id, innhold = innhold.toDto())
+
 }
