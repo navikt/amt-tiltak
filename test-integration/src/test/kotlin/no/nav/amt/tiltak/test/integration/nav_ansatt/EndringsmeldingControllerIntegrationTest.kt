@@ -128,6 +128,39 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
 	}
 
+	@Test
+	fun `markerFerdig() - skal returnere 403 og markere som ferdig`() {
+		val oid = UUID.randomUUID()
+
+		val token = mockOAuthServer.issueAzureAdToken(
+			ident = NAV_ANSATT_1.navIdent,
+			oid = oid
+		)
+
+		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
+			navAnsattAzureId = oid,
+			name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
+		)
+		val endringsmelding = insertSkjermetPersonMedEndringsmeldinger()
+		val endringsmeldingBefore = endringsmeldingRepository.get(endringsmelding.id)
+
+		endringsmeldingBefore.status shouldBe Endringsmelding.Status.AKTIV
+
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/nav-ansatt/endringsmelding/${endringsmelding.id}/ferdig",
+			headers = mapOf("Authorization" to "Bearer $token"),
+			body = "".toJsonRequestBody()
+		)
+
+		response.code shouldBe 403
+
+		val endringsmeldingAfter = endringsmeldingRepository.get(endringsmelding.id)
+
+		endringsmeldingAfter.status shouldBe Endringsmelding.Status.AKTIV
+
+	}
+
 	private fun insertSkjermetPersonMedEndringsmeldinger () : EndringsmeldingInput {
 		val skjermetDeltaker = TestData.createDeltakerInput(BRUKER_SKJERMET, GJENNOMFORING_1)
 		val endringsmelding = TestData.createEndringsmelding(skjermetDeltaker, ARRANGOR_ANSATT_1)
