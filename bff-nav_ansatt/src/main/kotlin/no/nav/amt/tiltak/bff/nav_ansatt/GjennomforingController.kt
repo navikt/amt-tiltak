@@ -1,8 +1,9 @@
 package no.nav.amt.tiltak.bff.nav_ansatt
 
+import no.nav.amt.tiltak.bff.nav_ansatt.dto.HentGjennomforingerDto
+import no.nav.amt.tiltak.bff.nav_ansatt.dto.TiltakDto
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
-import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
@@ -17,8 +18,8 @@ class GjennomforingController(
 	private val authService: AuthService,
 	private val gjennomforingService: GjennomforingService,
 	private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService,
-	private val endringsmeldingService: EndringsmeldingService,
 	private val tiltaksansvarligAutoriseringService: TiltaksansvarligAutoriseringService,
+	private val controllerService: NavAnsattControllerService
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
@@ -28,25 +29,10 @@ class GjennomforingController(
 		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()
 		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navAnsattAzureId)
 
-		val tilganger = tiltaksansvarligTilgangService.hentAktiveTilganger(navIdent)
+		val gjennomforingIder = tiltaksansvarligTilgangService.hentAktiveTilganger(navIdent)
 			.map { it.gjennomforingId }
 
-		return gjennomforingService.getGjennomforinger(tilganger).map { gjennomforing ->
-			val antallAktiveEndringsmeldinger = endringsmeldingService.hentAntallAktiveForGjennomforing(gjennomforing.id)
-			val arrangor = gjennomforing.arrangor
-			return@map HentGjennomforingerDto(
-				id = gjennomforing.id,
-				navn = gjennomforing.navn,
-				lopenr = gjennomforing.lopenr,
-				opprettetAar = gjennomforing.opprettetAar,
-				arrangorNavn = arrangor.overordnetEnhetNavn ?: arrangor.navn,
-				antallAktiveEndringsmeldinger = antallAktiveEndringsmeldinger,
-				tiltak = TiltakDto(
-					kode = gjennomforing.tiltak.kode,
-					navn = gjennomforing.tiltak.navn,
-				),
-			)
-		}
+		return controllerService.hentGjennomforinger(gjennomforingIder)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
@@ -105,16 +91,6 @@ class GjennomforingController(
 		}
 	}
 
-	data class HentGjennomforingerDto(
-		val id: UUID,
-		val navn: String,
-		val arrangorNavn: String,
-		val lopenr: Int,
-		val opprettetAar: Int,
-		val antallAktiveEndringsmeldinger: Int,
-		val tiltak: TiltakDto,
-	)
-
 	data class HentGjennomforingMedLopenrDto(
 		val id: UUID,
 		val navn: String,
@@ -141,11 +117,6 @@ class GjennomforingController(
 		val virksomhetOrgnr: String,
 		val organisasjonNavn: String?,
 		val organisasjonOrgnr: String?
-	)
-
-	data class TiltakDto(
-		val kode: String,
-		val navn: String,
 	)
 
 }

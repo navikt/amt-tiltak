@@ -79,7 +79,7 @@ class EndringsmeldingServiceImplTest {
 	}
 
 	@Test
-	fun `hentAntallAktiveForGjennomforing - teller aktive endringsmeldinger pa gjennomforing`() {
+	fun `hentAktiveEndringsmeldingerForGjennomforing - henter aktive endringsmeldinger pa gjennomforing`() {
 		every {
 			repository.getByGjennomforing(GJENNOMFORING_1.id)
 		} returns listOf(
@@ -87,7 +87,8 @@ class EndringsmeldingServiceImplTest {
 			endringsmeldingDbo.copy(status = Endringsmelding.Status.UTDATERT)
 		)
 
-		endringsmeldingService.hentAntallAktiveForGjennomforing(GJENNOMFORING_1.id) shouldBe 1
+		endringsmeldingService.hentAktiveEndringsmeldingerForGjennomforing(GJENNOMFORING_1.id).size shouldBe 1
+
 	}
 
 	val endringsmeldingDbo = EndringsmeldingDbo(

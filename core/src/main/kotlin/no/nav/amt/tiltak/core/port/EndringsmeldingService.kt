@@ -13,11 +13,9 @@ interface EndringsmeldingService {
 
 	fun hentEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding>
 
-	fun hentEndringsmeldingerForDeltaker(deltakerId: UUID): List<Endringsmelding>
+	fun hentAktiveEndringsmeldingerForDeltaker(deltakerId: UUID): List<Endringsmelding>
 
-	fun hentAktive(deltakerIder: List<UUID>): Map<UUID, List<Endringsmelding>>
-
-	fun hentAntallAktiveForGjennomforing(gjennomforingId: UUID): Int
+	fun hentAktiveEndringsmeldingerForDeltakere(deltakerIder: List<UUID>): Map<UUID, List<Endringsmelding>>
 
 	fun opprettLeggTilOppstartsdatoEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, oppstartsdato: LocalDate)
 
@@ -32,4 +30,6 @@ interface EndringsmeldingService {
 	fun opprettDeltakerIkkeAktuellEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, statusAarsak: DeltakerStatus.Aarsak)
 
     fun markerSomTilbakekalt(id: UUID)
+
+	fun hentAktiveEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding>
 }

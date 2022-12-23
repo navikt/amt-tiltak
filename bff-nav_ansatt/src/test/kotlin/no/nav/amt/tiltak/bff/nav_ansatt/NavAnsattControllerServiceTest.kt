@@ -7,6 +7,7 @@ import no.nav.amt.tiltak.bff.nav_ansatt.dto.DeltakerDto
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
+import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_SKJERMET
@@ -24,9 +25,11 @@ class NavAnsattControllerServiceTest {
 	private val endringsmeldingService = mockk<EndringsmeldingService>()
 	private val deltakerService = mockk<DeltakerService>()
 	private val taAuthService = mockk<TiltaksansvarligAutoriseringService>()
+	private val gjennomforingService = mockk<GjennomforingService>()
 	private val controller = NavAnsattControllerService(
 		endringsmeldingService,
-		deltakerService
+		deltakerService,
+		gjennomforingService
 	)
 	private val navIdent = "z1232"
 

@@ -38,7 +38,8 @@ open class AuthService(
 	open fun harTilgangTilSkjermedePersoner(): Boolean = tokenValidationContextHolder
 		.tokenValidationContext
 		.getClaims(Issuer.AZURE_AD)
-		.getAsList("groups").let { groups -> groups.any { it == tilgangTilNavAnsattGroupId } }
+		.getAsList("groups")
+		.let { groups -> groups.any { it == tilgangTilNavAnsattGroupId } }
 
 	open fun hentAzureIdTilInnloggetBruker(): UUID = tokenValidationContextHolder
 		.tokenValidationContext
