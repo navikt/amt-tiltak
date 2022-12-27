@@ -57,7 +57,8 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 
 		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
-			oid = oid
+			oid = oid,
+			adGroupIds = emptyArray(),
 		)
 
 		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
@@ -99,7 +100,8 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 
 		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
-			oid = oid
+			oid = oid,
+			adGroupIds = emptyArray(),
 		)
 
 		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
@@ -151,7 +153,8 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 
 		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
-			oid = oid
+			oid = oid,
+			adGroupIds = emptyArray(),
 		)
 
 		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
@@ -188,11 +191,10 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			name = AdGrupper.TILTAKSANSVARLIG_FLATE_GRUPPE
 		)
 
-		val token = mockOAuthServer.issueAzureAdToken(
+		return mockOAuthServer.issueAzureAdToken(
 			ident = ansatt.navIdent,
 			oid = oid,
 		)
-		return token
 	}
 
 }

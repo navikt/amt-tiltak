@@ -39,7 +39,7 @@ class AutentiseringControllerIntegrationTest : IntegrationTestBase() {
 
 		val token = mockOAuthServer.issueAzureAdToken(
 			ident = TestData.NAV_ANSATT_1.navIdent,
-			oid = oid
+			oid = oid,
 		)
 
 		val response = sendRequest(

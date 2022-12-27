@@ -1,10 +1,10 @@
 package no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig
 
+import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
 import no.nav.amt.tiltak.log.SecureLog.secureLog
-import no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig.ad_gruppe.AdGruppeService
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig.ad_gruppe.AdGrupper
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -13,13 +13,12 @@ import java.util.*
 
 @Service
 class TiltaksansvarligAutoriseringServiceImpl(
-	private val adGruppeService: AdGruppeService,
+	private val authService: AuthService,
 	private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService
 ) : TiltaksansvarligAutoriseringService {
 
 	override fun verifiserTilgangTilFlate(navAnsattAzureId: UUID) {
-		val harTilgang = adGruppeService.hentAdGrupper(navAnsattAzureId)
-			.any { it.name == AdGrupper.TILTAKSANSVARLIG_FLATE_GRUPPE }
+		val harTilgang = authService.harTilgangTilTiltaksansvarligflate()
 
 		if (!harTilgang) {
 			secureLog.warn(
@@ -34,8 +33,7 @@ class TiltaksansvarligAutoriseringServiceImpl(
 	}
 
 	override fun verifiserTilgangTilEndringsmelding(navAnsattAzureId: UUID) {
-		val harTilgang = adGruppeService.hentAdGrupper(navAnsattAzureId)
-			.any { it.name == AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE }
+		val harTilgang = authService.harTilgangTilEndringsmeldinger()
 
 		if (!harTilgang) {
 			secureLog.warn(
