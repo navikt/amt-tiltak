@@ -9,6 +9,11 @@ open class MockOAuthServer {
 	private val azureAdIssuer = "azuread"
 	private val tokenXIssuer = "tokenx"
 
+	val tilgangTilNavAnsattGroupId = "egen_ansatt_tilgang_id"
+	val tiltakAnsvarligGroupId = "tiltak_ansvarlig_tilgang_id"
+	val endringsmeldingGroupId = "endringsmelding_tilgang_id"
+
+
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
@@ -37,12 +42,14 @@ open class MockOAuthServer {
 		audience: String = "test-aud",
 		ident: String,
 		oid: UUID,
-		claims: Map<String, Any> = mapOf(
-			"NAVident" to ident,
-			"oid" to oid.toString(),
-			"groups" to emptyArray<String>()
-		)
+		adGroupIds: Array<String> = arrayOf(tiltakAnsvarligGroupId, endringsmeldingGroupId),
 	): String {
+		val claims = mapOf(
+				"NAVident" to ident,
+				"oid" to oid.toString(),
+				"groups" to adGroupIds,
+			)
+
 		return server.issueToken(azureAdIssuer, subject, audience, claims).serialize()
 	}
 
@@ -58,6 +65,5 @@ open class MockOAuthServer {
 
 		return server.issueToken(tokenXIssuer, subject, audience, claims).serialize()
 	}
-
 
 }

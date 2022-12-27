@@ -13,7 +13,6 @@ import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testNavAnsattAutentisering
-import no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig.ad_gruppe.AdGrupper
 import okhttp3.Request
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -47,11 +46,6 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
 		val oid = UUID.randomUUID()
 
-		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
-			navAnsattAzureId = oid,
-			name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
-		)
-
 		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
 			oid = oid,
@@ -70,11 +64,6 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 	fun `hentEndringsmeldinger() - skal returnere 200 med riktig response`() {
 		val oid = UUID.randomUUID()
 		val endringsmeldingInput = insertSkjermetPersonMedEndringsmeldinger()
-
-		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
-			navAnsattAzureId = oid,
-			name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
-		)
 
 		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
@@ -95,6 +84,38 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		response.body?.string() shouldBe expectedJson
 	}
 
+
+	@Test
+	fun `hentEndringsmeldinger() - med tilgang til skjermede personer - skal returnere 200 med riktig response`() {
+		val oid = UUID.randomUUID()
+		testDataRepository.deleteAllEndringsmeldinger()
+
+		val endringsmeldingInput = insertSkjermetPersonMedEndringsmeldinger()
+
+		val token = mockOAuthServer.issueAzureAdToken(
+			ident = NAV_ANSATT_1.navIdent,
+			oid = oid,
+			adGroupIds = arrayOf(
+				mockOAuthServer.endringsmeldingGroupId,
+				mockOAuthServer.tiltakAnsvarligGroupId,
+				mockOAuthServer.tilgangTilNavAnsattGroupId,
+			)
+
+		)
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/nav-ansatt/endringsmelding?gjennomforingId=${GJENNOMFORING_1.id}",
+			headers = mapOf("Authorization" to "Bearer $token")
+		)
+
+		val expectedJson = """
+				[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":"Skjermet bruker fornavn","mellomnavn":null,"etternavn":"Skjermet bruker etternavn","fodselsnummer":"10101010101","erSkjermet":true},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","type":"LEGG_TIL_OPPSTARTSDATO"}]
+			""".trimIndent()
+
+		response.code shouldBe 200
+		response.body?.string() shouldBe expectedJson
+	}
 	@Test
 	fun `markerFerdig() - skal returnere 200 og markere som ferdig`() {
 		val oid = UUID.randomUUID()
@@ -102,11 +123,6 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
 			oid = oid
-		)
-
-		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
-			navAnsattAzureId = oid,
-			name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
 		)
 
 		val endringsmeldingBefore = endringsmeldingRepository.get(ENDRINGSMELDING_1_DELTAKER_1.id)
@@ -137,10 +153,6 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 			oid = oid
 		)
 
-		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
-			navAnsattAzureId = oid,
-			name = AdGrupper.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
-		)
 		val endringsmelding = insertSkjermetPersonMedEndringsmeldinger()
 		val endringsmeldingBefore = endringsmeldingRepository.get(endringsmelding.id)
 
