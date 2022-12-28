@@ -5,7 +5,6 @@ import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
 import no.nav.amt.tiltak.log.SecureLog.secureLog
-import no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig.ad_gruppe.AdGrupper
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
@@ -56,5 +55,10 @@ class TiltaksansvarligAutoriseringServiceImpl(
 			throw UnauthorizedException("Ikke tilgang til gjennomføring")
 		}
 	}
+	object AdGrupper {
 
+		const val TILTAKSANSVARLIG_FLATE_GRUPPE = "0000-GA-TILTAK-ANSVARLIG"
+
+		const val TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE = "0000-GA-TILTAK-ENDRINGSMELDING"
+	}
 }

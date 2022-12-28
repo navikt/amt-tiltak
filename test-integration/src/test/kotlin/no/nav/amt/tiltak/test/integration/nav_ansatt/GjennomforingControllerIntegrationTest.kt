@@ -10,7 +10,6 @@ import no.nav.amt.tiltak.test.database.data.inputs.NavAnsattInput
 import no.nav.amt.tiltak.test.database.data.inputs.TiltaksansvarligGjennomforingTilgangInput
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testNavAnsattAutentisering
-import no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig.ad_gruppe.AdGrupper
 import okhttp3.Request
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -61,11 +60,6 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			adGroupIds = emptyArray(),
 		)
 
-		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
-			navAnsattAzureId = oid,
-			name = "IngenNyttigGruppe"
-		)
-
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/nav-ansatt/gjennomforing/",
@@ -102,11 +96,6 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			ident = NAV_ANSATT_1.navIdent,
 			oid = oid,
 			adGroupIds = emptyArray(),
-		)
-
-		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
-			navAnsattAzureId = oid,
-			name = "IngenNyttigGruppe"
 		)
 
 		val response = sendRequest(
@@ -157,11 +146,6 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			adGroupIds = emptyArray(),
 		)
 
-		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
-			navAnsattAzureId = oid,
-			name = "IngenNyttigGruppe"
-		)
-
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/nav-ansatt/gjennomforing?lopenr=${GJENNOMFORING_1.lopenr}",
@@ -185,11 +169,6 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 
 	private fun lagTokenMedAdGruppe(ansatt: NavAnsattInput): String {
 		val oid = UUID.randomUUID()
-
-		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
-			navAnsattAzureId = oid,
-			name = AdGrupper.TILTAKSANSVARLIG_FLATE_GRUPPE
-		)
 
 		return mockOAuthServer.issueAzureAdToken(
 			ident = ansatt.navIdent,

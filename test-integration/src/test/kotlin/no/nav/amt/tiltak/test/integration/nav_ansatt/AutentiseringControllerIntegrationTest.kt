@@ -5,7 +5,6 @@ import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testNavAnsattAutentisering
-import no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig.ad_gruppe.AdGrupper
 import okhttp3.Request
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -32,11 +31,6 @@ class AutentiseringControllerIntegrationTest : IntegrationTestBase() {
 	fun `meg() - skal returnere 200 med korrekt response`() {
 		val oid = UUID.randomUUID()
 
-		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
-			navAnsattAzureId = oid,
-			name = AdGrupper.TILTAKSANSVARLIG_FLATE_GRUPPE
-		)
-
 		val token = mockOAuthServer.issueAzureAdToken(
 			ident = TestData.NAV_ANSATT_1.navIdent,
 			oid = oid,
@@ -49,7 +43,7 @@ class AutentiseringControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-			{"navIdent":"Z4321","navn":"Vashnir Veiledersen","tilganger":["FLATE"]}
+			{"navIdent":"Z4321","navn":"Vashnir Veiledersen"}
 		""".trimIndent()
 
 		response.code shouldBe 200
