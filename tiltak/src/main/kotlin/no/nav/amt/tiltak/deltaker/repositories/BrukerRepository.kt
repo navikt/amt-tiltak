@@ -51,7 +51,8 @@ open class BrukerRepository(
 				telefonnummer = :telefonnummer,
 				epost = :epost,
 				ansvarlig_veileder_id = :veileder_id,
-				nav_enhet_id = :nav_enhet_id
+				nav_enhet_id = :nav_enhet_id,
+				modified_at = CURRENT_TIMESTAMP
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(

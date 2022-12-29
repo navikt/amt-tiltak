@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.deltaker.repositories
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.date.shouldBeAfter
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.deltaker.dbo.BrukerUpsertDbo
@@ -56,7 +57,9 @@ class BrukerRepositoryTest : FunSpec({
 		dbo.modifiedAt shouldNotBe null
 	}
 	test("upsert - bruker finnes - oppdaterer eksisterende bruker") {
-		repository.get(BRUKER_2.personIdent) shouldNotBe null
+		val originalBruker = repository.get(BRUKER_2.personIdent)
+		originalBruker shouldNotBe null
+
 		val bruker = BrukerUpsertDbo(BRUKER_2.personIdent,
 			"fornavn",
 			"mellomnavn",
@@ -75,6 +78,7 @@ class BrukerRepositoryTest : FunSpec({
 		nyBruker.telefonnummer shouldBe bruker.telefonnummer
 		nyBruker.epost shouldBe bruker.epost
 		nyBruker.ansvarligVeilederId shouldBe bruker.ansvarligVeilederId
+		nyBruker.modifiedAt shouldBeAfter originalBruker!!.modifiedAt
 	}
 
 	test("Get user that does not exist should be null") {

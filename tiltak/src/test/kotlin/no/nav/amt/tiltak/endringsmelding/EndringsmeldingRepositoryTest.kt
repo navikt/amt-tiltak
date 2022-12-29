@@ -5,6 +5,7 @@ import ch.qos.logback.classic.Logger
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.date.shouldBeAfter
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
@@ -93,6 +94,8 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		val oppdatertMelding = repository.get(ENDRINGSMELDING_1_DELTAKER_1.id)
 
 		oppdatertMelding.status shouldBe Endringsmelding.Status.TILBAKEKALT
+		oppdatertMelding.modifiedAt shouldBeAfter ENDRINGSMELDING_1_DELTAKER_1.modifiedAt
+
 	}
 
 	test("markerSomUtfort - skal sette status til UTFORT og nav ansatt") {
@@ -105,6 +108,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		oppdatertMelding.status shouldBe Endringsmelding.Status.UTFORT
 		oppdatertMelding.utfortAvNavAnsattId shouldBe NAV_ANSATT_1.id
 		oppdatertMelding.utfortTidspunkt!! shouldBeCloseTo ZonedDateTime.now()
+		oppdatertMelding.modifiedAt shouldBeAfter ENDRINGSMELDING_1_DELTAKER_1.modifiedAt
 	}
 
 	test("markerAktiveSomUtdatert - skal sette status til UTDATERT") {
@@ -118,6 +122,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		val oppdatertMelding = repository.get(ENDRINGSMELDING_1_DELTAKER_1.id)
 
 		oppdatertMelding.status shouldBe Endringsmelding.Status.UTDATERT
+		oppdatertMelding.modifiedAt shouldBeAfter ENDRINGSMELDING_1_DELTAKER_1.modifiedAt
 	}
 
 	test("getAktive - skal returnere tom liste hvis ingen deltakerIder er sendt inn") {
