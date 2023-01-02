@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_TILGANG_1
@@ -47,9 +48,13 @@ internal class GjennomforingMetricRepositoryTest : FunSpec({
 				val tiltak = TILTAK_1.copy(id = UUID.randomUUID(), type = entry.key)
 				val gjennomforing = GJENNOMFORING_1.copy(id = UUID.randomUUID(), tiltakId = tiltak.id)
 				val tilgang = GJENNOMFORING_TILGANG_1.copy(id = UUID.randomUUID(), gjennomforingId = gjennomforing.id)
+				val tilgang2 = GJENNOMFORING_TILGANG_1.copy(id = UUID.randomUUID(), gjennomforingId = gjennomforing.id, ansattId = ARRANGOR_ANSATT_2.id)
+
 				testRepository.insertTiltak(tiltak)
 				testRepository.insertGjennomforing(gjennomforing)
 				testRepository.insertArrangorAnsattGjennomforingTilgang(tilgang)
+				testRepository.insertArrangorAnsattGjennomforingTilgang(tilgang2)
+
 			}
 		}
 	}
