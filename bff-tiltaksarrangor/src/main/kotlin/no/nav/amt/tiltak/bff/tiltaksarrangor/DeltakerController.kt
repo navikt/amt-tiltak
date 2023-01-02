@@ -74,7 +74,6 @@ class DeltakerController(
 	) {
 		val ansatt = hentInnloggetAnsatt()
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		kastHvisSkjermet(deltakerId)
 		deltakerService.leggTilOppstartsdato(deltakerId, ansatt.id, request.oppstartsdato)
 	}
 
@@ -86,7 +85,6 @@ class DeltakerController(
 	) {
 		val ansatt = hentInnloggetAnsatt()
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		kastHvisSkjermet(deltakerId)
 		deltakerService.endreOppstartsdato(deltakerId, ansatt.id, request.oppstartsdato)
 	}
 
@@ -98,7 +96,6 @@ class DeltakerController(
 	) {
 		val ansatt = hentInnloggetAnsatt()
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		kastHvisSkjermet(deltakerId)
 		deltakerService.avsluttDeltakelse(deltakerId, ansatt.id, request.sluttdato, request.aarsak.toModel())
 	}
 
@@ -110,7 +107,6 @@ class DeltakerController(
 	) {
 		val ansatt = hentInnloggetAnsatt()
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		kastHvisSkjermet(deltakerId)
 		deltakerService.forlengDeltakelse(deltakerId, ansatt.id, request.sluttdato)
 	}
 
@@ -125,8 +121,6 @@ class DeltakerController(
 
 		val ansatt = hentInnloggetAnsatt()
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		kastHvisSkjermet(deltakerId)
-
 		deltakerService.endreDeltakelsesprosent(deltakerId, ansatt.id, body.deltakelseProsent)
 	}
 
@@ -138,7 +132,6 @@ class DeltakerController(
 	) {
 		val ansatt = hentInnloggetAnsatt()
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		kastHvisSkjermet(deltakerId)
 		deltakerService.deltakerIkkeAktuell(deltakerId, ansatt.id, request.aarsak.toModel())
 	}
 
@@ -146,12 +139,6 @@ class DeltakerController(
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 		return arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
 			?: throw UnauthorizedException("Arrangor ansatt finnes ikke")
-	}
-
-	private fun kastHvisSkjermet (deltakerId: UUID) {
-		val skjermetDeltaker = deltakerService.erSkjermet(deltakerId)
-
-		if (skjermetDeltaker) throw UnauthorizedException("Kan ikke endre skjermet person")
 	}
 
 	data class EndreDeltakelsesprosentRequestBody(
