@@ -60,10 +60,11 @@ class DeltakerController(
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/{tiltakDeltakerId}")
 	fun hentTiltakDeltakerDetaljer(@PathVariable("tiltakDeltakerId") deltakerId: UUID): DeltakerDetaljerDto {
-		val deltakerDetaljer = controllerService.getDeltakerDetaljerById(deltakerId)
 		val ansatt = hentInnloggetAnsatt()
-
 		auditLoggerService.tiltaksarrangorAnsattDeltakerOppslagAuditLog(ansatt.id, deltakerId)
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+
+		val deltakerDetaljer = controllerService.getDeltakerDetaljerById(deltakerId)
 
 		if (deltakerDetaljer.status.type == DeltakerStatus.Type.PABEGYNT)
 			throw UnauthorizedException("Har ikke tilgang til id $deltakerId")
