@@ -87,7 +87,8 @@ open class EndringsmeldingRepository(
 	fun markerSomTilbakekalt(id: UUID) {
 		val sql = """
 			UPDATE endringsmelding
-				SET status = 'TILBAKEKALT'
+				SET status = 'TILBAKEKALT',
+					modified_at = CURRENT_TIMESTAMP
 				WHERE id = :id AND status = 'AKTIV'
 		""".trimIndent()
 
@@ -102,6 +103,7 @@ open class EndringsmeldingRepository(
 			UPDATE endringsmelding
 				SET status = 'UTFORT',
 					utfort_tidspunkt = current_timestamp,
+					modified_at = current_timestamp,
 					utfort_av_nav_ansatt_id = :navAnsattId
 				WHERE id = :endringsmeldingId
 		""".trimIndent()
@@ -117,7 +119,8 @@ open class EndringsmeldingRepository(
 	fun markerAktiveSomUtdatert(deltakerId: UUID, type: EndringsmeldingDbo.Type) {
 		val sql = """
 			UPDATE endringsmelding
-				SET status = 'UTDATERT'
+				SET status = 'UTDATERT',
+					modified_at = CURRENT_TIMESTAMP
 				WHERE deltaker_id = :deltakerId AND type = :type AND status = 'AKTIV'
 		""".trimIndent()
 

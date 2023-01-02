@@ -360,6 +360,7 @@ object TestData {
 		status = Endringsmelding.Status.AKTIV,
 		type = "LEGG_TIL_OPPSTARTSDATO",
 		innhold = """{ "oppstartsdato": "2022-11-11" }""",
+		modifiedAt = ZonedDateTime.parse("2022-11-08T13:00:00.00000+00:00"),
 		createdAt = ZonedDateTime.parse("2022-11-08T13:00:00.00000+00:00"),
 	)
 
@@ -370,6 +371,7 @@ object TestData {
 		status = Endringsmelding.Status.AKTIV,
 		type = "AVSLUTT_DELTAKELSE",
 		innhold = """{ "sluttdato": "2022-11-10", "aarsak": { "type": "ANNET", "beskrivelse": "Flyttet til utland" } }""",
+		modifiedAt = ZonedDateTime.parse("2022-11-08T14:00:00.00000+00:00"),
 		createdAt = ZonedDateTime.parse("2022-11-08T14:00:00.00000+00:00"),
 	)
 
@@ -380,6 +382,7 @@ object TestData {
 		status = Endringsmelding.Status.AKTIV,
 		type = "LEGG_TIL_OPPSTARTSDATO",
 		innhold = """{ "oppstartsdato": "2022-11-09" }""",
+		modifiedAt = ZonedDateTime.parse("2022-11-08T15:00:00.00000+00:00"),
 		createdAt = ZonedDateTime.parse("2022-11-08T15:00:00.00000+00:00"),
 	)
 
