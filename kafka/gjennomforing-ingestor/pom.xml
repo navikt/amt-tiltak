@@ -27,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>mr-arena-adapter-client</artifactId>
+            <artifactId>mulighetsrommet-api-client</artifactId>
         </dependency>
 
 

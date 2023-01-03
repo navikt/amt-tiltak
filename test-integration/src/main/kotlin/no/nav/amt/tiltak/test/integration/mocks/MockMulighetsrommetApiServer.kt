@@ -1,11 +1,11 @@
 package no.nav.amt.tiltak.test.integration.mocks
 
-import no.nav.amt.tiltak.clients.mr_arena_adapter_client.GjennomforingArenaData
+import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.GjennomforingArenaData
 import no.nav.amt.tiltak.test.integration.utils.MockHttpServer
 import okhttp3.mockwebserver.MockResponse
 import java.util.*
 
-class MockMrArenaAdapterServer : MockHttpServer(name = "MockMrArenaAdapterServer") {
+class MockMulighetsrommetApiServer : MockHttpServer(name = "MockMulighetsrommetApiServer") {
 
 	fun reset() {
 		resetHttpServer()
@@ -23,6 +23,6 @@ class MockMrArenaAdapterServer : MockHttpServer(name = "MockMrArenaAdapterServer
 		""".trimIndent()
 
 		val response = MockResponse().setResponseCode(200).setBody(body)
-		addResponseHandler("/TODO/${id}", response)
+		addResponseHandler("/api/v1/tiltaksgjennomforinger/arenadata/${id}", response)
 	}
 }

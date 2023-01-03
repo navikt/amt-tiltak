@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mr-arena-adapter-client</artifactId>
+    <artifactId>mulighetsrommet-api-client</artifactId>
 
     <dependencies>
         <dependency>

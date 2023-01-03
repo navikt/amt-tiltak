@@ -5,8 +5,8 @@ import java.util.*
 
 data class GjennomforingMessage(
 	val id: UUID,
-	val tiltak: Tiltakstype,
-	val navn: String,
+	val tiltakstype: Tiltakstype,
+	val navn: String?,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 )
