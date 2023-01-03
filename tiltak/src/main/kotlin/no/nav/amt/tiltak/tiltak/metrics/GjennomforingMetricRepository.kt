@@ -25,16 +25,20 @@ class GjennomforingMetricRepository(
 
 	fun antallGjennomforingerGruppert() = template.query(
 		"""
-			SELECT g.status AS status, aagt.id IS NOT NULL AS gjennomforing_med_bruker_hos_arrangor, COUNT(*) AS antall
+			WITH gjennomforinger_lagt_til AS (
+				SELECT DISTINCT gjennomforing_id
+				FROM arrangor_ansatt_gjennomforing_tilgang
+			)
+			SELECT  g.status, tilgang.gjennomforing_id IS NOT NULL as lagt_til_av_arrangor, COUNT(*) AS antall
 			FROM gjennomforing g
-			LEFT JOIN arrangor_ansatt_gjennomforing_tilgang aagt on g.id = aagt.gjennomforing_id
-			GROUP BY g.status, gjennomforing_med_bruker_hos_arrangor;
+			LEFT JOIN gjennomforinger_lagt_til tilgang on g.id = tilgang.gjennomforing_id
+			GROUP BY g.status, lagt_til_av_arrangor;
 		""".trimMargin()
 	) { rs, _ ->
 		GjennomforingMetrikker(
-			rs.getString("status"),
-			rs.getBoolean("gjennomforing_med_bruker_hos_arrangor"),
-			rs.getInt("antall")
+			status = rs.getString("status"),
+			synligHosArrangor = rs.getBoolean("lagt_til_av_arrangor"),
+			antall = rs.getInt("antall")
 		)
 	}
 }
