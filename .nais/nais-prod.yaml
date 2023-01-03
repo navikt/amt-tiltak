@@ -58,7 +58,7 @@ spec:
         - application: amt-altinn-acl
           namespace: amt
           cluster: prod-gcp
-        - application: mulighetsrommet-arena-adapter
+        - application: mulighetsrommet-api
           namespace: team-mulighetsrommet
           cluster: prod-gcp
   kafka:
@@ -104,10 +104,10 @@ spec:
       value: http://poao-tilgang.poao.svc.cluster.local
     - name: POAO_TILGANG_SCOPE
       value: api://prod-gcp.poao.poao-tilgang/.default
-    - name: MR_ARENA_ADAPTER_SCOPE
-      value: api://prod-gcp.team-mulighetsrommet.mulighetsrommet-arena-adapter/.default
-    - name: MR_ARENA_ADAPTER_URL
-      value: http://mulighetsrommet-arena-adapter.team-mulighetsrommet.svc.cluster.local
+    - name: MULIGHETSROMMET_API_SCOPE
+      value: api://prod-gcp.team-mulighetsrommet.mulighetsrommet-api/.default
+    - name: MULIGHETSROMMET_API_URL
+      value: http://mulighetsrommet-api.team-mulighetsrommet.svc.cluster.local
     # Kafka topics
     - name: SISTE_TILORDNET_VEILEDER_TOPIC
       value: pto.siste-tilordnet-veileder-v1

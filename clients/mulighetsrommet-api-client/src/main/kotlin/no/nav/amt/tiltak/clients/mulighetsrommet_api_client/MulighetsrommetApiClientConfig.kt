@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.clients.mr_arena_adapter_client
+package no.nav.amt.tiltak.clients.mulighetsrommet_api_client
 
 import no.nav.common.token_client.client.MachineToMachineTokenClient
 import org.springframework.beans.factory.annotation.Value
@@ -6,17 +6,17 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-open class MrArenaAdapterClientConfig {
+open class MulighetsrommetApiClientConfig {
 
-	@Value("\${mr-arena-adapter.url}")
+	@Value("\${mulighetsrommet-api.url}")
 	lateinit var url: String
 
-	@Value("\${mr-arena-adapter.scope}")
+	@Value("\${mulighetsrommet-api.scope}")
 	lateinit var scope: String
 
 	@Bean
-	open fun mrArenaAdapterClient(machineToMachineTokenClient: MachineToMachineTokenClient): MrArenaAdapterClient {
-		return MrArenaAdapterClientImpl(
+	open fun mulighetsrommetApiClient(machineToMachineTokenClient: MachineToMachineTokenClient): MulighetsrommetApiClient {
+		return MulighetsrommetApiClientImpl(
 			baseUrl = url,
 			tokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(scope) },
 		)

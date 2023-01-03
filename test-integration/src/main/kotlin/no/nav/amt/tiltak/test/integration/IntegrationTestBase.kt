@@ -56,7 +56,7 @@ abstract class IntegrationTestBase {
 		val mockAmtAltinnAclHttpServer = MockAmtAltinnAclHttpServer()
 		val mockPdlHttpServer = MockPdlHttpServer()
 		val mockMachineToMachineHttpServer = MockMachineToMachineHttpServer()
-		val mockMrArenaAdapterServer = MockMrArenaAdapterServer()
+		val mockMulighetsrommetApiServer = MockMulighetsrommetApiServer()
 
 		@JvmStatic
 		@DynamicPropertySource
@@ -74,9 +74,9 @@ abstract class IntegrationTestBase {
 			registry.add("veilarboppfolging.url") { "TODO" }
 			registry.add("veilarboppfolging.scope") { "test.veilarboppfolging" }
 
-			mockMrArenaAdapterServer.start()
-			registry.add("mr-arena-adapter.url") { mockMrArenaAdapterServer.serverUrl() }
-			registry.add("mr-arena-adapter.scope") { "test.mr-arena-adapter" }
+			mockMulighetsrommetApiServer.start()
+			registry.add("mulighetsrommet-api.url") { mockMulighetsrommetApiServer.serverUrl() }
+			registry.add("mulighetsrommet-api.scope") { "test.mulighetsrommet-api" }
 
 			mockEnhetsregisterServer.start()
 			registry.add("amt-enhetsregister.url") { mockEnhetsregisterServer.serverUrl() }
@@ -131,7 +131,7 @@ abstract class IntegrationTestBase {
 		mockNomHttpServer.reset()
 		mockAmtAltinnAclHttpServer.reset()
 		mockPdlHttpServer.reset()
-		mockMrArenaAdapterServer.reset()
+		mockMulighetsrommetApiServer.reset()
 	}
 
 	fun resetMockServersAndAddDefaultData() {

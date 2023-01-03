@@ -1,17 +1,15 @@
 package no.nav.amt.tiltak.test.integration.kafka
 
-import io.kotest.common.runBlocking
-import io.kotest.framework.concurrency.eventually
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt.tiltak.arrangor.ArrangorRepository
 import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetDto
-import no.nav.amt.tiltak.clients.mr_arena_adapter_client.GjennomforingArenaData
+import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.GjennomforingArenaData
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
+import no.nav.amt.tiltak.test.integration.utils.AsyncUtils
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import org.junit.jupiter.api.BeforeEach
@@ -40,38 +38,36 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 		resetMockServersAndAddDefaultData()
 	}
 
-	@Test
-	internal fun `skal inserte gjennomforing`() {
 
-		val id = UUID.randomUUID()
-		val navn = "Oppfølging Gjennomføring"
-		val startDato = "2022-12-19"
-		val sluttDato = "2023-12-19"
+	val id = UUID.randomUUID()
+	val navn = "Oppfølging Gjennomføring"
+	val startDato = "2022-12-19"
+	val sluttDato = "2023-12-19"
 
-		val tiltakId = UUID.randomUUID()
-		val tiltaksNavn = "Tiltaks navn"
-		val arenaKode = "INDOPFAG"
+	val tiltakId = UUID.randomUUID()
+	val tiltaksNavn = "Tiltaks navn"
+	val arenaKode = "INDOPFAG"
 
-		val arrangorNavn = "Arrangor"
-		val overordnetEnhetNavn = "Arrangor Org"
-		val overordnetEnhetOrgNr = "888666555"
-		val virksomhetsnummer = "999888777"
+	val arrangorNavn = "Arrangor"
+	val overordnetEnhetNavn = "Arrangor Org"
+	val overordnetEnhetOrgNr = "888666555"
+	val virksomhetsnummer = "999888777"
 
-		val navEnhetId = "9876"
-		val navEnhetNavn = "Nav Enhet"
+	val navEnhetId = "9876"
+	val navEnhetNavn = "Nav Enhet"
 
-		val gjennomforingArenaData = GjennomforingArenaData(
-			opprettetAar = 2022,
-			lopenr = 123,
-			virksomhetsnummer = virksomhetsnummer,
-			ansvarligNavEnhetId = navEnhetId,
-			status = "GJENNOMFOR",
-		)
+	val gjennomforingArenaData = GjennomforingArenaData(
+		opprettetAar = 2022,
+		lopenr = 123,
+		virksomhetsnummer = virksomhetsnummer,
+		ansvarligNavEnhetId = navEnhetId,
+		status = "GJENNOMFOR",
+	)
 
-		val jsonObjekt = """
+	val jsonObjekt = """
 			{
 				"id": "$id",
-				"tiltak": {
+				"tiltakstype": {
 					"id": "$tiltakId",
 					"navn": "$tiltaksNavn",
 					"arenaKode": "$arenaKode"
@@ -82,7 +78,11 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 			}
 		""".trimIndent()
 
-		mockMrArenaAdapterServer.gjennomforingArenaData(id, gjennomforingArenaData)
+
+	@Test
+	internal fun `skal inserte gjennomforing`() {
+
+		mockMulighetsrommetApiServer.gjennomforingArenaData(id, gjennomforingArenaData)
 
 		mockEnhetsregisterServer.addEnhet(EnhetDto(
 			organisasjonsnummer = virksomhetsnummer,
@@ -95,8 +95,7 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 
 		kafkaMessageSender.sendTilSisteTitaksgjennomforingTopic(jsonObjekt)
 
-		runBlocking {
-			eventually(5000) {
+		AsyncUtils.eventually {
 				val maybeGjennomforing = gjennomforingRepository.get(id)
 				maybeGjennomforing shouldNotBe null
 
@@ -128,6 +127,17 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 				navEnhet.navn shouldBe navEnhetNavn
 			}
 		 }
+	@Test
+	internal fun `skal ikke inserte gjennomforing uten virksomhetsnummer`() {
+
+		mockMulighetsrommetApiServer.gjennomforingArenaData(id, gjennomforingArenaData.copy(virksomhetsnummer = null))
+
+		kafkaMessageSender.sendTilSisteTitaksgjennomforingTopic(jsonObjekt)
+
+		AsyncUtils.eventually {
+			mockMulighetsrommetApiServer.requestCount() shouldBe 1
+			gjennomforingRepository.get(id) shouldBe null
+		}
 
 	}
 }

@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.clients.mr_arena_adapter_client
+package no.nav.amt.tiltak.clients.mulighetsrommet_api_client
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -6,7 +6,7 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import java.util.*
 
-class MulighetsrommetArenaClientImplTest : FunSpec({
+class MulighetsrommetApiClientImplTest : FunSpec({
 
 	val server = MockWebServer()
 	val serverUrl = server.url("").toString().removeSuffix("/")
@@ -16,7 +16,7 @@ class MulighetsrommetArenaClientImplTest : FunSpec({
 	}
 
 	test("hentGjennomforingArenaData - skal lage riktig request og parse respons") {
-		val client = MrArenaAdapterClientImpl(
+		val client = MulighetsrommetApiClientImpl(
 			baseUrl = serverUrl,
 			tokenProvider = { "TOKEN" },
 		)
@@ -46,10 +46,9 @@ class MulighetsrommetArenaClientImplTest : FunSpec({
 		gjennomforingArenaData.ansvarligNavEnhetId shouldBe "1234"
 		gjennomforingArenaData.status shouldBe "GJENNOMFORES"
 
-		request.path shouldBe "/TODO/$id"
+		request.path shouldBe "/api/v1/tiltaksgjennomforinger/arenadata/$id"
 		request.method shouldBe "GET"
 		request.getHeader("Authorization") shouldBe "Bearer TOKEN"
 	}
-
 })
 

@@ -1,8 +1,8 @@
-package no.nav.amt.tiltak.clients.mr_arena_adapter_client
+package no.nav.amt.tiltak.clients.mulighetsrommet_api_client
 
 import java.util.*
 
-interface MrArenaAdapterClient {
+interface MulighetsrommetApiClient {
 
 	fun hentGjennomforingArenaData(id: UUID): GjennomforingArenaData
 
@@ -11,7 +11,7 @@ interface MrArenaAdapterClient {
 data class GjennomforingArenaData(
 	val opprettetAar: Int,
 	val lopenr: Int,
-	val virksomhetsnummer: String,
+	val virksomhetsnummer: String?,
 	val ansvarligNavEnhetId: String,
 	val status: String,
 )

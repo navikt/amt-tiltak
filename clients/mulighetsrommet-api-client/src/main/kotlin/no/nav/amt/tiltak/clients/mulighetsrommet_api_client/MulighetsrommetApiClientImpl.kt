@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.clients.mr_arena_adapter_client
+package no.nav.amt.tiltak.clients.mulighetsrommet_api_client
 
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.common.rest.client.RestClient.baseClient
@@ -7,15 +7,15 @@ import okhttp3.Request
 import java.util.*
 import java.util.function.Supplier
 
-class MrArenaAdapterClientImpl(
+class MulighetsrommetApiClientImpl(
     private val baseUrl: String,
     private val tokenProvider: Supplier<String>,
     private val httpClient: OkHttpClient = baseClient(),
-) : MrArenaAdapterClient {
+) : MulighetsrommetApiClient {
 
 	override fun hentGjennomforingArenaData(id: UUID): GjennomforingArenaData {
 		val request = Request.Builder()
-			.url("$baseUrl/TODO/$id")
+			.url("$baseUrl/api/v1/tiltaksgjennomforinger/arenadata/$id")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
 			.get()
 			.build()
@@ -43,11 +43,10 @@ class MrArenaAdapterClientImpl(
 		data class Response(
 			val opprettetAar: Int,
 			val lopenr: Int,
-			val virksomhetsnummer: String,
+			val virksomhetsnummer: String?,
 			val ansvarligNavEnhetId: String,
-			val status: String,
+			val status: String
 		)
 	}
-
 
 }
