@@ -1,11 +1,7 @@
 package no.nav.amt.tiltak.kafka.config
 
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider
-import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
-import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
-import no.nav.amt.tiltak.core.kafka.SkjermetPersonIngestor
-import no.nav.amt.tiltak.core.kafka.GjennomforingIngestor
-import no.nav.amt.tiltak.core.kafka.TildeltVeilederIngestor
+import no.nav.amt.tiltak.core.kafka.*
 import no.nav.common.kafka.consumer.KafkaConsumerClient
 import no.nav.common.kafka.consumer.feilhandtering.KafkaConsumerRecordProcessor
 import no.nav.common.kafka.consumer.feilhandtering.util.KafkaConsumerRecordProcessorBuilder
@@ -102,7 +98,7 @@ open class KafkaConfiguration(
 					kafkaTopicProperties.sisteTiltaksgjennomforingerTopic,
 					stringDeserializer(),
 					stringDeserializer(),
-					Consumer<ConsumerRecord<String, String>> { gjennomforingIngestor.ingestKafkaRecord(it.value()) }
+					Consumer<ConsumerRecord<String, String>> { gjennomforingIngestor.ingestKafkaRecord(it.key(), it.value()) }
 				)
 		)
 

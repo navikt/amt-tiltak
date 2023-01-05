@@ -8,6 +8,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.utils.AsyncUtils
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
@@ -93,7 +94,7 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 
 		mockNorgHttpServer.addNavEnhet(navEnhetId, navEnhetNavn)
 
-		kafkaMessageSender.sendTilSisteTitaksgjennomforingTopic(jsonObjekt)
+		kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(jsonObjekt)
 
 		AsyncUtils.eventually {
 				val maybeGjennomforing = gjennomforingRepository.get(id)
@@ -132,12 +133,23 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 
 		mockMulighetsrommetApiServer.gjennomforingArenaData(id, gjennomforingArenaData.copy(virksomhetsnummer = null))
 
-		kafkaMessageSender.sendTilSisteTitaksgjennomforingTopic(jsonObjekt)
+		kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(jsonObjekt)
 
 		AsyncUtils.eventually {
 			mockMulighetsrommetApiServer.requestCount() shouldBe 1
 			gjennomforingRepository.get(id) shouldBe null
 		}
+	}
 
+	@Test
+	internal fun `mottar melding om sletting - skal slette gjennomføring`() {
+		val id = UUID.randomUUID()
+		testDataRepository.insertGjennomforing(GJENNOMFORING_1.copy(id = id))
+
+		kafkaMessageSender.sendDeleteTilSisteTiltaksgjennomforingTopic(id.toString())
+
+		AsyncUtils.eventually {
+			gjennomforingRepository.get(id) shouldBe null
+		}
 	}
 }

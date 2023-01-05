@@ -12,11 +12,12 @@ class MockMulighetsrommetApiServer : MockHttpServer(name = "MockMulighetsrommetA
 	}
 
 	fun gjennomforingArenaData(id: UUID, arenaDataResponse: GjennomforingArenaData) {
+		val virksomhetsnummer = if (arenaDataResponse.virksomhetsnummer == null) "null" else "\"${arenaDataResponse.virksomhetsnummer}\""
 		val body = """
 			{
 				"opprettetAar": ${arenaDataResponse.opprettetAar},
 				"lopenr": ${arenaDataResponse.lopenr},
-				"virksomhetsnummer": "${arenaDataResponse.virksomhetsnummer}",
+				"virksomhetsnummer": $virksomhetsnummer,
 				"ansvarligNavEnhetId": "${arenaDataResponse.ansvarligNavEnhetId}",
 				"status": "${arenaDataResponse.status}"
 			}

@@ -5,6 +5,7 @@ import no.nav.common.kafka.producer.KafkaProducerClientImpl
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 class KafkaMessageSender(
@@ -25,10 +26,14 @@ class KafkaMessageSender(
 	private val kafkaProducer = KafkaProducerClientImpl<String, String>(properties.producer())
 
 	fun sendTilAmtTiltakTopic(jsonString: String) {
-		kafkaProducer.send(ProducerRecord(amtTiltakTopic, jsonString))
+		kafkaProducer.send(ProducerRecord(amtTiltakTopic, UUID.randomUUID().toString(), jsonString))
 	}
 
-	fun sendTilSisteTitaksgjennomforingTopic(jsonString: String) {
-		kafkaProducer.send(ProducerRecord(sisteTiltaksgjennomforingerTopic, jsonString))
+	fun sendTilSisteTiltaksgjennomforingTopic(jsonString: String) {
+		kafkaProducer.send(ProducerRecord(sisteTiltaksgjennomforingerTopic, UUID.randomUUID().toString(), jsonString))
+	}
+
+	fun sendDeleteTilSisteTiltaksgjennomforingTopic(gjennomforingId: String) {
+		kafkaProducer.send(ProducerRecord(sisteTiltaksgjennomforingerTopic, gjennomforingId, null))
 	}
 }
