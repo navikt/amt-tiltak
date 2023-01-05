@@ -1,10 +1,6 @@
 package no.nav.amt.tiltak.kafka.config
 
-import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
-import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
-import no.nav.amt.tiltak.core.kafka.SkjermetPersonIngestor
-import no.nav.amt.tiltak.core.kafka.GjennomforingIngestor
-import no.nav.amt.tiltak.core.kafka.TildeltVeilederIngestor
+import no.nav.amt.tiltak.core.kafka.*
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.common.kafka.producer.KafkaProducerClientImpl
 import no.nav.common.kafka.producer.util.ProducerUtils.toJsonProducerRecord
@@ -93,7 +89,7 @@ class KafkaConfigurationTest {
 		}
 
 		val gjennomforingIngestor = object : GjennomforingIngestor {
-			override fun ingestKafkaRecord(recordValue: String) {
+			override fun ingestKafkaRecord(gjennomforingId: String, recordValue: String?) {
 				counter.incrementAndGet()
 			}
 		}

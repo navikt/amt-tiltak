@@ -10,6 +10,7 @@ import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.TiltakService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class GjennomforingIngestorImpl(
@@ -21,7 +22,13 @@ class GjennomforingIngestorImpl(
 ): GjennomforingIngestor {
 
 	private val log = LoggerFactory.getLogger(javaClass)
-	override fun ingestKafkaRecord(recordValue: String) {
+	override fun ingestKafkaRecord(gjennomforingId: String, recordValue: String?) {
+		if (recordValue == null) {
+			val id = UUID.fromString(gjennomforingId)
+			log.info("Mottok melding om å slette gjennomføring med id $id")
+			gjennomforingService.slettGjennomforing(id)
+			return
+		}
 		val gjennomforing = fromJsonString<GjennomforingMessage>(recordValue)
 
 		val arenaData = mulighetsrommetApiClient.hentGjennomforingArenaData(gjennomforing.id)
