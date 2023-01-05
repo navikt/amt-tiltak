@@ -21,6 +21,15 @@ class GjennomforingIngestorImpl(
 	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
 ): GjennomforingIngestor {
 
+	private val stottedeTiltak = setOf(
+		"INDOPPFAG",
+		"ARBFORB",
+		"AVKLARAG",
+		"VASV",
+		"ARBRRHDAG",
+		"DIGIOPPARB"
+	)
+
 	private val log = LoggerFactory.getLogger(javaClass)
 	override fun ingestKafkaRecord(gjennomforingId: String, recordValue: String?) {
 		if (recordValue == null) {
@@ -30,6 +39,11 @@ class GjennomforingIngestorImpl(
 			return
 		}
 		val gjennomforing = fromJsonString<GjennomforingMessage>(recordValue)
+
+		if (!stottedeTiltak.contains(gjennomforing.tiltakstype.arenaKode)) {
+			log.info("Lagrer ikke gjennomføring med id ${gjennomforing.id} og tiltakstype ${gjennomforing.tiltakstype.arenaKode} fordi tiltaket ikke er støttet.")
+			return
+		}
 
 		val arenaData = mulighetsrommetApiClient.hentGjennomforingArenaData(gjennomforing.id)
 
