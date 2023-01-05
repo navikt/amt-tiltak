@@ -11,6 +11,7 @@ import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.utils.AsyncUtils
+import no.nav.amt.tiltak.test.integration.utils.LogUtils
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import org.junit.jupiter.api.BeforeEach
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.util.*
+
 
 class GjennomforingIngestorTest : IntegrationTestBase() {
 
@@ -47,7 +49,7 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 
 	val tiltakId = UUID.randomUUID()
 	val tiltaksNavn = "Tiltaks navn"
-	val arenaKode = "INDOPFAG"
+	val arenaKode = "INDOPPFAG"
 
 	val arrangorNavn = "Arrangor"
 	val overordnetEnhetNavn = "Arrangor Org"
@@ -151,5 +153,33 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 		AsyncUtils.eventually {
 			gjennomforingRepository.get(id) shouldBe null
 		}
+	}
+
+	@Test
+	internal fun `mottar gjennomforing som ikke er stottet - skal ikke inserte gjennomføring`() {
+		val jsonObjektIkkeStottet = """
+			{
+				"id": "$id",
+				"tiltakstype": {
+					"id": "${UUID.randomUUID()}",
+					"navn": "Individuell jobbstotte 1",
+					"arenaKode": "INDJOBSTOT"
+				},
+				"navn": "Individuell jobbstotte 1",
+				"startDato": "$startDato",
+				"sluttDato": "$sluttDato"
+			}
+		""".trimIndent()
+
+
+
+		LogUtils.withLogs { getLogs ->
+			kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(jsonObjektIkkeStottet)
+
+			AsyncUtils.eventually {
+				getLogs().any { it.message == "Lagrer ikke gjennomføring med id $id og tiltakstype INDJOBSTOT fordi tiltaket ikke er støttet." } shouldBe true
+			}
+		}
+
 	}
 }
