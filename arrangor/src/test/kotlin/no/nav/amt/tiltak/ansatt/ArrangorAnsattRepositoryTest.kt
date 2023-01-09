@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
@@ -21,10 +22,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.*
 
-class AnsattRepositoryTest {
+class ArrangorAnsattRepositoryTest {
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 
@@ -93,4 +96,27 @@ class AnsattRepositoryTest {
 		veiledere.any { it.id == ARRANGOR_ANSATT_2.id } shouldBe true
 	}
 
+	@Test
+	internal fun `Sett Sist oppdatert oppdaterer feltet`() {
+		val ansattBeforeUpdate = repository.get(ARRANGOR_ANSATT_1.id)
+		ansattBeforeUpdate!!.sistOppdatert shouldBe LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(1))
+
+		val now = LocalDateTime.now()
+
+		repository.setSistOppdatertForAnsatt(ansattBeforeUpdate.personligIdent, now)
+
+		val ansattAfterUpdate = repository.get(ARRANGOR_ANSATT_1.id)
+		ansattAfterUpdate!!.sistOppdatert shouldBe now
+	}
+
+	@Test
+	internal fun `Get siste oppdaterte returnerer riktig`() {
+		repository.setSistOppdatertForAnsatt(ARRANGOR_ANSATT_1.personligIdent, LocalDateTime.now())
+
+		val toUpdate = repository.getEldsteSistOppdaterteAnsattIds(1)
+
+		toUpdate.size shouldBe 1
+		toUpdate[0] shouldBe ARRANGOR_ANSATT_2.personligIdent
+	}
 }
+

@@ -107,6 +107,8 @@ abstract class IntegrationTestBase {
 				mockMachineToMachineHttpServer.serverUrl() + MockMachineToMachineHttpServer.tokenPath
 			}
 
+			registry.add("arrangoransatt.tilgang.updater.number-to-check") { 10 }
+
 			// Database ting
 			val container = SingletonPostgresContainer.getContainer()
 

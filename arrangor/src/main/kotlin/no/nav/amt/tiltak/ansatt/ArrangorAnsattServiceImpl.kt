@@ -10,6 +10,7 @@ import no.nav.amt.tiltak.core.port.PersonService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -46,6 +47,14 @@ class ArrangorAnsattServiceImpl(
 	override fun getKoordinatorerForGjennomforing(gjennomforingId: UUID): List<Ansatt> {
 		return arrangorAnsattRepository.getAnsatteForGjennomforing(gjennomforingId, ArrangorAnsattRolle.KOORDINATOR)
 			.map { it.toAnsatt(emptyList()) }
+	}
+
+	override fun setSistOppdatertForAnsatt(personIdent: String, sistOppdatert: LocalDateTime) {
+		arrangorAnsattRepository.setSistOppdatertForAnsatt(personIdent, sistOppdatert)
+	}
+
+	override fun getEldsteSistOppdaterteAnsattIds(antall: Int): List<String> {
+		return arrangorAnsattRepository.getEldsteSistOppdaterteAnsattIds(antall)
 	}
 
 	private fun createAnsatt(ansattPersonIdent: String): Ansatt {

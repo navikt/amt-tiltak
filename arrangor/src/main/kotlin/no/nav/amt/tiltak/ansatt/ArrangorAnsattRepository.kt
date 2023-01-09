@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 import java.util.*
 
 @Component
@@ -22,6 +23,7 @@ open class ArrangorAnsattRepository(
 			fornavn = rs.getString("fornavn"),
 			mellomnavn = rs.getString("mellomnavn"),
 			etternavn = rs.getString("etternavn"),
+			sistOppdatert = rs.getLocalDateTime("sist_oppdatert"),
 			createdAt = rs.getLocalDateTime("created_at"),
 			modifiedAt = rs.getLocalDateTime("modified_at")
 		)
@@ -89,6 +91,31 @@ open class ArrangorAnsattRepository(
 			rowMapper
 		)
 
+	}
+
+	fun setSistOppdatertForAnsatt(ansattPersonligIdent: String, sistOppdatert: LocalDateTime) {
+		val sql = """
+			UPDATE arrangor_ansatt SET sist_oppdatert = :sistOppdatert where personlig_ident = :personligIdent
+		""".trimIndent()
+
+		template.update(sql, sqlParameters(
+			"personligIdent" to ansattPersonligIdent,
+			"sistOppdatert" to sistOppdatert
+		))
+	}
+
+	fun getEldsteSistOppdaterteAnsattIds(antall: Int): List<String> {
+		val sql = """
+			SELECT personlig_ident
+			FROM arrangor_ansatt
+			ORDER BY sist_oppdatert ASC
+			LIMIT :antall
+		""".trimIndent()
+
+		return template.query(
+			sql,
+			sqlParameters("antall" to antall)
+		) { rs, _ -> rs.getString("personlig_ident") }
 	}
 
 }
