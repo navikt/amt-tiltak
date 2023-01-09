@@ -25,6 +25,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 class ArrangorAnsattRepositoryTest {
@@ -101,12 +102,12 @@ class ArrangorAnsattRepositoryTest {
 		val ansattBeforeUpdate = repository.get(ARRANGOR_ANSATT_1.id)
 		ansattBeforeUpdate!!.sistOppdatert shouldBe LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(1))
 
-		val now = LocalDateTime.now()
+		val now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
 
 		repository.setSistOppdatertForAnsatt(ansattBeforeUpdate.personligIdent, now)
 
 		val ansattAfterUpdate = repository.get(ARRANGOR_ANSATT_1.id)
-		ansattAfterUpdate!!.sistOppdatert shouldBe now
+		ansattAfterUpdate!!.sistOppdatert.truncatedTo(ChronoUnit.MINUTES) shouldBe now
 	}
 
 	@Test
