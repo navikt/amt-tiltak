@@ -49,11 +49,11 @@ class ArrangorAnsattServiceImpl(
 			.map { it.toAnsatt(emptyList()) }
 	}
 
-	override fun setSistOppdatertForAnsatt(personIdent: String, sistOppdatert: LocalDateTime) {
+	override fun setTilgangerSistSynkronisert(personIdent: String, sistOppdatert: LocalDateTime) {
 		arrangorAnsattRepository.setSistOppdatertForAnsatt(personIdent, sistOppdatert)
 	}
 
-	override fun getEldsteSistOppdaterteAnsattIds(antall: Int): List<String> {
+	override fun getEldsteTilgangerSistSynkronisert(antall: Int): List<String> {
 		return arrangorAnsattRepository.getEldsteSistOppdaterteAnsattIds(antall)
 	}
 

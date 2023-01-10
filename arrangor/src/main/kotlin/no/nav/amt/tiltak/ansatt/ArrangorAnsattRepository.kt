@@ -23,7 +23,7 @@ open class ArrangorAnsattRepository(
 			fornavn = rs.getString("fornavn"),
 			mellomnavn = rs.getString("mellomnavn"),
 			etternavn = rs.getString("etternavn"),
-			sistOppdatert = rs.getLocalDateTime("sist_oppdatert"),
+			tilgangerSistSynkronisert = rs.getLocalDateTime("tilganger_sist_synkronisert"),
 			createdAt = rs.getLocalDateTime("created_at"),
 			modifiedAt = rs.getLocalDateTime("modified_at")
 		)
@@ -93,14 +93,14 @@ open class ArrangorAnsattRepository(
 
 	}
 
-	fun setSistOppdatertForAnsatt(ansattPersonligIdent: String, sistOppdatert: LocalDateTime) {
+	fun setSistOppdatertForAnsatt(ansattPersonligIdent: String, tilgangerSistSynkronisert: LocalDateTime) {
 		val sql = """
-			UPDATE arrangor_ansatt SET sist_oppdatert = :sistOppdatert where personlig_ident = :personligIdent
+			UPDATE arrangor_ansatt SET tilganger_sist_synkronisert = :tilgangerSistSynkronisert where personlig_ident = :personligIdent
 		""".trimIndent()
 
 		template.update(sql, sqlParameters(
 			"personligIdent" to ansattPersonligIdent,
-			"sistOppdatert" to sistOppdatert
+			"tilgangerSistSynkronisert" to tilgangerSistSynkronisert
 		))
 	}
 
@@ -108,7 +108,7 @@ open class ArrangorAnsattRepository(
 		val sql = """
 			SELECT personlig_ident
 			FROM arrangor_ansatt
-			ORDER BY sist_oppdatert ASC
+			ORDER BY tilganger_sist_synkronisert ASC
 			LIMIT :antall
 		""".trimIndent()
 

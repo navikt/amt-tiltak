@@ -22,7 +22,7 @@ open class ArrangorAnsattTilgangUpdater(
 	}
 
 	private fun runner() {
-		val ids = arrangorAnsattService.getEldsteSistOppdaterteAnsattIds(numberToCheck)
+		val ids = arrangorAnsattService.getEldsteTilgangerSistSynkronisert(numberToCheck)
 		 ids.forEach { arrangorAnsattTilgangService.synkroniserRettigheterMedAltinn(it) }
 	}
 }

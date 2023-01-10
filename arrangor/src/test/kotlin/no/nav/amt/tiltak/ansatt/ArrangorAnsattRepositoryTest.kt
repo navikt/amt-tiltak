@@ -4,7 +4,6 @@ import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
@@ -100,14 +99,14 @@ class ArrangorAnsattRepositoryTest {
 	@Test
 	internal fun `Sett Sist oppdatert oppdaterer feltet`() {
 		val ansattBeforeUpdate = repository.get(ARRANGOR_ANSATT_1.id)
-		ansattBeforeUpdate!!.sistOppdatert shouldBe LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(1))
+		ansattBeforeUpdate!!.tilgangerSistSynkronisert shouldBe LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(1))
 
 		val now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
 
 		repository.setSistOppdatertForAnsatt(ansattBeforeUpdate.personligIdent, now)
 
 		val ansattAfterUpdate = repository.get(ARRANGOR_ANSATT_1.id)
-		ansattAfterUpdate!!.sistOppdatert.truncatedTo(ChronoUnit.MINUTES) shouldBe now
+		ansattAfterUpdate!!.tilgangerSistSynkronisert.truncatedTo(ChronoUnit.MINUTES) shouldBe now
 	}
 
 	@Test
