@@ -92,7 +92,7 @@ class GjennomforingServiceImpl(
 		return gjennomforingRepository.get(id)?.let { gjennomforingDbo ->
 			val (tiltak, arrangor) = getTiltakOgArrangor(gjennomforingDbo.tiltakId, gjennomforingDbo.arrangorId)
 			return@let gjennomforingDbo.toGjennomforing(tiltak, arrangor)
-		} ?: throw NoSuchElementException("Fant ikke gjennomforing")
+		} ?: throw NoSuchElementException("Fant ikke gjennomforing: $id")
 	}
 
 	override fun getGjennomforinger(gjennomforingIder: List<UUID>): List<Gjennomforing> {
