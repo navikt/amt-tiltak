@@ -14,6 +14,6 @@ interface ArrangorAnsattService {
 
 	fun getKoordinatorerForGjennomforing(gjennomforingId: UUID): List<Ansatt>
 
-	fun setTilgangerSistSynkronisert(personIdent: String, sistOppdatert: LocalDateTime)
-	fun getEldsteTilgangerSistSynkronisert(antall: Int): List<String>
+	fun setTilgangerSistSynkronisert(ansattId: UUID, sistOppdatert: LocalDateTime)
+	fun getAnsatteSistSynkronisertEldreEnn(eldreEnn: LocalDateTime, maksAntall: Int): List<Ansatt>
 }

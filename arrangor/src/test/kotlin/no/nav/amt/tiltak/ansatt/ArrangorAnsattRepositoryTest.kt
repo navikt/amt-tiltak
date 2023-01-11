@@ -103,7 +103,7 @@ class ArrangorAnsattRepositoryTest {
 
 		val now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
 
-		repository.setSistOppdatertForAnsatt(ansattBeforeUpdate.personligIdent, now)
+		repository.setSistOppdatertForAnsatt(ansattBeforeUpdate.id, now)
 
 		val ansattAfterUpdate = repository.get(ARRANGOR_ANSATT_1.id)
 		ansattAfterUpdate!!.tilgangerSistSynkronisert.truncatedTo(ChronoUnit.MINUTES) shouldBe now
@@ -111,12 +111,12 @@ class ArrangorAnsattRepositoryTest {
 
 	@Test
 	internal fun `Get siste oppdaterte returnerer riktig`() {
-		repository.setSistOppdatertForAnsatt(ARRANGOR_ANSATT_1.personligIdent, LocalDateTime.now())
+		repository.setSistOppdatertForAnsatt(ARRANGOR_ANSATT_1.id, LocalDateTime.now())
 
-		val toUpdate = repository.getEldsteSistOppdaterteAnsattIds(1)
+		val toUpdate = repository.getEldsteSistRolleSynkroniserteAnsatte(1)
 
 		toUpdate.size shouldBe 1
-		toUpdate[0] shouldBe ARRANGOR_ANSATT_2.personligIdent
+		toUpdate[0].id shouldBe ARRANGOR_ANSATT_2.id
 	}
 }
 

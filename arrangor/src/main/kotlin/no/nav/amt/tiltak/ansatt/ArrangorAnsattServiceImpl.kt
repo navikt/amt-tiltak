@@ -49,12 +49,17 @@ class ArrangorAnsattServiceImpl(
 			.map { it.toAnsatt(emptyList()) }
 	}
 
-	override fun setTilgangerSistSynkronisert(personIdent: String, sistOppdatert: LocalDateTime) {
-		arrangorAnsattRepository.setSistOppdatertForAnsatt(personIdent, sistOppdatert)
+	override fun setTilgangerSistSynkronisert(ansattId: UUID, sistOppdatert: LocalDateTime) {
+		arrangorAnsattRepository.setSistOppdatertForAnsatt(ansattId, sistOppdatert)
 	}
 
-	override fun getEldsteTilgangerSistSynkronisert(antall: Int): List<String> {
-		return arrangorAnsattRepository.getEldsteSistOppdaterteAnsattIds(antall)
+	override fun getAnsatteSistSynkronisertEldreEnn(eldreEnn: LocalDateTime, maksAntall: Int): List<Ansatt> {
+		return arrangorAnsattRepository.getEldsteSistRolleSynkroniserteAnsatte(maksAntall)
+			.filter { it.tilgangerSistSynkronisert.isBefore(eldreEnn) }
+			.map {
+				val arrangorer = hentTilknyttedeArrangorer(it.id)
+				it.toAnsatt(arrangorer)
+			}
 	}
 
 	private fun createAnsatt(ansattPersonIdent: String): Ansatt {

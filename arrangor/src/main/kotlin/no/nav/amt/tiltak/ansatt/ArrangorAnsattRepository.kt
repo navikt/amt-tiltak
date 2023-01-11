@@ -93,20 +93,20 @@ open class ArrangorAnsattRepository(
 
 	}
 
-	fun setSistOppdatertForAnsatt(ansattPersonligIdent: String, tilgangerSistSynkronisert: LocalDateTime) {
+	fun setSistOppdatertForAnsatt(ansattId: UUID, tilgangerSistSynkronisert: LocalDateTime) {
 		val sql = """
-			UPDATE arrangor_ansatt SET tilganger_sist_synkronisert = :tilgangerSistSynkronisert where personlig_ident = :personligIdent
+			UPDATE arrangor_ansatt SET tilganger_sist_synkronisert = :tilgangerSistSynkronisert where id = :id
 		""".trimIndent()
 
 		template.update(sql, sqlParameters(
-			"personligIdent" to ansattPersonligIdent,
+			"id" to ansattId,
 			"tilgangerSistSynkronisert" to tilgangerSistSynkronisert
 		))
 	}
 
-	fun getEldsteSistOppdaterteAnsattIds(antall: Int): List<String> {
+	fun getEldsteSistRolleSynkroniserteAnsatte(antall: Int): List<AnsattDbo> {
 		val sql = """
-			SELECT personlig_ident
+			SELECT *
 			FROM arrangor_ansatt
 			ORDER BY tilganger_sist_synkronisert ASC
 			LIMIT :antall
@@ -114,8 +114,9 @@ open class ArrangorAnsattRepository(
 
 		return template.query(
 			sql,
-			sqlParameters("antall" to antall)
-		) { rs, _ -> rs.getString("personlig_ident") }
+			sqlParameters("antall" to antall),
+			rowMapper
+		)
 	}
 
 }

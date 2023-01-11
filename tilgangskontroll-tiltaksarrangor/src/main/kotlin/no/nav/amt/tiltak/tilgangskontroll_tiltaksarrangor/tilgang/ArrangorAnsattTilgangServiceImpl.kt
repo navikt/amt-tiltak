@@ -174,7 +174,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 			log.info("Fjernet tilgang under synk med Altinn. ansattId=${ansatt.id} arrangorId=${tilgang.arrangorId} rolle=${tilgang.arrangorAnsattRolle}")
 		}
 
-		arrangorAnsattService.setTilgangerSistSynkronisert(ansattPersonligIdent, LocalDateTime.now())
+		arrangorAnsattService.setTilgangerSistSynkronisert(ansatt.id, LocalDateTime.now())
 	}
 
 	private fun finnTilgangerSomSkalLeggesTil(
