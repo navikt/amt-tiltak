@@ -7,7 +7,10 @@ import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.ArrangorAnsattService
+import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
+import no.nav.amt.tiltak.core.port.ArrangorService
+import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.log.SecureLog.secureLog
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.AltinnService
 import org.slf4j.LoggerFactory
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import org.springframework.web.server.ResponseStatusException
 import java.time.Duration
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -74,13 +78,15 @@ open class ArrangorAnsattTilgangServiceImpl(
 	}
 
 	override fun verifiserTilgangTilDeltaker(ansattId: UUID, deltakerId: UUID) {
-		val deltaker = deltakerService.hentDeltaker(deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
+		val deltaker = deltakerService.hentDeltaker(deltakerId)
+			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 
 		verifiserTilgangTilGjennomforing(ansattId, deltaker.gjennomforingId)
 	}
 
 	override fun verifiserTilgangTilDeltaker(ansattPersonligIdent: String, deltakerId: UUID) {
-		val deltaker = deltakerService.hentDeltaker(deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
+		val deltaker = deltakerService.hentDeltaker(deltakerId)
+			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 
 		verifiserTilgangTilGjennomforing(ansattPersonligIdent, deltaker.gjennomforingId)
 	}
@@ -120,7 +126,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 
 	override fun synkroniserRettigheterMedAltinn(ansattPersonligIdent: String) {
 		try {
-		    synkroniserAltinnRettigheter(ansattPersonligIdent)
+			synkroniserAltinnRettigheter(ansattPersonligIdent)
 		} catch (t: Throwable) {
 			log.error("Feil under synkronisering av altinn rettigheter", t)
 			secureLog.error("Feil under synkronisering av altinn rettigheter for fnr=$ansattPersonligIdent", t)
@@ -167,14 +173,22 @@ open class ArrangorAnsattTilgangServiceImpl(
 			}
 			log.info("Fjernet tilgang under synk med Altinn. ansattId=${ansatt.id} arrangorId=${tilgang.arrangorId} rolle=${tilgang.arrangorAnsattRolle}")
 		}
+
+		arrangorAnsattService.setTilgangerSistSynkronisert(ansatt.id, LocalDateTime.now())
 	}
 
-	private fun finnTilgangerSomSkalLeggesTil(altinnTilganger: List<AnsattTilgang>, lagredeTilganger: List<AnsattTilgang>): List<AnsattTilgang> {
+	private fun finnTilgangerSomSkalLeggesTil(
+		altinnTilganger: List<AnsattTilgang>,
+		lagredeTilganger: List<AnsattTilgang>
+	): List<AnsattTilgang> {
 		// Returnerer alle altinnTilganger som ikke finnes i lagredeTilganger
 		return altinnTilganger.subtract(lagredeTilganger.toSet()).toList()
 	}
 
-	private fun finnTilgangerSomSkalFjernes(altinnTilganger: List<AnsattTilgang>, lagredeTilganger: List<AnsattTilgang>): List<AnsattTilgang> {
+	private fun finnTilgangerSomSkalFjernes(
+		altinnTilganger: List<AnsattTilgang>,
+		lagredeTilganger: List<AnsattTilgang>
+	): List<AnsattTilgang> {
 		// Returnerer alle lagredeTilganger som ikke finnes i altinnTilganger
 		return lagredeTilganger.subtract(altinnTilganger.toSet()).toList()
 	}

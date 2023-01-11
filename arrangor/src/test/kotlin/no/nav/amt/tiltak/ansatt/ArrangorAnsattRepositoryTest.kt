@@ -21,10 +21,13 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
 
-class AnsattRepositoryTest {
+class ArrangorAnsattRepositoryTest {
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 
@@ -93,4 +96,38 @@ class AnsattRepositoryTest {
 		veiledere.any { it.id == ARRANGOR_ANSATT_2.id } shouldBe true
 	}
 
+	@Test
+	internal fun `Sett Sist oppdatert oppdaterer feltet`() {
+		val ansattBeforeUpdate = repository.get(ARRANGOR_ANSATT_1.id)
+		ansattBeforeUpdate!!.tilgangerSistSynkronisert shouldBe LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(1))
+
+		val now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
+
+		repository.setSistOppdatertForAnsatt(ansattBeforeUpdate.id, now)
+
+		val ansattAfterUpdate = repository.get(ARRANGOR_ANSATT_1.id)
+		ansattAfterUpdate!!.tilgangerSistSynkronisert.truncatedTo(ChronoUnit.MINUTES) shouldBe now
+	}
+
+	@Test
+	internal fun `Get siste oppdaterte returnerer riktig`() {
+		repository.setSistOppdatertForAnsatt(ARRANGOR_ANSATT_1.id, LocalDateTime.now())
+
+		val toUpdate = repository.getEldsteSistRolleSynkroniserteAnsatte(1)
+
+		toUpdate.size shouldBe 1
+		toUpdate[0].id shouldBe ARRANGOR_ANSATT_2.id
+	}
+
+	@Test
+	internal fun `getEldsteSisteRolleSynkroniserteAnsatte returnerer maks antall`() {
+		repository.setSistOppdatertForAnsatt(ARRANGOR_ANSATT_1.id, LocalDateTime.now().minusWeeks(1))
+		repository.setSistOppdatertForAnsatt(ARRANGOR_ANSATT_2.id, LocalDateTime.now().minusWeeks(2))
+
+		val toUpdate = repository.getEldsteSistRolleSynkroniserteAnsatte(1)
+
+		toUpdate.size shouldBe 1
+		toUpdate.map { it.id } shouldBe listOf(ARRANGOR_ANSATT_2.id)
+	}
 }
+

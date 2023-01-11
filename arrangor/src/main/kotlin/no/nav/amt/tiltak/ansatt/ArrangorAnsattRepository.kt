@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 import java.util.*
 
 @Component
@@ -22,6 +23,7 @@ open class ArrangorAnsattRepository(
 			fornavn = rs.getString("fornavn"),
 			mellomnavn = rs.getString("mellomnavn"),
 			etternavn = rs.getString("etternavn"),
+			tilgangerSistSynkronisert = rs.getLocalDateTime("tilganger_sist_synkronisert"),
 			createdAt = rs.getLocalDateTime("created_at"),
 			modifiedAt = rs.getLocalDateTime("modified_at")
 		)
@@ -89,6 +91,32 @@ open class ArrangorAnsattRepository(
 			rowMapper
 		)
 
+	}
+
+	fun setSistOppdatertForAnsatt(ansattId: UUID, tilgangerSistSynkronisert: LocalDateTime) {
+		val sql = """
+			UPDATE arrangor_ansatt SET tilganger_sist_synkronisert = :tilgangerSistSynkronisert where id = :id
+		""".trimIndent()
+
+		template.update(sql, sqlParameters(
+			"id" to ansattId,
+			"tilgangerSistSynkronisert" to tilgangerSistSynkronisert
+		))
+	}
+
+	fun getEldsteSistRolleSynkroniserteAnsatte(antall: Int): List<AnsattDbo> {
+		val sql = """
+			SELECT *
+			FROM arrangor_ansatt
+			ORDER BY tilganger_sist_synkronisert ASC
+			LIMIT :antall
+		""".trimIndent()
+
+		return template.query(
+			sql,
+			sqlParameters("antall" to antall),
+			rowMapper
+		)
 	}
 
 }
