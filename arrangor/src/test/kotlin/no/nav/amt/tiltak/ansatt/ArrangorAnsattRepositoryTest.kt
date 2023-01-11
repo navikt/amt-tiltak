@@ -118,5 +118,16 @@ class ArrangorAnsattRepositoryTest {
 		toUpdate.size shouldBe 1
 		toUpdate[0].id shouldBe ARRANGOR_ANSATT_2.id
 	}
+
+	@Test
+	internal fun `getEldsteSisteRolleSynkroniserteAnsatte returnerer maks antall`() {
+		repository.setSistOppdatertForAnsatt(ARRANGOR_ANSATT_1.id, LocalDateTime.now().minusWeeks(1))
+		repository.setSistOppdatertForAnsatt(ARRANGOR_ANSATT_2.id, LocalDateTime.now().minusWeeks(2))
+
+		val toUpdate = repository.getEldsteSistRolleSynkroniserteAnsatte(1)
+
+		toUpdate.size shouldBe 1
+		toUpdate.map { it.id } shouldBe listOf(ARRANGOR_ANSATT_2.id)
+	}
 }
 
