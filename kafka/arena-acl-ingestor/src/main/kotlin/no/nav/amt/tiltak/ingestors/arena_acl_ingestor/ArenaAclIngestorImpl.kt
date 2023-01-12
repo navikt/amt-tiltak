@@ -35,7 +35,12 @@ class ArenaAclIngestorImpl(
 				"GJENNOMFORING" -> {
 					val gjennomforingPayload = fromJsonNode<GjennomforingPayload>(unknownMessageWrapper.payload)
 					val gjennomforingMessage = toKnownMessageWrapper(gjennomforingPayload, unknownMessageWrapper)
-					gjennomforingProcessor.processMessage(gjennomforingMessage)
+
+					if (listOf("dev-gcp", "prod-gcp").contains(System.getenv()["NAIS_CLUSTER_NAME"])) {
+						log.info("Hoppet over gjennomføring med id ${gjennomforingMessage.payload.id}")
+					} else {
+						gjennomforingProcessor.processMessage(gjennomforingMessage)
+					}
 				}
 			}
 		}
