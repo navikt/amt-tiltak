@@ -5,15 +5,12 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.DeltakerProcessor
-import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.GjennomforingProcessor
 
 class ArenaAclIngestorImplTest : StringSpec({
 
 	val deltakerProcessor: DeltakerProcessor = mockk()
 
-	val gjennomforingProcessor: GjennomforingProcessor = mockk()
-
-	val ingestor = ArenaAclIngestorImpl(deltakerProcessor, gjennomforingProcessor)
+	val ingestor = ArenaAclIngestorImpl(deltakerProcessor)
 
 	"ingestKafkaMessageValue should parse DELTAKER message" {
 		val json = """
@@ -47,45 +44,6 @@ class ArenaAclIngestorImplTest : StringSpec({
 			deltakerProcessor.processMessage(any())
 		}
 
-	}
-
-	"ingestKafkaMessageValue should parse GJENNOMFORING message" {
-		val json = """
-			{
-			  "transactionId": "b3b46fc2-ad90-4dbb-abfb-2b767318258b",
-			  "type": "GJENNOMFORING",
-			  "timestamp": "2022-01-10T11:46:44.799Z",
-			  "operation": "CREATED",
-			  "payload": {
-			    "id": "ec3af220-65e9-4a39-928a-a73af2b16e46",
-				"tiltak": {
-					"id": "f692434a-694f-4be4-a87d-ff325ebc5833",
-					"kode": "INDOPPFAG",
-					"navn": "Oppfølging"
-				},
-				"virksomhetsnummer": "1235543432",
-				"navn": "Tiltak hos Muligheter AS",
-				"status": "GJENNOMFORES",
-				"startDato": "2022-01-10",
-				"sluttDato": "2022-01-12",
-				"registrertDato": "2022-01-08T11:46:44.799Z",
-				"fremmoteDato": "2022-01-10T11:46:44.799Z",
-				"ansvarligNavEnhetId": "1234",
-				"opprettetAar": 2020,
-				"lopenr": 65432
-			  }
-			}
-		""".trimIndent()
-
-		every {
-			gjennomforingProcessor.processMessage(any())
-		} returns Unit
-
-		ingestor.ingestKafkaRecord(json)
-
-		verify(exactly = 1) {
-			gjennomforingProcessor.processMessage(any())
-		}
 	}
 
 })

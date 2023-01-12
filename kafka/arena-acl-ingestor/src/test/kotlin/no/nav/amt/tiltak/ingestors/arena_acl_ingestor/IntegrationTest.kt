@@ -21,7 +21,6 @@ import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.DeltakerProcessor
-import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.GjennomforingProcessor
 import no.nav.amt.tiltak.nav_enhet.NavEnhetRepository
 import no.nav.amt.tiltak.nav_enhet.NavEnhetServiceImpl
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -65,7 +64,6 @@ class IntegrationTest {
 	private lateinit var veilarbarenaClient: VeilarbarenaClient
 	private lateinit var navEnhetService: NavEnhetService
 
-	private lateinit var gjennomforingProcessor: GjennomforingProcessor
 	private lateinit var deltakerProcessor: DeltakerProcessor
 
 	private lateinit var enhetsregisterClient: EnhetsregisterClient
@@ -112,9 +110,8 @@ class IntegrationTest {
 		gjennomforingService = GjennomforingServiceImpl(gjennomforingRepository, tiltakService, deltakerService, arrangorService, transactionTemplate)
 
 		deltakerProcessor = DeltakerProcessor(gjennomforingService, deltakerService, personService, transactionTemplate)
-		gjennomforingProcessor = GjennomforingProcessor(arrangorService, gjennomforingService, tiltakService, navEnhetService)
 
-		ingestor = ArenaAclIngestorImpl(deltakerProcessor, gjennomforingProcessor)
+		ingestor = ArenaAclIngestorImpl(deltakerProcessor)
 
 		every { enhetsregisterClient.hentVirksomhet(virksomhetsnr) } returns virksomhet
 
@@ -128,20 +125,6 @@ class IntegrationTest {
 		val testDataRepository = TestDataRepository(jdbcTemplate)
 
 		testDataRepository.insertNavEnhet(NAV_ENHET_1)
-	}
-
-	@Test
-	fun `ingestKafkaMessageValue() - Skal ingeste gyldig gjennomføring`() {
-
-		ingestor.ingestKafkaRecord(gjennomforingJson)
-
-		val inserted = gjennomforingRepository.get(toInsertGjennomforing.id)
-
-		inserted shouldNotBe null
-		val expected = toInsertGjennomforing.copy(arrangorId = inserted!!.arrangorId, createdAt = inserted.createdAt, modifiedAt = inserted.modifiedAt)
-		inserted shouldBe expected
-		inserted.deprecated shouldBe true
-
 	}
 
 	@Test
