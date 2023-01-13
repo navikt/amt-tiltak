@@ -6,6 +6,7 @@ import no.nav.amt.tiltak.clients.pdl.AdressebeskyttelseGradering
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.DbUtils.shouldBeEqualTo
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
@@ -56,7 +57,7 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 			deltaker.gjennomforingId shouldBe message.gjennomforingId
 			deltaker.prosentStilling shouldBe 0.0 // message.prosentDeltid - NULL i databasen blir konvertert til 0.0
 			deltaker.dagerPerUke shouldBe message.dagerPerUke
-			deltaker.registrertDato shouldBe message.registrertDato
+			deltaker.registrertDato shouldBeEqualTo message.registrertDato
 			deltaker.startDato shouldBe message.startDato
 			deltaker.sluttDato shouldBe message.sluttDato
 			deltaker.status.type shouldBe message.status
