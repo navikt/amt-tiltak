@@ -11,7 +11,7 @@ import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.utils.AsyncUtils
-import no.nav.amt.tiltak.test.integration.utils.GjennomforingMessagePayload
+import no.nav.amt.tiltak.test.integration.utils.GjennomforingMessage
 import no.nav.amt.tiltak.test.integration.utils.KafkaMessageCreator
 import no.nav.amt.tiltak.test.integration.utils.LogUtils
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.util.*
 
 
-class GjennomforingIngestorTest : IntegrationTestBase() {
+class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 
 	@Autowired
 	lateinit var gjennomforingRepository: GjennomforingRepository
@@ -58,14 +58,14 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 		status = "GJENNOMFOR",
 	)
 
-	val payload = GjennomforingMessagePayload()
-	val jsonObjekt = KafkaMessageCreator.opprettGjennomforingMessage(payload)
+	val gjennomforingMessage = GjennomforingMessage()
+	val jsonObjekt = KafkaMessageCreator.opprettGjennomforingMessage(gjennomforingMessage)
 
 
 	@Test
 	internal fun `skal inserte gjennomforing`() {
 
-		mockMulighetsrommetApiServer.gjennomforingArenaData(payload.id, gjennomforingArenaData)
+		mockMulighetsrommetApiServer.gjennomforingArenaData(gjennomforingMessage.id, gjennomforingArenaData)
 
 		mockEnhetsregisterServer.addEnhet(EnhetDto(
 			organisasjonsnummer = virksomhetsnummer,
@@ -79,24 +79,24 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 		kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(jsonObjekt)
 
 		AsyncUtils.eventually {
-				val maybeGjennomforing = gjennomforingRepository.get(payload.id)
+				val maybeGjennomforing = gjennomforingRepository.get(gjennomforingMessage.id)
 				maybeGjennomforing shouldNotBe null
 
 				val gjennomforing = maybeGjennomforing!!
 
-				gjennomforing.id shouldBe payload.id
-				gjennomforing.navn shouldBe payload.navn
-				gjennomforing.startDato shouldBe payload.startDato
-				gjennomforing.sluttDato shouldBe payload.sluttDato
-				gjennomforing.tiltakId shouldBe payload.tiltakId
+				gjennomforing.id shouldBe gjennomforingMessage.id
+				gjennomforing.navn shouldBe gjennomforingMessage.navn
+				gjennomforing.startDato shouldBe gjennomforingMessage.startDato
+				gjennomforing.sluttDato shouldBe gjennomforingMessage.sluttDato
+				gjennomforing.tiltakId shouldBe gjennomforingMessage.tiltakId
 
 				gjennomforing.opprettetAar shouldBe gjennomforingArenaData.opprettetAar
 				gjennomforing.lopenr shouldBe gjennomforingArenaData.lopenr
 				gjennomforing.status shouldBe Gjennomforing.Status.GJENNOMFORES
 
-				val tiltak = tiltakRepository.getAll().find { it.id == payload.tiltakId }!!
-				tiltak.navn shouldBe payload.tiltakNavn
-				tiltak.type shouldBe payload.tiltakArenaKode
+				val tiltak = tiltakRepository.getAll().find { it.id == gjennomforingMessage.tiltakId }!!
+				tiltak.navn shouldBe gjennomforingMessage.tiltakNavn
+				tiltak.type shouldBe gjennomforingMessage.tiltakArenaKode
 
 				val arrangor = arrangorService.getArrangorById(gjennomforing.arrangorId)
 				arrangor.organisasjonsnummer shouldBe virksomhetsnummer
@@ -112,13 +112,13 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 	@Test
 	internal fun `skal ikke inserte gjennomforing uten virksomhetsnummer`() {
 
-		mockMulighetsrommetApiServer.gjennomforingArenaData(payload.id, gjennomforingArenaData.copy(virksomhetsnummer = null))
+		mockMulighetsrommetApiServer.gjennomforingArenaData(gjennomforingMessage.id, gjennomforingArenaData.copy(virksomhetsnummer = null))
 
 		kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(jsonObjekt)
 
 		AsyncUtils.eventually {
 			mockMulighetsrommetApiServer.requestCount() shouldBe 1
-			gjennomforingRepository.get(payload.id) shouldBe null
+			gjennomforingRepository.get(gjennomforingMessage.id) shouldBe null
 		}
 	}
 
@@ -136,7 +136,7 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 
 	@Test
 	internal fun `mottar gjennomforing som ikke er stottet - skal ikke inserte gjennomføring`() {
-		val payloadIkkeStottet = payload.copy(
+		val gjennomforingMessageIkkeStottet = gjennomforingMessage.copy(
 			tiltakId = UUID.randomUUID(),
 			tiltakNavn = "Individuell jobbstotte 1",
 			tiltakArenaKode = "INDJOBSTOT",
@@ -144,10 +144,10 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 		)
 
 		LogUtils.withLogs { getLogs ->
-			kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(KafkaMessageCreator.opprettGjennomforingMessage(payloadIkkeStottet))
+			kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(KafkaMessageCreator.opprettGjennomforingMessage(gjennomforingMessageIkkeStottet))
 
 			AsyncUtils.eventually {
-				getLogs().any { it.message == "Lagrer ikke gjennomføring med id ${payloadIkkeStottet.id} og tiltakstype INDJOBSTOT fordi tiltaket ikke er støttet." } shouldBe true
+				getLogs().any { it.message == "Lagrer ikke gjennomføring med id ${gjennomforingMessageIkkeStottet.id} og tiltakstype INDJOBSTOT fordi tiltaket ikke er støttet." } shouldBe true
 			}
 		}
 

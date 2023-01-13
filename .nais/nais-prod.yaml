@@ -86,6 +86,10 @@ spec:
       value: https://nom-api.intern.nav.no
     - name: NOM_MOCK
       value: "false"
+    - name: NORG_URL
+      value: https://norg2.prod-fss-pub.nais.io
+    - name: VEILARBARENA_URL
+      value: https://veilarbarena.prod-fss-pub.nais.io
     - name: VEILARBARENA_SCOPE
       value: api://prod-fss.pto.veilarbarena/.default
     - name: VEILARBOPPFOLGING_SCOPE
@@ -96,10 +100,6 @@ spec:
       value: api://prod-gcp.team-rocket.digdir-krr-proxy/.default
     - name: DIGDIR_KRR_PROXY_URL
       value: https://digdir-krr-proxy.intern.nav.no
-    - name: POAO_GCP_PROXY_SCOPE
-      value: api://prod-fss.pto.poao-gcp-proxy/.default
-    - name: POAO_GCP_PROXY_URL
-      value: https://poao-gcp-proxy.prod-fss-pub.nais.io
     - name: POAO_TILGANG_URL
       value: http://poao-tilgang.poao.svc.cluster.local
     - name: POAO_TILGANG_SCOPE

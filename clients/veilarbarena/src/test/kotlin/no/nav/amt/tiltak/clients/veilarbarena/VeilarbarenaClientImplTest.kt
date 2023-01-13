@@ -17,8 +17,7 @@ class VeilarbarenaClientImplTest : FunSpec({
 	test("hentBrukerOppfolgingsenhetId skal lage riktig request og parse respons") {
 		val client = VeilarbarenaClientImpl(
 			baseUrl = serverUrl,
-			proxyTokenProvider = { "PROXY_TOKEN" },
-			veilarbarenaTokenProvider = { "VEILARBARENA_TOKEN" },
+			tokenProvider = { "VEILARBARENA_TOKEN" },
 		)
 
 		server.enqueue(
@@ -41,18 +40,16 @@ class VeilarbarenaClientImplTest : FunSpec({
 
 		val request = server.takeRequest()
 
-		request.path shouldBe "/api/arena/status?fnr=987654"
+		request.path shouldBe "/veilarbarena/api/arena/status?fnr=987654"
 		request.method shouldBe "GET"
-		request.getHeader("Authorization") shouldBe "Bearer PROXY_TOKEN"
-		request.getHeader("Downstream-Authorization") shouldBe "Bearer VEILARBARENA_TOKEN"
+		request.getHeader("Authorization") shouldBe "Bearer VEILARBARENA_TOKEN"
 		request.getHeader("Nav-Consumer-Id") shouldBe "amt-tiltak"
 	}
 
 	test("hentBrukerOppfolgingsenhetId skal returnere null hvis veilarbarena returnerer 404") {
 		val client = VeilarbarenaClientImpl(
 			baseUrl = serverUrl,
-			proxyTokenProvider = { "PROXY_TOKEN" },
-			veilarbarenaTokenProvider = { "VEILARBARENA_TOKEN" },
+			tokenProvider = { "VEILARBARENA_TOKEN" },
 		)
 
 		server.enqueue(MockResponse().setResponseCode(404))

@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
+import no.nav.amt.tiltak.test.integration.mocks.MockPdlBruker
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
 import okhttp3.Request
 import org.junit.jupiter.api.BeforeEach
@@ -44,7 +45,7 @@ class AnsattControllerIntegrationTest : IntegrationTestBase() {
 		val ident = "012345678912"
 
 		mockAmtAltinnAclHttpServer.addRoller(ident, mockAmtAltinnAclHttpServer.createRollerForSingleOrg(ARRANGOR_1.organisasjonsnummer, listOf("KOORDINATOR")))
-		mockPdlHttpServer.addPdlBruker(ident, "Integrasjon", "Test")
+		mockPdlHttpServer.mockHentBruker(ident, MockPdlBruker("Integrasjon", "Test"))
 
 		val response = sendRequest(
 			method = "GET",

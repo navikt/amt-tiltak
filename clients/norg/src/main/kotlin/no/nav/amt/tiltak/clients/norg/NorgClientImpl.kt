@@ -4,18 +4,15 @@ import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.common.rest.client.RestClient.baseClient
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.util.function.Supplier
 
 class NorgClientImpl(
 	private val url: String,
-	private val tokenProvider: Supplier<String>,
 	private val httpClient: OkHttpClient = baseClient(),
 ) : NorgClient {
 
 	override fun hentNavEnhet(enhetId: String): NorgNavEnhet? {
 		val request = Request.Builder()
-			.url("$url/api/v1/enhet/$enhetId")
-			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
+			.url("$url/norg2/api/v1/enhet/$enhetId")
 			.get()
 			.build()
 
@@ -37,8 +34,7 @@ class NorgClientImpl(
 
 	override fun hentAlleNavEnheter(): List<NorgNavEnhet> {
 		val request = Request.Builder()
-			.url("$url/api/v1/enhet/")
-			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
+			.url("$url/norg2/api/v1/enhet/")
 			.get()
 			.build()
 

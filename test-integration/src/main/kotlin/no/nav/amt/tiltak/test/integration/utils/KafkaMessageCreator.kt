@@ -4,51 +4,46 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZonedDateTime
 import java.util.*
 
 object KafkaMessageCreator {
-	fun opprettAmtTiltakDeltakerMessage(
-		operation: String = "CREATED",
-		payload: DeltakerMessagePayload,
-
-	): String {
+	fun opprettAmtTiltakDeltakerMessage(msg: DeltakerMessage): String {
 		return """
 			{
 			  "transactionId": "${UUID.randomUUID()}",
 			  "type": "DELTAKER",
-			  "timestamp": "${ZonedDateTime.now()}",
-			  "operation": $operation,
+			  "timestamp": "${LocalDateTime.now()}",
+			  "operation": "${msg.operation}",
 			  "payload": {
-			    "id": "${payload.id}",
-			    "gjennomforingId": "${payload.gjennomforingId}",
-			    "personIdent": "${payload.personIdent}",
-				"startDato": ${nullableStringJsonValue(payload.startDato.toString())},
-				"sluttDato": ${nullableStringJsonValue(payload.sluttDato.toString())},
-			    "status": "${payload.status.name}",
-				"statusAarsak": ${nullableStringJsonValue(payload.statusAarsak?.name)}
-			    "dagerPerUke": ${payload.dagerPerUke},
-			    "prosentDeltid": ${payload.prosentDeltid},
-			    "registrertDato": "${payload.registrertDato}",
-				"statusEndretDato": ${nullableStringJsonValue(payload.statusEndretDato.toString())},
-				"innsokBegrunnelse": ${nullableStringJsonValue(payload.innsokBegrunnelse)}
+			    "id": "${msg.id}",
+			    "gjennomforingId": "${msg.gjennomforingId}",
+			    "personIdent": "${msg.personIdent}",
+				"startDato": ${nullableStringJsonValue(msg.startDato.toString())},
+				"sluttDato": ${nullableStringJsonValue(msg.sluttDato.toString())},
+			    "status": "${msg.status.name}",
+				"statusAarsak": ${nullableStringJsonValue(msg.statusAarsak?.name)},
+			    "dagerPerUke": ${msg.dagerPerUke},
+			    "prosentDeltid": ${msg.prosentDeltid},
+			    "registrertDato": "${msg.registrertDato}",
+				"statusEndretDato": ${nullableStringJsonValue(msg.statusEndretDato.toString())},
+				"innsokBegrunnelse": ${nullableStringJsonValue(msg.innsokBegrunnelse)}
 			  }
 			}
 		""".trimIndent()
 	}
 
-	fun opprettGjennomforingMessage(payload: GjennomforingMessagePayload): String {
+	fun opprettGjennomforingMessage(msg: GjennomforingMessage): String {
 		return """
 			{
-				"id": "${payload.id}",
+				"id": "${msg.id}",
 				"tiltakstype": {
-					"id": "${payload.tiltakId}",
-					"navn": "${payload.tiltakNavn}",
-					"arenaKode": "${payload.tiltakArenaKode}"
+					"id": "${msg.tiltakId}",
+					"navn": "${msg.tiltakNavn}",
+					"arenaKode": "${msg.tiltakArenaKode}"
 				},
-				"navn": "${payload.navn}",
-				"startDato": ${nullableStringJsonValue(payload.startDato?.toString())},
-				"sluttDato": ${nullableStringJsonValue(payload.sluttDato?.toString())}
+				"navn": "${msg.navn}",
+				"startDato": ${nullableStringJsonValue(msg.startDato?.toString())},
+				"sluttDato": ${nullableStringJsonValue(msg.sluttDato?.toString())}
 			}
 		""".trimIndent()
 
@@ -63,7 +58,7 @@ object KafkaMessageCreator {
 	}
 }
 
-data class GjennomforingMessagePayload (
+data class GjennomforingMessage (
 	val id: UUID = UUID.randomUUID(),
 	val tiltakId: UUID = UUID.randomUUID(),
 	val tiltakNavn: String = "Oppfølging",
@@ -73,9 +68,10 @@ data class GjennomforingMessagePayload (
 	val sluttDato: LocalDate? = LocalDate.now().plusMonths(12),
 )
 
-data class DeltakerMessagePayload (
+data class DeltakerMessage (
+	val operation: String = "CREATED",
 	val id: UUID = UUID.randomUUID(),
-	val personIdent: String = "1234",
+	val personIdent: String = "42",
 	val startDato: LocalDate? = LocalDate.now().plusWeeks(2),
 	val sluttDato: LocalDate? = LocalDate.now().plusMonths(6),
 	val gjennomforingId: UUID = UUID.randomUUID(),
