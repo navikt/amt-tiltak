@@ -4,11 +4,9 @@ import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonNode
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
-import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.GjennomforingPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.UnknownMessageWrapper
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.DeltakerProcessor
-import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.GjennomforingProcessor
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.stereotype.Service
@@ -17,7 +15,6 @@ import java.util.*
 @Service
 class ArenaAclIngestorImpl(
 	private val deltakerProcessor: DeltakerProcessor,
-	private val gjennomforingProcessor: GjennomforingProcessor
 ) : ArenaAclIngestor {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -32,15 +29,8 @@ class ArenaAclIngestorImpl(
 					val deltakerMessage = toKnownMessageWrapper(deltakerPayload, unknownMessageWrapper)
 					deltakerProcessor.processMessage(deltakerMessage)
 				}
-				"GJENNOMFORING" -> {
-					val gjennomforingPayload = fromJsonNode<GjennomforingPayload>(unknownMessageWrapper.payload)
-					val gjennomforingMessage = toKnownMessageWrapper(gjennomforingPayload, unknownMessageWrapper)
-
-					if (listOf("dev-gcp", "prod-gcp").contains(System.getenv()["NAIS_CLUSTER_NAME"])) {
-						log.info("Hoppet over gjennomføring med id ${gjennomforingMessage.payload.id}")
-					} else {
-						gjennomforingProcessor.processMessage(gjennomforingMessage)
-					}
+				else -> {
+					throw IllegalArgumentException("Ukjent meldingtype ${unknownMessageWrapper.type}")
 				}
 			}
 		}

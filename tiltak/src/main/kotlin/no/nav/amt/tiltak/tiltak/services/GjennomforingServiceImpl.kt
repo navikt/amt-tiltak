@@ -48,7 +48,6 @@ class GjennomforingServiceImpl(
 			navEnhetId = gjennomforing.navEnhetId,
 			opprettetAar = gjennomforing.opprettetAar,
 			lopenr = gjennomforing.lopenr,
-			deprecated = gjennomforing.deprecated,
 		).toGjennomforing(tiltak, arrangor)
 	}
 

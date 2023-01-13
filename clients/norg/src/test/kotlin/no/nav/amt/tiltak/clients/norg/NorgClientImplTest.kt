@@ -17,7 +17,6 @@ class NorgClientImplTest : FunSpec({
 	test("hentNavEnhetNavn skal lage riktig request og parse respons") {
 		val client = NorgClientImpl(
 			url = serverUrl,
-			tokenProvider = { "TOKEN" },
 		)
 
 		server.enqueue(
@@ -53,8 +52,7 @@ class NorgClientImplTest : FunSpec({
 
 		val request = server.takeRequest()
 
-		request.path shouldBe "/api/v1/enhet/1234"
-		request.getHeader("Authorization") shouldBe "Bearer TOKEN"
+		request.path shouldBe "/norg2/api/v1/enhet/1234"
 	}
 
 })

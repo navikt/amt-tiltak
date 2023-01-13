@@ -6,7 +6,7 @@ import okhttp3.mockwebserver.MockResponse
 
 class MockNorgHttpServer : MockHttpServer(name = "MockNorgHttpServer") {
 
-	private val baseUrl = "/proxy/norg2/api/v1/enhet"
+	private val baseUrl = "/norg2/api/v1/enhet"
 
 	private val allResponses = mutableListOf<String>()
 

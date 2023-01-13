@@ -74,7 +74,6 @@ class GjennomforingIngestorImpl(
 				navEnhetId = navEnhet?.id,
 				lopenr = arenaData.lopenr,
 				opprettetAar = arenaData.opprettetAar,
-				deprecated = false,
 			)
 		)
 

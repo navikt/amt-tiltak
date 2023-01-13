@@ -57,6 +57,9 @@ abstract class IntegrationTestBase {
 		val mockPdlHttpServer = MockPdlHttpServer()
 		val mockMachineToMachineHttpServer = MockMachineToMachineHttpServer()
 		val mockMulighetsrommetApiServer = MockMulighetsrommetApiServer()
+		val mockVeilarboppfolgingHttpServer = MockVeilarboppfolgingHttpServer()
+		val mockVeilarbarenaHttpServer = MockVeilarbarenaHttpServer()
+		val mockDkifHttpServer = MockDkifHttpServer()
 
 		@JvmStatic
 		@DynamicPropertySource
@@ -68,11 +71,17 @@ abstract class IntegrationTestBase {
 			registry.add("no.nav.security.jwt.issuer.tokenx.discovery-url") { mockOAuthServer.getDiscoveryUrl("tokenx") }
 			registry.add("no.nav.security.jwt.issuer.tokenx.accepted-audience") { "test-aud" }
 
-			registry.add("digdir-krr-proxy.url") { "TODO" }
+			mockDkifHttpServer.start()
+			registry.add("digdir-krr-proxy.url") { mockDkifHttpServer.serverUrl() }
 			registry.add("digdir-krr-proxy.scope") { "test.digdir-krr-proxy" }
 
-			registry.add("veilarboppfolging.url") { "TODO" }
+			mockVeilarboppfolgingHttpServer.start()
+			registry.add("veilarboppfolging.url") { mockVeilarboppfolgingHttpServer.serverUrl() }
 			registry.add("veilarboppfolging.scope") { "test.veilarboppfolging" }
+
+			mockVeilarbarenaHttpServer.start()
+			registry.add("veilarbarena.url") { mockVeilarbarenaHttpServer.serverUrl() }
+			registry.add("veilarbarena.scope") { "test.veilarbarena" }
 
 			mockMulighetsrommetApiServer.start()
 			registry.add("mulighetsrommet-api.url") { mockMulighetsrommetApiServer.serverUrl() }
@@ -83,8 +92,7 @@ abstract class IntegrationTestBase {
 			registry.add("amt-enhetsregister.scope") { "test.amt-enhetsregister" }
 
 			mockNorgHttpServer.start()
-			registry.add("poao-gcp-proxy.url") { mockNorgHttpServer.serverUrl() }
-			registry.add("poao-gcp-proxy.scope") { "test.poao-gcp-proxy" }
+			registry.add("norg.url") { mockNorgHttpServer.serverUrl() }
 
 			mockPoaoTilgangHttpServer.start()
 			registry.add("poao-tilgang.url") { mockPoaoTilgangHttpServer.serverUrl() }
@@ -116,8 +124,6 @@ abstract class IntegrationTestBase {
 			registry.add("spring.datasource.username") { container.username }
 			registry.add("spring.datasource.password") { container.password }
 			registry.add("spring.datasource.hikari.maximum-pool-size") { 3 }
-
-
 		}
 	}
 
@@ -134,6 +140,9 @@ abstract class IntegrationTestBase {
 		mockAmtAltinnAclHttpServer.reset()
 		mockPdlHttpServer.reset()
 		mockMulighetsrommetApiServer.reset()
+		mockVeilarboppfolgingHttpServer.resetHttpServer()
+		mockVeilarbarenaHttpServer.resetHttpServer()
+		mockDkifHttpServer.resetHttpServer()
 	}
 
 	fun resetMockServersAndAddDefaultData() {

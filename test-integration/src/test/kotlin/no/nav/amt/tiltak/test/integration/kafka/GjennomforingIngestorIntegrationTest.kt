@@ -11,17 +11,18 @@ import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.utils.AsyncUtils
+import no.nav.amt.tiltak.test.integration.utils.GjennomforingMessage
+import no.nav.amt.tiltak.test.integration.utils.KafkaMessageCreator
 import no.nav.amt.tiltak.test.integration.utils.LogUtils
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDate
 import java.util.*
 
 
-class GjennomforingIngestorTest : IntegrationTestBase() {
+class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 
 	@Autowired
 	lateinit var gjennomforingRepository: GjennomforingRepository
@@ -41,16 +42,6 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 		resetMockServersAndAddDefaultData()
 	}
 
-
-	val id = UUID.randomUUID()
-	val navn = "Oppfølging Gjennomføring"
-	val startDato = "2022-12-19"
-	val sluttDato = "2023-12-19"
-
-	val tiltakId = UUID.randomUUID()
-	val tiltaksNavn = "Tiltaks navn"
-	val arenaKode = "INDOPPFAG"
-
 	val arrangorNavn = "Arrangor"
 	val overordnetEnhetNavn = "Arrangor Org"
 	val overordnetEnhetOrgNr = "888666555"
@@ -67,25 +58,14 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 		status = "GJENNOMFOR",
 	)
 
-	val jsonObjekt = """
-			{
-				"id": "$id",
-				"tiltakstype": {
-					"id": "$tiltakId",
-					"navn": "$tiltaksNavn",
-					"arenaKode": "$arenaKode"
-				},
-				"navn": "$navn",
-				"startDato": "$startDato",
-				"sluttDato": "$sluttDato"
-			}
-		""".trimIndent()
+	val gjennomforingMessage = GjennomforingMessage()
+	val jsonObjekt = KafkaMessageCreator.opprettGjennomforingMessage(gjennomforingMessage)
 
 
 	@Test
 	internal fun `skal inserte gjennomforing`() {
 
-		mockMulighetsrommetApiServer.gjennomforingArenaData(id, gjennomforingArenaData)
+		mockMulighetsrommetApiServer.gjennomforingArenaData(gjennomforingMessage.id, gjennomforingArenaData)
 
 		mockEnhetsregisterServer.addEnhet(EnhetDto(
 			organisasjonsnummer = virksomhetsnummer,
@@ -99,25 +79,24 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 		kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(jsonObjekt)
 
 		AsyncUtils.eventually {
-				val maybeGjennomforing = gjennomforingRepository.get(id)
+				val maybeGjennomforing = gjennomforingRepository.get(gjennomforingMessage.id)
 				maybeGjennomforing shouldNotBe null
 
 				val gjennomforing = maybeGjennomforing!!
 
-				gjennomforing.id shouldBe id
-				gjennomforing.navn shouldBe navn
-				gjennomforing.startDato shouldBe LocalDate.parse(startDato)
-				gjennomforing.sluttDato shouldBe LocalDate.parse(sluttDato)
-				gjennomforing.deprecated shouldBe false
-				gjennomforing.tiltakId shouldBe tiltakId
+				gjennomforing.id shouldBe gjennomforingMessage.id
+				gjennomforing.navn shouldBe gjennomforingMessage.navn
+				gjennomforing.startDato shouldBe gjennomforingMessage.startDato
+				gjennomforing.sluttDato shouldBe gjennomforingMessage.sluttDato
+				gjennomforing.tiltakId shouldBe gjennomforingMessage.tiltakId
 
 				gjennomforing.opprettetAar shouldBe gjennomforingArenaData.opprettetAar
 				gjennomforing.lopenr shouldBe gjennomforingArenaData.lopenr
 				gjennomforing.status shouldBe Gjennomforing.Status.GJENNOMFORES
 
-				val tiltak = tiltakRepository.getAll().find { it.id == tiltakId }!!
-				tiltak.navn shouldBe tiltaksNavn
-				tiltak.type shouldBe arenaKode
+				val tiltak = tiltakRepository.getAll().find { it.id == gjennomforingMessage.tiltakId }!!
+				tiltak.navn shouldBe gjennomforingMessage.tiltakNavn
+				tiltak.type shouldBe gjennomforingMessage.tiltakArenaKode
 
 				val arrangor = arrangorService.getArrangorById(gjennomforing.arrangorId)
 				arrangor.organisasjonsnummer shouldBe virksomhetsnummer
@@ -133,13 +112,13 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 	@Test
 	internal fun `skal ikke inserte gjennomforing uten virksomhetsnummer`() {
 
-		mockMulighetsrommetApiServer.gjennomforingArenaData(id, gjennomforingArenaData.copy(virksomhetsnummer = null))
+		mockMulighetsrommetApiServer.gjennomforingArenaData(gjennomforingMessage.id, gjennomforingArenaData.copy(virksomhetsnummer = null))
 
 		kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(jsonObjekt)
 
 		AsyncUtils.eventually {
 			mockMulighetsrommetApiServer.requestCount() shouldBe 1
-			gjennomforingRepository.get(id) shouldBe null
+			gjennomforingRepository.get(gjennomforingMessage.id) shouldBe null
 		}
 	}
 
@@ -157,27 +136,18 @@ class GjennomforingIngestorTest : IntegrationTestBase() {
 
 	@Test
 	internal fun `mottar gjennomforing som ikke er stottet - skal ikke inserte gjennomføring`() {
-		val jsonObjektIkkeStottet = """
-			{
-				"id": "$id",
-				"tiltakstype": {
-					"id": "${UUID.randomUUID()}",
-					"navn": "Individuell jobbstotte 1",
-					"arenaKode": "INDJOBSTOT"
-				},
-				"navn": "Individuell jobbstotte 1",
-				"startDato": "$startDato",
-				"sluttDato": "$sluttDato"
-			}
-		""".trimIndent()
-
-
+		val gjennomforingMessageIkkeStottet = gjennomforingMessage.copy(
+			tiltakId = UUID.randomUUID(),
+			tiltakNavn = "Individuell jobbstotte 1",
+			tiltakArenaKode = "INDJOBSTOT",
+			navn = "Individuell jobbstotte 1",
+		)
 
 		LogUtils.withLogs { getLogs ->
-			kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(jsonObjektIkkeStottet)
+			kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(KafkaMessageCreator.opprettGjennomforingMessage(gjennomforingMessageIkkeStottet))
 
 			AsyncUtils.eventually {
-				getLogs().any { it.message == "Lagrer ikke gjennomføring med id $id og tiltakstype INDJOBSTOT fordi tiltaket ikke er støttet." } shouldBe true
+				getLogs().any { it.message == "Lagrer ikke gjennomføring med id ${gjennomforingMessageIkkeStottet.id} og tiltakstype INDJOBSTOT fordi tiltaket ikke er støttet." } shouldBe true
 			}
 		}
 
