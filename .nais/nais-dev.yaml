@@ -39,6 +39,8 @@ spec:
           - "NAVident"
         groups:
           - id: {{ad_gruppe_egne_ansatte}}
+          - id: {{ad_gruppe_tiltak_ansvarlig}}
+          - id: {{ad_gruppe_endringsmelding}}
   tokenx:
     enabled: true
   accessPolicy:
@@ -67,6 +69,10 @@ spec:
   env:
     - name: AD_GRUPPE_ID_TILGANG_TIL_EGNE_ANSATTE
       value: {{ad_gruppe_egne_ansatte}}
+    - name: AD_GRUPPE_ID_TILTAK_ANSVARLIG
+      value: {{ad_gruppe_tiltak_ansvarlig}}
+    - name: AD_GRUPPE_ID_ENDRINGSMELDING
+      value: {{ad_gruppe_endringsmelding}}
     - name: PDL_SCOPE
       value: api://dev-fss.pdl.pdl-api/.default
     - name: PDL_URL

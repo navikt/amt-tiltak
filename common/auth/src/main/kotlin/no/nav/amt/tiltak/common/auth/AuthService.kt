@@ -15,6 +15,12 @@ open class AuthService(
 	@Value("\${ad_gruppe_tilgang_til_egne_ansatte}")
 	lateinit var tilgangTilNavAnsattGroupId: String
 
+	@Value("\${ad_gruppe_tiltak_ansvarlig}")
+	lateinit var tiltakAnsvarligGroupId: String
+
+	@Value("\${ad_gruppe_endringsmelding}")
+	lateinit var endringsmeldingGroupId: String
+
 	open fun hentPersonligIdentTilInnloggetBruker(): String {
 		val context = tokenValidationContextHolder.tokenValidationContext
 
@@ -35,11 +41,11 @@ open class AuthService(
 		?.toString()
 		?: throw NotAuthenticatedException("NAV ident is missing")
 
-	open fun harTilgangTilSkjermedePersoner(): Boolean = tokenValidationContextHolder
-		.tokenValidationContext
-		.getClaims(Issuer.AZURE_AD)
-		.getAsList("groups")
-		.let { groups -> groups.any { it == tilgangTilNavAnsattGroupId } }
+	open fun harTilgangTilSkjermedePersoner() = harTilgangTilADGruppe(tilgangTilNavAnsattGroupId)
+
+	open fun harTilgangTilTiltaksansvarligflate() = harTilgangTilADGruppe(tiltakAnsvarligGroupId)
+
+	open fun harTilgangTilEndringsmeldinger() = harTilgangTilADGruppe(endringsmeldingGroupId)
 
 	open fun hentAzureIdTilInnloggetBruker(): UUID = tokenValidationContextHolder
 		.tokenValidationContext
@@ -49,5 +55,32 @@ open class AuthService(
 			HttpStatus.UNAUTHORIZED,
 			"oid is missing"
 		)
+
+	fun hentAdGrupperTilInnloggetBruker(): List<AdGruppe> = tokenValidationContextHolder
+		.tokenValidationContext
+		.getClaims(Issuer.AZURE_AD)
+		.getAsList("groups")
+		.mapNotNull(this::mapIdTilAdGruppe)
+
+	private fun harTilgangTilADGruppe(id: String): Boolean = tokenValidationContextHolder
+		.tokenValidationContext
+		.getClaims(Issuer.AZURE_AD)
+		.getAsList("groups")
+		.let { groups -> groups.any { it == id }}
+
+	private fun mapIdTilAdGruppe(id: String?): AdGruppe? {
+		return when(id) {
+			tiltakAnsvarligGroupId -> AdGruppe.TILTAKSANSVARLIG_FLATE_GRUPPE
+			endringsmeldingGroupId -> AdGruppe.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
+			tilgangTilNavAnsattGroupId -> AdGruppe.TILTAKSANSVARLIG_EGNE_ANSATTE_GRUPPE
+			else -> null
+		}
+	}
+
+	enum class AdGruppe {
+		TILTAKSANSVARLIG_FLATE_GRUPPE,
+		TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE,
+		TILTAKSANSVARLIG_EGNE_ANSATTE_GRUPPE,
+	}
 
 }

@@ -5,7 +5,6 @@ import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testNavAnsattAutentisering
-import no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig.ad_gruppe.AdGrupper
 import okhttp3.Request
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -32,14 +31,14 @@ class AutentiseringControllerIntegrationTest : IntegrationTestBase() {
 	fun `meg() - skal returnere 200 med korrekt response`() {
 		val oid = UUID.randomUUID()
 
-		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
-			navAnsattAzureId = oid,
-			name = AdGrupper.TILTAKSANSVARLIG_FLATE_GRUPPE
-		)
-
 		val token = mockOAuthServer.issueAzureAdToken(
 			ident = TestData.NAV_ANSATT_1.navIdent,
-			oid = oid
+			oid = oid,
+			adGroupIds = arrayOf(
+				mockOAuthServer.tilgangTilNavAnsattGroupId,
+				mockOAuthServer.tiltakAnsvarligGroupId,
+				mockOAuthServer.endringsmeldingGroupId,
+			)
 		)
 
 		val response = sendRequest(
@@ -49,7 +48,32 @@ class AutentiseringControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-			{"navIdent":"Z4321","navn":"Vashnir Veiledersen","tilganger":["FLATE"]}
+			{"navIdent":"Z4321","navn":"Vashnir Veiledersen","tilganger":["EGNE_ANSATTE","FLATE","ENDRINGSMELDING"]}
+		""".trimIndent()
+
+		response.code shouldBe 200
+		response.body?.string() shouldBe expectedJson
+
+	}
+
+	@Test
+	fun `meg() - skal returnere 200 med korrekt response uten tilganger`() {
+		val oid = UUID.randomUUID()
+
+		val token = mockOAuthServer.issueAzureAdToken(
+			ident = TestData.NAV_ANSATT_1.navIdent,
+			oid = oid,
+			adGroupIds = arrayOf("Ukjent AD-gruppe"),
+		)
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/nav-ansatt/autentisering/meg",
+			headers = mapOf("Authorization" to "Bearer $token"),
+		)
+
+		val expectedJson = """
+			{"navIdent":"Z4321","navn":"Vashnir Veiledersen","tilganger":[]}
 		""".trimIndent()
 
 		response.code shouldBe 200

@@ -10,7 +10,6 @@ import no.nav.amt.tiltak.test.database.data.inputs.NavAnsattInput
 import no.nav.amt.tiltak.test.database.data.inputs.TiltaksansvarligGjennomforingTilgangInput
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testNavAnsattAutentisering
-import no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig.ad_gruppe.AdGrupper
 import okhttp3.Request
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -57,12 +56,8 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 
 		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
-			oid = oid
-		)
-
-		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
-			navAnsattAzureId = oid,
-			name = "IngenNyttigGruppe"
+			oid = oid,
+			adGroupIds = emptyArray(),
 		)
 
 		val response = sendRequest(
@@ -99,12 +94,8 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 
 		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
-			oid = oid
-		)
-
-		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
-			navAnsattAzureId = oid,
-			name = "IngenNyttigGruppe"
+			oid = oid,
+			adGroupIds = emptyArray(),
 		)
 
 		val response = sendRequest(
@@ -151,12 +142,8 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 
 		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
-			oid = oid
-		)
-
-		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
-			navAnsattAzureId = oid,
-			name = "IngenNyttigGruppe"
+			oid = oid,
+			adGroupIds = emptyArray(),
 		)
 
 		val response = sendRequest(
@@ -183,16 +170,10 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 	private fun lagTokenMedAdGruppe(ansatt: NavAnsattInput): String {
 		val oid = UUID.randomUUID()
 
-		mockPoaoTilgangHttpServer.addHentAdGrupperResponse(
-			navAnsattAzureId = oid,
-			name = AdGrupper.TILTAKSANSVARLIG_FLATE_GRUPPE
-		)
-
-		val token = mockOAuthServer.issueAzureAdToken(
+		return mockOAuthServer.issueAzureAdToken(
 			ident = ansatt.navIdent,
 			oid = oid,
 		)
-		return token
 	}
 
 }
