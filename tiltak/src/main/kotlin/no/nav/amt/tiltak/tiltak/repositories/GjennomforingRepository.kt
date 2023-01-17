@@ -1,13 +1,13 @@
 package no.nav.amt.tiltak.tiltak.repositories
 
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.utils.getNullableUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
-import java.time.LocalDate
 import java.util.*
 
 @Component
@@ -30,18 +30,7 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 		)
 	}
 
-	fun insert(
-		id: UUID,
-		tiltakId: UUID,
-		arrangorId: UUID,
-		navn: String,
-		status: Gjennomforing.Status,
-		startDato: LocalDate?,
-		sluttDato: LocalDate?,
-		navEnhetId: UUID?,
-		opprettetAar: Int,
-		lopenr: Int,
-	): GjennomforingDbo {
+	fun insert(gjennomforing: GjennomforingUpsert): GjennomforingDbo {
 
 		//language=PostgreSQL
 		val sql = """
@@ -62,23 +51,23 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"id" to id,
-				"tiltakId" to tiltakId,
-				"arrangorId" to arrangorId,
-				"navn" to navn,
-				"status" to status.name,
-				"startDato" to startDato,
-				"sluttDato" to sluttDato,
-				"navEnhetId" to navEnhetId,
-				"opprettetAar" to opprettetAar,
-				"lopenr" to lopenr,
+				"id" to gjennomforing.id,
+				"tiltakId" to gjennomforing.tiltakId,
+				"arrangorId" to gjennomforing.arrangorId,
+				"navn" to gjennomforing.navn,
+				"status" to gjennomforing.status.name,
+				"startDato" to gjennomforing.startDato,
+				"sluttDato" to gjennomforing.sluttDato,
+				"navEnhetId" to gjennomforing.navEnhetId,
+				"opprettetAar" to gjennomforing.opprettetAar,
+				"lopenr" to gjennomforing.lopenr,
 			)
 		)
 
 		template.update(sql, parameters)
 
-		return get(id)
-			?: throw NoSuchElementException("Gjennomføring med id $id finnes ikke")
+		return get(gjennomforing.id)
+			?: throw NoSuchElementException("Gjennomføring med id ${gjennomforing.id} finnes ikke")
 	}
 
 	fun update(gjennomforing: GjennomforingDbo): GjennomforingDbo {

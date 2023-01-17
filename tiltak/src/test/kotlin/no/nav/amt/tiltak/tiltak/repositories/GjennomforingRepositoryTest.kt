@@ -7,6 +7,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.DbUtils.isEqualTo
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
@@ -49,16 +50,18 @@ internal class GjennomforingRepositoryTest : FunSpec({
 		val sluttDato = LocalDate.now().plusDays(10)
 
 		val savedGjennomforing = repository.insert(
-			id = id,
-			tiltakId = TILTAK_1.id,
-			arrangorId = ARRANGOR_1.id,
-			navn = navn,
-			status = status,
-			startDato = startDato,
-			sluttDato = sluttDato,
-			navEnhetId = NAV_ENHET_1.id,
-			opprettetAar = 2020,
-			lopenr = 123,
+			GjennomforingUpsert(
+				id = id,
+				tiltakId = TILTAK_1.id,
+				arrangorId = ARRANGOR_1.id,
+				navn = navn,
+				status = status,
+				startDato = startDato,
+				sluttDato = sluttDato,
+				navEnhetId = NAV_ENHET_1.id,
+				opprettetAar = 2020,
+				lopenr = 123,
+			)
 		)
 
 		assertNotNull(savedGjennomforing)

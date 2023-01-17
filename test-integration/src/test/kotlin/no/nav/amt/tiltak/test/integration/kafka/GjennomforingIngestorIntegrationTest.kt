@@ -42,19 +42,21 @@ class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 		resetMockServersAndAddDefaultData()
 	}
 
-	val arrangorNavn = "Arrangor"
-	val overordnetEnhetNavn = "Arrangor Org"
-	val overordnetEnhetOrgNr = "888666555"
-	val virksomhetsnummer = "999888777"
 
-	val navEnhetId = "9876"
 	val navEnhetNavn = "Nav Enhet"
+
+	val enhetsregisterEnhet = EnhetDto(
+		organisasjonsnummer = "999888777",
+		navn = "Arrangor",
+		overordnetEnhetNavn = "Arrangor Org",
+		overordnetEnhetOrganisasjonsnummer = "888666555",
+	)
 
 	val gjennomforingArenaData = GjennomforingArenaData(
 		opprettetAar = 2022,
 		lopenr = 123,
-		virksomhetsnummer = virksomhetsnummer,
-		ansvarligNavEnhetId = navEnhetId,
+		virksomhetsnummer = enhetsregisterEnhet.organisasjonsnummer,
+		ansvarligNavEnhetId = "58749854",
 		status = "GJENNOMFOR",
 	)
 
@@ -66,15 +68,8 @@ class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 	internal fun `skal inserte gjennomforing`() {
 
 		mockMulighetsrommetApiServer.gjennomforingArenaData(gjennomforingMessage.id, gjennomforingArenaData)
-
-		mockEnhetsregisterServer.addEnhet(EnhetDto(
-			organisasjonsnummer = virksomhetsnummer,
-			navn = arrangorNavn,
-			overordnetEnhetNavn = overordnetEnhetNavn,
-			overordnetEnhetOrganisasjonsnummer = overordnetEnhetOrgNr,
-		))
-
-		mockNorgHttpServer.addNavEnhet(navEnhetId, navEnhetNavn)
+		mockEnhetsregisterServer.addEnhet(enhetsregisterEnhet)
+		mockNorgHttpServer.addNavEnhet(gjennomforingArenaData.ansvarligNavEnhetId, navEnhetNavn)
 
 		kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(jsonObjekt)
 
@@ -99,13 +94,13 @@ class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 				tiltak.type shouldBe gjennomforingMessage.tiltakArenaKode
 
 				val arrangor = arrangorService.getArrangorById(gjennomforing.arrangorId)
-				arrangor.organisasjonsnummer shouldBe virksomhetsnummer
-				arrangor.navn shouldBe arrangorNavn
-				arrangor.overordnetEnhetNavn shouldBe overordnetEnhetNavn
-				arrangor.overordnetEnhetOrganisasjonsnummer shouldBe overordnetEnhetOrgNr
+				arrangor.organisasjonsnummer shouldBe enhetsregisterEnhet.organisasjonsnummer
+				arrangor.navn shouldBe enhetsregisterEnhet.navn
+				arrangor.overordnetEnhetNavn shouldBe enhetsregisterEnhet.overordnetEnhetNavn
+				arrangor.overordnetEnhetOrganisasjonsnummer shouldBe enhetsregisterEnhet.overordnetEnhetOrganisasjonsnummer
 
 				val navEnhet = navEnhetService.getNavEnhet(gjennomforing.navEnhetId!!)
-				navEnhet.enhetId shouldBe navEnhetId
+				navEnhet.enhetId shouldBe gjennomforingArenaData.ansvarligNavEnhetId
 				navEnhet.navn shouldBe navEnhetNavn
 			}
 		 }

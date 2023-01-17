@@ -71,7 +71,7 @@ data class GjennomforingMessage (
 data class DeltakerMessage (
 	val operation: String = "CREATED",
 	val id: UUID = UUID.randomUUID(),
-	val personIdent: String = "42",
+	val personIdent: String = (1..Long.MAX_VALUE).random().toString(),
 	val startDato: LocalDate? = LocalDate.now().plusWeeks(2),
 	val sluttDato: LocalDate? = LocalDate.now().plusMonths(6),
 	val gjennomforingId: UUID = UUID.randomUUID(),
