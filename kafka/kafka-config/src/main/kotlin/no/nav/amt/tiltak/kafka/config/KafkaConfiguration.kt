@@ -104,6 +104,7 @@ open class KafkaConfiguration(
 
 		consumerRecordProcessor = KafkaConsumerRecordProcessorBuilder
 			.builder()
+			.withRecordBatchSize(2000)
 			.withLockProvider(JdbcTemplateLockProvider(jdbcTemplate))
 			.withKafkaConsumerRepository(consumerRepository)
 			.withConsumerConfigs(topicConfigs.map { it.consumerConfig })
