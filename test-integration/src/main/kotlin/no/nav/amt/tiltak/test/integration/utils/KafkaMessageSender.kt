@@ -36,4 +36,9 @@ class KafkaMessageSender(
 	fun sendDeleteTilSisteTiltaksgjennomforingTopic(gjennomforingId: String) {
 		kafkaProducer.send(ProducerRecord(sisteTiltaksgjennomforingerTopic, gjennomforingId, null))
 	}
+
+	fun sendTilSkjermetPersonTopic(fnr: String, erSkjermet: Boolean) {
+		kafkaProducer.send(ProducerRecord(skjermedePersonerTopic, fnr, erSkjermet.toString()))
+	}
+
 }

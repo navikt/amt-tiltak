@@ -36,19 +36,7 @@ class GjennomforingServiceImpl(
 			return updateGjennomforing(storedGjennomforing, gjennomforing).toGjennomforing(tiltak, arrangor)
 		}
 
-
-		return gjennomforingRepository.insert(
-			id = gjennomforing.id,
-			tiltakId = gjennomforing.tiltakId,
-			arrangorId = gjennomforing.arrangorId,
-			navn = gjennomforing.navn,
-			status = gjennomforing.status,
-			startDato = gjennomforing.startDato,
-			sluttDato = gjennomforing.sluttDato,
-			navEnhetId = gjennomforing.navEnhetId,
-			opprettetAar = gjennomforing.opprettetAar,
-			lopenr = gjennomforing.lopenr,
-		).toGjennomforing(tiltak, arrangor)
+		return gjennomforingRepository.insert(gjennomforing).toGjennomforing(tiltak, arrangor)
 	}
 
 	private fun updateGjennomforing(
@@ -97,7 +85,7 @@ class GjennomforingServiceImpl(
 	override fun getGjennomforinger(gjennomforingIder: List<UUID>): List<Gjennomforing> {
 		return gjennomforingRepository
 			.get(gjennomforingIder)
-			.map{ getGjennomforing(it.id) }
+			.map { getGjennomforing(it.id) }
 	}
 
 	override fun getByArrangorId(arrangorId: UUID): List<Gjennomforing> {
@@ -113,7 +101,7 @@ class GjennomforingServiceImpl(
 			.map {
 				val (tiltak, arrangor) = getTiltakOgArrangor(it.tiltakId, it.arrangorId)
 				return@map it.toGjennomforing(tiltak, arrangor)
-		}
+			}
 	}
 
 	private fun getTiltakOgArrangor(tiltakId: UUID, arrangorId: UUID): Pair<Tiltak, Arrangor> {

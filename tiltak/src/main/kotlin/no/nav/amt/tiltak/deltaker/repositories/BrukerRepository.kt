@@ -34,7 +34,7 @@ open class BrukerRepository(
 
     fun upsert(bruker: BrukerUpsertDbo): BrukerDbo {
 		val sql = """
-			INSERT INTO bruker(id, person_ident, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_enhet_id)
+			INSERT INTO bruker(id, person_ident, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_enhet_id, er_skjermet)
 			VALUES (:id,
 					:personIdent,
 					:fornavn,
@@ -43,7 +43,8 @@ open class BrukerRepository(
 					:telefonnummer,
 					:epost,
 					:veileder_id,
-					:nav_enhet_id)
+					:nav_enhet_id,
+					:er_skjermet)
 			ON CONFLICT(person_ident) DO UPDATE SET
 			 	fornavn = :fornavn,
 				mellomnavn = :mellomnavn,
@@ -52,7 +53,8 @@ open class BrukerRepository(
 				epost = :epost,
 				ansvarlig_veileder_id = :veileder_id,
 				nav_enhet_id = :nav_enhet_id,
-				modified_at = CURRENT_TIMESTAMP
+				modified_at = CURRENT_TIMESTAMP,
+				er_skjermet = :er_skjermet
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
@@ -65,7 +67,8 @@ open class BrukerRepository(
                 "telefonnummer" to bruker.telefonnummer,
                 "epost" to bruker.epost,
                 "veileder_id" to bruker.ansvarligVeilederId,
-				"nav_enhet_id" to bruker.navEnhetId
+				"nav_enhet_id" to bruker.navEnhetId,
+				"er_skjermet" to bruker.erSkjermet
             )
         )
 
