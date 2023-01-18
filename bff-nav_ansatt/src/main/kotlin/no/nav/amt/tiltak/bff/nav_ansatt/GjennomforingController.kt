@@ -76,7 +76,7 @@ class GjennomforingController(
 
 		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navAnsattAzureId)
 
-		return gjennomforingService.getAktiveByLopenr(lopenr).map {
+		return gjennomforingService.getByLopenr(lopenr).map {
 			HentGjennomforingMedLopenrDto(
 				id = it.id,
 				navn = it.navn,

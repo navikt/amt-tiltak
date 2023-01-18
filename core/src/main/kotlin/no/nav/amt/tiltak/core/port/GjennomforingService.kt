@@ -14,6 +14,8 @@ interface GjennomforingService {
 
 	fun getAktiveByLopenr(lopenr: Int): List<Gjennomforing>
 
+	fun getByLopenr(lopenr: Int): List<Gjennomforing>
+
 	fun upsert(gjennomforing: GjennomforingUpsert): Gjennomforing
 
 	fun slettGjennomforing(gjennomforingId: UUID)

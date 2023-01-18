@@ -116,6 +116,14 @@ class GjennomforingServiceImpl(
 		}
 	}
 
+	override fun getByLopenr(lopenr: Int): List<Gjennomforing> {
+		return gjennomforingRepository.getByLopenr(lopenr)
+			.map {
+				val (tiltak, arrangor) = getTiltakOgArrangor(it.tiltakId, it.arrangorId)
+				return@map it.toGjennomforing(tiltak, arrangor)
+			}
+	}
+
 	private fun getTiltakOgArrangor(tiltakId: UUID, arrangorId: UUID): Pair<Tiltak, Arrangor> {
 		val tiltak = tiltakService.getTiltakById(tiltakId)
 		val arrangor = arrangorService.getArrangorById(arrangorId)
