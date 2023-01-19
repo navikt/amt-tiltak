@@ -5,13 +5,16 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.beInstanceOf
+import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
@@ -19,10 +22,14 @@ import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.test.database.data.inputs.DeltakerStatusInput
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
+import no.nav.security.token.support.core.api.ProtectedWithClaims
 import okhttp3.Request
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.skyscreamer.jsonassert.JSONAssert
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -32,9 +39,13 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	@Autowired
 	lateinit var endringsmeldingService: EndringsmeldingService
 
+	@Autowired
+	lateinit var deltakerService: DeltakerService
+
 	val dato = "2022-11-01"
 	val deltakerIkkeTilgang = DELTAKER_1.copy(id = UUID.randomUUID(), gjennomforingId = GJENNOMFORING_2.id)
 	val deltakerIkkeTilgangStatus = DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerIkkeTilgang.id )
+	val createAnsatt1AuthHeader = { mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}") }
 
 	@BeforeEach
 	fun setup() {
@@ -46,7 +57,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	internal fun `skal teste token autentisering`() {
-
 		val requestBuilders = listOf(
 			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/deltaker?gjennomforingId=${UUID.randomUUID()}"),
 			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}"),
@@ -64,11 +74,21 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = createAnsatt1AuthHeader()
 		)
 
 		response.code shouldBe 404
+	}
 
+	@Test
+	fun `hentTiltakDeltakerDetaljer() skal returnere 400 hvis deltaker er skjult`() {
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/deltaker/${opprettSkjultDeltaker()}",
+			headers = createAnsatt1AuthHeader()
+		)
+
+		response.code shouldBe 400
 	}
 
 	@Test
@@ -76,7 +96,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = createAnsatt1AuthHeader()
 		)
 
 		val expectedBody = """
@@ -93,7 +113,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_2.id}",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = createAnsatt1AuthHeader()
 		)
 
 		response.code shouldBe 403
@@ -104,7 +124,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = createAnsatt1AuthHeader()
 		)
 
 		val expectedJson = """
@@ -115,13 +135,35 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
+	internal fun `hentDeltakere - skal ikke vise deltakere som er skjulte`() {
+		val deltakerId = UUID.randomUUID()
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId, gjennomforingId = GJENNOMFORING_1.id))
+		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerId, status = "IKKE_AKTUELL"))
+
+		deltakerService.skjulDeltakerForTiltaksarrangor(deltakerId, ARRANGOR_ANSATT_1.id)
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
+			headers = createAnsatt1AuthHeader()
+		)
+
+		response.code shouldBe 200
+
+		val body = response.body?.string()
+
+		JsonPath.parse(body).read<Int>("$.length()") shouldBe 2
+		JsonPath.parse(body).read<List<String>>("$[*].id") shouldBe listOf(DELTAKER_1.id.toString(), DELTAKER_2.id.toString())
+	}
+
+	@Test
 	internal fun `hentDeltakere - returnere deltakere med aktive endringsmeldinger`() {
 		testDataRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
 		testDataRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_2)
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = createAnsatt1AuthHeader()
 		)
 
 		val expectedJson = """
@@ -151,7 +193,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = createAnsatt1AuthHeader()
 		)
 
 		val expectedJson = "[]"
@@ -179,7 +221,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = createAnsatt1AuthHeader()
 		)
 
 		response.code shouldBe 200
@@ -191,7 +233,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/oppstartsdato",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = createAnsatt1AuthHeader(),
 			body = """{"oppstartsdato": "$dato"}""".toJsonRequestBody()
 		)
 
@@ -207,11 +249,23 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
+	fun `endreOppstartsdato() skal returnere 400 hvis deltaker er skjult`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${opprettSkjultDeltaker()}/oppstartsdato",
+			headers = createAnsatt1AuthHeader(),
+			body = """{"oppstartsdato": "$dato"}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 400
+	}
+
+	@Test
 	fun `endreOppstartsdato() skal returnere 403 hvis ikke tilgang`() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/oppstartsdato",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = createAnsatt1AuthHeader(),
 			body = """{"oppstartsdato": "$dato"}""".toJsonRequestBody()
 		)
 
@@ -225,7 +279,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/deltakelse-prosent",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = createAnsatt1AuthHeader(),
 			body = """{"deltakelseProsent": $deltakelseProsent}""".toJsonRequestBody()
 		)
 
@@ -242,11 +296,23 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
+	fun `endreDeltakelsesprosent skal returnere 400 hvis deltaker er skjult`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${opprettSkjultDeltaker()}/deltakelse-prosent",
+			headers = createAnsatt1AuthHeader(),
+			body = """{"deltakelseProsent": 12}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 400
+	}
+
+	@Test
 	fun `avsluttDeltakelse() skal returnere 200 og opprette endringsmelding`() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/avslutt-deltakelse",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = createAnsatt1AuthHeader(),
 			body = """{"sluttdato": "$dato", "aarsak": {"type": "FATT_JOBB"} }""".toJsonRequestBody()
 		)
 
@@ -263,11 +329,23 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
+	fun `avsluttDeltakelse skal returnere 400 hvis deltaker er skjult`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${opprettSkjultDeltaker()}/avslutt-deltakelse",
+			headers = createAnsatt1AuthHeader(),
+			body = """{"sluttdato": "$dato", "aarsak": {"type": "FATT_JOBB"} }""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 400
+	}
+
+	@Test
 	fun `avsluttDeltakelse() skal returnere 403 hvis ikke tilgang`() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/avslutt-deltakelse",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = createAnsatt1AuthHeader(),
 			body = """{"sluttdato": "$dato", "aarsak": {"type": "FATT_JOBB"}}""".toJsonRequestBody()
 		)
 
@@ -278,7 +356,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/forleng-deltakelse",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = createAnsatt1AuthHeader(),
 			body = """{"sluttdato": "$dato"}""".toJsonRequestBody()
 		)
 
@@ -294,11 +372,23 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
+	fun `forlengDeltakelse skal returnere 400 hvis deltaker er skjult`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${opprettSkjultDeltaker()}/forleng-deltakelse",
+			headers = createAnsatt1AuthHeader(),
+			body = """{"sluttdato": "$dato"}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 400
+	}
+
+	@Test
 	fun `forlengDeltakelse() skal returnere 403 hvis ikke tilgang`() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/forleng-deltakelse",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = createAnsatt1AuthHeader(),
 			body = """{"sluttdato": "$dato"}""".toJsonRequestBody()
 		)
 
@@ -309,7 +399,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/ikke-aktuell",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = createAnsatt1AuthHeader(),
 			body = """{"aarsak": {"type": "FATT_JOBB"}}""".toJsonRequestBody()
 		)
 
@@ -325,11 +415,23 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
+	fun `deltakerIkkeAktuell skal returnere 400 hvis deltaker er skjult`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${opprettSkjultDeltaker()}/ikke-aktuell",
+			headers = createAnsatt1AuthHeader(),
+			body = """{"aarsak": {"type": "FATT_JOBB"}}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 400
+	}
+
+	@Test
 	fun `deltakerIkkeAktuell() skal returnere 403 hvis ikke tilgang`() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/ikke-aktuell",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = createAnsatt1AuthHeader(),
 			body = """{"aarsak": {"type": "FATT_JOBB"}}""".toJsonRequestBody()
 		)
 
@@ -341,7 +443,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "POST",
 			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/oppstartsdato",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = createAnsatt1AuthHeader(),
 			body = """{"oppstartsdato": "$dato"}""".toJsonRequestBody()
 		)
 
@@ -357,15 +459,66 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
+	fun `leggTilOppstartsdato skal returnere 400 hvis deltaker er skjult`() {
+		val response = sendRequest(
+			method = "POST",
+			url = "/api/tiltaksarrangor/deltaker/${opprettSkjultDeltaker()}/oppstartsdato",
+			headers = createAnsatt1AuthHeader(),
+			body = """{"oppstartsdato": "$dato"}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 400
+	}
+
+	@Test
 	fun `leggTilOppstartsdato() skal returnere 403 hvis ikke tilgang`() {
 		val response = sendRequest(
 			method = "POST",
 			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/oppstartsdato",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = createAnsatt1AuthHeader(),
 			body = """{"oppstartsdato": "$dato"}""".toJsonRequestBody()
 		)
 
 		response.code shouldBe 403
+	}
+
+	@Test
+	fun `skjulDeltakerForTiltaksarrangor() - skal skjule deltaker`() {
+		val deltakerId = UUID.randomUUID()
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId))
+		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerId, status = "IKKE_AKTUELL"))
+
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${deltakerId}/skjul",
+			headers = createAnsatt1AuthHeader(),
+		)
+
+		response.code shouldBe 200
+
+		deltakerService.erSkjultForTiltaksarrangor(deltakerId) shouldBe true
+	}
+
+	@Test
+	fun `skjulDeltakerForTiltaksarrangor() skal returnere 403 hvis ikke tilgang`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/skjul",
+			headers = createAnsatt1AuthHeader(),
+		)
+
+		response.code shouldBe 403
+	}
+
+	private fun opprettSkjultDeltaker(): UUID {
+		val deltakerId = UUID.randomUUID()
+
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId, gjennomforingId = GJENNOMFORING_1.id))
+		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerId, status = "IKKE_AKTUELL"))
+
+		deltakerService.skjulDeltakerForTiltaksarrangor(deltakerId, ARRANGOR_ANSATT_1.id)
+
+		return deltakerId
 	}
 
 }

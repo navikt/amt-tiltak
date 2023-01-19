@@ -21,6 +21,7 @@ class MockPdlHttpServer : MockHttpServer(name = "PdlHttpServer") {
 					PdlQueries.HentBruker.Variables(brukerFnr)
 				)
 			)
+
 		val requestPredicate = { req: RecordedRequest ->
 			req.path == "/graphql"
 				&& req.method == "POST"

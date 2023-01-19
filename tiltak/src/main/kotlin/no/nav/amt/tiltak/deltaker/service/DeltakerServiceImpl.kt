@@ -6,6 +6,7 @@ import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.deltaker.dbo.*
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
+import no.nav.amt.tiltak.deltaker.repositories.SkjultDeltakerRepository
 import no.nav.amt.tiltak.tiltak.services.BrukerService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -20,6 +21,7 @@ open class DeltakerServiceImpl(
 	private val deltakerStatusRepository: DeltakerStatusRepository,
 	private val brukerService: BrukerService,
 	private val endringsmeldingService: EndringsmeldingService,
+	private val skjultDeltakerRepository: SkjultDeltakerRepository,
 	private val transactionTemplate: TransactionTemplate
 ) : DeltakerService {
 
@@ -135,7 +137,7 @@ open class DeltakerServiceImpl(
 	}
 
 	private fun hentStatusOrThrow(deltakerId: UUID) : DeltakerStatus {
-		return hentStatus(deltakerId)?: throw NoSuchElementException("Fant ikke status på deltaker med id $deltakerId")
+		return hentStatus(deltakerId) ?: throw NoSuchElementException("Fant ikke status på deltaker med id $deltakerId")
 	}
 
 	private fun hentStatus(deltakerId: UUID) : DeltakerStatus? {
@@ -211,6 +213,34 @@ open class DeltakerServiceImpl(
 		val deltakere = deltakerRepository.getDeltakere(deltakerIder)
 		return mapDeltakereOgAktiveStatuser(deltakere).associateBy { it.id }
 	}
+
+	override fun kanDeltakerSkjulesForTiltaksarrangor(deltakerId: UUID): Boolean {
+		val statuserSomKanSkjules = listOf(DeltakerStatus.Type.IKKE_AKTUELL, DeltakerStatus.Type.HAR_SLUTTET)
+
+		val deltakerStatus = hentStatusOrThrow(deltakerId)
+
+		return statuserSomKanSkjules.contains(deltakerStatus.type)
+	}
+
+	override fun skjulDeltakerForTiltaksarrangor(deltakerId: UUID, arrangorAnsattId: UUID) {
+		if (!kanDeltakerSkjulesForTiltaksarrangor(deltakerId))
+			throw IllegalStateException("Kan ikke skjule deltaker $deltakerId. Ugyldig status")
+
+		skjultDeltakerRepository.skjulDeltaker(UUID.randomUUID(), deltakerId, arrangorAnsattId)
+	}
+
+	override fun opphevSkjulDeltakerForTiltaksarrangor(deltakerId: UUID) {
+		skjultDeltakerRepository.opphevSkjulDeltaker(deltakerId)
+	}
+
+	override fun erSkjultForTiltaksarrangor(deltakerId: UUID): Boolean {
+		return skjultDeltakerRepository.erSkjultForTiltaksarrangor(listOf(deltakerId)).getOrDefault(deltakerId, false)
+	}
+
+	override fun erSkjultForTiltaksarrangor(deltakerIder: List<UUID>): Map<UUID, Boolean> {
+		return skjultDeltakerRepository.erSkjultForTiltaksarrangor(deltakerIder)
+	}
+
 }
 
 

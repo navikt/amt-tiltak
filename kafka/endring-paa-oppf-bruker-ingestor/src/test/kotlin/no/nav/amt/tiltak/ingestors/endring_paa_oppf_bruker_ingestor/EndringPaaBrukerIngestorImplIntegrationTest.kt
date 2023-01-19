@@ -68,6 +68,7 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 			deltakerStatusRepository,
 			brukerService,
 			endringsmeldingService,
+			mockk(),
 			TransactionTemplate()
 		)
 		endringPaaBrukerIngestorImpl = EndringPaaBrukerIngestorImpl(deltakerService, navEnhetService)

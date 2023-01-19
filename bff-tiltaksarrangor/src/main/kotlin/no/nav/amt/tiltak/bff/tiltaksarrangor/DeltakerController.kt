@@ -10,6 +10,7 @@ import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.core.exceptions.SkjultDeltakerException
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.exceptions.ValidationException
 import no.nav.amt.tiltak.core.port.*
@@ -36,9 +37,15 @@ class DeltakerController(
 
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
 
-		val deltakere = deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
+		var deltakere = deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
 			.filter { it.status.type != DeltakerStatus.Type.PABEGYNT }
 			.filter { !it.erUtdatert }
+
+		val erSkjultMap = deltakerService.erSkjultForTiltaksarrangor(deltakere.map { it.id })
+
+		deltakere = deltakere.filter {
+			!erSkjultMap.getOrDefault(it.id, false)
+		}
 
 		val endringmeldingerMap = endringsmeldingService.hentAktiveEndringsmeldingerForDeltakere(deltakere.map { it.id })
 
@@ -61,6 +68,8 @@ class DeltakerController(
 		if (deltakerDetaljer.status.type == DeltakerStatus.Type.PABEGYNT)
 			throw UnauthorizedException("Har ikke tilgang til id $deltakerId")
 
+		verifiserErIkkeSkjult(deltakerId)
+
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 
 		return deltakerDetaljer
@@ -73,7 +82,10 @@ class DeltakerController(
 		@RequestBody request: LeggTilOppstartsdatoRequest,
 	) {
 		val ansatt = hentInnloggetAnsatt()
+
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		verifiserErIkkeSkjult(deltakerId)
+
 		deltakerService.leggTilOppstartsdato(deltakerId, ansatt.id, request.oppstartsdato)
 	}
 
@@ -84,7 +96,10 @@ class DeltakerController(
 		@RequestBody request: EndreOppstartsdatoRequest,
 	) {
 		val ansatt = hentInnloggetAnsatt()
+
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		verifiserErIkkeSkjult(deltakerId)
+
 		deltakerService.endreOppstartsdato(deltakerId, ansatt.id, request.oppstartsdato)
 	}
 
@@ -95,7 +110,10 @@ class DeltakerController(
 		@RequestBody request: AvsluttDeltakelseRequest,
 	) {
 		val ansatt = hentInnloggetAnsatt()
+
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		verifiserErIkkeSkjult(deltakerId)
+
 		deltakerService.avsluttDeltakelse(deltakerId, ansatt.id, request.sluttdato, request.aarsak.toModel())
 	}
 
@@ -106,7 +124,10 @@ class DeltakerController(
 		@RequestBody request: ForlengDeltakelseRequest,
 	) {
 		val ansatt = hentInnloggetAnsatt()
+
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		verifiserErIkkeSkjult(deltakerId)
+
 		deltakerService.forlengDeltakelse(deltakerId, ansatt.id, request.sluttdato)
 	}
 
@@ -120,7 +141,10 @@ class DeltakerController(
 		if(body.deltakelseProsent > 100) throw ValidationException("Deltakelsesprosent kan ikke være over 100%")
 
 		val ansatt = hentInnloggetAnsatt()
+
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		verifiserErIkkeSkjult(deltakerId)
+
 		deltakerService.endreDeltakelsesprosent(deltakerId, ansatt.id, body.deltakelseProsent)
 	}
 
@@ -131,14 +155,32 @@ class DeltakerController(
 		@RequestBody request: DeltakerIkkeAktuellRequest,
 	) {
 		val ansatt = hentInnloggetAnsatt()
+
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		verifiserErIkkeSkjult(deltakerId)
+
 		deltakerService.deltakerIkkeAktuell(deltakerId, ansatt.id, request.aarsak.toModel())
+	}
+
+	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
+	@PatchMapping("/{deltakerId}/skjul")
+	fun skjulDeltakerForTiltaksarrangor(@PathVariable("deltakerId") deltakerId: UUID) {
+		val ansatt = hentInnloggetAnsatt()
+
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+
+		deltakerService.skjulDeltakerForTiltaksarrangor(deltakerId, ansatt.id)
 	}
 
 	private fun hentInnloggetAnsatt(): Ansatt {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 		return arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
 			?: throw UnauthorizedException("Arrangor ansatt finnes ikke")
+	}
+
+	private fun verifiserErIkkeSkjult(deltakerId: UUID) {
+		if (deltakerService.erSkjultForTiltaksarrangor(deltakerId))
+			throw SkjultDeltakerException("Deltaker med id $deltakerId er skjult for tiltaksarrangør")
 	}
 
 	data class EndreDeltakelsesprosentRequestBody(

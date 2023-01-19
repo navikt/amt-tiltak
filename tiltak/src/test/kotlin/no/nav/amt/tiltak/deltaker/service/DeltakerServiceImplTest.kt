@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.deltaker.service
 
+import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
@@ -14,9 +15,11 @@ import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
+import no.nav.amt.tiltak.deltaker.repositories.SkjultDeltakerRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
@@ -50,6 +53,7 @@ class DeltakerServiceImplTest {
 	lateinit var testDataRepository: TestDataRepository
 	lateinit var navEnhetService: NavEnhetService
 	lateinit var endringsmeldingService: EndringsmeldingService
+	lateinit var skjultDeltakerRepository: SkjultDeltakerRepository
 	lateinit var skjermetPersonService: SkjermetPersonService
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
@@ -66,11 +70,14 @@ class DeltakerServiceImplTest {
 		brukerService = BrukerService(brukerRepository, mockk(), mockk(), navEnhetService, skjermetPersonService)
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
+		skjultDeltakerRepository = SkjultDeltakerRepository(jdbcTemplate)
+
 		deltakerServiceImpl = DeltakerServiceImpl(
 			deltakerRepository = deltakerRepository,
 			deltakerStatusRepository = deltakerStatusRepository,
 			brukerService = brukerService,
 			endringsmeldingService = endringsmeldingService,
+			skjultDeltakerRepository = skjultDeltakerRepository,
 			transactionTemplate = TransactionTemplate(DataSourceTransactionManager(dataSource)),
 		)
 		testDataRepository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
@@ -292,6 +299,30 @@ class DeltakerServiceImplTest {
 		deltakere.find { it.id == deltakerUpserts[0].id }!!.status.type shouldBe statusInserts[0].type
 		deltakere.find { it.id == deltakerUpserts[1].id }!!.status.type shouldBe statusInserts[1].type
 		deltakere.find { it.id == deltakerUpserts[2].id }!!.status.type shouldBe statusInserts[2].type
+	}
+
+	@Test
+	fun `skjulDeltakerForTiltaksarrangor - skal skjule deltaker`() {
+		val deltakerId = UUID.randomUUID()
+
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId))
+		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerId, status = "IKKE_AKTUELL"))
+
+		deltakerServiceImpl.skjulDeltakerForTiltaksarrangor(deltakerId, ARRANGOR_ANSATT_1.id)
+
+		deltakerServiceImpl.erSkjultForTiltaksarrangor(deltakerId) shouldBe true
+	}
+
+	@Test
+	fun `skjulDeltakerForTiltaksarrangor - skal kaste exception hvis deltaker har ugyldig status`() {
+		val deltakerId = UUID.randomUUID()
+
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId))
+		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerId, status = "DELTAR"))
+
+		shouldThrowExactly<IllegalStateException> {
+			deltakerServiceImpl.skjulDeltakerForTiltaksarrangor(deltakerId, ARRANGOR_ANSATT_1.id)
+		}
 	}
 
 	val deltaker = DeltakerUpsert(

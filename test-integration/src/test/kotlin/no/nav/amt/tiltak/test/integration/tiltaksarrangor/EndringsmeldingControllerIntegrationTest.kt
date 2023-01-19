@@ -2,8 +2,10 @@ package no.nav.amt.tiltak.test.integration.tiltaksarrangor
 
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_1
@@ -17,8 +19,13 @@ import java.util.*
 
 class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
+	val createAnsatt1AuthHeader = { mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}") }
+
 	@Autowired
 	lateinit var endringsmeldingRepository: EndringsmeldingRepository
+
+	@Autowired
+	lateinit var deltakerService: DeltakerService
 
 	@BeforeEach
 	internal fun setUp() {
@@ -28,11 +35,11 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	internal fun `skal teste token autentisering`() {
-
 		val requestBuilders = listOf(
 			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/endringsmelding/aktiv?deltakerId=${UUID.randomUUID()}"),
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/endringsmelding/${UUID.randomUUID()}/tilbakekall/"),
 		)
+
 		testTiltaksarrangorAutentisering(requestBuilders, client, mockOAuthServer)
 	}
 
@@ -41,7 +48,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/endringsmelding/aktiv?deltakerId=${DELTAKER_1.id}",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = createAnsatt1AuthHeader(),
 		)
 
 		val expectedJson = """
@@ -52,13 +59,23 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		response.body?.string() shouldBe expectedJson
 	}
 
+	@Test
+	fun `hentAktiveEndringsmeldinger() - skal returnere 400 hvis deltaker er skjult`() {
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/endringsmelding/aktiv?deltakerId=${opprettSkjultDeltaker()}",
+			headers = createAnsatt1AuthHeader(),
+		)
+
+		response.code shouldBe 400
+	}
 
 	@Test
 	fun `tilbakekallEndringsmelding() - skal returnere 200 om endringsmeldingen ble tilbakekalt`() {
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/endringsmelding/${ENDRINGSMELDING_1_DELTAKER_1.id}/tilbakekall/",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = createAnsatt1AuthHeader(),
 			body = emptyRequest(),
 		)
 
@@ -73,10 +90,11 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 	fun `tilbakekallEndringsmelding() - skal returnere 400 om endringsmeldingen ikke ble tilbakekalt`() {
 		val utfortEndringsmelding = ENDRINGSMELDING_1_DELTAKER_1.copy(id = UUID.randomUUID(), status = Endringsmelding.Status.UTFORT)
 		testDataRepository.insertEndringsmelding(utfortEndringsmelding)
+
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/endringsmelding/${utfortEndringsmelding.id}/tilbakekall/",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
+			headers = createAnsatt1AuthHeader(),
 			body = emptyRequest(),
 		)
 
@@ -85,6 +103,17 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		val melding = endringsmeldingRepository.get(utfortEndringsmelding.id)
 
 		melding.status shouldBe Endringsmelding.Status.UTFORT
+	}
+
+	private fun opprettSkjultDeltaker(): UUID {
+		val deltakerId = UUID.randomUUID()
+
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId, gjennomforingId = TestData.GJENNOMFORING_1.id))
+		testDataRepository.insertDeltakerStatus(TestData.DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerId, status = "IKKE_AKTUELL"))
+
+		deltakerService.skjulDeltakerForTiltaksarrangor(deltakerId, ARRANGOR_ANSATT_1.id)
+
+		return deltakerId
 	}
 
 }
