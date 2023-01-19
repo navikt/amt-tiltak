@@ -15,8 +15,8 @@ class TiltaksansvarligGjennomforingTilgangMetricRepository(
 					 JOIN endringsmelding e ON d.id = e.deltaker_id
 			WHERE e.status = 'AKTIV' AND NOT EXISTS (
 					SELECT gjennomforing_id
-					FROM tiltaksansvarlig_gjennomforing_tilgang tt
-					WHERE d.gjennomforing_id = tt.gjennomforing_id AND tt.gyldig_til > current_timestamp
+					FROM tiltaksansvarlig_gjennomforing_tilgang tgt
+					WHERE d.gjennomforing_id = tgt.gjennomforing_id AND tgt.gyldig_til > current_timestamp
 				);
 		""".trimIndent()
 

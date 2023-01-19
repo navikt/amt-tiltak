@@ -68,14 +68,14 @@ class TiltaksansvarligGjennomforingTilgangMetricRepositoryTest {
 	}
 
 	@Test
-	fun `antallGjennomforingerUtenTilgangerMedMeldinger - skal telle antall unike gjennomforinger med aktive meldinger uten aktive tilganger - ingen tilganger finnes`() {
+	fun `antallGjennomforingerUtenTilgangerMedMeldinger - ingen tilganger finnes - skal telle antall unike gjennomforinger med aktive meldinger uten aktive tilganger`() {
 		val antall = repository.antallGjennomforingerUtenTilgangerMedMeldinger()
 
 		antall shouldBe 2
 	}
 
 	@Test
-	fun `antallGjennomforingerUtenTilgangerMedMeldinger - skal telle antall unike gjennomforinger med aktive meldinger uten aktive tilganger - tilganger finnes`() {
+	fun `antallGjennomforingerUtenTilgangerMedMeldinger - tilganger finnes - skal telle antall unike gjennomforinger med aktive meldinger uten aktive tilganger`() {
 		testDataRepository.insertTiltaksansvarligGjennomforingTilgang(NAV_ANSATT_1_GJENNOMFORING_1_TILGANG)
 		testDataRepository.insertTiltaksansvarligGjennomforingTilgang(
 			NAV_ANSATT_1_GJENNOMFORING_1_TILGANG.copy(
@@ -88,7 +88,7 @@ class TiltaksansvarligGjennomforingTilgangMetricRepositoryTest {
 	}
 
 	@Test
-	fun `antallGjennomforingerUtenTilgangerMedMeldinger - skal telle antall unike gjennomforinger med aktive med aktive meldinger uten aktive tilganger - skal kun telle gjennomforing en gang`() {
+	fun `antallGjennomforingerUtenTilgangerMedMeldinger - skal kun telle en gjennomforing en gang`() {
 		testDataRepository.insertEndringsmelding(
 			ENDRINGSMELDING_1_DELTAKER_1.copy(
 				id = UUID.randomUUID(),
