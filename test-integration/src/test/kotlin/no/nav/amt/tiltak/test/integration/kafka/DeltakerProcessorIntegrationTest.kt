@@ -9,6 +9,9 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.DbUtils.shouldBeEqualTo
+import no.nav.amt.tiltak.test.database.data.TestData
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
@@ -21,6 +24,7 @@ import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.util.*
 
 class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 
@@ -136,7 +140,6 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	fun `skal slette deltaker med operation DELETED`() {
-
 		testDataRepository.deleteAllEndringsmeldinger() // Trengs fordi slettDeltaker() sletter ikke endringsmeldinger knyttet til deltaker
 		deltakerService.hentDeltaker(DELTAKER_1.id) shouldNotBe null
 
@@ -147,9 +150,35 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 		AsyncUtils.eventually {
 			deltakerService.hentDeltaker(DELTAKER_1.id) shouldBe null
 		}
-
-
 	}
+
+	@Test
+	fun `deltaker som er tidligere skjult skal oppheves når deltakerstatus oppdateres`() {
+		val skjultDeltaker = DELTAKER_1.copy(id = UUID.randomUUID())
+
+		testDataRepository.insertDeltaker(skjultDeltaker)
+		testDataRepository.insertDeltakerStatus(TestData.DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = skjultDeltaker.id, status = "IKKE_AKTUELL"))
+
+		deltakerService.skjulDeltakerForTiltaksarrangor(skjultDeltaker.id, ARRANGOR_ANSATT_1.id)
+
+		deltakerService.erSkjultForTiltaksarrangor(skjultDeltaker.id) shouldBe true
+
+		mockPdlHttpServer.mockHentBruker(BRUKER_1.personIdent, MockPdlBruker())
+
+		val message = DeltakerMessage(
+			id = skjultDeltaker.id,
+			gjennomforingId = skjultDeltaker.gjennomforingId,
+			status = DeltakerStatus.Type.DELTAR,
+			personIdent = BRUKER_1.personIdent
+		)
+
+		kafkaMessageSender.sendTilAmtTiltakTopic(KafkaMessageCreator.opprettAmtTiltakDeltakerMessage(message))
+
+		AsyncUtils.eventually {
+			deltakerService.erSkjultForTiltaksarrangor(skjultDeltaker.id) shouldBe false
+		}
+	}
+
 
 	private fun ingestGjennomforing(): GjennomforingMessage {
 		val enhetsregisterEnhet = EnhetDto(

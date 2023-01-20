@@ -1,10 +1,7 @@
 package no.nav.amt.tiltak.application
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import no.nav.amt.tiltak.core.exceptions.EndringsmeldingIkkeAktivException
-import no.nav.amt.tiltak.core.exceptions.NotAuthenticatedException
-import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
-import no.nav.amt.tiltak.core.exceptions.ValidationException
+import no.nav.amt.tiltak.core.exceptions.*
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.slf4j.LoggerFactory
@@ -101,6 +98,17 @@ open class ControllerAdvice(
 	@ExceptionHandler(EndringsmeldingIkkeAktivException::class)
 	fun handleEndringsmeldingIkkeAktivException(e: EndringsmeldingIkkeAktivException): ResponseEntity<Response> {
 		logger.error(e.message, e)
+
+		return buildResponse(
+			status = HttpStatus.BAD_REQUEST,
+			exception = e
+		)
+	}
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(SkjultDeltakerException::class)
+	fun handleSkjultDeltakerException(e: SkjultDeltakerException): ResponseEntity<Response> {
+		logger.info(e.message, e)
 
 		return buildResponse(
 			status = HttpStatus.BAD_REQUEST,

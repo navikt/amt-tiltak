@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.test.database.data
 
+import no.nav.amt.tiltak.common.db_utils.DbUtils
 import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.common.db_utils.getZonedDateTime
 import no.nav.amt.tiltak.test.database.DbTestDataUtils.parameters
@@ -333,6 +334,22 @@ class TestDataRepository(
 		""".trimIndent()
 
 		template.jdbcTemplate.update(sql)
+	}
+
+	fun insertSkjultDeltaker(input: SkjultDeltakerInput) {
+		val sql = """
+			INSERT INTO skjult_deltaker(id, deltaker_id, skjult_av_arrangor_ansatt_id, skjult_til)
+			VALUES (:id, :deltakerId, :skjultAvArrangorAnsattId, :skjultTil)
+		""".trimIndent()
+
+		val parameters = DbUtils.sqlParameters(
+			"id" to input.id,
+			"deltakerId" to input.deltakerId,
+			"skjultAvArrangorAnsattId" to input.skjultAvArrangorAnsattId,
+			"skjultTil" to input.skjultTil.toOffsetDateTime(),
+		)
+
+		template.update(sql, parameters)
 	}
 
 }
