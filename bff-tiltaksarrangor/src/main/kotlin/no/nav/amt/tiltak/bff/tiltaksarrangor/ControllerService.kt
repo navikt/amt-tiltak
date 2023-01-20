@@ -20,7 +20,6 @@ open class ControllerService(
 		val navVeileder = deltaker.navVeilederId?.let { navAnsattService.getNavAnsatt(it)}
 		val navEnhet = deltaker.navEnhetId?.let { navEnhetService.getNavEnhet(it) }
 		val gjennomforing = deltaker.gjennomforingId.let { gjennomforingService.getGjennomforing(it) }
-		val erSkjermet = deltakerService.erSkjermet(deltaker.id)
 
 		return DeltakerDetaljerDto(
 			id = deltaker.id,
@@ -33,7 +32,6 @@ open class ControllerService(
 			deltakelseProsent = deltaker.prosentStilling?.toInt(),
 			navEnhet = navEnhet?.toDto(),
 			navVeileder = navVeileder?.toDto(),
-			erSkjermetPerson = erSkjermet,
 			startDato = deltaker.startDato,
 			sluttDato = deltaker.sluttDato,
 			registrertDato = deltaker.registrertDato,

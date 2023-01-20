@@ -15,7 +15,6 @@ data class DeltakerDetaljerDto(
 	val deltakelseProsent: Int?,
 	val navEnhet: NavEnhetDto?,
 	val navVeileder: NavVeilederDto?,
-	val erSkjermetPerson: Boolean,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val registrertDato: LocalDateTime,
