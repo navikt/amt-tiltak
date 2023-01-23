@@ -12,7 +12,7 @@ interface GjennomforingService {
 
 	fun getByArrangorId(arrangorId: UUID): List<Gjennomforing>
 
-	fun getAktiveByLopenr(lopenr: Int): List<Gjennomforing>
+	fun getByLopenr(lopenr: Int): List<Gjennomforing>
 
 	fun upsert(gjennomforing: GjennomforingUpsert): Gjennomforing
 

@@ -95,9 +95,8 @@ class GjennomforingServiceImpl(
 		}
 	}
 
-	override fun getAktiveByLopenr(lopenr: Int): List<Gjennomforing> {
+	override fun getByLopenr(lopenr: Int): List<Gjennomforing> {
 		return gjennomforingRepository.getByLopenr(lopenr)
-			.filter { it.status == Gjennomforing.Status.GJENNOMFORES }
 			.map {
 				val (tiltak, arrangor) = getTiltakOgArrangor(it.tiltakId, it.arrangorId)
 				return@map it.toGjennomforing(tiltak, arrangor)
