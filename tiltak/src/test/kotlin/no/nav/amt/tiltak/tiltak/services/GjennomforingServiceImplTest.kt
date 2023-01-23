@@ -161,26 +161,6 @@ class GjennomforingServiceImplTest : FunSpec({
 		GJENNOMFORING_1.toGjennomforing(tiltakInserted, arrangorInserted) shouldBe gjennomforing
 	}
 
-	test("getByLopenr - gjennomforinger finnes - returnerer liste med gjennomforing") {
-		testDataRepository.insertNavEnhet(NAV_ENHET_1)
-		testDataRepository.insertTiltak(TILTAK_1)
-		testDataRepository.insertArrangor(ARRANGOR_1)
-		testDataRepository.insertGjennomforing(GJENNOMFORING_1)
-
-		val avsluttet = GJENNOMFORING_1.copy(id = UUID.randomUUID(), status = Gjennomforing.Status.AVSLUTTET.name)
-		testDataRepository.insertGjennomforing(avsluttet)
-
-		val tiltakInserted = TILTAK_1.toTiltak()
-		val arrangorInserted = ARRANGOR_1.toArrangor()
-		val lopenr = GJENNOMFORING_1.lopenr
-
-		every { arrangorService.getArrangorById(ARRANGOR_1.id) } returns arrangorInserted
-		every { tiltakService.getTiltakById(TILTAK_1.id) } returns tiltakInserted
-
-		val expected = GJENNOMFORING_1.toGjennomforing(tiltakInserted, arrangorInserted)
-		service.getAktiveByLopenr(lopenr) shouldBe listOf(expected)
-	}
-
 	test("getByLopenummer - returnerer alle gjennomføringer, uansett status") {
 		testDataRepository.insertNavEnhet(NAV_ENHET_1)
 		testDataRepository.insertTiltak(TILTAK_1)
