@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
+import no.nav.amt.tiltak.core.exceptions.HarAlleredeTilgangException
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import org.springframework.web.server.ResponseStatusException
 import java.time.ZonedDateTime
@@ -103,7 +104,7 @@ class TiltaksansvarligTilgangServiceImplTest : FunSpec({
 			)
 		)
 
-		shouldThrowExactly<ResponseStatusException> {
+		shouldThrowExactly<HarAlleredeTilgangException> {
 			service.giTilgangTilGjennomforing(navAnsattId, gjennomforingId)
 		}
 	}
