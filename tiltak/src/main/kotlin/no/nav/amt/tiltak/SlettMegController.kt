@@ -27,7 +27,7 @@ class SlettMegController(
 	}
 
 	private fun isInternal(servlet: HttpServletRequest): Boolean {
-		return servlet.remoteAddr === "127.0.0.1"
+		return servlet.remoteAddr == "127.0.0.1"
 	}
 
 }
