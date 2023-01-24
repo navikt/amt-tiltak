@@ -1,12 +1,15 @@
 package no.nav.amt.tiltak.kafka.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.ConstructorBinding
 
+@ConstructorBinding
 @ConfigurationProperties(prefix = "app.env")
 data class KafkaTopicProperties(
-	var amtTiltakTopic: String = "",
-	var sisteTilordnetVeilederTopic: String = "",
-	var endringPaaBrukerTopic: String = "",
-	var skjermedePersonerTopic: String = "",
-	var sisteTiltaksgjennomforingerTopic: String = "",
+	val amtTiltakTopic: String,
+	val sisteTilordnetVeilederTopic: String,
+	val endringPaaBrukerTopic: String,
+	val skjermedePersonerTopic: String,
+	val sisteTiltaksgjennomforingerTopic: String,
+	val leesahTopic: String
 )

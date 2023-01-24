@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.test.integration.utils
 import no.nav.amt.tiltak.kafka.config.KafkaProperties
 import no.nav.common.kafka.util.KafkaPropertiesBuilder
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
-import org.apache.kafka.common.serialization.StringSerializer
+import org.apache.kafka.common.serialization.ByteArraySerializer
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.utility.DockerImageName
@@ -38,7 +38,7 @@ object SingletonKafkaProvider {
 					.withBrokerUrl(host)
 					.withBaseProperties()
 					.withProducerId(producerId)
-					.withSerializers(StringSerializer::class.java, StringSerializer::class.java)
+					.withSerializers(ByteArraySerializer::class.java, ByteArraySerializer::class.java)
 					.build()
 			}
 		}

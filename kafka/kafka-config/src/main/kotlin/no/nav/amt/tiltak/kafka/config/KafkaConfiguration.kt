@@ -12,6 +12,7 @@ import no.nav.common.kafka.producer.KafkaProducerClientImpl
 import no.nav.common.kafka.spring.PostgresJdbcTemplateConsumerRepository
 import okhttp3.internal.toImmutableList
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.slf4j.LoggerFactory
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -33,6 +34,7 @@ open class KafkaConfiguration(
 	endringPaaBrukerIngestor: EndringPaaBrukerIngestor,
 	skjermetPersonIngestor: SkjermetPersonIngestor,
 	gjennomforingIngestor: GjennomforingIngestor,
+	leesahIngestor: LeesahIngestor
 ) {
 	private val log = LoggerFactory.getLogger(javaClass)
     private var client: KafkaConsumerClient
@@ -40,7 +42,7 @@ open class KafkaConfiguration(
 	private var consumerRecordProcessor: KafkaConsumerRecordProcessor
 
 	init {
-		val topicConfigs = mutableListOf<KafkaConsumerClientBuilder.TopicConfig<String, String>>()
+		val topicConfigs = mutableListOf<KafkaConsumerClientBuilder.TopicConfig<String, out Any>>()
 
 		topicConfigs.add(
 			KafkaConsumerClientBuilder.TopicConfig<String, String>()
@@ -99,6 +101,18 @@ open class KafkaConfiguration(
 					stringDeserializer(),
 					stringDeserializer(),
 					Consumer<ConsumerRecord<String, String>> { gjennomforingIngestor.ingestKafkaRecord(it.key(), it.value()) }
+				)
+		)
+
+		topicConfigs.add(
+			KafkaConsumerClientBuilder.TopicConfig<String, ByteArray>()
+				.withLogging()
+				.withStoreOnFailure(consumerRepository)
+				.withConsumerConfig(
+					kafkaTopicProperties.leesahTopic,
+					stringDeserializer(),
+					ByteArrayDeserializer(),
+					Consumer<ConsumerRecord<String, ByteArray>> { leesahIngestor.ingestKafkaRecord(it.key(), it.value()) }
 				)
 		)
 

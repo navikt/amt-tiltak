@@ -124,6 +124,9 @@ spec:
       value: pto.endring-paa-oppfolgingsbruker-v2
     - name: SKJERMEDE_PERSONER_STATUS_TOPIC
       value: nom.skjermede-personer-status-v1
+    - name: LEESAH_TOPIC
+      value: pdl.leesah-v1
+
   gcp:
     sqlInstances:
       - name: amt-tiltak-v1
