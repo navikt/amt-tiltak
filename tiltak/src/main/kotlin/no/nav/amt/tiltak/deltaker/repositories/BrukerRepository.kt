@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
+import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.deltaker.dbo.BrukerUpsertDbo
 import no.nav.amt.tiltak.utils.getNullableUUID
@@ -8,31 +9,32 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 import java.util.*
 
 @Component
 open class BrukerRepository(
-    private val template: NamedParameterJdbcTemplate
+	private val template: NamedParameterJdbcTemplate
 ) {
 
-    private val rowMapper = RowMapper { rs, _ ->
-        BrukerDbo(
+	private val rowMapper = RowMapper { rs, _ ->
+		BrukerDbo(
 			id = rs.getUUID("id"),
-            personIdent = rs.getString("person_ident"),
-            fornavn = rs.getString("fornavn"),
+			personIdent = rs.getString("person_ident"),
+			fornavn = rs.getString("fornavn"),
 			mellomnavn = rs.getString("mellomnavn"),
-            etternavn = rs.getString("etternavn"),
-            telefonnummer = rs.getString("telefonnummer"),
-            epost = rs.getString("epost"),
-            ansvarligVeilederId = rs.getNullableUUID("ansvarlig_veileder_id"),
+			etternavn = rs.getString("etternavn"),
+			telefonnummer = rs.getString("telefonnummer"),
+			epost = rs.getString("epost"),
+			ansvarligVeilederId = rs.getNullableUUID("ansvarlig_veileder_id"),
 			navEnhetId = rs.getNullableUUID("nav_enhet_id"),
 			erSkjermet = rs.getBoolean("er_skjermet"),
-            createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
-            modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
-        )
-    }
+			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
+			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
+		)
+	}
 
-    fun upsert(bruker: BrukerUpsertDbo): BrukerDbo {
+	fun upsert(bruker: BrukerUpsertDbo): BrukerDbo {
 		val sql = """
 			INSERT INTO bruker(id, person_ident, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_enhet_id, er_skjermet)
 			VALUES (:id,
@@ -58,42 +60,42 @@ open class BrukerRepository(
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
-            mapOf(
+			mapOf(
 				"id" to UUID.randomUUID(),
-                "personIdent" to bruker.personIdent,
-                "fornavn" to bruker.fornavn,
+				"personIdent" to bruker.personIdent,
+				"fornavn" to bruker.fornavn,
 				"mellomnavn" to bruker.mellomnavn,
-                "etternavn" to bruker.etternavn,
-                "telefonnummer" to bruker.telefonnummer,
-                "epost" to bruker.epost,
-                "veileder_id" to bruker.ansvarligVeilederId,
+				"etternavn" to bruker.etternavn,
+				"telefonnummer" to bruker.telefonnummer,
+				"epost" to bruker.epost,
+				"veileder_id" to bruker.ansvarligVeilederId,
 				"nav_enhet_id" to bruker.navEnhetId,
 				"er_skjermet" to bruker.erSkjermet
-            )
-        )
+			)
+		)
 
-        template.update(sql, parameters)
+		template.update(sql, parameters)
 
-        return get(bruker.personIdent)
-            ?: throw NoSuchElementException("Bruker med id ${bruker.personIdent} finnes ikke")
-    }
+		return get(bruker.personIdent)
+			?: throw NoSuchElementException("Bruker med id ${bruker.personIdent} finnes ikke")
+	}
 
-    fun get(personIdent: String): BrukerDbo? {
-        val sql = """
+	fun get(personIdent: String): BrukerDbo? {
+		val sql = """
 			SELECT *
 			FROM bruker
 			WHERE person_ident = :personIdent
 		""".trimIndent()
 
-        val parameters = MapSqlParameterSource().addValues(
-            mapOf(
-                "personIdent" to personIdent
-            )
-        )
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"personIdent" to personIdent
+			)
+		)
 
-        return template.query(sql, parameters, rowMapper)
-            .firstOrNull()
-    }
+		return template.query(sql, parameters, rowMapper)
+			.firstOrNull()
+	}
 
 	fun get(id: UUID): BrukerDbo? {
 		val sql = """
@@ -111,6 +113,7 @@ open class BrukerRepository(
 		return template.query(sql, parameters, rowMapper)
 			.firstOrNull()
 	}
+
 	fun oppdaterVeileder(personIdent: String, veilederId: UUID) {
 		val sql = """
 			UPDATE bruker SET ansvarlig_veileder_id = :veilederId, modified_at = CURRENT_TIMESTAMP
@@ -158,5 +161,23 @@ open class BrukerRepository(
 		)
 
 		template.update(sql, parameters)
+	}
+
+	fun getBrukere(offset: Int = 0, limit: Int = 500): List<BrukerDbo> {
+		val sql = """
+			SELECT *
+			FROM bruker
+			ORDER BY id
+			OFFSET :offset
+			LIMIT :limit;
+		""".trimIndent()
+
+		val parameters = sqlParameters(
+			"offset" to offset,
+			"limit" to limit
+		)
+
+		return template.query(sql, parameters, rowMapper)
+
 	}
 }
