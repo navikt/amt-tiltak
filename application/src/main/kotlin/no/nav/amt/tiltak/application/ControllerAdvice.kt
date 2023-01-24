@@ -116,6 +116,15 @@ open class ControllerAdvice(
 		)
 	}
 
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(HarAlleredeTilgangException::class)
+	fun handleHarAlleredeTilgangException(e: HarAlleredeTilgangException): ResponseEntity<Response> {
+		return buildResponse(
+			status = HttpStatus.BAD_REQUEST,
+			exception = e
+		)
+	}
+
 	private fun buildResponse(
 		status: HttpStatus,
 		exception: Throwable,
