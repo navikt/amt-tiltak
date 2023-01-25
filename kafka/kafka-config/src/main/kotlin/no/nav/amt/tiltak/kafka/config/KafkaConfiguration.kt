@@ -1,8 +1,5 @@
 package no.nav.amt.tiltak.kafka.config
 
-import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient
-import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient
-import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider
 import no.nav.amt.tiltak.core.kafka.*
 import no.nav.common.kafka.consumer.KafkaConsumerClient
@@ -17,11 +14,9 @@ import okhttp3.internal.toImmutableList
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Profile
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.context.event.EventListener
 import org.springframework.jdbc.core.JdbcTemplate
@@ -139,21 +134,6 @@ open class KafkaConfiguration(
 	open fun kafkaProducer(kafkaProperties: KafkaProperties): KafkaProducerClient<String, String> {
 		return KafkaProducerClientImpl(kafkaProperties.producer())
 	}
-
-	@Profile("default")
-	@Bean
-	open fun schemaRegistryClient(
-		@Value("\${kafka.schema.registry.url}") schemaRegistryUrl: String,
-		@Value("\${kafka.schema.registry.username}") schemaRegistryUsername: String,
-		@Value("\${kafka.schema.registry.password}") schemaRegistryPassword: String,
-	) : SchemaRegistryClient {
-		val configs: MutableMap<String, Any> = HashMap()
-		configs[SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE] = "USER_INFO"
-		configs[SchemaRegistryClientConfig.USER_INFO_CONFIG] = String.format("%s:%s", schemaRegistryUsername, schemaRegistryPassword)
-
-		return CachedSchemaRegistryClient(schemaRegistryUrl, 100, configs)
-	}
-
 
 	@EventListener
 	open fun onApplicationEvent(_event: ContextRefreshedEvent?) {
