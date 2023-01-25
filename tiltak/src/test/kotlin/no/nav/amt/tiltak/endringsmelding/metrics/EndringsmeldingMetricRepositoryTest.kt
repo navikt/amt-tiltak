@@ -86,4 +86,14 @@ class EndringsmeldingMetricRepositoryTest : FunSpec({
 		}
 	}
 
+	test("antallEndringsmeldingerPerStatus - Skal vise antall endringsmeldinger per status") {
+		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
+		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1.copy(status = Endringsmelding.Status.UTFORT))
+
+		val data = repository.getAntallEndringsmeldingerPerStatus()
+
+		data[Endringsmelding.Status.AKTIV] shouldBe 1
+		data[Endringsmelding.Status.UTFORT] shouldBe 1
+	}
+
 })
