@@ -1,5 +1,7 @@
 package no.nav.amt.tiltak.kafka.config
 
+import no.nav.common.kafka.producer.KafkaProducerClient
+import no.nav.common.kafka.producer.KafkaProducerClientImpl
 import no.nav.common.kafka.util.KafkaPropertiesBuilder
 import no.nav.common.kafka.util.KafkaPropertiesPreset
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
@@ -50,5 +52,10 @@ open class KafkaBeans {
             }
         }
     }
+
+	@Bean
+	open fun kafkaProducer(kafkaProperties: KafkaProperties): KafkaProducerClient<ByteArray, ByteArray> {
+		return KafkaProducerClientImpl(kafkaProperties.producer())
+	}
 
 }

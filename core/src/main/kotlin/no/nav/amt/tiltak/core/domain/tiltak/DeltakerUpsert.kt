@@ -7,6 +7,7 @@ import java.util.*
 data class DeltakerUpsert(
 	val id: UUID,
 	val gjennomforingId: UUID,
+	val statusInsert: DeltakerStatusInsert,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val registrertDato: LocalDateTime,
@@ -16,6 +17,13 @@ data class DeltakerUpsert(
 ) {
 	fun compareTo(deltaker: Deltaker) = this == DeltakerUpsert(
 			id = deltaker.id,
+			statusInsert = DeltakerStatusInsert(
+				id = deltaker.status.id,
+				deltakerId = deltaker.id,
+				type = deltaker.status.type,
+				aarsak = deltaker.status.aarsak,
+				gyldigFra = deltaker.status.gyldigFra
+			),
 			gjennomforingId = deltaker.gjennomforingId,
 			startDato = deltaker.startDato,
 			sluttDato = deltaker.sluttDato,

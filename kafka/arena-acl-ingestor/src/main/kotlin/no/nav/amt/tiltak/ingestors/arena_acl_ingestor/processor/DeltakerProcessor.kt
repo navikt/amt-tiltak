@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
+import no.nav.amt.tiltak.core.kafka.KafkaProducerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.PersonService
@@ -50,16 +51,6 @@ class DeltakerProcessor(
 
 		val tiltaksgjennomforing = gjennomforingService.getGjennomforing(deltakerDto.gjennomforingId)
 
-		val deltakerUpsert = DeltakerUpsert(
-			id = deltakerDto.id,
-			startDato = deltakerDto.startDato,
-			sluttDato = deltakerDto.sluttDato,
-			dagerPerUke = deltakerDto.dagerPerUke,
-			prosentStilling = deltakerDto.prosentDeltid,
-			registrertDato = deltakerDto.registrertDato,
-			gjennomforingId = tiltaksgjennomforing.id,
-			innsokBegrunnelse = deltakerDto.innsokBegrunnelse
-		)
 		val status = DeltakerStatusInsert(
 			id = UUID.randomUUID(),
 			deltakerId = deltakerDto.id,
@@ -68,9 +59,20 @@ class DeltakerProcessor(
 			gyldigFra = deltakerDto.statusEndretDato,
 		)
 
+		val deltakerUpsert = DeltakerUpsert(
+			id = deltakerDto.id,
+			statusInsert = status,
+			startDato = deltakerDto.startDato,
+			sluttDato = deltakerDto.sluttDato,
+			dagerPerUke = deltakerDto.dagerPerUke,
+			prosentStilling = deltakerDto.prosentDeltid,
+			registrertDato = deltakerDto.registrertDato,
+			gjennomforingId = tiltaksgjennomforing.id,
+			innsokBegrunnelse = deltakerDto.innsokBegrunnelse
+		)
+
 		transactionTemplate.executeWithoutResult {
 			deltakerService.upsertDeltaker(deltakerDto.personIdent, deltakerUpsert)
-			deltakerService.insertStatus(status)
 
 			/*
 			 	Deltakere blir noen ganger gjenbrukt istedenfor at det opprettes en ny,

@@ -9,6 +9,7 @@ import io.mockk.mockk
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.kafka.KafkaProducerService
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.NavEnhetService
@@ -53,6 +54,8 @@ class GjennomforingServiceImplTest : FunSpec({
 
 	lateinit var navEnhetService: NavEnhetService
 
+	lateinit var kafkaProducerService: KafkaProducerService
+
 	lateinit var service: GjennomforingServiceImpl
 
 	beforeEach {
@@ -73,6 +76,8 @@ class GjennomforingServiceImplTest : FunSpec({
 
 		navEnhetService = mockk()
 
+		kafkaProducerService = mockk(relaxUnitFun = true)
+
 		service = GjennomforingServiceImpl(
 			gjennomforingRepository = gjennomforingRepository,
 			tiltakService = tiltakService,
@@ -83,6 +88,7 @@ class GjennomforingServiceImplTest : FunSpec({
 				mockk(),
 				mockk(),
 				transactionTemplate,
+				kafkaProducerService
 			),
 			arrangorService = arrangorService,
 			transactionTemplate = transactionTemplate,

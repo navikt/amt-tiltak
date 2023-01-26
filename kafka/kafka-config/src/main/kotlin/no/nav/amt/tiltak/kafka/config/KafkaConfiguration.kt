@@ -130,11 +130,6 @@ open class KafkaConfiguration(
             .build()
     }
 
-	@Bean
-	open fun kafkaProducer(kafkaProperties: KafkaProperties): KafkaProducerClient<String, String> {
-		return KafkaProducerClientImpl(kafkaProperties.producer())
-	}
-
 	@EventListener
 	open fun onApplicationEvent(_event: ContextRefreshedEvent?) {
 		log.info("Starting kafka consumer and stored record processor...")

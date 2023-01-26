@@ -27,6 +27,7 @@ class KafkaConfigurationTest {
 	private val skjermetPersonTopic = "nom.skjermede-personer-status-v1"
 	private val sisteTiltaksgjennomforingerTopic: String = "test.siste-tiltaksgjennomforinger"
 	private val leesahTopic: String = "test.leesah-v1"
+	private val deltakerTopic: String = "test.deltaker-v1"
 
 	@Container
 	var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.2.1"))
@@ -42,7 +43,8 @@ class KafkaConfigurationTest {
 			endringPaaBrukerTopic = endringPaaBrukerTopic,
 			skjermedePersonerTopic = skjermetPersonTopic,
 			sisteTiltaksgjennomforingerTopic = sisteTiltaksgjennomforingerTopic,
-			leesahTopic = leesahTopic
+			leesahTopic = leesahTopic,
+			deltakerTopic = deltakerTopic
 		)
 
 		val kafkaProperties = object : KafkaProperties {
