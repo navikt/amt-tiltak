@@ -266,6 +266,37 @@ open class DeltakerServiceImpl(
 		return skjultDeltakerRepository.erSkjultForTiltaksarrangor(deltakerIder)
 	}
 
+	override fun republiserAlleDeltakerePaKafka(batchSize: Int) {
+		var offset = 0
+
+		var deltakere: List<DeltakerDbo>
+
+		do {
+			deltakere = deltakerRepository.hentDeltakere(offset, batchSize)
+
+			val statuser = hentAktiveStatuserForDeltakere(deltakere.map { it.id })
+
+			deltakere.forEach {
+				val status = statuser[it.id]?.toModel()
+
+				if (status == null) {
+					log.error("Klarte ikke å republisere deltaker med id ${it.id} fordi status mangler")
+					return@forEach
+				}
+
+				val deltaker = it.toDeltaker(status)
+
+				kafkaProducerService.publiserDeltaker(deltaker)
+			}
+
+			offset += deltakere.size
+
+			log.info("Publisert batch med deltakere på kafka, offset=$offset, batchSize=${deltakere.size}")
+		} while (deltakere.isNotEmpty())
+
+		log.info("Ferdig med republisering av deltakere på kafka")
+	}
+
 }
 
 

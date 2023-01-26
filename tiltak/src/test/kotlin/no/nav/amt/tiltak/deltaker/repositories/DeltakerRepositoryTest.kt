@@ -17,6 +17,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
+import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
@@ -31,14 +32,20 @@ internal class DeltakerRepositoryTest : FunSpec({
 	lateinit var repository: DeltakerRepository
 
 	lateinit var deltakerStatusRepository: DeltakerStatusRepository
+
+	lateinit var testDataRepository: TestDataRepository
+
 	val now = LocalDate.now().atStartOfDay()
 
 	beforeEach {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 		rootLogger.level = Level.WARN
 
-		repository = DeltakerRepository(NamedParameterJdbcTemplate(dataSource))
-		deltakerStatusRepository = DeltakerStatusRepository(NamedParameterJdbcTemplate(dataSource))
+		val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
+
+		repository = DeltakerRepository(jdbcTemplate)
+		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
+		testDataRepository = TestDataRepository(jdbcTemplate)
 
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 	}
@@ -358,4 +365,20 @@ internal class DeltakerRepositoryTest : FunSpec({
 		repository.slettDeltaker(deltakerInsertDbo.id)
 		repository.get(deltakerInsertDbo.id) shouldBe null
 	}
+
+	test("hentDeltakere - skal hente deltakere med offset og limit") {
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = UUID.randomUUID()))
+
+		val deltakere1 = repository.hentDeltakere(0, 1)
+
+		deltakere1 shouldHaveSize 1
+
+		val deltakere2 = repository.hentDeltakere(1, 2)
+
+		val deltaker1Id = deltakere1[0].id
+
+		deltakere2 shouldHaveSize 2
+		deltakere2.any { it.id == deltaker1Id } shouldBe false
+	}
+
 })

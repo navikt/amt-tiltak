@@ -11,7 +11,6 @@ import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.log.SecureLog.secureLog
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 import java.util.*
 
 @Service

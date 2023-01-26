@@ -1,17 +1,13 @@
 package no.nav.amt.tiltak.arrangor
 
 import io.kotest.core.spec.style.FunSpec
-import io.mockk.called
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.clients.amt_enhetsregister.Virksomhet
-import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 class ArrangorServiceImplTest: FunSpec({
 	lateinit var enhetsregisterClient: EnhetsregisterClient

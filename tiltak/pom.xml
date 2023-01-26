@@ -164,6 +164,11 @@
             <artifactId>mock-oauth-server</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>test-utils</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

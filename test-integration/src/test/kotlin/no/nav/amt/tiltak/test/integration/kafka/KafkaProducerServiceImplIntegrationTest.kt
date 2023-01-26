@@ -6,8 +6,8 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
-import no.nav.amt.tiltak.test.integration.utils.AsyncUtils
 import no.nav.amt.tiltak.test.integration.utils.KafkaMessageConsumer
+import no.nav.amt.tiltak.test.utils.AsyncUtils
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

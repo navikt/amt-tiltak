@@ -39,6 +39,11 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>test-utils</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>io.kotest</groupId>
             <artifactId>kotest-assertions-core-jvm</artifactId>
             <scope>compile</scope>

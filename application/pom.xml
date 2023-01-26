@@ -43,6 +43,10 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>bff-internal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>tiltak</artifactId>
         </dependency>
         <dependency>

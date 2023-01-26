@@ -3,7 +3,6 @@ package no.nav.amt.tiltak.kafka.producer
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
-import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.kafka.config.KafkaTopicProperties
 import no.nav.amt.tiltak.kafka.producer.dto.DeltakerV1Dto
 import no.nav.common.kafka.producer.KafkaProducerClient

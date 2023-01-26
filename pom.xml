@@ -23,6 +23,7 @@
         <module>tiltak</module>
         <module>bff-tiltaksarrangor</module>
         <module>bff-nav_ansatt</module>
+        <module>bff-internal</module>
         <module>tilgangskontroll-tiltaksansvarlig</module>
         <module>tilgangskontroll-tiltaksarrangor</module>
         <module>test-integration</module>
@@ -291,7 +292,11 @@
                 <artifactId>bff-nav_ansatt</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>bff-internal</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>net.javacrumbs.shedlock</groupId>
@@ -392,6 +397,12 @@
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>mock-oauth-server</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>test-utils</artifactId>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>

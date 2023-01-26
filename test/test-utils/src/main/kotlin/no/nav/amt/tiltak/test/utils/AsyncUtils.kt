@@ -1,6 +1,5 @@
-package no.nav.amt.tiltak.test_utils
+package no.nav.amt.tiltak.test.utils
 
-import java.lang.AssertionError
 import java.time.Duration
 import java.time.LocalDateTime
 

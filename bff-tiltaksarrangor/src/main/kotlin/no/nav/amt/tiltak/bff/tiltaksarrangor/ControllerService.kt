@@ -2,7 +2,10 @@ package no.nav.amt.tiltak.bff.tiltaksarrangor
 
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerDetaljerDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.NavAnsattService
+import no.nav.amt.tiltak.core.port.NavEnhetService
 import org.springframework.stereotype.Service
 import java.util.*
 

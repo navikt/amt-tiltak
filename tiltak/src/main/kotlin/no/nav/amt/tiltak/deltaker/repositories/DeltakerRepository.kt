@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
+import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getNullableUUID
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
@@ -259,6 +260,21 @@ open class DeltakerRepository(
 				AND deltaker.slutt_dato >= CURRENT_DATE
 		""".trimIndent()
 		val parameters = MapSqlParameterSource()
+		return template.query(sql, parameters, rowMapper)
+	}
+
+	fun hentDeltakere(offset: Int, limit: Int): List<DeltakerDbo> {
+		val sql = """
+			SELECT deltaker.*, bruker.*
+			FROM deltaker inner join bruker on bruker.id = deltaker.bruker_id
+			ORDER BY deltaker.id OFFSET :offset LIMIT :limit
+		""".trimIndent()
+
+		val parameters = sqlParameters(
+			"offset" to offset,
+			"limit" to limit
+		)
+
 		return template.query(sql, parameters, rowMapper)
 	}
 

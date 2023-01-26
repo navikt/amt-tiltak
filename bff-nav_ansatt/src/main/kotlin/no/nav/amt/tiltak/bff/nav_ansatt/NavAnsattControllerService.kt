@@ -8,8 +8,7 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import org.springframework.stereotype.Service
-import java.util.NoSuchElementException
-import java.util.UUID
+import java.util.*
 
 @Service
 class NavAnsattControllerService(

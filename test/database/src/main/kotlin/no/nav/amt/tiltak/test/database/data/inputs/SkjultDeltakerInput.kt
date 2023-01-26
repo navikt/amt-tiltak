@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.test.database.data.inputs
 
 import java.time.ZonedDateTime
-import java.util.UUID
+import java.util.*
 
 data class SkjultDeltakerInput(
 	val id: UUID,

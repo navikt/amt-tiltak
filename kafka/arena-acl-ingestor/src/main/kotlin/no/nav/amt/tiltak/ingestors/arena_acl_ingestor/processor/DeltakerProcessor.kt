@@ -3,7 +3,6 @@ package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
-import no.nav.amt.tiltak.core.kafka.KafkaProducerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.PersonService

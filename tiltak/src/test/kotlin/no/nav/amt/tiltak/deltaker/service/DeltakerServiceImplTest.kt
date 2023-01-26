@@ -3,7 +3,6 @@ package no.nav.amt.tiltak.deltaker.service
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
@@ -378,6 +377,15 @@ class DeltakerServiceImplTest {
 		shouldThrowExactly<IllegalStateException> {
 			deltakerServiceImpl.skjulDeltakerForTiltaksarrangor(deltakerId, ARRANGOR_ANSATT_1.id)
 		}
+	}
+
+	@Test
+	fun `republiserAlleDeltakerePaKafka - skal publisere deltakere på kafka`() {
+		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
+
+		deltakerServiceImpl.republiserAlleDeltakerePaKafka(1)
+
+		verify(exactly = 2) { kafkaProducerService.publiserDeltaker(any()) }
 	}
 
 	val statusInsert = DeltakerStatusInsert(
