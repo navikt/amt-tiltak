@@ -22,23 +22,30 @@ class KafkaMessageSender(
 	private val endringPaaBrukerTopic: String,
 	@Value("\${app.env.skjermedePersonerTopic}")
 	private val skjermedePersonerTopic: String,
+	@Value("\${app.env.leesahTopic}")
+	private val leesahTopic: String
+
 ) {
-	private val kafkaProducer = KafkaProducerClientImpl<String, String>(properties.producer())
+	private val kafkaProducer = KafkaProducerClientImpl<ByteArray, ByteArray>(properties.producer())
 
 	fun sendTilAmtTiltakTopic(jsonString: String) {
-		kafkaProducer.send(ProducerRecord(amtTiltakTopic, UUID.randomUUID().toString(), jsonString))
+		kafkaProducer.send(ProducerRecord(amtTiltakTopic, UUID.randomUUID().toString().toByteArray(), jsonString.toByteArray()))
 	}
 
 	fun sendTilSisteTiltaksgjennomforingTopic(jsonString: String) {
-		kafkaProducer.send(ProducerRecord(sisteTiltaksgjennomforingerTopic, UUID.randomUUID().toString(), jsonString))
+		kafkaProducer.send(ProducerRecord(sisteTiltaksgjennomforingerTopic, UUID.randomUUID().toString().toByteArray(), jsonString.toByteArray()))
 	}
 
 	fun sendDeleteTilSisteTiltaksgjennomforingTopic(gjennomforingId: String) {
-		kafkaProducer.send(ProducerRecord(sisteTiltaksgjennomforingerTopic, gjennomforingId, null))
+		kafkaProducer.send(ProducerRecord(sisteTiltaksgjennomforingerTopic, gjennomforingId.toByteArray(), null))
 	}
 
 	fun sendTilSkjermetPersonTopic(fnr: String, erSkjermet: Boolean) {
-		kafkaProducer.send(ProducerRecord(skjermedePersonerTopic, fnr, erSkjermet.toString()))
+		kafkaProducer.send(ProducerRecord(skjermedePersonerTopic, fnr.toByteArray(), erSkjermet.toString().toByteArray()))
+	}
+
+	fun sendTilLeesahTopic(aktorId: String, payload: ByteArray) {
+		kafkaProducer.send(ProducerRecord(leesahTopic, aktorId.toByteArray(), payload))
 	}
 
 }

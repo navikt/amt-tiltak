@@ -19,5 +19,6 @@
         <module>tildelt-veileder-ingestor</module>
         <module>skjermet-person-ingestor</module>
         <module>gjennomforing-ingestor</module>
+        <module>pdl-leesah-ingestor</module>
     </modules>
 </project>
