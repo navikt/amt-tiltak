@@ -19,7 +19,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.createStatusInput
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import java.util.UUID
+import java.util.*
 
 class NavAnsattControllerServiceTest {
 	private val endringsmeldingService = mockk<EndringsmeldingService>()

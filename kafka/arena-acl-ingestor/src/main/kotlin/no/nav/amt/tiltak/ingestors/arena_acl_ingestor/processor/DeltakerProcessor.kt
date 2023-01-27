@@ -50,16 +50,6 @@ class DeltakerProcessor(
 
 		val tiltaksgjennomforing = gjennomforingService.getGjennomforing(deltakerDto.gjennomforingId)
 
-		val deltakerUpsert = DeltakerUpsert(
-			id = deltakerDto.id,
-			startDato = deltakerDto.startDato,
-			sluttDato = deltakerDto.sluttDato,
-			dagerPerUke = deltakerDto.dagerPerUke,
-			prosentStilling = deltakerDto.prosentDeltid,
-			registrertDato = deltakerDto.registrertDato,
-			gjennomforingId = tiltaksgjennomforing.id,
-			innsokBegrunnelse = deltakerDto.innsokBegrunnelse
-		)
 		val status = DeltakerStatusInsert(
 			id = UUID.randomUUID(),
 			deltakerId = deltakerDto.id,
@@ -68,9 +58,20 @@ class DeltakerProcessor(
 			gyldigFra = deltakerDto.statusEndretDato,
 		)
 
+		val deltakerUpsert = DeltakerUpsert(
+			id = deltakerDto.id,
+			statusInsert = status,
+			startDato = deltakerDto.startDato,
+			sluttDato = deltakerDto.sluttDato,
+			dagerPerUke = deltakerDto.dagerPerUke,
+			prosentStilling = deltakerDto.prosentDeltid,
+			registrertDato = deltakerDto.registrertDato,
+			gjennomforingId = tiltaksgjennomforing.id,
+			innsokBegrunnelse = deltakerDto.innsokBegrunnelse
+		)
+
 		transactionTemplate.executeWithoutResult {
 			deltakerService.upsertDeltaker(deltakerDto.personIdent, deltakerUpsert)
-			deltakerService.insertStatus(status)
 
 			/*
 			 	Deltakere blir noen ganger gjenbrukt istedenfor at det opprettes en ny,

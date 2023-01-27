@@ -15,6 +15,7 @@
     <modules>
         <module>arena-acl-ingestor</module>
         <module>kafka-config</module>
+        <module>kafka-producer</module>
         <module>endring-paa-oppf-bruker-ingestor</module>
         <module>tildelt-veileder-ingestor</module>
         <module>skjermet-person-ingestor</module>

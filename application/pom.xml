@@ -43,6 +43,10 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>bff-internal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>tiltak</artifactId>
         </dependency>
         <dependency>
@@ -73,6 +77,10 @@
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>kafka-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>kafka-producer</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>

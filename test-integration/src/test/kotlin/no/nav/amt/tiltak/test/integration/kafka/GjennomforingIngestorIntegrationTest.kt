@@ -10,10 +10,10 @@ import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
-import no.nav.amt.tiltak.test.integration.utils.AsyncUtils
 import no.nav.amt.tiltak.test.integration.utils.GjennomforingMessage
 import no.nav.amt.tiltak.test.integration.utils.KafkaMessageCreator
 import no.nav.amt.tiltak.test.integration.utils.LogUtils
+import no.nav.amt.tiltak.test.utils.AsyncUtils
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import org.junit.jupiter.api.BeforeEach

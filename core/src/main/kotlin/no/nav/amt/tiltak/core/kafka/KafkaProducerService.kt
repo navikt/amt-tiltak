@@ -1,4 +1,12 @@
 package no.nav.amt.tiltak.core.kafka
 
-// Lar interfacet være til vi skal produsere ting på kafka, fjern denne kommentaren
-interface KafkaProducerService
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import java.util.*
+
+interface KafkaProducerService {
+
+	fun publiserDeltaker(deltaker: Deltaker)
+
+	fun publiserSlettDeltaker(deltakerId: UUID)
+
+}

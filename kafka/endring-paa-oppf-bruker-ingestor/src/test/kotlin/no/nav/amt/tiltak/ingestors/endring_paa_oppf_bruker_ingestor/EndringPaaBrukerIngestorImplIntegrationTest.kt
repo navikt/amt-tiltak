@@ -10,6 +10,7 @@ import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
+import no.nav.amt.tiltak.deltaker.service.BrukerService
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
 import no.nav.amt.tiltak.nav_enhet.NavEnhetRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -20,7 +21,6 @@ import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.TestDataSeeder
 import no.nav.amt.tiltak.test.database.data.inputs.NavEnhetInput
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
-import no.nav.amt.tiltak.deltaker.service.BrukerService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -69,7 +69,8 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 			brukerService,
 			endringsmeldingService,
 			mockk(),
-			TransactionTemplate()
+			TransactionTemplate(),
+			mockk()
 		)
 		endringPaaBrukerIngestorImpl = EndringPaaBrukerIngestorImpl(deltakerService, navEnhetService)
 	}

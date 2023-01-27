@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.deltaker.service
 
 import no.nav.amt.tiltak.core.domain.tiltak.*
+import no.nav.amt.tiltak.core.kafka.KafkaProducerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.deltaker.dbo.*
@@ -21,7 +22,8 @@ open class DeltakerServiceImpl(
 	private val brukerService: BrukerService,
 	private val endringsmeldingService: EndringsmeldingService,
 	private val skjultDeltakerRepository: SkjultDeltakerRepository,
-	private val transactionTemplate: TransactionTemplate
+	private val transactionTemplate: TransactionTemplate,
+	private val kafkaProducerService: KafkaProducerService
 ) : DeltakerService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -29,27 +31,31 @@ open class DeltakerServiceImpl(
 	override fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert) {
 		val lagretDeltaker = hentDeltaker(deltaker.id)
 
-		if (lagretDeltaker == null) {
-			insertDeltaker(personIdent, deltaker)
-		} else if(!deltaker.compareTo(lagretDeltaker)){
-			update(deltaker)
+		transactionTemplate.executeWithoutResult {
+			if (lagretDeltaker == null) {
+				insertDeltaker(personIdent, deltaker)
+			} else if(!deltaker.compareTo(lagretDeltaker)){
+				update(deltaker)
+			}
+
+			oppdaterStatus(deltaker.statusInsert)
+
+			val oppdatertDeltaker = hentDeltaker(deltaker.id)
+				?: throw IllegalStateException("Fant ikke deltaker med id ${deltaker.id}")
+
+			kafkaProducerService.publiserDeltaker(oppdatertDeltaker)
 		}
+
 	}
 
 	override fun insertStatus(status: DeltakerStatusInsert) {
-		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(status.deltakerId)
-		if (forrigeStatus?.type == status.type && forrigeStatus.aarsak == status.aarsak) return
-
-		val nyStatus = DeltakerStatusInsertDbo(
-			id = status.id,
-			deltakerId = status.deltakerId,
-			type = status.type,
-			aarsak = status.aarsak,
-			gyldigFra = status.gyldigFra?: LocalDateTime.now()
-		)
 		transactionTemplate.executeWithoutResult {
-			forrigeStatus?.let { deltakerStatusRepository.deaktiver(it.id) }
-			deltakerStatusRepository.insert(nyStatus)
+			oppdaterStatus(status)
+
+			val oppdatertDeltaker = hentDeltaker(status.deltakerId)
+				?: throw IllegalStateException("Fant ikke deltaker med id ${status.deltakerId}")
+
+			kafkaProducerService.publiserDeltaker(oppdatertDeltaker)
 		}
 	}
 
@@ -86,6 +92,8 @@ open class DeltakerServiceImpl(
 		transactionTemplate.execute {
 			deltakerStatusRepository.slettDeltakerStatus(deltakerId)
 			deltakerRepository.slettDeltaker(deltakerId)
+
+			kafkaProducerService.publiserSlettDeltaker(deltakerId)
 		}
 
 		log.info("Deltaker med id=$deltakerId er slettet")
@@ -116,6 +124,24 @@ open class DeltakerServiceImpl(
 		)
 
 		deltakerRepository.update(toUpdate)
+	}
+
+	private fun oppdaterStatus(status: DeltakerStatusInsert) {
+		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(status.deltakerId)
+		if (forrigeStatus?.type == status.type && forrigeStatus.aarsak == status.aarsak) return
+
+		val nyStatus = DeltakerStatusInsertDbo(
+			id = status.id,
+			deltakerId = status.deltakerId,
+			type = status.type,
+			aarsak = status.aarsak,
+			gyldigFra = status.gyldigFra?: LocalDateTime.now()
+		)
+
+		transactionTemplate.executeWithoutResult {
+			forrigeStatus?.let { deltakerStatusRepository.deaktiver(it.id) }
+			deltakerStatusRepository.insert(nyStatus)
+		}
 	}
 
 	private fun insertDeltaker(fodselsnummer: String, deltaker: DeltakerUpsert) {
@@ -238,6 +264,37 @@ open class DeltakerServiceImpl(
 
 	override fun erSkjultForTiltaksarrangor(deltakerIder: List<UUID>): Map<UUID, Boolean> {
 		return skjultDeltakerRepository.erSkjultForTiltaksarrangor(deltakerIder)
+	}
+
+	override fun republiserAlleDeltakerePaKafka(batchSize: Int) {
+		var offset = 0
+
+		var deltakere: List<DeltakerDbo>
+
+		do {
+			deltakere = deltakerRepository.hentDeltakere(offset, batchSize)
+
+			val statuser = hentAktiveStatuserForDeltakere(deltakere.map { it.id })
+
+			deltakere.forEach {
+				val status = statuser[it.id]?.toModel()
+
+				if (status == null) {
+					log.error("Klarte ikke å republisere deltaker med id ${it.id} fordi status mangler")
+					return@forEach
+				}
+
+				val deltaker = it.toDeltaker(status)
+
+				kafkaProducerService.publiserDeltaker(deltaker)
+			}
+
+			offset += deltakere.size
+
+			log.info("Publisert batch med deltakere på kafka, offset=$offset, batchSize=${deltakere.size}")
+		} while (deltakere.isNotEmpty())
+
+		log.info("Ferdig med republisering av deltakere på kafka")
 	}
 
 }

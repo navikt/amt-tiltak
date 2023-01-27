@@ -126,6 +126,8 @@ spec:
       value: nom.skjermede-personer-status-v1
     - name: LEESAH_TOPIC
       value: pdl.leesah-v1
+    - name: DELTAKER_TOPIC
+      value: amt.deltaker-v1
 
   gcp:
     sqlInstances:
