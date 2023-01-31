@@ -9,13 +9,25 @@ import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletRequest
 
 @RestController
-@RequestMapping("/internal/diskresjonskode")
-class SlettMegController(
+@RequestMapping("/internal")
+class InternalUpdateController(
 	private val service: BrukerService
 ) {
 
 	@Unprotected
-	@GetMapping
+	@GetMapping("/oppdater-bruker-informasjon")
+	fun oppdaterBrukerinformasjon(
+		servlet: HttpServletRequest
+	) {
+		if (isInternal(servlet)) {
+			JobRunner.runAsync("oppdater_brukere") {
+				service.updateAllBrukere()
+			}
+		}
+	}
+
+	@Unprotected
+	@GetMapping("/diskresjonskode")
 	fun logBrukereMedAdressebeskyttelse(
 		servlet: HttpServletRequest
 	) {
