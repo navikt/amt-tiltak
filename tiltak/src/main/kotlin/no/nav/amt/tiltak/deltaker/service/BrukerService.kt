@@ -4,6 +4,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.PersonService
+import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.deltaker.dbo.BrukerUpsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
@@ -69,15 +70,61 @@ class BrukerService(
 			brukere.forEach { bruker ->
 				val person = personService.hentPerson(bruker.personIdent)
 
-				if(person.diskresjonskode != null) {
+				if (person.diskresjonskode != null) {
 					log.info("BrukerId har diskresjonskode: ${bruker.id}")
 				}
 			}
 
-			log.info("Sjekket brukere mellom $offset og ${offset+brukere.size}")
+			log.info("Sjekket brukere mellom $offset og ${offset + brukere.size}")
 			offset += brukere.size
 		} while (brukere.isNotEmpty())
 		log.info("---- Logger Brukere END ----")
+	}
+
+	fun updateAllBrukere() {
+		var brukereOppdatert = 0
+		var offset = 0
+		var brukere: List<BrukerDbo>
+
+		val hasChanges = fun(bruker: BrukerDbo, newData: BrukerUpsertDbo): Boolean {
+			return bruker.fornavn != newData.fornavn
+				|| bruker.mellomnavn != newData.mellomnavn
+				|| bruker.etternavn != newData.etternavn
+				|| bruker.telefonnummer != newData.telefonnummer
+				|| bruker.epost != newData.epost
+		}
+
+		log.info("Oppdaterer brukerinformasjon")
+		do {
+			brukere = brukerRepository.getBrukere(offset)
+
+			brukere.forEach { bruker ->
+				val person = personService.hentPerson(bruker.personIdent)
+				val kontaktinformasjon = personService.hentPersonKontaktinformasjon(bruker.personIdent)
+
+				val updatedBruker = BrukerUpsertDbo(
+					personIdent = bruker.personIdent,
+					fornavn = person.fornavn,
+					mellomnavn = person.mellomnavn,
+					etternavn = person.etternavn,
+					telefonnummer = person.telefonnummer ?: kontaktinformasjon.telefonnummer,
+					epost = kontaktinformasjon.epost,
+					ansvarligVeilederId = bruker.ansvarligVeilederId,
+					navEnhetId = bruker.navEnhetId,
+					erSkjermet = bruker.erSkjermet
+				)
+
+				if (hasChanges(bruker, updatedBruker)) {
+					brukerRepository.upsert(updatedBruker)
+					brukereOppdatert++
+				}
+			}
+
+			log.info("Sjekket brukere mellom $offset og ${offset + brukere.size}")
+			offset += brukere.size
+		} while (brukere.isNotEmpty())
+
+		log.info("Brukere oppdatert. Det var $brukereOppdatert oppdateringer.")
 	}
 
 	private fun createBruker(fodselsnummer: String): BrukerDbo {
