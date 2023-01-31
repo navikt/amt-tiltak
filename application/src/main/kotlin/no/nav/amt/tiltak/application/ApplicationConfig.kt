@@ -6,6 +6,9 @@ import no.nav.common.rest.filter.LogRequestFilter
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder
 import no.nav.common.token_client.client.MachineToMachineTokenClient
 import no.nav.common.utils.EnvironmentUtils
+import no.nav.poao_tilgang.client.PoaoTilgangCachedClient
+import no.nav.poao_tilgang.client.PoaoTilgangClient
+import no.nav.poao_tilgang.client.PoaoTilgangHttpClient
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.servlet.FilterRegistrationBean
@@ -36,6 +39,20 @@ open class ApplicationConfig {
 	@Bean
 	open fun auditLogger(): AuditLogger {
 		return AuditLoggerImpl()
+	}
+
+	@Bean
+	open fun poaoTilgangClient(
+		@Value("\${poao-tilgang.url}") poaoTilgangUrl: String,
+		@Value("\${poao-tilgang.scope}") poaoTilgangScope: String,
+		machineToMachineTokenClient: MachineToMachineTokenClient
+	): PoaoTilgangClient {
+		return PoaoTilgangCachedClient(
+			PoaoTilgangHttpClient(
+				baseUrl = poaoTilgangUrl,
+				tokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(poaoTilgangScope) }
+			)
+		)
 	}
 
 	@Bean

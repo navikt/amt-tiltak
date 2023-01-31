@@ -10,6 +10,8 @@ interface PersonService {
 
 	fun hentGjeldendePersonligIdent(ident: String): String
 
+	fun erSkjermet(norskIdent: String): Boolean
+
 }
 
 data class Kontaktinformasjon(

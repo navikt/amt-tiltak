@@ -67,6 +67,11 @@
             <id>confluent</id>
             <url>https://packages.confluent.io/maven/</url>
         </repository>
+
+        <repository>
+            <id>jitpack</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <build>
@@ -160,11 +165,6 @@
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>amt_enhetsregister</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>poao-tilgang</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -348,6 +348,11 @@
                 <groupId>no.nav.common</groupId>
                 <artifactId>token-client</artifactId>
                 <version>${common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.navikt.poao-tilgang</groupId>
+                <artifactId>client</artifactId>
+                <version>2023.01.27_14.49-9fe135865a9f</version>
             </dependency>
 
             <dependency>

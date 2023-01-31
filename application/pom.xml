@@ -115,6 +115,10 @@
             <artifactId>token-client</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.github.navikt.poao-tilgang</groupId>
+            <artifactId>client</artifactId>
+        </dependency>
+        <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>log</artifactId>
         </dependency>

@@ -87,11 +87,11 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>poao-tilgang</artifactId>
+            <artifactId>utils</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>utils</artifactId>
+            <groupId>com.github.navikt.poao-tilgang</groupId>
+            <artifactId>client</artifactId>
         </dependency>
 
         <dependency>

@@ -12,7 +12,6 @@ import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.NavEnhetService
-import no.nav.amt.tiltak.core.port.SkjermetPersonService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
@@ -55,7 +54,6 @@ class DeltakerServiceImplTest {
 	lateinit var navEnhetService: NavEnhetService
 	lateinit var endringsmeldingService: EndringsmeldingService
 	lateinit var skjultDeltakerRepository: SkjultDeltakerRepository
-	lateinit var skjermetPersonService: SkjermetPersonService
 	lateinit var kafkaProducerService: KafkaProducerService
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
@@ -68,9 +66,8 @@ class DeltakerServiceImplTest {
 
 		navEnhetService = mockk()
 		endringsmeldingService = mockk()
-		skjermetPersonService = mockk()
 		kafkaProducerService = mockk(relaxUnitFun = true)
-		brukerService = BrukerService(brukerRepository, mockk(), mockk(), navEnhetService, skjermetPersonService)
+		brukerService = BrukerService(brukerRepository, mockk(), mockk(), navEnhetService)
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		skjultDeltakerRepository = SkjultDeltakerRepository(jdbcTemplate)
