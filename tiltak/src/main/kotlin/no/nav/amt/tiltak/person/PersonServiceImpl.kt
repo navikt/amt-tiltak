@@ -10,6 +10,7 @@ import no.nav.amt.tiltak.core.port.Diskresjonskode
 import no.nav.amt.tiltak.core.port.Kontaktinformasjon
 import no.nav.amt.tiltak.core.port.Person
 import no.nav.amt.tiltak.core.port.PersonService
+import no.nav.poao_tilgang.client.PoaoTilgangClient
 import org.springframework.stereotype.Service
 
 @Service
@@ -17,7 +18,8 @@ class PersonServiceImpl(
 	private val pdlClient: PdlClient,
 	private val dkifClient: DkifClient,
 	private val veilarboppfolgingClient: VeilarboppfolgingClient,
-	private val meterRegistry: MeterRegistry
+	private val meterRegistry: MeterRegistry,
+	private val poaoTilgangClient: PoaoTilgangClient
 ) : PersonService {
 
 	private val diskresjonskodeCounters = mapOf<Diskresjonskode, Counter>()
@@ -53,6 +55,10 @@ class PersonServiceImpl(
 	}
 
 	override fun hentGjeldendePersonligIdent(ident: String) : String = pdlClient.hentGjeldendePersonligIdent(ident)
+
+	override fun erSkjermet(norskIdent: String): Boolean {
+		return poaoTilgangClient.erSkjermetPerson(norskIdent).getOrThrow()
+	}
 
 	private fun incrementCounter(kode: Diskresjonskode) = diskresjonskodeCounters.getOrElse(kode) {
 		meterRegistry.counter("amt_tiltak_connector_person_counter", "diskresjonskode", kode.name)

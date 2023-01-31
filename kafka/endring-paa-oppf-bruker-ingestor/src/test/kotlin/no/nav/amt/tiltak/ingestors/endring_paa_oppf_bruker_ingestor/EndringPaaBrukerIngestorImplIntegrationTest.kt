@@ -44,7 +44,6 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 	val navAnsattService: NavAnsattService = mockk()
 	val navEnhetService: NavEnhetService = mockk()
 	val endringsmeldingService: EndringsmeldingService = mockk()
-	val skjermetPersonService: SkjermetPersonService = mockk()
 
 	lateinit var dataSource: DataSource
 	lateinit var jdbcTemplate: NamedParameterJdbcTemplate
@@ -62,7 +61,7 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		gjennomforingRepository = GjennomforingRepository(jdbcTemplate)
 
-		brukerService = BrukerService(brukerRepository, personService, navAnsattService, navEnhetService, skjermetPersonService)
+		brukerService = BrukerService(brukerRepository, personService, navAnsattService, navEnhetService)
 		deltakerService = DeltakerServiceImpl(
 			deltakerRepository,
 			deltakerStatusRepository,

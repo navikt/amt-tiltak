@@ -29,6 +29,10 @@ class PersonServiceMock : PersonService {
 		throw UnsupportedOperationException()
 	}
 
+	override fun erSkjermet(norskIdent: String): Boolean {
+		TODO("Not yet implemented")
+	}
+
 	private fun PersonMockData.toPdlBruker(): Person {
 		return Person(
 			fornavn = this.fornavn,
