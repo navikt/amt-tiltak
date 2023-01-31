@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
-private const val gjennomforingerPerAnsatt = "amt.tiltak.antall.gjennomforinger.pr.ansatt"
+private const val gjennomforingerPerAnsatt = "amt_tiltak_antall_gjennomforinger_pr_ansatt"
 
 @Configuration
 open class ArrangorAnsattGjennomforingTiltakStatistikkUpdater(

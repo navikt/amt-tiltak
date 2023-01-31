@@ -8,14 +8,14 @@ import org.springframework.stereotype.Component
 import java.util.concurrent.atomic.AtomicInteger
 
 
-private const val deltakere = "amt.tiltak.antall.deltakere"
-private const val deltakerePrStatus = "amt.tiltak.antall.deltakere.pr.status"
-private const val arrangorer = "amt.tiltak.antall.arrangorer"
-private const val arrangorerMedBrukere = "amt.tiltak.antall.arrangorer.med.brukere"
-private const val aktiveArrangorer = "amt.tiltak.antall.aktive.arrangorer"
-private const val aktiveArrangorerMedBrukere = "amt.tiltak.antall.aktive.arrangorer.med.brukere"
-private const val eksponerteBrukere = "amt.tiltak.antall.brukere.eksponerte" // erstattes av eksponerteBrukerePrStatus
-private const val eksponerteBrukerePrStatus = "amt.tiltak.antall.brukere.eksponerte.pr.status"
+private const val deltakere = "amt_tiltak_antall_deltakere"
+private const val deltakerePrStatus = "amt_tiltak_antall_deltakere_pr_status"
+private const val arrangorer = "amt_tiltak_antall_arrangorer"
+private const val arrangorerMedBrukere = "amt_tiltak_antall_arrangorer_med_brukere"
+private const val aktiveArrangorer = "amt_tiltak_antall_aktive_arrangorer"
+private const val aktiveArrangorerMedBrukere = "amt_tiltak_antall_aktive_arrangorer_med_brukere"
+private const val eksponerteBrukere = "amt_tiltak_antall_brukere_eksponerte" // erstattes av eksponerteBrukerePrStatus
+private const val eksponerteBrukerePrStatus = "amt_tiltak_antall_brukere_eksponerte_pr_status"
 
 @Component
 class DeltakerStatistikkUpdater(
