@@ -7,7 +7,7 @@ import io.micrometer.core.instrument.Tags
 import org.springframework.stereotype.Service
 
 private const val antallGjennomforingerPerType = "amt_tiltak_gjennomforinger_per_type_antall"
-private const val gjennomforing = "amt.tiltak.antall.gjennomforing"
+private const val gjennomforing = "amt_tiltak_antall_gjennomforing"
 
 @Service
 class GjennomforingMetricService(

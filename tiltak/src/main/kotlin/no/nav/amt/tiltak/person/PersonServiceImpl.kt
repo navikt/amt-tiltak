@@ -55,7 +55,7 @@ class PersonServiceImpl(
 	override fun hentGjeldendePersonligIdent(ident: String) : String = pdlClient.hentGjeldendePersonligIdent(ident)
 
 	private fun incrementCounter(kode: Diskresjonskode) = diskresjonskodeCounters.getOrElse(kode) {
-		meterRegistry.counter("amt.tiltak.connector.person.counter", "diskresjonskode", kode.name)
+		meterRegistry.counter("amt_tiltak_connector_person_counter", "diskresjonskode", kode.name)
 	}.increment()
 
 
