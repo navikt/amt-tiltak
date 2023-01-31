@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.endringsmelding.metrics
 
+import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.utils.getNullableLocalDateTime
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
@@ -37,12 +38,27 @@ class EndringsmeldingMetricRepository(
 
 	fun getAntallEndringsmeldingerPerType(): List<AntallEndringsmeldingerPerType> {
 		val sql = "SELECT type, count(*) AS antall FROM endringsmelding GROUP BY type"
-	 	return template.query(sql) { rs, _ ->
+		return template.query(sql) { rs, _ ->
 			AntallEndringsmeldingerPerType(
 				type = rs.getString("type"),
 				antall = rs.getInt("antall"),
 			)
 		}
+	}
+
+	fun getAntallEndringsmeldingerPerStatus(): Map<Endringsmelding.Status, Int> {
+		val sql = """
+			select status, count(*) as antall
+			from endringsmelding
+			group by status
+		""".trimIndent()
+
+		return template.query(sql) { rs, _ ->
+			Pair(
+				Endringsmelding.Status.valueOf(rs.getString("status")),
+				rs.getInt("antall")
+			)
+		}.toMap()
 	}
 
 	data class AntallEndringsmeldingerPerType(

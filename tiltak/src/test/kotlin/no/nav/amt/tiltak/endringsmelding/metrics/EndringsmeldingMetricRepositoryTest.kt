@@ -46,14 +46,29 @@ class EndringsmeldingMetricRepositoryTest : FunSpec({
 
 	test("antallAktiveEndringsmeldinger - skal hente antall aktive endringsmeldinger") {
 		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
-		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1.copy(id = UUID.randomUUID(), status = Endringsmelding.Status.UTFORT))
+		testRepository.insertEndringsmelding(
+			ENDRINGSMELDING_1_DELTAKER_1.copy(
+				id = UUID.randomUUID(),
+				status = Endringsmelding.Status.UTFORT
+			)
+		)
 
 		repository.getMetrics()?.antallAktive shouldBe 1
 	}
 
 	test("antallAutomatiskFerdigEndringsmeldinger - skal hente antall endringsmeldinger som har status UTDATERT") {
-		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1.copy(id = UUID.randomUUID(), status = Endringsmelding.Status.UTDATERT))
-		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1.copy(id = UUID.randomUUID(), status = Endringsmelding.Status.UTDATERT))
+		testRepository.insertEndringsmelding(
+			ENDRINGSMELDING_1_DELTAKER_1.copy(
+				id = UUID.randomUUID(),
+				status = Endringsmelding.Status.UTDATERT
+			)
+		)
+		testRepository.insertEndringsmelding(
+			ENDRINGSMELDING_1_DELTAKER_1.copy(
+				id = UUID.randomUUID(),
+				status = Endringsmelding.Status.UTDATERT
+			)
+		)
 		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
 
 		repository.getMetrics()?.automatiskFerdige shouldBe 2
@@ -61,17 +76,24 @@ class EndringsmeldingMetricRepositoryTest : FunSpec({
 
 	test("antallManueltFerdigEndringsmeldinger - skal hente antall endringsmeldinger med status UTFORT") {
 		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
-		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1.copy(
-			id = UUID.randomUUID(),
-			status = Endringsmelding.Status.UTFORT,
-		))
+		testRepository.insertEndringsmelding(
+			ENDRINGSMELDING_1_DELTAKER_1.copy(
+				id = UUID.randomUUID(),
+				status = Endringsmelding.Status.UTFORT,
+			)
+		)
 
 		repository.getMetrics()?.manueltFerdige shouldBe 1
 	}
 
 	test("getAntallEndringsmeldingerPerType - skal hente antall endringsmeldinger for hver type") {
 		EndringsmeldingDbo.Type.values().forEach {
-			testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1.copy(id = UUID.randomUUID(), type = it.name))
+			testRepository.insertEndringsmelding(
+				ENDRINGSMELDING_1_DELTAKER_1.copy(
+					id = UUID.randomUUID(),
+					type = it.name
+				)
+			)
 		}
 		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
 
@@ -84,6 +106,22 @@ class EndringsmeldingMetricRepositoryTest : FunSpec({
 				it.antall shouldBe 1
 			}
 		}
+	}
+
+	test("antallEndringsmeldingerPerStatus - Skal vise antall endringsmeldinger per status") {
+		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
+
+		testRepository.insertEndringsmelding(
+			ENDRINGSMELDING_1_DELTAKER_1.copy(
+				id = UUID.randomUUID(),
+				status = Endringsmelding.Status.UTFORT
+			)
+		)
+
+		val data = repository.getAntallEndringsmeldingerPerStatus()
+
+		data[Endringsmelding.Status.AKTIV] shouldBe 1
+		data[Endringsmelding.Status.UTFORT] shouldBe 1
 	}
 
 })
