@@ -16,6 +16,7 @@ import no.nav.amt.tiltak.core.exceptions.ValidationException
 import no.nav.amt.tiltak.core.port.*
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
 import java.util.*
 
 @RestController
@@ -140,13 +141,14 @@ class DeltakerController(
 	) {
 		if(body.deltakelseProsent <= 0) throw ValidationException("Deltakelsesprosent kan ikke være mindre eller lik 0")
 		if(body.deltakelseProsent > 100) throw ValidationException("Deltakelsesprosent kan ikke være over 100%")
+		body.gyldigFraDato?.let { if (it.isBefore(LocalDate.now())) throw ValidationException("Gyldig fra-dato kan ikke være tidligere enn i dag") }
 
 		val ansatt = hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		verifiserErIkkeSkjult(deltakerId)
 
-		deltakerService.endreDeltakelsesprosent(deltakerId, ansatt.id, body.deltakelseProsent)
+		deltakerService.endreDeltakelsesprosent(deltakerId, ansatt.id, body.deltakelseProsent, body.gyldigFraDato)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -185,7 +187,8 @@ class DeltakerController(
 	}
 
 	data class EndreDeltakelsesprosentRequestBody(
-		val deltakelseProsent: Int
+		val deltakelseProsent: Int,
+		val gyldigFraDato: LocalDate?
 	)
 
 	private fun Endringsmelding.toDto() = EndringsmeldingDto(id = id, innhold = innhold.toDto())

@@ -56,7 +56,8 @@ data class EndringsmeldingDbo(
 		) : Innhold()
 
 		data class EndreDeltakelseProsentInnhold(
-			val nyDeltakelseProsent: Int
+			val nyDeltakelseProsent: Int,
+			val gyldigFraDato: LocalDate?
 		): Innhold()
 
 		fun type(): Type {

@@ -41,7 +41,8 @@ data class Endringsmelding(
 		) : Innhold()
 
 		data class EndreDeltakelseProsentInnhold(
-			val deltakelseProsent: Int
+			val deltakelseProsent: Int,
+			val gyldigFraDato: LocalDate?
 		) : Innhold()
 	}
 }
