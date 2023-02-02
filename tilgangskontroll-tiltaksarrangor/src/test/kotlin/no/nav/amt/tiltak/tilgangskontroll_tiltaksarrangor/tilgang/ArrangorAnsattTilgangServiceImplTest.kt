@@ -12,12 +12,16 @@ import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.KOORDINATOR
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.AltinnService
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.ArrangorAnsattRoller
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
@@ -54,6 +58,29 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 	val arrangorId = UUID.randomUUID()
 
 	val datasource = SingletonPostgresContainer.getDataSource()
+
+	val gjennomforing = Gjennomforing(
+		id = gjennomforingId,
+		tiltak = Tiltak(
+			id = UUID.randomUUID(),
+			kode = "TEST",
+			navn = "TEST"
+		),
+		arrangor = Arrangor(
+			id = arrangorId,
+			navn = "TEST",
+			organisasjonsnummer = "123",
+			overordnetEnhetNavn = null,
+			overordnetEnhetOrganisasjonsnummer = null
+		),
+		navn = "TEST",
+		status = Gjennomforing.Status.GJENNOMFORES,
+		startDato = null,
+		sluttDato = null,
+		navEnhetId = null,
+		opprettetAar = 2022,
+		lopenr = 3837
+	)
 
 	val deltaker = Deltaker(
 		id = deltakerId,
@@ -112,6 +139,19 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 			"",
 			emptyList()
 		)
+
+		every {
+			ansattRolleService.hentAktiveRoller(any())
+		} returns listOf(
+			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
+				arrangorId = arrangorId,
+				roller = listOf(KOORDINATOR)
+			)
+		)
+
+		every {
+			gjennomforingService.getGjennomforing(any())
+		} returns gjennomforing
 	}
 
 	test("verifiserTilgangTilGjennomforing skal kaste exception hvis ikke tilgang") {
