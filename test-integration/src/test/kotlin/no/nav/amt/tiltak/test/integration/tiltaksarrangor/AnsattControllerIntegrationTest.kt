@@ -41,6 +41,17 @@ class AnsattControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
+	fun `getInnloggetAnsatt() should return 403 when not only veileder`() {
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/ansatt/meg",
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(TestData.ARRANGOR_ANSATT_2.personligIdent)}")
+		)
+
+		response.code shouldBe 403
+	}
+
+	@Test
 	fun `getInnloggetAnsatt() should return 200 when ansatt is not previously stored`() {
 		val ident = "012345678912"
 

@@ -4,6 +4,7 @@ import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.KOORDINATOR
 import no.nav.amt.tiltak.core.exceptions.SkjultDeltakerException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
@@ -26,7 +27,7 @@ class EndringsmeldingController(
 	fun hentAktiveEndringsmeldinger(@RequestParam("deltakerId") deltakerId: UUID): List<EndringsmeldingDto> {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 
-		arrangorTilgangService.verifiserTilgangTilDeltaker(ansattPersonligIdent, deltakerId)
+		arrangorTilgangService.verifiserTilgangTilDeltaker(ansattPersonligIdent, deltakerId, KOORDINATOR)
 
 		if (deltakerService.erSkjultForTiltaksarrangor(deltakerId))
 			throw SkjultDeltakerException("Deltaker med id $deltakerId er skjult for tiltaksarrangør")
@@ -47,7 +48,11 @@ class EndringsmeldingController(
 
 		val endringsmelding = endringsmeldingService.hentEndringsmelding(id)
 
-		arrangorTilgangService.verifiserTilgangTilDeltaker(ansattPersonligIdent, endringsmelding.deltakerId)
+		arrangorTilgangService.verifiserTilgangTilDeltaker(
+			ansattPersonligIdent,
+			endringsmelding.deltakerId,
+			KOORDINATOR
+		)
 		endringsmeldingService.markerSomTilbakekalt(endringsmelding.id)
 	}
 

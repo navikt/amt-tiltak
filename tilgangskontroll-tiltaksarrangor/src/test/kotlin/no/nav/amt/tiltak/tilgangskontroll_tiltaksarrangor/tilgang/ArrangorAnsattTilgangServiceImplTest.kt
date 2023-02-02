@@ -9,12 +9,14 @@ import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.KOORDINATOR
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.AltinnService
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.ArrangorAnsattRoller
@@ -38,6 +40,8 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 	lateinit var altinnService: AltinnService
 
 	lateinit var arrangorService: ArrangorService
+
+	lateinit var gjennomforingService: GjennomforingService
 
 	val personligIdent = "fnr"
 
@@ -89,10 +93,13 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		arrangorService = mockk()
 
+		gjennomforingService = mockk()
+
 		arrangorAnsattTilgangServiceImpl = ArrangorAnsattTilgangServiceImpl(
 			arrangorAnsattService, ansattRolleService,
 			deltakerService, altinnService, arrangorAnsattGjennomforingTilgangService,
-			arrangorService, TransactionTemplate(DataSourceTransactionManager(datasource))
+			arrangorService, TransactionTemplate(DataSourceTransactionManager(datasource)),
+			gjennomforingService
 		)
 
 		every {
@@ -113,7 +120,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		} returns emptyList()
 
 		shouldThrowExactly<UnauthorizedException> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(personligIdent, gjennomforingId)
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(personligIdent, gjennomforingId, KOORDINATOR)
 		}
 	}
 
@@ -123,7 +130,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		} returns listOf(gjennomforingId)
 
 		shouldNotThrow<Throwable> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(personligIdent, gjennomforingId)
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(personligIdent, gjennomforingId, KOORDINATOR)
 		}
 	}
 
@@ -133,7 +140,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		} returns listOf(UUID.randomUUID())
 
 		shouldThrowExactly<UnauthorizedException> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilArrangor(personligIdent, arrangorId)
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilArrangor(personligIdent, arrangorId, KOORDINATOR)
 		}
 	}
 
@@ -143,7 +150,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		} returns listOf(arrangorId)
 
 		shouldNotThrow<Throwable> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilArrangor(personligIdent, arrangorId)
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilArrangor(personligIdent, arrangorId, KOORDINATOR)
 		}
 	}
 
@@ -157,7 +164,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		} returns listOf(gjennomforingId)
 
 		shouldNotThrow<Throwable> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId, KOORDINATOR)
 		}
 	}
 
@@ -171,7 +178,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		} returns emptyList()
 
 		shouldThrowExactly<UnauthorizedException> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId, KOORDINATOR)
 		}
 	}
 
@@ -183,7 +190,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		val organisasjonsnummer = "5678"
 
 		every { altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
-			ArrangorAnsattRoller(organisasjonsnummer, listOf(ArrangorAnsattRolle.KOORDINATOR))
+			ArrangorAnsattRoller(organisasjonsnummer, listOf(KOORDINATOR))
 		)
 		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
 		every { arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent) } returns Ansatt(
@@ -210,7 +217,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		arrangorAnsattTilgangServiceImpl.synkroniserRettigheterMedAltinn(ansattPersonligIdent)
 
-		verify(exactly = 1) { ansattRolleService.opprettRolle(any(), ansattId, arrangorId, ArrangorAnsattRolle.KOORDINATOR) }
+		verify(exactly = 1) { ansattRolleService.opprettRolle(any(), ansattId, arrangorId, KOORDINATOR) }
 	}
 
 	test("synkroniserRettigheterMedAltinn - skal ikke legge til rolle hvis allerede finnes") {
@@ -221,7 +228,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		val organisasjonsnummer = "5678"
 
 		every { altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
-			ArrangorAnsattRoller(organisasjonsnummer, listOf(ArrangorAnsattRolle.KOORDINATOR))
+			ArrangorAnsattRoller(organisasjonsnummer, listOf(KOORDINATOR))
 		)
 		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
 		every { arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent) } returns Ansatt(
@@ -235,7 +242,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		every { ansattRolleService.hentAktiveRoller(ansattId) } returns listOf(
 			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
 				arrangorId = arrangorId,
-				roller = listOf(ArrangorAnsattRolle.KOORDINATOR)
+				roller = listOf(KOORDINATOR)
 			)
 		)
 		every { arrangorService.getOrCreateArrangor(organisasjonsnummer) } returns Arrangor(
@@ -260,7 +267,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		val organisasjonsnummer2 = "9999"
 		every { altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
-			ArrangorAnsattRoller(organisasjonsnummer2, listOf(ArrangorAnsattRolle.KOORDINATOR))
+			ArrangorAnsattRoller(organisasjonsnummer2, listOf(KOORDINATOR))
 		)
 		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
 		every { arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent) } returns Ansatt(
@@ -274,7 +281,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		every { ansattRolleService.hentAktiveRoller(ansattId) } returns listOf(
 			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
 				arrangorId = arrangorId,
-				roller = listOf(ArrangorAnsattRolle.KOORDINATOR)
+				roller = listOf(KOORDINATOR)
 			)
 		)
 		every { arrangorService.getOrCreateArrangor(organisasjonsnummer2) } returns Arrangor(
@@ -294,7 +301,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		arrangorAnsattTilgangServiceImpl.synkroniserRettigheterMedAltinn(ansattPersonligIdent)
 
-		verify(exactly = 1) { ansattRolleService.deaktiverRolleHosArrangor(ansattId, arrangorId, ArrangorAnsattRolle.KOORDINATOR) }
+		verify(exactly = 1) { ansattRolleService.deaktiverRolleHosArrangor(ansattId, arrangorId, KOORDINATOR) }
 		verify(exactly = 1) { arrangorAnsattGjennomforingTilgangService.fjernTilgangTilGjennomforinger(ansattId, arrangorId) }
 
 	}

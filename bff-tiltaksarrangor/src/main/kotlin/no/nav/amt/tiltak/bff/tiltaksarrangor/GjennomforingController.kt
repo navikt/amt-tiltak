@@ -5,7 +5,7 @@ import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.KoordinatorDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
-import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.KOORDINATOR
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
@@ -30,6 +30,7 @@ class GjennomforingController(
 	@GetMapping
 	fun hentGjennomforinger(): List<GjennomforingDto> {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
+		arrangorAnsattTilgangService.shouldHaveRolle(ansattPersonligIdent, KOORDINATOR)
 
 		val gjennomforingIder = arrangorAnsattTilgangService
 			.hentGjennomforingIder(ansattPersonligIdent)
@@ -44,6 +45,7 @@ class GjennomforingController(
 	@GetMapping("/tilgjengelig")
 	fun hentTilgjengeligeGjennomforinger(): List<GjennomforingDto> {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
+		arrangorAnsattTilgangService.shouldHaveRolle(ansattPersonligIdent, KOORDINATOR)
 
 		val ansattId = arrangorAnsattTilgangService.hentAnsattId(ansattPersonligIdent)
 
@@ -54,6 +56,7 @@ class GjennomforingController(
 	@PostMapping("/{gjennomforingId}/tilgang")
 	fun opprettTilgangTilGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID) {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
+		arrangorAnsattTilgangService.shouldHaveRolle(ansattPersonligIdent, KOORDINATOR)
 
 		val ansattId = arrangorAnsattTilgangService.hentAnsattId(ansattPersonligIdent)
 
@@ -70,6 +73,7 @@ class GjennomforingController(
 	@DeleteMapping("/{gjennomforingId}/tilgang")
 	fun fjernTilgangTilGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID) {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
+		arrangorAnsattTilgangService.shouldHaveRolle(ansattPersonligIdent, KOORDINATOR)
 
 		arrangorAnsattTilgangService.fjernTilgang(ansattPersonligIdent, gjennomforingId)
 	}
@@ -80,7 +84,7 @@ class GjennomforingController(
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId).toDto()
-		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
+		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId, KOORDINATOR)
 		return gjennomforing
 	}
 
@@ -89,7 +93,7 @@ class GjennomforingController(
 	fun hentKoordinatorerPaGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID): List<KoordinatorDto> {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 
-		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
+		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId, KOORDINATOR)
 
 		return arrangorAnsattService.getKoordinatorerForGjennomforing(gjennomforingId)
 			.map {
@@ -103,7 +107,7 @@ class GjennomforingController(
 
 	private fun hentGjennomforingerSomKanLeggesTil(ansattId: UUID): List<Gjennomforing> {
 		return arrangorAnsattTilgangService.hentAnsattTilganger(ansattId)
-			.filter { it.roller.contains(ArrangorAnsattRolle.KOORDINATOR) }
+			.filter { it.roller.contains(KOORDINATOR) }
 			.map { gjennomforingService.getByArrangorId(it.arrangorId) }
 			.flatten()
 			.filter(this::erSynligForArrangor)
