@@ -32,4 +32,7 @@ interface EndringsmeldingService {
     fun markerSomTilbakekalt(id: UUID)
 
 	fun hentAktiveEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding>
+
+	fun slettEndringsmeldingerForDeltaker(deltakerId: UUID)
+
 }

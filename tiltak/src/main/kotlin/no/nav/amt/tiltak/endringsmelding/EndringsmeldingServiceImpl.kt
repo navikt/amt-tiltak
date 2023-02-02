@@ -157,6 +157,11 @@ open class EndringsmeldingServiceImpl(
 		)
 	}
 
+	override fun slettEndringsmeldingerForDeltaker(deltakerId: UUID) {
+		endringsmeldingRepository.deleteByDeltaker(deltakerId)
+	}
+
+
 	private fun EndringsmeldingDbo.toModel(): Endringsmelding {
 		return Endringsmelding(
 			id = id,

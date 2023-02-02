@@ -235,4 +235,20 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		endringsmelding.innhold shouldBe innhold
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 	}
+
+	test("deleteByDeltaker - skal slette alle endringsmeldinger på deltakeren") {
+		val utfortMelding = ENDRINGSMELDING_1_DELTAKER_1.copy(
+				id = UUID.randomUUID(),
+				status = Endringsmelding.Status.UTFORT,
+				utfortTidspunkt = ZonedDateTime.now().minusWeeks(1),
+				utfortAvNavAnsattId = NAV_ANSATT_1.id,
+			)
+
+		testRepository.insertEndringsmelding(utfortMelding)
+		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
+
+		repository.deleteByDeltaker(DELTAKER_1.id)
+
+		repository.getByDeltaker(DELTAKER_1.id) shouldHaveSize 0
+	}
 })

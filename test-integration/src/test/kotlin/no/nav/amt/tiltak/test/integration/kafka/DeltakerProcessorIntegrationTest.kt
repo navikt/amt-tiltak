@@ -112,8 +112,6 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	fun `ingest deltaker - status feilregistrert - skal slette deltaker`() {
-
-		testDataRepository.deleteAllEndringsmeldinger() // Trengs fordi slettDeltaker() sletter ikke endringsmeldinger knyttet til deltaker
 		deltakerService.hentDeltaker(DELTAKER_1.id) shouldNotBe null
 
 		val message = DeltakerMessage(id = DELTAKER_1.id, gjennomforingId = DELTAKER_1.gjennomforingId, status = DeltakerStatus.Type.FEILREGISTRERT)
@@ -144,7 +142,6 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	fun `skal slette deltaker med operation DELETED`() {
-		testDataRepository.deleteAllEndringsmeldinger() // Trengs fordi slettDeltaker() sletter ikke endringsmeldinger knyttet til deltaker
 		deltakerService.hentDeltaker(DELTAKER_1.id) shouldNotBe null
 
 		val message = DeltakerMessage(id = DELTAKER_1.id, gjennomforingId = DELTAKER_1.gjennomforingId, operation = "DELETED")
