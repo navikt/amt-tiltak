@@ -62,6 +62,10 @@ class ArrangorAnsattServiceImpl(
 			}
 	}
 
+	override fun setVellykketInnlogging(ansattId: UUID) {
+		arrangorAnsattRepository.setVelykketInnlogging(ansattId)
+	}
+
 	private fun createAnsatt(ansattPersonIdent: String): Ansatt {
 		val person = personService.hentPerson(ansattPersonIdent)
 
