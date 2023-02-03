@@ -18,6 +18,11 @@ class MockAmtAltinnAclHttpServer : MockHttpServer(name = "AmtAltinnAclHttpServer
 			norskIdent = TestData.ARRANGOR_ANSATT_1.personligIdent,
 			roller = createRollerForSingleOrg(ARRANGOR_1.organisasjonsnummer, listOf("KOORDINATOR"))
 		)
+
+		addRoller(
+			norskIdent = TestData.ARRANGOR_ANSATT_2.personligIdent,
+			roller = createRollerForSingleOrg(ARRANGOR_1.organisasjonsnummer, listOf("VEILEDER"))
+		)
 	}
 
 	fun addRoller(

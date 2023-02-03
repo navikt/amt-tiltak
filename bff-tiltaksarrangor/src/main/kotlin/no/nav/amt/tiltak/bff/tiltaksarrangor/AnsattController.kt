@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.bff.tiltaksarrangor
 import no.nav.amt.tiltak.ansatt.toDto
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.PersonService
@@ -26,6 +27,7 @@ class AnsattController(
 		val personligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 
 		arrangorAnsattTilgangService.synkroniserRettigheterMedAltinn(personligIdent)
+		arrangorAnsattTilgangService.shouldHaveRolle(personligIdent, ArrangorAnsattRolle.KOORDINATOR)
 
 		return arrangorAnsattService.getAnsattByPersonligIdent(personligIdent)?.toDto() ?:
 			personService.hentPerson(personligIdent).let {
