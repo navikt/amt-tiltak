@@ -24,6 +24,7 @@ open class ArrangorAnsattRepository(
 			mellomnavn = rs.getString("mellomnavn"),
 			etternavn = rs.getString("etternavn"),
 			tilgangerSistSynkronisert = rs.getLocalDateTime("tilganger_sist_synkronisert"),
+			sistVelykkedeInnlogging = rs.getLocalDateTime("sist_velykkede_innlogging"),
 			createdAt = rs.getLocalDateTime("created_at"),
 			modifiedAt = rs.getLocalDateTime("modified_at")
 		)
@@ -117,6 +118,14 @@ open class ArrangorAnsattRepository(
 			sqlParameters("antall" to antall),
 			rowMapper
 		)
+	}
+
+	fun setVelykketInnlogging(ansattId: UUID) {
+		val sql = """
+			UPDATE arrangor_ansatt SET sist_velykkede_innlogging = CURRENT_TIMESTAMP WHERE id = :ansattId
+		""".trimIndent()
+
+		template.update(sql, sqlParameters("ansattId" to ansattId))
 	}
 
 }

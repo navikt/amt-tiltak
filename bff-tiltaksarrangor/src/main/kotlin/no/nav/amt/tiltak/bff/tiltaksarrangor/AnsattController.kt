@@ -29,13 +29,16 @@ class AnsattController(
 		arrangorAnsattTilgangService.synkroniserRettigheterMedAltinn(personligIdent)
 		arrangorAnsattTilgangService.shouldHaveRolle(personligIdent, ArrangorAnsattRolle.KOORDINATOR)
 
-		return arrangorAnsattService.getAnsattByPersonligIdent(personligIdent)?.toDto() ?:
-			personService.hentPerson(personligIdent).let {
+		val ansatt = arrangorAnsattService.getAnsattByPersonligIdent(personligIdent)
+			?: return personService.hentPerson(personligIdent).let {
 				no.nav.amt.tiltak.ansatt.AnsattDto(
 					fornavn = it.fornavn,
 					etternavn = it.etternavn,
 					arrangorer = emptyList()
 				)
 			}
+
+		arrangorAnsattService.setVellykketInnlogging(ansatt.id)
+		return ansatt.toDto()
 	}
 }
