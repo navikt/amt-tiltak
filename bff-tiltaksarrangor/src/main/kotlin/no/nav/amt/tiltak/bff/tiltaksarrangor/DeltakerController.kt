@@ -8,6 +8,7 @@ import no.nav.amt.tiltak.bff.tiltaksarrangor.request.*
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.KOORDINATOR
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.exceptions.SkjultDeltakerException
@@ -36,7 +37,11 @@ class DeltakerController(
 	fun hentDeltakere(@RequestParam("gjennomforingId") gjennomforingId: UUID): List<DeltakerDto> {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 
-		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId)
+		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(
+			ansattPersonligIdent,
+			gjennomforingId,
+			KOORDINATOR
+		)
 
 		var deltakere = deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
 			.filter { it.status.type != DeltakerStatus.Type.PABEGYNT }
@@ -48,7 +53,8 @@ class DeltakerController(
 			!erSkjultMap.getOrDefault(it.id, false)
 		}
 
-		val endringmeldingerMap = endringsmeldingService.hentAktiveEndringsmeldingerForDeltakere(deltakere.map { it.id })
+		val endringmeldingerMap =
+			endringsmeldingService.hentAktiveEndringsmeldingerForDeltakere(deltakere.map { it.id })
 
 		return deltakere.map {
 			val endringsmeldinger = endringmeldingerMap.getOrDefault(it.id, emptyList())
@@ -63,7 +69,7 @@ class DeltakerController(
 	fun hentTiltakDeltakerDetaljer(@PathVariable("tiltakDeltakerId") deltakerId: UUID): DeltakerDetaljerDto {
 		val ansatt = hentInnloggetAnsatt()
 		auditLoggerService.tiltaksarrangorAnsattDeltakerOppslagAuditLog(ansatt.id, deltakerId)
-		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId, KOORDINATOR)
 
 		val deltakerDetaljer = controllerService.getDeltakerDetaljerById(deltakerId)
 
@@ -72,7 +78,7 @@ class DeltakerController(
 
 		verifiserErIkkeSkjult(deltakerId)
 
-		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId, KOORDINATOR)
 
 		return deltakerDetaljer
 	}
@@ -85,7 +91,7 @@ class DeltakerController(
 	) {
 		val ansatt = hentInnloggetAnsatt()
 
-		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId, KOORDINATOR)
 		verifiserErIkkeSkjult(deltakerId)
 
 		deltakerService.leggTilOppstartsdato(deltakerId, ansatt.id, request.oppstartsdato)
@@ -99,7 +105,7 @@ class DeltakerController(
 	) {
 		val ansatt = hentInnloggetAnsatt()
 
-		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId, KOORDINATOR)
 		verifiserErIkkeSkjult(deltakerId)
 
 		deltakerService.endreOppstartsdato(deltakerId, ansatt.id, request.oppstartsdato)
@@ -113,7 +119,7 @@ class DeltakerController(
 	) {
 		val ansatt = hentInnloggetAnsatt()
 
-		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId, KOORDINATOR)
 		verifiserErIkkeSkjult(deltakerId)
 
 		deltakerService.avsluttDeltakelse(deltakerId, ansatt.id, request.sluttdato, request.aarsak.toModel())
@@ -127,7 +133,7 @@ class DeltakerController(
 	) {
 		val ansatt = hentInnloggetAnsatt()
 
-		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId, KOORDINATOR)
 		verifiserErIkkeSkjult(deltakerId)
 
 		deltakerService.forlengDeltakelse(deltakerId, ansatt.id, request.sluttdato)
@@ -139,13 +145,13 @@ class DeltakerController(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestBody body: EndreDeltakelsesprosentRequestBody
 	) {
-		if(body.deltakelseProsent <= 0) throw ValidationException("Deltakelsesprosent kan ikke være mindre eller lik 0")
-		if(body.deltakelseProsent > 100) throw ValidationException("Deltakelsesprosent kan ikke være over 100%")
+		if (body.deltakelseProsent <= 0) throw ValidationException("Deltakelsesprosent kan ikke være mindre eller lik 0")
+		if (body.deltakelseProsent > 100) throw ValidationException("Deltakelsesprosent kan ikke være over 100%")
 		body.gyldigFraDato?.let { if (it.isBefore(LocalDate.now())) throw ValidationException("Gyldig fra-dato kan ikke være tidligere enn i dag") }
 
 		val ansatt = hentInnloggetAnsatt()
 
-		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId, KOORDINATOR)
 		verifiserErIkkeSkjult(deltakerId)
 
 		deltakerService.endreDeltakelsesprosent(deltakerId, ansatt.id, body.deltakelseProsent, body.gyldigFraDato)
@@ -159,7 +165,7 @@ class DeltakerController(
 	) {
 		val ansatt = hentInnloggetAnsatt()
 
-		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId, KOORDINATOR)
 		verifiserErIkkeSkjult(deltakerId)
 
 		deltakerService.deltakerIkkeAktuell(deltakerId, ansatt.id, request.aarsak.toModel())
@@ -170,7 +176,7 @@ class DeltakerController(
 	fun skjulDeltakerForTiltaksarrangor(@PathVariable("deltakerId") deltakerId: UUID) {
 		val ansatt = hentInnloggetAnsatt()
 
-		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId, KOORDINATOR)
 
 		deltakerService.skjulDeltakerForTiltaksarrangor(deltakerId, ansatt.id)
 	}

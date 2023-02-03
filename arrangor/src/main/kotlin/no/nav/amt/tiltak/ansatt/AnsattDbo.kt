@@ -11,6 +11,7 @@ data class AnsattDbo(
 	val fornavn: String,
 	val mellomnavn: String?,
 	val etternavn: String,
+	val sistVelykkedeInnlogging: LocalDateTime,
 	val tilgangerSistSynkronisert: LocalDateTime,
 	val createdAt: LocalDateTime,
 	val modifiedAt: LocalDateTime

@@ -1,22 +1,26 @@
 package no.nav.amt.tiltak.deltaker.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.assertions.throwables.shouldThrowExactly
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
-import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.repositories.SkjultDeltakerRepository
+import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
+import no.nav.amt.tiltak.endringsmelding.EndringsmeldingServiceImpl
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2
@@ -52,13 +56,16 @@ class DeltakerServiceImplTest {
 	lateinit var brukerService: BrukerService
 	lateinit var testDataRepository: TestDataRepository
 	lateinit var navEnhetService: NavEnhetService
-	lateinit var endringsmeldingService: EndringsmeldingService
+	lateinit var endringsmeldingService: EndringsmeldingServiceImpl
+	lateinit var endringsmeldingRepository: EndringsmeldingRepository
 	lateinit var skjultDeltakerRepository: SkjultDeltakerRepository
 	lateinit var kafkaProducerService: KafkaProducerService
+	lateinit var objectMapper: ObjectMapper
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 	val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
 	val deltakerId = UUID.randomUUID()
+	val transactionTemplate = TransactionTemplate(DataSourceTransactionManager(dataSource))
 
 	@BeforeEach
 	fun beforeEach() {
@@ -68,9 +75,12 @@ class DeltakerServiceImplTest {
 		endringsmeldingService = mockk()
 		kafkaProducerService = mockk(relaxUnitFun = true)
 		brukerService = BrukerService(brukerRepository, mockk(), mockk(), navEnhetService)
+		objectMapper = JsonUtils.objectMapper
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		skjultDeltakerRepository = SkjultDeltakerRepository(jdbcTemplate)
+		endringsmeldingRepository = EndringsmeldingRepository(jdbcTemplate, objectMapper)
+		endringsmeldingService = EndringsmeldingServiceImpl(endringsmeldingRepository, mockk(), transactionTemplate)
 
 		deltakerServiceImpl = DeltakerServiceImpl(
 			deltakerRepository = deltakerRepository,
@@ -78,7 +88,7 @@ class DeltakerServiceImplTest {
 			brukerService = brukerService,
 			endringsmeldingService = endringsmeldingService,
 			skjultDeltakerRepository = skjultDeltakerRepository,
-			transactionTemplate = TransactionTemplate(DataSourceTransactionManager(dataSource)),
+			transactionTemplate = transactionTemplate,
 			kafkaProducerService = kafkaProducerService,
 		)
 		testDataRepository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
@@ -302,6 +312,35 @@ class DeltakerServiceImplTest {
 		deltakerRepository.get(deltakerId) shouldBe null
 
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldBe null
+	}
+
+	@Test
+	fun `slettDeltaker - skal slette deltaker, status og endringsmeldinger`() {
+		val statusInsertDbo = DeltakerStatusInsert(
+			id = UUID.randomUUID(),
+			deltakerId = deltaker.id,
+			type = DeltakerStatus.Type.DELTAR,
+			aarsak = null,
+			gyldigFra = LocalDateTime.now().minusDays(2)
+		)
+
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
+		deltakerServiceImpl.insertStatus(statusInsertDbo)
+		endringsmeldingService.opprettForlengDeltakelseEndringsmelding(
+			deltaker.id,
+			ARRANGOR_ANSATT_1.id,
+			LocalDate.now().plusWeeks(4),
+		)
+
+		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldNotBe null
+
+		deltakerServiceImpl.slettDeltaker(deltakerId)
+
+		deltakerRepository.get(deltakerId) shouldBe null
+
+		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldBe null
+
+		endringsmeldingService.hentAktiveEndringsmeldingerForDeltaker(deltakerId) shouldHaveSize 0
 	}
 
 	@Test

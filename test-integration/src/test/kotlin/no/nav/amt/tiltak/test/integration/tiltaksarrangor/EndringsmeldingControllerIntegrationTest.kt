@@ -7,6 +7,7 @@ import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_1
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
@@ -20,6 +21,8 @@ import java.util.*
 class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
 	val createAnsatt1AuthHeader = { mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}") }
+	val createAnsatt2AuthHeader = { mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_2.personligIdent)}") }
+
 
 	@Autowired
 	lateinit var endringsmeldingRepository: EndringsmeldingRepository
@@ -42,6 +45,18 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
 		testTiltaksarrangorAutentisering(requestBuilders, client, mockOAuthServer)
 	}
+
+	@Test
+	fun `hentAktiveEndringsmeldinger() skal returnere 403 om Ansatt kun er veileder`() {
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/endringsmelding/aktiv?deltakerId=${DELTAKER_1.id}",
+			headers = createAnsatt2AuthHeader(),
+		)
+
+		response.code shouldBe 403
+	}
+
 
 	@Test
 	fun `hentAktiveEndringsmeldinger() - skal returnere 200 med korrekt respons`() {
@@ -69,6 +84,19 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
 		response.code shouldBe 400
 	}
+
+	@Test
+	fun `tilbakekallEndringsmelding() skal returnere 403 om Ansatt kun er veileder`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/endringsmelding/${ENDRINGSMELDING_1_DELTAKER_1.id}/tilbakekall/",
+			headers = createAnsatt2AuthHeader(),
+			body = emptyRequest(),
+		)
+
+		response.code shouldBe 403
+	}
+
 
 	@Test
 	fun `tilbakekallEndringsmelding() - skal returnere 200 om endringsmeldingen ble tilbakekalt`() {

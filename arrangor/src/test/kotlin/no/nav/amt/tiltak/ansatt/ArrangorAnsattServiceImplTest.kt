@@ -67,7 +67,8 @@ class ArrangorAnsattServiceImplTest {
 			etternavn = "Etternavn_$nr",
 			tilgangerSistSynkronisert = sistSynkronisert,
 			createdAt = LocalDateTime.now(),
-			modifiedAt = LocalDateTime.now()
+			modifiedAt = LocalDateTime.now(),
+			sistVelykkedeInnlogging = LocalDateTime.MIN
 		)
 	}
 }

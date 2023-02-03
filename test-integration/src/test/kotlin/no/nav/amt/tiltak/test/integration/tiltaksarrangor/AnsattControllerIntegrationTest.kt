@@ -1,17 +1,26 @@
 package no.nav.amt.tiltak.test.integration.tiltaksarrangor
 
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import no.nav.amt.tiltak.ansatt.ArrangorAnsattRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.mocks.MockPdlBruker
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
 import okhttp3.Request
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 class AnsattControllerIntegrationTest : IntegrationTestBase() {
+
+	@Autowired
+	lateinit var arrangorAnsattRepository: ArrangorAnsattRepository
 
 	@BeforeEach
 	internal fun setUp() {
@@ -30,21 +39,41 @@ class AnsattControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	fun `getInnloggetAnsatt() should return 200 when authenticated`() {
+	fun `getInnloggetAnsatt() should return 200 when authenticated and be logged in DB`() {
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/ansatt/meg",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(TestData.ARRANGOR_ANSATT_1.personligIdent)}")
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
 		)
 
+		val arrangorAnsatt = arrangorAnsattRepository.get(ARRANGOR_ANSATT_1.id)
+		arrangorAnsatt shouldNotBe null
+		arrangorAnsatt!!.sistVelykkedeInnlogging.truncatedTo(ChronoUnit.HOURS) shouldBe LocalDateTime.now()
+			.truncatedTo(ChronoUnit.HOURS)
+
+
 		response.code shouldBe 200
+	}
+
+	@Test
+	fun `getInnloggetAnsatt() should return 403 when not only veileder`() {
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/ansatt/meg",
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(TestData.ARRANGOR_ANSATT_2.personligIdent)}")
+		)
+
+		response.code shouldBe 403
 	}
 
 	@Test
 	fun `getInnloggetAnsatt() should return 200 when ansatt is not previously stored`() {
 		val ident = "012345678912"
 
-		mockAmtAltinnAclHttpServer.addRoller(ident, mockAmtAltinnAclHttpServer.createRollerForSingleOrg(ARRANGOR_1.organisasjonsnummer, listOf("KOORDINATOR")))
+		mockAmtAltinnAclHttpServer.addRoller(
+			ident,
+			mockAmtAltinnAclHttpServer.createRollerForSingleOrg(ARRANGOR_1.organisasjonsnummer, listOf("KOORDINATOR"))
+		)
 		mockPdlHttpServer.mockHentBruker(ident, MockPdlBruker("Integrasjon", "Test"))
 
 		val response = sendRequest(

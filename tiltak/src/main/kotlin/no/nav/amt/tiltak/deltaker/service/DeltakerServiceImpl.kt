@@ -90,6 +90,7 @@ open class DeltakerServiceImpl(
 
 	override fun slettDeltaker(deltakerId: UUID) {
 		transactionTemplate.execute {
+			endringsmeldingService.slettEndringsmeldingerForDeltaker(deltakerId)
 			deltakerStatusRepository.slettDeltakerStatus(deltakerId)
 			deltakerRepository.slettDeltaker(deltakerId)
 

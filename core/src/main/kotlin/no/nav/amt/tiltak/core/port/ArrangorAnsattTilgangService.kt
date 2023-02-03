@@ -1,21 +1,26 @@
 package no.nav.amt.tiltak.core.port
 
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller
 import java.util.*
 
 interface ArrangorAnsattTilgangService {
 
-	fun verifiserTilgangTilGjennomforing(ansattPersonligIdent: String, gjennomforingId: UUID)
+	fun verifiserTilgangTilGjennomforing(
+		ansattPersonligIdent: String,
+		gjennomforingId: UUID,
+		rolle: ArrangorAnsattRolle
+	)
 
-	fun verifiserTilgangTilGjennomforing(ansattId: UUID, gjennomforingId: UUID)
+	fun verifiserTilgangTilGjennomforing(ansattId: UUID, gjennomforingId: UUID, rolle: ArrangorAnsattRolle)
 
-	fun verifiserTilgangTilArrangor(ansattPersonligIdent: String, arrangorId: UUID)
+	fun verifiserTilgangTilArrangor(ansattPersonligIdent: String, arrangorId: UUID, rolle: ArrangorAnsattRolle)
 
-	fun verifiserTilgangTilArrangor(ansattId: UUID, arrangorId: UUID)
+	fun verifiserTilgangTilArrangor(ansattId: UUID, arrangorId: UUID, rolle: ArrangorAnsattRolle)
 
-	fun verifiserTilgangTilDeltaker(ansattPersonligIdent: String, deltakerId: UUID)
+	fun verifiserTilgangTilDeltaker(ansattPersonligIdent: String, deltakerId: UUID, rolle: ArrangorAnsattRolle)
 
-	fun verifiserTilgangTilDeltaker(ansattId: UUID, deltakerId: UUID)
+	fun verifiserTilgangTilDeltaker(ansattId: UUID, deltakerId: UUID, rolle: ArrangorAnsattRolle)
 
 	fun hentAnsattTilganger(ansattId: UUID): List<ArrangorAnsattRoller>
 
@@ -29,4 +34,5 @@ interface ArrangorAnsattTilgangService {
 
 	fun synkroniserRettigheterMedAltinn(ansattPersonligIdent: String)
 
+	fun shouldHaveRolle(personligIdent: String, rolle: ArrangorAnsattRolle)
 }

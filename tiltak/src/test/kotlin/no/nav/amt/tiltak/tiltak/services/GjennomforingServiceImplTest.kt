@@ -18,6 +18,7 @@ import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.service.BrukerService
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
+import no.nav.amt.tiltak.endringsmelding.EndringsmeldingServiceImpl
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
@@ -56,7 +57,10 @@ class GjennomforingServiceImplTest : FunSpec({
 
 	lateinit var kafkaProducerService: KafkaProducerService
 
+	lateinit var endringsmeldingService: EndringsmeldingServiceImpl
+
 	lateinit var service: GjennomforingServiceImpl
+
 
 	beforeEach {
 		val parameterTemplate = NamedParameterJdbcTemplate(dataSource)
@@ -78,6 +82,8 @@ class GjennomforingServiceImplTest : FunSpec({
 
 		kafkaProducerService = mockk(relaxUnitFun = true)
 
+		endringsmeldingService = mockk()
+
 		service = GjennomforingServiceImpl(
 			gjennomforingRepository = gjennomforingRepository,
 			tiltakService = tiltakService,
@@ -85,7 +91,7 @@ class GjennomforingServiceImplTest : FunSpec({
 				DeltakerRepository(parameterTemplate),
 				DeltakerStatusRepository(parameterTemplate),
 				brukerService,
-				mockk(),
+				endringsmeldingService,
 				mockk(),
 				transactionTemplate,
 				kafkaProducerService
@@ -107,6 +113,10 @@ class GjennomforingServiceImplTest : FunSpec({
 		testDataRepository.insertBruker(BRUKER_1)
 		testDataRepository.insertDeltaker(DELTAKER_1)
 		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1)
+
+		every {
+			endringsmeldingService.slettEndringsmeldingerForDeltaker(any())
+		} returns Unit
 
 		every {
 			deltakerService.slettDeltaker(any())

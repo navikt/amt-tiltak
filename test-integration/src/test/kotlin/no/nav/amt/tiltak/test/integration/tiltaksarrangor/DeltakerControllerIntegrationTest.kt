@@ -11,6 +11,7 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
@@ -41,6 +42,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	val deltakerIkkeTilgang = DELTAKER_1.copy(id = UUID.randomUUID(), gjennomforingId = GJENNOMFORING_2.id)
 	val deltakerIkkeTilgangStatus = DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerIkkeTilgang.id )
 	val createAnsatt1AuthHeader = { mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}") }
+	val createAnsatt2AuthHeader = { mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_2.personligIdent)}") }
 
 	@BeforeEach
 	fun setup() {
@@ -268,6 +270,21 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
+	fun `endreDeltakelsesprosent() skal returnere 403 om Ansatt kun er veileder`() {
+		val deltakelseProsent = 95
+
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/deltakelse-prosent",
+			headers = createAnsatt2AuthHeader(),
+			body = """{"deltakelseProsent": $deltakelseProsent}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 403
+	}
+
+
+	@Test
 	internal fun `endreDeltakelsesprosent skal returnere 200 og opprette endringsmelding`() {
 		val deltakelseProsent = 95
 		val gyldigFraDato = "2023-02-03"
@@ -391,6 +408,33 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 		response.code shouldBe 403
 	}
+
+	@Test
+	fun `forlengDeltakelse() skal returnere 403 om Ansatt kun er veileder`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/forleng-deltakelse",
+			headers = createAnsatt2AuthHeader(),
+			body = """{"sluttdato": "$dato"}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 403
+	}
+
+	@Test
+	fun `deltakerIkkeAktuell() skal returnere 403 om Ansatt kun er veileder`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/ikke-aktuell",
+			headers = createAnsatt2AuthHeader(),
+			body = """{"aarsak": {"type": "FATT_JOBB"}}""".toJsonRequestBody()
+		)
+
+
+		response.code shouldBe 403
+	}
+
+
 	@Test
 	fun `deltakerIkkeAktuell() skal returnere 200 og opprette endringsmelding`() {
 		val response = sendRequest(
@@ -506,6 +550,19 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 		response.code shouldBe 403
 	}
+
+	@Test
+	fun `skjulDeltakerForTiltaksarrangor() skal returnere 403 om Ansatt kun er veileder`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/skjul",
+			headers = createAnsatt2AuthHeader(),
+		)
+
+
+		response.code shouldBe 403
+	}
+
 
 	private fun opprettSkjultDeltaker(): UUID {
 		val deltakerId = UUID.randomUUID()

@@ -148,6 +148,18 @@ open class EndringsmeldingRepository(
 		template.update(sql, params)
 	}
 
+	fun deleteByDeltaker(deltakerId: UUID) {
+		val sql = """
+			DELETE FROM endringsmelding
+			WHERE deltaker_id = :deltakerId
+		""".trimIndent()
+
+		val params = sqlParameters(
+			"deltakerId" to deltakerId,
+		)
+		template.update(sql, params)
+	}
+
 	private fun parseInnholdJson(innholdJson: String, type: EndringsmeldingDbo.Type): EndringsmeldingDbo.Innhold {
 		return when(type) {
 			EndringsmeldingDbo.Type.LEGG_TIL_OPPSTARTSDATO ->
@@ -165,4 +177,5 @@ open class EndringsmeldingRepository(
 		}
 
 	}
+
 }
