@@ -44,6 +44,10 @@
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>db_utils</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
