@@ -53,7 +53,7 @@ class DeltakerServiceImplTest {
 	lateinit var deltakerStatusRepository: DeltakerStatusRepository
 	lateinit var deltakerServiceImpl: DeltakerServiceImpl
 	lateinit var brukerRepository: BrukerRepository
-	lateinit var brukerService: BrukerService
+	lateinit var brukerService: BrukerServiceImpl
 	lateinit var testDataRepository: TestDataRepository
 	lateinit var navEnhetService: NavEnhetService
 	lateinit var endringsmeldingService: EndringsmeldingServiceImpl
@@ -74,7 +74,7 @@ class DeltakerServiceImplTest {
 		navEnhetService = mockk()
 		endringsmeldingService = mockk()
 		kafkaProducerService = mockk(relaxUnitFun = true)
-		brukerService = BrukerService(brukerRepository, mockk(), mockk(), navEnhetService)
+		brukerService = BrukerServiceImpl(brukerRepository, mockk(), mockk(), navEnhetService)
 		objectMapper = JsonUtils.objectMapper
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)

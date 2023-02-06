@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak
 
-import no.nav.amt.tiltak.deltaker.service.BrukerService
+import no.nav.amt.tiltak.deltaker.service.BrukerServiceImpl
 import no.nav.common.job.JobRunner
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.web.bind.annotation.GetMapping
@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest
 @RestController
 @RequestMapping("/internal")
 class InternalUpdateController(
-	private val service: BrukerService
+	private val service: BrukerServiceImpl
 ) {
 
 	@Unprotected

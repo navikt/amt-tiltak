@@ -19,7 +19,7 @@ import java.util.*
 open class DeltakerServiceImpl(
 	private val deltakerRepository: DeltakerRepository,
 	private val deltakerStatusRepository: DeltakerStatusRepository,
-	private val brukerService: BrukerService,
+	private val brukerService: BrukerServiceImpl,
 	private val endringsmeldingService: EndringsmeldingService,
 	private val skjultDeltakerRepository: SkjultDeltakerRepository,
 	private val transactionTemplate: TransactionTemplate,
