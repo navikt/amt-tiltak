@@ -19,9 +19,9 @@ open class ArrangorMetricJobs(
 
 	private val simpleGauges: Map<String, AtomicInteger> = mapOf(
 		Pair(antallAnsatte, registry.gauge(antallAnsatte, AtomicInteger(0))!!),
-		Pair(loggetInnSisteTime, registry.gauge(antallAnsatte, AtomicInteger(0))!!),
-		Pair(loggetInnSisteDag, registry.gauge(antallAnsatte, AtomicInteger(0))!!),
-		Pair(loggetInnSisteUke, registry.gauge(antallAnsatte, AtomicInteger(0))!!)
+		Pair(loggetInnSisteTime, registry.gauge(loggetInnSisteTime, AtomicInteger(0))!!),
+		Pair(loggetInnSisteDag, registry.gauge(loggetInnSisteDag, AtomicInteger(0))!!),
+		Pair(loggetInnSisteUke, registry.gauge(loggetInnSisteUke, AtomicInteger(0))!!)
 	)
 
 	//Every 5 minutes
