@@ -13,4 +13,5 @@ data class KafkaTopicProperties(
 	val sisteTiltaksgjennomforingerTopic: String,
 	val leesahTopic: String,
 	val deltakerTopic: String,
+	val aktorV2Topic: String
 )

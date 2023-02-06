@@ -23,6 +23,19 @@ class BrukerServiceImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
+	override fun oppdaterPersonIdenter(gjeldendeIdent: String, identer: List<String>) {
+		val brukere = brukerRepository.getBrukere(identer)
+
+		if(brukere.size > 1) {
+			secureLog.error("Vi har flere brukere knyttet til identer:$identer")
+			throw IllegalStateException("Vi har flere brukere knyttet til samme person")
+		}
+
+		brukere.firstOrNull()?.let { bruker ->
+			brukerRepository.oppdaterIdenter(bruker.id, gjeldendeIdent, identer)
+		}
+	}
+
 	override fun getOrCreate(fodselsnummer: String): UUID {
 		val bruker = brukerRepository.get(fodselsnummer) ?: createBruker(fodselsnummer)
 		return bruker.id

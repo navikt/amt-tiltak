@@ -6,6 +6,7 @@ import java.util.*
 data class BrukerDbo(
 	val id: UUID,
 	val personIdent: String,
+	val identer: List<String>,
 	val fornavn: String,
 	val mellomnavn: String?,
 	val etternavn: String,

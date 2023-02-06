@@ -101,4 +101,33 @@ class BrukerRepositoryTest : FunSpec({
 		repository.get(BRUKER_1.personIdent)?.erSkjermet shouldBe true
 	}
 
+	test("getBrukere - ingen brukere har ident - returnerer tom liste") {
+		repository.getBrukere(listOf("309390")) shouldBe emptyList()
+	}
+
+	test("getBrukere - bruker med ident finnes - returnerer bruker") {
+		val brukere = repository.getBrukere(listOf(BRUKER_1.personIdent))
+		brukere.size shouldBe 1
+		brukere.first().id shouldBe BRUKER_1.id
+	}
+
+	test("getBrukere - flere brukere med ident finnes - returnerer bruker") {
+		val brukere = repository.getBrukere(listOf(BRUKER_1.personIdent, BRUKER_2.personIdent))
+		brukere.size shouldBe 2
+		brukere.find { it.id == BRUKER_1.id } shouldNotBe null
+		brukere.find { it.id == BRUKER_2.id } shouldNotBe null
+
+	}
+
+	test("oppdaterIdenter - bruker finnes med annen ident - oppdaterer") {
+		val nyIdent = "1234"
+		val identer = listOf(BRUKER_1.personIdent, nyIdent)
+
+		repository.oppdaterIdenter(BRUKER_1.id, nyIdent, identer)
+		val bruker = repository.get(BRUKER_1.id)
+
+		bruker!!.personIdent shouldBe nyIdent
+		bruker.identer shouldBe identer
+	}
+
 })

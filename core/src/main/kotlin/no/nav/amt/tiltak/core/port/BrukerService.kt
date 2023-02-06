@@ -18,4 +18,5 @@ interface BrukerService {
 	fun finnesBruker(personIdent: String): Boolean
 	fun oppdaterAnsvarligVeileder(personIdent: String, navAnsattId: UUID)
 
+	fun oppdaterPersonIdenter(gjeldendeIdent: String, identer: List<String>)
 }

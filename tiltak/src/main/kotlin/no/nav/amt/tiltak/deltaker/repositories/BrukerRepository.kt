@@ -20,6 +20,7 @@ open class BrukerRepository(
 		BrukerDbo(
 			id = rs.getUUID("id"),
 			personIdent = rs.getString("person_ident"),
+			identer = (rs.getArray("identer").array as Array<String>).asList(),
 			fornavn = rs.getString("fornavn"),
 			mellomnavn = rs.getString("mellomnavn"),
 			etternavn = rs.getString("etternavn"),
@@ -179,4 +180,42 @@ open class BrukerRepository(
 		return template.query(sql, parameters, rowMapper)
 
 	}
+
+	fun getBrukere(identer: List<String>): List<BrukerDbo> {
+		if (identer.isEmpty()) return emptyList()
+
+		val sql = """
+			SELECT *
+			FROM bruker
+			WHERE person_ident in (:identer)
+		""".trimIndent()
+
+		val parameters = sqlParameters(
+			"identer" to identer,
+		)
+
+		return template.query(sql, parameters, rowMapper)
+
+	}
+
+	fun oppdaterIdenter(id: UUID, gjeldendeIdent: String, identer: List<String>) {
+		val sql = """
+			UPDATE bruker
+			SET person_ident = :gjeldendeIdent,
+			identer =  :identer,
+			modified_at = CURRENT_TIMESTAMP
+			WHERE id = :id
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"id" to id,
+				"gjeldendeIdent" to gjeldendeIdent,
+				"identer" to identer.toTypedArray(),
+			)
+		)
+
+		template.update(sql, parameters)
+	}
+
 }
