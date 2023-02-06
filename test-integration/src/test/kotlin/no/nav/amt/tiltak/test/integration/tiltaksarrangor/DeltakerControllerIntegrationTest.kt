@@ -287,7 +287,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	@Test
 	internal fun `endreDeltakelsesprosent skal returnere 200 og opprette endringsmelding`() {
 		val deltakelseProsent = 95
-		val gyldigFraDato = "2023-02-03"
+		val gyldigFraDato = LocalDate.now()
 
 		val response = sendRequest(
 			method = "PATCH",
@@ -306,7 +306,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.EndreDeltakelseProsentInnhold>()
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 		(endringsmelding.innhold as Endringsmelding.Innhold.EndreDeltakelseProsentInnhold).deltakelseProsent shouldBe deltakelseProsent
-		(endringsmelding.innhold as Endringsmelding.Innhold.EndreDeltakelseProsentInnhold).gyldigFraDato shouldBe LocalDate.parse(gyldigFraDato)
+		(endringsmelding.innhold as Endringsmelding.Innhold.EndreDeltakelseProsentInnhold).gyldigFraDato shouldBe gyldigFraDato
 	}
 
 	@Test
