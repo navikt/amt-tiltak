@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor
 
+import no.nav.amt.tiltak.ansatt.AnsattDto
 import no.nav.amt.tiltak.ansatt.toDto
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
@@ -23,22 +24,34 @@ class AnsattController(
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/meg")
-	fun getInnloggetAnsatt(): no.nav.amt.tiltak.ansatt.AnsattDto {
+	fun getInnloggetAnsatt(): AnsattDto {
 		val personligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 
 		arrangorAnsattTilgangService.synkroniserRettigheterMedAltinn(personligIdent)
-		arrangorAnsattTilgangService.shouldHaveRolle(personligIdent, ArrangorAnsattRolle.KOORDINATOR)
 
 		val ansatt = arrangorAnsattService.getAnsattByPersonligIdent(personligIdent)
-			?: return personService.hentPerson(personligIdent).let {
-				no.nav.amt.tiltak.ansatt.AnsattDto(
+
+		if (ansatt == null) {
+			return personService.hentPerson(personligIdent).let {
+				AnsattDto(
 					fornavn = it.fornavn,
 					etternavn = it.etternavn,
 					arrangorer = emptyList()
 				)
 			}
+		}
 
-		arrangorAnsattService.setVellykketInnlogging(ansatt.id)
-		return ansatt.toDto()
+		val arrangorerForAnsattMedKoordinatorRolle = ansatt.arrangorer
+			.filter { it.roller.contains(ArrangorAnsattRolle.KOORDINATOR.name) }
+
+		if (arrangorerForAnsattMedKoordinatorRolle.isNotEmpty()) {
+			arrangorAnsattService.setVellykketInnlogging(ansatt.id)
+		}
+
+		return AnsattDto(
+			fornavn = ansatt.fornavn,
+			etternavn = ansatt.etternavn,
+			arrangorer = arrangorerForAnsattMedKoordinatorRolle.map { it.toDto() }
+		)
 	}
 }

@@ -129,5 +129,19 @@ class ArrangorAnsattRepositoryTest {
 		toUpdate.size shouldBe 1
 		toUpdate.map { it.id } shouldBe listOf(ARRANGOR_ANSATT_2.id)
 	}
+
+	@Test
+	internal fun getAnsattMetrics() {
+		val metrics = repository.getAnsattMetrics()
+
+		metrics.antallAnsatte shouldBe 2
+		metrics.antallAnsatteInnloggetSisteTime shouldBe 0
+
+		repository.setVelykketInnlogging(ARRANGOR_ANSATT_1.id)
+
+		val updatedMetrics = repository.getAnsattMetrics()
+
+		updatedMetrics.antallAnsatteInnloggetSisteTime shouldBe 1
+	}
 }
 

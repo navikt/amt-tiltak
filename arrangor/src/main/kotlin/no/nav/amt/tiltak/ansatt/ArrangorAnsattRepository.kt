@@ -48,9 +48,11 @@ open class ArrangorAnsattRepository(
 	}
 
 	fun get(ansattId: UUID): AnsattDbo? {
-		val parameters = MapSqlParameterSource().addValues(mapOf(
-			"ansattId" to ansattId
-		))
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"ansattId" to ansattId
+			)
+		)
 
 		return template.query(
 			"SELECT * FROM arrangor_ansatt WHERE id = :ansattId",
@@ -60,9 +62,11 @@ open class ArrangorAnsattRepository(
 	}
 
 	fun getByPersonligIdent(personligIdent: String): AnsattDbo? {
-		val parameters = MapSqlParameterSource().addValues(mapOf(
-			"personligIdent" to personligIdent
-		))
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"personligIdent" to personligIdent
+			)
+		)
 
 		return template.query(
 			"SELECT * FROM arrangor_ansatt WHERE personlig_ident = :personligIdent",
@@ -99,10 +103,12 @@ open class ArrangorAnsattRepository(
 			UPDATE arrangor_ansatt SET tilganger_sist_synkronisert = :tilgangerSistSynkronisert where id = :id
 		""".trimIndent()
 
-		template.update(sql, sqlParameters(
-			"id" to ansattId,
-			"tilgangerSistSynkronisert" to tilgangerSistSynkronisert
-		))
+		template.update(
+			sql, sqlParameters(
+				"id" to ansattId,
+				"tilgangerSistSynkronisert" to tilgangerSistSynkronisert
+			)
+		)
 	}
 
 	fun getEldsteSistRolleSynkroniserteAnsatte(antall: Int): List<AnsattDbo> {
@@ -127,5 +133,31 @@ open class ArrangorAnsattRepository(
 
 		template.update(sql, sqlParameters("ansattId" to ansattId))
 	}
+
+	fun getAnsattMetrics(): AnsattMetrics {
+		val sql = """
+			select
+    		(select count(*) as antall_ansatte from arrangor_ansatt as antall_ansatte),
+    		(select count(*) as logged_in_last_hour from arrangor_ansatt where sist_velykkede_innlogging BETWEEN NOW() - INTERVAL '1 HOUR' AND NOW()),
+    		(select count(*) as logged_in_last_day from arrangor_ansatt where sist_velykkede_innlogging BETWEEN NOW() - INTERVAL '24 HOURS' AND NOW()),
+    		(select count(*) as logged_in_last_week from arrangor_ansatt where sist_velykkede_innlogging BETWEEN NOW() - INTERVAL '7 DAYS' AND NOW())
+		""".trimIndent()
+
+		return template.query(sql) { rs, _ ->
+			AnsattMetrics(
+				rs.getInt("antall_ansatte"),
+				rs.getInt("logged_in_last_hour"),
+				rs.getInt("logged_in_last_day"),
+				rs.getInt("logged_in_last_week"),
+			)
+		}.first()
+	}
+
+	data class AnsattMetrics(
+		val antallAnsatte: Int,
+		val antallAnsatteInnloggetSisteTime: Int,
+		val antallAnsatteInnloggetSisteDag: Int,
+		val antallAnsatteInnloggetSisteUke: Int
+	)
 
 }
