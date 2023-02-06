@@ -147,7 +147,6 @@ class DeltakerController(
 	) {
 		if (body.deltakelseProsent <= 0) throw ValidationException("Deltakelsesprosent kan ikke være mindre eller lik 0")
 		if (body.deltakelseProsent > 100) throw ValidationException("Deltakelsesprosent kan ikke være over 100%")
-		body.gyldigFraDato?.let { if (it.isBefore(LocalDate.now())) throw ValidationException("Gyldig fra-dato kan ikke være tidligere enn i dag") }
 
 		val ansatt = hentInnloggetAnsatt()
 
