@@ -121,7 +121,7 @@ internal class ArrangorRepositoryTest {
 	}
 
 	@Test
-	fun `update() skal oppdatere arrangor`() {
+	fun `update() - nytt navn og ny overordnet enhet - skal oppdatere arrangor`() {
 		testDataRepository.insertArrangor(ARRANGOR_1)
 		val updateDbo = ArrangorUpdateDbo(
 			id = ARRANGOR_1.id,
@@ -139,7 +139,25 @@ internal class ArrangorRepositoryTest {
 	}
 
 	@Test
-	fun `updateUnderenheter() skal oppdatere overordnetEnehetNavn hos alle undereneheter`() {
+	fun `update() - overordnet enhet er null - skal oppdatere arrangor`() {
+		testDataRepository.insertArrangor(ARRANGOR_1)
+		val updateDbo = ArrangorUpdateDbo(
+			id = ARRANGOR_1.id,
+			navn = ARRANGOR_1.navn,
+			overordnetEnhetOrganisasjonsnummer = null,
+			overordnetEnhetNavn = null,
+		)
+		repository.update(updateDbo)
+
+		val oppdatertArrangor = repository.getById(ARRANGOR_1.id)
+
+		oppdatertArrangor.navn shouldBe updateDbo.navn
+		oppdatertArrangor.overordnetEnhetOrganisasjonsnummer shouldBe updateDbo.overordnetEnhetOrganisasjonsnummer
+		oppdatertArrangor.overordnetEnhetNavn shouldBe updateDbo.overordnetEnhetNavn
+	}
+
+	@Test
+	fun `updateUnderenheter() - nytt overordnet enhet navn - skal oppdatere underenheter`() {
 		val id = UUID.randomUUID()
 		val nyOverordnetEnhetNavn = "Ny overordnet enhet"
 
