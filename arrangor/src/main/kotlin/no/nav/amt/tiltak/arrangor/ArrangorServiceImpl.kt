@@ -50,32 +50,23 @@ class ArrangorServiceImpl(
 	}
 
 	override fun oppdaterArrangor(arrangorUpdate: ArrangorUpdate) {
-		val original =  getArrangorByVirksomhetsnummer(arrangorUpdate.organisasjonsnummer) ?:
-			throw NoSuchElementException("Fant ikke Arrangør med virksomhetsnummer ${arrangorUpdate.organisasjonsnummer}")
+		val original = getArrangorByVirksomhetsnummer(arrangorUpdate.organisasjonsnummer) ?: return
 
-		val overordnetEnhet = hentOverordnetEnhet(arrangorUpdate, original)
+		val overordnetEnhet = arrangorUpdate.overordnetEnhetOrganisasjonsnummer?.let {
+			enhetsregisterClient.hentVirksomhet(it)
+		}
 
 		transactionTemplate.executeWithoutResult {
 			arrangorRepository.update(
 				ArrangorUpdateDbo(
 					id = original.id,
 					navn = arrangorUpdate.navn,
-					overordnetEnhetNavn = overordnetEnhet.navn,
-					overordnetEnhetOrganisasjonsnummer = overordnetEnhet.organisasjonsnummer,
+					overordnetEnhetNavn = overordnetEnhet?.navn,
+					overordnetEnhetOrganisasjonsnummer = overordnetEnhet?.organisasjonsnummer,
 				)
 			)
 			arrangorRepository.updateUnderenheter(arrangorUpdate.organisasjonsnummer, arrangorUpdate.navn)
 		}
-	}
-
-	private fun hentOverordnetEnhet(arrangorUpdate: ArrangorUpdate, original: Arrangor) : OverordnetEnhet {
-		if (arrangorUpdate.overordnetEnhetOrganisasjonsnummer != original.overordnetEnhetOrganisasjonsnummer) {
-			val nyOverordnetEnhet = arrangorUpdate.overordnetEnhetOrganisasjonsnummer?.let {
-				enhetsregisterClient.hentVirksomhet(it)
-			}
-			return OverordnetEnhet(nyOverordnetEnhet?.navn, nyOverordnetEnhet?.organisasjonsnummer)
-		}
-		return OverordnetEnhet(original.overordnetEnhetNavn, original.overordnetEnhetOrganisasjonsnummer)
 	}
 
 	private fun opprettArrangor(virksomhetsnummer: String): Arrangor {
@@ -92,8 +83,4 @@ class ArrangorServiceImpl(
 		return arrangorRepository.getById(id).toArrangor()
 	}
 
-	private data class OverordnetEnhet(
-		val navn: String?,
-		val organisasjonsnummer: String?,
-	)
 }

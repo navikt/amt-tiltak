@@ -28,6 +28,13 @@ class VirksomhetIngestorTest : IntegrationTestBase() {
 
 	@Test
 	fun `ingest - nytt navn - skal oppdatere arrangor og underenheter`() {
+		val overordnetEnhet = EnhetDto(
+			organisasjonsnummer = ARRANGOR_1.overordnetEnhetOrganisasjonsnummer!!,
+			navn = ARRANGOR_1.overordnetEnhetNavn!!,
+			overordnetEnhetNavn = null,
+			overordnetEnhetOrganisasjonsnummer = null,
+		)
+
 		val underenhet = ArrangorInput(
 			id = UUID.randomUUID(),
 			navn = "Underenhet 1",
@@ -36,6 +43,8 @@ class VirksomhetIngestorTest : IntegrationTestBase() {
 			overordnetEnhetNavn = ARRANGOR_1.navn
 		)
 		testDataRepository.insertArrangor(underenhet)
+
+		mockEnhetsregisterServer.addEnhet(overordnetEnhet)
 
 		val msg = VirksomhetMessage(
 			organisasjonsnummer = ARRANGOR_1.organisasjonsnummer,
@@ -55,6 +64,27 @@ class VirksomhetIngestorTest : IntegrationTestBase() {
 
 			val oppdatertUnderenhet = arrangorService.getArrangorById(underenhet.id)
 			oppdatertUnderenhet.overordnetEnhetNavn shouldBe oppdatertArrangor.navn
+		}
+	}
+
+	@Test
+	fun `ingest - overordnetEnhetOrgnr er null - skal oppdatere arrangor`() {
+		val msg = VirksomhetMessage(
+			organisasjonsnummer = ARRANGOR_1.organisasjonsnummer,
+			navn = "Nytt Virksomhetsnavn",
+			overordnetEnhetOrganisasjonsnummer = null,
+		)
+
+		kafkaMessageSender.sendTilVirksomhetTopic(
+			KafkaMessageCreator.opprettVirksomhetMessage(msg)
+		)
+
+		AsyncUtils.eventually {
+			val oppdatertArrangor = arrangorService.getArrangorById(ARRANGOR_1.id)
+			oppdatertArrangor.navn shouldBe msg.navn
+			oppdatertArrangor.organisasjonsnummer shouldBe msg.organisasjonsnummer
+			oppdatertArrangor.overordnetEnhetOrganisasjonsnummer shouldBe msg.overordnetEnhetOrganisasjonsnummer
+			oppdatertArrangor.overordnetEnhetNavn shouldBe null
 		}
 	}
 

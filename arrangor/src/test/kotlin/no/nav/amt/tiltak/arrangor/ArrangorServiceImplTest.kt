@@ -77,7 +77,7 @@ class ArrangorServiceImplTest: FunSpec({
 		verify(exactly = 0) { arrangorRepository.insert(any(), any(), any(), any(), any()) }
 	}
 
-	test("oppdaterArrangor - skal hente ny overordnet enhet om overordnet enhet orgnr er endret") {
+	test("oppdaterArrangor - ny overordnet enhet - skal hente overordnet enhet og oppdatere arrangor") {
 		val id = UUID.randomUUID()
 		val arrangorUpdate = ArrangorUpdate("Foo", "1234", "6789")
 		every { arrangorRepository.getByOrganisasjonsnummer(arrangorUpdate.organisasjonsnummer) } returns ArrangorDbo(
@@ -106,33 +106,6 @@ class ArrangorServiceImplTest: FunSpec({
 		arrangorService.oppdaterArrangor(arrangorUpdate)
 
 		verify(exactly = 1) { enhetsregisterClient.hentVirksomhet(any()) }
-
-		verify(exactly = 1) { arrangorRepository.update(any()) }
-
-		verify(exactly = 1) { arrangorRepository.updateUnderenheter(arrangorUpdate.organisasjonsnummer, arrangorUpdate.navn) }
-
-	}
-
-	test("oppdaterArrangor - skal ikke hente ny overordnet enhet om overordnet enhet orgnr ikke er endret") {
-		val id = UUID.randomUUID()
-		val arrangorUpdate = ArrangorUpdate("Foo", "1234", "6789")
-		every { arrangorRepository.getByOrganisasjonsnummer(arrangorUpdate.organisasjonsnummer) } returns ArrangorDbo(
-			id = id,
-			navn = "Bar",
-			organisasjonsnummer = arrangorUpdate.organisasjonsnummer,
-			overordnetEnhetOrganisasjonsnummer = arrangorUpdate.overordnetEnhetOrganisasjonsnummer,
-			overordnetEnhetNavn = "Baz",
-			createdAt = LocalDateTime.now(),
-			modifiedAt = LocalDateTime.now(),
-		)
-
-		every { transactionTemplate.executeWithoutResult(any<Consumer<TransactionStatus>>()) } answers {
-			(firstArg() as Consumer<TransactionStatus>).accept(SimpleTransactionStatus())
-		}
-
-		arrangorService.oppdaterArrangor(arrangorUpdate)
-
-		verify(exactly = 0) { enhetsregisterClient.hentVirksomhet(any()) }
 
 		verify(exactly = 1) { arrangorRepository.update(any()) }
 
