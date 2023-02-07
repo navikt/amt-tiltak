@@ -117,5 +117,25 @@ class VirksomhetIngestorTest : IntegrationTestBase() {
 		}
 	}
 
+	@Test
+	fun `ingest - nytt navn virksomheten er en overordnet enhet men ikke arrangor - skal oppdatere overordnet enhet navn hos arrangor`() {
+		val msg = VirksomhetMessage(
+			organisasjonsnummer = ARRANGOR_1.overordnetEnhetOrganisasjonsnummer!!,
+			navn = "Nytt overordnet enhet navn",
+			overordnetEnhetOrganisasjonsnummer = "42",
+		)
+
+		kafkaMessageSender.sendTilVirksomhetTopic(
+			KafkaMessageCreator.opprettVirksomhetMessage(msg)
+		)
+
+		AsyncUtils.eventually {
+			val oppdatertArrangor = arrangorService.getArrangorById(ARRANGOR_1.id)
+
+			oppdatertArrangor.overordnetEnhetOrganisasjonsnummer shouldBe msg.organisasjonsnummer
+			oppdatertArrangor.overordnetEnhetNavn shouldBe msg.navn
+		}
+	}
+
 
 }

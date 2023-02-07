@@ -50,7 +50,13 @@ class ArrangorServiceImpl(
 	}
 
 	override fun oppdaterArrangor(arrangorUpdate: ArrangorUpdate) {
-		val original = getArrangorByVirksomhetsnummer(arrangorUpdate.organisasjonsnummer) ?: return
+		val arrangor = getArrangorByVirksomhetsnummer(arrangorUpdate.organisasjonsnummer)
+
+		if (arrangor == null) {
+			// Sjekk om virksomheten er en overordnet enhet til noen arrangører og oppdater navn.
+			arrangorRepository.updateOverordnetEnhetNavn(arrangorUpdate.organisasjonsnummer, arrangorUpdate.navn)
+			return
+		}
 
 		val overordnetEnhet = arrangorUpdate.overordnetEnhetOrganisasjonsnummer?.let {
 			enhetsregisterClient.hentVirksomhet(it)
@@ -59,13 +65,13 @@ class ArrangorServiceImpl(
 		transactionTemplate.executeWithoutResult {
 			arrangorRepository.update(
 				ArrangorUpdateDbo(
-					id = original.id,
+					id = arrangor.id,
 					navn = arrangorUpdate.navn,
 					overordnetEnhetNavn = overordnetEnhet?.navn,
 					overordnetEnhetOrganisasjonsnummer = overordnetEnhet?.organisasjonsnummer,
 				)
 			)
-			arrangorRepository.updateUnderenheter(arrangorUpdate.organisasjonsnummer, arrangorUpdate.navn)
+			arrangorRepository.updateOverordnetEnhetNavn(arrangorUpdate.organisasjonsnummer, arrangorUpdate.navn)
 		}
 	}
 

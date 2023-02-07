@@ -168,7 +168,7 @@ open class ArrangorRepository(
 		template.update(sql, parameters)
 	}
 
-	fun updateUnderenheter(organisasjonsnummer: String, navn: String) {
+	fun updateOverordnetEnhetNavn(organisasjonsnummer: String, navn: String) {
 		val sql = """
 			UPDATE arrangor
 			SET overordnet_enhet_navn = :navn, modified_at = CURRENT_TIMESTAMP

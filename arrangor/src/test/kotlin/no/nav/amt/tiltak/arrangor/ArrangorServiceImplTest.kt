@@ -109,7 +109,7 @@ class ArrangorServiceImplTest: FunSpec({
 
 		verify(exactly = 1) { arrangorRepository.update(any()) }
 
-		verify(exactly = 1) { arrangorRepository.updateUnderenheter(arrangorUpdate.organisasjonsnummer, arrangorUpdate.navn) }
+		verify(exactly = 1) { arrangorRepository.updateOverordnetEnhetNavn(arrangorUpdate.organisasjonsnummer, arrangorUpdate.navn) }
 
 	}
 

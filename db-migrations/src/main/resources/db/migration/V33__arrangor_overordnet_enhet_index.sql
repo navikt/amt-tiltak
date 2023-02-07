@@ -1,0 +1,1 @@
+CREATE INDEX overordnet_enhet_organisasjonsnummer_idx ON arrangor (overordnet_enhet_organisasjonsnummer);
