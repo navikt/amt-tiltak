@@ -310,6 +310,30 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
+	internal fun `endreDeltakelsesprosent skal returnere 200 og opprette endringsmelding selv om gyldigFraDato mangler`() {
+		val deltakelseProsent = 95
+
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/deltakelse-prosent",
+			headers = createAnsatt1AuthHeader(),
+			body = """{"deltakelseProsent": $deltakelseProsent}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 200
+
+		val endringsmeldinger = endringsmeldingService.hentAktiveEndringsmeldingerForDeltaker(DELTAKER_1.id)
+
+		endringsmeldinger shouldHaveSize 1
+
+		val endringsmelding = endringsmeldinger.first()
+		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.EndreDeltakelseProsentInnhold>()
+		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
+		(endringsmelding.innhold as Endringsmelding.Innhold.EndreDeltakelseProsentInnhold).deltakelseProsent shouldBe deltakelseProsent
+		(endringsmelding.innhold as Endringsmelding.Innhold.EndreDeltakelseProsentInnhold).gyldigFraDato shouldBe null
+	}
+
+	@Test
 	fun `endreDeltakelsesprosent skal returnere 400 hvis deltaker er skjult`() {
 		val response = sendRequest(
 			method = "PATCH",
