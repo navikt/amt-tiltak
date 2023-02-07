@@ -214,11 +214,12 @@ open class DeltakerServiceImpl(
 		endringsmeldingService.opprettForlengDeltakelseEndringsmelding(deltakerId, arrangorAnsattId, sluttdato)
 	}
 
-	override fun endreDeltakelsesprosent(deltakerId: UUID, arrangorAnsattId: UUID, deltakerProsent: Int) {
+	override fun endreDeltakelsesprosent(deltakerId: UUID, arrangorAnsattId: UUID, deltakerProsent: Int, gyldigFraDato: LocalDate?) {
 		endringsmeldingService.opprettEndreDeltakelseProsentEndringsmelding(
 			deltakerId = deltakerId,
 			arrangorAnsattId = arrangorAnsattId,
-			deltakerProsent = deltakerProsent
+			deltakerProsent = deltakerProsent,
+			gyldigFraDato = gyldigFraDato
 		)
 	}
 

@@ -115,10 +115,12 @@ open class EndringsmeldingServiceImpl(
 	override fun opprettEndreDeltakelseProsentEndringsmelding(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
-		deltakerProsent: Int
+		deltakerProsent: Int,
+		gyldigFraDato: LocalDate?
 	) {
 		val innhold = EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold(
-			nyDeltakelseProsent = deltakerProsent
+			nyDeltakelseProsent = deltakerProsent,
+			gyldigFraDato = gyldigFraDato
 		)
 
 		opprettOgMarkerAktiveSomUtdatert(
@@ -194,7 +196,8 @@ open class EndringsmeldingServiceImpl(
 
 			is EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold ->
 				Endringsmelding.Innhold.EndreDeltakelseProsentInnhold(
-					deltakelseProsent = innhold.nyDeltakelseProsent
+					deltakelseProsent = innhold.nyDeltakelseProsent,
+					gyldigFraDato = innhold.gyldigFraDato
 				)
 		}
 	}

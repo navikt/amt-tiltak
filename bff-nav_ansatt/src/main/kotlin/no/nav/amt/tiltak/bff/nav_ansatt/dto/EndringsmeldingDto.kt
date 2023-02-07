@@ -52,7 +52,8 @@ data class EndringsmeldingDto(
 		) : Innhold()
 
 		data class EndreDeltakelseProsentInnhold(
-			val deltakelseProsent: Int
+			val deltakelseProsent: Int,
+			val gyldigFraDato: LocalDate?
 		) : Innhold()
 
 		fun type(): Type {
@@ -82,7 +83,8 @@ fun Endringsmelding.Innhold.toDto(): EndringsmeldingDto.Innhold {
 			EndringsmeldingDto.Innhold.DeltakerIkkeAktuellInnhold(this.aarsak.toDto())
 		is Endringsmelding.Innhold.EndreDeltakelseProsentInnhold ->
 			EndringsmeldingDto.Innhold.EndreDeltakelseProsentInnhold(
-				deltakelseProsent = this.deltakelseProsent
+				deltakelseProsent = this.deltakelseProsent,
+				gyldigFraDato = this.gyldigFraDato
 			)
 	}
 }

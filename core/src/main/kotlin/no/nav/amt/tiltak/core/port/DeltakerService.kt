@@ -32,7 +32,7 @@ interface DeltakerService {
 
 	fun forlengDeltakelse(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate)
 
-	fun endreDeltakelsesprosent(deltakerId: UUID, id: UUID, deltakerProsent: Int)
+	fun endreDeltakelsesprosent(deltakerId: UUID, arrangorAnsattId: UUID, deltakerProsent: Int, gyldigFraDato: LocalDate?)
 
 	fun avsluttDeltakelse(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate, statusAarsak: DeltakerStatus.Aarsak)
 

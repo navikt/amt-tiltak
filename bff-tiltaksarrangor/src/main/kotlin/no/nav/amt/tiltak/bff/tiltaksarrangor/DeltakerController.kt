@@ -17,6 +17,7 @@ import no.nav.amt.tiltak.core.exceptions.ValidationException
 import no.nav.amt.tiltak.core.port.*
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
 import java.util.*
 
 @RestController
@@ -152,7 +153,7 @@ class DeltakerController(
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId, KOORDINATOR)
 		verifiserErIkkeSkjult(deltakerId)
 
-		deltakerService.endreDeltakelsesprosent(deltakerId, ansatt.id, body.deltakelseProsent)
+		deltakerService.endreDeltakelsesprosent(deltakerId, ansatt.id, body.deltakelseProsent, body.gyldigFraDato)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -191,7 +192,8 @@ class DeltakerController(
 	}
 
 	data class EndreDeltakelsesprosentRequestBody(
-		val deltakelseProsent: Int
+		val deltakelseProsent: Int,
+		val gyldigFraDato: LocalDate?
 	)
 
 	private fun Endringsmelding.toDto() = EndringsmeldingDto(id = id, innhold = innhold.toDto())
