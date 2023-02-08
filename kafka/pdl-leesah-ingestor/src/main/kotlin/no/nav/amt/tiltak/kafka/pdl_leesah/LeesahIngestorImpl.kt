@@ -46,12 +46,16 @@ class LeesahIngestorImpl(
 				secureLog.info("Har slettet deltakere personidenter: ${it.personIdent}")
 
 			}
-		} else {
-			val navn = JsonUtils.fromJsonString<Navn>(genericRecord.get("navn").toString())
+		}
 
-			personIdenter.forEach { personIdent ->
-				brukerService.update(personIdent, navn.fornavn, navn.mellomnavn, navn.etternavn)
-			}
+		val navn = JsonUtils.fromJsonString<Navn>(genericRecord.get("navn").toString())
+		personIdenter.forEach { personIdent ->
+			brukerService.updateBrukerByPersonIdent(
+				personIdent = personIdent,
+				fornavn = navn.fornavn,
+				mellomnavn = navn.mellomnavn,
+				etternavn =  navn.etternavn
+			)
 		}
 
 	}

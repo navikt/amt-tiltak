@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak
 
-import no.nav.amt.tiltak.deltaker.service.BrukerServiceImpl
+import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.common.job.JobRunner
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.web.bind.annotation.GetMapping
@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest
 @RestController
 @RequestMapping("/internal")
 class InternalUpdateController(
-	private val service: BrukerServiceImpl
+	private val service: BrukerService
 ) {
 
 	@Unprotected
@@ -33,7 +33,7 @@ class InternalUpdateController(
 	fun oppdaterBrukerInformasjon(
 		@PathVariable("brukerId") brukerId: UUID
 	): Boolean {
-		return service.updateBruker(brukerId)
+		return service.updateBrukerByPersonIdent(brukerId)
 	}
 
 	@Unprotected

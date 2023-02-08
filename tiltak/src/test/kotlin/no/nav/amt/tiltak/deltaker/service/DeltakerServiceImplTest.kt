@@ -13,6 +13,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
+import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
@@ -53,7 +54,7 @@ class DeltakerServiceImplTest {
 	lateinit var deltakerStatusRepository: DeltakerStatusRepository
 	lateinit var deltakerServiceImpl: DeltakerServiceImpl
 	lateinit var brukerRepository: BrukerRepository
-	lateinit var brukerService: BrukerServiceImpl
+	lateinit var brukerService: BrukerService
 	lateinit var testDataRepository: TestDataRepository
 	lateinit var navEnhetService: NavEnhetService
 	lateinit var endringsmeldingService: EndringsmeldingServiceImpl

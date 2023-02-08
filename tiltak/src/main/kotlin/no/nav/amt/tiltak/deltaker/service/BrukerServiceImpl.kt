@@ -23,33 +23,33 @@ class BrukerServiceImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	fun getOrCreate(fodselsnummer: String): UUID {
+	override fun getOrCreate(fodselsnummer: String): UUID {
 		val bruker = brukerRepository.get(fodselsnummer) ?: createBruker(fodselsnummer)
 		return bruker.id
 	}
 
-	fun finnesBruker(fodselsnummer: String): Boolean {
+	override fun finnesBruker(fodselsnummer: String): Boolean {
 		return brukerRepository.get(fodselsnummer) != null
 	}
 
-	fun oppdaterAnsvarligVeileder(fodselsnummer: String, navAnsattId: UUID) {
+	override fun oppdaterAnsvarligVeileder(fodselsnummer: String, navAnsattId: UUID) {
 		brukerRepository.oppdaterVeileder(fodselsnummer, navAnsattId)
 	}
 
-	fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet?) {
+	override fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet?) {
 		val bruker = brukerRepository.get(fodselsnummer)
 			?: throw IllegalStateException("Kan ikke oppdatere nav enhet. Fant ikke bruker")
 		if (bruker.navEnhetId == navEnhet?.id) return
 		brukerRepository.oppdaterNavEnhet(fodselsnummer, navEnhet?.id)
 	}
 
-	fun settErSkjermet(personIdent: String, erSkjermet: Boolean) {
+	override fun settErSkjermet(personIdent: String, erSkjermet: Boolean) {
 		val erBrukerSkjermet = erSkjermet(personIdent)
 		if (erSkjermet == erBrukerSkjermet) return
 		brukerRepository.settSkjermet(personIdent, erSkjermet)
 	}
 
-	fun erSkjermet(personIdent: String): Boolean {
+	override fun erSkjermet(personIdent: String): Boolean {
 		val bruker = brukerRepository.get(personIdent)
 
 		if (bruker == null) {
@@ -60,7 +60,7 @@ class BrukerServiceImpl(
 		return bruker.erSkjermet
 	}
 
-	override fun update(personIdent: String, fornavn: String, mellomnavn: String?, etternavn: String) {
+	override fun updateBrukerByPersonIdent(personIdent: String, fornavn: String, mellomnavn: String?, etternavn: String) {
 		val bruker = brukerRepository.get(personIdent)
 
 		if(bruker != null) {
@@ -74,12 +74,12 @@ class BrukerServiceImpl(
 				epost = kontaktinformasjon.epost
 			)
 
-			update(bruker, newBruker)
+			updateBrukerData(bruker, newBruker)
 		}
 
 	}
 
-	fun logSkjermedeBrukere() {
+	override fun logSkjermedeBrukere() {
 		var offset = 0
 		var brukere: List<BrukerDbo>
 		log.info("--- Logger Brukere START ---")
@@ -98,6 +98,30 @@ class BrukerServiceImpl(
 			offset += brukere.size
 		} while (brukere.isNotEmpty())
 		log.info("---- Logger Brukere END ----")
+	}
+
+	override fun updateBrukerByPersonIdent(brukerId: UUID): Boolean {
+		return brukerRepository.get(brukerId)
+			?.let { getAndUpdateBrukerData(it) }
+			?: throw NoSuchElementException("Bruker med id $brukerId eksisterer ikke")
+	}
+
+	override fun updateAllBrukere() {
+		var brukereOppdatert = 0
+		var offset = 0
+		var brukere: List<BrukerDbo>
+
+		log.info("Oppdaterer brukerinformasjon")
+		do {
+			brukere = brukerRepository.getBrukere(offset)
+
+			brukere.forEach { bruker -> getAndUpdateBrukerData(bruker).let { if (it) brukereOppdatert++ } }
+
+			log.info("Sjekket brukere mellom $offset og ${offset + brukere.size}")
+			offset += brukere.size
+		} while (brukere.isNotEmpty())
+
+		log.info("Brukere oppdatert. Det var $brukereOppdatert oppdateringer.")
 	}
 
 	private fun createBruker(fodselsnummer: String): BrukerDbo {
@@ -128,35 +152,12 @@ class BrukerServiceImpl(
 		return brukerRepository.upsert(bruker)
 	}
 
-	fun updateBruker(brukerId: UUID): Boolean {
-		return brukerRepository.get(brukerId)
-			?.let { update(it) }
-			?: throw NoSuchElementException("Bruker med id $brukerId eksisterer ikke")
-	}
 
-	fun updateAllBrukere() {
-		var brukereOppdatert = 0
-		var offset = 0
-		var brukere: List<BrukerDbo>
-
-		log.info("Oppdaterer brukerinformasjon")
-		do {
-			brukere = brukerRepository.getBrukere(offset)
-
-			brukere.forEach { bruker -> update(bruker).let { if (it) brukereOppdatert++ } }
-
-			log.info("Sjekket brukere mellom $offset og ${offset + brukere.size}")
-			offset += brukere.size
-		} while (brukere.isNotEmpty())
-
-		log.info("Brukere oppdatert. Det var $brukereOppdatert oppdateringer.")
-	}
-
-	private fun update(bruker: BrukerDbo): Boolean {
+	private fun getAndUpdateBrukerData(bruker: BrukerDbo): Boolean {
 		val person = personService.hentPerson(bruker.personIdent)
 		val kontaktinformasjon = personService.hentPersonKontaktinformasjon(bruker.personIdent)
 
-		val other = bruker.copy(
+		val nyinnhentetBruker = bruker.copy(
 			fornavn = person.fornavn,
 			mellomnavn = person.mellomnavn,
 			etternavn = person.etternavn,
@@ -164,10 +165,10 @@ class BrukerServiceImpl(
 			epost = kontaktinformasjon.epost,
 		)
 
-		return update(bruker, other)
+		return updateBrukerData(bruker, nyinnhentetBruker)
 	}
 
-	private fun update(b1: BrukerDbo, b2: BrukerDbo): Boolean {
+	private fun updateBrukerData(b1: BrukerDbo, b2: BrukerDbo): Boolean {
 		val hasChanges = fun(b1: BrukerDbo, b2: BrukerDbo): Boolean {
 			return b1.fornavn != b2.fornavn
 				|| b1.mellomnavn != b2.mellomnavn

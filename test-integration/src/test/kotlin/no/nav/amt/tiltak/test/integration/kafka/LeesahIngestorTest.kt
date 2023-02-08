@@ -11,6 +11,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.mocks.MockKontaktinformasjon
 import no.nav.amt.tiltak.test.utils.AsyncUtils
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,16 +31,29 @@ class LeesahIngestorTest : IntegrationTestBase() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 		testDataRepository.deleteAllEndringsmeldinger()
 
+
 		val schema = Avro.default.schema(LeesahData.serializer())
 		mockSchemaRegistryClient.register("leesah-value", schema)
 
 		kafkaAvroSerializer = KafkaAvroSerializer(mockSchemaRegistryClient)
-
 	}
 
+	@AfterEach
+	internal fun tearDown() {
+		DbTestDataUtils.cleanDatabase(dataSource)
+		mockDkifHttpServer.resetHttpServer()
+	}
 
 	@Test
 	fun `skal slette deltakere med adressebeskyttelse`() {
+		mockDkifHttpServer.mockHentBrukerKontaktinformasjon(
+			MockKontaktinformasjon(
+				BRUKER_1.epost,
+				BRUKER_1.telefonnummer
+			)
+		)
+
+
 		val leesahData = LeesahData(
 			personidenter = listOf(BRUKER_1.personIdent),
 			adressebeskyttelse = Adressebeskyttelse(
@@ -59,20 +73,13 @@ class LeesahIngestorTest : IntegrationTestBase() {
 	}
 
 	@Test
-	internal fun `Skal oppdatere brukeren om endringer`() {
+	internal fun `Ingest - bruker finnes - oppdaterer navn, epost og telefon`() {
+		val expectedFornavn = "NYTT FORNAVN"
 		val expectedMellomnavn = "NYTT MELLOMNAVN"
-		val expectedEpost = "test@testersen.no"
-		val expectedTelefon = "+4787652154"
+		val expectedEtternavn = "NYTT ETTERNAVN"
 
-		val leesahData = LeesahData(
-			personidenter = listOf(BRUKER_1.personIdent),
-			adressebeskyttelse = Adressebeskyttelse(
-				gradering = Adressebeskyttelse.Gradering.UGRADERT
-			),
-			navn().copy(
-				mellomnavn = expectedMellomnavn
-			)
-		)
+		val expectedEpost = "ny@epost.no"
+		val expectedTelefon = "+12345678"
 
 		mockDkifHttpServer.mockHentBrukerKontaktinformasjon(
 			MockKontaktinformasjon(
@@ -81,16 +88,33 @@ class LeesahIngestorTest : IntegrationTestBase() {
 			)
 		)
 
+
+		val leesahData = LeesahData(
+			personidenter = listOf(BRUKER_1.personIdent),
+			adressebeskyttelse = Adressebeskyttelse(
+				gradering = Adressebeskyttelse.Gradering.UGRADERT
+			),
+			navn().copy(
+				fornavn = expectedFornavn,
+				mellomnavn = expectedMellomnavn,
+				etternavn = expectedEtternavn,
+			)
+		)
+
 		val record = Avro.default.toRecord(LeesahData.serializer(), leesahData)
 
 		val bytes = kafkaAvroSerializer.serialize("leesah", record)
+
 		kafkaMessageSender.sendTilLeesahTopic("574839574", bytes)
+
 
 		AsyncUtils.eventually {
 			val deltakere = deltakerService.hentDeltakereMedPersonIdent(BRUKER_1.personIdent)
 			deltakere.size shouldBe 1
 			val deltaker = deltakere.first()
+			deltaker.fornavn shouldBe expectedFornavn
 			deltaker.mellomnavn shouldBe expectedMellomnavn
+			deltaker.etternavn shouldBe expectedEtternavn
 			deltaker.epost shouldBe expectedEpost
 			deltaker.telefonnummer shouldBe expectedTelefon
 		}
@@ -101,11 +125,7 @@ class LeesahIngestorTest : IntegrationTestBase() {
 		mellomnavn = BRUKER_1.mellomnavn,
 		etternavn = BRUKER_1.etternavn,
 		forkortetNavn = null,
-		originaltNavn = OriginaltNavn(
-			fornavn = "Test",
-			mellomnavn = null,
-			etternavn = "Testersen"
-		)
+		originaltNavn = null
 	)
 
 	@Serializable
