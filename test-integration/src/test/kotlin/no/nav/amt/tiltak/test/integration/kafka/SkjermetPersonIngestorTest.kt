@@ -25,11 +25,7 @@ class SkjermetPersonIngestorTest: IntegrationTestBase() {
 	@BeforeEach
 	fun before() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
-	}
-
-	@AfterEach
-	internal fun tearDown() {
-		DbTestDataUtils.cleanDatabase(dataSource)
+		resetMockServersAndAddDefaultData()
 	}
 
 	@Test
