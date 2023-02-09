@@ -127,11 +127,6 @@ abstract class IntegrationTestBase {
 		}
 	}
 
-	@AfterEach
-	fun cleanup() {
-		resetMockServers()
-	}
-
 	fun resetMockServers() {
 		mockEnhetsregisterServer.reset()
 		mockNorgHttpServer.reset()

@@ -10,7 +10,7 @@ import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
-import no.nav.amt.tiltak.deltaker.service.BrukerService
+import no.nav.amt.tiltak.deltaker.service.BrukerServiceImpl
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
 import no.nav.amt.tiltak.nav_enhet.NavEnhetRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -32,7 +32,7 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 
 	lateinit var endringPaaBrukerIngestorImpl: EndringPaaBrukerIngestor
 	lateinit var deltakerService: DeltakerService
-	lateinit var brukerService: BrukerService
+	lateinit var brukerService: BrukerServiceImpl
 
 	lateinit var brukerRepository: BrukerRepository
 	lateinit var navEnhetRepository: NavEnhetRepository
@@ -61,7 +61,7 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		gjennomforingRepository = GjennomforingRepository(jdbcTemplate)
 
-		brukerService = BrukerService(brukerRepository, personService, navAnsattService, navEnhetService)
+		brukerService = BrukerServiceImpl(brukerRepository, personService, navAnsattService, navEnhetService)
 		deltakerService = DeltakerServiceImpl(
 			deltakerRepository,
 			deltakerStatusRepository,

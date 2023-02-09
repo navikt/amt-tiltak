@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.deltaker.service
 
 import no.nav.amt.tiltak.core.domain.tiltak.*
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
+import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.deltaker.dbo.*

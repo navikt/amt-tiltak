@@ -11,6 +11,7 @@ import no.nav.amt.tiltak.test.integration.mocks.MockPdlBruker
 import no.nav.amt.tiltak.test.integration.utils.DeltakerMessage
 import no.nav.amt.tiltak.test.integration.utils.KafkaMessageCreator
 import no.nav.amt.tiltak.test.utils.AsyncUtils
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,7 +25,7 @@ class SkjermetPersonIngestorTest: IntegrationTestBase() {
 	@BeforeEach
 	fun before() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
-
+		resetMockServersAndAddDefaultData()
 	}
 
 	@Test

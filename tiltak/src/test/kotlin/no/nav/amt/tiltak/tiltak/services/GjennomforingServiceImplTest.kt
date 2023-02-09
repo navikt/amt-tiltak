@@ -10,13 +10,10 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
-import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.NavEnhetService
-import no.nav.amt.tiltak.core.port.TiltakService
+import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
-import no.nav.amt.tiltak.deltaker.service.BrukerService
+import no.nav.amt.tiltak.deltaker.service.BrukerServiceImpl
 import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
 import no.nav.amt.tiltak.endringsmelding.EndringsmeldingServiceImpl
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
