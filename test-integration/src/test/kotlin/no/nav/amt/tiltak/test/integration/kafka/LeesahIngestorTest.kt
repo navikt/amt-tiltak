@@ -120,6 +120,35 @@ class LeesahIngestorTest : IntegrationTestBase() {
 		}
 	}
 
+	@Test
+	internal fun `Ingest - bruker finnes - navn i melding = null skal fortsatt sjekke adressebeskyttelse`() {
+		mockDkifHttpServer.mockHentBrukerKontaktinformasjon(
+			MockKontaktinformasjon(
+				BRUKER_1.epost,
+				BRUKER_1.telefonnummer
+			)
+		)
+
+
+		val leesahData = LeesahData(
+			personidenter = listOf(BRUKER_1.personIdent),
+			adressebeskyttelse = Adressebeskyttelse(
+				gradering = Adressebeskyttelse.Gradering.STRENGT_FORTROLIG
+			),
+			navn = null
+		)
+		val record = Avro.default.toRecord(LeesahData.serializer(), leesahData)
+
+		val bytes = kafkaAvroSerializer.serialize("leesah", record)
+		kafkaMessageSender.sendTilLeesahTopic("574839574", bytes)
+
+		AsyncUtils.eventually {
+			val deltakere = deltakerService.hentDeltakereMedPersonIdent(BRUKER_1.personIdent)
+			deltakere.isEmpty() shouldBe true
+		}
+	}
+
+
 	private fun navn() = Navn(
 		fornavn = BRUKER_1.fornavn,
 		mellomnavn = BRUKER_1.mellomnavn,

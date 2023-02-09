@@ -48,14 +48,16 @@ class LeesahIngestorImpl(
 			}
 		}
 
-		val navn = JsonUtils.fromJsonString<Navn>(genericRecord.get("navn").toString())
-		personIdenter.forEach { personIdent ->
-			brukerService.updateBrukerByPersonIdent(
-				personIdent = personIdent,
-				fornavn = navn.fornavn,
-				mellomnavn = navn.mellomnavn,
-				etternavn =  navn.etternavn
-			)
+		if(genericRecord.get("navn") != null) {
+			val navn = JsonUtils.fromJsonString<Navn>(genericRecord.get("navn").toString())
+			personIdenter.forEach { personIdent ->
+				brukerService.updateBrukerByPersonIdent(
+					personIdent = personIdent,
+					fornavn = navn.fornavn,
+					mellomnavn = navn.mellomnavn,
+					etternavn =  navn.etternavn
+				)
+			}
 		}
 
 	}
