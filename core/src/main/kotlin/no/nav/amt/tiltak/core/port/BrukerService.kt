@@ -11,12 +11,18 @@ interface BrukerService {
 	fun updateAllBrukere()
 
 	fun logSkjermedeBrukere()
+
 	fun oppdaterNavEnhet(personIdent: String, navEnhet: NavEnhet?)
+
 	fun erSkjermet(personIdent: String): Boolean
+
 	fun settErSkjermet(personIdent: String, erSkjermet: Boolean)
+
 	fun getOrCreate(fodselsnummer: String): UUID
+
 	fun finnesBruker(personIdent: String): Boolean
+
 	fun oppdaterAnsvarligVeileder(personIdent: String, navAnsattId: UUID)
 
-	fun oppdaterPersonIdenter(gjeldendeIdent: String, identer: List<String>)
+	fun oppdaterPersonIdenter(gjeldendeIdent: String, historiskeIdenter: List<String>)
 }

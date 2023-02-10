@@ -127,7 +127,7 @@ class BrukerRepositoryTest : FunSpec({
 		val bruker = repository.get(BRUKER_1.id)
 
 		bruker!!.personIdent shouldBe nyIdent
-		bruker.identer shouldBe identer
+		bruker.historiskeIdenter shouldBe identer
 	}
 
 })

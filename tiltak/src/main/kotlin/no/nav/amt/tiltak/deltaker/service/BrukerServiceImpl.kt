@@ -23,16 +23,17 @@ class BrukerServiceImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	override fun oppdaterPersonIdenter(gjeldendeIdent: String, identer: List<String>) {
-		val brukere = brukerRepository.getBrukere(identer)
+	override fun oppdaterPersonIdenter(gjeldendeIdent: String, historiskeIdenter: List<String>) {
+		val brukere = brukerRepository.getBrukere(historiskeIdenter.plus(gjeldendeIdent))
 
 		if(brukere.size > 1) {
-			secureLog.error("Vi har flere brukere knyttet til identer:$identer")
+			secureLog.error("Vi har flere brukere knyttet til ident: $gjeldendeIdent, historiske identer:$historiskeIdenter")
+			log.error("Vi har flere brukere knyttet til samme person")
 			throw IllegalStateException("Vi har flere brukere knyttet til samme person")
 		}
 
 		brukere.firstOrNull()?.let { bruker ->
-			brukerRepository.oppdaterIdenter(bruker.id, gjeldendeIdent, identer)
+			brukerRepository.oppdaterIdenter(bruker.id, gjeldendeIdent, historiskeIdenter)
 		}
 	}
 
@@ -41,19 +42,19 @@ class BrukerServiceImpl(
 		return bruker.id
 	}
 
-	override fun finnesBruker(fodselsnummer: String): Boolean {
-		return brukerRepository.get(fodselsnummer) != null
+	override fun finnesBruker(personIdent: String): Boolean {
+		return brukerRepository.get(personIdent) != null
 	}
 
-	override fun oppdaterAnsvarligVeileder(fodselsnummer: String, navAnsattId: UUID) {
-		brukerRepository.oppdaterVeileder(fodselsnummer, navAnsattId)
+	override fun oppdaterAnsvarligVeileder(personIdent: String, navAnsattId: UUID) {
+		brukerRepository.oppdaterVeileder(personIdent, navAnsattId)
 	}
 
-	override fun oppdaterNavEnhet(fodselsnummer: String, navEnhet: NavEnhet?) {
-		val bruker = brukerRepository.get(fodselsnummer)
+	override fun oppdaterNavEnhet(personIdent: String, navEnhet: NavEnhet?) {
+		val bruker = brukerRepository.get(personIdent)
 			?: throw IllegalStateException("Kan ikke oppdatere nav enhet. Fant ikke bruker")
 		if (bruker.navEnhetId == navEnhet?.id) return
-		brukerRepository.oppdaterNavEnhet(fodselsnummer, navEnhet?.id)
+		brukerRepository.oppdaterNavEnhet(personIdent, navEnhet?.id)
 	}
 
 	override fun settErSkjermet(personIdent: String, erSkjermet: Boolean) {
