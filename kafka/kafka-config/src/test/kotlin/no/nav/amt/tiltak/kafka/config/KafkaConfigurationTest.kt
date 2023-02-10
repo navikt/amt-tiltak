@@ -107,7 +107,7 @@ class KafkaConfigurationTest {
 		}
 
 		val aktorV2Ingestor = object : AktorV2Ingestor {
-			override fun ingestKafkaRecord(key: String, value: ByteArray) {
+			override fun ingestKafkaRecord(key: String, value: ByteArray?) {
 				counter.incrementAndGet()
 			}
 		}
