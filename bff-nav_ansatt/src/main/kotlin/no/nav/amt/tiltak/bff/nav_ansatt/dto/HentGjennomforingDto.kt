@@ -13,4 +13,5 @@ data class HentGjennomforingDto(
 	val lopenr: Int,
 	val opprettetAr: Int,
 	val tiltak: TiltakDto,
+	val status: Status
 )

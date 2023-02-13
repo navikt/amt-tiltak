@@ -64,6 +64,7 @@ class GjennomforingController(
 				kode = gjennomforing.tiltak.kode,
 				navn = gjennomforing.tiltak.navn,
 			),
+			status = gjennomforing.status.toDto()
 		)
 	}
 

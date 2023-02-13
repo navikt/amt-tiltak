@@ -54,6 +54,9 @@ class NavAnsattControllerService(
 			kode = tiltak.kode,
 			navn = tiltak.navn,
 		),
+		status = status.toDto(),
+		startDato = startDato,
+		sluttDato = sluttDato
 	)
 
 	private fun Endringsmelding.toDto(deltakerDto: DeltakerDto) = EndringsmeldingDto(

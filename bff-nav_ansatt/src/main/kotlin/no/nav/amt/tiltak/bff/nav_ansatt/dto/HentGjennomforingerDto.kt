@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.bff.nav_ansatt.dto
 
+import java.time.LocalDate
 import java.util.*
 
 data class HentGjennomforingerDto(
@@ -11,4 +12,7 @@ data class HentGjennomforingerDto(
 	val antallAktiveEndringsmeldinger: Int,
 	val harSkjermedeDeltakere: Boolean,
 	val tiltak: TiltakDto,
+	val status: Status,
+	val startDato: LocalDate?,
+	val sluttDato: LocalDate?
 )
