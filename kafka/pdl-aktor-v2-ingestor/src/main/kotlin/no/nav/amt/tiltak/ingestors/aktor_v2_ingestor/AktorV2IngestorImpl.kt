@@ -50,7 +50,7 @@ class AktorV2IngestorImpl(
 
 		if (gjeldendeIdenter.size != 1) {
 			//Kan dette skje?
-			secureLog.error("AktorV2 ingestor mottok bruker med ${gjeldendeIdenter.size} gjeldende ident(er): $gjeldendeIdenter")
+			secureLog.error("AktorV2 ingestor mottok bruker med ${gjeldendeIdenter.size} personident(er): $personIdenter")
 			log.error("AktorV2 ingestor mottok bruker med ${gjeldendeIdenter.size} gjeldende ident(er). Se secure logs for detaljer")
 			throw IllegalStateException("Kan ikke ingeste bruker med ${gjeldendeIdenter.size} gjeldende ident(er)")
 		}
