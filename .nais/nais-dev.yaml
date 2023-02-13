@@ -13,6 +13,7 @@ spec:
     - https://amt-tiltak.dev.intern.nav.no
   prometheus:
     enabled: true
+    path: /internal/prometheus
   readiness:
     path: /internal/health/readiness
     initialDelay: 20
