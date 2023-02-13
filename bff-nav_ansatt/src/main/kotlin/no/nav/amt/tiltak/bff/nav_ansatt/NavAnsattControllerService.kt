@@ -54,7 +54,7 @@ class NavAnsattControllerService(
 			kode = tiltak.kode,
 			navn = tiltak.navn,
 		),
-		status = status.toDto(),
+		status = status,
 		startDato = startDato,
 		sluttDato = sluttDato
 	)

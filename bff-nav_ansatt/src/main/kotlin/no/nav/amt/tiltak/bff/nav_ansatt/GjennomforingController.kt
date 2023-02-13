@@ -64,7 +64,7 @@ class GjennomforingController(
 				kode = gjennomforing.tiltak.kode,
 				navn = gjennomforing.tiltak.navn,
 			),
-			status = gjennomforing.status.toDto()
+			status = gjennomforing.status
 		)
 	}
 
@@ -80,7 +80,7 @@ class GjennomforingController(
 				id = it.id,
 				navn = it.navn,
 				lopenr = it.lopenr,
-				status = it.status.toDto(),
+				status = it.status,
 				startDato = it.startDato,
 				sluttDato = it.sluttDato,
 				opprettetAr = it.opprettetAar,
