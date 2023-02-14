@@ -133,7 +133,7 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 		LogUtils.withLogs { getLogs ->
 			kafkaMessageSender.sendTilAmtTiltakTopic(KafkaMessageCreator.opprettAmtTiltakDeltakerMessage(message))
 			AsyncUtils.eventually {
-				getLogs().any { it.message == "Deltaker id=${message.id} har diskresjonskode KODE_7 og skal filtreres ut" } shouldBe true
+				getLogs().any { it.message == "Deltaker har diskresjonskode KODE_7 og skal filtreres ut" } shouldBe true
 
 				deltakerService.hentDeltaker(message.id) shouldBe null
 			}
