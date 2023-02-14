@@ -44,7 +44,7 @@ class DeltakerProcessor(
 		val person = personService.hentPerson(deltakerFnr)
 
 		if (person.diskresjonskode != null) {
-			log.info("Deltaker id=${deltakerDto.id} har diskresjonskode ${person.diskresjonskode} og skal filtreres ut")
+			log.info("Deltaker har diskresjonskode ${person.diskresjonskode} og skal filtreres ut")
 			return
 		}
 

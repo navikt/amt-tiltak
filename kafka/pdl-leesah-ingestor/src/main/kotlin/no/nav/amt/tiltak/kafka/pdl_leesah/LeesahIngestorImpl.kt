@@ -38,7 +38,7 @@ class LeesahIngestorImpl(
 		if (erAddressebeskyttet) {
 			val deltakere = personIdenter.flatMap { deltakerService.hentDeltakereMedPersonIdent(it) }
 			if (deltakere.isNotEmpty()) {
-				secureLog.info("Sletter addressebeskyttet deltaker med personidenter: $personIdenter")
+				secureLog.info("Sletter addressebeskyttet deltaker med personidenter")
 			}
 
 			deltakere.forEach {
