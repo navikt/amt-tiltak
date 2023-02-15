@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.core.port
 
+import no.nav.amt.tiltak.core.domain.tiltak.IdentType
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import java.util.*
 
@@ -24,5 +25,5 @@ interface BrukerService {
 
 	fun oppdaterAnsvarligVeileder(personIdent: String, navAnsattId: UUID)
 
-	fun oppdaterPersonIdenter(gjeldendeIdent: String, historiskeIdenter: List<String>)
+	fun oppdaterPersonIdenter(gjeldendeIdent: String, identType: IdentType, historiskeIdenter: List<String>)
 }

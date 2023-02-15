@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
+import no.nav.amt.tiltak.core.domain.tiltak.IdentType
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.deltaker.dbo.BrukerUpsertDbo
 import no.nav.amt.tiltak.utils.getNullableUUID
@@ -20,6 +21,7 @@ open class BrukerRepository(
 		BrukerDbo(
 			id = rs.getUUID("id"),
 			personIdent = rs.getString("person_ident"),
+			personIdentType = rs.getString("person_ident_type")?.let { IdentType.valueOf(it)},
 			historiskeIdenter = (rs.getArray("historiske_identer").array as Array<String>).asList(),
 			fornavn = rs.getString("fornavn"),
 			mellomnavn = rs.getString("mellomnavn"),
@@ -198,10 +200,11 @@ open class BrukerRepository(
 
 	}
 
-	fun oppdaterIdenter(id: UUID, gjeldendeIdent: String, historiskeIdenter: List<String>) {
+	fun oppdaterIdenter(id: UUID, gjeldendeIdent: String, gjeldendeIdentType: IdentType, historiskeIdenter: List<String>) {
 		val sql = """
 			UPDATE bruker
 			SET person_ident = :gjeldendeIdent,
+			person_ident_type = :gjeldendeIdentType,
 			historiske_identer = :historiskeIdenter,
 			modified_at = CURRENT_TIMESTAMP
 			WHERE id = :id
@@ -211,6 +214,7 @@ open class BrukerRepository(
 			mapOf(
 				"id" to id,
 				"gjeldendeIdent" to gjeldendeIdent,
+				"gjeldendeIdentType" to gjeldendeIdentType.toString(),
 				"historiskeIdenter" to historiskeIdenter.toTypedArray(),
 			)
 		)

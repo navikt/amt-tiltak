@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.deltaker.service
 
+import no.nav.amt.tiltak.core.domain.tiltak.IdentType
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.NavAnsattService
@@ -23,7 +24,7 @@ class BrukerServiceImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	override fun oppdaterPersonIdenter(gjeldendeIdent: String, historiskeIdenter: List<String>) {
+	override fun oppdaterPersonIdenter(gjeldendeIdent: String, identType: IdentType, historiskeIdenter: List<String>) {
 		val brukere = brukerRepository.getBrukere(historiskeIdenter.plus(gjeldendeIdent))
 
 		if(brukere.size > 1) {
@@ -33,7 +34,7 @@ class BrukerServiceImpl(
 		}
 
 		brukere.firstOrNull()?.let { bruker ->
-			brukerRepository.oppdaterIdenter(bruker.id, gjeldendeIdent, historiskeIdenter)
+			brukerRepository.oppdaterIdenter(bruker.id, gjeldendeIdent, identType, historiskeIdenter)
 		}
 	}
 
