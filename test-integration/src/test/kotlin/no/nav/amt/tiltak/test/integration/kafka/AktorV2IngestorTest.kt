@@ -4,6 +4,7 @@ import com.github.avrokotlin.avro4k.Avro
 import io.confluent.kafka.schemaregistry.client.MockSchemaRegistryClient
 import io.confluent.kafka.serializers.KafkaAvroSerializer
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import kotlinx.serialization.Serializable
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -75,6 +76,39 @@ class AktorV2IngestorTest: IntegrationTestBase() {
 		AsyncUtils.eventually {
 			val bruker = brukerRepository.get(nyGjeldendeIdent)
 			bruker!!.historiskeIdenter shouldBe listOf(BRUKER_1.personIdent)
+		}
+	}
+
+	@Test
+	fun `ingest - bruker får flere gjeldende identer - skal lagre FOLKEREGISTERIDENT`() {
+		val nyGjeldendeFnr = "4738294789"
+		val nyGjeldendeNPID = "4845390584"
+		val nyeIdenter = listOf(
+			PersonIdent(
+				idnummer = nyGjeldendeNPID,
+				type = Type.NPID,
+				gjeldende = true
+			),
+			PersonIdent(
+				idnummer = nyGjeldendeFnr,
+				type = Type.FOLKEREGISTERIDENT,
+				gjeldende = true
+			),
+			PersonIdent(
+				idnummer = BRUKER_1.personIdent,
+				type = Type.FOLKEREGISTERIDENT,
+				gjeldende = false
+			)
+		)
+		val record = Avro.default.toRecord(AktorV2Payload.serializer(), AktorV2Payload(nyeIdenter))
+		val bytes =  kafkaAvroSerializer.serialize("aktorV2", record)
+
+		kafkaMessageSender.sendTilAktorV2Topic("123", bytes)
+
+		AsyncUtils.eventually {
+			val bruker = brukerRepository.get(nyGjeldendeFnr)
+			bruker shouldNotBe null
+			bruker!!.historiskeIdenter shouldBe listOf(nyGjeldendeNPID, BRUKER_1.personIdent)
 		}
 	}
 

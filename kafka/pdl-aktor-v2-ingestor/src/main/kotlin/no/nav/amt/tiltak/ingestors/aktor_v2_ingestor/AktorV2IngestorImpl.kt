@@ -18,6 +18,7 @@ class AktorV2IngestorImpl(
 	private val deserializer = KafkaAvroDeserializer(schemaRegistryClient)
 
 	private val log = LoggerFactory.getLogger(javaClass)
+
 	override fun ingestKafkaRecord(key: String, value: ByteArray?) {
 		if(value == null) {
 			secureLog.error("Fikk tombstone for record med key=$key.")
@@ -31,35 +32,53 @@ class AktorV2IngestorImpl(
 
 	private fun ingest(genericRecord: GenericRecord) {
 
-		val personIdenter = (genericRecord.get("identifikatorer") as GenericData.Array<GenericRecord>).map {
-			val personIdent = it.get("idnummer").toString()
-			val type = when (val typeString = it.get("type").toString()) {
-				"FOLKEREGISTERIDENT" -> Type.FOLKEREGISTERIDENT
-				"AKTORID" -> Type.AKTORID
-				"NPID" -> Type.NPID
-				else -> throw IllegalStateException("Har mottatt ident med ukjent type $typeString")
-			}
-
-			val erGjeldende = (it.get("gjeldende")).toString().toBooleanStrict()
-
-			PersonIdent(personIdent, type, erGjeldende)
-		}
+		val personIdenter = genericRecord.toPersonIdenter()
 
 		val gjeldendeIdenter = personIdenter
 			.filter { it.identType == Type.FOLKEREGISTERIDENT || it.identType == Type.NPID }
 			.filter { it.erGjeldende }
+			.sortedWith { a, _ -> folkeregisteridentFirst(a) }
 
-		if (gjeldendeIdenter.size != 1) {
-			secureLog.error("AktorV2 ingestor mottok bruker med ${gjeldendeIdenter.size} personident(er): $personIdenter")
-			log.error("AktorV2 ingestor mottok bruker med ${gjeldendeIdenter.size} gjeldende ident(er). Se secure logs for detaljer")
-			throw IllegalStateException("Kan ikke ingeste bruker med ${gjeldendeIdenter.size} gjeldende ident(er)")
+		if (gjeldendeIdenter.isEmpty()) {
+			secureLog.error("AktorV2 ingestor mottok bruker med 0 personident(er): $personIdenter")
+			log.error("AktorV2 ingestor mottok bruker med 0 gjeldende ident(er). Se secure logs for detaljer")
+			throw IllegalStateException("Kan ikke ingeste bruker med 0 gjeldende ident(er)")
+		}
+
+		if (gjeldendeIdenter.size > 1) {
+			secureLog.warn("AktorV2 ingestor mottok bruker med ${gjeldendeIdenter.size} personident(er): $personIdenter")
+			log.error("AktorV2 ingestor mottok bruker med ${gjeldendeIdenter.size}  gjeldende ident(er). Se secure logs for detaljer")
 		}
 
 		brukerService.oppdaterPersonIdenter(
 			gjeldendeIdenter.first().ident,
 			gjeldendeIdenter.first().identType.toModel(),
-			personIdenter.filter { !it.erGjeldende }.map { it.ident }
+			personIdenter.filter { it != gjeldendeIdenter.first()}.map { it.ident }
 		)
+	}
+}
+
+private fun folkeregisteridentFirst (a:PersonIdent ): Int {
+	return when (a.identType) {
+		Type.FOLKEREGISTERIDENT -> -1
+		Type.NPID -> 1
+		else -> 0
+	}
+}
+
+private fun GenericRecord.toPersonIdenter(): List<PersonIdent> {
+	return (this.get("identifikatorer") as GenericData.Array<GenericRecord>).map {
+		val personIdent = it.get("idnummer").toString()
+		val type = when (val typeString = it.get("type").toString()) {
+			"FOLKEREGISTERIDENT" -> Type.FOLKEREGISTERIDENT
+			"AKTORID" -> Type.AKTORID
+			"NPID" -> Type.NPID
+			else -> throw IllegalStateException("Har mottatt ident med ukjent type $typeString")
+		}
+
+		val erGjeldende = (it.get("gjeldende")).toString().toBooleanStrict()
+
+		PersonIdent(personIdent, type, erGjeldende)
 	}
 }
 
