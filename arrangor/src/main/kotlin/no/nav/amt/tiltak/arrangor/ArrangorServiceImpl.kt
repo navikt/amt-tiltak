@@ -52,27 +52,34 @@ class ArrangorServiceImpl(
 	override fun oppdaterArrangor(arrangorUpdate: ArrangorUpdate) {
 		val arrangor = getArrangorByVirksomhetsnummer(arrangorUpdate.organisasjonsnummer)
 
-		if (arrangor == null) {
-			// Sjekk om virksomheten er en overordnet enhet til noen arrangører og oppdater navn.
-			arrangorRepository.updateOverordnetEnhetNavn(arrangorUpdate.organisasjonsnummer, arrangorUpdate.navn)
-			return
-		}
+		arrangorRepository.updateUnderenheterIfAny(organisasjonsnummer = arrangorUpdate.organisasjonsnummer, navn = arrangorUpdate.navn)
 
-		val overordnetEnhet = arrangorUpdate.overordnetEnhetOrganisasjonsnummer?.let {
-			enhetsregisterClient.hentVirksomhet(it)
-		}
+		if (arrangor == null) return
 
-		transactionTemplate.executeWithoutResult {
+		if (arrangorUpdate.overordnetEnhetOrganisasjonsnummer != arrangor.overordnetEnhetOrganisasjonsnummer) {
+			val nyOverordnetEnhet = arrangorUpdate.overordnetEnhetOrganisasjonsnummer?.let {
+				enhetsregisterClient.hentVirksomhet(it)
+			}
 			arrangorRepository.update(
 				ArrangorUpdateDbo(
 					id = arrangor.id,
 					navn = arrangorUpdate.navn,
-					overordnetEnhetNavn = overordnetEnhet?.navn,
-					overordnetEnhetOrganisasjonsnummer = overordnetEnhet?.organisasjonsnummer,
+					overordnetEnhetNavn = nyOverordnetEnhet?.navn,
+					overordnetEnhetOrganisasjonsnummer = nyOverordnetEnhet?.organisasjonsnummer,
 				)
 			)
-			arrangorRepository.updateOverordnetEnhetNavn(arrangorUpdate.organisasjonsnummer, arrangorUpdate.navn)
 		}
+		else {
+			arrangorRepository.update(
+				ArrangorUpdateDbo(
+					id = arrangor.id,
+					navn = arrangorUpdate.navn,
+					overordnetEnhetNavn = arrangor.overordnetEnhetNavn,
+					overordnetEnhetOrganisasjonsnummer = arrangor.overordnetEnhetOrganisasjonsnummer,
+				)
+			)
+		}
+
 	}
 
 	private fun opprettArrangor(virksomhetsnummer: String): Arrangor {

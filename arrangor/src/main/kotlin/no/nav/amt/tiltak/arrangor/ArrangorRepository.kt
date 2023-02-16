@@ -153,7 +153,7 @@ open class ArrangorRepository(
 				navn = :navn,
 				overordnet_enhet_navn = :overordnetEnhetNavn,
 				overordnet_enhet_organisasjonsnummer = :overordnetEnhetOrganisasjonsnummer,
-				modified_at = :modifiedAt
+				modified_at = CURRENT_TIMESTAMP
 			WHERE id = :id
 		""".trimIndent()
 
@@ -162,13 +162,12 @@ open class ArrangorRepository(
 			"navn" to arrangorUpdateDbo.navn,
 			"overordnetEnhetNavn" to arrangorUpdateDbo.overordnetEnhetNavn,
 			"overordnetEnhetOrganisasjonsnummer" to arrangorUpdateDbo.overordnetEnhetOrganisasjonsnummer,
-			"modifiedAt" to arrangorUpdateDbo.modifiedAt,
 		)
 
 		template.update(sql, parameters)
 	}
 
-	fun updateOverordnetEnhetNavn(organisasjonsnummer: String, navn: String) {
+	fun updateUnderenheterIfAny(organisasjonsnummer: String, navn: String) {
 		val sql = """
 			UPDATE arrangor
 			SET overordnet_enhet_navn = :navn, modified_at = CURRENT_TIMESTAMP

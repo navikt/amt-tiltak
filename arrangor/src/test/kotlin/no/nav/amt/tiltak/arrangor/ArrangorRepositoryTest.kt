@@ -164,7 +164,7 @@ internal class ArrangorRepositoryTest {
 		testDataRepository.insertArrangor(ARRANGOR_1)
 		testDataRepository.insertArrangor(ARRANGOR_1.copy(id = id, organisasjonsnummer = "1234"))
 
-		repository.updateOverordnetEnhetNavn(ARRANGOR_1.overordnetEnhetOrganisasjonsnummer!!, nyOverordnetEnhetNavn)
+		repository.updateUnderenheterIfAny(ARRANGOR_1.overordnetEnhetOrganisasjonsnummer!!, nyOverordnetEnhetNavn)
 
 		repository.getById(ARRANGOR_1.id).overordnetEnhetNavn shouldBe nyOverordnetEnhetNavn
 		repository.getById(id).overordnetEnhetNavn shouldBe nyOverordnetEnhetNavn

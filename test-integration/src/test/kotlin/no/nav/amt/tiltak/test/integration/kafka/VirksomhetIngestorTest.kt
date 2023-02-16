@@ -28,12 +28,6 @@ class VirksomhetIngestorTest : IntegrationTestBase() {
 
 	@Test
 	fun `ingest - nytt navn - skal oppdatere arrangor og underenheter`() {
-		val overordnetEnhet = EnhetDto(
-			organisasjonsnummer = ARRANGOR_1.overordnetEnhetOrganisasjonsnummer!!,
-			navn = ARRANGOR_1.overordnetEnhetNavn!!,
-			overordnetEnhetNavn = null,
-			overordnetEnhetOrganisasjonsnummer = null,
-		)
 
 		val underenhet = ArrangorInput(
 			id = UUID.randomUUID(),
@@ -43,8 +37,6 @@ class VirksomhetIngestorTest : IntegrationTestBase() {
 			overordnetEnhetNavn = ARRANGOR_1.navn
 		)
 		testDataRepository.insertArrangor(underenhet)
-
-		mockEnhetsregisterServer.addEnhet(overordnetEnhet)
 
 		val msg = VirksomhetMessage(
 			organisasjonsnummer = ARRANGOR_1.organisasjonsnummer,
