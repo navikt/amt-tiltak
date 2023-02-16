@@ -48,7 +48,7 @@ class GjennomforingIngestorImpl(
 		val arenaData = mulighetsrommetApiClient.hentGjennomforingArenaData(gjennomforing.id)
 
 		if (arenaData.virksomhetsnummer == null) {
-			log.error("Lagrer ikke gjennomføring med id ${gjennomforing.id} og tiltakstype ${gjennomforing.tiltakstype.arenaKode} fordi virksomhetsnummer mangler.")
+			log.info("Lagrer ikke gjennomføring med id ${gjennomforing.id} og tiltakstype ${gjennomforing.tiltakstype.arenaKode} fordi virksomhetsnummer mangler.")
 			return
 		}
 
