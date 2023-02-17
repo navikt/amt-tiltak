@@ -6,8 +6,13 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.clients.amt_enhetsregister.Virksomhet
+import no.nav.amt.tiltak.core.domain.arrangor.ArrangorUpdate
+import org.springframework.transaction.TransactionStatus
+import org.springframework.transaction.support.SimpleTransactionStatus
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDateTime
 import java.util.*
+import java.util.function.Consumer
 
 class ArrangorServiceImplTest: FunSpec({
 	lateinit var enhetsregisterClient: EnhetsregisterClient
@@ -15,10 +20,13 @@ class ArrangorServiceImplTest: FunSpec({
 
 	lateinit var arrangorService: ArrangorServiceImpl
 
+	lateinit var transactionTemplate: TransactionTemplate
+
 	beforeEach {
 		enhetsregisterClient = mockk()
 		arrangorRepository = mockk(relaxUnitFun = true)
-		arrangorService = ArrangorServiceImpl(enhetsregisterClient, arrangorRepository)
+		transactionTemplate = mockk()
+		arrangorService = ArrangorServiceImpl(enhetsregisterClient, arrangorRepository, transactionTemplate)
 	}
 
 	test("getOrCreateArrangor - skal opprette arrangor hvis ikke finnes") {
@@ -67,6 +75,69 @@ class ArrangorServiceImplTest: FunSpec({
 		arrangorService.getOrCreateArrangor(organisasjonsnummer)
 
 		verify(exactly = 0) { arrangorRepository.insert(any(), any(), any(), any(), any()) }
+	}
+
+	test("oppdaterArrangor - skal hente ny overordnet enhet om overordnet enhet orgnr er endret") {
+		val id = UUID.randomUUID()
+		val arrangorUpdate = ArrangorUpdate("Foo", "1234", "6789")
+		every { arrangorRepository.getByOrganisasjonsnummer(arrangorUpdate.organisasjonsnummer) } returns ArrangorDbo(
+			id = id,
+			navn = arrangorUpdate.navn,
+			organisasjonsnummer = arrangorUpdate.organisasjonsnummer,
+			overordnetEnhetOrganisasjonsnummer = "9876",
+			overordnetEnhetNavn = "Bar",
+			createdAt = LocalDateTime.now(),
+			modifiedAt = LocalDateTime.now(),
+		)
+
+		val overordnetEnhetNavn = "Ny Overordnet Enhet"
+
+		every { enhetsregisterClient.hentVirksomhet(arrangorUpdate.overordnetEnhetOrganisasjonsnummer!!) } returns Virksomhet(
+			navn = overordnetEnhetNavn,
+			organisasjonsnummer = arrangorUpdate.overordnetEnhetOrganisasjonsnummer!!,
+			overordnetEnhetNavn = "Baz",
+			overordnetEnhetOrganisasjonsnummer = "4321",
+		)
+
+		every { transactionTemplate.executeWithoutResult(any<Consumer<TransactionStatus>>()) } answers {
+			(firstArg() as Consumer<TransactionStatus>).accept(SimpleTransactionStatus())
+		}
+
+		arrangorService.oppdaterArrangor(arrangorUpdate)
+
+		verify(exactly = 1) { enhetsregisterClient.hentVirksomhet(any()) }
+
+		verify(exactly = 1) { arrangorRepository.update(any()) }
+
+		verify(exactly = 1) { arrangorRepository.updateUnderenheter(arrangorUpdate.organisasjonsnummer, arrangorUpdate.navn) }
+
+	}
+
+	test("oppdaterArrangor - skal ikke hente ny overordnet enhet om overordnet enhet orgnr ikke er endret") {
+		val id = UUID.randomUUID()
+		val arrangorUpdate = ArrangorUpdate("Foo", "1234", "6789")
+		every { arrangorRepository.getByOrganisasjonsnummer(arrangorUpdate.organisasjonsnummer) } returns ArrangorDbo(
+			id = id,
+			navn = "Bar",
+			organisasjonsnummer = arrangorUpdate.organisasjonsnummer,
+			overordnetEnhetOrganisasjonsnummer = arrangorUpdate.overordnetEnhetOrganisasjonsnummer,
+			overordnetEnhetNavn = "Baz",
+			createdAt = LocalDateTime.now(),
+			modifiedAt = LocalDateTime.now(),
+		)
+
+		every { transactionTemplate.executeWithoutResult(any<Consumer<TransactionStatus>>()) } answers {
+			(firstArg() as Consumer<TransactionStatus>).accept(SimpleTransactionStatus())
+		}
+
+		arrangorService.oppdaterArrangor(arrangorUpdate)
+
+		verify(exactly = 0) { enhetsregisterClient.hentVirksomhet(any()) }
+
+		verify(exactly = 1) { arrangorRepository.update(any()) }
+
+		verify(exactly = 1) { arrangorRepository.updateUnderenheter(arrangorUpdate.organisasjonsnummer, arrangorUpdate.navn) }
+
 	}
 
 })

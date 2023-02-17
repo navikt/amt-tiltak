@@ -2,14 +2,17 @@ package no.nav.amt.tiltak.arrangor
 
 import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
+import no.nav.amt.tiltak.core.domain.arrangor.ArrangorUpdate
 import no.nav.amt.tiltak.core.port.ArrangorService
 import org.springframework.stereotype.Service
+import org.springframework.transaction.support.TransactionTemplate
 import java.util.*
 
 @Service
 class ArrangorServiceImpl(
 	private val enhetsregisterClient: EnhetsregisterClient,
-	private val arrangorRepository: ArrangorRepository
+	private val arrangorRepository: ArrangorRepository,
+	private val transactionTemplate: TransactionTemplate,
 ) : ArrangorService {
 
 	override fun upsertArrangor(virksomhetsnummer: String): Arrangor {
@@ -46,8 +49,33 @@ class ArrangorServiceImpl(
 		return arrangorRepository.getByOrganisasjonsnummer(virksomhetsnummer)?.toArrangor()
 	}
 
-	override fun getVirksomheterForAnsatt(ansattId: UUID): List<Arrangor> {
-		throw NotImplementedError("getVirksomheterForAnsatt in ArrangorService is not yet implemented")
+	override fun oppdaterArrangor(arrangorUpdate: ArrangorUpdate) {
+		val original =  getArrangorByVirksomhetsnummer(arrangorUpdate.organisasjonsnummer) ?:
+			throw NoSuchElementException("Fant ikke Arrangør med virksomhetsnummer ${arrangorUpdate.organisasjonsnummer}")
+
+		val overordnetEnhet = hentOverordnetEnhet(arrangorUpdate, original)
+
+		transactionTemplate.executeWithoutResult {
+			arrangorRepository.update(
+				ArrangorUpdateDbo(
+					id = original.id,
+					navn = arrangorUpdate.navn,
+					overordnetEnhetNavn = overordnetEnhet.navn,
+					overordnetEnhetOrganisasjonsnummer = overordnetEnhet.organisasjonsnummer,
+				)
+			)
+			arrangorRepository.updateUnderenheter(arrangorUpdate.organisasjonsnummer, arrangorUpdate.navn)
+		}
+	}
+
+	private fun hentOverordnetEnhet(arrangorUpdate: ArrangorUpdate, original: Arrangor) : OverordnetEnhet {
+		if (arrangorUpdate.overordnetEnhetOrganisasjonsnummer != original.overordnetEnhetOrganisasjonsnummer) {
+			val nyOverordnetEnhet = arrangorUpdate.overordnetEnhetOrganisasjonsnummer?.let {
+				enhetsregisterClient.hentVirksomhet(it)
+			}
+			return OverordnetEnhet(nyOverordnetEnhet?.navn, nyOverordnetEnhet?.organisasjonsnummer)
+		}
+		return OverordnetEnhet(original.overordnetEnhetNavn, original.overordnetEnhetOrganisasjonsnummer)
 	}
 
 	private fun opprettArrangor(virksomhetsnummer: String): Arrangor {
@@ -63,4 +91,9 @@ class ArrangorServiceImpl(
 
 		return arrangorRepository.getById(id).toArrangor()
 	}
+
+	private data class OverordnetEnhet(
+		val navn: String?,
+		val organisasjonsnummer: String?,
+	)
 }

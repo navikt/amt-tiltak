@@ -145,4 +145,42 @@ open class ArrangorRepository(
 
 		return template.query(sql, parameters, rowMapper)
 	}
+
+	fun update(arrangorUpdateDbo: ArrangorUpdateDbo) {
+		val sql = """
+			UPDATE arrangor
+			SET
+				navn = :navn,
+				overordnet_enhet_navn = :overordnetEnhetNavn,
+				overordnet_enhet_organisasjonsnummer = :overordnetEnhetOrganisasjonsnummer,
+				modified_at = :modifiedAt
+			WHERE id = :id
+		""".trimIndent()
+
+		val parameters = sqlParameters(
+			"id" to arrangorUpdateDbo.id,
+			"navn" to arrangorUpdateDbo.navn,
+			"overordnetEnhetNavn" to arrangorUpdateDbo.overordnetEnhetNavn,
+			"overordnetEnhetOrganisasjonsnummer" to arrangorUpdateDbo.overordnetEnhetOrganisasjonsnummer,
+			"modifiedAt" to arrangorUpdateDbo.modifiedAt,
+		)
+
+		template.update(sql, parameters)
+	}
+
+	fun updateUnderenheter(organisasjonsnummer: String, navn: String) {
+		val sql = """
+			UPDATE arrangor
+			SET overordnet_enhet_navn = :navn, modified_at = CURRENT_TIMESTAMP
+			WHERE overordnet_enhet_organisasjonsnummer = :organisasjonsnummer
+		""".trimIndent()
+
+		val parameters = sqlParameters(
+			"navn" to navn,
+			"organisasjonsnummer" to organisasjonsnummer,
+		)
+
+		template.update(sql, parameters)
+	}
+
 }
