@@ -28,6 +28,7 @@ class KafkaConfigurationTest {
 	private val sisteTiltaksgjennomforingerTopic: String = "test.siste-tiltaksgjennomforinger"
 	private val leesahTopic: String = "test.leesah-v1"
 	private val deltakerTopic: String = "test.deltaker-v1"
+	private val aktorV2Topic: String = "test.aktor-v2"
 
 	@Container
 	var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.2.1"))
@@ -44,7 +45,8 @@ class KafkaConfigurationTest {
 			skjermedePersonerTopic = skjermetPersonTopic,
 			sisteTiltaksgjennomforingerTopic = sisteTiltaksgjennomforingerTopic,
 			leesahTopic = leesahTopic,
-			deltakerTopic = deltakerTopic
+			deltakerTopic = deltakerTopic,
+			aktorV2Topic = aktorV2Topic
 		)
 
 		val kafkaProperties = object : KafkaProperties {
@@ -104,6 +106,12 @@ class KafkaConfigurationTest {
 			}
 		}
 
+		val aktorV2Ingestor = object : AktorV2Ingestor {
+			override fun ingestKafkaRecord(key: String, value: ByteArray?) {
+				counter.incrementAndGet()
+			}
+		}
+
 
 		val config = KafkaConfiguration(
 			kafkaTopicProperties,
@@ -114,7 +122,8 @@ class KafkaConfigurationTest {
 			endringPaaBrukerIngestor,
 			skjermetPersonIngestor,
 			gjennomforingIngestor,
-			leesahIngestor
+			leesahIngestor,
+			aktorV2Ingestor
 		)
 
 		config.onApplicationEvent(null)

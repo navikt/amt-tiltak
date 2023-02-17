@@ -129,6 +129,8 @@ spec:
       value: pdl.leesah-v1
     - name: DELTAKER_TOPIC
       value: amt.deltaker-v1
+    - name: AKTOR_V2_TOPIC
+      value: pdl.aktor-v2
 
   gcp:
     sqlInstances:
