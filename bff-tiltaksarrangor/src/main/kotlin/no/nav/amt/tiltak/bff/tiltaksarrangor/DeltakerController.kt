@@ -44,7 +44,7 @@ class DeltakerController(
 		)
 
 		var deltakere = deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
-			.filter { it.status.type != DeltakerStatus.Type.PABEGYNT }
+			.filter { it.status.type != DeltakerStatus.Type.PABEGYNT && it.status.type != DeltakerStatus.Type.PABEGYNT_REGISTRERING }
 			.filter { !it.erUtdatert }
 
 		val erSkjultMap = deltakerService.erSkjultForTiltaksarrangor(deltakere.map { it.id })
@@ -73,7 +73,7 @@ class DeltakerController(
 
 		val deltakerDetaljer = controllerService.getDeltakerDetaljerById(deltakerId)
 
-		if (deltakerDetaljer.status.type == DeltakerStatus.Type.PABEGYNT)
+		if (deltakerDetaljer.status.type == DeltakerStatus.Type.PABEGYNT || deltakerDetaljer.status.type == DeltakerStatus.Type.PABEGYNT_REGISTRERING)
 			throw UnauthorizedException("Har ikke tilgang til id $deltakerId")
 
 		verifiserErIkkeSkjult(deltakerId)
