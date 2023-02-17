@@ -73,9 +73,6 @@ class DeltakerController(
 
 		val deltakerDetaljer = controllerService.getDeltakerDetaljerById(deltakerId)
 
-		if (deltakerDetaljer.status.type == DeltakerStatus.Type.PABEGYNT || deltakerDetaljer.status.type == DeltakerStatus.Type.PABEGYNT_REGISTRERING)
-			throw UnauthorizedException("Har ikke tilgang til id $deltakerId")
-
 		verifiserErIkkeSkjult(deltakerId)
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId, KOORDINATOR)
