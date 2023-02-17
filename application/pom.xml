@@ -112,7 +112,7 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>virksomheter-ingestor</artifactId>
+            <artifactId>virksomhet-ingestor</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>

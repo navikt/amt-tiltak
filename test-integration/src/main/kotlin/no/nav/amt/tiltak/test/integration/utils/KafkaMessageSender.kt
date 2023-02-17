@@ -26,8 +26,8 @@ class KafkaMessageSender(
 	private val leesahTopic: String,
 	@Value("\${app.env.aktorV2Topic}")
 	private val aktorV2Topic: String,
-	@Value("\${app.env.virksomheterTopic}")
-	private val virksomheterTopic: String,
+	@Value("\${app.env.virksomhetTopic}")
+	private val virksomhetTopic: String
 ) {
 	private val kafkaProducer = KafkaProducerClientImpl<ByteArray, ByteArray>(properties.producer())
 
@@ -54,8 +54,8 @@ class KafkaMessageSender(
 	fun sendTilAktorV2Topic(key: String, payload: ByteArray) {
 		kafkaProducer.send(ProducerRecord(aktorV2Topic, key.toByteArray(), payload))
 	}
-	fun sendTilVirksomheterTopic(jsonString: String) {
-		kafkaProducer.send(ProducerRecord(virksomheterTopic, "999888777".toByteArray(), jsonString.toByteArray()))
+	fun sendTilVirksomhetTopic(jsonString: String) {
+		kafkaProducer.send(ProducerRecord(virksomhetTopic, "999888777".toByteArray(), jsonString.toByteArray()))
 	}
 
 }

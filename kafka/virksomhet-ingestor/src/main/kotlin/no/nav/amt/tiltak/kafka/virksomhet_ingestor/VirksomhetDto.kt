@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.kafka.virksomheter_ingestor
+package no.nav.amt.tiltak.kafka.virksomhet_ingestor
 
 data class VirksomhetDto (
 	val organisasjonsnummer: String,

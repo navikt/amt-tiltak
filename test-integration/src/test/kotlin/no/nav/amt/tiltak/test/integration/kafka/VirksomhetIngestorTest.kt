@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.*
 
-class VirksomheterIngestorTest : IntegrationTestBase() {
+class VirksomhetIngestorTest : IntegrationTestBase() {
 
 	@Autowired
 	lateinit var arrangorService: ArrangorService
@@ -43,7 +43,7 @@ class VirksomheterIngestorTest : IntegrationTestBase() {
 			overordnetEnhetOrganisasjonsnummer = ARRANGOR_1.overordnetEnhetOrganisasjonsnummer,
 		)
 
-		kafkaMessageSender.sendTilVirksomheterTopic(
+		kafkaMessageSender.sendTilVirksomhetTopic(
 			KafkaMessageCreator.opprettVirksomhetMessage(msg)
 		)
 
@@ -75,7 +75,7 @@ class VirksomheterIngestorTest : IntegrationTestBase() {
 
 		mockEnhetsregisterServer.addEnhet(nyOverordnetEnhet)
 
-		kafkaMessageSender.sendTilVirksomheterTopic(
+		kafkaMessageSender.sendTilVirksomhetTopic(
 			KafkaMessageCreator.opprettVirksomhetMessage(msg)
 		)
 
