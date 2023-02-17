@@ -4,6 +4,7 @@ import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorUpdate
 import no.nav.amt.tiltak.core.port.ArrangorService
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -12,6 +13,8 @@ class ArrangorServiceImpl(
 	private val enhetsregisterClient: EnhetsregisterClient,
 	private val arrangorRepository: ArrangorRepository,
 ) : ArrangorService {
+
+	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun upsertArrangor(virksomhetsnummer: String): Arrangor {
 		val arrangor = enhetsregisterClient.hentVirksomhet(virksomhetsnummer)
@@ -50,7 +53,14 @@ class ArrangorServiceImpl(
 	override fun oppdaterArrangor(arrangorUpdate: ArrangorUpdate) {
 		val arrangor = getArrangorByVirksomhetsnummer(arrangorUpdate.organisasjonsnummer)
 
-		arrangorRepository.updateUnderenheterIfAny(organisasjonsnummer = arrangorUpdate.organisasjonsnummer, navn = arrangorUpdate.navn)
+		val antallUnderenheter = arrangorRepository.updateUnderenheterIfAny(
+			organisasjonsnummer = arrangorUpdate.organisasjonsnummer,
+			navn = arrangorUpdate.navn
+		)
+
+		if (antallUnderenheter > 0) {
+			log.info("Oppdaterte $antallUnderenheter underenheter for virksomhet med orgnr ${arrangorUpdate.organisasjonsnummer}")
+		}
 
 		if (arrangor == null) return
 
@@ -64,6 +74,8 @@ class ArrangorServiceImpl(
 				overordnetEnhetOrganisasjonsnummer = overordnetEnhet.organisasjonsnummer,
 			)
 		)
+
+		log.info("Oppdaterte arrangør ${arrangor.id}")
 	}
 
 	private fun hentOverordnetEnhet(arrangorUpdate: ArrangorUpdate, original: Arrangor) : OverordnetEnhet {

@@ -167,7 +167,7 @@ open class ArrangorRepository(
 		template.update(sql, parameters)
 	}
 
-	fun updateUnderenheterIfAny(organisasjonsnummer: String, navn: String) {
+	fun updateUnderenheterIfAny(organisasjonsnummer: String, navn: String): Int {
 		val sql = """
 			UPDATE arrangor
 			SET overordnet_enhet_navn = :navn, modified_at = CURRENT_TIMESTAMP
@@ -179,7 +179,7 @@ open class ArrangorRepository(
 			"organisasjonsnummer" to organisasjonsnummer,
 		)
 
-		template.update(sql, parameters)
+		return template.update(sql, parameters)
 	}
 
 }
