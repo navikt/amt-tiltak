@@ -83,6 +83,7 @@ class ArrangorServiceImplTest: FunSpec({
 			modifiedAt = LocalDateTime.now(),
 		)
 		every { arrangorRepository.getByOrganisasjonsnummer(arrangorUpdate.organisasjonsnummer) } returns eksisterendeArrangor
+		every { arrangorRepository.updateUnderenheterIfAny(any(), any()) } returns 0
 
 		val nyttOverordnetEnhetNavn = "Ny Overordnet Enhet"
 
@@ -121,6 +122,7 @@ class ArrangorServiceImplTest: FunSpec({
 		)
 
 		every { arrangorRepository.getByOrganisasjonsnummer(arrangorUpdate.organisasjonsnummer) } returns eksisterendeArrangor
+		every { arrangorRepository.updateUnderenheterIfAny(any(), any()) } returns 1
 
 		arrangorService.oppdaterArrangor(arrangorUpdate)
 
