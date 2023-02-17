@@ -5,6 +5,7 @@ import io.confluent.kafka.schemaregistry.client.MockSchemaRegistryClient
 import io.confluent.kafka.serializers.KafkaAvroSerializer
 import io.kotest.matchers.shouldBe
 import kotlinx.serialization.Serializable
+import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
@@ -23,6 +24,9 @@ class LeesahIngestorTest : IntegrationTestBase() {
 
 	@Autowired
 	lateinit var deltakerService: DeltakerService
+
+	@Autowired
+	lateinit var brukerService: BrukerService
 
 	lateinit var kafkaAvroSerializer: KafkaAvroSerializer
 
@@ -69,6 +73,7 @@ class LeesahIngestorTest : IntegrationTestBase() {
 		AsyncUtils.eventually {
 			val deltakere = deltakerService.hentDeltakereMedPersonIdent(BRUKER_1.personIdent)
 			deltakere.isEmpty() shouldBe true
+			brukerService.finnesBruker(BRUKER_1.personIdent) shouldBe false
 		}
 	}
 

@@ -38,6 +38,10 @@ class BrukerServiceImpl(
 		}
 	}
 
+	override fun slettBruker(personIdent: String) {
+		brukerRepository.slettBruker(personIdent)
+	}
+
 	override fun getOrCreate(fodselsnummer: String): UUID {
 		val bruker = brukerRepository.get(fodselsnummer) ?: createBruker(fodselsnummer)
 		return bruker.id
