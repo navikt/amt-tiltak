@@ -20,8 +20,6 @@ import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
-import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.AltinnService
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.ArrangorAnsattRoller
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
@@ -219,6 +217,20 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		shouldThrowExactly<UnauthorizedException> {
 			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId, KOORDINATOR)
+		}
+	}
+
+	test("verifiserAnsatteHarRolleHosArrangorer - ansatt har rolle hos arrangorer - skal ikke kaste exception") {
+		shouldNotThrow<Throwable> {
+			arrangorAnsattTilgangServiceImpl
+				.verifiserAnsatteHarRolleHosArrangorer(listOf(ansattId), listOf(arrangorId), KOORDINATOR)
+		}
+	}
+
+	test("verifiserAnsatteHarRolleHosArrangorer - ansatt har rolle hos arrangorer - skal kaste exception hvis ikke") {
+		shouldThrowExactly<UnauthorizedException> {
+			arrangorAnsattTilgangServiceImpl
+				.verifiserAnsatteHarRolleHosArrangorer(listOf(ansattId), listOf(UUID.randomUUID()), KOORDINATOR)
 		}
 	}
 

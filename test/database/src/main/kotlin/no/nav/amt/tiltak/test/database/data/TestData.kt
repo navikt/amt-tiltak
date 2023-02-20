@@ -402,4 +402,23 @@ object TestData {
 		createdAt = ZonedDateTime.now()
 	)
 
+	val ARRANGOR_ANSATT_1_VEILEDER_1 = ArrangorVeilederDboInput(
+		id = UUID.randomUUID(),
+		ansattId =  ARRANGOR_ANSATT_1.id,
+		deltakerId = DELTAKER_1.id,
+		erMedveileder = false,
+		gyldigFra = ZonedDateTime.parse("2022-11-08T15:00:00.00000+00:00"),
+		gyldigTil = ZonedDateTime.parse("3000-01-01T00:00:00.00000+00:00"),
+	)
+
+	val ARRANGOR_ANSATT_2_VEILEDER_1 = ArrangorVeilederDboInput(
+		id = UUID.randomUUID(),
+		ansattId =  ARRANGOR_ANSATT_2.id,
+		deltakerId = DELTAKER_1.id,
+		erMedveileder = true,
+		gyldigFra = ZonedDateTime.parse("2022-11-08T15:00:00.00000+00:00"),
+		gyldigTil = ZonedDateTime.parse("3000-01-01T00:00:00.00000+00:00"),
+	)
+
+
 }

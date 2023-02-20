@@ -352,4 +352,33 @@ class TestDataRepository(
 		template.update(sql, parameters)
 	}
 
+	fun insertArrangorVeileder(input: ArrangorVeilederDboInput) {
+		val sql = """
+			INSERT INTO arrangor_veileder(
+				id,
+				ansatt_id,
+				deltaker_id,
+				gyldig_fra,
+				gyldig_til,
+				er_medveileder,
+				modified_at,
+				created_at
+			)
+			VALUES(:id, :ansattId, :deltakerId, :gyldigFra, :gyldigTil, :erMedveileder, :modifiedAt, :createdAt)
+		""".trimIndent()
+
+		val parameters = DbUtils.sqlParameters(
+			"id" to input.id,
+			"ansattId" to input.ansattId,
+			"deltakerId" to input.deltakerId,
+			"gyldigFra" to input.gyldigFra.toOffsetDateTime(),
+			"gyldigTil" to input.gyldigTil.toOffsetDateTime(),
+			"erMedveileder" to input.erMedveileder,
+			"modifiedAt" to input.modifiedAt.toOffsetDateTime(),
+			"createdAt" to input.createdAt.toOffsetDateTime(),
+		)
+
+		template.update(sql, parameters)
+	}
+
 }

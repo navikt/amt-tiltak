@@ -79,6 +79,10 @@
             <artifactId>kotest-assertions-core-jvm</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>test-utils</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

@@ -35,4 +35,10 @@ interface ArrangorAnsattTilgangService {
 	fun synkroniserRettigheterMedAltinn(ansattPersonligIdent: String)
 
 	fun shouldHaveRolle(personligIdent: String, rolle: ArrangorAnsattRolle)
+
+	fun verifiserAnsatteHarRolleHosArrangorer(
+		ansattIder: List<UUID>,
+		arrangorIder: List<UUID>,
+		rolle: ArrangorAnsattRolle
+	)
 }

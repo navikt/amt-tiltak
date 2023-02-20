@@ -153,9 +153,22 @@ open class ArrangorAnsattTilgangServiceImpl(
 		}
 	}
 
+	override fun verifiserAnsatteHarRolleHosArrangorer(
+		ansattIder: List<UUID>,
+		arrangorIder: List<UUID>,
+		rolle: ArrangorAnsattRolle
+	) {
+		for (arrangorId in arrangorIder) {
+			for (ansattId in ansattIder) {
+				shouldHaveRolleOnArrangor(ansattId, arrangorId, rolle)
+			}
+		}
+	}
+
+
 	private fun shouldHaveRolleOnArrangor(ansattId: UUID, arrangorId: UUID, rolle: ArrangorAnsattRolle) {
 		val hasRolle = hentAnsattTilganger(ansattId)
-			.find { it.arrangorId === arrangorId }
+			.find { it.arrangorId == arrangorId }
 			?.roller?.contains(rolle)
 			?: false
 
@@ -252,5 +265,3 @@ open class ArrangorAnsattTilgangServiceImpl(
 		val arrangorAnsattRolle: ArrangorAnsattRolle
 	)
 }
-
-
