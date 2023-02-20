@@ -35,10 +35,6 @@ class VeilederController (
 			ArrangorAnsattRolle.KOORDINATOR,
 		)
 
-		if (request.veiledere.filter { it.erMedveileder }.size > 3) {
-			throw IllegalArgumentException("Deltakere kan ikke ha flere enn 3 medveiledere")
-		}
-
 		val veiledere = request.veiledere.map { ArrangorVeilederInput(it.ansattId, it.erMedveileder) }
 
 		arrangorVeilederService.opprettVeiledere(

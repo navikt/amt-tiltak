@@ -5,17 +5,23 @@ import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.core.port.ArrangorVeilederService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_ROLLE_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_VEILEDER_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorVeilederDboInput
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
 import no.nav.amt.tiltak.test.utils.AsyncUtils
 import okhttp3.Request
+import okhttp3.RequestBody
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.ZonedDateTime
 import java.util.*
 
 class VeilederControllerIntegrationTest : IntegrationTestBase() {
@@ -23,8 +29,10 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 	@Autowired
 	lateinit var arrangorVeilederService: ArrangorVeilederService
 
-	private val lagAnsatt1Header =  { mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}") }
-	private val lagAnsatt2Header =  { mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_2.personligIdent)}") }
+	private val lagAnsatt1Header =
+		{ mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}") }
+	private val lagAnsatt2Header =
+		{ mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_2.personligIdent)}") }
 
 	@BeforeEach
 	internal fun setUp() {
@@ -46,11 +54,11 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt2Header(),
-			body = lagOpprettVeilederJson(
+			body = lagOpprettVeilederRequestBody(
 				listOf(DELTAKER_1.id),
 				listOf(Pair(ARRANGOR_ANSATT_2.id, false)),
 				GJENNOMFORING_1.id
-			).toJsonRequestBody(),
+			),
 		)
 
 		response.code shouldBe 403
@@ -62,11 +70,11 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt1Header(),
-			body = lagOpprettVeilederJson(
+			body = lagOpprettVeilederRequestBody(
 				listOf(DELTAKER_1.id),
 				listOf(Pair(ARRANGOR_ANSATT_1.id, false)),
 				GJENNOMFORING_1.id
-			).toJsonRequestBody(),
+			),
 		)
 
 		response.code shouldBe 403
@@ -78,11 +86,11 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt1Header(),
-			body = lagOpprettVeilederJson(
+			body = lagOpprettVeilederRequestBody(
 				listOf(DELTAKER_1.id),
 				listOf(Pair(ARRANGOR_ANSATT_2.id, false)),
 				GJENNOMFORING_1.id
-			).toJsonRequestBody(),
+			),
 		)
 
 		response.code shouldBe 200
@@ -98,17 +106,17 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	internal fun `leggTilVeiledere - veileder finnes fra før - overskrives av ny veileder`() {
+	internal fun `leggTilVeiledere - veileder finnes fra før - erstattes av ny veileder`() {
 		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt1Header(),
-			body = lagOpprettVeilederJson(
+			body = lagOpprettVeilederRequestBody(
 				listOf(DELTAKER_1.id),
 				listOf(Pair(ARRANGOR_ANSATT_2.id, false)),
 				GJENNOMFORING_1.id
-			).toJsonRequestBody(),
+			),
 		)
 
 		response.code shouldBe 200
@@ -125,11 +133,118 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 
 	}
 
-	private fun lagOpprettVeilederJson(
+	@Test
+	internal fun `leggTilVeiledere - medveiledere finnes fra før - eldste overskrives av ny veileder`() {
+		val medveiledere = opprettMedveiledereForDeltaker(3, DELTAKER_1.id)
+		val eldsteMedveileder = medveiledere.last()
+
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/veiledere",
+			headers = lagAnsatt1Header(),
+			body = lagOpprettVeilederRequestBody(
+				listOf(DELTAKER_1.id),
+				listOf(Pair(ARRANGOR_ANSATT_2.id, true)),
+				GJENNOMFORING_1.id
+			),
+		)
+
+		response.code shouldBe 200
+
+		AsyncUtils.eventually {
+			val veiledere = arrangorVeilederService.hentVeiledereForDeltaker(DELTAKER_1.id)
+			veiledere shouldHaveSize 3
+
+			veiledere.any { it.id == eldsteMedveileder.id } shouldBe false
+			veiledere.any { it.ansattId == ARRANGOR_ANSATT_2.id } shouldBe true
+		}
+
+	}
+
+	@Test
+	internal fun `leggTilVeiledere - flere deltakere med medveiledere fra før - eldste veiledere blir erstattet av nye`() {
+		val medveiledere1 = opprettMedveiledereForDeltaker(3, DELTAKER_1.id)
+		val medveiledere2 = opprettMedveiledereForDeltaker(2, DELTAKER_2.id)
+
+		val arrangor3 = arrangorAnsattInput()
+
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/veiledere",
+			headers = lagAnsatt1Header(),
+			body = lagOpprettVeilederRequestBody(
+				listOf(DELTAKER_1.id, DELTAKER_2.id),
+				listOf(Pair(ARRANGOR_ANSATT_2.id, true), Pair(arrangor3.id, true)),
+				GJENNOMFORING_1.id
+			),
+		)
+
+		response.code shouldBe 200
+
+		AsyncUtils.eventually {
+			val veiledereForDeltaker1 = arrangorVeilederService.hentVeiledereForDeltaker(DELTAKER_1.id)
+			veiledereForDeltaker1 shouldHaveSize 3
+
+			veiledereForDeltaker1.any { it.ansattId == ARRANGOR_ANSATT_2.id } shouldBe true
+			veiledereForDeltaker1.any { it.ansattId == arrangor3.id } shouldBe true
+			veiledereForDeltaker1.any { it.ansattId == medveiledere1.first().ansattId } shouldBe true
+
+			val veiledereForDeltaker2 = arrangorVeilederService.hentVeiledereForDeltaker(DELTAKER_2.id)
+			veiledereForDeltaker2 shouldHaveSize 3
+
+			veiledereForDeltaker2.any { it.ansattId == ARRANGOR_ANSATT_2.id } shouldBe true
+			veiledereForDeltaker2.any { it.ansattId == arrangor3.id } shouldBe true
+			veiledereForDeltaker2.any { it.ansattId == medveiledere2.first().ansattId } shouldBe true
+		}
+
+	}
+
+	@Test
+	internal fun `leggTilVeiledere - flere enn 3 medveiledere - skal kaste 400`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/veiledere",
+			headers = lagAnsatt1Header(),
+			body = lagOpprettVeilederRequestBody(
+				listOf(DELTAKER_1.id, DELTAKER_2.id),
+				listOf(
+					Pair(arrangorAnsattInput().id, true),
+					Pair(arrangorAnsattInput().id, true),
+					Pair(arrangorAnsattInput().id, true),
+					Pair(arrangorAnsattInput().id, true),
+				),
+				GJENNOMFORING_1.id
+			),
+		)
+
+		response.code shouldBe 400
+	}
+
+	@Test
+	internal fun `leggTilVeiledere - flere enn 1 veileder - skal kaste 400`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/veiledere",
+			headers = lagAnsatt1Header(),
+			body = lagOpprettVeilederRequestBody(
+				listOf(DELTAKER_1.id, DELTAKER_2.id),
+				listOf(
+					Pair(arrangorAnsattInput().id, false),
+					Pair(arrangorAnsattInput().id, false),
+				),
+				GJENNOMFORING_1.id
+			),
+		)
+
+		response.code shouldBe 400
+	}
+
+
+	private fun lagOpprettVeilederRequestBody(
 		deltakerIder: List<UUID>,
 		veiledere: List<Pair<UUID, Boolean>>,
 		gjennomforingId: UUID,
-	) : String {
+	): RequestBody {
 		val deltakerIderStr = deltakerIder.joinToString { "\"$it\"" }
 		val veiledereStr = veiledere.joinToString {
 			"""
@@ -143,6 +258,40 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 				"veiledere": [$veiledereStr],
 				"gjennomforingId": "$gjennomforingId"
 			}
-		""".trimIndent()
+		""".trimIndent().toJsonRequestBody()
 	}
+
+	/**
+	 * Oppretter *n* medveiledere for deltaker. Returnerer liste med veiledere sortert på gyldigFra synkende.
+	 */
+	private fun opprettMedveiledereForDeltaker(antallVeiledere: Int, deltakerId: UUID): List<ArrangorVeilederDboInput> {
+		val veiledere = mutableListOf<ArrangorVeilederDboInput>()
+
+		repeat(antallVeiledere) { i ->
+			val ansatt = arrangorAnsattInput()
+
+			val veilederInput = ARRANGOR_ANSATT_1_VEILEDER_1.copy(
+				id = UUID.randomUUID(),
+				ansattId = ansatt.id,
+				deltakerId = deltakerId,
+				erMedveileder = true,
+				gyldigFra = ZonedDateTime.now().minusWeeks((20L + i))
+			)
+			testDataRepository.insertArrangorVeileder(veilederInput)
+
+			veiledere.add(veilederInput)
+		}
+
+		return veiledere
+	}
+
+	private fun arrangorAnsattInput(): ArrangorAnsattInput {
+		val ident = Random().nextLong(10_00_00_00000, 90_00_00_00000).toString()
+		val ansatt = ARRANGOR_ANSATT_1.copy(id = UUID.randomUUID(), personligIdent = ident)
+		val rolle = ARRANGOR_ANSATT_1_ROLLE_1.copy(id = UUID.randomUUID(), ansattId = ansatt.id, rolle = "VEILEDER")
+		testDataRepository.insertArrangorAnsatt(ansatt)
+		testDataRepository.insertArrangorAnsattRolle(rolle)
+		return ansatt
+	}
+
 }

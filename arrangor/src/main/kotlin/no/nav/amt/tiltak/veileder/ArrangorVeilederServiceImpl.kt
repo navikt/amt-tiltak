@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.veileder
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeileder
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeilederInput
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
+import no.nav.amt.tiltak.core.exceptions.ValidationException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.ArrangorVeilederService
 import no.nav.amt.tiltak.core.port.DeltakerService
@@ -23,7 +24,7 @@ class ArrangorVeilederServiceImpl (
 
 	override fun opprettVeiledere(veilederInputs: List<ArrangorVeilederInput>, deltakerIder: List<UUID>) {
 		if (veilederInputs.filter { !it.erMedveileder }.size > 1) {
-			throw IllegalStateException("Deltakere kan kun ha 1 veileder.")
+			throw ValidationException("Deltakere kan kun ha 1 veileder.")
 		}
 
 		verifiserVeilederTilganger(deltakerIder, veilederInputs.map { it.ansattId })
@@ -43,7 +44,7 @@ class ArrangorVeilederServiceImpl (
 		val antallNyeMedveiledere = veiledere.count { it.erMedveileder }
 
 		if (antallNyeMedveiledere > maksMedveiledere)
-			throw IllegalStateException("Kan ikke håndtere flere enn $maksMedveiledere medveiledere")
+			throw ValidationException("Kan ikke håndtere flere enn $maksMedveiledere medveiledere")
 
 		arrangorVeilederRepository.inaktiverVeiledereForDeltakere(
 			veiledere.map { it.ansattId },
