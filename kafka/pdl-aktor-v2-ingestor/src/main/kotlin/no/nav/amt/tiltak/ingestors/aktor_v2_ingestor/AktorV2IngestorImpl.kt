@@ -20,14 +20,13 @@ class AktorV2IngestorImpl(
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun ingestKafkaRecord(key: String, value: ByteArray?) {
-		if(value == null) {
-			secureLog.error("Fikk tombstone for record med key=$key.")
-			log.error("Fikk tombstone for kafka record. Se secure logs for key")
-			throw IllegalStateException("Fikk tombstone for kafka record. Se secure logs for key")
+		if (value == null) {
+			secureLog.warn("Fikk tombstone for record med key=$key.")
+			log.warn("Fikk tombstone for kafka record. Se secure logs for key. Behandler ikke meldingen.")
+		} else {
+			val response = deserializer.deserialize("", value) as GenericRecord
+			ingest(response)
 		}
-
-		val response = deserializer.deserialize("", value) as GenericRecord
-		ingest(response)
 	}
 
 	private fun ingest(genericRecord: GenericRecord) {
