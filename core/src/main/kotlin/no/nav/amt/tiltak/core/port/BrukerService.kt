@@ -26,4 +26,6 @@ interface BrukerService {
 	fun oppdaterAnsvarligVeileder(personIdent: String, navAnsattId: UUID)
 
 	fun oppdaterPersonIdenter(gjeldendeIdent: String, identType: IdentType, historiskeIdenter: List<String>)
+
+	fun slettBruker(personIdent: String)
 }

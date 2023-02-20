@@ -44,11 +44,10 @@ class LeesahIngestorImpl(
 			deltakere.forEach {
 				deltakerService.slettDeltaker(it.id)
 				secureLog.info("Har slettet deltakere personidenter: ${it.personIdent}")
+				brukerService.slettBruker(it.personIdent)
 
 			}
-		}
-
-		if(genericRecord.get("navn") != null) {
+		} else if (genericRecord.get("navn") != null) {
 			val navn = JsonUtils.fromJsonString<Navn>(genericRecord.get("navn").toString())
 			personIdenter.forEach { personIdent ->
 				brukerService.updateBrukerByPersonIdent(
