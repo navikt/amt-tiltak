@@ -29,6 +29,7 @@ class KafkaConfigurationTest {
 	private val leesahTopic: String = "test.leesah-v1"
 	private val deltakerTopic: String = "test.deltaker-v1"
 	private val aktorV2Topic: String = "test.aktor-v2"
+	private val virksomhetTopic: String = "test.virksomheter-v1"
 
 	@Container
 	var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.2.1"))
@@ -46,7 +47,8 @@ class KafkaConfigurationTest {
 			sisteTiltaksgjennomforingerTopic = sisteTiltaksgjennomforingerTopic,
 			leesahTopic = leesahTopic,
 			deltakerTopic = deltakerTopic,
-			aktorV2Topic = aktorV2Topic
+			aktorV2Topic = aktorV2Topic,
+			virksomhetTopic = virksomhetTopic,
 		)
 
 		val kafkaProperties = object : KafkaProperties {
@@ -112,6 +114,12 @@ class KafkaConfigurationTest {
 			}
 		}
 
+		val virksomhetIngestor = object : VirksomhetIngestor {
+			override fun ingestKafkaRecord(recordValue: String) {
+				counter.incrementAndGet()
+			}
+		}
+
 
 		val config = KafkaConfiguration(
 			kafkaTopicProperties,
@@ -123,7 +131,8 @@ class KafkaConfigurationTest {
 			skjermetPersonIngestor,
 			gjennomforingIngestor,
 			leesahIngestor,
-			aktorV2Ingestor
+			aktorV2Ingestor,
+			virksomhetIngestor,
 		)
 
 		config.onApplicationEvent(null)
@@ -136,6 +145,7 @@ class KafkaConfigurationTest {
 		kafkaProducer.sendSync(toJsonProducerRecord(endringPaaBrukerTopic, "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord(skjermetPersonTopic, "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord(sisteTiltaksgjennomforingerTopic, "1", value))
+		kafkaProducer.sendSync(toJsonProducerRecord(virksomhetTopic, "1", value))
 
 		kafkaProducer.close()
 
@@ -143,7 +153,7 @@ class KafkaConfigurationTest {
 
 		Thread.sleep(3000)
 
-		assertEquals(5, counter.get())
+		assertEquals(6, counter.get())
 	}
 
 }

@@ -6,6 +6,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.clients.amt_enhetsregister.Virksomhet
+import no.nav.amt.tiltak.core.domain.arrangor.ArrangorUpdate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -67,6 +68,74 @@ class ArrangorServiceImplTest: FunSpec({
 		arrangorService.getOrCreateArrangor(organisasjonsnummer)
 
 		verify(exactly = 0) { arrangorRepository.insert(any(), any(), any(), any(), any()) }
+	}
+
+	test("oppdaterArrangor - ny overordnet enhet orgnummer - skal hente ny enhet og oppdatere arrangor") {
+		val id = UUID.randomUUID()
+		val arrangorUpdate = ArrangorUpdate("Foo", "1234", "6789")
+		val eksisterendeArrangor = ArrangorDbo(
+			id = id,
+			navn = arrangorUpdate.navn,
+			organisasjonsnummer = arrangorUpdate.organisasjonsnummer,
+			overordnetEnhetOrganisasjonsnummer = "9876",
+			overordnetEnhetNavn = "Bar",
+			createdAt = LocalDateTime.now(),
+			modifiedAt = LocalDateTime.now(),
+		)
+		every { arrangorRepository.getByOrganisasjonsnummer(arrangorUpdate.organisasjonsnummer) } returns eksisterendeArrangor
+		every { arrangorRepository.updateUnderenheterIfAny(any(), any()) } returns 0
+
+		val nyttOverordnetEnhetNavn = "Ny Overordnet Enhet"
+
+		every { enhetsregisterClient.hentVirksomhet(arrangorUpdate.overordnetEnhetOrganisasjonsnummer!!) } returns Virksomhet(
+			navn = nyttOverordnetEnhetNavn,
+			organisasjonsnummer = arrangorUpdate.overordnetEnhetOrganisasjonsnummer!!,
+			overordnetEnhetNavn = "Baz",
+			overordnetEnhetOrganisasjonsnummer = "4321",
+		)
+
+		arrangorService.oppdaterArrangor(arrangorUpdate)
+
+		verify(exactly = 1) { enhetsregisterClient.hentVirksomhet(any()) }
+		verify(exactly = 1) { arrangorRepository.updateUnderenheterIfAny(arrangorUpdate.organisasjonsnummer, arrangorUpdate.navn) }
+
+		verify(exactly = 1) { arrangorRepository.update( ArrangorUpdateDbo(
+			id = eksisterendeArrangor.id,
+			navn = arrangorUpdate.navn,
+			overordnetEnhetOrganisasjonsnummer = arrangorUpdate.overordnetEnhetOrganisasjonsnummer,
+			overordnetEnhetNavn = nyttOverordnetEnhetNavn,
+		)) }
+
+	}
+
+	test("oppdaterArrangor - endret navn på enhet - oppdaterer enhet og underenheter") {
+		val id = UUID.randomUUID()
+		val arrangorUpdate = ArrangorUpdate("nytt enhetsnavn", "1234", "6789")
+		val eksisterendeArrangor = ArrangorDbo(
+			id = id,
+			navn = "enhetsnavn",
+			organisasjonsnummer = arrangorUpdate.organisasjonsnummer,
+			overordnetEnhetOrganisasjonsnummer = arrangorUpdate.overordnetEnhetOrganisasjonsnummer,
+			overordnetEnhetNavn = "Baz",
+			createdAt = LocalDateTime.now(),
+			modifiedAt = LocalDateTime.now(),
+		)
+
+		every { arrangorRepository.getByOrganisasjonsnummer(arrangorUpdate.organisasjonsnummer) } returns eksisterendeArrangor
+		every { arrangorRepository.updateUnderenheterIfAny(any(), any()) } returns 1
+
+		arrangorService.oppdaterArrangor(arrangorUpdate)
+
+		verify(exactly = 1) { arrangorRepository.update(any()) }
+
+		verify(exactly = 1) { arrangorRepository.updateUnderenheterIfAny(arrangorUpdate.organisasjonsnummer, arrangorUpdate.navn) }
+		verify(exactly = 1) { arrangorRepository.update( ArrangorUpdateDbo(
+			id = eksisterendeArrangor.id,
+			navn = arrangorUpdate.navn,
+			overordnetEnhetOrganisasjonsnummer = eksisterendeArrangor.overordnetEnhetOrganisasjonsnummer,
+			overordnetEnhetNavn = eksisterendeArrangor.overordnetEnhetNavn,
+		)) }
+
 	}
 
 })

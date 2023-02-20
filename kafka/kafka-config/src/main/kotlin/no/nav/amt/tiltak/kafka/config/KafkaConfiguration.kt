@@ -32,7 +32,8 @@ open class KafkaConfiguration(
 	skjermetPersonIngestor: SkjermetPersonIngestor,
 	gjennomforingIngestor: GjennomforingIngestor,
 	leesahIngestor: LeesahIngestor,
-	aktorV2Ingestor: AktorV2Ingestor
+	aktorV2Ingestor: AktorV2Ingestor,
+	virksomhetIngestor: VirksomhetIngestor,
 ) {
 	private val log = LoggerFactory.getLogger(javaClass)
     private var client: KafkaConsumerClient
@@ -123,6 +124,18 @@ open class KafkaConfiguration(
 					stringDeserializer(),
 					ByteArrayDeserializer(),
 					Consumer<ConsumerRecord<String, ByteArray>> { aktorV2Ingestor.ingestKafkaRecord(it.key(), it.value()) }
+				)
+		)
+
+		topicConfigs.add(
+			KafkaConsumerClientBuilder.TopicConfig<String, String>()
+				.withLogging()
+				.withStoreOnFailure(consumerRepository)
+				.withConsumerConfig(
+					kafkaTopicProperties.virksomhetTopic,
+					stringDeserializer(),
+					stringDeserializer(),
+					Consumer<ConsumerRecord<String, String>> { virksomhetIngestor.ingestKafkaRecord(it.value()) }
 				)
 		)
 
