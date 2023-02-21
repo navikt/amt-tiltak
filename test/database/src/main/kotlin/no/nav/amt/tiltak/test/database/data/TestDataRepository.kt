@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.test.database.data
 import no.nav.amt.tiltak.common.db_utils.DbUtils
 import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.common.db_utils.getZonedDateTime
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.test.database.DbTestDataUtils.parameters
 import no.nav.amt.tiltak.test.database.data.inputs.*
 import no.nav.amt.tiltak.test.database.data.outputs.ArrangorAnsattGjennomforingTilgangOutput
@@ -379,6 +380,24 @@ class TestDataRepository(
 		)
 
 		template.update(sql, parameters)
+	}
+
+	fun deleteAllArrangorAnsattRoller(rolle: ArrangorAnsattRolle) {
+		val sql = """
+			DELETE FROM arrangor_ansatt_rolle WHERE rolle = :rolle::arrangor_rolle
+		""".trimIndent()
+
+		val parameters = DbUtils.sqlParameters("rolle" to rolle.name)
+
+		template.update(sql, parameters)
+	}
+
+	fun deleteAllArrangorAnsattRoller() {
+		val sql = """
+			DELETE FROM arrangor_ansatt_rolle
+		""".trimIndent()
+
+		template.jdbcTemplate.update(sql)
 	}
 
 }

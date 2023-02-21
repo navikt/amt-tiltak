@@ -93,6 +93,22 @@ open class ArrangorAnsattTilgangServiceImpl(
 		verifiserTilgangTilGjennomforing(ansattPersonligIdent, deltaker.gjennomforingId, rolle)
 	}
 
+	override fun hentRollerForAnsattTilknyttetDeltaker(ansattId: UUID, deltakerId: UUID) : List<ArrangorAnsattRolle> {
+		val deltaker = deltakerService.hentDeltaker(deltakerId)
+			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
+
+		val arrangorId = gjennomforingService.getGjennomforing(deltaker.gjennomforingId).arrangor.id
+
+		val arrangorAnsattRoller = ansattRolleService.hentAktiveRoller(ansattId).firstOrNull { it.arrangorId == arrangorId }
+
+		if (arrangorAnsattRoller == null || arrangorAnsattRoller.roller.isEmpty()) {
+			log.warn("Ansatt $ansattId har ingen roller hos tiltaksarrangør ${arrangorId}")
+			throw UnauthorizedException("Ansatt har ingen roller hos arrangør")
+		}
+
+		return arrangorAnsattRoller.roller
+	}
+
 	override fun hentAnsattTilganger(ansattId: UUID): List<ArrangorAnsattRoller> {
 		return ansattRolleService.hentAktiveRoller(ansattId)
 	}

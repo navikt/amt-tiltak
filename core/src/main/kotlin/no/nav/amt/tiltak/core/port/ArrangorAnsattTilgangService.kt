@@ -24,6 +24,8 @@ interface ArrangorAnsattTilgangService {
 
 	fun hentAnsattTilganger(ansattId: UUID): List<ArrangorAnsattRoller>
 
+	fun hentRollerForAnsattTilknyttetDeltaker(ansattId: UUID, deltakerId: UUID): List<ArrangorAnsattRolle>
+
 	fun hentGjennomforingIder(ansattPersonligIdent: String): List<UUID>
 
 	fun hentAnsattId(ansattPersonligIdent: String): UUID

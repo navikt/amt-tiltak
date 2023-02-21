@@ -1,19 +1,18 @@
 package no.nav.amt.tiltak.veileder
 
+import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeileder
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeilederInput
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.exceptions.ValidationException
-import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
-import no.nav.amt.tiltak.core.port.ArrangorVeilederService
-import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.*
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
 import java.util.*
 
 @Service
 class ArrangorVeilederServiceImpl (
+	private val arrangorAnsattService: ArrangorAnsattService,
 	private val arrangorVeilederRepository: ArrangorVeilederRepository,
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
 	private val deltakerService: DeltakerService,
@@ -40,11 +39,28 @@ class ArrangorVeilederServiceImpl (
 		return arrangorVeilederRepository.getAktiveForDeltaker(deltakerId).map { it.toArrangorVeileder() }
 	}
 
+	override fun hentAktiveVeiledereForGjennomforing(gjennomforingId: UUID): List<ArrangorVeileder> {
+		val deltakerIder = deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId).map { it.id }
+
+		return arrangorVeilederRepository.getAktiveForDeltakere(deltakerIder).map { it.toArrangorVeileder() }
+	}
+
+	override fun hentTilgjengeligeVeiledereForGjennomforing(gjennomforingId: UUID): List<Ansatt> {
+		val arrangorId = gjennomforingService.getGjennomforing(gjennomforingId).arrangor.id
+
+		// Henter alle veiledere hos arrangør inntil noen form for veileder-gjennomføringtilgang er implementert.
+		return arrangorAnsattService.getVeiledereForArrangor(arrangorId)
+	}
+
+	override fun erVeilederFor(ansattId: UUID, deltakerId: UUID): Boolean {
+		return hentVeiledereForDeltaker(deltakerId).any { it.ansattId == ansattId }
+	}
+
 	private fun inaktiverVeiledereSomSkalErstattes(veiledere: List<OpprettVeilederDbo>, deltakerIder: List<UUID>) {
 		val antallNyeMedveiledere = veiledere.count { it.erMedveileder }
 
 		if (antallNyeMedveiledere > maksMedveiledere)
-			throw ValidationException("Kan ikke håndtere flere enn $maksMedveiledere medveiledere")
+			throw ValidationException("Deltakere kan ikke ha flere enn $maksMedveiledere medveiledere")
 
 		arrangorVeilederRepository.inaktiverVeiledereForDeltakere(
 			veiledere.map { it.ansattId },
@@ -74,7 +90,6 @@ class ArrangorVeilederServiceImpl (
 					.slice(forsteVeilederSomSkalInaktiveres until medveiledere.size)
 					.map { it.id }
 			}
-
 	}
 
 	private fun aktiveVeiledereSomSkalErstattes(
@@ -85,7 +100,6 @@ class ArrangorVeilederServiceImpl (
 			return aktiveVeiledere.filter { !it.erMedveileder }.map { it.id }
 		}
 		return emptyList()
-
 	}
 
 	private fun verifiserVeilederTilganger(deltakerIder: List<UUID>, veilederIder: List<UUID>) {

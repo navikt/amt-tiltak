@@ -403,7 +403,7 @@ object TestData {
 	)
 
 	val ARRANGOR_ANSATT_1_VEILEDER_1 = ArrangorVeilederDboInput(
-		id = UUID.randomUUID(),
+		id = UUID.fromString("af238302-e96b-436a-8978-ec2aa5f2ee66"),
 		ansattId =  ARRANGOR_ANSATT_1.id,
 		deltakerId = DELTAKER_1.id,
 		erMedveileder = false,
@@ -412,7 +412,7 @@ object TestData {
 	)
 
 	val ARRANGOR_ANSATT_2_VEILEDER_1 = ArrangorVeilederDboInput(
-		id = UUID.randomUUID(),
+		id = UUID.fromString("bbadfe46-eaf3-4ee8-bb53-2e9e15ea7ef0"),
 		ansattId =  ARRANGOR_ANSATT_2.id,
 		deltakerId = DELTAKER_1.id,
 		erMedveileder = true,

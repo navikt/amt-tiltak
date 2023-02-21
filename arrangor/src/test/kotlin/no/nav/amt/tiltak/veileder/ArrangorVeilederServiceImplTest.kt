@@ -4,8 +4,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeilederInput
+import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
-import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
@@ -28,7 +28,7 @@ class ArrangorVeilederServiceImplTest {
 
 	lateinit var arrangorAnsattTilgangService: ArrangorAnsattTilgangService
 
-	lateinit var arrangorService: ArrangorService
+	lateinit var arrangorAnsattService: ArrangorAnsattService
 
 	lateinit var arrangorVeilederServiceImpl: ArrangorVeilederServiceImpl
 
@@ -40,11 +40,12 @@ class ArrangorVeilederServiceImplTest {
 	fun setup() {
 		arrangorVeilederRepository = mockk(relaxUnitFun = true)
 		arrangorAnsattTilgangService = mockk(relaxUnitFun = true)
-		arrangorService = mockk()
+		arrangorAnsattService = mockk()
 		deltakerService = mockk()
 		gjennomforingService = mockk()
 
 		arrangorVeilederServiceImpl = ArrangorVeilederServiceImpl(
+			arrangorAnsattService = arrangorAnsattService,
 			arrangorVeilederRepository = arrangorVeilederRepository,
 			arrangorAnsattTilgangService = arrangorAnsattTilgangService,
 			deltakerService = deltakerService,

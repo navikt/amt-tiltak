@@ -2,12 +2,14 @@ package no.nav.amt.tiltak.test.integration.tiltaksarrangor
 
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.port.ArrangorVeilederService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_ROLLE_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_VEILEDER_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2_VEILEDER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
@@ -44,6 +46,9 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 	internal fun `skal teste token autentisering`() {
 		val requestBuilders = listOf(
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/veiledere"),
+			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/veiledere?gjennomforingId=${UUID.randomUUID()}"),
+			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/veiledere?deltakerId=${UUID.randomUUID()}"),
+			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/veiledere/tilgjengelig?gjennomforingId=${UUID.randomUUID()}"),
 		)
 		testTiltaksarrangorAutentisering(requestBuilders, client, mockOAuthServer)
 	}
@@ -55,9 +60,9 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt2Header(),
 			body = lagOpprettVeilederRequestBody(
-				listOf(DELTAKER_1.id),
-				listOf(Pair(ARRANGOR_ANSATT_2.id, false)),
-				GJENNOMFORING_1.id
+				deltakerIder = listOf(DELTAKER_1.id),
+				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, false)),
+				gjennomforingId = GJENNOMFORING_1.id
 			),
 		)
 
@@ -71,9 +76,9 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt1Header(),
 			body = lagOpprettVeilederRequestBody(
-				listOf(DELTAKER_1.id),
-				listOf(Pair(ARRANGOR_ANSATT_1.id, false)),
-				GJENNOMFORING_1.id
+				deltakerIder = listOf(DELTAKER_1.id),
+				veiledere = listOf(Pair(ARRANGOR_ANSATT_1.id, false)),
+				gjennomforingId = GJENNOMFORING_1.id
 			),
 		)
 
@@ -87,9 +92,9 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt1Header(),
 			body = lagOpprettVeilederRequestBody(
-				listOf(DELTAKER_1.id),
-				listOf(Pair(ARRANGOR_ANSATT_2.id, false)),
-				GJENNOMFORING_1.id
+				deltakerIder = listOf(DELTAKER_1.id),
+				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, false)),
+				gjennomforingId = GJENNOMFORING_1.id
 			),
 		)
 
@@ -113,9 +118,9 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt1Header(),
 			body = lagOpprettVeilederRequestBody(
-				listOf(DELTAKER_1.id),
-				listOf(Pair(ARRANGOR_ANSATT_2.id, false)),
-				GJENNOMFORING_1.id
+				deltakerIder = listOf(DELTAKER_1.id),
+				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, false)),
+				gjennomforingId = GJENNOMFORING_1.id
 			),
 		)
 
@@ -143,9 +148,9 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt1Header(),
 			body = lagOpprettVeilederRequestBody(
-				listOf(DELTAKER_1.id),
-				listOf(Pair(ARRANGOR_ANSATT_2.id, true)),
-				GJENNOMFORING_1.id
+				deltakerIder = listOf(DELTAKER_1.id),
+				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, true)),
+				gjennomforingId = GJENNOMFORING_1.id
 			),
 		)
 
@@ -173,9 +178,9 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt1Header(),
 			body = lagOpprettVeilederRequestBody(
-				listOf(DELTAKER_1.id, DELTAKER_2.id),
-				listOf(Pair(ARRANGOR_ANSATT_2.id, true), Pair(arrangor3.id, true)),
-				GJENNOMFORING_1.id
+				deltakerIder = listOf(DELTAKER_1.id, DELTAKER_2.id),
+				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, true), Pair(arrangor3.id, true)),
+				gjennomforingId = GJENNOMFORING_1.id
 			),
 		)
 
@@ -206,14 +211,14 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt1Header(),
 			body = lagOpprettVeilederRequestBody(
-				listOf(DELTAKER_1.id, DELTAKER_2.id),
-				listOf(
+				deltakerIder = listOf(DELTAKER_1.id, DELTAKER_2.id),
+				veiledere = listOf(
 					Pair(arrangorAnsattInput().id, true),
 					Pair(arrangorAnsattInput().id, true),
 					Pair(arrangorAnsattInput().id, true),
 					Pair(arrangorAnsattInput().id, true),
 				),
-				GJENNOMFORING_1.id
+				gjennomforingId = GJENNOMFORING_1.id
 			),
 		)
 
@@ -227,16 +232,157 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt1Header(),
 			body = lagOpprettVeilederRequestBody(
-				listOf(DELTAKER_1.id, DELTAKER_2.id),
-				listOf(
+				deltakerIder = listOf(DELTAKER_1.id, DELTAKER_2.id),
+				veiledere = listOf(
 					Pair(arrangorAnsattInput().id, false),
 					Pair(arrangorAnsattInput().id, false),
 				),
-				GJENNOMFORING_1.id
+				gjennomforingId = GJENNOMFORING_1.id
 			),
 		)
 
 		response.code shouldBe 400
+	}
+
+	@Test
+	internal fun `hentTilgjengeligeVeiledere - veiledere finnes - skal ha status 200 og returnerer veiledere`() {
+		testDataRepository.insertArrangorAnsattRolle(
+				ARRANGOR_ANSATT_1_ROLLE_1.copy(id = UUID.randomUUID(), rolle = "VEILEDER")
+		)
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/veiledere/tilgjengelig?gjennomforingId=${GJENNOMFORING_1.id}",
+			headers = lagAnsatt1Header(),
+		)
+
+		response.code shouldBe 200
+
+		response.body!!.string() shouldBe """
+			[{"ansattId":"6321c7dc-6cfb-47b0-b566-32979be5041f","fornavn":"Ansatt 1 fornavn","mellomnavn":"Ansatt 1 mellomnavn","etternavn":"Ansatt 1 etternavn"},{"ansattId":"a24e659c-2651-4fbb-baad-01cacb2412f0","fornavn":"Ansatt 2 fornavn","mellomnavn":null,"etternavn":"Ansatt 2 etternavn"}]
+		""".trimIndent()
+	}
+
+	@Test
+	internal fun `hentTilgjengeligeVeiledere - veiledere finnes ikke - skal ha status 200 og returnerer tom liste`() {
+		testDataRepository.deleteAllArrangorAnsattRoller(ArrangorAnsattRolle.VEILEDER)
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/veiledere/tilgjengelig?gjennomforingId=${GJENNOMFORING_1.id}",
+			headers = lagAnsatt1Header(),
+		)
+
+		response.code shouldBe 200
+
+		response.body!!.string() shouldBe "[]"
+	}
+
+	@Test
+	internal fun `hentTilgjengeligeVeiledere - har ikke tilgang - skal kaste 403`() {
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/veiledere/tilgjengelig?gjennomforingId=${GJENNOMFORING_1.id}",
+			headers = lagAnsatt2Header(),
+		)
+
+		response.code shouldBe 403
+	}
+
+
+	@Test
+	internal fun `hentVeiledereForDeltaker - veiledere finnes - skal ha status 200 og returnerer veiledere`() {
+		testDataRepository.insertArrangorAnsattRolle(
+			ARRANGOR_ANSATT_1_ROLLE_1.copy(id = UUID.randomUUID(), rolle = "VEILEDER")
+		)
+
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_2_VEILEDER_1)
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/veiledere?deltakerId=${DELTAKER_1.id}",
+			headers = lagAnsatt1Header(),
+		)
+
+		response.code shouldBe 200
+
+		response.body!!.string() shouldBe """
+			[{"id":"af238302-e96b-436a-8978-ec2aa5f2ee66","ansattId":"6321c7dc-6cfb-47b0-b566-32979be5041f","deltakerId":"dc600c70-124f-4fe7-a687-b58439beb214","erMedveileder":false,"fornavn":"Ansatt 1 fornavn","mellomnavn":"Ansatt 1 mellomnavn","etternavn":"Ansatt 1 etternavn"},{"id":"bbadfe46-eaf3-4ee8-bb53-2e9e15ea7ef0","ansattId":"a24e659c-2651-4fbb-baad-01cacb2412f0","deltakerId":"dc600c70-124f-4fe7-a687-b58439beb214","erMedveileder":true,"fornavn":"Ansatt 2 fornavn","mellomnavn":null,"etternavn":"Ansatt 2 etternavn"}]
+		""".trimIndent()
+	}
+
+	@Test
+	internal fun `hentVeiledereForDeltaker - veiledere finnes ikke - skal ha status 200 og returnerer tom liste`() {
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/veiledere?deltakerId=${DELTAKER_1.id}",
+			headers = lagAnsatt1Header(),
+		)
+
+		response.code shouldBe 200
+
+		response.body!!.string() shouldBe "[]"
+	}
+
+	@Test
+	internal fun `hentVeiledereForDeltaker - har ikke tilgang - skal kaste 403`() {
+		testDataRepository.deleteAllArrangorAnsattRoller()
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/veiledere?deltakerId=${DELTAKER_1.id}",
+			headers = lagAnsatt1Header(),
+		)
+
+		response.code shouldBe 403
+	}
+
+
+	@Test
+	internal fun `hentAktiveVeiledereForGjennomforing - veiledere finnes - skal ha status 200 og returnerer veiledere`() {
+		testDataRepository.insertArrangorAnsattRolle(
+			ARRANGOR_ANSATT_1_ROLLE_1.copy(id = UUID.randomUUID(), rolle = "VEILEDER")
+		)
+
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_2_VEILEDER_1)
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/veiledere?gjennomforingId=${GJENNOMFORING_1.id}",
+			headers = lagAnsatt1Header(),
+		)
+
+		response.code shouldBe 200
+
+		response.body!!.string() shouldBe """
+			[{"id":"af238302-e96b-436a-8978-ec2aa5f2ee66","ansattId":"6321c7dc-6cfb-47b0-b566-32979be5041f","deltakerId":"dc600c70-124f-4fe7-a687-b58439beb214","erMedveileder":false,"fornavn":"Ansatt 1 fornavn","mellomnavn":"Ansatt 1 mellomnavn","etternavn":"Ansatt 1 etternavn"},{"id":"bbadfe46-eaf3-4ee8-bb53-2e9e15ea7ef0","ansattId":"a24e659c-2651-4fbb-baad-01cacb2412f0","deltakerId":"dc600c70-124f-4fe7-a687-b58439beb214","erMedveileder":true,"fornavn":"Ansatt 2 fornavn","mellomnavn":null,"etternavn":"Ansatt 2 etternavn"}]
+		""".trimIndent()
+	}
+
+	@Test
+	internal fun `hentAktiveVeiledereForGjennomforing - veiledere finnes ikke - skal ha status 200 og returnerer tom liste`() {
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/veiledere?gjennomforingId=${GJENNOMFORING_1.id}",
+			headers = lagAnsatt1Header(),
+		)
+
+		response.code shouldBe 200
+
+		response.body!!.string() shouldBe "[]"
+	}
+
+	@Test
+	internal fun `hentAktiveVeiledereForGjennomforing - har ikke tilgang - skal kaste 403`() {
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/veiledere?deltakerId=${DELTAKER_1.id}",
+			headers = lagAnsatt2Header(),
+		)
+
+		response.code shouldBe 403
 	}
 
 

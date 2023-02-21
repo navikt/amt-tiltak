@@ -37,6 +37,10 @@ class ArrangorAnsattServiceImpl(
 		return ansattDbo.toAnsatt(arrangorer)
 	}
 
+	override fun getAnsatte(ansattIder: List<UUID>): List<Ansatt> {
+		return arrangorAnsattRepository.getAnsatte(ansattIder).map { it.toAnsatt(emptyList()) }
+	}
+
 	override fun getAnsattByPersonligIdent(personIdent: String): Ansatt? {
 		val ansattDbo = arrangorAnsattRepository.getByPersonligIdent(personIdent) ?: return null
 		val arrangorer = hentTilknyttedeArrangorer(ansattDbo.id)
@@ -46,6 +50,11 @@ class ArrangorAnsattServiceImpl(
 
 	override fun getKoordinatorerForGjennomforing(gjennomforingId: UUID): List<Ansatt> {
 		return arrangorAnsattRepository.getAnsatteForGjennomforing(gjennomforingId, ArrangorAnsattRolle.KOORDINATOR)
+			.map { it.toAnsatt(emptyList()) }
+	}
+
+	override fun getVeiledereForArrangor(arrangorId: UUID): List<Ansatt> {
+		return arrangorAnsattRepository.getAnsatteMedRolleForArrangor(arrangorId, ArrangorAnsattRolle.VEILEDER)
 			.map { it.toAnsatt(emptyList()) }
 	}
 
