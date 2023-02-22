@@ -83,13 +83,18 @@ class ArrangorVeilederServiceImpl (
 			.filter { it.erMedveileder }
 			.groupBy { it.deltakerId }
 			.filterValues { medveiledere -> medveiledere.size + antallNyeMedveiledere > maksMedveiledere }
-			.flatMap { (_, medveiledere) ->
-				val forsteVeilederSomSkalInaktiveres = maksMedveiledere - antallNyeMedveiledere
-				medveiledere
-					.sortedByDescending { it.gyldigFra }
-					.slice(forsteVeilederSomSkalInaktiveres until medveiledere.size)
-					.map { it.id }
-			}
+			.flatMap { (_, medveiledere) -> finnMedveiledereSomSkalErstattes(medveiledere, antallNyeMedveiledere) }
+	}
+
+	private fun finnMedveiledereSomSkalErstattes(
+		medveiledere: List<ArrangorVeilederDbo>,
+		antallNyeMedveiledere: Int,
+	): List<UUID> {
+		val forsteVeilederSomSkalInaktiveres = maksMedveiledere - antallNyeMedveiledere
+		return medveiledere
+			.sortedByDescending { it.gyldigFra }
+			.slice(forsteVeilederSomSkalInaktiveres until medveiledere.size)
+			.map { it.id }
 	}
 
 	private fun aktiveVeiledereSomSkalErstattes(

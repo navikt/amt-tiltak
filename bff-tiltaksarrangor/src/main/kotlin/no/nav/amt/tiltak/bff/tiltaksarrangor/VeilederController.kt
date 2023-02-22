@@ -6,7 +6,6 @@ import no.nav.amt.tiltak.bff.tiltaksarrangor.request.LeggTilVeiledereRequest
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
-import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeileder
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeilederInput
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
@@ -24,6 +23,7 @@ class VeilederController (
 	private val authService: AuthService,
 	private val arrangorAnsattService: ArrangorAnsattService,
 	private val arrangorVeilederService: ArrangorVeilederService,
+	private val controllerService: ControllerService,
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -50,7 +50,7 @@ class VeilederController (
 
 		val veiledere = arrangorVeilederService.hentVeiledereForDeltaker(deltakerId)
 
-		return mapTilVeilederDtoer(veiledere)
+		return controllerService.mapAnsatteTilVeilederDtoer(veiledere)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -66,7 +66,7 @@ class VeilederController (
 
 		val veiledere = arrangorVeilederService.hentAktiveVeiledereForGjennomforing(gjennomforingId)
 
-		return mapTilVeilederDtoer(veiledere)
+		return controllerService.mapAnsatteTilVeilederDtoer(veiledere)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -88,25 +88,6 @@ class VeilederController (
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 		return arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
 			?: throw UnauthorizedException("Arrangor ansatt finnes ikke")
-	}
-
-	private fun mapTilVeilederDtoer(veiledere: List<ArrangorVeileder>): List<VeilederDto> {
-		val ansatte = arrangorAnsattService.getAnsatte(veiledere.map { it.ansattId })
-
-		return veiledere.map { veileder ->
-			val ansatt = ansatte.find { veileder.ansattId == it.id } ?:
-			throw IllegalStateException("Fant ikke ansatt ${veileder.ansattId} for veileder ${veileder.id}")
-
-			return@map VeilederDto(
-				id = veileder.id,
-				ansattId = ansatt.id,
-				deltakerId = veileder.deltakerId,
-				erMedveileder = veileder.erMedveileder,
-				fornavn = ansatt.fornavn,
-				mellomnavn = ansatt.mellomnavn,
-				etternavn = ansatt.etternavn,
-			)
-		}
 	}
 
 	private fun verifiserTilgangTilDeltaker(ansatt: Ansatt, deltakerId: UUID) {

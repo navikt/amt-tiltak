@@ -15,11 +15,12 @@ data class DeltakerDto(
 	val sluttDato: LocalDate?,
 	val status: DeltakerStatusDto,
 	val registrertDato: LocalDateTime,
-	val aktiveEndringsmeldinger: List<EndringsmeldingDto>
+	val aktiveEndringsmeldinger: List<EndringsmeldingDto>,
+	val aktiveVeiledere: List<VeilederDto>,
 )
 
 
-fun Deltaker.toDto(aktiveEndringsmeldinger: List<EndringsmeldingDto>) = DeltakerDto(
+fun Deltaker.toDto(aktiveEndringsmeldinger: List<EndringsmeldingDto>, aktiveVeiledere: List<VeilederDto>) = DeltakerDto(
 	id = id,
 	fornavn = fornavn,
 	mellomnavn = mellomnavn,
@@ -30,4 +31,5 @@ fun Deltaker.toDto(aktiveEndringsmeldinger: List<EndringsmeldingDto>) = Deltaker
 	status = status.toDto(),
 	registrertDato = registrertDato,
 	aktiveEndringsmeldinger = aktiveEndringsmeldinger,
+	aktiveVeiledere = aktiveVeiledere,
 )

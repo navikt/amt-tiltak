@@ -25,6 +25,7 @@ import java.util.*
 class DeltakerController(
 	private val controllerService: ControllerService,
 	private val authService: AuthService,
+	private val arrangorVeilederService: ArrangorVeilederService,
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
 	private val auditLoggerService: AuditLoggerService,
 	private val arrangorAnsattService: ArrangorAnsattService,
@@ -56,11 +57,17 @@ class DeltakerController(
 		val endringmeldingerMap =
 			endringsmeldingService.hentAktiveEndringsmeldingerForDeltakere(deltakere.map { it.id })
 
+		val veiledere = arrangorVeilederService.hentAktiveVeiledereForGjennomforing(gjennomforingId)
+		val veilederDtoer = controllerService.mapAnsatteTilVeilederDtoer(veiledere).groupBy { it.deltakerId }
+
+
 		return deltakere.map {
 			val endringsmeldinger = endringmeldingerMap.getOrDefault(it.id, emptyList())
 				.map { e -> e.toDto() }
 
-			return@map it.toDto(endringsmeldinger)
+			val veiledereForDeltaker = veilederDtoer.getOrDefault(it.id, emptyList())
+
+			return@map it.toDto(endringsmeldinger, veiledereForDeltaker)
 		}
 	}
 
