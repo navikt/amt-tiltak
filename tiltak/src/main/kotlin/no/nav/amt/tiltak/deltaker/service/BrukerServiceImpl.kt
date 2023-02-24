@@ -197,7 +197,7 @@ class BrukerServiceImpl(
 		}
 
 		if (hasChanges(b1, b2)) {
-			log.info("Bruker er blitt oppdatert")
+			log.info("Bruker med id ${b2.id} er blitt oppdatert")
 			secureLog.info("Bruker med ident ${b2.personIdent} er blitt oppdatert")
 			brukerRepository.upsert(b2.upsert())
 			return true
