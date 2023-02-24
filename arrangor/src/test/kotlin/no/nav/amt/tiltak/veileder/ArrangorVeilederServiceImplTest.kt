@@ -67,8 +67,8 @@ class ArrangorVeilederServiceImplTest {
 		} returns listOf(deltaker1)
 
 		every {
-			gjennomforingService.getGjennomforinger(listOf(deltaker1.gjennomforingId))
-		} returns listOf(gjennomforing)
+			gjennomforingService.getGjennomforing(deltaker1.gjennomforingId)
+		} returns gjennomforing
 
 
 		val medveilederSomSkalErstattes = veilederDbo(deltakerIder.first(), ZonedDateTime.now().minusWeeks(20))
@@ -114,8 +114,8 @@ class ArrangorVeilederServiceImplTest {
 		} returns listOf(deltaker1, deltaker2)
 
 		every {
-			gjennomforingService.getGjennomforinger(listOf(deltaker1.gjennomforingId))
-		} returns listOf(gjennomforing)
+			gjennomforingService.getGjennomforing(deltaker1.gjennomforingId)
+		} returns gjennomforing
 
 
 		val medveiledereSomSkalErstattes = listOf(

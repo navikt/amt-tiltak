@@ -220,20 +220,6 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		}
 	}
 
-	test("verifiserAnsatteHarRolleHosArrangorer - ansatt har rolle hos arrangorer - skal ikke kaste exception") {
-		shouldNotThrow<Throwable> {
-			arrangorAnsattTilgangServiceImpl
-				.verifiserAnsatteHarRolleHosArrangorer(listOf(ansattId), listOf(arrangorId), KOORDINATOR)
-		}
-	}
-
-	test("verifiserAnsatteHarRolleHosArrangorer - ansatt har rolle hos arrangorer - skal kaste exception hvis ikke") {
-		shouldThrowExactly<UnauthorizedException> {
-			arrangorAnsattTilgangServiceImpl
-				.verifiserAnsatteHarRolleHosArrangorer(listOf(ansattId), listOf(UUID.randomUUID()), KOORDINATOR)
-		}
-	}
-
 	test("synkroniserRettigheterMedAltinn - skal legge til nye roller fra Altinn") {
 		val ansattPersonligIdent = "1234"
 		val ansattId = UUID.randomUUID()

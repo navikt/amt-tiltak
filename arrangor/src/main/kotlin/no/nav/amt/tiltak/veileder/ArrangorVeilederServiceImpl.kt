@@ -69,7 +69,7 @@ class ArrangorVeilederServiceImpl (
 
 		val aktiveVeiledere = arrangorVeilederRepository.getAktiveForDeltakere(deltakerIder)
 
-		val veiledereSomSkalErstattes = aktiveVeiledereSomSkalErstattes(veiledere, aktiveVeiledere)
+		val veiledereSomSkalErstattes = aktiveHovedveiledereSomSkalErstattes(veiledere, aktiveVeiledere)
 			.plus(aktiveMedveiledereSomSkalErstattes(aktiveVeiledere, antallNyeMedveiledere))
 
 		arrangorVeilederRepository.inaktiverVeiledere(veiledereSomSkalErstattes)
@@ -97,7 +97,7 @@ class ArrangorVeilederServiceImpl (
 			.map { it.id }
 	}
 
-	private fun aktiveVeiledereSomSkalErstattes(
+	private fun aktiveHovedveiledereSomSkalErstattes(
 		veiledere: List<OpprettVeilederDbo>,
 		aktiveVeiledere: List<ArrangorVeilederDbo>,
 	) : List<UUID> {
@@ -109,17 +109,17 @@ class ArrangorVeilederServiceImpl (
 
 	private fun verifiserVeilederTilganger(deltakerIder: List<UUID>, veilederIder: List<UUID>) {
 		val gjennomforingIder = deltakerService.hentDeltakere(deltakerIder)
-			.map { it.gjennomforingId }
-			.toSet()
-			.toList()
+			.map { it.gjennomforingId }.distinct()
 
-		val arrangorIder = gjennomforingService.getGjennomforinger(gjennomforingIder).map { it.arrangor.id }
+		if (gjennomforingIder.size > 1) {
+			throw ValidationException("Alle deltakere må være på samme gjennomføring for å tildele veiledere")
+		}
 
-		arrangorAnsattTilgangService.verifiserAnsatteHarRolleHosArrangorer(
-			veilederIder,
-			arrangorIder,
-			ArrangorAnsattRolle.VEILEDER,
-		)
+		val arrangorId = gjennomforingService.getGjennomforing(gjennomforingIder.first()).arrangor.id
+
+		veilederIder.forEach {
+			arrangorAnsattTilgangService.verifiserTilgangTilArrangor(it, arrangorId, ArrangorAnsattRolle.VEILEDER)
+		}
 	}
 
 }
