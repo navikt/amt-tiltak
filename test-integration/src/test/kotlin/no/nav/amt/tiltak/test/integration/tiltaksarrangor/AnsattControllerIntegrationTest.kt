@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.mocks.MockPdlBruker
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import java.util.*
 
 class AnsattControllerIntegrationTest : IntegrationTestBase() {
 
@@ -93,8 +95,9 @@ class AnsattControllerIntegrationTest : IntegrationTestBase() {
 		val ident = "012345678912"
 
 		mockAmtAltinnAclHttpServer.addRoller(
-			ident,
-			mockAmtAltinnAclHttpServer.createRollerForSingleOrg(ARRANGOR_1.organisasjonsnummer, listOf("KOORDINATOR"))
+			norskIdent = ident,
+			orgNr = ARRANGOR_1.organisasjonsnummer,
+			roller = listOf("KOORDINATOR")
 		)
 		mockPdlHttpServer.mockHentBruker(ident, MockPdlBruker("Integrasjon", "Test"))
 
@@ -113,4 +116,73 @@ class AnsattControllerIntegrationTest : IntegrationTestBase() {
 		response.body?.string() shouldBe expectedJson
 
 	}
+
+	@Test
+	internal fun `getRoller - Har ikke roller - Returnerer tomt set`() {
+		val ident = UUID.randomUUID().toString()
+
+		mockAmtAltinnAclHttpServer.addRoller(
+			norskIdent = ident,
+			orgNr = ARRANGOR_1.organisasjonsnummer,
+			roller = listOf()
+		)
+		mockPdlHttpServer.mockHentBruker(ident, MockPdlBruker("Integrasjon", "Test"))
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/ansatt/meg/roller",
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ident)}")
+		)
+
+		response.body?.string() shouldBe "[]"
+	}
+
+	@Test
+	internal fun `getRoller - Har flere koordinator roller - Returnerer KOORDINATOR`() {
+		val ident = UUID.randomUUID().toString()
+
+		mockAmtAltinnAclHttpServer.addRoller(
+			ident,
+			mapOf(
+				ARRANGOR_1.organisasjonsnummer to listOf("KOORDINATOR"),
+				ARRANGOR_2.organisasjonsnummer to listOf("KOORDINATOR")
+			)
+		)
+		mockPdlHttpServer.mockHentBruker(ident, MockPdlBruker("Integrasjon", "Test"))
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/ansatt/meg/roller",
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ident)}")
+		)
+
+		val responseBody = JsonUtils.fromJsonString<Set<String>>(response.body?.string()!!)
+
+		responseBody shouldBe setOf("KOORDINATOR")
+	}
+
+	@Test
+	internal fun `getRoller - Har koordinator og veileder roller - Returnerer KOORDINATOR, VEILEDER`() {
+		val ident = UUID.randomUUID().toString()
+
+		mockAmtAltinnAclHttpServer.addRoller(
+			ident,
+			mapOf(
+				ARRANGOR_1.organisasjonsnummer to listOf("KOORDINATOR"),
+				ARRANGOR_2.organisasjonsnummer to listOf("VEILEDER")
+			)
+		)
+		mockPdlHttpServer.mockHentBruker(ident, MockPdlBruker("Integrasjon", "Test"))
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/ansatt/meg/roller",
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ident)}")
+		)
+
+		val responseBody = JsonUtils.fromJsonString<Set<String>>(response.body?.string()!!)
+
+		responseBody shouldBe setOf("KOORDINATOR", "VEILEDER")
+	}
+
 }

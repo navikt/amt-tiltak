@@ -54,4 +54,18 @@ class AnsattController(
 			arrangorer = arrangorerForAnsattMedKoordinatorRolle.map { it.toDto() }
 		)
 	}
+
+	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
+	@GetMapping("/meg/roller")
+	fun getMineRoller(): Set<String> {
+		val personligIdent = authService.hentPersonligIdentTilInnloggetBruker()
+		arrangorAnsattTilgangService.synkroniserRettigheterMedAltinn(personligIdent)
+
+		val ansatt = arrangorAnsattService.getAnsattByPersonligIdent(personligIdent)
+
+		return ansatt?.arrangorer
+			?.flatMap { it.roller }
+			?.toSet()
+			?: emptySet()
+	}
 }

@@ -16,12 +16,14 @@ class MockAmtAltinnAclHttpServer : MockHttpServer(name = "AmtAltinnAclHttpServer
 	fun addDefaultData() {
 		addRoller(
 			norskIdent = TestData.ARRANGOR_ANSATT_1.personligIdent,
-			roller = createRollerForSingleOrg(ARRANGOR_1.organisasjonsnummer, listOf("KOORDINATOR"))
+			orgNr = ARRANGOR_1.organisasjonsnummer,
+			roller = listOf("KOORDINATOR")
 		)
 
 		addRoller(
 			norskIdent = TestData.ARRANGOR_ANSATT_2.personligIdent,
-			roller = createRollerForSingleOrg(ARRANGOR_1.organisasjonsnummer, listOf("VEILEDER"))
+			orgNr = ARRANGOR_1.organisasjonsnummer,
+			roller = listOf("VEILEDER")
 		)
 	}
 
@@ -36,18 +38,22 @@ class MockAmtAltinnAclHttpServer : MockHttpServer(name = "AmtAltinnAclHttpServer
 		addResponseHandler("/api/v1/rolle/tiltaksarrangor?norskIdent=$norskIdent", response)
 	}
 
-	fun createRollerForSingleOrg(
-		orgNr: String,
-		roller: List<String>
-	): AmtAltinnAclClientImpl.HentTiltaksarrangorRoller.Response {
-		return AmtAltinnAclClientImpl.HentTiltaksarrangorRoller.Response(
-			roller = listOf(
-				AmtAltinnAclClientImpl.HentTiltaksarrangorRoller.Response.TiltaksarrangorRoller(
-					orgNr, roller
-				)
-			)
-		)
-
+	fun addRoller(norskIdent: String, orgNr: String, roller: List<String>) {
+		addRoller(norskIdent, createRolleResponse(mapOf(orgNr to roller)))
 	}
 
+	fun addRoller(norskIdent: String, rollerPerOrg: Map<String, List<String>>) {
+		addRoller(norskIdent, createRolleResponse(rollerPerOrg))
+	}
+
+	private fun createRolleResponse(
+		rollerPerOrg: Map<String, List<String>>
+	): AmtAltinnAclClientImpl.HentTiltaksarrangorRoller.Response {
+		return AmtAltinnAclClientImpl.HentTiltaksarrangorRoller.Response(
+			roller = rollerPerOrg.map {
+				AmtAltinnAclClientImpl.HentTiltaksarrangorRoller.Response.TiltaksarrangorRoller(
+					it.key, it.value
+				)
+			})
+	}
 }
