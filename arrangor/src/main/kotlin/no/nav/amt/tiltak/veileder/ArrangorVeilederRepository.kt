@@ -113,6 +113,8 @@ open class ArrangorVeilederRepository(
 	}
 
 	internal fun getAktiveForDeltakere(deltakerIder: List<UUID>): List<ArrangorVeilederDbo> {
+		if (deltakerIder.isEmpty()) return emptyList()
+
 		val sql = """
 			SELECT * FROM arrangor_veileder
 			WHERE deltaker_id in (:deltakerIder) AND gyldig_fra < current_timestamp AND gyldig_til > current_timestamp
@@ -121,5 +123,4 @@ open class ArrangorVeilederRepository(
 		val parameters = sqlParameters("deltakerIder" to deltakerIder)
 		return template.query(sql, parameters, rowMapper)
 	}
-
 }
