@@ -20,7 +20,7 @@ class ArrangorVeilederServiceImpl (
 ): ArrangorVeilederService {
 
 	private val maksMedveiledere = 3
-
+	private val defaultGyldigTil = ZonedDateTime.parse("3000-01-01T00:00Z")
 	override fun opprettVeiledere(veilederInputs: List<ArrangorVeilederInput>, deltakerIder: List<UUID>) {
 		if (veilederInputs.filter { !it.erMedveileder }.size > 1) {
 			throw ValidationException("Deltakere kan kun ha 1 veileder.")
@@ -28,7 +28,14 @@ class ArrangorVeilederServiceImpl (
 
 		verifiserVeilederTilganger(deltakerIder, veilederInputs.map { it.ansattId })
 
-		val veiledere = veilederInputs.map { OpprettVeilederDbo(it.ansattId, it.erMedveileder) }
+		val veiledere = veilederInputs.map {
+			OpprettVeilederDbo(
+				ansattId = it.ansattId,
+				erMedveileder = it.erMedveileder,
+				gyldigFra = ZonedDateTime.now(),
+				gyldigTil = defaultGyldigTil,
+			)
+		}
 
 		inaktiverVeiledereSomSkalErstattes(veiledere, deltakerIder)
 
@@ -127,6 +134,6 @@ class ArrangorVeilederServiceImpl (
 internal data class OpprettVeilederDbo(
 	val ansattId: UUID,
 	val erMedveileder: Boolean,
-	val gyldigFra: ZonedDateTime = ZonedDateTime.now(),
-	val gyldigTil: ZonedDateTime = ZonedDateTime.parse("3000-01-01T00:00Z"),
+	val gyldigFra: ZonedDateTime,
+	val gyldigTil: ZonedDateTime,
 )

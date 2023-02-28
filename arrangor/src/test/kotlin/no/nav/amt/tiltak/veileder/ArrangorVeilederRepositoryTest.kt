@@ -33,11 +33,13 @@ class ArrangorVeilederRepositoryTest {
 		ansattId = ARRANGOR_ANSATT_1.id,
 		erMedveileder = false,
 		gyldigFra = ZonedDateTime.now().minusSeconds(10),
+		gyldigTil = ZonedDateTime.now().plusYears(5),
 	)
 	private val opprettVeilederDbo2 = OpprettVeilederDbo(
 		ansattId = ARRANGOR_ANSATT_2.id,
 		erMedveileder = true,
 		gyldigFra = ZonedDateTime.now().minusSeconds(10),
+		gyldigTil = ZonedDateTime.now().plusYears(5),
 	)
 
 	@BeforeEach
