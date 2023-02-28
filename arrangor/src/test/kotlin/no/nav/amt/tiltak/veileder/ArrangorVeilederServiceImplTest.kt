@@ -19,6 +19,9 @@ import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.transaction.TransactionStatus
+import org.springframework.transaction.support.SimpleTransactionStatus
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -36,6 +39,8 @@ class ArrangorVeilederServiceImplTest {
 
 	lateinit var gjennomforingService: GjennomforingService
 
+	lateinit var transactionTemplate: TransactionTemplate
+
 	@BeforeEach
 	fun setup() {
 		arrangorVeilederRepository = mockk(relaxUnitFun = true)
@@ -43,6 +48,7 @@ class ArrangorVeilederServiceImplTest {
 		arrangorAnsattService = mockk()
 		deltakerService = mockk()
 		gjennomforingService = mockk()
+		transactionTemplate = mockk()
 
 		arrangorVeilederServiceImpl = ArrangorVeilederServiceImpl(
 			arrangorAnsattService = arrangorAnsattService,
@@ -50,6 +56,7 @@ class ArrangorVeilederServiceImplTest {
 			arrangorAnsattTilgangService = arrangorAnsattTilgangService,
 			deltakerService = deltakerService,
 			gjennomforingService = gjennomforingService,
+			transactionTemplate = transactionTemplate,
 		)
 	}
 
@@ -61,6 +68,10 @@ class ArrangorVeilederServiceImplTest {
 			ArrangorVeilederInput(UUID.randomUUID(), true),
 			ArrangorVeilederInput(UUID.randomUUID(), true),
 		)
+
+		every { transactionTemplate.executeWithoutResult(any<java.util.function.Consumer<TransactionStatus>>()) } answers {
+			(firstArg() as java.util.function.Consumer<TransactionStatus>).accept(SimpleTransactionStatus())
+		}
 
 		every {
 			deltakerService.hentDeltakere(deltakerIder)
@@ -117,6 +128,10 @@ class ArrangorVeilederServiceImplTest {
 			gjennomforingService.getGjennomforing(deltaker1.gjennomforingId)
 		} returns gjennomforing
 
+
+		every { transactionTemplate.executeWithoutResult(any<java.util.function.Consumer<TransactionStatus>>()) } answers {
+			(firstArg() as java.util.function.Consumer<TransactionStatus>).accept(SimpleTransactionStatus())
+		}
 
 		val medveiledereSomSkalErstattes = listOf(
 			veilederDbo(deltakerIder.first(), ZonedDateTime.now().minusWeeks(20)),

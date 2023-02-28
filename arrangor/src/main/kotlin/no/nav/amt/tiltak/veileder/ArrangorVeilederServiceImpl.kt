@@ -7,6 +7,7 @@ import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.exceptions.ValidationException
 import no.nav.amt.tiltak.core.port.*
 import org.springframework.stereotype.Service
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -17,6 +18,7 @@ class ArrangorVeilederServiceImpl (
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
 	private val deltakerService: DeltakerService,
 	private val gjennomforingService: GjennomforingService,
+	private val transactionTemplate: TransactionTemplate,
 ): ArrangorVeilederService {
 
 	private val maksMedveiledere = 3
@@ -37,9 +39,10 @@ class ArrangorVeilederServiceImpl (
 			)
 		}
 
-		inaktiverVeiledereSomSkalErstattes(veiledere, deltakerIder)
-
-		arrangorVeilederRepository.opprettVeiledere(veiledere, deltakerIder)
+		transactionTemplate.executeWithoutResult {
+			inaktiverVeiledereSomSkalErstattes(veiledere, deltakerIder)
+			arrangorVeilederRepository.opprettVeiledere(veiledere, deltakerIder)
+		}
 	}
 
 	override fun hentVeiledereForDeltaker(deltakerId: UUID): List<ArrangorVeileder> {
