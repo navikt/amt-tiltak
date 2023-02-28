@@ -108,7 +108,7 @@ class ArrangorVeilederRepositoryTest {
 	}
 
 	@Test
-	fun `fjernVeiledere - flere aktive veiledere på en deltaker - skal sette gyldigTil til nå på alle veilederne`() {
+	fun `inaktiverVeiledereForDeltakere - flere aktive veiledere på en deltaker - skal sette gyldigTil til nå på alle veilederne`() {
 		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
 		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_2_VEILEDER_1)
 
@@ -121,7 +121,7 @@ class ArrangorVeilederRepositoryTest {
 	}
 
 	@Test
-	fun `fjernVeiledere - flere aktive veiledere på en deltaker - skal sette gyldigTil til nå på kun en veileder`() {
+	fun `inaktiverVeiledereForDeltakere - flere aktive veiledere på en deltaker - skal sette gyldigTil til nå på kun en veileder`() {
 		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
 		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_2_VEILEDER_1)
 
@@ -132,9 +132,9 @@ class ArrangorVeilederRepositoryTest {
 
 		val veiledere = repository.getAktiveForDeltaker(DELTAKER_1.id)
 
-		val fjernetVeileder = repository.get(ARRANGOR_ANSATT_1_VEILEDER_1.id)
+		val inaktiveretVeileder = repository.get(ARRANGOR_ANSATT_1_VEILEDER_1.id)
 
-		fjernetVeileder.gyldigTil shouldBeCloseTo ZonedDateTime.now()
+		inaktiveretVeileder.gyldigTil shouldBeCloseTo ZonedDateTime.now()
 
 		veiledere shouldHaveSize 1
 		veiledere[0].id shouldBe ARRANGOR_ANSATT_2_VEILEDER_1.id
@@ -142,7 +142,7 @@ class ArrangorVeilederRepositoryTest {
 	}
 
 	@Test
-	fun `fjernVeiledere - flere aktive veiledere på flere deltakere - skal sette gyldigTil til nå på alle veiledere`() {
+	fun `inaktiverVeiledereForDeltakere - flere aktive veiledere på flere deltakere - skal sette gyldigTil til nå på alle veiledere`() {
 		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
 		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_2_VEILEDER_1)
 		testDataRepository.insertArrangorVeileder(
@@ -163,7 +163,7 @@ class ArrangorVeilederRepositoryTest {
 	}
 
 	@Test
-	fun `fjernVeiledere - en aktiv- og en inaktiv veileder på deltaker - skal sette ikke gyldigTil til nå på inaktiv veileder`() {
+	fun `inaktiverVeiledereForDeltakere - en aktiv- og en inaktiv veileder på deltaker - skal ikke sette gyldigTil til nå på inaktiv veileder`() {
 		val inaktivVeileder = ARRANGOR_ANSATT_2_VEILEDER_1.copy(gyldigTil = ZonedDateTime.now().minusWeeks(10))
 
 		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
@@ -228,5 +228,37 @@ class ArrangorVeilederRepositoryTest {
 
 		veileder2.id shouldBe ARRANGOR_ANSATT_2_VEILEDER_1.id
 		veileder2.gyldigTil shouldBeGreaterThan ZonedDateTime.now()
+	}
+
+	@Test
+	fun `inaktiverAlleVeiledereForDeltaker - en aktiv og en inaktiv veileder - gyldigTil endres på den aktive`() {
+		val inaktivVeileder = ARRANGOR_ANSATT_2_VEILEDER_1.copy(gyldigTil = ZonedDateTime.now().minusWeeks(10))
+
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
+		testDataRepository.insertArrangorVeileder(inaktivVeileder)
+
+		repository.inaktiverAlleVeiledereForDeltaker(DELTAKER_1.id)
+
+		repository.getAktiveForDeltaker(DELTAKER_1.id) shouldHaveSize 0
+
+		repository.get(inaktivVeileder.id).gyldigTil shouldBeCloseTo inaktivVeileder.gyldigTil
+
+		repository.get(ARRANGOR_ANSATT_1_VEILEDER_1.id).gyldigTil shouldBeCloseTo ZonedDateTime.now()
+
+	}
+
+	@Test
+	fun `inaktiverVeiledere - en aktiv og en inaktiv veileder - gyldigTil endres på den aktive`() {
+		val inaktivVeileder = ARRANGOR_ANSATT_2_VEILEDER_1.copy(gyldigTil = ZonedDateTime.now().minusWeeks(10))
+
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
+		testDataRepository.insertArrangorVeileder(inaktivVeileder)
+
+		repository.inaktiverVeiledere(listOf(inaktivVeileder.id, ARRANGOR_ANSATT_1_VEILEDER_1.id))
+
+		repository.get(inaktivVeileder.id).gyldigTil shouldBeCloseTo inaktivVeileder.gyldigTil
+
+		repository.get(ARRANGOR_ANSATT_1_VEILEDER_1.id).gyldigTil shouldBeCloseTo ZonedDateTime.now()
+
 	}
 }
