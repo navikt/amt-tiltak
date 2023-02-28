@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.test.database.data
 import no.nav.amt.tiltak.common.db_utils.DbUtils
 import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.common.db_utils.getZonedDateTime
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.test.database.DbTestDataUtils.parameters
 import no.nav.amt.tiltak.test.database.data.inputs.*
 import no.nav.amt.tiltak.test.database.data.outputs.ArrangorAnsattGjennomforingTilgangOutput
@@ -350,6 +351,53 @@ class TestDataRepository(
 		)
 
 		template.update(sql, parameters)
+	}
+
+	fun insertArrangorVeileder(input: ArrangorVeilederDboInput) {
+		val sql = """
+			INSERT INTO arrangor_veileder(
+				id,
+				ansatt_id,
+				deltaker_id,
+				gyldig_fra,
+				gyldig_til,
+				er_medveileder,
+				modified_at,
+				created_at
+			)
+			VALUES(:id, :ansattId, :deltakerId, :gyldigFra, :gyldigTil, :erMedveileder, :modifiedAt, :createdAt)
+		""".trimIndent()
+
+		val parameters = DbUtils.sqlParameters(
+			"id" to input.id,
+			"ansattId" to input.ansattId,
+			"deltakerId" to input.deltakerId,
+			"gyldigFra" to input.gyldigFra.toOffsetDateTime(),
+			"gyldigTil" to input.gyldigTil.toOffsetDateTime(),
+			"erMedveileder" to input.erMedveileder,
+			"modifiedAt" to input.modifiedAt.toOffsetDateTime(),
+			"createdAt" to input.createdAt.toOffsetDateTime(),
+		)
+
+		template.update(sql, parameters)
+	}
+
+	fun deleteAllArrangorAnsattRoller(rolle: ArrangorAnsattRolle) {
+		val sql = """
+			DELETE FROM arrangor_ansatt_rolle WHERE rolle = :rolle::arrangor_rolle
+		""".trimIndent()
+
+		val parameters = DbUtils.sqlParameters("rolle" to rolle.name)
+
+		template.update(sql, parameters)
+	}
+
+	fun deleteAllArrangorAnsattRoller() {
+		val sql = """
+			DELETE FROM arrangor_ansatt_rolle
+		""".trimIndent()
+
+		template.jdbcTemplate.update(sql)
 	}
 
 }

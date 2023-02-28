@@ -64,6 +64,16 @@ class ArrangorAnsattRepositoryTest {
 	}
 
 	@Test
+	internal fun `getAnsatte - flere ansatte - returnere liste med alle ansatte`() {
+		val ansatte = repository.getAnsatte(listOf(ARRANGOR_ANSATT_1.id, ARRANGOR_ANSATT_2.id))
+
+		ansatte shouldHaveSize 2
+
+		ansatte.any { it.id == ARRANGOR_ANSATT_1.id } shouldBe true
+		ansatte.any { it.id == ARRANGOR_ANSATT_2.id } shouldBe true
+	}
+
+	@Test
 	internal fun `getAnsatteForGjennomforing - skal filtrere pa rolle, gjennomforing og filtere ut duplikater`() {
 		testRepository.insertArrangorAnsattRolle(
 			ArrangorAnsattRolleInput(
@@ -91,6 +101,31 @@ class ArrangorAnsattRepositoryTest {
 		koordinatorer shouldHaveSize 1
 
 		val veiledere = repository.getAnsatteForGjennomforing(GJENNOMFORING_1.id, ArrangorAnsattRolle.VEILEDER)
+
+		veiledere.any { it.id == ARRANGOR_ANSATT_1.id } shouldBe true
+		veiledere.any { it.id == ARRANGOR_ANSATT_2.id } shouldBe true
+	}
+
+	@Test
+	internal fun `getAnsatteMedRolleForArrangor - flere ansatte - skal filtrere pa rolle`() {
+		testRepository.insertArrangorAnsattRolle(
+			ArrangorAnsattRolleInput(
+				id = UUID.randomUUID(),
+				ARRANGOR_1.id,
+				ARRANGOR_ANSATT_1.id,
+				ArrangorAnsattRolle.VEILEDER.name,
+			)
+		)
+
+		val koordinatorer = repository.getAnsatteMedRolleForArrangor(ARRANGOR_1.id, ArrangorAnsattRolle.KOORDINATOR)
+
+		koordinatorer.first().id shouldBe ARRANGOR_ANSATT_1.id
+
+		koordinatorer shouldHaveSize 1
+
+		val veiledere = repository.getAnsatteMedRolleForArrangor(ARRANGOR_1.id, ArrangorAnsattRolle.VEILEDER)
+
+		veiledere shouldHaveSize 2
 
 		veiledere.any { it.id == ARRANGOR_ANSATT_1.id } shouldBe true
 		veiledere.any { it.id == ARRANGOR_ANSATT_2.id } shouldBe true

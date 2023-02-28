@@ -14,6 +14,8 @@ interface DeltakerService {
 
 	fun hentDeltaker(deltakerId: UUID): Deltaker?
 
+	fun hentDeltakere(deltakerIder: List<UUID>): List<Deltaker>
+
 	fun oppdaterStatuser()
 
 	fun slettDeltaker(deltakerId: UUID)

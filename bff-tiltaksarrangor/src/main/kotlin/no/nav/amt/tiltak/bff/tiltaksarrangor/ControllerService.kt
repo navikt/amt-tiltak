@@ -1,18 +1,18 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor
 
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerDetaljerDto
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.VeilederDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
+import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeileder
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
-import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.core.port.NavAnsattService
-import no.nav.amt.tiltak.core.port.NavEnhetService
+import no.nav.amt.tiltak.core.port.*
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
 open class ControllerService(
+	private val arrangorAnsattService: ArrangorAnsattService,
 	private val deltakerService: DeltakerService,
 	private val gjennomforingService: GjennomforingService,
 	private val navAnsattService: NavAnsattService,
@@ -49,4 +49,25 @@ open class ControllerService(
 			innsokBegrunnelse = deltaker.innsokBegrunnelse,
 		)
 	}
+
+
+	fun mapAnsatteTilVeilederDtoer(veiledere: List<ArrangorVeileder>): List<VeilederDto> {
+		val ansatte = arrangorAnsattService.getAnsatte(veiledere.map { it.ansattId })
+
+		return veiledere.map { veileder ->
+			val ansatt = ansatte.find { veileder.ansattId == it.id } ?:
+			throw IllegalStateException("Fant ikke ansatt ${veileder.ansattId} for veileder ${veileder.id}")
+
+			return@map VeilederDto(
+				id = veileder.id,
+				ansattId = ansatt.id,
+				deltakerId = veileder.deltakerId,
+				erMedveileder = veileder.erMedveileder,
+				fornavn = ansatt.fornavn,
+				mellomnavn = ansatt.mellomnavn,
+				etternavn = ansatt.etternavn,
+			)
+		}
+	}
+
 }

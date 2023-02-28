@@ -72,6 +72,11 @@ open class DeltakerServiceImpl(
 		return deltaker.toDeltaker(hentStatusOrThrow(deltakerId))
 	}
 
+	override fun hentDeltakere(deltakerIder: List<UUID>): List<Deltaker> {
+		val deltakere = deltakerRepository.getDeltakere(deltakerIder)
+		return mapDeltakereOgAktiveStatuser(deltakere)
+	}
+
 	override fun hentDeltakereMedPersonIdent(personIdent: String): List<Deltaker>{
 		val deltakere =  deltakerRepository.getDeltakereMedPersonIdent(personIdent)
 		return mapDeltakereOgAktiveStatuser(deltakere)
