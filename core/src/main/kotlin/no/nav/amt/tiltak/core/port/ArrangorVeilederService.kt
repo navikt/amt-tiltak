@@ -17,4 +17,6 @@ interface ArrangorVeilederService {
 
 	fun erVeilederFor(ansattId: UUID, deltakerId: UUID): Boolean
 
+	fun opprettVeiledereForDeltaker(veiledere: List<ArrangorVeilederInput>, deltakerId: UUID)
+
 }

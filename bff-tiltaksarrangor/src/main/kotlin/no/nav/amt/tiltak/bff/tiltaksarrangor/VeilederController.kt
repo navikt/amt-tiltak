@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.bff.tiltaksarrangor
 
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.TilgjengeligVeilederDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.VeilederDto
+import no.nav.amt.tiltak.bff.tiltaksarrangor.request.LeggTilVeiledereBulkRequest
 import no.nav.amt.tiltak.bff.tiltaksarrangor.request.LeggTilVeiledereRequest
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
@@ -28,7 +29,7 @@ class VeilederController (
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@PatchMapping
-	fun leggTilVeiledere(@RequestBody request: LeggTilVeiledereRequest) {
+	fun leggTilVeiledere(@RequestBody request: LeggTilVeiledereBulkRequest) {
 		val ansatt = hentInnloggetAnsatt()
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(
 			ansatt.id,
@@ -51,6 +52,21 @@ class VeilederController (
 		val veiledere = arrangorVeilederService.hentVeiledereForDeltaker(deltakerId)
 
 		return controllerService.mapAnsatteTilVeilederDtoer(veiledere)
+	}
+
+	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
+	@PatchMapping(params = ["deltakerId"])
+	fun tildelVeiledereForDeltaker(
+		@RequestParam("deltakerId") deltakerId: UUID,
+		@RequestBody request: LeggTilVeiledereRequest,
+	) {
+		val ansatt = hentInnloggetAnsatt()
+
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId, ArrangorAnsattRolle.KOORDINATOR)
+
+		val veiledere = request.veiledere.map { ArrangorVeilederInput(it.ansattId, it.erMedveileder) }
+
+		arrangorVeilederService.opprettVeiledereForDeltaker(veiledere, deltakerId)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)

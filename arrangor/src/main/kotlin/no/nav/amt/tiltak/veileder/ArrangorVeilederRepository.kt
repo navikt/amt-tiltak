@@ -57,6 +57,10 @@ open class ArrangorVeilederRepository(
 		template.batchUpdate(sql, parameters)
 	}
 
+	internal fun opprettVeiledere(veiledere: List<OpprettVeilederDbo>, deltakerId: UUID) {
+		opprettVeiledere(veiledere, listOf(deltakerId))
+	}
+
 	internal fun inaktiverVeiledere(veilederIder: List<UUID>) {
 		if (veilederIder.isEmpty()) return
 
@@ -88,6 +92,18 @@ open class ArrangorVeilederRepository(
 		}.toTypedArray()
 
 		template.batchUpdate(sql, parameters)
+	}
+
+	internal fun inaktiverAlleVeiledereForDeltaker(deltakerId: UUID) {
+		val sql = """
+			UPDATE arrangor_veileder
+			SET gyldig_til = current_timestamp, modified_at = current_timestamp
+			WHERE deltaker_id = :deltakerId AND gyldig_til > current_timestamp
+		""".trimIndent()
+
+		val parameters = sqlParameters("deltakerId" to deltakerId)
+
+		template.update(sql, parameters)
 	}
 
 	internal fun get(id: UUID): ArrangorVeilederDbo {

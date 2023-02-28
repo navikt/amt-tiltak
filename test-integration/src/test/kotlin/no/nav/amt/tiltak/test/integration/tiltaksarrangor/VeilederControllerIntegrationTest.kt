@@ -46,6 +46,7 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 	internal fun `skal teste token autentisering`() {
 		val requestBuilders = listOf(
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/veiledere"),
+			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/veiledere?deltakerId=${UUID.randomUUID()}"),
 			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/veiledere?gjennomforingId=${UUID.randomUUID()}"),
 			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/veiledere?deltakerId=${UUID.randomUUID()}"),
 			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/veiledere/tilgjengelig?gjennomforingId=${UUID.randomUUID()}"),
@@ -59,7 +60,7 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt2Header(),
-			body = lagOpprettVeilederRequestBody(
+			body = lagOpprettVeilederBulkRequestBody(
 				deltakerIder = listOf(DELTAKER_1.id),
 				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, false)),
 				gjennomforingId = GJENNOMFORING_1.id
@@ -75,7 +76,7 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt1Header(),
-			body = lagOpprettVeilederRequestBody(
+			body = lagOpprettVeilederBulkRequestBody(
 				deltakerIder = listOf(DELTAKER_1.id),
 				veiledere = listOf(Pair(ARRANGOR_ANSATT_1.id, false)),
 				gjennomforingId = GJENNOMFORING_1.id
@@ -91,7 +92,7 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt1Header(),
-			body = lagOpprettVeilederRequestBody(
+			body = lagOpprettVeilederBulkRequestBody(
 				deltakerIder = listOf(DELTAKER_1.id),
 				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, false)),
 				gjennomforingId = GJENNOMFORING_1.id
@@ -117,7 +118,7 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt1Header(),
-			body = lagOpprettVeilederRequestBody(
+			body = lagOpprettVeilederBulkRequestBody(
 				deltakerIder = listOf(DELTAKER_1.id),
 				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, false)),
 				gjennomforingId = GJENNOMFORING_1.id
@@ -147,7 +148,7 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt1Header(),
-			body = lagOpprettVeilederRequestBody(
+			body = lagOpprettVeilederBulkRequestBody(
 				deltakerIder = listOf(DELTAKER_1.id),
 				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, true)),
 				gjennomforingId = GJENNOMFORING_1.id
@@ -177,7 +178,7 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt1Header(),
-			body = lagOpprettVeilederRequestBody(
+			body = lagOpprettVeilederBulkRequestBody(
 				deltakerIder = listOf(DELTAKER_1.id, DELTAKER_2.id),
 				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, true), Pair(arrangor3.id, true)),
 				gjennomforingId = GJENNOMFORING_1.id
@@ -210,7 +211,7 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt1Header(),
-			body = lagOpprettVeilederRequestBody(
+			body = lagOpprettVeilederBulkRequestBody(
 				deltakerIder = listOf(DELTAKER_1.id, DELTAKER_2.id),
 				veiledere = listOf(
 					Pair(arrangorAnsattInput().id, true),
@@ -231,7 +232,7 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/veiledere",
 			headers = lagAnsatt1Header(),
-			body = lagOpprettVeilederRequestBody(
+			body = lagOpprettVeilederBulkRequestBody(
 				deltakerIder = listOf(DELTAKER_1.id, DELTAKER_2.id),
 				veiledere = listOf(
 					Pair(arrangorAnsattInput().id, false),
@@ -241,6 +242,94 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			),
 		)
 
+		response.code shouldBe 400
+	}
+
+	@Test
+	internal fun `tildelVeiledereForDeltaker - ansatt er ikke koordinator på gjennomføring - skal kaste 403`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/veiledere?deltakerId=${DELTAKER_1.id}",
+			headers = lagAnsatt2Header(),
+			body = lagOpprettVeiledereRequestBody(
+				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, false)),
+			),
+		)
+
+		response.code shouldBe 403
+	}
+
+	@Test
+	internal fun `tildelVeiledereForDeltaker - ansatt som legges til har ikke rollen VEILEDER - skal kaste 403`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/veiledere?deltakerId=${DELTAKER_1.id}",
+			headers = lagAnsatt1Header(),
+			body = lagOpprettVeiledereRequestBody(
+				veiledere = listOf(Pair(ARRANGOR_ANSATT_1.id, false)),
+			),
+		)
+
+		response.code shouldBe 403
+	}
+
+	@Test
+	internal fun `tildelVeiledereForDeltaker - flere veiledere fra før - veiledere blir erstattet av nye`() {
+		opprettMedveiledereForDeltaker(3, DELTAKER_1.id)
+
+		val ansatt3 = arrangorAnsattInput()
+		val ansatt4 = arrangorAnsattInput()
+
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/veiledere?deltakerId=${DELTAKER_1.id}",
+			headers = lagAnsatt1Header(),
+			body = lagOpprettVeiledereRequestBody(
+				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, true), Pair(ansatt3.id, true), Pair(ansatt4.id, false)),
+			),
+		)
+
+		response.code shouldBe 200
+
+		AsyncUtils.eventually {
+			val veiledereForDeltaker1 = arrangorVeilederService.hentVeiledereForDeltaker(DELTAKER_1.id)
+			veiledereForDeltaker1 shouldHaveSize 3
+
+			veiledereForDeltaker1.any { it.ansattId == ARRANGOR_ANSATT_2.id } shouldBe true
+			veiledereForDeltaker1.any { it.ansattId == ansatt3.id } shouldBe true
+			veiledereForDeltaker1.any { it.ansattId == ansatt4.id } shouldBe true
+		}
+
+	}
+
+	@Test
+	internal fun `tildelVeiledereForDeltaker - request med for mange hovedveiledere - skal kaste 400`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/veiledere?deltakerId=${DELTAKER_1.id}",
+			headers = lagAnsatt1Header(),
+			body = lagOpprettVeiledereRequestBody(
+				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, false), Pair(ARRANGOR_ANSATT_1.id, false)),
+			),
+		)
+		response.code shouldBe 400
+	}
+
+	@Test
+	internal fun `tildelVeiledereForDeltaker - request med for mange medveiledere - skal kaste 400`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/veiledere?deltakerId=${DELTAKER_1.id}",
+			headers = lagAnsatt1Header(),
+			body = lagOpprettVeiledereRequestBody(
+				veiledere = listOf(
+					Pair(arrangorAnsattInput().id, true),
+					Pair(arrangorAnsattInput().id, true),
+					Pair(arrangorAnsattInput().id, true),
+					Pair(arrangorAnsattInput().id, true),
+				),
+			),
+		)
 		response.code shouldBe 400
 	}
 
@@ -385,8 +474,17 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 		response.code shouldBe 403
 	}
 
+	private fun lagOpprettVeiledereRequestBody(veiledere: List<Pair<UUID, Boolean>>): RequestBody {
+		val veiledereStr = veiledere.joinToString {
+			"""
+				{"ansattId": "${it.first}", "erMedveileder": ${it.second}}
+			""".trimIndent()
+		}
 
-	private fun lagOpprettVeilederRequestBody(
+		return """{ "veiledere": [$veiledereStr] }""".trimIndent().toJsonRequestBody()
+	}
+
+	private fun lagOpprettVeilederBulkRequestBody(
 		deltakerIder: List<UUID>,
 		veiledere: List<Pair<UUID, Boolean>>,
 		gjennomforingId: UUID,

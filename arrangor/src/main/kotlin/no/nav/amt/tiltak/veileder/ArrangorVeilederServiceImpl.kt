@@ -23,25 +23,29 @@ class ArrangorVeilederServiceImpl (
 
 	private val maksMedveiledere = 3
 	private val defaultGyldigTil = ZonedDateTime.parse("3000-01-01T00:00Z")
+
 	override fun opprettVeiledere(veilederInputs: List<ArrangorVeilederInput>, deltakerIder: List<UUID>) {
-		if (veilederInputs.filter { !it.erMedveileder }.size > 1) {
-			throw ValidationException("Deltakere kan kun ha 1 veileder.")
-		}
+		val veiledere = mapOpprettVeilederDboer(veilederInputs)
 
-		verifiserVeilederTilganger(deltakerIder, veilederInputs.map { it.ansattId })
-
-		val veiledere = veilederInputs.map {
-			OpprettVeilederDbo(
-				ansattId = it.ansattId,
-				erMedveileder = it.erMedveileder,
-				gyldigFra = ZonedDateTime.now(),
-				gyldigTil = defaultGyldigTil,
-			)
-		}
+		verifiserVeilederTilganger(deltakerIder, veiledere.map { it.ansattId })
 
 		transactionTemplate.executeWithoutResult {
 			inaktiverVeiledereSomSkalErstattes(veiledere, deltakerIder)
 			arrangorVeilederRepository.opprettVeiledere(veiledere, deltakerIder)
+		}
+	}
+
+	override fun opprettVeiledereForDeltaker(veilederInputs: List<ArrangorVeilederInput>, deltakerId: UUID) {
+		val veiledere = mapOpprettVeilederDboer(veilederInputs)
+
+		if (veiledere.count { it.erMedveileder } > maksMedveiledere)
+			throw ValidationException("Deltakere kan ikke ha flere enn $maksMedveiledere medveiledere")
+
+		verifiserVeilederTilganger(deltakerId, veiledere.map { it.ansattId })
+
+		transactionTemplate.executeWithoutResult {
+			arrangorVeilederRepository.inaktiverAlleVeiledereForDeltaker(deltakerId)
+			arrangorVeilederRepository.opprettVeiledere(veiledere, deltakerId)
 		}
 	}
 
@@ -117,6 +121,10 @@ class ArrangorVeilederServiceImpl (
 		return emptyList()
 	}
 
+	private fun verifiserVeilederTilganger(deltakerId: UUID, veilederIder: List<UUID>) {
+		verifiserVeilederTilganger(listOf(deltakerId), veilederIder)
+	}
+
 	private fun verifiserVeilederTilganger(deltakerIder: List<UUID>, veilederIder: List<UUID>) {
 		val gjennomforingIder = deltakerService.hentDeltakere(deltakerIder)
 			.map { it.gjennomforingId }.distinct()
@@ -132,6 +140,20 @@ class ArrangorVeilederServiceImpl (
 		}
 	}
 
+	private fun mapOpprettVeilederDboer(veilederInputs: List<ArrangorVeilederInput>): List<OpprettVeilederDbo> {
+		if (veilederInputs.filter { !it.erMedveileder }.size > 1) {
+			throw ValidationException("Deltakere kan kun ha 1 veileder.")
+		}
+
+		return veilederInputs.map {
+			OpprettVeilederDbo(
+				ansattId = it.ansattId,
+				erMedveileder = it.erMedveileder,
+				gyldigFra = ZonedDateTime.now(),
+				gyldigTil = defaultGyldigTil,
+			)
+		}
+	}
 }
 
 internal data class OpprettVeilederDbo(
