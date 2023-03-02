@@ -63,9 +63,15 @@ class AnsattController(
 
 		val ansatt = arrangorAnsattService.getAnsattByPersonligIdent(personligIdent)
 
-		return ansatt?.arrangorer
+		val roller = ansatt?.arrangorer
 			?.flatMap { it.roller }
 			?.toSet()
 			?: emptySet()
+
+		if (ansatt != null && roller.contains("KOORDINATOR")) {
+			arrangorAnsattService.setVellykketInnlogging(ansatt.id)
+		}
+
+		return roller
 	}
 }
