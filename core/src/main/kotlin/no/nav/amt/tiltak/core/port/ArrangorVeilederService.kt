@@ -11,6 +11,8 @@ interface ArrangorVeilederService {
 
 	fun hentVeiledereForDeltaker(deltakerId: UUID): List<ArrangorVeileder>
 
+	fun hentDeltakereForVeileder(ansattId: UUID): List<ArrangorVeileder>
+
 	fun hentAktiveVeiledereForGjennomforing(gjennomforingId: UUID): List<ArrangorVeileder>
 
 	fun hentTilgjengeligeVeiledereForGjennomforing(gjennomforingId: UUID): List<Ansatt>
