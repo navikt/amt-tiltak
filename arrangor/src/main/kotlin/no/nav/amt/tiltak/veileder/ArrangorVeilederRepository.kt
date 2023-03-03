@@ -118,6 +118,17 @@ open class ArrangorVeilederRepository(
 			throw NoSuchElementException("Fant ingen ArrangorVeileder med id $id")
 	}
 
+	internal fun getDeltakereForVeileder(ansattId: UUID): List<ArrangorVeilederDbo> {
+		val sql = """
+			SELECT * FROM arrangor_veileder
+			WHERE ansatt_id = :ansattId AND gyldig_fra < current_timestamp AND gyldig_til > current_timestamp
+		""".trimIndent()
+
+		val parameters = sqlParameters("ansattId" to ansattId)
+
+		return template.query(sql, parameters, rowMapper)
+	}
+
 	internal fun getAktiveForDeltaker(deltakerId: UUID): List<ArrangorVeilederDbo> {
 		val sql = """
 			SELECT * FROM arrangor_veileder

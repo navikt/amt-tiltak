@@ -53,6 +53,10 @@ class ArrangorVeilederServiceImpl (
 		return arrangorVeilederRepository.getAktiveForDeltaker(deltakerId).map { it.toArrangorVeileder() }
 	}
 
+	override fun hentDeltakereForVeileder(ansattId: UUID): List<ArrangorVeileder> {
+		return arrangorVeilederRepository.getDeltakereForVeileder(ansattId).map { it.toArrangorVeileder() }
+	}
+
 	override fun hentAktiveVeiledereForGjennomforing(gjennomforingId: UUID): List<ArrangorVeileder> {
 		val deltakerIder = deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId).map { it.id }
 

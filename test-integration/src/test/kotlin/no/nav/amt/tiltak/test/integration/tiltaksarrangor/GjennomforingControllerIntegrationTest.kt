@@ -4,6 +4,7 @@ import com.jayway.jsonpath.JsonPath
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
@@ -38,6 +39,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 				.url("${serverUrl()}/api/tiltaksarrangor/gjennomforing/${UUID.randomUUID()}/tilgang"),
 			Request.Builder().delete()
 				.url("${serverUrl()}/api/tiltaksarrangor/gjennomforing/${UUID.randomUUID()}/tilgang"),
+			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/deltakeroversikt"),
 		)
 		testTiltaksarrangorAutentisering(requestBuilders, client, mockOAuthServer)
 	}
@@ -339,6 +341,37 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 		response.code shouldBe 200
 		response.body?.string() shouldBe expectedJson
 	}
+	
+	@Test
+	fun `hentDeltakeroversikt() - ansatt er veileder - skal returnere deltakeroversikt med veilederinfo`() {
+		testDataRepository.insertArrangorVeileder(TestData.ARRANGOR_ANSATT_2_VEILEDER_1)
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/deltakeroversikt",
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_2.personligIdent)}")
+		)
 
+		val expectedJson =
+			"""{"veilederInfo":{"veilederFor":0,"medveilederFor":1},"koordinatorInfo":null}""".trimIndent()
+
+		response.code shouldBe 200
+		response.body?.string() shouldBe expectedJson
+	}
+
+	@Test
+	fun `hentDeltakeroversikt() - ansatt er veileder og koordinator - skal returnere deltakeroversikt med veileder- og koordinatorinfo`() {
+		testDataRepository.insertArrangorVeileder(TestData.ARRANGOR_ANSATT_1_VEILEDER_1)
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/deltakeroversikt",
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+		)
+
+		val expectedJson =
+			"""{"veilederInfo":{"veilederFor":1,"medveilederFor":0},"koordinatorInfo":{"deltakerlister":[{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","type":"Tiltak1"}]}}""".trimIndent()
+
+		response.code shouldBe 200
+		response.body?.string() shouldBe expectedJson
+	}
 
 }
