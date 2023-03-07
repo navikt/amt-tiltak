@@ -143,6 +143,14 @@ object TestData {
 		rolle = "VEILEDER"
 	)
 
+	val ARRANGOR_ANSATT_3 = ArrangorAnsattInput(
+		id = UUID.fromString("afdf2b47-c846-4d52-8ba4-9ae3a4175e86"),
+		personligIdent = "67676767676",
+		fornavn = "Ansatt 3 fornavn",
+		mellomnavn = "Ansatt 3 mellomnavn",
+		etternavn = "Ansatt 3 etternavn"
+	)
+
 
 	val TILTAK_1 = TiltakInput(
 		id = UUID.fromString("b18fd670-3bc1-11ec-8d3d-0242ac130003"),

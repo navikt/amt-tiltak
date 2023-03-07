@@ -3,10 +3,12 @@ package no.nav.amt.tiltak.veileder
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.common.db_utils.getZonedDateTime
+import no.nav.amt.tiltak.core.domain.tiltak.ArrangorVeiledersDeltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.UUID
 
 @Component
 open class ArrangorVeilederRepository(
@@ -23,6 +25,25 @@ open class ArrangorVeilederRepository(
 			gyldigTil = rs.getZonedDateTime("gyldig_til"),
 			createdAt = rs.getZonedDateTime("created_at"),
 			modifiedAt = rs.getZonedDateTime("modified_at"),
+		)
+	}
+
+	private val rowMapperVeiledersDeltaker = RowMapper { rs, _ ->
+		ArrangorVeiledersDeltaker(
+			id = rs.getUUID("deltaker_id"),
+			fornavn = rs.getString("fornavn"),
+			mellomnavn = rs.getString("mellomnavn"),
+			etternavn = rs.getString("etternavn"),
+			fodselsnummer = rs.getString("person_ident"),
+			startDato = rs.getDate("start_dato")?.toLocalDate(),
+			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
+			status = DeltakerStatus.Type.valueOf(rs.getString("status")),
+			statusDato = rs.getTimestamp("created_at").toLocalDateTime(),
+			gjennomforingId = rs.getUUID("gjennomforing_id"),
+			gjennomforingNavn = rs.getString("gjennomforing_navn"),
+			gjennomforingType = rs.getString("tiltak_navn"),
+			erMedveilederFor = rs.getBoolean("er_medveileder"),
+			erSkjermet = rs.getBoolean("er_skjermet")
 		)
 	}
 
@@ -149,5 +170,35 @@ open class ArrangorVeilederRepository(
 
 		val parameters = sqlParameters("deltakerIder" to deltakerIder)
 		return template.query(sql, parameters, rowMapper)
+	}
+
+	internal fun getDeltakerlisteForVeileder(ansattId: UUID): List<ArrangorVeiledersDeltaker> {
+		val sql = """
+			SELECT
+				arrangor_veileder.deltaker_id,
+				arrangor_veileder.er_medveileder,
+				deltaker.gjennomforing_id,
+				deltaker.start_dato,
+				deltaker.slutt_dato,
+				deltaker_status.status,
+				deltaker_status.created_at,
+				bruker.person_ident,
+				bruker.fornavn,
+				bruker.mellomnavn,
+				bruker.etternavn,
+				bruker.er_skjermet,
+				gjennomforing.navn as gjennomforing_navn,
+				tiltak.navn as tiltak_navn
+			FROM arrangor_veileder
+					 inner join deltaker on arrangor_veileder.deltaker_id = deltaker.id
+					 inner join deltaker_status on arrangor_veileder.deltaker_id = deltaker_status.deltaker_id
+					 inner join bruker on bruker.id = deltaker.bruker_id
+					 inner join gjennomforing on deltaker.gjennomforing_id = gjennomforing.id
+					 inner join tiltak on gjennomforing.tiltak_id = tiltak.id
+			WHERE ansatt_id = :ansattId AND arrangor_veileder.gyldig_fra < current_timestamp AND arrangor_veileder.gyldig_til > current_timestamp;
+		""".trimIndent()
+
+		val parameters = sqlParameters("ansattId" to ansattId)
+		return template.query(sql, parameters, rowMapperVeiledersDeltaker)
 	}
 }

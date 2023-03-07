@@ -7,6 +7,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_ROLLE_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_ROLLE_2
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2_ROLLE_1
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_3
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_3
@@ -45,6 +46,8 @@ object TestDataSeeder {
 
 		repository.insertArrangorAnsatt(ARRANGOR_ANSATT_2)
 		repository.insertArrangorAnsattRolle(ARRANGOR_ANSATT_2_ROLLE_1)
+
+		repository.insertArrangorAnsatt(ARRANGOR_ANSATT_3)
 
 		repository.insertTiltak(TILTAK_1)
 		repository.insertGjennomforing(GJENNOMFORING_1)

@@ -4,12 +4,17 @@ import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeileder
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeilederInput
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
+import no.nav.amt.tiltak.core.domain.tiltak.ArrangorVeiledersDeltaker
 import no.nav.amt.tiltak.core.exceptions.ValidationException
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.ArrangorAnsattService
+import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
+import no.nav.amt.tiltak.core.port.ArrangorVeilederService
+import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.GjennomforingService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 @Service
 class ArrangorVeilederServiceImpl (
@@ -72,6 +77,10 @@ class ArrangorVeilederServiceImpl (
 
 	override fun erVeilederFor(ansattId: UUID, deltakerId: UUID): Boolean {
 		return hentVeiledereForDeltaker(deltakerId).any { it.ansattId == ansattId }
+	}
+
+	override fun hentDeltakerliste(ansattId: UUID): List<ArrangorVeiledersDeltaker> {
+		return arrangorVeilederRepository.getDeltakerlisteForVeileder(ansattId).filter { !it.erSkjermet }
 	}
 
 	private fun inaktiverVeiledereSomSkalErstattes(veiledere: List<OpprettVeilederDbo>, deltakerIder: List<UUID>) {

@@ -10,6 +10,7 @@ import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_3
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattGjennomforingTilgangInput
@@ -158,18 +159,19 @@ class ArrangorAnsattRepositoryTest {
 	internal fun `getEldsteSisteRolleSynkroniserteAnsatte returnerer maks antall`() {
 		repository.setSistOppdatertForAnsatt(ARRANGOR_ANSATT_1.id, LocalDateTime.now().minusWeeks(1))
 		repository.setSistOppdatertForAnsatt(ARRANGOR_ANSATT_2.id, LocalDateTime.now().minusWeeks(2))
+		repository.setSistOppdatertForAnsatt(ARRANGOR_ANSATT_3.id, LocalDateTime.now().minusWeeks(3))
 
 		val toUpdate = repository.getEldsteSistRolleSynkroniserteAnsatte(1)
 
 		toUpdate.size shouldBe 1
-		toUpdate.map { it.id } shouldBe listOf(ARRANGOR_ANSATT_2.id)
+		toUpdate.map { it.id } shouldBe listOf(ARRANGOR_ANSATT_3.id)
 	}
 
 	@Test
 	internal fun getAnsattMetrics() {
 		val metrics = repository.getAnsattMetrics()
 
-		metrics.antallAnsatte shouldBe 2
+		metrics.antallAnsatte shouldBe 3
 		metrics.antallAnsatteInnloggetSisteTime shouldBe 0
 
 		repository.setVelykketInnlogging(ARRANGOR_ANSATT_1.id)
