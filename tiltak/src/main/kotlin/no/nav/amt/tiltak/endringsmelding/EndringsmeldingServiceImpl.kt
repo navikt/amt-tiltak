@@ -159,7 +159,7 @@ open class EndringsmeldingServiceImpl(
 		)
 	}
 
-	override fun slettEndringsmeldingerForDeltaker(deltakerId: UUID) {
+	override fun slett(deltakerId: UUID) {
 		endringsmeldingRepository.deleteByDeltaker(deltakerId)
 	}
 

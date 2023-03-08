@@ -59,4 +59,17 @@ open class SkjultDeltakerRepository(
 		return erSkjultMap
 	}
 
+	fun slett(deltakerId: UUID) {
+		val sql = """
+			DELETE from skjult_deltaker WHERE deltaker_id = :deltakerId
+		""".trimIndent()
+
+		val parameters = sqlParameters(
+			"deltakerId" to deltakerId,
+		)
+
+		template.update(sql, parameters)
+	}
+
+
 }

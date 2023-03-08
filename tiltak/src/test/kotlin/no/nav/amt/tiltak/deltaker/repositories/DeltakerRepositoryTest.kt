@@ -362,7 +362,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		repository.insert(deltakerInsertDbo)
 		repository.get(deltakerInsertDbo.id) shouldNotBe null
-		repository.slettDeltaker(deltakerInsertDbo.id)
+		repository.slett(deltakerInsertDbo.id)
 		repository.get(deltakerInsertDbo.id) shouldBe null
 	}
 

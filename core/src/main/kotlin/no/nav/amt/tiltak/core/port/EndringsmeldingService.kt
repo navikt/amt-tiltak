@@ -33,6 +33,6 @@ interface EndringsmeldingService {
 
 	fun hentAktiveEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding>
 
-	fun slettEndringsmeldingerForDeltaker(deltakerId: UUID)
+	fun slett(deltakerId: UUID)
 
 }

@@ -96,10 +96,10 @@ open class DeltakerServiceImpl(
 
 	override fun slettDeltaker(deltakerId: UUID) {
 		transactionTemplate.execute {
-			endringsmeldingService.slettEndringsmeldingerForDeltaker(deltakerId)
-			deltakerStatusRepository.slettDeltakerStatus(deltakerId)
-			deltakerRepository.slettDeltaker(deltakerId)
-
+			endringsmeldingService.slett(deltakerId)
+			deltakerStatusRepository.slett(deltakerId)
+			skjultDeltakerRepository.slett(deltakerId)
+			deltakerRepository.slett(deltakerId)
 			kafkaProducerService.publiserSlettDeltaker(deltakerId)
 		}
 
