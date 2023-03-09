@@ -174,28 +174,32 @@ open class ArrangorVeilederRepository(
 
 	internal fun getDeltakerlisteForVeileder(ansattId: UUID): List<ArrangorVeiledersDeltaker> {
 		val sql = """
-			SELECT
-				arrangor_veileder.deltaker_id,
-				arrangor_veileder.er_medveileder,
-				deltaker.gjennomforing_id,
-				deltaker.start_dato,
-				deltaker.slutt_dato,
-				deltaker_status.status,
-				deltaker_status.created_at,
-				bruker.person_ident,
-				bruker.fornavn,
-				bruker.mellomnavn,
-				bruker.etternavn,
-				bruker.er_skjermet,
-				gjennomforing.navn as gjennomforing_navn,
-				tiltak.navn as tiltak_navn
+			SELECT arrangor_veileder.deltaker_id,
+				   arrangor_veileder.er_medveileder,
+				   deltaker.gjennomforing_id,
+				   deltaker.start_dato,
+				   deltaker.slutt_dato,
+				   deltaker_status.status,
+				   deltaker_status.created_at,
+				   bruker.person_ident,
+				   bruker.fornavn,
+				   bruker.mellomnavn,
+				   bruker.etternavn,
+				   bruker.er_skjermet,
+				   gjennomforing.navn AS gjennomforing_navn,
+				   tiltak.navn        AS tiltak_navn
 			FROM arrangor_veileder
-					 inner join deltaker on arrangor_veileder.deltaker_id = deltaker.id
-					 inner join deltaker_status on arrangor_veileder.deltaker_id = deltaker_status.deltaker_id
-					 inner join bruker on bruker.id = deltaker.bruker_id
-					 inner join gjennomforing on deltaker.gjennomforing_id = gjennomforing.id
-					 inner join tiltak on gjennomforing.tiltak_id = tiltak.id
-			WHERE ansatt_id = :ansattId AND arrangor_veileder.gyldig_fra < current_timestamp AND arrangor_veileder.gyldig_til > current_timestamp;
+					 INNER JOIN deltaker ON arrangor_veileder.deltaker_id = deltaker.id
+					 INNER JOIN deltaker_status ON arrangor_veileder.deltaker_id = deltaker_status.deltaker_id
+					 INNER JOIN bruker ON bruker.id = deltaker.bruker_id
+					 INNER JOIN gjennomforing ON deltaker.gjennomforing_id = gjennomforing.id
+					 INNER JOIN tiltak ON gjennomforing.tiltak_id = tiltak.id
+			WHERE ansatt_id = :ansattId
+			  AND arrangor_veileder.gyldig_fra < CURRENT_TIMESTAMP
+			  AND arrangor_veileder.gyldig_til > CURRENT_TIMESTAMP
+			  AND deltaker_status.aktiv = TRUE
+			  AND deltaker_status.status != 'PABEGYNT_REGISTRERING'
+			  AND deltaker_status.status != 'PABEGYNT'
 		""".trimIndent()
 
 		val parameters = sqlParameters("ansattId" to ansattId)
