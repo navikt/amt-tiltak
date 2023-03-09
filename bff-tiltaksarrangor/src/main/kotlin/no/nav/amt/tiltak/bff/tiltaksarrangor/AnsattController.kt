@@ -68,7 +68,7 @@ class AnsattController(
 			?.toSet()
 			?: emptySet()
 
-		if (ansatt != null && roller.contains("KOORDINATOR")) {
+		if (ansatt != null && roller.isNotEmpty()) {
 			arrangorAnsattService.setVellykketInnlogging(ansatt.id)
 		}
 
