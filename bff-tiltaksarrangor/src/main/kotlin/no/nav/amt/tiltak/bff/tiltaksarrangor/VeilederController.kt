@@ -111,12 +111,9 @@ class VeilederController (
 		val ansatt = hentInnloggetAnsatt()
 		arrangorAnsattTilgangService.shouldHaveRolle(ansatt.personligIdent, ArrangorAnsattRolle.VEILEDER)
 
-		val gjennomforingIder = arrangorAnsattTilgangService.hentGjennomforingIder(ansatt.personligIdent)
 		val deltakerliste = arrangorVeilederService.hentDeltakerliste(ansatt.id)
 
-		val tilgangssjekketDeltakerliste = deltakerliste.filter { it.gjennomforingId in gjennomforingIder }
-
-		return tilgangssjekketDeltakerliste.map { it.toVeiledersDeltakerDto() }
+		return deltakerliste.map { it.toVeiledersDeltakerDto() }
 	}
 
 	private fun hentInnloggetAnsatt(): Ansatt {
