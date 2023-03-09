@@ -86,7 +86,7 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 		testDataRepository.insertDeltakerStatus(statusCmd)
 
 		repository.getStatuserForDeltaker(deltakerCmd.id) shouldHaveSize 1
-		repository.slettDeltakerStatus(deltakerCmd.id)
+		repository.slett(deltakerCmd.id)
 		repository.getStatuserForDeltaker(deltakerCmd.id) shouldHaveSize 0
 	}
 

@@ -60,4 +60,15 @@ class SkjultDeltakerRepositoryTest {
 		erSkjultMap[DELTAKER_2.id] shouldBe false
 	}
 
+	@Test
+	fun `slett - skal slette record`() {
+		testRepository.insertSkjultDeltaker(SkjultDeltakerInput(UUID.randomUUID(), DELTAKER_1.id, ARRANGOR_ANSATT_1.id, ZonedDateTime.now().plusDays(1)))
+
+		repository.slett(DELTAKER_1.id)
+
+		val erSkjult = repository.erSkjultForTiltaksarrangor(listOf(DELTAKER_1.id))
+
+		erSkjult[DELTAKER_1.id] shouldBe false
+	}
+
 }
