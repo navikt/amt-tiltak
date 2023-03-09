@@ -341,7 +341,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 		response.code shouldBe 200
 		response.body?.string() shouldBe expectedJson
 	}
-	
+
 	@Test
 	fun `hentDeltakeroversikt() - ansatt er veileder - skal returnere deltakeroversikt med veilederinfo`() {
 		testDataRepository.insertArrangorVeileder(TestData.ARRANGOR_ANSATT_2_VEILEDER_1)

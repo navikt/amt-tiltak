@@ -10,6 +10,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_ROLLE_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_VEILEDER_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2_VEILEDER_1
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_3
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
@@ -35,6 +36,8 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 		{ mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}") }
 	private val lagAnsatt2Header =
 		{ mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_2.personligIdent)}") }
+	private val lagAnsatt3Header =
+		{ mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_3.personligIdent)}") }
 
 	@BeforeEach
 	internal fun setUp() {
@@ -50,6 +53,7 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/veiledere?gjennomforingId=${UUID.randomUUID()}"),
 			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/veiledere?deltakerId=${UUID.randomUUID()}"),
 			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/veiledere/tilgjengelig?gjennomforingId=${UUID.randomUUID()}"),
+			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/veileder/deltakerliste"),
 		)
 		testTiltaksarrangorAutentisering(requestBuilders, client, mockOAuthServer)
 	}
@@ -472,6 +476,32 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		response.code shouldBe 403
+	}
+
+	@Test
+	internal fun `hentDeltakerliste - har ikke veilederrolle - skal kaste 403`() {
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/veileder/deltakerliste",
+			headers = lagAnsatt3Header(),
+		)
+
+		response.code shouldBe 403
+	}
+
+	@Test
+	internal fun `hentDeltakerliste - er veileder - henter deltakerliste`() {
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/veileder/deltakerliste",
+			headers = lagAnsatt1Header(),
+		)
+
+		response.code shouldBe 200
+		response.body!!.string() shouldBe """
+			[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"deltakerliste":{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","type":"Tiltak1"},"erMedveilederFor":false}]
+		""".trimIndent()
 	}
 
 	private fun lagOpprettVeiledereRequestBody(veiledere: List<Pair<UUID, Boolean>>): RequestBody {
