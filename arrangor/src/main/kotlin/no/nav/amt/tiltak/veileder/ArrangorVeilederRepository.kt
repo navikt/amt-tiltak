@@ -198,11 +198,15 @@ open class ArrangorVeilederRepository(
 			  AND arrangor_veileder.gyldig_fra < CURRENT_TIMESTAMP
 			  AND arrangor_veileder.gyldig_til > CURRENT_TIMESTAMP
 			  AND deltaker_status.aktiv = TRUE
-			  AND deltaker_status.status != 'PABEGYNT_REGISTRERING'
-			  AND deltaker_status.status != 'PABEGYNT'
+			  AND deltaker_status.status != :pabegyntRegistreringStatus
+			  AND deltaker_status.status != :pabegyntStatus
 		""".trimIndent()
 
-		val parameters = sqlParameters("ansattId" to ansattId)
+		val parameters = sqlParameters(
+			"ansattId" to ansattId,
+			"pabegyntRegistreringStatus" to DeltakerStatus.Type.PABEGYNT_REGISTRERING.name,
+			"pabegyntStatus" to DeltakerStatus.Type.PABEGYNT.name
+		)
 		return template.query(sql, parameters, rowMapperVeiledersDeltaker)
 	}
 }
