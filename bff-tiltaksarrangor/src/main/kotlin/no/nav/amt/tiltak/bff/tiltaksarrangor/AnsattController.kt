@@ -42,7 +42,7 @@ class AnsattController(
 		}
 
 		val arrangorerForAnsattMedKoordinatorRolle = ansatt.arrangorer
-			.filter { it.roller.contains(ArrangorAnsattRolle.KOORDINATOR.name) }
+			.filter { it.roller.contains(ArrangorAnsattRolle.KOORDINATOR) }
 
 		if (arrangorerForAnsattMedKoordinatorRolle.isNotEmpty()) {
 			arrangorAnsattService.setVellykketInnlogging(ansatt.id)
@@ -57,7 +57,7 @@ class AnsattController(
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/meg/roller")
-	fun getMineRoller(): Set<String> {
+	fun getMineRoller(): List<String> {
 		val personligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 		arrangorAnsattTilgangService.synkroniserRettigheterMedAltinn(personligIdent)
 
@@ -65,13 +65,12 @@ class AnsattController(
 
 		val roller = ansatt?.arrangorer
 			?.flatMap { it.roller }
-			?.toSet()
-			?: emptySet()
+			?: emptyList()
 
 		if (ansatt != null && roller.isNotEmpty()) {
 			arrangorAnsattService.setVellykketInnlogging(ansatt.id)
 		}
 
-		return roller
+		return roller.map { it.name }
 	}
 }

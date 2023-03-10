@@ -1,9 +1,4 @@
 package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang
-
-import com.github.benmanes.caffeine.cache.Caffeine
-import no.nav.amt.tiltak.common.utils.CacheUtils.tryCacheFirstNotNull
-import no.nav.amt.tiltak.common.utils.CacheUtils.tryCacheFirstNullable
-import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
@@ -15,7 +10,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import org.springframework.web.server.ResponseStatusException
-import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
 
@@ -25,166 +19,33 @@ open class ArrangorAnsattTilgangServiceImpl(
 	private val ansattRolleService: AnsattRolleService,
 	private val deltakerService: DeltakerService,
 	private val altinnService: AltinnService,
-	private val arrangorAnsattGjennomforingTilgangService: ArrangorAnsattGjennomforingTilgangService,
+	private val mineDeltakerlisterService: MineDeltakerlisterService,
+	private val arrangorVeilederService: ArrangorVeilederService,
 	private val arrangorService: ArrangorService,
 	private val transactionTemplate: TransactionTemplate,
-	private val gjennomforingService: GjennomforingService
 ) : ArrangorAnsattTilgangService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	private val personligIdentToAnsattIdCache = Caffeine.newBuilder()
-		.expireAfterWrite(Duration.ofHours(12))
-		.maximumSize(100_000)
-		.build<String, UUID>()
-
-	private val ansattIdToArrangorIdListCache = Caffeine.newBuilder()
-		.expireAfterWrite(Duration.ofMinutes(15))
-		.maximumSize(100_000)
-		.build<UUID, List<UUID>>()
-
-	override fun verifiserTilgangTilGjennomforing(
-		ansattPersonligIdent: String,
-		gjennomforingId: UUID,
-		rolle: ArrangorAnsattRolle
-	) {
-		return verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId, listOf(rolle))
-	}
-
-	override fun verifiserTilgangTilGjennomforing(
-		ansattPersonligIdent: String,
-		gjennomforingId: UUID,
-		roller: List<ArrangorAnsattRolle>
-	) {
-		val ansattId = hentAnsattId(ansattPersonligIdent)
-
-		verifiserTilgangTilGjennomforing(ansattId, gjennomforingId, roller)
-	}
-
-	override fun verifiserTilgangTilGjennomforing(
-		ansattId: UUID,
-		gjennomforingId: UUID,
-		rolle: ArrangorAnsattRolle
-	) {
-		return verifiserTilgangTilGjennomforing(ansattId, gjennomforingId, listOf(rolle))
-	}
-
-	override fun verifiserTilgangTilGjennomforing(
-		ansattId: UUID,
-		gjennomforingId: UUID,
-		roller: List<ArrangorAnsattRolle>
-	) {
-		val gjennomforinger = arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
-
-		val harTilgang = gjennomforinger.contains(gjennomforingId)
-
-		shouldHaveRollerOnArrangorWithGjennomforing(ansattId, gjennomforingId, roller)
-
-		if (!harTilgang) {
+	override fun verifiserTilgangTilGjennomforing(ansattId: UUID, gjennomforingId: UUID) {
+		if (!harKoordinatorTilgang(ansattId, gjennomforingId)){
 			secureLog.warn("Ansatt med id=$ansattId har ikke tilgang til gjennomføring med id=$gjennomforingId")
 			throw UnauthorizedException("Ansatt har ikke tilgang til gjennomforing")
 		}
 	}
 
-	override fun verifiserTilgangTilArrangor(
-		ansattPersonligIdent: String,
-		arrangorId: UUID,
-		rolle: ArrangorAnsattRolle
-	) {
-		val ansattId = hentAnsattId(ansattPersonligIdent)
-
-		verifiserTilgangTilArrangor(ansattId, arrangorId, rolle)
-	}
-
-	override fun verifiserTilgangTilArrangor(ansattId: UUID, arrangorId: UUID, rolle: ArrangorAnsattRolle) {
-		val harTilgang = hentArrangorIderForAnsatt(ansattId).contains(arrangorId)
-
-		shouldHaveRolleOnArrangor(ansattId, arrangorId, rolle)
-
-		if (!harTilgang) {
-			secureLog.warn("Ansatt med id=$ansattId har ikke tilgang til arrangør med id=$arrangorId")
-			throw UnauthorizedException("Ansatt har ikke tilgang til arrangor")
-		}
-	}
-
-	override fun verifiserTilgangTilDeltaker(ansattId: UUID, deltakerId: UUID, rolle: ArrangorAnsattRolle) {
-		return verifiserTilgangTilDeltaker(ansattId, deltakerId, listOf(rolle))
-	}
-
-	override fun verifiserTilgangTilDeltaker(ansattId: UUID, deltakerId: UUID, roller: List<ArrangorAnsattRolle>) {
+	override fun verifiserTilgangTilDeltaker(ansattId: UUID, deltakerId: UUID) {
 		val deltaker = deltakerService.hentDeltaker(deltakerId)
 			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 
-		verifiserTilgangTilGjennomforing(ansattId, deltaker.gjennomforingId, roller)
-	}
-
-	override fun verifiserTilgangTilDeltaker(
-		ansattPersonligIdent: String,
-		deltakerId: UUID,
-		rolle: ArrangorAnsattRolle
-	) {
-		verifiserTilgangTilDeltaker(ansattPersonligIdent, deltakerId, listOf(rolle))
-	}
-
-	override fun verifiserTilgangTilDeltaker(
-		ansattPersonligIdent: String,
-		deltakerId: UUID,
-		roller: List<ArrangorAnsattRolle>
-	) {
-		val deltaker = deltakerService.hentDeltaker(deltakerId)
-			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
-
-		verifiserTilgangTilGjennomforing(ansattPersonligIdent, deltaker.gjennomforingId, roller)
-	}
-
-	override fun hentRollerForAnsattTilknyttetDeltaker(ansattId: UUID, deltakerId: UUID): List<ArrangorAnsattRolle> {
-		val deltaker = deltakerService.hentDeltaker(deltakerId)
-			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
-
-		val arrangorId = gjennomforingService.getGjennomforing(deltaker.gjennomforingId).arrangor.id
-
-		val arrangorAnsattRoller =
-			ansattRolleService.hentAktiveRoller(ansattId).firstOrNull { it.arrangorId == arrangorId }
-
-		if (arrangorAnsattRoller == null || arrangorAnsattRoller.roller.isEmpty()) {
-			log.warn("Ansatt $ansattId har ingen roller hos tiltaksarrangør ${arrangorId}")
-			throw UnauthorizedException("Ansatt har ingen roller hos arrangør")
+		if(!harKoordinatorTilgang(ansattId, deltaker.gjennomforingId) && !harVeilederTilgang(ansattId, deltakerId)) {
+			throw UnauthorizedException("Arrangør ansatt med id:$ansattId har ikke tilgang til deltaker med id $deltakerId")
 		}
 
-		return arrangorAnsattRoller.roller
 	}
 
 	override fun hentAnsattTilganger(ansattId: UUID): List<ArrangorAnsattRoller> {
 		return ansattRolleService.hentAktiveRoller(ansattId)
-	}
-
-	override fun hentAnsattId(ansattPersonligIdent: String): UUID {
-		val ansattId = tryCacheFirstNullable(personligIdentToAnsattIdCache, ansattPersonligIdent) {
-			arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)?.id
-		}
-
-		if (ansattId == null) {
-			secureLog.warn("Fnr $ansattPersonligIdent er ikke ansatt hos en tiltaksarrangør")
-			throw ResponseStatusException(HttpStatus.FORBIDDEN)
-		}
-
-		return ansattId
-	}
-
-	override fun opprettTilgang(ansattPersonligIdent: String, gjennomforingId: UUID) {
-		val ansatt = hentAnsatt(ansattPersonligIdent)
-
-		arrangorAnsattGjennomforingTilgangService.opprettTilgang(
-			UUID.randomUUID(),
-			ansatt.id,
-			gjennomforingId
-		)
-	}
-
-	override fun fjernTilgang(ansattPersonligIdent: String, gjennomforingId: UUID) {
-		val ansatt = hentAnsatt(ansattPersonligIdent)
-
-		arrangorAnsattGjennomforingTilgangService.fjernTilgang(ansatt.id, gjennomforingId)
 	}
 
 	override fun synkroniserRettigheterMedAltinn(ansattPersonligIdent: String) {
@@ -196,51 +57,38 @@ open class ArrangorAnsattTilgangServiceImpl(
 		}
 	}
 
-	override fun hentGjennomforingIder(ansattPersonligIdent: String): List<UUID> {
-		val ansattId = hentAnsattId(ansattPersonligIdent)
+	override fun verifiserRolleHosArrangor(ansattId: UUID, arrangorId: UUID, rolle: ArrangorAnsattRolle) {
+		val hasRolle = harRolleHosArrangor(ansattId, arrangorId, rolle)
 
-		return arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
+		if (!hasRolle) {
+			secureLog.error("Ansatt ident: $ansattId har ikke $rolle rolle hos arrangør: $arrangorId")
+			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ansatt har ikke $rolle rolle. Se secure logs for deltaljer")
+		}
 	}
 
-	override fun shouldHaveRolle(personligIdent: String, rolle: ArrangorAnsattRolle) {
-		val ansatt = hentAnsatt(personligIdent)
+	override fun verifiserHarRolleAnywhere(ansattId: UUID, rolle: ArrangorAnsattRolle) {
+		val hasRolle = hentRoller(ansattId).contains(rolle)
 
-		val hasRolle = hentAnsattTilganger(ansatt.id)
+		if (!hasRolle) {
+			secureLog.error("Ansatt ident: $ansattId har ikke $rolle rolle hos noen arrangører")
+			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ansatt har ikke $rolle rolle. Se secure logs for deltaljer")
+		}
+	}
+
+	override fun harRolleHosArrangor(ansattId: UUID, arrangorId: UUID, rolle: ArrangorAnsattRolle): Boolean {
+		val ansatt = arrangorAnsattService.getAnsatt(ansattId)
+		val tilgangerHosArrangor = ansatt.arrangorer.first {it.id == arrangorId}
+		return tilgangerHosArrangor.roller.contains(rolle)
+	}
+
+	private fun hentRoller(ansattId: UUID): List<ArrangorAnsattRolle> {
+		return hentAnsattTilganger(ansattId)
 			.flatMap { it.roller }
-			.contains(rolle)
-
-		if (!hasRolle) {
-			throw UnauthorizedException("Ansatt med id ${ansatt.id} har ikke $rolle rolle")
-		}
 	}
 
-	private fun shouldHaveRolleOnArrangor(ansattId: UUID, arrangorId: UUID, rolle: ArrangorAnsattRolle) {
-		val hasRolle = hentAnsattTilganger(ansattId)
-			.find { it.arrangorId == arrangorId }
-			?.roller?.contains(rolle)
-			?: false
-
-		if (!hasRolle) {
-			throw UnauthorizedException("Ansatt med id ${ansattId} har ikke $rolle rolle på Arrangør $arrangorId")
-		}
-	}
-
-	private fun shouldHaveRollerOnArrangorWithGjennomforing(
-		ansattId: UUID,
-		gjennomforingId: UUID,
-		roller: List<ArrangorAnsattRolle>
-	) {
-
-		val arrangorId = gjennomforingService.getGjennomforing(gjennomforingId).arrangor.id
-
-		val hasRolle = hentAnsattTilganger(ansattId)
-			.find { it.arrangorId == arrangorId }
-			?.roller?.any { it in roller }
-			?: false
-
-		if (!hasRolle) {
-			throw UnauthorizedException("Ansatt med id $ansattId har ikke noen av rollene $roller")
-		}
+	private fun harLagtTilGjennomforing(ansattId: UUID, gjennomforingId: UUID): Boolean {
+		val gjennomforinger = mineDeltakerlisterService.hentAlleForAnsatt(ansattId)
+		return gjennomforinger.contains(gjennomforingId)
 	}
 
 	private fun synkroniserAltinnRettigheter(ansattPersonligIdent: String) {
@@ -273,7 +121,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 		tilgangerSomSkalFjernes.forEach { tilgang ->
 			transactionTemplate.executeWithoutResult {
 				ansattRolleService.deaktiverRolleHosArrangor(ansatt.id, tilgang.arrangorId, tilgang.arrangorAnsattRolle)
-				arrangorAnsattGjennomforingTilgangService.fjernTilgangTilGjennomforinger(ansatt.id, tilgang.arrangorId)
+				mineDeltakerlisterService.fjernGjennomforinger(ansatt.id, tilgang.arrangorId)
 			}
 			log.info("Fjernet tilgang under synk med Altinn. ansattId=${ansatt.id} arrangorId=${tilgang.arrangorId} rolle=${tilgang.arrangorAnsattRolle}")
 		}
@@ -297,17 +145,13 @@ open class ArrangorAnsattTilgangServiceImpl(
 		return lagredeTilganger.subtract(altinnTilganger.toSet()).toList()
 	}
 
-	private fun hentAnsatt(ansattPersonligIdent: String): Ansatt {
-		return arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
-			?: throw IllegalStateException("Fant ingen arrangør ansatt med personlig ident")
+	private fun harKoordinatorTilgang(ansattId: UUID, gjennomforingId: UUID): Boolean {
+		return hentRoller(ansattId).contains(ArrangorAnsattRolle.KOORDINATOR) && harLagtTilGjennomforing(ansattId, gjennomforingId)
 	}
 
-	private fun hentArrangorIderForAnsatt(ansattId: UUID): List<UUID> {
-		return tryCacheFirstNotNull(ansattIdToArrangorIdListCache, ansattId) {
-			ansattRolleService.hentArrangorIderForAnsatt(ansattId)
-		}
+	private fun harVeilederTilgang(ansattId: UUID, deltakerId: UUID): Boolean {
+		return hentRoller(ansattId).contains(ArrangorAnsattRolle.VEILEDER) && arrangorVeilederService.erVeilederFor(ansattId, deltakerId)
 	}
-
 	private data class AnsattTilgang(
 		val arrangorId: UUID,
 		val arrangorAnsattRolle: ArrangorAnsattRolle

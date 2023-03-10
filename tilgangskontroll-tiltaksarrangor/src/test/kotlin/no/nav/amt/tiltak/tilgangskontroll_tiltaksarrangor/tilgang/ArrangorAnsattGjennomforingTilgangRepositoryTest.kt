@@ -29,7 +29,7 @@ class ArrangorAnsattGjennomforingTilgangRepositoryTest : FunSpec({
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 
-	lateinit var repository: ArrangorAnsattGjennomforingTilgangRepository
+	lateinit var repository: MineDeltakerlisterRepository
 
 	lateinit var testRepository: TestDataRepository
 
@@ -39,7 +39,7 @@ class ArrangorAnsattGjennomforingTilgangRepositoryTest : FunSpec({
 
 		val parameterTemplate = NamedParameterJdbcTemplate(dataSource)
 
-		repository = ArrangorAnsattGjennomforingTilgangRepository(parameterTemplate)
+		repository = MineDeltakerlisterRepository(parameterTemplate)
 		testRepository = TestDataRepository(parameterTemplate)
 
 		DbTestDataUtils.cleanDatabase(dataSource)
@@ -57,7 +57,7 @@ class ArrangorAnsattGjennomforingTilgangRepositoryTest : FunSpec({
 		val gyldigFra = ZonedDateTime.now()
 		val gyldigTil = ZonedDateTime.now().plusHours(1)
 
-		repository.opprettTilgang(tilgangId, ARRANGOR_ANSATT_1.id, GJENNOMFORING_1.id, gyldigFra, gyldigTil)
+		repository.leggTil(tilgangId, ARRANGOR_ANSATT_1.id, GJENNOMFORING_1.id, gyldigFra, gyldigTil)
 
 		val tilgang = repository.get(tilgangId)
 
@@ -103,7 +103,7 @@ class ArrangorAnsattGjennomforingTilgangRepositoryTest : FunSpec({
 			)
 		)
 
-		val tilganger = repository.hentAktiveGjennomforingTilgangerForAnsatt(ansattId)
+		val tilganger = repository.hent(ansattId)
 
 		tilganger.size shouldBe 1
 		tilganger.any { it.gjennomforingId == gjennomforing1Id } shouldBe true
@@ -133,7 +133,7 @@ class ArrangorAnsattGjennomforingTilgangRepositoryTest : FunSpec({
 			)
 		)
 
-		repository.fjernTilgang(ansattId, gjennomforingId)
+		repository.fjern(ansattId, gjennomforingId)
 
 		val tilgang = repository.get(tilgangId)
 
@@ -142,7 +142,7 @@ class ArrangorAnsattGjennomforingTilgangRepositoryTest : FunSpec({
 
 	test("getAntallGjennomforingerPerAnsatt") {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
-		val data = repository.getAntallGjennomforingerPerAnsatt()
+		val data = repository.hentAntallPerAnsatt()
 
 		data.size shouldBe 1
 		data[ARRANGOR_ANSATT_1.id] shouldNotBe null

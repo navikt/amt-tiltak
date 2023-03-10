@@ -32,13 +32,13 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 
-	lateinit var repository: ArrangorAnsattGjennomforingTilgangRepository
+	lateinit var repository: MineDeltakerlisterRepository
 
 	lateinit var testRepository: TestDataRepository
 
 	lateinit var transactionTemplate: TransactionTemplate
 
-	lateinit var service: ArrangorAnsattGjennomforingTilgangService
+	lateinit var service: MineDeltakerlisterServiceImpl
 
 	lateinit var gjennomforingService: GjennomforingService
 
@@ -48,7 +48,7 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 
 		val template = NamedParameterJdbcTemplate(dataSource)
 
-		repository = ArrangorAnsattGjennomforingTilgangRepository(template)
+		repository = MineDeltakerlisterRepository(template)
 
 		testRepository = TestDataRepository(template)
 
@@ -56,7 +56,7 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 
 		gjennomforingService = mockk()
 
-		service = ArrangorAnsattGjennomforingTilgangService(repository, gjennomforingService, transactionTemplate)
+		service = MineDeltakerlisterServiceImpl(repository, gjennomforingService, transactionTemplate)
 
 
 		DbTestDataUtils.cleanDatabase(dataSource)
@@ -99,11 +99,11 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 			)
 		)
 
-		service.fjernTilgang(ARRANGOR_ANSATT_1.id, GJENNOMFORING_1.id)
+		service.fjern(ARRANGOR_ANSATT_1.id, GJENNOMFORING_1.id)
 
 		eventually(5.seconds) {
 			val aktiveTilganger =
-				repository.hentAktiveGjennomforingTilgangerForAnsatt(ARRANGOR_ANSATT_1.id)
+				repository.hent(ARRANGOR_ANSATT_1.id)
 
 			aktiveTilganger shouldHaveSize 1
 			aktiveTilganger.first().gjennomforingId shouldBe GJENNOMFORING_2.id
@@ -120,7 +120,7 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 		)
 
 		shouldThrowExactly<IllegalStateException> {
-			service.opprettTilgang(UUID.randomUUID(), ARRANGOR_ANSATT_1.id, GJENNOMFORING_1.id)
+			service.leggTil(UUID.randomUUID(), ARRANGOR_ANSATT_1.id, GJENNOMFORING_1.id)
 		}
 	}
 
@@ -169,12 +169,12 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 				lopenr = 2,
 		))
 
-		var aktiveGjennomforingTilganger = repository.hentAktiveGjennomforingTilgangerForAnsatt(ARRANGOR_ANSATT_1.id)
+		var aktiveGjennomforingTilganger = repository.hent(ARRANGOR_ANSATT_1.id)
 		aktiveGjennomforingTilganger shouldHaveSize 2
 
-		service.fjernTilgangTilGjennomforinger(ARRANGOR_ANSATT_1.id, ARRANGOR_1.id)
+		service.fjernGjennomforinger(ARRANGOR_ANSATT_1.id, ARRANGOR_1.id)
 
-		aktiveGjennomforingTilganger = repository.hentAktiveGjennomforingTilgangerForAnsatt(ARRANGOR_ANSATT_1.id)
+		aktiveGjennomforingTilganger = repository.hent(ARRANGOR_ANSATT_1.id)
 		aktiveGjennomforingTilganger shouldHaveSize 0
 	}
 

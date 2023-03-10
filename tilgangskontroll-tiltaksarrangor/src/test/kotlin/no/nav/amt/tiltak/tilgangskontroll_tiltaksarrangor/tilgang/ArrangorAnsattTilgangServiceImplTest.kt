@@ -15,10 +15,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
-import no.nav.amt.tiltak.core.port.ArrangorAnsattService
-import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.AltinnService
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.ArrangorAnsattRoller
@@ -37,13 +34,15 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	lateinit var arrangorAnsattTilgangServiceImpl: ArrangorAnsattTilgangServiceImpl
 
-	lateinit var arrangorAnsattGjennomforingTilgangService: ArrangorAnsattGjennomforingTilgangService
+	lateinit var arrangorAnsattGjennomforingTilgangService: MineDeltakerlisterServiceImpl
 
 	lateinit var altinnService: AltinnService
 
 	lateinit var arrangorService: ArrangorService
 
 	lateinit var gjennomforingService: GjennomforingService
+
+	lateinit var arrangorVeilederService: ArrangorVeilederService
 
 	val personligIdent = "fnr"
 
@@ -120,11 +119,12 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		gjennomforingService = mockk()
 
+		arrangorVeilederService = mockk()
+
 		arrangorAnsattTilgangServiceImpl = ArrangorAnsattTilgangServiceImpl(
 			arrangorAnsattService, ansattRolleService,
-			deltakerService, altinnService, arrangorAnsattGjennomforingTilgangService,
-			arrangorService, TransactionTemplate(DataSourceTransactionManager(datasource)),
-			gjennomforingService
+			deltakerService, altinnService, arrangorAnsattGjennomforingTilgangService, arrangorVeilederService,
+			arrangorService, TransactionTemplate(DataSourceTransactionManager(datasource))
 		)
 
 		every {
@@ -154,41 +154,21 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	test("verifiserTilgangTilGjennomforing skal kaste exception hvis ikke tilgang") {
 		every {
-			arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
+			arrangorAnsattGjennomforingTilgangService.hentAlleForAnsatt(ansattId)
 		} returns emptyList()
 
 		shouldThrowExactly<UnauthorizedException> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(personligIdent, gjennomforingId, KOORDINATOR)
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(ansattId, gjennomforingId)
 		}
 	}
 
 	test("verifiserTilgangTilGjennomforing skal ikke kaste exception hvis tilgang") {
 		every {
-			arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
+			arrangorAnsattGjennomforingTilgangService.hentAlleForAnsatt(ansattId)
 		} returns listOf(gjennomforingId)
 
 		shouldNotThrow<Throwable> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(personligIdent, gjennomforingId, KOORDINATOR)
-		}
-	}
-
-	test("verifiserTilgangTilArrangor skal kaste exception hvis ikke tilgang") {
-		every {
-			ansattRolleService.hentArrangorIderForAnsatt(ansattId)
-		} returns listOf(UUID.randomUUID())
-
-		shouldThrowExactly<UnauthorizedException> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilArrangor(personligIdent, arrangorId, KOORDINATOR)
-		}
-	}
-
-	test("verifiserTilgangTilArrangor skal ikke kaste exception hvis tilgang") {
-		every {
-			ansattRolleService.hentArrangorIderForAnsatt(ansattId)
-		} returns listOf(arrangorId)
-
-		shouldNotThrow<Throwable> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilArrangor(personligIdent, arrangorId, KOORDINATOR)
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(ansattId, gjennomforingId)
 		}
 	}
 
@@ -198,11 +178,11 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		} returns deltaker
 
 		every {
-			arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
+			arrangorAnsattGjennomforingTilgangService.hentAlleForAnsatt(ansattId)
 		} returns listOf(gjennomforingId)
 
 		shouldNotThrow<Throwable> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId, KOORDINATOR)
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)
 		}
 	}
 
@@ -212,11 +192,11 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		} returns deltaker
 
 		every {
-			arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
+			arrangorAnsattGjennomforingTilgangService.hentAlleForAnsatt(ansattId)
 		} returns emptyList()
 
 		shouldThrowExactly<UnauthorizedException> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId, KOORDINATOR)
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)
 		}
 	}
 
@@ -340,7 +320,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		arrangorAnsattTilgangServiceImpl.synkroniserRettigheterMedAltinn(ansattPersonligIdent)
 
 		verify(exactly = 1) { ansattRolleService.deaktiverRolleHosArrangor(ansattId, arrangorId, KOORDINATOR) }
-		verify(exactly = 1) { arrangorAnsattGjennomforingTilgangService.fjernTilgangTilGjennomforinger(ansattId, arrangorId) }
+		verify(exactly = 1) { arrangorAnsattGjennomforingTilgangService.fjernGjennomforinger(ansattId, arrangorId) }
 
 	}
 
@@ -354,6 +334,6 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		verify(exactly = 0) { ansattRolleService.opprettRolle(any(), any(), any(), any()) }
 		verify(exactly = 0) { ansattRolleService.deaktiverRolleHosArrangor(any(), any(), any()) }
-		verify(exactly = 0) { arrangorAnsattGjennomforingTilgangService.fjernTilgangTilGjennomforinger(any(), any()) }
+		verify(exactly = 0) { arrangorAnsattGjennomforingTilgangService.fjernGjennomforinger(any(), any()) }
 	}
 })

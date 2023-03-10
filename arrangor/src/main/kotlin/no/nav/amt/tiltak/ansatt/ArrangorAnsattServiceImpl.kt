@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.TilknyttetArrangor
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
+import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.ArrangorService
@@ -46,6 +47,11 @@ class ArrangorAnsattServiceImpl(
 		val arrangorer = hentTilknyttedeArrangorer(ansattDbo.id)
 
 		return ansattDbo.toAnsatt(arrangorer)
+	}
+
+	override fun getAnsattIdByPersonligIdent(personIdent: String) : UUID {
+		return arrangorAnsattRepository.getByPersonligIdent(personIdent)?.id
+			?: throw UnauthorizedException("Fant ikke ansatt")
 	}
 
 	override fun getKoordinatorerForGjennomforing(gjennomforingId: UUID): List<Ansatt> {
@@ -104,7 +110,7 @@ class ArrangorAnsattServiceImpl(
 				organisasjonsnummer = it.organisasjonsnummer,
 				overordnetEnhetOrganisasjonsnummer = it.overordnetEnhetOrganisasjonsnummer,
 				overordnetEnhetNavn = it.overordnetEnhetNavn,
-				roller = arrangorRoller.roller.map { it.name }
+				roller = arrangorRoller.roller
 			)
 		}
 	}

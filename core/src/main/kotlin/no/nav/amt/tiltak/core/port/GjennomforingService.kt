@@ -18,4 +18,5 @@ interface GjennomforingService {
 
 	fun slettGjennomforing(gjennomforingId: UUID)
 
+	fun getArrangorId(gjennomforingId: UUID): UUID
 }

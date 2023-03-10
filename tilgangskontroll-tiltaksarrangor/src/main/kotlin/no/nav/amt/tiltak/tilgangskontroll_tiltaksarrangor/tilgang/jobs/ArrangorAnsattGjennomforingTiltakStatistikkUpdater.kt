@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang.jobs
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
-import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang.ArrangorAnsattGjennomforingTilgangRepository
+import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang.MineDeltakerlisterRepository
 import no.nav.common.job.JobRunner
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
@@ -15,7 +15,7 @@ private const val gjennomforingerPerAnsatt = "amt_tiltak_antall_gjennomforinger_
 
 @Configuration
 open class ArrangorAnsattGjennomforingTiltakStatistikkUpdater(
-	private val repository: ArrangorAnsattGjennomforingTilgangRepository,
+	private val repository: MineDeltakerlisterRepository,
 	private val registry: MeterRegistry
 ) {
 
@@ -31,7 +31,7 @@ open class ArrangorAnsattGjennomforingTiltakStatistikkUpdater(
 	}
 
 	private fun runner() {
-		val data = repository.getAntallGjennomforingerPerAnsatt()
+		val data = repository.hentAntallPerAnsatt()
 		data.forEach { (ansattId, numberOfGjennomforinger) ->
 			val gauge = gjennomforingerPerAnsattGauges[ansattId]
 
