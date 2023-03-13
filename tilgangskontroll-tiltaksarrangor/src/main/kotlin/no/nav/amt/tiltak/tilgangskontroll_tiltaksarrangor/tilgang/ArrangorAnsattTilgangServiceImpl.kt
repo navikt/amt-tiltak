@@ -28,9 +28,9 @@ open class ArrangorAnsattTilgangServiceImpl(
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun verifiserTilgangTilGjennomforing(ansattId: UUID, gjennomforingId: UUID) {
-		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
+		val arrangorId = gjennomforingService.getArrangorId(gjennomforingId)
 
-		if (!harKoordinatorTilgang(ansattId, gjennomforingId, gjennomforing.arrangor.id)){
+		if (!harKoordinatorTilgang(ansattId, gjennomforingId, arrangorId)){
 			secureLog.warn("Ansatt med id=$ansattId har ikke tilgang til gjennomføring med id=$gjennomforingId")
 			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ansatt har ikke tilgang til gjennomforing")
 		}
@@ -40,10 +40,10 @@ open class ArrangorAnsattTilgangServiceImpl(
 		val deltaker = deltakerService.hentDeltaker(deltakerId)
 			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 
-		val gjennomforing = gjennomforingService.getGjennomforing(deltaker.gjennomforingId)
+		val arrangorId = gjennomforingService.getArrangorId(deltaker.gjennomforingId)
 
-		if(!harKoordinatorTilgang(ansattId, deltaker.gjennomforingId, gjennomforing.arrangor.id)
-			&& !harVeilederTilgang(ansattId, deltakerId, gjennomforing.arrangor.id)) {
+		if(!harKoordinatorTilgang(ansattId, deltaker.gjennomforingId, arrangorId)
+			&& !harVeilederTilgang(ansattId, deltakerId, arrangorId)) {
 			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Arrangør ansatt med id:$ansattId har ikke tilgang til deltaker med id $deltakerId")
 		}
 

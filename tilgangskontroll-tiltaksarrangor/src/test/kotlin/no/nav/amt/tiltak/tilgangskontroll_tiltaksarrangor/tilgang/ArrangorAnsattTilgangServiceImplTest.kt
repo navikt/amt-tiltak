@@ -7,7 +7,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
-import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.KOORDINATOR
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.VEILEDER
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
@@ -144,8 +143,8 @@ class ArrangorAnsattTilgangServiceImplTest {
 		)
 
 		every {
-			gjennomforingService.getGjennomforing(any())
-		} returns gjennomforing
+			gjennomforingService.getArrangorId(gjennomforingId)
+		} returns arrangorId
 	}
 	@Test
 	fun `verifiserTilgangTilGjennomforing - koordinator har ikke lagt til deltakerliste - skal kaste exception`() {
@@ -346,7 +345,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 		every { ansattRolleService.hentAktiveRoller(ansattId) } returns listOf(
 			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
 				arrangorId = arrangorId,
-				roller = listOf(ArrangorAnsattRolle.VEILEDER)
+				roller = listOf(VEILEDER)
 			)
 		)
 		every { arrangorService.getOrCreateArrangor(organisasjonsnummer) } returns Arrangor(
