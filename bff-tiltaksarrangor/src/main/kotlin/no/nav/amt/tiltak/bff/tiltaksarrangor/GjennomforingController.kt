@@ -33,7 +33,7 @@ class GjennomforingController(
 		val ansatt = arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
 			?: throw UnauthorizedException("Innlogget ansatt har ikke tilgang til gjennomføringer")
 
-		val deltakerlisterLagtTil = mineDeltakerlisterService.hentAlleForAnsatt(ansatt.id)
+		val deltakerlisterLagtTil = mineDeltakerlisterService.hent(ansatt.id)
 
 		return gjennomforingService.getGjennomforinger(deltakerlisterLagtTil)
 			.filter { arrangorAnsattTilgangService.harRolleHosArrangor(ansatt.id, it.arrangor.id, KOORDINATOR) }
@@ -94,7 +94,7 @@ class GjennomforingController(
 	fun hentGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID): GjennomforingDto {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
 		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
-		val harLagtTilListe = mineDeltakerlisterService.harLagtTilDeltakerliste(ansattId, gjennomforingId)
+		val harLagtTilListe = mineDeltakerlisterService.erLagtTil(ansattId, gjennomforingId)
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
 
 		if (!harLagtTilListe){
@@ -163,7 +163,7 @@ class GjennomforingController(
 
 	private fun getDeltakerlister(ansattPersonligIdent: String): List<DeltakerlisteDto> {
 		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
-		val gjennomforingIder = mineDeltakerlisterService.hentAlleForAnsatt(ansattId)
+		val gjennomforingIder = mineDeltakerlisterService.hent(ansattId)
 
 		return gjennomforingService.getGjennomforinger(gjennomforingIder)
 			.filter { erSynligForArrangor(it) }

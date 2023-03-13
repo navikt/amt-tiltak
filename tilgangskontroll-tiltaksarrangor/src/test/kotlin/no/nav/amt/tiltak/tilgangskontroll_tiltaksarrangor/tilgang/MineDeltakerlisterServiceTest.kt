@@ -28,7 +28,7 @@ import org.springframework.transaction.support.TransactionTemplate
 import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
-class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
+class MineDeltakerlisterServiceTest : FunSpec({
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 
@@ -74,8 +74,8 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 		)
 	}
 
-	test("fjernTilgang - skal fjerne tilgang til gjennomføring") {
-		testRepository.insertArrangorAnsattGjennomforingTilgang(
+	test("fjern - skal fjerne tilgang til gjennomføring") {
+		testRepository.insertMineDeltakerlister(
 			GJENNOMFORING_TILGANG_1.copy(
 				id = UUID.randomUUID(),
 				ansattId = ARRANGOR_ANSATT_1.id,
@@ -83,7 +83,7 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 			)
 		)
 
-		testRepository.insertArrangorAnsattGjennomforingTilgang(
+		testRepository.insertMineDeltakerlister(
 			GJENNOMFORING_TILGANG_1.copy(
 				id = UUID.randomUUID(),
 				ansattId = ARRANGOR_ANSATT_1.id,
@@ -91,7 +91,7 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 			)
 		)
 
-		testRepository.insertArrangorAnsattGjennomforingTilgang(
+		testRepository.insertMineDeltakerlister(
 			GJENNOMFORING_TILGANG_1.copy(
 				id = UUID.randomUUID(),
 				ansattId = ARRANGOR_ANSATT_1.id,
@@ -110,8 +110,8 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 		}
 	}
 
-	test("opprettTilgang - skal kaste exception hvis tilgang er allerede opprettet") {
-		testRepository.insertArrangorAnsattGjennomforingTilgang(
+	test("leggTil - skal kaste exception hvis tilgang er allerede opprettet") {
+		testRepository.insertMineDeltakerlister(
 			GJENNOMFORING_TILGANG_1.copy(
 				id = UUID.randomUUID(),
 				ansattId = ARRANGOR_ANSATT_1.id,
@@ -124,11 +124,11 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 		}
 	}
 
-	test("fjernTilgangTilGjennomforinger - skal fjerne tilgang til gjennomforing hos arrangor") {
+	test("fjernAlleHosArrangor - skal fjerne tilgang til gjennomforing hos arrangor") {
 		val id1 = UUID.randomUUID()
 		val id2 = UUID.randomUUID()
 
-		testRepository.insertArrangorAnsattGjennomforingTilgang(
+		testRepository.insertMineDeltakerlister(
 			GJENNOMFORING_TILGANG_1.copy(
 				id = id1,
 				ansattId = ARRANGOR_ANSATT_1.id,
@@ -136,7 +136,7 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 			)
 		)
 
-		testRepository.insertArrangorAnsattGjennomforingTilgang(
+		testRepository.insertMineDeltakerlister(
 			GJENNOMFORING_TILGANG_1.copy(
 				id = id2,
 				ansattId = ARRANGOR_ANSATT_1.id,
@@ -172,7 +172,7 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 		var aktiveGjennomforingTilganger = repository.hent(ARRANGOR_ANSATT_1.id)
 		aktiveGjennomforingTilganger shouldHaveSize 2
 
-		service.fjernGjennomforinger(ARRANGOR_ANSATT_1.id, ARRANGOR_1.id)
+		service.fjernAlleHosArrangor(ARRANGOR_ANSATT_1.id, ARRANGOR_1.id)
 
 		aktiveGjennomforingTilganger = repository.hent(ARRANGOR_ANSATT_1.id)
 		aktiveGjennomforingTilganger shouldHaveSize 0

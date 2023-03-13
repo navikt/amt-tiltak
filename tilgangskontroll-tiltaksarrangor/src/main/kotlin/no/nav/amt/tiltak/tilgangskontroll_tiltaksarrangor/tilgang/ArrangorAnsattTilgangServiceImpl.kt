@@ -1,7 +1,6 @@
 package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller
-import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.log.SecureLog.secureLog
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.AltinnService
@@ -18,6 +17,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 	private val arrangorAnsattService: ArrangorAnsattService,
 	private val ansattRolleService: AnsattRolleService,
 	private val deltakerService: DeltakerService,
+	private val gjennomforingService: GjennomforingService,
 	private val altinnService: AltinnService,
 	private val mineDeltakerlisterService: MineDeltakerlisterService,
 	private val arrangorVeilederService: ArrangorVeilederService,
@@ -28,9 +28,11 @@ open class ArrangorAnsattTilgangServiceImpl(
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun verifiserTilgangTilGjennomforing(ansattId: UUID, gjennomforingId: UUID) {
-		if (!harKoordinatorTilgang(ansattId, gjennomforingId)){
+		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
+
+		if (!harKoordinatorTilgang(ansattId, gjennomforingId, gjennomforing.arrangor.id)){
 			secureLog.warn("Ansatt med id=$ansattId har ikke tilgang til gjennomføring med id=$gjennomforingId")
-			throw UnauthorizedException("Ansatt har ikke tilgang til gjennomforing")
+			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ansatt har ikke tilgang til gjennomforing")
 		}
 	}
 
@@ -38,8 +40,11 @@ open class ArrangorAnsattTilgangServiceImpl(
 		val deltaker = deltakerService.hentDeltaker(deltakerId)
 			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 
-		if(!harKoordinatorTilgang(ansattId, deltaker.gjennomforingId) && !harVeilederTilgang(ansattId, deltakerId)) {
-			throw UnauthorizedException("Arrangør ansatt med id:$ansattId har ikke tilgang til deltaker med id $deltakerId")
+		val gjennomforing = gjennomforingService.getGjennomforing(deltaker.gjennomforingId)
+
+		if(!harKoordinatorTilgang(ansattId, deltaker.gjennomforingId, gjennomforing.arrangor.id)
+			&& !harVeilederTilgang(ansattId, deltakerId, gjennomforing.arrangor.id)) {
+			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Arrangør ansatt med id:$ansattId har ikke tilgang til deltaker med id $deltakerId")
 		}
 
 	}
@@ -87,7 +92,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 	}
 
 	private fun harLagtTilGjennomforing(ansattId: UUID, gjennomforingId: UUID): Boolean {
-		val gjennomforinger = mineDeltakerlisterService.hentAlleForAnsatt(ansattId)
+		val gjennomforinger = mineDeltakerlisterService.hent(ansattId)
 		return gjennomforinger.contains(gjennomforingId)
 	}
 
@@ -121,7 +126,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 		tilgangerSomSkalFjernes.forEach { tilgang ->
 			transactionTemplate.executeWithoutResult {
 				ansattRolleService.deaktiverRolleHosArrangor(ansatt.id, tilgang.arrangorId, tilgang.arrangorAnsattRolle)
-				mineDeltakerlisterService.fjernGjennomforinger(ansatt.id, tilgang.arrangorId)
+				mineDeltakerlisterService.fjernAlleHosArrangor(ansatt.id, tilgang.arrangorId)
 			}
 			log.info("Fjernet tilgang under synk med Altinn. ansattId=${ansatt.id} arrangorId=${tilgang.arrangorId} rolle=${tilgang.arrangorAnsattRolle}")
 		}
@@ -145,13 +150,24 @@ open class ArrangorAnsattTilgangServiceImpl(
 		return lagredeTilganger.subtract(altinnTilganger.toSet()).toList()
 	}
 
-	private fun harKoordinatorTilgang(ansattId: UUID, gjennomforingId: UUID): Boolean {
-		return hentRoller(ansattId).contains(ArrangorAnsattRolle.KOORDINATOR) && harLagtTilGjennomforing(ansattId, gjennomforingId)
+	private fun harKoordinatorTilgang(ansattId: UUID, gjennomforingId: UUID, arrangorId: UUID): Boolean {
+		val tilgangTilArrangor = hentAnsattTilganger(ansattId)
+			.find { it.arrangorId == arrangorId }
+			?.roller
+			?.contains(ArrangorAnsattRolle.KOORDINATOR)
+
+		return tilgangTilArrangor == true && harLagtTilGjennomforing(ansattId, gjennomforingId)
 	}
 
-	private fun harVeilederTilgang(ansattId: UUID, deltakerId: UUID): Boolean {
-		return hentRoller(ansattId).contains(ArrangorAnsattRolle.VEILEDER) && arrangorVeilederService.erVeilederFor(ansattId, deltakerId)
+	private fun harVeilederTilgang(ansattId: UUID, deltakerId: UUID, arrangorId: UUID): Boolean {
+		val tilgangTilArrangor = hentAnsattTilganger(ansattId)
+			.find { it.arrangorId == arrangorId }
+			?.roller
+			?.contains(ArrangorAnsattRolle.VEILEDER)
+
+		return tilgangTilArrangor == true && arrangorVeilederService.erVeilederFor(ansattId, deltakerId)
 	}
+
 	private data class AnsattTilgang(
 		val arrangorId: UUID,
 		val arrangorAnsattRolle: ArrangorAnsattRolle

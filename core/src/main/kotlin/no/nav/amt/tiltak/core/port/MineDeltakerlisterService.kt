@@ -6,7 +6,7 @@ interface MineDeltakerlisterService {
 
 	fun leggTil(id: UUID, arrangorAnsattId: UUID, gjennomforingId: UUID)
 	fun fjern(arrangorAnsattId: UUID, gjennomforingId: UUID)
-	fun fjernGjennomforinger(arrangorAnsattId: UUID, arrangorId: UUID)
-	fun hentAlleForAnsatt(ansattId: UUID): List<UUID>
-	fun harLagtTilDeltakerliste(ansattId: UUID, gjennomforingId: UUID): Boolean
+	fun fjernAlleHosArrangor(arrangorAnsattId: UUID, arrangorId: UUID)
+	fun hent(ansattId: UUID): List<UUID>
+	fun erLagtTil(ansattId: UUID, gjennomforingId: UUID): Boolean
 }

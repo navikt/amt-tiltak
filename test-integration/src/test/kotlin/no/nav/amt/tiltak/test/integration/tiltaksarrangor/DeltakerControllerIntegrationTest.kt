@@ -21,7 +21,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_
 import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
-import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattGjennomforingTilgangInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorVeilederDboInput
 import no.nav.amt.tiltak.test.database.data.inputs.DeltakerStatusInput
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
@@ -586,18 +586,20 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	fun `skjulDeltakerForTiltaksarrangor() - VEILEDER - skal skjule deltaker`() {
+	fun `skjulDeltakerForTiltaksarrangor() - VEILEDER - skal kunne skjule deltaker`() {
 		val deltakerId = UUID.randomUUID()
 		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId))
 		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerId, status = "IKKE_AKTUELL"))
 
-		testDataRepository.insertArrangorAnsattGjennomforingTilgang(ArrangorAnsattGjennomforingTilgangInput(
-			id = UUID.randomUUID(),
-			ARRANGOR_ANSATT_2.id,
-			DELTAKER_1.gjennomforingId,
-			ZonedDateTime.now().minusDays(1),
-			ZonedDateTime.now().plusDays(1)
-		))
+		testDataRepository.insertArrangorVeileder(
+			ArrangorVeilederDboInput(
+				id = UUID.randomUUID(),
+				ansattId = ARRANGOR_ANSATT_2.id,
+				deltakerId = deltakerId,
+				erMedveileder = false,
+				gyldigFra = ZonedDateTime.now().minusDays(1),
+				gyldigTil = ZonedDateTime.now().plusDays(1)
+			))
 
 		val response = sendRequest(
 			method = "PATCH",

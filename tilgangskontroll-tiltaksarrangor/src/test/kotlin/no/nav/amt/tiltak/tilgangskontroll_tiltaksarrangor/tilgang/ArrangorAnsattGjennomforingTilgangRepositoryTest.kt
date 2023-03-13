@@ -85,7 +85,7 @@ class ArrangorAnsattGjennomforingTilgangRepositoryTest : FunSpec({
 		val tilgangId1 = UUID.randomUUID()
 		val tilgangId2 = UUID.randomUUID()
 
-		testRepository.insertArrangorAnsattGjennomforingTilgang(
+		testRepository.insertMineDeltakerlister(
 			GJENNOMFORING_TILGANG_1.copy(
 				id = tilgangId1,
 				ansattId = ansattId,
@@ -93,7 +93,7 @@ class ArrangorAnsattGjennomforingTilgangRepositoryTest : FunSpec({
 			)
 		)
 
-		testRepository.insertArrangorAnsattGjennomforingTilgang(
+		testRepository.insertMineDeltakerlister(
 			GJENNOMFORING_TILGANG_1.copy(
 				id = tilgangId2,
 				ansattId = ansattId,
@@ -125,7 +125,7 @@ class ArrangorAnsattGjennomforingTilgangRepositoryTest : FunSpec({
 		val gjennomforingId = GJENNOMFORING_1.id
 		val tilgangId = UUID.randomUUID()
 
-		testRepository.insertArrangorAnsattGjennomforingTilgang(
+		testRepository.insertMineDeltakerlister(
 			GJENNOMFORING_TILGANG_1.copy(
 				id = tilgangId,
 				ansattId = ansattId,

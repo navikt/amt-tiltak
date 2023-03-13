@@ -32,7 +32,7 @@ class TestDataRepository(
 		)
 	}
 
-	fun insertArrangorAnsattGjennomforingTilgang(cmd: ArrangorAnsattGjennomforingTilgangInput) {
+	fun insertMineDeltakerlister(cmd: ArrangorAnsattGjennomforingTilgangInput) {
 		val sql = """
 			INSERT INTO arrangor_ansatt_gjennomforing_tilgang(id, ansatt_id, gjennomforing_id, gyldig_fra, gyldig_til)
 			VALUES(:id, :ansatt_id, :gjennomforing_id, :gyldig_fra, :gyldig_til)

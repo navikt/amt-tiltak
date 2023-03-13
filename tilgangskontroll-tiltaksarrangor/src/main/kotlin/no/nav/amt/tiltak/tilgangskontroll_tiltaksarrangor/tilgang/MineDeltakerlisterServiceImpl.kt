@@ -17,7 +17,7 @@ open class MineDeltakerlisterServiceImpl(
 	private val defaultGyldigTil = ZonedDateTime.parse("3000-01-01T00:00:00.00000+00:00")
 
 	override fun leggTil(id: UUID, arrangorAnsattId: UUID, gjennomforingId: UUID) {
-		val harAlleredeTilgang = hentAlleForAnsatt(arrangorAnsattId)
+		val harAlleredeTilgang = hent(arrangorAnsattId)
 			.contains(gjennomforingId)
 
 		if (harAlleredeTilgang) {
@@ -40,7 +40,7 @@ open class MineDeltakerlisterServiceImpl(
 		mineDeltakerlisterRepository.fjern(arrangorAnsattId, gjennomforingId)
 	}
 
-	override fun fjernGjennomforinger(arrangorAnsattId: UUID, arrangorId: UUID) {
+	override fun fjernAlleHosArrangor(arrangorAnsattId: UUID, arrangorId: UUID) {
 		val tilganger = mineDeltakerlisterRepository
 			.hent(arrangorAnsattId)
 		val gjennomforinger = gjennomforingService.getByArrangorId(arrangorId)
@@ -52,13 +52,13 @@ open class MineDeltakerlisterServiceImpl(
 		}
 	}
 
-	override fun hentAlleForAnsatt(ansattId: UUID): List<UUID> {
+	override fun hent(ansattId: UUID): List<UUID> {
 		return mineDeltakerlisterRepository.hent(ansattId)
 			.map { it.gjennomforingId }
 	}
 
-	override fun harLagtTilDeltakerliste(ansattId: UUID, gjennomforingId: UUID): Boolean {
-		val gjennomforinger = hentAlleForAnsatt(ansattId)
+	override fun erLagtTil(ansattId: UUID, gjennomforingId: UUID): Boolean {
+		val gjennomforinger = hent(ansattId)
 		return gjennomforinger.contains(gjennomforingId)
 	}
 
