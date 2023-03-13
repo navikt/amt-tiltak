@@ -21,6 +21,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_
 import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattGjennomforingTilgangInput
 import no.nav.amt.tiltak.test.database.data.inputs.DeltakerStatusInput
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.util.*
 
 class DeltakerControllerIntegrationTest : IntegrationTestBase() {
@@ -582,6 +584,32 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 		deltakerService.erSkjultForTiltaksarrangor(deltakerId) shouldBe true
 	}
+
+	@Test
+	fun `skjulDeltakerForTiltaksarrangor() - VEILEDER - skal skjule deltaker`() {
+		val deltakerId = UUID.randomUUID()
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId))
+		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerId, status = "IKKE_AKTUELL"))
+
+		testDataRepository.insertArrangorAnsattGjennomforingTilgang(ArrangorAnsattGjennomforingTilgangInput(
+			id = UUID.randomUUID(),
+			ARRANGOR_ANSATT_2.id,
+			DELTAKER_1.gjennomforingId,
+			ZonedDateTime.now().minusDays(1),
+			ZonedDateTime.now().plusDays(1)
+		))
+
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${deltakerId}/skjul",
+			headers = createAnsatt2AuthHeader(),
+		)
+
+		response.code shouldBe 200
+
+		deltakerService.erSkjultForTiltaksarrangor(deltakerId) shouldBe true
+	}
+
 
 	@Test
 	fun `skjulDeltakerForTiltaksarrangor() skal returnere 403 hvis ikke tilgang`() {

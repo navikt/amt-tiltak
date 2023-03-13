@@ -12,7 +12,15 @@ interface ArrangorAnsattTilgangService {
 		rolle: ArrangorAnsattRolle
 	)
 
-	fun verifiserTilgangTilGjennomforing(ansattId: UUID, gjennomforingId: UUID, rolle: ArrangorAnsattRolle)
+	fun verifiserTilgangTilGjennomforing(
+		ansattPersonligIdent: String,
+		gjennomforingId: UUID,
+		roller: List<ArrangorAnsattRolle>
+	)
+
+	fun verifiserTilgangTilGjennomforing(ansattId: UUID, gjennomforingId: UUID, roller: ArrangorAnsattRolle)
+
+	fun verifiserTilgangTilGjennomforing(ansattId: UUID, gjennomforingId: UUID, roller: List<ArrangorAnsattRolle>)
 
 	fun verifiserTilgangTilArrangor(ansattPersonligIdent: String, arrangorId: UUID, rolle: ArrangorAnsattRolle)
 
@@ -20,7 +28,11 @@ interface ArrangorAnsattTilgangService {
 
 	fun verifiserTilgangTilDeltaker(ansattPersonligIdent: String, deltakerId: UUID, rolle: ArrangorAnsattRolle)
 
+	fun verifiserTilgangTilDeltaker(ansattPersonligIdent: String, deltakerId: UUID, roller: List<ArrangorAnsattRolle>)
+
 	fun verifiserTilgangTilDeltaker(ansattId: UUID, deltakerId: UUID, rolle: ArrangorAnsattRolle)
+
+	fun verifiserTilgangTilDeltaker(ansattId: UUID, deltakerId: UUID, roller: List<ArrangorAnsattRolle>)
 
 	fun hentAnsattTilganger(ansattId: UUID): List<ArrangorAnsattRoller>
 
