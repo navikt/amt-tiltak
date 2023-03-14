@@ -2,32 +2,30 @@ package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang
 
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrowExactly
-import io.kotest.core.spec.style.FunSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
-import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.KOORDINATOR
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.VEILEDER
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
-import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
-import no.nav.amt.tiltak.core.port.ArrangorAnsattService
-import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.AltinnService
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.ArrangorAnsattRoller
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
+import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
 import java.util.*
 
-class ArrangorAnsattTilgangServiceImplTest : FunSpec({
+class ArrangorAnsattTilgangServiceImplTest {
 
 	lateinit var arrangorAnsattService: ArrangorAnsattService
 
@@ -37,13 +35,15 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 	lateinit var arrangorAnsattTilgangServiceImpl: ArrangorAnsattTilgangServiceImpl
 
-	lateinit var arrangorAnsattGjennomforingTilgangService: ArrangorAnsattGjennomforingTilgangService
+	lateinit var mineDeltakerlisterService: MineDeltakerlisterServiceImpl
 
 	lateinit var altinnService: AltinnService
 
 	lateinit var arrangorService: ArrangorService
 
 	lateinit var gjennomforingService: GjennomforingService
+
+	lateinit var arrangorVeilederService: ArrangorVeilederService
 
 	val personligIdent = "fnr"
 
@@ -105,14 +105,15 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		gjennomforingId = gjennomforingId,
 		erSkjermet = true
 	)
-	beforeEach {
+	@BeforeEach
+	fun beforeEach() {
 		arrangorAnsattService = mockk()
 
 		ansattRolleService = mockk(relaxUnitFun = true)
 
 		deltakerService = mockk()
 
-		arrangorAnsattGjennomforingTilgangService = mockk(relaxUnitFun = true)
+		mineDeltakerlisterService = mockk(relaxUnitFun = true)
 
 		altinnService = mockk()
 
@@ -120,11 +121,14 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		gjennomforingService = mockk()
 
+		arrangorVeilederService = mockk()
+
+		gjennomforingService = mockk()
+
 		arrangorAnsattTilgangServiceImpl = ArrangorAnsattTilgangServiceImpl(
 			arrangorAnsattService, ansattRolleService,
-			deltakerService, altinnService, arrangorAnsattGjennomforingTilgangService,
-			arrangorService, TransactionTemplate(DataSourceTransactionManager(datasource)),
-			gjennomforingService
+			deltakerService, gjennomforingService, altinnService, mineDeltakerlisterService, arrangorVeilederService,
+			arrangorService, TransactionTemplate(DataSourceTransactionManager(datasource))
 		)
 
 		every {
@@ -139,6 +143,16 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		)
 
 		every {
+			gjennomforingService.getArrangorId(gjennomforingId)
+		} returns arrangorId
+	}
+	@Test
+	fun `verifiserTilgangTilGjennomforing - koordinator har ikke lagt til deltakerliste - skal kaste exception`() {
+		every {
+			mineDeltakerlisterService.hent(ansattId)
+		} returns emptyList()
+
+		every {
 			ansattRolleService.hentAktiveRoller(any())
 		} returns listOf(
 			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
@@ -147,80 +161,169 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 			)
 		)
 
-		every {
-			gjennomforingService.getGjennomforing(any())
-		} returns gjennomforing
-	}
-
-	test("verifiserTilgangTilGjennomforing skal kaste exception hvis ikke tilgang") {
-		every {
-			arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
-		} returns emptyList()
-
-		shouldThrowExactly<UnauthorizedException> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(personligIdent, gjennomforingId, KOORDINATOR)
+		shouldThrowExactly<ResponseStatusException> {
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(ansattId, gjennomforingId)
 		}
 	}
 
-	test("verifiserTilgangTilGjennomforing skal ikke kaste exception hvis tilgang") {
+	@Test
+	fun `verifiserTilgangTilGjennomforing - koordinator lagt til deltakerliste - skal ikke kaste exception`() {
 		every {
-			arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
+			mineDeltakerlisterService.hent(ansattId)
 		} returns listOf(gjennomforingId)
 
-		shouldNotThrow<Throwable> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(personligIdent, gjennomforingId, KOORDINATOR)
-		}
-	}
-
-	test("verifiserTilgangTilArrangor skal kaste exception hvis ikke tilgang") {
 		every {
-			ansattRolleService.hentArrangorIderForAnsatt(ansattId)
-		} returns listOf(UUID.randomUUID())
-
-		shouldThrowExactly<UnauthorizedException> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilArrangor(personligIdent, arrangorId, KOORDINATOR)
-		}
-	}
-
-	test("verifiserTilgangTilArrangor skal ikke kaste exception hvis tilgang") {
-		every {
-			ansattRolleService.hentArrangorIderForAnsatt(ansattId)
-		} returns listOf(arrangorId)
+			ansattRolleService.hentAktiveRoller(any())
+		} returns listOf(
+			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
+				arrangorId = arrangorId,
+				roller = listOf(KOORDINATOR)
+			)
+		)
 
 		shouldNotThrow<Throwable> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilArrangor(personligIdent, arrangorId, KOORDINATOR)
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(ansattId, gjennomforingId)
 		}
 	}
 
-	test("verifiserTilgangTilDeltaker skal ikke kaste exception hvis tilgang") {
+	@Test
+	fun `verifiserTilgangTilGjennomforing - veileder rolle - skal kaste exception`() {
+		every {
+			mineDeltakerlisterService.hent(ansattId)
+		} returns listOf(gjennomforingId)
+
+		every {
+			ansattRolleService.hentAktiveRoller(any())
+		} returns listOf(
+			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
+				arrangorId = arrangorId,
+				roller = listOf(VEILEDER)
+			)
+		)
+
+		shouldThrowExactly<ResponseStatusException> {
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilGjennomforing(ansattId, gjennomforingId)
+		}
+	}
+
+	@Test
+	fun `verifiserTilgangTilDeltaker - veileder rolle med tilgang - skal ikke kaste exception`() {
+		every {
+			arrangorVeilederService.erVeilederFor(ansattId, deltakerId)
+		} returns true
+
+		every {
+			ansattRolleService.hentAktiveRoller(any())
+		} returns listOf(
+			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
+				arrangorId = arrangorId,
+				roller = listOf(VEILEDER)
+			)
+		)
+
+		every {
+			deltakerService.hentDeltaker(deltakerId)
+		} returns deltaker
+
+		shouldNotThrow<ResponseStatusException> {
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)
+		}
+	}
+	@Test
+	fun `verifiserTilgangTilDeltaker - veileder uten tilgang til arrangør - skal kaste exception`() {
+		every {
+			arrangorVeilederService.erVeilederFor(ansattId, deltakerId)
+		} returns true
+
+		every {
+			ansattRolleService.hentAktiveRoller(any())
+		} returns emptyList()
+
+		every {
+			deltakerService.hentDeltaker(deltakerId)
+		} returns deltaker
+
+		shouldThrowExactly<ResponseStatusException> {
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)
+		}
+
+	}
+
+	@Test
+	fun `verifiserTilgangTilDeltaker - veileder med tilgang til deltaker, og annen arrangør - skal kaste exception`() {
+		every {
+			arrangorVeilederService.erVeilederFor(ansattId, deltakerId)
+		} returns true
+
+		every {
+			ansattRolleService.hentAktiveRoller(any())
+		} returns listOf(
+			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
+				arrangorId = UUID.randomUUID(),
+				roller = listOf(VEILEDER)
+			)
+		)
+
+		every {
+			deltakerService.hentDeltaker(deltakerId)
+		} returns deltaker
+
+		shouldThrowExactly<ResponseStatusException> {
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)
+		}
+
+	}
+
+	@Test
+	fun `verifiserTilgangTilDeltaker - koordinator har tilgang til arrangør - skal ikke kaste exception`() {
 		every {
 			deltakerService.hentDeltaker(deltakerId)
 		} returns deltaker
 
 		every {
-			arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
+			mineDeltakerlisterService.hent(ansattId)
 		} returns listOf(gjennomforingId)
 
+		every {
+			ansattRolleService.hentAktiveRoller(any())
+		} returns listOf(
+			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
+				arrangorId = arrangorId,
+				roller = listOf(KOORDINATOR)
+			)
+		)
+
 		shouldNotThrow<Throwable> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId, KOORDINATOR)
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)
 		}
 	}
 
-	test("verifiserTilgangTilDeltaker skal kaste exception hvis ikke tilgang til gjennomforing") {
+	@Test
+	fun `verifiserTilgangTilDeltaker - koordinator ikke tilgang til arrangør - skal kaste exception`() {
 		every {
 			deltakerService.hentDeltaker(deltakerId)
 		} returns deltaker
 
 		every {
-			arrangorAnsattGjennomforingTilgangService.hentGjennomforingerForAnsatt(ansattId)
+			mineDeltakerlisterService.hent(ansattId)
 		} returns emptyList()
 
-		shouldThrowExactly<UnauthorizedException> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId, KOORDINATOR)
+		every {
+			ansattRolleService.hentAktiveRoller(any())
+		} returns listOf(
+			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
+				arrangorId = UUID.randomUUID(),
+				roller = listOf(KOORDINATOR)
+			)
+		)
+
+		shouldThrowExactly<ResponseStatusException> {
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)
 		}
 	}
 
-	test("synkroniserRettigheterMedAltinn - skal legge til nye roller fra Altinn") {
+	@Test
+	fun `synkroniserRettigheterMedAltinn - skal legge til nye roller fra Altinn`() {
 		val ansattPersonligIdent = "1234"
 		val ansattId = UUID.randomUUID()
 
@@ -242,7 +345,7 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		every { ansattRolleService.hentAktiveRoller(ansattId) } returns listOf(
 			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
 				arrangorId = arrangorId,
-				roller = listOf(ArrangorAnsattRolle.VEILEDER)
+				roller = listOf(VEILEDER)
 			)
 		)
 		every { arrangorService.getOrCreateArrangor(organisasjonsnummer) } returns Arrangor(
@@ -258,7 +361,8 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		verify(exactly = 1) { ansattRolleService.opprettRolle(any(), ansattId, arrangorId, KOORDINATOR) }
 	}
 
-	test("synkroniserRettigheterMedAltinn - skal ikke legge til rolle hvis allerede finnes") {
+	@Test
+	fun `synkroniserRettigheterMedAltinn - skal ikke legge til rolle hvis allerede finnes`() {
 		val ansattPersonligIdent = "1234"
 		val ansattId = UUID.randomUUID()
 
@@ -296,7 +400,8 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		verify(exactly = 0) { ansattRolleService.opprettRolle(any(), any(), any(), any()) }
 	}
 
-	test("synkroniserRettigheterMedAltinn - skal fjerne roller som ikke finnes i Altinn") {
+	@Test
+	fun `synkroniserRettigheterMedAltinn - skal fjerne roller som ikke finnes i Altinn`() {
 	val ansattPersonligIdent = "1234"
 		val ansattId = UUID.randomUUID()
 
@@ -340,11 +445,12 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 		arrangorAnsattTilgangServiceImpl.synkroniserRettigheterMedAltinn(ansattPersonligIdent)
 
 		verify(exactly = 1) { ansattRolleService.deaktiverRolleHosArrangor(ansattId, arrangorId, KOORDINATOR) }
-		verify(exactly = 1) { arrangorAnsattGjennomforingTilgangService.fjernTilgangTilGjennomforinger(ansattId, arrangorId) }
+		verify(exactly = 1) { mineDeltakerlisterService.fjernAlleHosArrangor(ansattId, arrangorId) }
 
 	}
 
-	test("synkroniserRettigheterMedAltinn - skal returne tidlig hvis ingen rolle og ikke ansatt") {
+	@Test
+	fun `synkroniserRettigheterMedAltinn - skal returne tidlig hvis ingen rolle og ikke ansatt`() {
 		val ansattPersonligIdent = "1234"
 
 		every { altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf()
@@ -354,6 +460,6 @@ class ArrangorAnsattTilgangServiceImplTest : FunSpec({
 
 		verify(exactly = 0) { ansattRolleService.opprettRolle(any(), any(), any(), any()) }
 		verify(exactly = 0) { ansattRolleService.deaktiverRolleHosArrangor(any(), any(), any()) }
-		verify(exactly = 0) { arrangorAnsattGjennomforingTilgangService.fjernTilgangTilGjennomforinger(any(), any()) }
+		verify(exactly = 0) { mineDeltakerlisterService.fjernAlleHosArrangor(any(), any()) }
 	}
-})
+}

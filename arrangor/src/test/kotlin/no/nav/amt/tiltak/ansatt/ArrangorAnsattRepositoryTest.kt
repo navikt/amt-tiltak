@@ -85,7 +85,7 @@ class ArrangorAnsattRepositoryTest {
 			)
 		)
 
-		testRepository.insertArrangorAnsattGjennomforingTilgang(
+		testRepository.insertMineDeltakerlister(
 			ArrangorAnsattGjennomforingTilgangInput(
 				id = UUID.randomUUID(),
 				ansattId = ARRANGOR_ANSATT_2.id,

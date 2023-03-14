@@ -34,6 +34,6 @@ fun TilknyttetArrangor.toDto(): TilknyttetArrangorDto {
 		organisasjonsnummer = this.organisasjonsnummer,
 		overordnetEnhetOrganisasjonsnummer = this.overordnetEnhetOrganisasjonsnummer,
 		overordnetEnhetNavn = this.overordnetEnhetNavn,
-		roller = this.roller
+		roller = this.roller.map { it.name }
 	)
 }

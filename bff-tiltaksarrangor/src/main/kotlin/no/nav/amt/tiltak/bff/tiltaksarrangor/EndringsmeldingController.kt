@@ -4,8 +4,8 @@ import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
-import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.KOORDINATOR
 import no.nav.amt.tiltak.core.exceptions.SkjultDeltakerException
+import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
@@ -18,6 +18,7 @@ import java.util.*
 class EndringsmeldingController(
 	private val endringsmeldingService: EndringsmeldingService,
 	private val arrangorTilgangService: ArrangorAnsattTilgangService,
+	private val arrangorAnsattService: ArrangorAnsattService,
 	private val deltakerService: DeltakerService,
 	private val authService: AuthService,
 ) {
@@ -26,8 +27,8 @@ class EndringsmeldingController(
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	fun hentAktiveEndringsmeldinger(@RequestParam("deltakerId") deltakerId: UUID): List<EndringsmeldingDto> {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-
-		arrangorTilgangService.verifiserTilgangTilDeltaker(ansattPersonligIdent, deltakerId, KOORDINATOR)
+		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
+		arrangorTilgangService.verifiserTilgangTilDeltaker(ansattId, deltakerId)
 
 		if (deltakerService.erSkjultForTiltaksarrangor(deltakerId))
 			throw SkjultDeltakerException("Deltaker med id $deltakerId er skjult for tiltaksarrangør")
@@ -45,14 +46,10 @@ class EndringsmeldingController(
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	fun tilbakekallEndringsmelding(@PathVariable("id") id: UUID) {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-
+		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
 		val endringsmelding = endringsmeldingService.hentEndringsmelding(id)
 
-		arrangorTilgangService.verifiserTilgangTilDeltaker(
-			ansattPersonligIdent,
-			endringsmelding.deltakerId,
-			KOORDINATOR
-		)
+		arrangorTilgangService.verifiserTilgangTilDeltaker(ansattId, endringsmelding.deltakerId)
 		endringsmeldingService.markerSomTilbakekalt(endringsmelding.id)
 	}
 

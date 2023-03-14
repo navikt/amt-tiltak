@@ -11,7 +11,7 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @Component
-open class ArrangorAnsattGjennomforingTilgangRepository(
+open class MineDeltakerlisterRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
 
@@ -37,7 +37,7 @@ open class ArrangorAnsattGjennomforingTilgangRepository(
 			?: throw NoSuchElementException("Fant ikke arrangor_ansatt_gjennomforing_tilgang med id $id")
 	}
 
-	internal fun opprettTilgang(
+	internal fun leggTil(
 		id: UUID,
 		arrangorAnsattId: UUID,
 		gjennomforingId: UUID,
@@ -60,7 +60,7 @@ open class ArrangorAnsattGjennomforingTilgangRepository(
 		template.update(sql, parameters)
 	}
 
-	internal fun fjernTilgang(arrangorAnsattId: UUID, gjennomforingId: UUID) {
+	internal fun fjern(arrangorAnsattId: UUID, gjennomforingId: UUID) {
 		val sql = """
 			UPDATE arrangor_ansatt_gjennomforing_tilgang
 			SET gyldig_til = current_timestamp
@@ -75,7 +75,7 @@ open class ArrangorAnsattGjennomforingTilgangRepository(
 		template.update(sql, parameters)
 	}
 
-	internal fun hentAktiveGjennomforingTilgangerForAnsatt(ansattId: UUID): List<ArrangorAnsattGjennomforingTilgangDbo> {
+	internal fun hent(ansattId: UUID): List<ArrangorAnsattGjennomforingTilgangDbo> {
 		val sql = """
 			SELECT * FROM arrangor_ansatt_gjennomforing_tilgang
 				WHERE ansatt_id = :ansattId AND gyldig_fra < current_timestamp AND gyldig_til > current_timestamp
@@ -86,7 +86,7 @@ open class ArrangorAnsattGjennomforingTilgangRepository(
 		return template.query(sql, parameters, rowMapper)
 	}
 
-	fun getAntallGjennomforingerPerAnsatt(): Map<UUID, Int> {
+	fun hentAntallPerAnsatt(): Map<UUID, Int> {
 
 		@Language("PostgreSQL")
 		val sql = """

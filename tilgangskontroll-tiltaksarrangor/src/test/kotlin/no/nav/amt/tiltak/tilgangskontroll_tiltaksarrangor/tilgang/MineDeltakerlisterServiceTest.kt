@@ -28,17 +28,17 @@ import org.springframework.transaction.support.TransactionTemplate
 import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
-class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
+class MineDeltakerlisterServiceTest : FunSpec({
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 
-	lateinit var repository: ArrangorAnsattGjennomforingTilgangRepository
+	lateinit var repository: MineDeltakerlisterRepository
 
 	lateinit var testRepository: TestDataRepository
 
 	lateinit var transactionTemplate: TransactionTemplate
 
-	lateinit var service: ArrangorAnsattGjennomforingTilgangService
+	lateinit var service: MineDeltakerlisterServiceImpl
 
 	lateinit var gjennomforingService: GjennomforingService
 
@@ -48,7 +48,7 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 
 		val template = NamedParameterJdbcTemplate(dataSource)
 
-		repository = ArrangorAnsattGjennomforingTilgangRepository(template)
+		repository = MineDeltakerlisterRepository(template)
 
 		testRepository = TestDataRepository(template)
 
@@ -56,7 +56,7 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 
 		gjennomforingService = mockk()
 
-		service = ArrangorAnsattGjennomforingTilgangService(repository, gjennomforingService, transactionTemplate)
+		service = MineDeltakerlisterServiceImpl(repository, gjennomforingService, transactionTemplate)
 
 
 		DbTestDataUtils.cleanDatabase(dataSource)
@@ -74,8 +74,8 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 		)
 	}
 
-	test("fjernTilgang - skal fjerne tilgang til gjennomføring") {
-		testRepository.insertArrangorAnsattGjennomforingTilgang(
+	test("fjern - skal fjerne tilgang til gjennomføring") {
+		testRepository.insertMineDeltakerlister(
 			GJENNOMFORING_TILGANG_1.copy(
 				id = UUID.randomUUID(),
 				ansattId = ARRANGOR_ANSATT_1.id,
@@ -83,7 +83,7 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 			)
 		)
 
-		testRepository.insertArrangorAnsattGjennomforingTilgang(
+		testRepository.insertMineDeltakerlister(
 			GJENNOMFORING_TILGANG_1.copy(
 				id = UUID.randomUUID(),
 				ansattId = ARRANGOR_ANSATT_1.id,
@@ -91,7 +91,7 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 			)
 		)
 
-		testRepository.insertArrangorAnsattGjennomforingTilgang(
+		testRepository.insertMineDeltakerlister(
 			GJENNOMFORING_TILGANG_1.copy(
 				id = UUID.randomUUID(),
 				ansattId = ARRANGOR_ANSATT_1.id,
@@ -99,19 +99,19 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 			)
 		)
 
-		service.fjernTilgang(ARRANGOR_ANSATT_1.id, GJENNOMFORING_1.id)
+		service.fjern(ARRANGOR_ANSATT_1.id, GJENNOMFORING_1.id)
 
 		eventually(5.seconds) {
 			val aktiveTilganger =
-				repository.hentAktiveGjennomforingTilgangerForAnsatt(ARRANGOR_ANSATT_1.id)
+				repository.hent(ARRANGOR_ANSATT_1.id)
 
 			aktiveTilganger shouldHaveSize 1
 			aktiveTilganger.first().gjennomforingId shouldBe GJENNOMFORING_2.id
 		}
 	}
 
-	test("opprettTilgang - skal kaste exception hvis tilgang er allerede opprettet") {
-		testRepository.insertArrangorAnsattGjennomforingTilgang(
+	test("leggTil - skal kaste exception hvis tilgang er allerede opprettet") {
+		testRepository.insertMineDeltakerlister(
 			GJENNOMFORING_TILGANG_1.copy(
 				id = UUID.randomUUID(),
 				ansattId = ARRANGOR_ANSATT_1.id,
@@ -120,15 +120,15 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 		)
 
 		shouldThrowExactly<IllegalStateException> {
-			service.opprettTilgang(UUID.randomUUID(), ARRANGOR_ANSATT_1.id, GJENNOMFORING_1.id)
+			service.leggTil(UUID.randomUUID(), ARRANGOR_ANSATT_1.id, GJENNOMFORING_1.id)
 		}
 	}
 
-	test("fjernTilgangTilGjennomforinger - skal fjerne tilgang til gjennomforing hos arrangor") {
+	test("fjernAlleHosArrangor - skal fjerne tilgang til gjennomforing hos arrangor") {
 		val id1 = UUID.randomUUID()
 		val id2 = UUID.randomUUID()
 
-		testRepository.insertArrangorAnsattGjennomforingTilgang(
+		testRepository.insertMineDeltakerlister(
 			GJENNOMFORING_TILGANG_1.copy(
 				id = id1,
 				ansattId = ARRANGOR_ANSATT_1.id,
@@ -136,7 +136,7 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 			)
 		)
 
-		testRepository.insertArrangorAnsattGjennomforingTilgang(
+		testRepository.insertMineDeltakerlister(
 			GJENNOMFORING_TILGANG_1.copy(
 				id = id2,
 				ansattId = ARRANGOR_ANSATT_1.id,
@@ -169,12 +169,12 @@ class ArrangorAnsattGjennomforingTilgangServiceTest : FunSpec({
 				lopenr = 2,
 		))
 
-		var aktiveGjennomforingTilganger = repository.hentAktiveGjennomforingTilgangerForAnsatt(ARRANGOR_ANSATT_1.id)
+		var aktiveGjennomforingTilganger = repository.hent(ARRANGOR_ANSATT_1.id)
 		aktiveGjennomforingTilganger shouldHaveSize 2
 
-		service.fjernTilgangTilGjennomforinger(ARRANGOR_ANSATT_1.id, ARRANGOR_1.id)
+		service.fjernAlleHosArrangor(ARRANGOR_ANSATT_1.id, ARRANGOR_1.id)
 
-		aktiveGjennomforingTilganger = repository.hentAktiveGjennomforingTilgangerForAnsatt(ARRANGOR_ANSATT_1.id)
+		aktiveGjennomforingTilganger = repository.hent(ARRANGOR_ANSATT_1.id)
 		aktiveGjennomforingTilganger shouldHaveSize 0
 	}
 

@@ -47,7 +47,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 	@Test
 	fun `hentGjennomforinger() skal returnere 403 om Ansatt kun er veileder`() {
 
-		testDataRepository.insertArrangorAnsattGjennomforingTilgang(
+		testDataRepository.insertMineDeltakerlister(
 			ArrangorAnsattGjennomforingTilgangInput(
 				id = UUID.randomUUID(),
 				ansattId = ARRANGOR_ANSATT_2.id,
@@ -126,7 +126,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			)
 		)
 
-		testDataRepository.insertArrangorAnsattGjennomforingTilgang(
+		testDataRepository.insertMineDeltakerlister(
 			ArrangorAnsattGjennomforingTilgangInput(
 				id = UUID.randomUUID(),
 				ansattId = ARRANGOR_ANSATT_1.id,
@@ -136,7 +136,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			)
 		)
 
-		testDataRepository.insertArrangorAnsattGjennomforingTilgang(
+		testDataRepository.insertMineDeltakerlister(
 			ArrangorAnsattGjennomforingTilgangInput(
 				id = UUID.randomUUID(),
 				ansattId = ARRANGOR_ANSATT_1.id,

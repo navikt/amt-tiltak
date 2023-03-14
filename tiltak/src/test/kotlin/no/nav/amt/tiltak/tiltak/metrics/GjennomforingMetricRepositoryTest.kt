@@ -52,8 +52,8 @@ internal class GjennomforingMetricRepositoryTest : FunSpec({
 
 				testRepository.insertTiltak(tiltak)
 				testRepository.insertGjennomforing(gjennomforing)
-				testRepository.insertArrangorAnsattGjennomforingTilgang(tilgang)
-				testRepository.insertArrangorAnsattGjennomforingTilgang(tilgang2)
+				testRepository.insertMineDeltakerlister(tilgang)
+				testRepository.insertMineDeltakerlister(tilgang2)
 
 			}
 		}

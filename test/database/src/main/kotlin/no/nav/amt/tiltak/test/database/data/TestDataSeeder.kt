@@ -53,7 +53,7 @@ object TestDataSeeder {
 		repository.insertGjennomforing(GJENNOMFORING_1)
 		repository.insertGjennomforing(GJENNOMFORING_2)
 
-		repository.insertArrangorAnsattGjennomforingTilgang(GJENNOMFORING_TILGANG_1)
+		repository.insertMineDeltakerlister(GJENNOMFORING_TILGANG_1)
 
 		repository.insertNavAnsatt(NAV_ANSATT_1)
 		repository.insertNavAnsatt(NAV_ANSATT_2)
@@ -87,7 +87,7 @@ object TestDataSeeder {
 		repository.insertTiltak(TILTAK_1)
 		repository.insertGjennomforing(GJENNOMFORING_1)
 
-		repository.insertArrangorAnsattGjennomforingTilgang(GJENNOMFORING_TILGANG_1)
+		repository.insertMineDeltakerlister(GJENNOMFORING_TILGANG_1)
 
 		repository.insertNavAnsatt(NAV_ANSATT_1)
 

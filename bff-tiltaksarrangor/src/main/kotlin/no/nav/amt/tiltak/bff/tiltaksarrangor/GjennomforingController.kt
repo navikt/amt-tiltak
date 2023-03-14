@@ -1,22 +1,13 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor
 
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerlisteDto
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakeroversiktDto
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.GjennomforingDto
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.KoordinatorDto
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.KoordinatorInfoDto
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.VeilederInfoDto
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDeltakerlisteDto
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.*
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.KOORDINATOR
+import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.VEILEDER
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
-import no.nav.amt.tiltak.core.port.ArrangorAnsattService
-import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
-import no.nav.amt.tiltak.core.port.ArrangorVeilederService
-import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.*
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -31,19 +22,21 @@ class GjennomforingController(
 	private val authService: AuthService,
 	private val arrangorAnsattService: ArrangorAnsattService,
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
-	private val arrangorVeilederService: ArrangorVeilederService
+	private val arrangorVeilederService: ArrangorVeilederService,
+	private val mineDeltakerlisterService: MineDeltakerlisterService
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/gjennomforing")
-	fun hentGjennomforinger(): List<GjennomforingDto> {
+	fun hentDeltakerlisterLagtTil(): List<GjennomforingDto> {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-		arrangorAnsattTilgangService.shouldHaveRolle(ansattPersonligIdent, KOORDINATOR)
+		val ansatt = arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
+			?: throw UnauthorizedException("Innlogget ansatt har ikke tilgang til gjennomføringer")
 
-		val gjennomforingIder = arrangorAnsattTilgangService
-			.hentGjennomforingIder(ansattPersonligIdent)
+		val deltakerlisterLagtTil = mineDeltakerlisterService.hent(ansatt.id)
 
-		return gjennomforingService.getGjennomforinger(gjennomforingIder)
+		return gjennomforingService.getGjennomforinger(deltakerlisterLagtTil)
+			.filter { arrangorAnsattTilgangService.harRolleHosArrangor(ansatt.id, it.arrangor.id, KOORDINATOR) }
 			.filter(this::erSynligForArrangor)
 			.map { it.toDto() }
 	}
@@ -53,55 +46,73 @@ class GjennomforingController(
 	@GetMapping("/gjennomforing/tilgjengelig")
 	fun hentTilgjengeligeGjennomforinger(): List<GjennomforingDto> {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-		arrangorAnsattTilgangService.shouldHaveRolle(ansattPersonligIdent, KOORDINATOR)
+		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
 
-		val ansattId = arrangorAnsattTilgangService.hentAnsattId(ansattPersonligIdent)
+		arrangorAnsattTilgangService.verifiserHarRolleAnywhere(ansattId, KOORDINATOR)
 
-		return hentGjennomforingerSomKanLeggesTil(ansattId).map { it.toDto() }
+		return arrangorAnsattTilgangService.hentAnsattTilganger(ansattId)
+			.filter { it.roller.contains(KOORDINATOR) }
+			.map { gjennomforingService.getByArrangorId(it.arrangorId) }
+			.flatten()
+			.filter(this::erSynligForArrangor)
+			.map { it.toDto() }
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@PostMapping("/gjennomforing/{gjennomforingId}/tilgang")
 	fun opprettTilgangTilGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID) {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-		arrangorAnsattTilgangService.shouldHaveRolle(ansattPersonligIdent, KOORDINATOR)
+		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
+		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
 
-		val ansattId = arrangorAnsattTilgangService.hentAnsattId(ansattPersonligIdent)
-
-		val gjennomforinger = hentGjennomforingerSomKanLeggesTil(ansattId)
-
-		if (!gjennomforinger.map { it.id }.contains(gjennomforingId)) {
+		if (!erSynligForArrangor(gjennomforing)) {
 			throw ResponseStatusException(HttpStatus.FORBIDDEN)
 		}
 
-		arrangorAnsattTilgangService.opprettTilgang(ansattPersonligIdent, gjennomforingId)
+		arrangorAnsattTilgangService.verifiserRolleHosArrangor(ansattId, gjennomforing.arrangor.id, KOORDINATOR)
+
+		mineDeltakerlisterService.leggTil(
+			UUID.randomUUID(),
+			ansattId,
+			gjennomforingId
+		)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@DeleteMapping("/gjennomforing/{gjennomforingId}/tilgang")
 	fun fjernTilgangTilGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID) {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-		arrangorAnsattTilgangService.shouldHaveRolle(ansattPersonligIdent, KOORDINATOR)
+		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
+		val arrangorId = gjennomforingService.getArrangorId(gjennomforingId)
 
-		arrangorAnsattTilgangService.fjernTilgang(ansattPersonligIdent, gjennomforingId)
+		arrangorAnsattTilgangService.verifiserRolleHosArrangor(ansattId, arrangorId, KOORDINATOR)
+		mineDeltakerlisterService.fjern(ansattId, gjennomforingId)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/gjennomforing/{gjennomforingId}")
 	fun hentGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID): GjennomforingDto {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
+		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
+		val harLagtTilListe = mineDeltakerlisterService.erLagtTil(ansattId, gjennomforingId)
+		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
 
-		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId).toDto()
-		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId, KOORDINATOR)
-		return gjennomforing
+		if (!harLagtTilListe){
+			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ansatt $ansattId kan ikke hente deltaker før den er lagt til")
+		}
+
+		arrangorAnsattTilgangService.verifiserRolleHosArrangor(ansattId, gjennomforing.arrangor.id, KOORDINATOR)
+
+		return gjennomforing.toDto()
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/gjennomforing/{gjennomforingId}/koordinatorer")
 	fun hentKoordinatorerPaGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID): List<KoordinatorDto> {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
+		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
 
-		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattPersonligIdent, gjennomforingId, KOORDINATOR)
+		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattId, gjennomforingId)
 
 		return arrangorAnsattService.getKoordinatorerForGjennomforing(gjennomforingId)
 			.map {
@@ -120,20 +131,21 @@ class GjennomforingController(
 		val ansatt = arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
 			?: throw UnauthorizedException("Arrangor-ansatt finnes ikke")
 
+
 		val roller = ansatt.arrangorer
 			.flatMap { it.roller }
-			.toSet()
+
 		if (roller.isEmpty()) {
 			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ansatt ${ansatt.id} er ikke veileder eller koordinator")
 		}
 
-		val koordinatorInfo = if (roller.contains("KOORDINATOR")) {
+		val koordinatorInfo = if (roller.contains(KOORDINATOR)) {
 			KoordinatorInfoDto(getDeltakerlister(ansattPersonligIdent))
 		} else {
 			null
 		}
 
-		val veilederInfo = if (roller.contains("VEILEDER")) {
+		val veilederInfo = if (roller.contains(VEILEDER)) {
 			val veilederrelasjoner = arrangorVeilederService.hentDeltakereForVeileder(ansatt.id)
 			VeilederInfoDto(
 				veilederFor = veilederrelasjoner.count { !it.erMedveileder },
@@ -150,19 +162,12 @@ class GjennomforingController(
 	}
 
 	private fun getDeltakerlister(ansattPersonligIdent: String): List<DeltakerlisteDto> {
-		val gjennomforingIder = arrangorAnsattTilgangService.hentGjennomforingIder(ansattPersonligIdent)
+		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
+		val gjennomforingIder = mineDeltakerlisterService.hent(ansattId)
 
 		return gjennomforingService.getGjennomforinger(gjennomforingIder)
 			.filter { erSynligForArrangor(it) }
 			.map { it.toDeltakerlisteDto() }
-	}
-
-	private fun hentGjennomforingerSomKanLeggesTil(ansattId: UUID): List<Gjennomforing> {
-		return arrangorAnsattTilgangService.hentAnsattTilganger(ansattId)
-			.filter { it.roller.contains(KOORDINATOR) }
-			.map { gjennomforingService.getByArrangorId(it.arrangorId) }
-			.flatten()
-			.filter(this::erSynligForArrangor)
 	}
 
 	private fun erSynligForArrangor(gjennomforing: Gjennomforing): Boolean {

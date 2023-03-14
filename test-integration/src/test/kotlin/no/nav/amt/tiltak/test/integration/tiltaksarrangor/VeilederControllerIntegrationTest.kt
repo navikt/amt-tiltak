@@ -307,19 +307,6 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	internal fun `tildelVeiledereForDeltaker - request med for mange hovedveiledere - skal kaste 400`() {
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/veiledere?deltakerId=${DELTAKER_1.id}",
-			headers = lagAnsatt1Header(),
-			body = lagOpprettVeiledereRequestBody(
-				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, false), Pair(ARRANGOR_ANSATT_1.id, false)),
-			),
-		)
-		response.code shouldBe 400
-	}
-
-	@Test
 	internal fun `tildelVeiledereForDeltaker - request med for mange medveiledere - skal kaste 400`() {
 		val response = sendRequest(
 			method = "PATCH",
@@ -491,16 +478,16 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	internal fun `hentDeltakerliste - er veileder - henter deltakerliste`() {
-		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_2_VEILEDER_1)
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/veileder/deltakerliste",
-			headers = lagAnsatt1Header(),
+			headers = lagAnsatt2Header(),
 		)
 
 		response.code shouldBe 200
 		response.body!!.string() shouldBe """
-			[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"deltakerliste":{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","type":"Tiltak1"},"erMedveilederFor":false}]
+			[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"deltakerliste":{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","type":"Tiltak1"},"erMedveilederFor":true}]
 		""".trimIndent()
 	}
 

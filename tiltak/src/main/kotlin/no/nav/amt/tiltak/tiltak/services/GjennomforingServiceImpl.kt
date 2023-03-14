@@ -95,6 +95,10 @@ class GjennomforingServiceImpl(
 		}
 	}
 
+	override fun getArrangorId(gjennomforingId: UUID): UUID {
+		return gjennomforingRepository.get(gjennomforingId)?.arrangorId ?: throw IllegalStateException("Fant ikke gjennomføring med id $gjennomforingId")
+	}
+
 	override fun getByLopenr(lopenr: Int): List<Gjennomforing> {
 		return gjennomforingRepository.getByLopenr(lopenr)
 			.map {

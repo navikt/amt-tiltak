@@ -1,11 +1,6 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor
 
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerStatusDto
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerlisteDto
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.StatusTypeDto
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.TilgjengeligVeilederDto
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.VeilederDto
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.VeiledersDeltakerDto
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.*
 import no.nav.amt.tiltak.bff.tiltaksarrangor.request.LeggTilVeiledereBulkRequest
 import no.nav.amt.tiltak.bff.tiltaksarrangor.request.LeggTilVeiledereRequest
 import no.nav.amt.tiltak.common.auth.AuthService
@@ -15,11 +10,12 @@ import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeilederInput
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tiltak.ArrangorVeiledersDeltaker
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
-import no.nav.amt.tiltak.core.port.ArrangorAnsattService
-import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
-import no.nav.amt.tiltak.core.port.ArrangorVeilederService
+import no.nav.amt.tiltak.core.exceptions.ValidationException
+import no.nav.amt.tiltak.core.port.*
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController("VeilederControllerTiltaksarrangor")
@@ -29,7 +25,9 @@ class VeilederController (
 	private val authService: AuthService,
 	private val arrangorAnsattService: ArrangorAnsattService,
 	private val arrangorVeilederService: ArrangorVeilederService,
+	private val gjennomforingService: GjennomforingService,
 	private val controllerService: ControllerService,
+	private val deltakerService: DeltakerService
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -39,10 +37,10 @@ class VeilederController (
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(
 			ansatt.id,
 			request.gjennomforingId,
-			ArrangorAnsattRolle.KOORDINATOR,
 		)
 
 		val veiledere = request.veiledere.map { ArrangorVeilederInput(it.ansattId, it.erMedveileder) }
+		verifiserVeilederTilganger(request.deltakerIder, veiledere.map { it.ansattId })
 
 		arrangorVeilederService.opprettVeiledere(veiledere, request.deltakerIder)
 	}
@@ -52,7 +50,7 @@ class VeilederController (
 	fun hentVeiledereForDeltaker(@RequestParam("deltakerId") deltakerId: UUID) : List<VeilederDto> {
 		val ansatt = hentInnloggetAnsatt()
 
-		verifiserTilgangTilDeltaker(ansatt, deltakerId)
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 
 		val veiledere = arrangorVeilederService.hentVeiledereForDeltaker(deltakerId)
 
@@ -66,10 +64,13 @@ class VeilederController (
 		@RequestBody request: LeggTilVeiledereRequest,
 	) {
 		val ansatt = hentInnloggetAnsatt()
+		val deltaker = deltakerService.hentDeltaker(deltakerId) ?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 
-		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId, ArrangorAnsattRolle.KOORDINATOR)
+		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansatt.id, deltaker.gjennomforingId)
 
 		val veiledere = request.veiledere.map { ArrangorVeilederInput(it.ansattId, it.erMedveileder) }
+
+		verifiserVeilederTilganger(listOf(deltakerId), veiledere.map { it.ansattId })
 
 		arrangorVeilederService.opprettVeiledereForDeltaker(veiledere, deltakerId)
 	}
@@ -81,8 +82,7 @@ class VeilederController (
 
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(
 			ansatt.id,
-			gjennomforingId,
-			ArrangorAnsattRolle.KOORDINATOR,
+			gjennomforingId
 		)
 
 		val veiledere = arrangorVeilederService.hentAktiveVeiledereForGjennomforing(gjennomforingId)
@@ -97,7 +97,6 @@ class VeilederController (
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(
 			ansatt.id,
 			gjennomforingId,
-			ArrangorAnsattRolle.KOORDINATOR,
 		)
 
 		val tilgjengelige = arrangorVeilederService.hentTilgjengeligeVeiledereForGjennomforing(gjennomforingId)
@@ -109,9 +108,13 @@ class VeilederController (
 	@GetMapping("/veileder/deltakerliste")
 	fun hentDeltakerliste(): List<VeiledersDeltakerDto> {
 		val ansatt = hentInnloggetAnsatt()
-		arrangorAnsattTilgangService.shouldHaveRolle(ansatt.personligIdent, ArrangorAnsattRolle.VEILEDER)
 
-		val deltakerliste = arrangorVeilederService.hentDeltakerliste(ansatt.id)
+		arrangorAnsattTilgangService.verifiserHarRolleAnywhere(ansatt.id, ArrangorAnsattRolle.VEILEDER)
+
+		val deltakerliste = arrangorVeilederService.hentDeltakerliste(ansatt.id).filter {
+			val arrangorId = gjennomforingService.getArrangorId(it.gjennomforingId)
+			arrangorAnsattTilgangService.harRolleHosArrangor(ansatt.id, arrangorId, ArrangorAnsattRolle.VEILEDER)
+		}
 
 		return deltakerliste.map { it.toVeiledersDeltakerDto() }
 	}
@@ -122,17 +125,21 @@ class VeilederController (
 			?: throw UnauthorizedException("Arrangor ansatt finnes ikke")
 	}
 
-	private fun verifiserTilgangTilDeltaker(ansatt: Ansatt, deltakerId: UUID) {
-		val roller = arrangorAnsattTilgangService.hentRollerForAnsattTilknyttetDeltaker(ansatt.id, deltakerId)
+	private fun verifiserVeilederTilganger(deltakerIder: List<UUID>, veilederIder: List<UUID>) {
+		val gjennomforingIder = deltakerService.hentDeltakere(deltakerIder)
+			.map { it.gjennomforingId }.distinct()
 
-		if (roller.contains(ArrangorAnsattRolle.KOORDINATOR)) {
-			arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(
-				ansatt.id,
-				deltakerId,
-				ArrangorAnsattRolle.KOORDINATOR,
-			)
-		} else if (!arrangorVeilederService.erVeilederFor(ansatt.id, deltakerId)) {
-			throw UnauthorizedException("Ansatt ${ansatt.id} er ikke veileder for deltaker $deltakerId")
+		if (gjennomforingIder.size > 1) {
+			throw ValidationException("Alle deltakere må være på samme gjennomføring for å tildele veiledere")
+		}
+
+		val arrangorId = gjennomforingService.getArrangorId(gjennomforingIder.first())
+
+		veilederIder.forEach {
+			val harVeilederTilgang = arrangorAnsattTilgangService.harRolleHosArrangor(it, arrangorId, ArrangorAnsattRolle.VEILEDER)
+			if(!harVeilederTilgang) {
+				throw ResponseStatusException(HttpStatus.FORBIDDEN, "Kan ikke tildele veileder som ikke har veiledertilgang")
+			}
 		}
 	}
 }
