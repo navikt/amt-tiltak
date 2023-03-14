@@ -17,6 +17,6 @@ data class ArrangorVeiledersDeltaker(
 	val gjennomforingId: UUID,
 	val gjennomforingNavn: String,
 	val gjennomforingType: String,
-	val erMedveilederFor: Boolean,
-	val erSkjermet: Boolean
+	val arrangorId: UUID,
+	val erMedveilederFor: Boolean
 )

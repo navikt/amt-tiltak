@@ -112,8 +112,7 @@ class VeilederController (
 		arrangorAnsattTilgangService.verifiserHarRolleAnywhere(ansatt.id, ArrangorAnsattRolle.VEILEDER)
 
 		val deltakerliste = arrangorVeilederService.hentDeltakerliste(ansatt.id).filter {
-			val arrangorId = gjennomforingService.getArrangorId(it.gjennomforingId)
-			arrangorAnsattTilgangService.harRolleHosArrangor(ansatt.id, arrangorId, ArrangorAnsattRolle.VEILEDER)
+			arrangorAnsattTilgangService.harRolleHosArrangor(ansatt.id, it.arrangorId, ArrangorAnsattRolle.VEILEDER)
 		}
 
 		return deltakerliste.map { it.toVeiledersDeltakerDto() }
