@@ -42,8 +42,8 @@ open class ArrangorVeilederRepository(
 			gjennomforingId = rs.getUUID("gjennomforing_id"),
 			gjennomforingNavn = rs.getString("gjennomforing_navn"),
 			gjennomforingType = rs.getString("tiltak_navn"),
-			erMedveilederFor = rs.getBoolean("er_medveileder"),
-			erSkjermet = rs.getBoolean("er_skjermet")
+			arrangorId = rs.getUUID("arrangor_id"),
+			erMedveilederFor = rs.getBoolean("er_medveileder")
 		)
 	}
 
@@ -185,7 +185,7 @@ open class ArrangorVeilederRepository(
 				   bruker.fornavn,
 				   bruker.mellomnavn,
 				   bruker.etternavn,
-				   bruker.er_skjermet,
+				   gjennomforing.arrangor_id,
 				   gjennomforing.navn AS gjennomforing_navn,
 				   tiltak.navn        AS tiltak_navn
 			FROM arrangor_veileder
@@ -200,6 +200,14 @@ open class ArrangorVeilederRepository(
 			  AND deltaker_status.aktiv = TRUE
 			  AND deltaker_status.status != :pabegyntRegistreringStatus
 			  AND deltaker_status.status != :pabegyntStatus
+			  AND NOT EXISTS
+				(
+					SELECT *
+					FROM skjult_deltaker sd
+					WHERE sd.skjult_av_arrangor_ansatt_id = ansatt_id
+					  AND sd.deltaker_id = deltaker.id
+					  AND sd.skjult_til > CURRENT_TIMESTAMP
+				)
 		""".trimIndent()
 
 		val parameters = sqlParameters(
