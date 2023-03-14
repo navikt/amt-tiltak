@@ -76,6 +76,18 @@ class ArrangorVeilederServiceImpl (
 		return arrangorVeilederRepository.getDeltakerlisteForVeileder(ansattId)
 	}
 
+	override fun fjernAlleMedAnsattHosArrangor(ansattId: UUID, arrangorId: UUID) {
+		val gjennomforingIder = gjennomforingService.getByArrangorId(arrangorId)
+			.map { it.id }
+			.toSet()
+
+		val deltakereHosArrangor = hentDeltakerliste(ansattId)
+			.filter { gjennomforingIder.contains(it.gjennomforingId) }
+			.map { it.id }
+
+		arrangorVeilederRepository.inaktiverVeilederForDeltakere(ansattId, deltakereHosArrangor)
+	}
+
 	private fun inaktiverVeiledereSomSkalErstattes(veiledere: List<OpprettVeilederDbo>, deltakerIder: List<UUID>) {
 		val antallNyeMedveiledere = veiledere.count { it.erMedveileder }
 

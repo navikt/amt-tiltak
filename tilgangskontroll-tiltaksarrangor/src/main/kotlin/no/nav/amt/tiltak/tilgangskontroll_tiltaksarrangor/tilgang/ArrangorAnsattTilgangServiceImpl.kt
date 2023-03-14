@@ -126,7 +126,10 @@ open class ArrangorAnsattTilgangServiceImpl(
 		tilgangerSomSkalFjernes.forEach { tilgang ->
 			transactionTemplate.executeWithoutResult {
 				ansattRolleService.deaktiverRolleHosArrangor(ansatt.id, tilgang.arrangorId, tilgang.arrangorAnsattRolle)
-				mineDeltakerlisterService.fjernAlleHosArrangor(ansatt.id, tilgang.arrangorId)
+				when (tilgang.arrangorAnsattRolle)	{
+					ArrangorAnsattRolle.KOORDINATOR -> mineDeltakerlisterService.fjernAlleHosArrangor(ansatt.id, tilgang.arrangorId)
+					ArrangorAnsattRolle.VEILEDER -> arrangorVeilederService.fjernAlleMedAnsattHosArrangor(ansatt.id, tilgang.arrangorId)
+				}
 			}
 			log.info("Fjernet tilgang under synk med Altinn. ansattId=${ansatt.id} arrangorId=${tilgang.arrangorId} rolle=${tilgang.arrangorAnsattRolle}")
 		}

@@ -8,7 +8,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
-import java.util.UUID
+import java.util.*
 
 @Component
 open class ArrangorVeilederRepository(
@@ -125,6 +125,10 @@ open class ArrangorVeilederRepository(
 		val parameters = sqlParameters("deltakerId" to deltakerId)
 
 		template.update(sql, parameters)
+	}
+
+	fun inaktiverVeilederForDeltakere(ansattId: UUID, deltakerIder: List<UUID>) {
+		inaktiverVeiledereForDeltakere(listOf(ansattId), deltakerIder)
 	}
 
 	internal fun get(id: UUID): ArrangorVeilederDbo {
