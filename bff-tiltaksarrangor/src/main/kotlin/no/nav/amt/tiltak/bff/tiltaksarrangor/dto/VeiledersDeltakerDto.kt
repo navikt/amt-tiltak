@@ -13,5 +13,6 @@ data class VeiledersDeltakerDto(
 	val sluttDato: LocalDate?,
 	val status: DeltakerStatusDto,
 	val deltakerliste: DeltakerlisteDto,
-	val erMedveilederFor: Boolean
+	val erMedveilederFor: Boolean,
+	val aktiveEndringsmeldinger: List<EndringsmeldingDto>
 )

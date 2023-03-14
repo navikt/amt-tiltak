@@ -27,7 +27,8 @@ class VeilederController (
 	private val arrangorVeilederService: ArrangorVeilederService,
 	private val gjennomforingService: GjennomforingService,
 	private val controllerService: ControllerService,
-	private val deltakerService: DeltakerService
+	private val deltakerService: DeltakerService,
+	private val endringsmeldingService: EndringsmeldingService
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -115,7 +116,14 @@ class VeilederController (
 			arrangorAnsattTilgangService.harRolleHosArrangor(ansatt.id, it.arrangorId, ArrangorAnsattRolle.VEILEDER)
 		}
 
-		return deltakerliste.map { it.toVeiledersDeltakerDto() }
+		val endringmeldingerMap =
+			endringsmeldingService.hentAktiveEndringsmeldingerForDeltakere(deltakerliste.map { it.id })
+
+		return deltakerliste.map {
+			val endringsmeldinger = endringmeldingerMap.getOrDefault(it.id, emptyList())
+				.map { e -> e.toDto() }
+			it.toVeiledersDeltakerDto(endringsmeldinger)
+		}
 	}
 
 	private fun hentInnloggetAnsatt(): Ansatt {
@@ -143,7 +151,7 @@ class VeilederController (
 	}
 }
 
-fun ArrangorVeiledersDeltaker.toVeiledersDeltakerDto() =
+fun ArrangorVeiledersDeltaker.toVeiledersDeltakerDto(endringsmeldinger: List<EndringsmeldingDto>) =
 	VeiledersDeltakerDto(
 		id = id,
 		fornavn = fornavn,
@@ -161,5 +169,6 @@ fun ArrangorVeiledersDeltaker.toVeiledersDeltakerDto() =
 			navn = gjennomforingNavn,
 			type = gjennomforingType
 		),
-		erMedveilederFor = erMedveilederFor
+		erMedveilederFor = erMedveilederFor,
+		aktiveEndringsmeldinger = endringsmeldinger
 	)
