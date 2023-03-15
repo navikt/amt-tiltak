@@ -5,7 +5,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
 
 @Repository
-class AnsattRolleMetricRepository(
+open class AnsattRolleMetricRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
 
