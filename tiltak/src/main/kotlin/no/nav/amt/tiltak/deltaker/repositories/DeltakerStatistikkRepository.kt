@@ -74,14 +74,11 @@ class DeltakerStatistikkRepository(
 
 	fun eksponerteBrukerePrStatus(): List<StatusStatistikk> {
 		val query = """
-			select ds.status as status, count(distinct d.bruker_id) as antall
-			from deltaker d
-			inner join deltaker_status ds on d.id = ds.deltaker_id
-			where d.gjennomforing_id in (
-				select gjennomforing_id
-				from arrangor_ansatt_gjennomforing_tilgang tilgang
-				where d.gjennomforing_id = tilgang.gjennomforing_id)
-			and ds.aktiv = true
+			select ds.status as status, count(distinct deltaker.id) as antall
+			from arrangor_ansatt_gjennomforing_tilgang tilgang
+				join deltaker on deltaker.gjennomforing_id = tilgang.gjennomforing_id
+         		join deltaker_status ds on deltaker.id = ds.deltaker_id
+			where ds.aktiv=true
 			group by ds.status;
 		""".trimIndent()
 		return template.query(query) { rs, _ ->
