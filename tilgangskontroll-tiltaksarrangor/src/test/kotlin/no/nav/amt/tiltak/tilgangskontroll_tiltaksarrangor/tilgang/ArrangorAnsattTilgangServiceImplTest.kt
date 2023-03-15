@@ -402,7 +402,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 
 	@Test
 	fun `synkroniserRettigheterMedAltinn - skal fjerne roller som ikke finnes i Altinn`() {
-	val ansattPersonligIdent = "1234"
+		val ansattPersonligIdent = "1234"
 		val ansattId = UUID.randomUUID()
 
 		val arrangorId = UUID.randomUUID()
@@ -410,7 +410,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 
 		val organisasjonsnummer2 = "9999"
 		every { altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
-			ArrangorAnsattRoller(organisasjonsnummer2, listOf(KOORDINATOR))
+			ArrangorAnsattRoller(organisasjonsnummer2, listOf(KOORDINATOR, VEILEDER))
 		)
 		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
 		every { arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent) } returns Ansatt(
@@ -424,7 +424,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 		every { ansattRolleService.hentAktiveRoller(ansattId) } returns listOf(
 			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
 				arrangorId = arrangorId,
-				roller = listOf(KOORDINATOR)
+				roller = listOf(KOORDINATOR, VEILEDER)
 			)
 		)
 		every { arrangorService.getOrCreateArrangor(organisasjonsnummer2) } returns Arrangor(
@@ -445,8 +445,9 @@ class ArrangorAnsattTilgangServiceImplTest {
 		arrangorAnsattTilgangServiceImpl.synkroniserRettigheterMedAltinn(ansattPersonligIdent)
 
 		verify(exactly = 1) { ansattRolleService.deaktiverRolleHosArrangor(ansattId, arrangorId, KOORDINATOR) }
+		verify(exactly = 1) { ansattRolleService.deaktiverRolleHosArrangor(ansattId, arrangorId, VEILEDER) }
 		verify(exactly = 1) { mineDeltakerlisterService.fjernAlleHosArrangor(ansattId, arrangorId) }
-
+		verify(exactly = 1) { arrangorVeilederService.fjernAlleDeltakereForVeilederHosArrangor(ansattId, arrangorId) }
 	}
 
 	@Test
@@ -461,5 +462,6 @@ class ArrangorAnsattTilgangServiceImplTest {
 		verify(exactly = 0) { ansattRolleService.opprettRolle(any(), any(), any(), any()) }
 		verify(exactly = 0) { ansattRolleService.deaktiverRolleHosArrangor(any(), any(), any()) }
 		verify(exactly = 0) { mineDeltakerlisterService.fjernAlleHosArrangor(any(), any()) }
+		verify(exactly = 0) { arrangorVeilederService.fjernAlleDeltakereForVeilederHosArrangor(any(), any()) }
 	}
 }

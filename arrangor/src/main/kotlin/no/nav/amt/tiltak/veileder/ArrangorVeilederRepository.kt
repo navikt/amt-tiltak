@@ -8,7 +8,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
-import java.util.UUID
+import java.util.*
 
 @Component
 open class ArrangorVeilederRepository(
@@ -123,6 +123,25 @@ open class ArrangorVeilederRepository(
 		""".trimIndent()
 
 		val parameters = sqlParameters("deltakerId" to deltakerId)
+
+		template.update(sql, parameters)
+	}
+
+	fun inaktiverVeilederPaGjennomforinger(ansattId: UUID, gjennomforingIder: List<UUID>) {
+		val sql = """
+			update arrangor_veileder
+			set gyldig_til = current_timestamp
+			where gyldig_til > current_timestamp and id in (
+				select av.id from arrangor_veileder av
+					join deltaker d on av.deltaker_id = d.id
+				where av.ansatt_id = :ansattId AND d.gjennomforing_id in (:gjennomforingIder)
+		)
+		""".trimIndent()
+
+		val parameters = sqlParameters(
+			"ansattId" to ansattId,
+			"gjennomforingIder" to gjennomforingIder,
+		)
 
 		template.update(sql, parameters)
 	}
