@@ -24,5 +24,5 @@ interface ArrangorVeilederService {
 
 	fun hentDeltakerliste(ansattId: UUID): List<ArrangorVeiledersDeltaker>
 
-	fun fjernAlleMedAnsattHosArrangor(ansattId: UUID, arrangorId: UUID)
+	fun fjernAlleDeltakereForVeilederHosArrangor(ansattId: UUID, arrangorId: UUID)
 }

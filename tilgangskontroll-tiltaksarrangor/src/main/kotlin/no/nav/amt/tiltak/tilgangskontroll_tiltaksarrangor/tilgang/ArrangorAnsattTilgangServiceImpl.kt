@@ -128,7 +128,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 				ansattRolleService.deaktiverRolleHosArrangor(ansatt.id, tilgang.arrangorId, tilgang.arrangorAnsattRolle)
 				when (tilgang.arrangorAnsattRolle)	{
 					ArrangorAnsattRolle.KOORDINATOR -> mineDeltakerlisterService.fjernAlleHosArrangor(ansatt.id, tilgang.arrangorId)
-					ArrangorAnsattRolle.VEILEDER -> arrangorVeilederService.fjernAlleMedAnsattHosArrangor(ansatt.id, tilgang.arrangorId)
+					ArrangorAnsattRolle.VEILEDER -> arrangorVeilederService.fjernAlleDeltakereForVeilederHosArrangor(ansatt.id, tilgang.arrangorId)
 				}
 			}
 			log.info("Fjernet tilgang under synk med Altinn. ansattId=${ansatt.id} arrangorId=${tilgang.arrangorId} rolle=${tilgang.arrangorAnsattRolle}")

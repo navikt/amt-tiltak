@@ -447,7 +447,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 		verify(exactly = 1) { ansattRolleService.deaktiverRolleHosArrangor(ansattId, arrangorId, KOORDINATOR) }
 		verify(exactly = 1) { ansattRolleService.deaktiverRolleHosArrangor(ansattId, arrangorId, VEILEDER) }
 		verify(exactly = 1) { mineDeltakerlisterService.fjernAlleHosArrangor(ansattId, arrangorId) }
-		verify(exactly = 1) { arrangorVeilederService.fjernAlleMedAnsattHosArrangor(ansattId, arrangorId) }
+		verify(exactly = 1) { arrangorVeilederService.fjernAlleDeltakereForVeilederHosArrangor(ansattId, arrangorId) }
 	}
 
 	@Test
@@ -462,6 +462,6 @@ class ArrangorAnsattTilgangServiceImplTest {
 		verify(exactly = 0) { ansattRolleService.opprettRolle(any(), any(), any(), any()) }
 		verify(exactly = 0) { ansattRolleService.deaktiverRolleHosArrangor(any(), any(), any()) }
 		verify(exactly = 0) { mineDeltakerlisterService.fjernAlleHosArrangor(any(), any()) }
-		verify(exactly = 0) { arrangorVeilederService.fjernAlleMedAnsattHosArrangor(any(), any()) }
+		verify(exactly = 0) { arrangorVeilederService.fjernAlleDeltakereForVeilederHosArrangor(any(), any()) }
 	}
 }

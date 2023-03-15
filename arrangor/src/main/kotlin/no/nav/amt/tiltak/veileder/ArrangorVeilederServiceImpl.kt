@@ -76,7 +76,7 @@ class ArrangorVeilederServiceImpl (
 		return arrangorVeilederRepository.getDeltakerlisteForVeileder(ansattId)
 	}
 
-	override fun fjernAlleMedAnsattHosArrangor(ansattId: UUID, arrangorId: UUID) {
+	override fun fjernAlleDeltakereForVeilederHosArrangor(ansattId: UUID, arrangorId: UUID) {
 		val gjennomforingIder = gjennomforingService.getByArrangorId(arrangorId)
 			.map { it.id }
 			.distinct()
