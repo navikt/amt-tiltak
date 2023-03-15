@@ -63,8 +63,7 @@ class DeltakerStatistikkUpdater(
 
 
 	fun oppdaterEksponterteBrukerePerStatus() {
-
-		val rows = deltakerStatistikkRepository.eksponerteBrukerePrStatus().map {
+		deltakerStatistikkRepository.eksponerteBrukerePrStatus().map {
 			eksponterteBrukereStatusGauges.getValue(it.first).set(it.second)
 		}
 	}
