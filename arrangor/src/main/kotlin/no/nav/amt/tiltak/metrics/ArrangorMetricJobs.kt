@@ -32,8 +32,8 @@ open class ArrangorMetricJobs(
 	)
 
 	private val tildeltVeilederGauges: Map<String, AtomicInteger> = mapOf(
-		Pair(antallAktiveDeltakere, registry.gauge(antallAnsatte, AtomicInteger(0))!!),
-		Pair(antallAktiveDeltakereMedVeileder, registry.gauge(loggetInnSisteTime, AtomicInteger(0))!!)
+		Pair(antallAktiveDeltakere, registry.gauge(antallAktiveDeltakere, AtomicInteger(0))!!),
+		Pair(antallAktiveDeltakereMedVeileder, registry.gauge(antallAktiveDeltakereMedVeileder, AtomicInteger(0))!!)
 	)
 
 
@@ -51,14 +51,11 @@ open class ArrangorMetricJobs(
 	// Hver halve time
 	@Scheduled(cron = "0 */30 * ? * *")
 	open fun updateTildeltVeilederMetrics() {
-		JobRunner.run("oppdater_deltakere_med_veileder_metric", this::runTildelVeileder)
+		JobRunner.run("oppdater_deltakere_med_veileder_metric") {
+			val metrics = arrangorVeilederMetricRepository.hentAndelAktiveDeltakereMedVeileder()
+
+			tildeltVeilederGauges[antallAktiveDeltakere]?.set(metrics.totalAntallDeltakere)
+			tildeltVeilederGauges[antallAktiveDeltakereMedVeileder]?.set(metrics.antallMedVeileder)
+		}
 	}
-
-	private fun runTildelVeileder() {
-		val metrics = arrangorVeilederMetricRepository.hentAndelAktiveDeltakereMedVeileder()
-
-		tildeltVeilederGauges[antallAktiveDeltakere]?.set(metrics.totalAntallDeltakere)
-		tildeltVeilederGauges[antallAktiveDeltakereMedVeileder]?.set(metrics.antallMedVeileder)
-	}
-
 }
