@@ -14,6 +14,8 @@ import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_4
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_4
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_3
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -260,5 +262,38 @@ class ArrangorVeilederRepositoryTest {
 
 		repository.get(ARRANGOR_ANSATT_1_VEILEDER_1.id).gyldigTil shouldBeCloseTo ZonedDateTime.now()
 
+	}
+
+	@Test
+	fun `inaktiverVeilederPaGjennomforinger - aktiv veileder finnes på flere gjennomforinger - den inaktiveres`() {
+		val deltaker3 = DELTAKER_1.copy(
+			id = UUID.randomUUID(),
+			gjennomforingId = GJENNOMFORING_3.id
+		)
+		testDataRepository.insertGjennomforing(GJENNOMFORING_3)
+		testDataRepository.insertDeltaker(deltaker3)
+
+		val ansatt1Veileder2 = ARRANGOR_ANSATT_1_VEILEDER_1.copy(
+			id = UUID.randomUUID(),
+			deltakerId = deltaker3.id,
+		)
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
+		testDataRepository.insertArrangorVeileder(ansatt1Veileder2)
+
+		repository.inaktiverVeilederPaGjennomforinger(ARRANGOR_ANSATT_1.id, listOf(GJENNOMFORING_1.id, deltaker3.gjennomforingId))
+
+		repository.get(ARRANGOR_ANSATT_1_VEILEDER_1.id).gyldigTil shouldBeCloseTo ZonedDateTime.now()
+		repository.get(ansatt1Veileder2.id).gyldigTil shouldBeCloseTo ZonedDateTime.now()
+	}
+
+	@Test
+	fun `inaktiverVeilederaGjennomforinger - flere aktive veiledere finnes - kun de med riktig ansattId inaktiveres`() {
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_2_VEILEDER_1)
+
+		repository.inaktiverVeilederPaGjennomforinger(ARRANGOR_ANSATT_1.id, listOf(GJENNOMFORING_1.id))
+
+		repository.get(ARRANGOR_ANSATT_1_VEILEDER_1.id).gyldigTil shouldBeCloseTo ZonedDateTime.now()
+		repository.get(ARRANGOR_ANSATT_2_VEILEDER_1.id).gyldigTil shouldBeCloseTo ARRANGOR_ANSATT_2_VEILEDER_1.gyldigTil
 	}
 }

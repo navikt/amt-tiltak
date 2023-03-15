@@ -92,6 +92,10 @@ abstract class MockHttpServer(
 		return responseCount
 	}
 
+	fun clearResponses() {
+		responses.clear()
+	}
+
 	private fun printHeaders(headers: Headers): String {
 		return headers.map { "		${it.first} : ${it.second}" }
 			.joinToString("\n")

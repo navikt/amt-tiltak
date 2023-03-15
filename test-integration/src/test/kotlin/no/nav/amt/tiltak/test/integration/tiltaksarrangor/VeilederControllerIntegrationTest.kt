@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.port.ArrangorVeilederService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_ROLLE_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_VEILEDER_1
@@ -489,6 +490,27 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 		response.body!!.string() shouldBe """
 			[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"deltakerliste":{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","type":"Tiltak1"},"erMedveilederFor":true}]
 		""".trimIndent()
+	}
+
+	@Test
+	internal fun `veileder mister rollen i altinn - inaktiveres for tildelte deltakere`() {
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_2_VEILEDER_1)
+		mockAmtAltinnAclHttpServer.clearResponses()
+		mockAmtAltinnAclHttpServer.addRoller(
+			norskIdent = ARRANGOR_ANSATT_2.personligIdent,
+			orgNr = ARRANGOR_1.organisasjonsnummer,
+			roller = emptyList(),
+		)
+
+		sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/ansatt/meg/roller",
+			headers = lagAnsatt2Header(),
+		)
+
+		AsyncUtils.eventually {
+			arrangorVeilederService.hentDeltakereForVeileder(ARRANGOR_ANSATT_2_VEILEDER_1.ansattId) shouldBe emptyList()
+		}
 	}
 
 	private fun lagOpprettVeiledereRequestBody(veiledere: List<Pair<UUID, Boolean>>): RequestBody {
