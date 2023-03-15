@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v3
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v3
       - name: Deploy application
         uses: nais/deploy/actions/deploy@v1
         env:
@@ -54,12 +54,10 @@ jobs:
           VARS: .nais/vars-dev.yaml
           VAR: version=${{ env.IMAGE_TAG }}
       - name: Create release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
+          name: Release to dev
           tag_name: release/dev@${{ env.IMAGE_TAG }}
-          release_name: Release to dev
           prerelease: true
 
   deploy-prod:
@@ -69,7 +67,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v3
       - name: Deploy application
         uses: nais/deploy/actions/deploy@v1
         env:
@@ -79,10 +77,8 @@ jobs:
           VARS: .nais/vars-prod.yaml
           VAR: version=${{ env.IMAGE_TAG }}
       - name: Create release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
+          name: Release to prod
           tag_name: release/prod@${{ env.IMAGE_TAG }}
-          release_name: Release to prod
           prerelease: false
