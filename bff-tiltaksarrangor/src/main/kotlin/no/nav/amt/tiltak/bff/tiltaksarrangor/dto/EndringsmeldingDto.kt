@@ -82,3 +82,5 @@ fun Endringsmelding.Innhold.toDto(): EndringsmeldingDto.Innhold {
 			)
 	}
 }
+
+fun Endringsmelding.toDto() = EndringsmeldingDto(id = id, innhold = innhold.toDto())
