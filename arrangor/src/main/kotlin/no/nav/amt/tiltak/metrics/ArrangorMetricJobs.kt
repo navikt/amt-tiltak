@@ -51,12 +51,14 @@ open class ArrangorMetricJobs(
 	// Hver halve time
 	@Scheduled(cron = "0 */30 * ? * *")
 	open fun updateTildeltVeilederMetrics() {
-		JobRunner.run("oppdater_deltakere_med_veileder_metric") {
-			val metrics = arrangorVeilederMetricRepository.hentAndelAktiveDeltakereMedVeileder()
+		JobRunner.run("oppdater_deltakere_med_veileder_metric", this::runTildelVeileder)
+	}
 
-			tildeltVeilederGauges[antallAktiveDeltakere]?.set(metrics.totalAntallDeltakere)
-			tildeltVeilederGauges[antallAktiveDeltakereMedVeileder]?.set(metrics.antallMedVeileder)
-		}
+	private fun runTildelVeileder() {
+		val metrics = arrangorVeilederMetricRepository.hentAndelAktiveDeltakereMedVeileder()
+
+		tildeltVeilederGauges[antallAktiveDeltakere]?.set(metrics.totalAntallDeltakere)
+		tildeltVeilederGauges[antallAktiveDeltakereMedVeileder]?.set(metrics.antallMedVeileder)
 	}
 
 }
