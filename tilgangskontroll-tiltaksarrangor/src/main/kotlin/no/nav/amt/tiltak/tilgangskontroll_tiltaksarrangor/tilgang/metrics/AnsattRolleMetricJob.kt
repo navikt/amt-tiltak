@@ -9,7 +9,7 @@ open class AnsattRolleMetricJob(
 	private val ansattRolleMetricService: AnsattRolleMetricService,
 ) {
 
-	@Scheduled(cron = "@hourly")
+	@Scheduled(fixedDelay = 60 * 60 * 1000L)
 	open fun oppdaterMetrikker() {
 		JobRunner.run("oppdater_ansatt_rolle_metrikker", ansattRolleMetricService::oppdaterMetrikker)
 	}
