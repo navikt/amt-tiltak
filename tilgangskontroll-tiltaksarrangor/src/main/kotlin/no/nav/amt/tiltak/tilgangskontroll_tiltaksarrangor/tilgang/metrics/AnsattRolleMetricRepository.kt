@@ -9,34 +9,29 @@ open class AnsattRolleMetricRepository(
 ) {
 	fun getMetrikker(): AnsattRolleMetrikkHolder {
 		val sql = """
+			with ansatt_rolle as (select ansatt_id, rolle from arrangor_ansatt_rolle where gyldig_til > current_timestamp)
 			select
-			(
-				select count(distinct ansatt_id) as antall_veiledere
-				from arrangor_ansatt_rolle
-				where gyldig_til > current_timestamp and rolle = 'VEILEDER' and ansatt_id not in (
-					 select ansatt_id
-					 from arrangor_ansatt_rolle
-					 where gyldig_til > current_timestamp and rolle = 'KOORDINATOR'
-				)
-			),
-			(
-				select count(distinct ansatt_id) as antall_koordinatorer
-				from arrangor_ansatt_rolle
-				where gyldig_til > current_timestamp and rolle = 'KOORDINATOR' and ansatt_id not in (
-					 select ansatt_id
-					 from arrangor_ansatt_rolle
-					 where gyldig_til > current_timestamp and rolle = 'VEILEDER'
-				)
-			),
-			(
-				select count(distinct ansatt_id) as antall_med_begge_roller
-				from arrangor_ansatt_rolle
-				where gyldig_til > current_timestamp and rolle = 'VEILEDER' and ansatt_id in (
-					select ansatt_id
-					from arrangor_ansatt_rolle
-					where gyldig_til > current_timestamp and rolle = 'KOORDINATOR'
-				)
-			);
+				(
+					select count(distinct ansatt_id) as antall_veiledere
+					from ansatt_rolle
+					where rolle = 'VEILEDER' and ansatt_id not in (
+						select ansatt_id from ansatt_rolle where rolle = 'KOORDINATOR'
+					)
+				),
+				(
+					select count(distinct ansatt_id) as antall_koordinatorer
+					from ansatt_rolle
+					where rolle = 'KOORDINATOR' and ansatt_id not in (
+						select ansatt_id from ansatt_rolle where rolle = 'VEILEDER'
+					)
+				),
+				(
+					select count(distinct ansatt_id) as antall_med_begge_roller
+					from ansatt_rolle
+					where rolle = 'VEILEDER' and ansatt_id in (
+						select ansatt_id from ansatt_rolle where rolle = 'KOORDINATOR'
+					)
+				);
 		""".trimIndent()
 
 		return template.query(sql) { rs, _ ->
