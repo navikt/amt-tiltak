@@ -14,7 +14,7 @@ class AnsattRolleMetricService(
 	private val ansattRolleMetricRepository: AnsattRolleMetricRepository,
 ) {
 
-	private val antallEndringsmeldingerPerTypeGauges: Map<RollePermutasjon, AtomicInteger>  = mapOf(
+	private val antallRolletypeGauges: Map<RollePermutasjon, AtomicInteger>  = mapOf(
 		RollePermutasjon.KOORDINATOR to registry.gauge(
 			antallAnsatteMedRoller, Tags.of("rolle", RollePermutasjon.KOORDINATOR.name), AtomicInteger(0)
 		)!!,
@@ -27,15 +27,10 @@ class AnsattRolleMetricService(
 	)
 
 	fun oppdaterMetrikker() {
-		antallEndringsmeldingerPerTypeGauges[RollePermutasjon.KOORDINATOR]?.set(
-			ansattRolleMetricRepository.antallAnsatteSomErKunKoordinator()
-		)
-		antallEndringsmeldingerPerTypeGauges[RollePermutasjon.VEILEDER]?.set(
-			ansattRolleMetricRepository.antallAnsatteSomErKunVeileder()
-		)
-		antallEndringsmeldingerPerTypeGauges[RollePermutasjon.KOORDINATOR_OG_VEILEDER]?.set(
-			ansattRolleMetricRepository.antallAnsatteSomHarBeggeRollene()
-		)
+		val metrikker = ansattRolleMetricRepository.getMetrikker()
+		antallRolletypeGauges[RollePermutasjon.KOORDINATOR]?.set(metrikker.antallKoordinatorer)
+		antallRolletypeGauges[RollePermutasjon.VEILEDER]?.set(metrikker.antallVeiledere)
+		antallRolletypeGauges[RollePermutasjon.KOORDINATOR_OG_VEILEDER]?.set(metrikker.antallMedBeggeRoller)
 	}
 
 	private enum class RollePermutasjon {
