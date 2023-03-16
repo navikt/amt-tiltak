@@ -1,9 +1,9 @@
 package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang.metrics
 
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.stereotype.Repository
+import org.springframework.stereotype.Component
 
-@Repository
+@Component
 open class AnsattRolleMetricRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
