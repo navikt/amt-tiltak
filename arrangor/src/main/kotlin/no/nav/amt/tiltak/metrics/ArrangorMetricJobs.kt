@@ -32,8 +32,8 @@ open class ArrangorMetricJobs(
 	)
 
 	private val tildeltVeilederGauges: Map<String, AtomicInteger> = mapOf(
-		Pair(antallAktiveDeltakere, registry.gauge(antallAnsatte, AtomicInteger(0))!!),
-		Pair(antallAktiveDeltakereMedVeileder, registry.gauge(loggetInnSisteTime, AtomicInteger(0))!!)
+		Pair(antallAktiveDeltakere, registry.gauge(antallAktiveDeltakere, AtomicInteger(0))!!),
+		Pair(antallAktiveDeltakereMedVeileder, registry.gauge(antallAktiveDeltakereMedVeileder, AtomicInteger(0))!!)
 	)
 
 
@@ -58,5 +58,4 @@ open class ArrangorMetricJobs(
 			tildeltVeilederGauges[antallAktiveDeltakereMedVeileder]?.set(metrics.antallMedVeileder)
 		}
 	}
-
 }
