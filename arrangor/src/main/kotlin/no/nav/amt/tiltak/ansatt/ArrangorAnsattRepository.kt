@@ -163,30 +163,4 @@ open class ArrangorAnsattRepository(
 		template.update(sql, sqlParameters("ansattId" to ansattId))
 	}
 
-	fun getAnsattMetrics(): AnsattMetrics {
-		val sql = """
-			select
-    		(select count(*) as antall_ansatte from arrangor_ansatt as antall_ansatte),
-    		(select count(*) as logged_in_last_hour from arrangor_ansatt where sist_velykkede_innlogging BETWEEN NOW() - INTERVAL '1 HOUR' AND NOW()),
-    		(select count(*) as logged_in_last_day from arrangor_ansatt where sist_velykkede_innlogging BETWEEN NOW() - INTERVAL '24 HOURS' AND NOW()),
-    		(select count(*) as logged_in_last_week from arrangor_ansatt where sist_velykkede_innlogging BETWEEN NOW() - INTERVAL '7 DAYS' AND NOW())
-		""".trimIndent()
-
-		return template.query(sql) { rs, _ ->
-			AnsattMetrics(
-				rs.getInt("antall_ansatte"),
-				rs.getInt("logged_in_last_hour"),
-				rs.getInt("logged_in_last_day"),
-				rs.getInt("logged_in_last_week"),
-			)
-		}.first()
-	}
-
-	data class AnsattMetrics(
-		val antallAnsatte: Int,
-		val antallAnsatteInnloggetSisteTime: Int,
-		val antallAnsatteInnloggetSisteDag: Int,
-		val antallAnsatteInnloggetSisteUke: Int
-	)
-
 }
