@@ -19,7 +19,6 @@ open class ArrangorMetricJobs(
 	private val loggetInnSisteTime = "amt_tiltak_arrangor_ansatt_innlogget_siste_1_time"
 	private val loggetInnSisteDag = "amt_tiltak_arrangor_ansatt_innlogget_siste_24_timer"
 	private val loggetInnSisteUke = "amt_tiltak_arrangor_ansatt_innlogget_siste_1_uke"
-	private val loggetInn = "amt_tiltak_arrangor_ansatte_innlogget"
 
 
 	private val antallAktiveDeltakere = "amt_tiltak_aktive_deltakere_antall"
@@ -29,13 +28,12 @@ open class ArrangorMetricJobs(
 
 	private val sistInnloggetGauges: Map<String, AtomicInteger> = mapOf(
 		Pair(antallAnsatte, registry.gauge(antallAnsatte, AtomicInteger(0))!!),
-		Pair(loggetInnSisteTime, registry.gauge(loggetInnSisteTime, AtomicInteger(0))!!),
 		Pair(loggetInnSisteDag, registry.gauge(loggetInnSisteDag, AtomicInteger(0))!!),
 		Pair(loggetInnSisteUke, registry.gauge(loggetInnSisteUke, AtomicInteger(0))!!)
 	)
 
 	private val sistInnloggetGauge = MultiGauge
-		.builder(loggetInn)
+		.builder(loggetInnSisteTime)
 		.description("Antall innloggede brukere siste time")
 		.register(registry)
 
@@ -65,7 +63,9 @@ open class ArrangorMetricJobs(
 				listOf(
 					MultiGauge.Row.of(Tags.of(Tag.of(rolleTagName, RollePermutasjon.KOORDINATOR.name)), metrics.antallKoordinatorer),
 					MultiGauge.Row.of(Tags.of(Tag.of(rolleTagName, RollePermutasjon.VEILEDER.name)), metrics.antallVeiledere),
-					MultiGauge.Row.of(Tags.of(Tag.of(rolleTagName, RollePermutasjon.KOORDINATOR_OG_VEILEDER.name)), metrics.antallBegge)
+					MultiGauge.Row.of(Tags.of(Tag.of(rolleTagName, RollePermutasjon.KOORDINATOR_OG_VEILEDER.name)), metrics.antallBegge),
+					MultiGauge.Row.of(Tags.of(Tag.of(rolleTagName, RollePermutasjon.ANY.name)), metrics.totaltAntallAnsatte)
+
 			))
 		}
 	}
@@ -83,6 +83,6 @@ open class ArrangorMetricJobs(
 	}
 
 	private enum class RollePermutasjon {
-		KOORDINATOR, VEILEDER, KOORDINATOR_OG_VEILEDER
+		KOORDINATOR, VEILEDER, KOORDINATOR_OG_VEILEDER, ANY
 	}
 }

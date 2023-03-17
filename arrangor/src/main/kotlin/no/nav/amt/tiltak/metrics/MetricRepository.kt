@@ -100,14 +100,16 @@ open class MetricRepository(
 			select
 				(select count(*) antall_koordinatorer from bare_koordinatorer),
 				(select count(*) antall_veiledere from bare_veiledere),
-				(select count(*) antall_begge from begge_roller);
+				(select count(*) antall_begge from begge_roller),
+				(select count(*) totalt_antall from ansatte_logget_inn)
 		""".trimIndent()
 
 		return template.query(sql) { rs, _ ->
 			SistInnloggedeRoller(
 				antallKoordinatorer = rs.getInt("antall_koordinatorer"),
 				antallVeiledere = rs.getInt("antall_veiledere"),
-				antallBegge = rs.getInt("antall_begge")
+				antallBegge = rs.getInt("antall_begge"),
+				totaltAntallAnsatte = rs.getInt("totalt_antall")
 			)
 		}.first()
 
@@ -117,7 +119,8 @@ open class MetricRepository(
 	data class SistInnloggedeRoller (
 		val antallKoordinatorer: Int,
 		val antallVeiledere: Int,
-		val antallBegge: Int
+		val antallBegge: Int,
+		val totaltAntallAnsatte: Int
 	)
 
 	data class SistInnlogget(
