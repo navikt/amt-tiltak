@@ -77,15 +77,19 @@ class GjennomforingServiceImpl(
 
 	override fun getGjennomforing(id: UUID): Gjennomforing {
 		return gjennomforingRepository.get(id)?.let { gjennomforingDbo ->
-			val (tiltak, arrangor) = getTiltakOgArrangor(gjennomforingDbo.tiltakId, gjennomforingDbo.arrangorId)
-			return@let gjennomforingDbo.toGjennomforing(tiltak, arrangor)
+			return@let getTiltakOgArrangorOgMapTilGjennomforing(gjennomforingDbo)
 		} ?: throw NoSuchElementException("Fant ikke gjennomforing: $id")
 	}
 
 	override fun getGjennomforinger(gjennomforingIder: List<UUID>): List<Gjennomforing> {
 		return gjennomforingRepository
 			.get(gjennomforingIder)
-			.map { getGjennomforing(it.id) }
+			.map { getTiltakOgArrangorOgMapTilGjennomforing(it) }
+	}
+
+	private fun getTiltakOgArrangorOgMapTilGjennomforing(gjennomforingDbo: GjennomforingDbo): Gjennomforing {
+		val (tiltak, arrangor) = getTiltakOgArrangor(gjennomforingDbo.tiltakId, gjennomforingDbo.arrangorId)
+		return gjennomforingDbo.toGjennomforing(tiltak, arrangor)
 	}
 
 	override fun getByArrangorId(arrangorId: UUID): List<Gjennomforing> {
