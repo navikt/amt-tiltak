@@ -79,12 +79,12 @@ open class MetricRepository(
 				ansatte_veiledere as (
 					select ansatt_id, sist_velykkede_innlogging
 					from ansatte_logget_inn
-					where rolle='${ArrangorAnsattRolle.VEILEDER}'
+					where rolle='${ArrangorAnsattRolle.VEILEDER.name}'
 				),
 				ansatte_koordinatorer as (
 					select ansatt_id, sist_velykkede_innlogging
 					from ansatte_logget_inn
-					where rolle='${ArrangorAnsattRolle.KOORDINATOR}'
+					where rolle='${ArrangorAnsattRolle.KOORDINATOR.name}'
 				),
 				begge_roller as (
 					select * from ansatte_veiledere intersect select * from ansatte_koordinatorer

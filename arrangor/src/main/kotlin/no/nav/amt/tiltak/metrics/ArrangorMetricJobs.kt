@@ -1,8 +1,7 @@
 package no.nav.amt.tiltak.metrics
 
+import io.micrometer.core.instrument.Gauge
 import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.core.instrument.MultiGauge
-import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Tags
 import no.nav.common.job.JobRunner
 import org.springframework.context.annotation.Configuration
@@ -11,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 @Configuration
 open class ArrangorMetricJobs(
-	registry: MeterRegistry,
+	private val registry: MeterRegistry,
 	private val metricRepository: MetricRepository
 ) {
 
@@ -24,25 +23,32 @@ open class ArrangorMetricJobs(
 	private val antallAktiveDeltakere = "amt_tiltak_aktive_deltakere_antall"
 	private val antallAktiveDeltakereMedVeileder = "amt_tiltak_aktive_deltakere_med_veileder_antall"
 
-
-
 	private val sistInnloggetGauges: Map<String, AtomicInteger> = mapOf(
 		Pair(antallAnsatte, registry.gauge(antallAnsatte, AtomicInteger(0))!!),
 		Pair(loggetInnSisteDag, registry.gauge(loggetInnSisteDag, AtomicInteger(0))!!),
 		Pair(loggetInnSisteUke, registry.gauge(loggetInnSisteUke, AtomicInteger(0))!!)
 	)
 
-	private val sistInnloggetGauge = MultiGauge
-		.builder(loggetInnSisteTime)
-		.description("Antall innloggede brukere siste time")
-		.register(registry)
 
 	private val tildeltVeilederGauges: Map<String, AtomicInteger> = mapOf(
 		Pair(antallAktiveDeltakere, registry.gauge(antallAktiveDeltakere, AtomicInteger(0))!!),
 		Pair(antallAktiveDeltakereMedVeileder, registry.gauge(antallAktiveDeltakereMedVeileder, AtomicInteger(0))!!)
 	)
 
+	private val rolleGauges: Map<RollePermutasjon, AtomicInteger> = emptyMap()
 
+	private fun setAntallRolleInnloggetGauge(rolle: RollePermutasjon, value: Int) {
+		val rolleTagName = "rolle"
+		if(rolleGauges.containsKey(rolle)) {
+			rolleGauges[rolle]?.set(value)
+		}
+		else {
+			val tags = Tags.of(rolleTagName, rolle.name)
+			Gauge.builder(loggetInnSisteTime, rolleGauges) { map -> map[rolle]!!.toDouble() }
+				.tags(tags)
+				.register(registry)
+		}
+	}
 	//Every 5 minutes
 	@Scheduled(cron = "0 */5 * ? * *")
 	open fun updateSistInnloggetMetrics() {
@@ -56,20 +62,14 @@ open class ArrangorMetricJobs(
 	@Scheduled(cron = "0 */10 * ? * *")
 	open fun updateSistInnloggetRolleMetrics() {
 		val metrics = metricRepository.getRolleInnloggetSisteTime()
-		val rolleTagName = "rolle"
 
 		JobRunner.run("oppdaterer_roller_innlogget_siste_time") {
-			sistInnloggetGauge.register(
-				listOf(
-					MultiGauge.Row.of(Tags.of(Tag.of(rolleTagName, RollePermutasjon.KOORDINATOR.name)), metrics.antallKoordinatorer),
-					MultiGauge.Row.of(Tags.of(Tag.of(rolleTagName, RollePermutasjon.VEILEDER.name)), metrics.antallVeiledere),
-					MultiGauge.Row.of(Tags.of(Tag.of(rolleTagName, RollePermutasjon.KOORDINATOR_OG_VEILEDER.name)), metrics.antallBegge),
-					MultiGauge.Row.of(Tags.of(Tag.of(rolleTagName, RollePermutasjon.ANY.name)), metrics.totaltAntallAnsatte)
-
-			))
+			setAntallRolleInnloggetGauge(RollePermutasjon.KOORDINATOR, metrics.antallKoordinatorer)
+			setAntallRolleInnloggetGauge(RollePermutasjon.VEILEDER, metrics.antallVeiledere)
+			setAntallRolleInnloggetGauge(RollePermutasjon.KOORDINATOR_OG_VEILEDER, metrics.antallBegge)
+			setAntallRolleInnloggetGauge(RollePermutasjon.ANY, metrics.totaltAntallAnsatte)
 		}
 	}
-
 
 	// Hver halve time
 	@Scheduled(cron = "0 */30 * ? * *")
