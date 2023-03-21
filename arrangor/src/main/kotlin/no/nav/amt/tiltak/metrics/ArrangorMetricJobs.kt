@@ -39,15 +39,14 @@ open class ArrangorMetricJobs(
 
 	private fun setAntallRolleInnloggetGauge(rolle: RollePermutasjon, value: Int) {
 		val rolleTagName = "rolle"
-		if(rolleGauges.containsKey(rolle)) {
-			rolleGauges[rolle]?.set(value)
-		}
-		else {
+		if(!rolleGauges.containsKey(rolle)) {
 			val tags = Tags.of(rolleTagName, rolle.name)
 			Gauge.builder(loggetInnSisteTime, rolleGauges) { map -> map[rolle]!!.toDouble() }
 				.tags(tags)
 				.register(registry)
 		}
+		rolleGauges[rolle]?.set(value)
+
 	}
 	//Every 5 minutes
 	@Scheduled(cron = "0 */5 * ? * *")
