@@ -101,7 +101,7 @@ open class MetricRepository(
 				(select count(*) antall_koordinatorer from bare_koordinatorer),
 				(select count(*) antall_veiledere from bare_veiledere),
 				(select count(*) antall_begge from begge_roller),
-				(select count(*) totalt_antall from ansatte_logget_inn)
+				(select count(distinct ansatt_id) totalt_antall from ansatte_logget_inn)
 		""".trimIndent()
 
 		return template.query(sql) { rs, _ ->
