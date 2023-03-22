@@ -49,6 +49,7 @@ spec:
       rules:
         - application: amt-tiltaksarrangor-flate
         - application: amt-tiltaksansvarlig-flate
+        - application: amt-tiltaksarrangor-bff
     outbound:
       rules:
         - application: amt-enhetsregister
