@@ -10,7 +10,6 @@ spec:
   port: 8080
   webproxy: true
   ingresses:
-    - https://amt-tiltak.dev.intern.nav.no
     - https://amt-tiltak.intern.dev.nav.no
   prometheus:
     enabled: true
