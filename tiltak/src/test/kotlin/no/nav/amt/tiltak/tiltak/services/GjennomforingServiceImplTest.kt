@@ -217,7 +217,6 @@ class GjennomforingServiceImplTest : FunSpec({
 		val tiltakInserted = TILTAK_1.toTiltak()
 		val oppdatertArrangor = ARRANGOR_2.toArrangor()
 
-		every { arrangorService.getArrangorById(ARRANGOR_1.id) } returns ARRANGOR_1.toArrangor()
 		every { arrangorService.getArrangorById(ARRANGOR_2.id) } returns oppdatertArrangor
 		every { tiltakService.getTiltakById(TILTAK_1.id) } returns tiltakInserted
 
