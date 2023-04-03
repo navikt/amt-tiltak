@@ -27,6 +27,12 @@ class GjennomforingServiceImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
+	// Noen gjennomføringer skal aldri oppdateres, ref https://confluence.adeo.no/pages/viewpage.action?pageId=535926750
+	private val GJENNOMFORINGER_SOM_IKKE_SKAL_OPPDATERES = listOf(
+		UUID.fromString("f5d4089b-a656-457a-85d8-2e74588902e2"),
+		UUID.fromString("c0c5e06e-9b93-4ddc-a60b-de397b442ece")
+	)
+
 	override fun upsert(gjennomforing: GjennomforingUpsert): Gjennomforing {
 		val storedGjennomforing = gjennomforingRepository.get(gjennomforing.id)
 
@@ -43,9 +49,14 @@ class GjennomforingServiceImpl(
 		storedGjennomforing: GjennomforingDbo,
 		updatedGjennomforing: GjennomforingUpsert,
 	): GjennomforingDbo {
+		if (storedGjennomforing.id in GJENNOMFORINGER_SOM_IKKE_SKAL_OPPDATERES) {
+			log.info("Oppdaterer ikke svartelistet gjennomføring med id ${storedGjennomforing.id}")
+			return storedGjennomforing
+		}
 		val update = storedGjennomforing.update(
 			storedGjennomforing.copy(
 				navn = updatedGjennomforing.navn,
+				arrangorId = updatedGjennomforing.arrangorId,
 				status = updatedGjennomforing.status,
 				startDato = updatedGjennomforing.startDato,
 				sluttDato = updatedGjennomforing.sluttDato,

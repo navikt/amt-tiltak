@@ -76,6 +76,7 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 			UPDATE gjennomforing
 			SET navn            = :navn,
 				status          = :status,
+				arrangor_id		= :arrangorId,
 				start_dato      = :startDato,
 				slutt_dato      = :sluttDato,
 				nav_enhet_id 	= :navEnhetId,
@@ -89,6 +90,7 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 			mapOf(
 				"navn" to gjennomforing.navn,
 				"status" to gjennomforing.status.name,
+				"arrangorId" to gjennomforing.arrangorId,
 				"startDato" to gjennomforing.startDato,
 				"sluttDato" to gjennomforing.sluttDato,
 				"opprettetAar" to gjennomforing.opprettetAar,
