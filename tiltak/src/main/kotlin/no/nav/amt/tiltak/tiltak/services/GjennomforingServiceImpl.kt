@@ -27,25 +27,36 @@ class GjennomforingServiceImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	override fun upsert(gjennomforing: GjennomforingUpsert): Gjennomforing {
+	// Noen gjennomføringer skal aldri bytte arrangør, ref https://confluence.adeo.no/pages/viewpage.action?pageId=535926750
+	private val gjennomforingerSomIkkeSkalBytteArrangor = listOf(
+		UUID.fromString("f5d4089b-a656-457a-85d8-2e74588902e2"),
+		UUID.fromString("c0c5e06e-9b93-4ddc-a60b-de397b442ece")
+	)
+
+	override fun upsert(gjennomforing: GjennomforingUpsert) {
 		val storedGjennomforing = gjennomforingRepository.get(gjennomforing.id)
 
-		val arrangor = arrangorService.getArrangorById(gjennomforing.arrangorId)
-		val tiltak = tiltakService.getTiltakById(gjennomforing.tiltakId)
 		if (storedGjennomforing != null) {
-			return updateGjennomforing(storedGjennomforing, gjennomforing).toGjennomforing(tiltak, arrangor)
+			updateGjennomforing(storedGjennomforing, gjennomforing)
+		} else {
+			gjennomforingRepository.insert(gjennomforing)
 		}
-
-		return gjennomforingRepository.insert(gjennomforing).toGjennomforing(tiltak, arrangor)
 	}
 
 	private fun updateGjennomforing(
 		storedGjennomforing: GjennomforingDbo,
 		updatedGjennomforing: GjennomforingUpsert,
-	): GjennomforingDbo {
+	) {
+		val arrangorId = if (storedGjennomforing.id in gjennomforingerSomIkkeSkalBytteArrangor) {
+			log.info("Oppdaterer ikke arrangørId for svartelistet gjennomføring med id ${storedGjennomforing.id}")
+			storedGjennomforing.arrangorId
+		} else {
+			updatedGjennomforing.arrangorId
+		}
 		val update = storedGjennomforing.update(
 			storedGjennomforing.copy(
 				navn = updatedGjennomforing.navn,
+				arrangorId = arrangorId,
 				status = updatedGjennomforing.status,
 				startDato = updatedGjennomforing.startDato,
 				sluttDato = updatedGjennomforing.sluttDato,
@@ -55,11 +66,8 @@ class GjennomforingServiceImpl(
 			)
 		)
 
-		return if (update.status == UpdateStatus.UPDATED) {
-			gjennomforingRepository
-				.update(update.updatedObject!!)
-		} else {
-			storedGjennomforing
+		if (update.status == UpdateStatus.UPDATED) {
+			gjennomforingRepository.update(update.updatedObject!!)
 		}
 	}
 

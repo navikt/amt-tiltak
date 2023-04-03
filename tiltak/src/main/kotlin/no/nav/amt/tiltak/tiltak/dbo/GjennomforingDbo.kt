@@ -43,6 +43,7 @@ data class GjennomforingDbo(
 		if (this != other) {
 			val updated = this.copy(
 				navn = other.navn,
+				arrangorId = other.arrangorId,
 				status = other.status,
 				startDato = other.startDato,
 				sluttDato = other.sluttDato,
