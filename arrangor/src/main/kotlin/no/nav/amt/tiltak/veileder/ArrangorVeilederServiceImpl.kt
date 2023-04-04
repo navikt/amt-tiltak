@@ -81,7 +81,9 @@ class ArrangorVeilederServiceImpl (
 			.map { it.id }
 			.distinct()
 
-		arrangorVeilederRepository.inaktiverVeilederPaGjennomforinger(ansattId, gjennomforingIder)
+		if (gjennomforingIder.isNotEmpty()) {
+			arrangorVeilederRepository.inaktiverVeilederPaGjennomforinger(ansattId, gjennomforingIder)
+		}
 	}
 
 	private fun inaktiverVeiledereSomSkalErstattes(veiledere: List<OpprettVeilederDbo>, deltakerIder: List<UUID>) {
