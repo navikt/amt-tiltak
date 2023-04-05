@@ -21,7 +21,8 @@ object TestData {
 			sluttDato = LocalDate.now().plusYears(3),
 			navEnhetId = enhet.id,
 			opprettetAar = 2020,
-			lopenr = 123
+			lopenr = 123,
+			erKurs = false
 		)
 
 	fun createDeltakerInput(bruker: BrukerInput, gjennomforing: GjennomforingInput) =
@@ -168,7 +169,8 @@ object TestData {
 		sluttDato = LocalDate.of(2050, 12, 30),
 		navEnhetId = NAV_ENHET_1.id,
 		opprettetAar = 2020,
-		lopenr = 123
+		lopenr = 123,
+		erKurs = false
 	)
 
 	val GJENNOMFORING_2 = GjennomforingInput(
@@ -181,7 +183,8 @@ object TestData {
 		sluttDato = LocalDate.of(2022, 2, 13),
 		navEnhetId = NAV_ENHET_2.id,
 		opprettetAar = 2020,
-		lopenr = 124
+		lopenr = 124,
+		erKurs = false
 	)
 
 	val GJENNOMFORING_3 = GjennomforingInput(
@@ -194,7 +197,8 @@ object TestData {
 		sluttDato = LocalDate.of(2022, 7, 12),
 		navEnhetId = NAV_ENHET_2.id,
 		opprettetAar = 2022,
-		lopenr = 439823
+		lopenr = 439823,
+		erKurs = false
 	)
 
 	val GJENNOMFORING_TILGANG_1 = ArrangorAnsattGjennomforingTilgangInput(

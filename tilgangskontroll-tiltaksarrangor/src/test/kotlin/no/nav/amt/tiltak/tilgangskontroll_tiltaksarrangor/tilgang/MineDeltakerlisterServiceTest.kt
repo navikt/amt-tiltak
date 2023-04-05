@@ -156,6 +156,7 @@ class MineDeltakerlisterServiceTest : FunSpec({
 				navEnhetId = null,
 				opprettetAar = 0,
 				lopenr = 1,
+				erKurs = false
 			), Gjennomforing(
 				id = GJENNOMFORING_2.id,
 				tiltak = mockk(),
@@ -167,6 +168,7 @@ class MineDeltakerlisterServiceTest : FunSpec({
 				navEnhetId = null,
 				opprettetAar = 0,
 				lopenr = 2,
+				erKurs = false
 		))
 
 		var aktiveGjennomforingTilganger = repository.hent(ARRANGOR_ANSATT_1.id)

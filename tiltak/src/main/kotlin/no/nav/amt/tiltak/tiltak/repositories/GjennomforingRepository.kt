@@ -25,6 +25,7 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 			navEnhetId = rs.getNullableUUID("nav_enhet_id"),
 			opprettetAar = rs.getInt("opprettet_aar"),
 			lopenr = rs.getInt("lopenr"),
+			erKurs = rs.getBoolean("er_kurs"),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime(),
 		)
@@ -35,7 +36,7 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 		//language=PostgreSQL
 		val sql = """
 		INSERT INTO gjennomforing(id, tiltak_id, arrangor_id, navn, status, start_dato,
-                           slutt_dato, nav_enhet_id, opprettet_aar, lopenr)
+                           slutt_dato, nav_enhet_id, opprettet_aar, lopenr, er_kurs)
 		VALUES (:id,
 				:tiltakId,
 				:arrangorId,
@@ -45,7 +46,8 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 				:sluttDato,
 				:navEnhetId,
 				:opprettetAar,
-				:lopenr
+				:lopenr,
+				:erKurs
 				)
 	""".trimIndent()
 
@@ -61,6 +63,7 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 				"navEnhetId" to gjennomforing.navEnhetId,
 				"opprettetAar" to gjennomforing.opprettetAar,
 				"lopenr" to gjennomforing.lopenr,
+				"erKurs" to gjennomforing.erKurs
 			)
 		)
 
@@ -82,6 +85,7 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 				nav_enhet_id 	= :navEnhetId,
 				opprettet_aar 	= :opprettetAar,
 				lopenr 			= :lopenr,
+				er_kurs			= :erKurs,
 				modified_at     = :modifiedAt
 			WHERE id = :id
 		""".trimIndent()
@@ -96,6 +100,7 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 				"opprettetAar" to gjennomforing.opprettetAar,
 				"navEnhetId" to gjennomforing.navEnhetId,
 				"lopenr" to gjennomforing.lopenr,
+				"erKurs" to gjennomforing.erKurs,
 				"modifiedAt" to gjennomforing.modifiedAt,
 				"id" to gjennomforing.id
 			)

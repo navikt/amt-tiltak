@@ -144,7 +144,8 @@ class AuditLoggerServiceImplTest {
 			sluttDato = null,
 			navEnhetId = null,
 			opprettetAar = 1,
-			lopenr = 1
+			lopenr = 1,
+			erKurs = false
 		)
 
 		val messageSlot = slot<CefMessage>()

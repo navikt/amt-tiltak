@@ -187,6 +187,23 @@ class GjennomforingServiceImplTest : FunSpec({
 		GJENNOMFORING_1.toGjennomforing(tiltakInserted, arrangorInserted) shouldBe gjennomforing
 	}
 
+
+	test("getGjennomforing - gjennomføring er kurs - returnerer gjennomføring") {
+		val gjennomforingId = UUID.randomUUID()
+		testDataRepository.insertNavEnhet(NAV_ENHET_1)
+		testDataRepository.insertTiltak(TILTAK_1)
+		testDataRepository.insertArrangor(ARRANGOR_1)
+		testDataRepository.insertGjennomforing(GJENNOMFORING_1.copy(id=gjennomforingId, erKurs = true))
+
+		val tiltakInserted = TILTAK_1.toTiltak()
+		val arrangorInserted = ARRANGOR_1.toArrangor()
+
+		every { arrangorService.getArrangorById(ARRANGOR_1.id) } returns arrangorInserted
+		every { tiltakService.getTiltakById(TILTAK_1.id) } returns tiltakInserted
+		service.getGjennomforing(gjennomforingId).id shouldBe gjennomforingId
+
+	}
+
 	test("getByLopenummer - returnerer alle gjennomføringer, uansett status") {
 		testDataRepository.insertNavEnhet(NAV_ENHET_1)
 		testDataRepository.insertTiltak(TILTAK_1)
@@ -231,7 +248,8 @@ class GjennomforingServiceImplTest : FunSpec({
 				sluttDato = GJENNOMFORING_1.sluttDato,
 				navEnhetId = NAV_ENHET_1.id,
 				lopenr = GJENNOMFORING_1.lopenr,
-				opprettetAar = GJENNOMFORING_1.opprettetAar
+				opprettetAar = GJENNOMFORING_1.opprettetAar,
+				erKurs = false
 			)
 		)
 

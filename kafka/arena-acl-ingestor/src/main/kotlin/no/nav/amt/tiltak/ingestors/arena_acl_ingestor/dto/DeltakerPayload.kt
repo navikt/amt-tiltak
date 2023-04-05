@@ -19,7 +19,8 @@ data class DeltakerPayload(
 	val innsokBegrunnelse: String?
 ) {
 	enum class Status {
-		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, FEILREGISTRERT, PABEGYNT, PABEGYNT_REGISTRERING
+		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, FEILREGISTRERT, PABEGYNT, PABEGYNT_REGISTRERING,
+		SOKT_INN, VURDERES, VENTELISTE, AVBRUTT // kurs statuser
 		//PABEGYNT er erstattet av PABEGYNT_REGISTRERING, men må beholdes så lenge statusen er på topicen
 
 	}
@@ -33,7 +34,6 @@ data class DeltakerPayload(
 		FERDIG,
 		AVLYST_KONTRAKT,
 		IKKE_MOTT,
-		FEILREGISTRERT,
 		ANNET
 	}
 }

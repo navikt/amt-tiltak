@@ -2,6 +2,9 @@ package no.nav.amt.tiltak.test.integration.tiltaksarrangor
 
 import com.jayway.jsonpath.JsonPath
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.GjennomforingDto
+import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData
@@ -209,6 +212,35 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 		JsonPath.parse(jsonBody).read<Int>("$.length()") shouldBe 2
 		JsonPath.parse(jsonBody).read<String>("$.[0].id") shouldBe GJENNOMFORING_1.id.toString()
 		JsonPath.parse(jsonBody).read<String>("$.[1].id") shouldBe skalVareSynligId.toString()
+
+	}
+
+	@Test
+	fun `hentTilgjengeligeGjennomforinger - kurstiltak tilgjengelig, toggle er av - skal ikke hente kurs`() {
+		val kurstiltak = GJENNOMFORING_1.copy(
+			id = UUID.randomUUID(),
+			navn = "Kurstiltak",
+			erKurs = true,
+		)
+		val ikkeKurstiltak = GJENNOMFORING_1.copy(
+			id = UUID.randomUUID(),
+		)
+		testDataRepository.insertGjennomforing(kurstiltak)
+		testDataRepository.insertGjennomforing(ikkeKurstiltak)
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/gjennomforing/tilgjengelig",
+			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
+		)
+
+		response.code shouldBe 200
+
+		val jsonBody = response.body!!.string()
+		val responseBody = JsonUtils.fromJsonString<List<GjennomforingDto>>(jsonBody)
+
+		responseBody.find { it.id == ikkeKurstiltak.id } shouldNotBe null
+		responseBody.find { it.id == kurstiltak.id } shouldBe null
 
 	}
 

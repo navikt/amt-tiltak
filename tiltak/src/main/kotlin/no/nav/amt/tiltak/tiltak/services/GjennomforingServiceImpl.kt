@@ -22,7 +22,7 @@ class GjennomforingServiceImpl(
 	private val tiltakService: TiltakService,
 	private val deltakerService: DeltakerService,
 	private val arrangorService: ArrangorService,
-	private val transactionTemplate: TransactionTemplate,
+	private val transactionTemplate: TransactionTemplate
 ) : GjennomforingService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -62,7 +62,8 @@ class GjennomforingServiceImpl(
 				sluttDato = updatedGjennomforing.sluttDato,
 				navEnhetId = updatedGjennomforing.navEnhetId,
 				lopenr = updatedGjennomforing.lopenr,
-				opprettetAar = updatedGjennomforing.opprettetAar
+				opprettetAar = updatedGjennomforing.opprettetAar,
+				erKurs = updatedGjennomforing.erKurs
 			)
 		)
 

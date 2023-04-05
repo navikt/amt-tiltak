@@ -17,6 +17,7 @@ data class GjennomforingInput(
 	val navEnhetId: UUID?,
 	val opprettetAar: Int,
 	val lopenr: Int,
+	val erKurs: Boolean
 ) {
 	fun toGjennomforing(tiltak: Tiltak, arrangor: Arrangor): Gjennomforing {
 		return Gjennomforing(
@@ -29,7 +30,8 @@ data class GjennomforingInput(
 			sluttDato = this.sluttDato,
 			navEnhetId = this.navEnhetId,
 			opprettetAar = this.opprettetAar,
-			lopenr = this.lopenr
+			lopenr = this.lopenr,
+			erKurs = this.erKurs
 		)
 	}
 }

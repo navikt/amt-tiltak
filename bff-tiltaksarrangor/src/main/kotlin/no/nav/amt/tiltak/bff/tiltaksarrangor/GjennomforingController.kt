@@ -8,6 +8,7 @@ import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.VEILED
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.*
+import no.nav.common.featuretoggle.UnleashClient
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -23,7 +24,8 @@ class GjennomforingController(
 	private val arrangorAnsattService: ArrangorAnsattService,
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
 	private val arrangorVeilederService: ArrangorVeilederService,
-	private val mineDeltakerlisterService: MineDeltakerlisterService
+	private val mineDeltakerlisterService: MineDeltakerlisterService,
+	private val unleashClient: UnleashClient
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -37,6 +39,7 @@ class GjennomforingController(
 
 		return gjennomforingService.getGjennomforinger(deltakerlisterLagtTil)
 			.filter { arrangorAnsattTilgangService.harRolleHosArrangor(ansatt.id, it.arrangor.id, KOORDINATOR) }
+			.filter { !it.erKurs || kursTiltakToggleEnabled() }
 			.filter(this::erSynligForArrangor)
 			.map { it.toDto() }
 	}
@@ -54,6 +57,7 @@ class GjennomforingController(
 			.filter { it.roller.contains(KOORDINATOR) }
 			.map { gjennomforingService.getByArrangorId(it.arrangorId) }
 			.flatten()
+			.filter { !it.erKurs || kursTiltakToggleEnabled() }
 			.filter(this::erSynligForArrangor)
 			.map { it.toDto() }
 	}
@@ -65,7 +69,7 @@ class GjennomforingController(
 		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
 
-		if (!erSynligForArrangor(gjennomforing)) {
+		if (!erSynligForArrangor(gjennomforing) || (gjennomforing.erKurs && !kursTiltakToggleEnabled())) {
 			throw ResponseStatusException(HttpStatus.FORBIDDEN)
 		}
 
@@ -99,6 +103,9 @@ class GjennomforingController(
 
 		if (!harLagtTilListe){
 			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ansatt $ansattId kan ikke hente deltaker før den er lagt til")
+		}
+		if(gjennomforing.erKurs && !kursTiltakToggleEnabled()) {
+			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ansatt $ansattId kan hente kurstiltak")
 		}
 
 		arrangorAnsattTilgangService.verifiserRolleHosArrangor(ansattId, gjennomforing.arrangor.id, KOORDINATOR)
@@ -167,6 +174,7 @@ class GjennomforingController(
 
 		return gjennomforingService.getGjennomforinger(gjennomforingIder)
 			.filter { erSynligForArrangor(it) }
+			.filter { !it.erKurs || kursTiltakToggleEnabled() }
 			.map { it.toDeltakerlisteDto() }
 	}
 
@@ -180,5 +188,9 @@ class GjennomforingController(
 		) return true
 
 		return false
+	}
+
+	private fun kursTiltakToggleEnabled(): Boolean {
+		return unleashClient.isEnabled("amt.eksponer-kurs")
 	}
 }

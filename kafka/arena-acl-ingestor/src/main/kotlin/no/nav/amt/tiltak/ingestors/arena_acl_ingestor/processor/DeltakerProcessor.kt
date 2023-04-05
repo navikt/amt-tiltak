@@ -48,7 +48,7 @@ class DeltakerProcessor(
 			return
 		}
 
-		val tiltaksgjennomforing = gjennomforingService.getGjennomforing(deltakerDto.gjennomforingId)
+		val gjennomforing = gjennomforingService.getGjennomforing(deltakerDto.gjennomforingId)
 
 		val status = DeltakerStatusInsert(
 			id = UUID.randomUUID(),
@@ -66,7 +66,7 @@ class DeltakerProcessor(
 			dagerPerUke = deltakerDto.dagerPerUke,
 			prosentStilling = deltakerDto.prosentDeltid,
 			registrertDato = deltakerDto.registrertDato,
-			gjennomforingId = tiltaksgjennomforing.id,
+			gjennomforingId = gjennomforing.id,
 			innsokBegrunnelse = deltakerDto.innsokBegrunnelse
 		)
 
@@ -86,7 +86,7 @@ class DeltakerProcessor(
 			}
 		}
 
-		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=${tiltaksgjennomforing.id}")
+		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=${gjennomforing.id}")
 	}
 
 	private fun tilDeltakerStatusType(status: DeltakerPayload.Status): DeltakerStatus.Type {
@@ -98,6 +98,10 @@ class DeltakerProcessor(
 			DeltakerPayload.Status.FEILREGISTRERT -> DeltakerStatus.Type.FEILREGISTRERT
 			DeltakerPayload.Status.PABEGYNT -> DeltakerStatus.Type.PABEGYNT_REGISTRERING
 			DeltakerPayload.Status.PABEGYNT_REGISTRERING -> DeltakerStatus.Type.PABEGYNT_REGISTRERING
+			DeltakerPayload.Status.SOKT_INN -> DeltakerStatus.Type.SOKT_INN
+			DeltakerPayload.Status.VURDERES -> DeltakerStatus.Type.VURDERES
+			DeltakerPayload.Status.VENTELISTE -> DeltakerStatus.Type.VENTELISTE
+			DeltakerPayload.Status.AVBRUTT -> DeltakerStatus.Type.AVBRUTT
 
 		}
 	}
@@ -112,7 +116,6 @@ class DeltakerProcessor(
 			DeltakerPayload.StatusAarsak.FERDIG -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.FERDIG)
 			DeltakerPayload.StatusAarsak.AVLYST_KONTRAKT -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.AVLYST_KONTRAKT)
 			DeltakerPayload.StatusAarsak.IKKE_MOTT -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.IKKE_MOTT)
-			DeltakerPayload.StatusAarsak.FEILREGISTRERT -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.FEILREGISTRERT)
 			DeltakerPayload.StatusAarsak.ANNET -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.ANNET, null)
 			else -> null
 		}

@@ -27,7 +27,16 @@ class GjennomforingIngestorImpl(
 		"AVKLARAG",
 		"VASV",
 		"ARBRRHDAG",
-		"DIGIOPPARB"
+		"DIGIOPPARB",
+		"JOBBK",
+		"GRUPPEAMO",
+		"GRUFAGYRKE"
+	)
+
+	private val kursTiltak = setOf(
+		"JOBBK",
+		"GRUPPEAMO",
+		"GRUFAGYRKE"
 	)
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -39,6 +48,7 @@ class GjennomforingIngestorImpl(
 			return
 		}
 		val gjennomforing = fromJsonString<GjennomforingMessage>(recordValue)
+		val erKurs = kursTiltak.contains(gjennomforing.tiltakstype.arenaKode)
 
 		if (!stottedeTiltak.contains(gjennomforing.tiltakstype.arenaKode)) {
 			log.info("Lagrer ikke gjennomføring med id ${gjennomforing.id} og tiltakstype ${gjennomforing.tiltakstype.arenaKode} fordi tiltaket ikke er støttet.")
@@ -74,6 +84,7 @@ class GjennomforingIngestorImpl(
 				navEnhetId = navEnhet?.id,
 				lopenr = arenaData.lopenr,
 				opprettetAar = arenaData.opprettetAar,
+				erKurs = erKurs
 			)
 		)
 
