@@ -51,7 +51,7 @@
         <mockk.version>1.12.0</mockk.version>
         <kotest.version>5.1.0</kotest.version>
         <okhttp.version>4.10.0</okhttp.version>
-        <token-support.version>2.1.9</token-support.version>
+        <token-support.version>3.0.10</token-support.version>
         <mock-oauth2-server.version>0.3.5</mock-oauth2-server.version>
         <common.version>2.2023.01.02_13.51-1c6adeb1653b</common.version>
         <logstash.version>7.2</logstash.version>
