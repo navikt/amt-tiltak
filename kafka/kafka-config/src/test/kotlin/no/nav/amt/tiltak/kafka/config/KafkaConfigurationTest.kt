@@ -49,6 +49,11 @@ class KafkaConfigurationTest {
 			deltakerTopic = deltakerTopic,
 			aktorV2Topic = aktorV2Topic,
 			virksomhetTopic = virksomhetTopic,
+			amtArrangorAnsattTopic = "",
+			amtArrangorTopic = "",
+			amtDeltakerTopic = "",
+			amtDeltakerlisteTopic = "",
+			amtEndringsmeldingTopic = ""
 		)
 
 		val kafkaProperties = object : KafkaProperties {

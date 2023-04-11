@@ -1,20 +1,22 @@
 package no.nav.amt.tiltak.bff.internal
 
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
+import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.common.job.JobRunner
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.util.*
 import javax.servlet.http.HttpServletRequest
 
 @Unprotected
 @RestController
 @RequestMapping("/internal/api/republisering")
 class RepubliseringController(
-	private val deltakerService: DeltakerService
+	private val deltakerService: DeltakerService,
+	private val dataPublisher: DataPublisherService
 ) {
 
 	@GetMapping("/deltakere")
@@ -23,6 +25,26 @@ class RepubliseringController(
 			JobRunner.runAsync("republiser_deltakere_kafka", deltakerService::republiserAlleDeltakerePaKafka)
 		} else {
 			throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
+		}
+	}
+
+	@PostMapping
+	fun republishAll(request: HttpServletRequest) {
+		if (isInternal(request)) {
+			JobRunner.runAsync("republiser_all_data_til_kafka", dataPublisher::publishAll)
+		} else {
+			throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
+		}
+	}
+
+	@PostMapping("/{type}/{id}")
+	fun republish(
+		@PathVariable("type") type: DataPublishType,
+		@PathVariable("id") id: UUID,
+		request: HttpServletRequest
+	) {
+		if (isInternal(request)) {
+			JobRunner.runAsync("republiser_${type}_${id}") { dataPublisher.publish(id, type) }
 		}
 	}
 

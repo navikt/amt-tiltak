@@ -27,6 +27,7 @@
         <module>tilgangskontroll-tiltaksansvarlig</module>
         <module>tilgangskontroll-tiltaksarrangor</module>
         <module>test-integration</module>
+        <module>data-publisher</module>
     </modules>
 
     <name>AMT-Tiltak</name>
@@ -305,6 +306,11 @@
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>bff-internal</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>data-publisher</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
