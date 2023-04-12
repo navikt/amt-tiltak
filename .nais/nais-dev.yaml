@@ -6,7 +6,7 @@ metadata:
   labels:
     team: amt
 spec:
-  image: ghcr.io/navikt/amt-tiltak/amt-tiltak:{{version}}
+  image: {{image}}
   port: 8080
   webproxy: true
   ingresses:
