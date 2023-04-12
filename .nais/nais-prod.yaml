@@ -64,6 +64,13 @@ spec:
         - application: mulighetsrommet-api
           namespace: team-mulighetsrommet
           cluster: prod-gcp
+      external:
+        - host: pdl-api.prod-fss-pub.nais.io
+        - host: nom-api.intern.nav.no
+        - host: norg2.prod-fss-pub.nais.io
+        - host: veilarbarena.prod-fss-pub.nais.io
+        - host: veilarboppfolging.prod-fss-pub.nais.io
+        - host: digdir-krr-proxy.intern.nav.no
   kafka:
     pool: nav-prod
   secureLogs:
