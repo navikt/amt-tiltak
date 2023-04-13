@@ -6,7 +6,7 @@ metadata:
   labels:
     team: amt
 spec:
-  image: ghcr.io/navikt/amt-tiltak/amt-tiltak:{{version}}
+  image: {{image}}
   port: 8080
   webproxy: true
   ingresses:
@@ -64,6 +64,13 @@ spec:
         - application: mulighetsrommet-api
           namespace: team-mulighetsrommet
           cluster: dev-gcp
+      external:
+        - host: pdl-api.dev-fss-pub.nais.io
+        - host: nom-api.dev.intern.nav.no
+        - host: norg2.dev-fss-pub.nais.io
+        - host: veilarbarena.dev-fss-pub.nais.io
+        - host: veilarboppfolging.dev-fss-pub.nais.io
+        - host: digdir-krr-proxy.dev.intern.nav.no
   kafka:
     pool: nav-dev
   secureLogs:

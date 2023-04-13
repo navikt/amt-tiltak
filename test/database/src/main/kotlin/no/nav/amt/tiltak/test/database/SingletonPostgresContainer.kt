@@ -49,6 +49,7 @@ object SingletonPostgresContainer {
 		val flyway: Flyway = Flyway.configure()
 			.dataSource(dataSource)
 			.connectRetries(10)
+			.cleanDisabled(false)
 			.load()
 
 		flyway.clean()

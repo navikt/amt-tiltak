@@ -31,7 +31,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 	internal fun `skal teste token autentisering`() {
 		val requestBuilders = listOf(
 			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/gjennomforing/${UUID.randomUUID()}"),
-			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/gjennomforing/"),
+			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/gjennomforing"),
 			Request.Builder().get()
 				.url("${serverUrl()}/api/tiltaksarrangor/gjennomforing/${UUID.randomUUID()}/koordinatorer"),
 			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/gjennomforing/tilgjengelig"),

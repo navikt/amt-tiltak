@@ -40,7 +40,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 
 		val response = sendRequest(
 			method = "GET",
-			url = "/api/nav-ansatt/gjennomforing/",
+			url = "/api/nav-ansatt/gjennomforing",
 			headers = mapOf("Authorization" to "Bearer $token")
 		)
 
@@ -62,7 +62,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 
 		val response = sendRequest(
 			method = "GET",
-			url = "/api/nav-ansatt/gjennomforing/",
+			url = "/api/nav-ansatt/gjennomforing",
 			headers = mapOf("Authorization" to "Bearer $token")
 		)
 

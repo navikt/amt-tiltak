@@ -47,13 +47,13 @@ class AuthServiceTest {
 		    authService.hentPersonligIdentTilInnloggetBruker()
 			fail("")
 		} catch (e: ResponseStatusException) {
-			assertEquals(HttpStatus.UNAUTHORIZED, e.status)
+			assertEquals(HttpStatus.UNAUTHORIZED, e.statusCode)
 			assertEquals("""401 UNAUTHORIZED "User is not authorized, valid token is missing"""", e.message)
 		}
 	}
 
 	@Test
-	fun `hentPersonligIdentTilInnloggetBruker skal kaste ResponseStatusException hvis token ikke har "pid"-claim`() {
+	fun `hentPersonligIdentTilInnloggetBruker skal kaste ResponseStatusException hvis token ikke har pid-claim`() {
 		val token = server.issueToken("tokenx", "test", "test").serialize()
 
 		val contextHolder = object : TokenValidationContextHolder {
@@ -75,7 +75,7 @@ class AuthServiceTest {
 			authService.hentPersonligIdentTilInnloggetBruker()
 			fail("")
 		} catch (e: ResponseStatusException) {
-			assertEquals(HttpStatus.UNAUTHORIZED, e.status)
+			assertEquals(HttpStatus.UNAUTHORIZED, e.statusCode)
 			assertEquals("""401 UNAUTHORIZED "PID is missing or is not a string"""", e.message)
 		}
 	}

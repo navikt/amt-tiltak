@@ -5,13 +5,14 @@ on:
     branches:
       - main
 env:
-  IMAGE_TAG: ${{ github.sha }}
-  IMAGE: ghcr.io/${{ github.repository }}/amt-tiltak
   PRINT_PAYLOAD: true
   TZ: Europe/Oslo
 
 jobs:
   test-build-and-push:
+    permissions:
+      contents: "read"
+      id-token: "write"
     name: Test, build and push
     runs-on: ubuntu-latest
     steps:
@@ -30,13 +31,16 @@ jobs:
           restore-keys: ${{ runner.os }}-maven-
       - name: Build maven artifacts
         run: mvn -B package
-      - name: Build and push Docker image
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo ${GITHUB_TOKEN} | docker login ghcr.io -u ${GITHUB_REPOSITORY} --password-stdin
-          docker build -t ${IMAGE}:${IMAGE_TAG} .
-          docker push ${IMAGE}:${IMAGE_TAG}
+      - name: docker-build-push
+        uses: nais/docker-build-push@v0
+        id: docker-build-push
+        with:
+          team: amt
+          tag: ${{ github.sha }}
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+    outputs:
+      image: ${{ steps.docker-build-push.outputs.image }}
 
   deploy-dev:
     name: Deploy application to dev
@@ -46,39 +50,39 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Deploy application
-        uses: nais/deploy/actions/deploy@v1
+        uses: nais/deploy/actions/deploy@master
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: .nais/nais-dev.yaml
           VARS: .nais/vars-dev.yaml
-          VAR: version=${{ env.IMAGE_TAG }}
+          VAR: image=${{ needs.test-build-and-push.outputs.image }}
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
           name: Release to dev
-          tag_name: release/dev@${{ env.IMAGE_TAG }}
+          tag_name: release/dev@${{ github.sha }}
           prerelease: true
 
   deploy-prod:
     name: Deploy application to prod
-    needs: deploy-dev
+    needs: [ test-build-and-push, deploy-dev ]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Deploy application
-        uses: nais/deploy/actions/deploy@v1
+        uses: nais/deploy/actions/deploy@master
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
           RESOURCE: .nais/nais-prod.yaml
           VARS: .nais/vars-prod.yaml
-          VAR: version=${{ env.IMAGE_TAG }}
+          VAR: image=${{ needs.test-build-and-push.outputs.image }}
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
           name: Release to prod
-          tag_name: release/prod@${{ env.IMAGE_TAG }}
+          tag_name: release/prod@${{ github.sha }}
           prerelease: false
