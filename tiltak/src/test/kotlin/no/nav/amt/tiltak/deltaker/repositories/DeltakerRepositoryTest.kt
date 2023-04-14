@@ -222,7 +222,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		deltakerStatusRepository.insert(statusInsertDbo)
 
-		val potensieltHarSlutta = repository.skalAvsluttes().filter { it.id == deltakerId }
+		val potensieltHarSlutta = repository.sluttDatoPassert().filter { it.id == deltakerId }
 
 		potensieltHarSlutta shouldHaveSize 1
 		potensieltHarSlutta[0] shouldBe deltaker
@@ -249,7 +249,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		repository.insert(deltakerInsertDbo)
 		deltakerStatusRepository.insert(statusInsertDbo)
 
-		val potensieltHarSlutta = repository.skalAvsluttes().filter { it.id == BRUKER_3.id }
+		val potensieltHarSlutta = repository.sluttDatoPassert().filter { it.id == BRUKER_3.id }
 
 		potensieltHarSlutta shouldHaveSize 0
 	}

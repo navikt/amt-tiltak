@@ -173,6 +173,20 @@ object TestData {
 		erKurs = false
 	)
 
+	val GJENNOMFORING_KURS = GjennomforingInput(
+		id = UUID.randomUUID(),
+		tiltakId = TILTAK_1.id,
+		arrangorId = ARRANGOR_1.id,
+		navn = "Kurstiltak",
+		status = "GJENNOMFORES",
+		startDato = LocalDate.of(2022, 2, 1),
+		sluttDato = LocalDate.of(2050, 12, 30),
+		navEnhetId = NAV_ENHET_1.id,
+		opprettetAar = 2020,
+		lopenr = 123,
+		erKurs = true
+	)
+
 	val GJENNOMFORING_2 = GjennomforingInput(
 		id = UUID.fromString("513219ca-481b-4aae-9d51-435dba9929cd"),
 		tiltakId = TILTAK_1.id,

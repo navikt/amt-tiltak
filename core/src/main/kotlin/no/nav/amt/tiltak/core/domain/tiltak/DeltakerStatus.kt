@@ -41,16 +41,15 @@ val AVSLUTTENDE_STATUSER = listOf(
 	DeltakerStatus.Type.AVBRUTT
 )
 
-val HAR_IKKE_STARTET_STATUSER = listOf(
-	DeltakerStatus.Type.VENTER_PA_OPPSTART,
+
+val VENTER_PAA_PLASS_STATUSER = listOf(
 	DeltakerStatus.Type.SOKT_INN,
 	DeltakerStatus.Type.VURDERES,
 	DeltakerStatus.Type.VENTELISTE,
 	DeltakerStatus.Type.PABEGYNT_REGISTRERING
 )
-fun DeltakerStatus.erAvsluttende() : Boolean {
-	return type in AVSLUTTENDE_STATUSER
-}
+
+val HAR_IKKE_STARTET_STATUSER = listOf(DeltakerStatus.Type.VENTER_PA_OPPSTART).plus(VENTER_PAA_PLASS_STATUSER)
 
 fun DeltakerStatus.harIkkeStartet() : Boolean {
 	return type in HAR_IKKE_STARTET_STATUSER

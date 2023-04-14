@@ -246,7 +246,7 @@ open class DeltakerRepository(
 		""".trimIndent()
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"avsluttende_statuser" to AVSLUTTENDE_STATUSER,
+				"avsluttende_statuser" to AVSLUTTENDE_STATUSER.map { it.name },
 				"gjennomforing_status" to Gjennomforing.Status.AVSLUTTET.name
 			)
 		)

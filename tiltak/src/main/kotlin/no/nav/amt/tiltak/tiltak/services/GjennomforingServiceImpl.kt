@@ -5,7 +5,6 @@ import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
@@ -13,16 +12,13 @@ import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.utils.UpdateStatus
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import org.springframework.transaction.support.TransactionTemplate
 import java.util.*
 
 @Service
 class GjennomforingServiceImpl(
 	private val gjennomforingRepository: GjennomforingRepository,
 	private val tiltakService: TiltakService,
-	private val deltakerService: DeltakerService,
 	private val arrangorService: ArrangorService,
-	private val transactionTemplate: TransactionTemplate
 ) : GjennomforingService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -73,14 +69,7 @@ class GjennomforingServiceImpl(
 	}
 
 	override fun slettGjennomforing(gjennomforingId: UUID) {
-		transactionTemplate.execute {
-			deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId).forEach {
-				deltakerService.slettDeltaker(it.id)
-			}
-
-			gjennomforingRepository.delete(gjennomforingId)
-		}
-
+		gjennomforingRepository.delete(gjennomforingId)
 		log.info("Gjennomføring med id=$gjennomforingId er slettet")
 	}
 
