@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.bff.internal
 
+import jakarta.servlet.http.HttpServletRequest
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType

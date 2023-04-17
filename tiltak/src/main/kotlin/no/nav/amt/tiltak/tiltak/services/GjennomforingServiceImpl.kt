@@ -97,12 +97,7 @@ class GjennomforingServiceImpl(
 	}
 
 	override fun getGjennomforinger(gjennomforingIder: List<UUID>): List<Gjennomforing> {
-		return gjennomforingRepository
-			.get(gjennomforingIder)
-			.map {
-				val (tiltak, arrangor) = getTiltakOgArrangor(it.tiltakId, it.arrangorId)
-				it.toGjennomforing(tiltak, arrangor)
-			}
+		return gjennomforingRepository.getGjennomforingWithArrangorAndTiltak(gjennomforingIder)
 	}
 
 	override fun getByArrangorId(arrangorId: UUID): List<Gjennomforing> {

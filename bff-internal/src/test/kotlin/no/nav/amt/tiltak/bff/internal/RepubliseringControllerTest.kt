@@ -4,12 +4,12 @@ import io.kotest.assertions.throwables.shouldThrowExactly
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import jakarta.servlet.http.HttpServletRequest
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.test.utils.AsyncUtils
 import org.junit.jupiter.api.Test
 import org.springframework.web.server.ResponseStatusException
-import javax.servlet.http.HttpServletRequest
 
 class RepubliseringControllerTest {
 
