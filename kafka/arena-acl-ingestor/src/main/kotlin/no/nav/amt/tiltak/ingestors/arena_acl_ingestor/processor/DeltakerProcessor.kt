@@ -1,13 +1,15 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 
+import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.Gjennomforing
+import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.MulighetsrommetApiClient
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
-import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.core.port.PersonService
+import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
+import no.nav.amt.tiltak.core.port.*
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
+import no.nav.amt.tiltak.kafka.tiltaksgjennomforing_ingestor.GjennomforingStatusConverter
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
@@ -18,6 +20,10 @@ class DeltakerProcessor(
 	private val gjennomforingService: GjennomforingService,
 	private val deltakerService: DeltakerService,
 	private val personService: PersonService,
+	private val arrangorService: ArrangorService,
+	private val tiltakService: TiltakService,
+	private val navEnhetService: NavEnhetService,
+	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
 	private val transactionTemplate: TransactionTemplate
 ) : GenericProcessor<DeltakerPayload>() {
 
@@ -48,7 +54,8 @@ class DeltakerProcessor(
 			return
 		}
 
-		val gjennomforing = gjennomforingService.getGjennomforing(deltakerDto.gjennomforingId)
+		val gjennomforingId = gjennomforingService.getGjennomforingOrNull(deltakerDto.gjennomforingId)?.id
+			?: ingestGjennomforing(deltakerDto.gjennomforingId).id
 
 		val status = DeltakerStatusInsert(
 			id = UUID.randomUUID(),
@@ -66,7 +73,7 @@ class DeltakerProcessor(
 			dagerPerUke = deltakerDto.dagerPerUke,
 			prosentStilling = deltakerDto.prosentDeltid,
 			registrertDato = deltakerDto.registrertDato,
-			gjennomforingId = gjennomforing.id,
+			gjennomforingId = gjennomforingId,
 			innsokBegrunnelse = deltakerDto.innsokBegrunnelse
 		)
 
@@ -86,9 +93,44 @@ class DeltakerProcessor(
 			}
 		}
 
-		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=${gjennomforing.id}")
+		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=${gjennomforingId}")
 	}
 
+	private fun ingestGjennomforing(gjennomforingId: UUID): Gjennomforing {
+		val gjennomforing = mulighetsrommetApiClient.hentGjennomforing(gjennomforingId)
+		val gjennomforingArenaData = mulighetsrommetApiClient.hentGjennomforingArenaData(gjennomforingId)
+		if (gjennomforingArenaData.virksomhetsnummer == null) {
+			throw IllegalStateException("Lagrer ikke gjennomføring med id ${gjennomforing.id} og tiltakstype ${gjennomforing.tiltakstype.arenaKode} fordi virksomhetsnummer mangler.")
+		}
+
+		val arrangor = arrangorService.upsertArrangor(gjennomforingArenaData.virksomhetsnummer!!)
+
+		val tiltak = tiltakService.upsertTiltak(
+			gjennomforing.tiltakstype.id,
+			gjennomforing.tiltakstype.navn,
+			gjennomforing.tiltakstype.arenaKode
+		)
+
+		val navEnhet = gjennomforingArenaData.ansvarligNavEnhetId.let { navEnhetService.getNavEnhet(it) }
+
+		gjennomforingService.upsert(
+			GjennomforingUpsert(
+				id = gjennomforing.id,
+				tiltakId = tiltak.id,
+				arrangorId = arrangor.id,
+				navn = gjennomforing.navn,
+				status = GjennomforingStatusConverter.convert(gjennomforingArenaData.status),
+				startDato = gjennomforing.startDato,
+				sluttDato = gjennomforing.sluttDato,
+				navEnhetId = navEnhet?.id,
+				lopenr = gjennomforingArenaData.lopenr,
+				opprettetAar = gjennomforingArenaData.opprettetAar,
+				erKurs = gjennomforing.erKurs()
+			)
+		)
+		return gjennomforing
+
+	}
 	private fun tilDeltakerStatusType(status: DeltakerPayload.Status): DeltakerStatus.Type {
 		return when(status){
 			DeltakerPayload.Status.VENTER_PA_OPPSTART -> DeltakerStatus.Type.VENTER_PA_OPPSTART

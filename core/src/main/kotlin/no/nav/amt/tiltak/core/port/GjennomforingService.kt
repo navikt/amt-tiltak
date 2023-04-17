@@ -8,6 +8,8 @@ interface GjennomforingService {
 
 	fun getGjennomforing(id: UUID): Gjennomforing
 
+	fun getGjennomforingOrNull(id: UUID): Gjennomforing?
+
 	fun getGjennomforinger(gjennomforingIder: List<UUID>): List<Gjennomforing>
 
 	fun getByArrangorId(arrangorId: UUID): List<Gjennomforing>
