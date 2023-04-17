@@ -40,7 +40,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 	internal fun `skal teste token autentisering`() {
 		val requestBuilders = listOf(
 			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/endringsmelding/aktiv?deltakerId=${UUID.randomUUID()}"),
-			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/endringsmelding/${UUID.randomUUID()}/tilbakekall/"),
+			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/endringsmelding/${UUID.randomUUID()}/tilbakekall"),
 		)
 
 		testTiltaksarrangorAutentisering(requestBuilders, client, mockOAuthServer)
@@ -89,7 +89,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 	fun `tilbakekallEndringsmelding() skal returnere 403 om Ansatt kun er veileder`() {
 		val response = sendRequest(
 			method = "PATCH",
-			url = "/api/tiltaksarrangor/endringsmelding/${ENDRINGSMELDING_1_DELTAKER_1.id}/tilbakekall/",
+			url = "/api/tiltaksarrangor/endringsmelding/${ENDRINGSMELDING_1_DELTAKER_1.id}/tilbakekall",
 			headers = createAnsatt2AuthHeader(),
 			body = emptyRequest(),
 		)
@@ -102,7 +102,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 	fun `tilbakekallEndringsmelding() - skal returnere 200 om endringsmeldingen ble tilbakekalt`() {
 		val response = sendRequest(
 			method = "PATCH",
-			url = "/api/tiltaksarrangor/endringsmelding/${ENDRINGSMELDING_1_DELTAKER_1.id}/tilbakekall/",
+			url = "/api/tiltaksarrangor/endringsmelding/${ENDRINGSMELDING_1_DELTAKER_1.id}/tilbakekall",
 			headers = createAnsatt1AuthHeader(),
 			body = emptyRequest(),
 		)
@@ -121,7 +121,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
 		val response = sendRequest(
 			method = "PATCH",
-			url = "/api/tiltaksarrangor/endringsmelding/${utfortEndringsmelding.id}/tilbakekall/",
+			url = "/api/tiltaksarrangor/endringsmelding/${utfortEndringsmelding.id}/tilbakekall",
 			headers = createAnsatt1AuthHeader(),
 			body = emptyRequest(),
 		)

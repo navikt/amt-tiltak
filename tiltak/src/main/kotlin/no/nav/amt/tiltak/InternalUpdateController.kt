@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak
 
+import jakarta.servlet.http.HttpServletRequest
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.common.job.JobRunner
 import no.nav.security.token.support.core.api.Unprotected
@@ -7,8 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.*
-import javax.servlet.http.HttpServletRequest
+import java.util.UUID
 
 @RestController
 @RequestMapping("/internal")

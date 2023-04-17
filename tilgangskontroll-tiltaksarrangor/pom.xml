@@ -33,7 +33,7 @@
             <artifactId>shedlock-spring</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.common</groupId>
+            <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>job</artifactId>
         </dependency>
         <dependency>
