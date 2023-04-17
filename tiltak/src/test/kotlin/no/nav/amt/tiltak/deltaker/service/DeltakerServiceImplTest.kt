@@ -5,6 +5,7 @@ import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.common.json.JsonUtils
@@ -15,6 +16,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.NavEnhetService
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
@@ -62,6 +64,7 @@ class DeltakerServiceImplTest {
 	lateinit var skjultDeltakerRepository: SkjultDeltakerRepository
 	lateinit var kafkaProducerService: KafkaProducerService
 	lateinit var objectMapper: ObjectMapper
+	lateinit var publisherService: DataPublisherService
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 	val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
@@ -75,13 +78,14 @@ class DeltakerServiceImplTest {
 		navEnhetService = mockk()
 		endringsmeldingService = mockk()
 		kafkaProducerService = mockk(relaxUnitFun = true)
+		publisherService = mockk()
 		brukerService = BrukerServiceImpl(brukerRepository, mockk(), mockk(), navEnhetService)
 		objectMapper = JsonUtils.objectMapper
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		skjultDeltakerRepository = SkjultDeltakerRepository(jdbcTemplate)
 		endringsmeldingRepository = EndringsmeldingRepository(jdbcTemplate, objectMapper)
-		endringsmeldingService = EndringsmeldingServiceImpl(endringsmeldingRepository, mockk(), transactionTemplate)
+		endringsmeldingService = EndringsmeldingServiceImpl(endringsmeldingRepository, mockk(), transactionTemplate, publisherService)
 
 		deltakerServiceImpl = DeltakerServiceImpl(
 			deltakerRepository = deltakerRepository,
@@ -91,10 +95,12 @@ class DeltakerServiceImplTest {
 			skjultDeltakerRepository = skjultDeltakerRepository,
 			transactionTemplate = transactionTemplate,
 			kafkaProducerService = kafkaProducerService,
+			publisherService = publisherService
 		)
 		testDataRepository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
 
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource, TestDataSeeder::insertMinimum)
+		every { publisherService.publish(any(), any()) } returns Unit
 	}
 
 	@AfterEach

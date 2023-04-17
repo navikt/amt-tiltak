@@ -8,6 +8,7 @@ import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.exceptions.EndringsmeldingIkkeAktivException
 import no.nav.amt.tiltak.core.port.AuditLoggerService
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
@@ -28,13 +29,18 @@ class EndringsmeldingServiceImplTest {
 
 	lateinit var transactionTemplate: TransactionTemplate
 
+	lateinit var publisherService: DataPublisherService
+
 
 	@BeforeEach
 	fun beforeEach() {
 		repository = mockk(relaxUnitFun = true)
 		auditLoggerService = mockk(relaxUnitFun = true)
 		transactionTemplate = mockk()
-		endringsmeldingService = EndringsmeldingServiceImpl(repository, auditLoggerService, transactionTemplate)
+		publisherService = mockk()
+		endringsmeldingService = EndringsmeldingServiceImpl(repository, auditLoggerService, transactionTemplate, publisherService)
+
+		every { publisherService.publish(any(), any()) } returns Unit
 	}
 
 	@Test

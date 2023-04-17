@@ -130,6 +130,16 @@ spec:
       value: pdl.leesah-v1
     - name: DELTAKER_TOPIC
       value: amt.deltaker-v1
+    - name: DELTAKER_TOPIC_V2
+      value: amt.deltaker-v2
+    - name: DELTAKERLISTE_TOPIC
+      value: amt.deltakerliste-v1
+    - name: ARRANGOR_TOPIC
+      value: amt.amt.arrangor-v1
+    - name: ARRANGOR_ANSATT_TOPIC
+      value: amt.amt.arrangor-ansatt-v1
+    - name: ENDRINGSMELDIG_TOPIC
+      value: amt.endringsmelding-v1
     - name: AKTOR_V2_TOPIC
       value: pdl.aktor-v2
     - name: VIRKSOMHET_TOPIC

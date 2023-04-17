@@ -7,6 +7,7 @@ import io.mockk.mockk
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
 import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
@@ -44,6 +45,7 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 	val navAnsattService: NavAnsattService = mockk()
 	val navEnhetService: NavEnhetService = mockk()
 	val endringsmeldingService: EndringsmeldingService = mockk()
+	val publisherService: DataPublisherService = mockk()
 
 	lateinit var dataSource: DataSource
 	lateinit var jdbcTemplate: NamedParameterJdbcTemplate
@@ -69,9 +71,12 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 			endringsmeldingService,
 			mockk(),
 			TransactionTemplate(),
-			mockk()
+			mockk(),
+			publisherService
 		)
 		endringPaaBrukerIngestorImpl = EndringPaaBrukerIngestorImpl(deltakerService, navEnhetService)
+
+		every { publisherService.publish(any(), any()) } returns Unit
 	}
 
 	@Test

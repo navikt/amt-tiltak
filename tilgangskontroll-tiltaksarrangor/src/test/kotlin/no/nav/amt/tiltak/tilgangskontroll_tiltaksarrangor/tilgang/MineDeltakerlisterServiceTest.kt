@@ -11,6 +11,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
@@ -42,6 +43,9 @@ class MineDeltakerlisterServiceTest : FunSpec({
 
 	lateinit var gjennomforingService: GjennomforingService
 
+	lateinit var publisherService: DataPublisherService
+
+
 	beforeEach {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 		rootLogger.level = Level.WARN
@@ -56,10 +60,13 @@ class MineDeltakerlisterServiceTest : FunSpec({
 
 		gjennomforingService = mockk()
 
-		service = MineDeltakerlisterServiceImpl(repository, gjennomforingService, transactionTemplate)
+		publisherService = mockk()
+
+		service = MineDeltakerlisterServiceImpl(repository, gjennomforingService, transactionTemplate, publisherService)
 
 
 		DbTestDataUtils.cleanDatabase(dataSource)
+		every { publisherService.publish(any(), any()) } returns Unit
 
 		testRepository.insertNavEnhet(NAV_ENHET_1)
 		testRepository.insertArrangor(ARRANGOR_1)

@@ -2,6 +2,8 @@ package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang
 
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.MineDeltakerlisterService
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
+import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.ZonedDateTime
@@ -11,7 +13,8 @@ import java.util.*
 open class MineDeltakerlisterServiceImpl(
 	private val mineDeltakerlisterRepository: MineDeltakerlisterRepository,
 	private val gjennomforingService: GjennomforingService,
-	private val transactionTemplate: TransactionTemplate
+	private val transactionTemplate: TransactionTemplate,
+	private val publisherService: DataPublisherService
 ): MineDeltakerlisterService {
 
 	private val defaultGyldigTil = ZonedDateTime.parse("3000-01-01T00:00:00.00000+00:00")
@@ -34,10 +37,13 @@ open class MineDeltakerlisterServiceImpl(
 			gyldigTil = defaultGyldigTil
 		)
 
+		publisherService.publish(arrangorAnsattId, DataPublishType.ARRANGOR_ANSATT)
+
 	}
 
 	override fun fjern(arrangorAnsattId: UUID, gjennomforingId: UUID) {
 		mineDeltakerlisterRepository.fjern(arrangorAnsattId, gjennomforingId)
+		publisherService.publish(arrangorAnsattId, DataPublishType.ARRANGOR_ANSATT)
 	}
 
 	override fun fjernAlleHosArrangor(arrangorAnsattId: UUID, arrangorId: UUID) {
@@ -50,6 +56,7 @@ open class MineDeltakerlisterServiceImpl(
 				.filter { tilgang -> gjennomforinger.any { tilgang.gjennomforingId == it.id } }
 				.forEach { fjern(arrangorAnsattId, it.gjennomforingId) }
 		}
+		publisherService.publish(arrangorAnsattId, DataPublishType.ARRANGOR_ANSATT)
 	}
 
 	override fun hent(ansattId: UUID): List<UUID> {

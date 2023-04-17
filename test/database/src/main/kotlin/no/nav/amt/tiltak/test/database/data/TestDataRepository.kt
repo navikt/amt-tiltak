@@ -49,23 +49,27 @@ class TestDataRepository(
 		)
 	}
 
-	fun getArrangorAnsattGjennomforingTilganger(arrangorAnsattId: UUID) : List<ArrangorAnsattGjennomforingTilgangOutput> {
+	fun getArrangorAnsattGjennomforingTilganger(arrangorAnsattId: UUID): List<ArrangorAnsattGjennomforingTilgangOutput> {
 		val sql = """
 			SELECT * FROM arrangor_ansatt_gjennomforing_tilgang WHERE ansatt_id = :ansattId
 		""".trimIndent()
 
-		val rowMapper = RowMapper { rs, _ -> ArrangorAnsattGjennomforingTilgangOutput(
-			id = rs.getUUID("id"),
-			ansattId = rs.getUUID("ansatt_id"),
-			gjennomforingId = rs.getUUID("gjennomforing_id"),
-			gyldigFra = rs.getZonedDateTime("gyldig_fra"),
-			gyldigTil = rs.getZonedDateTime("gyldig_til"),
-			createdAt = rs.getZonedDateTime("created_at"),
-		)}
+		val rowMapper = RowMapper { rs, _ ->
+			ArrangorAnsattGjennomforingTilgangOutput(
+				id = rs.getUUID("id"),
+				ansattId = rs.getUUID("ansatt_id"),
+				gjennomforingId = rs.getUUID("gjennomforing_id"),
+				gyldigFra = rs.getZonedDateTime("gyldig_fra"),
+				gyldigTil = rs.getZonedDateTime("gyldig_til"),
+				createdAt = rs.getZonedDateTime("created_at"),
+			)
+		}
 
-		return template.query(sql, parameters(
-			"ansattId" to arrangorAnsattId,
-		), rowMapper)
+		return template.query(
+			sql, parameters(
+				"ansattId" to arrangorAnsattId,
+			), rowMapper
+		)
 	}
 
 	fun deleteAllArrangorAnsattGjennomforingTilganger() {
@@ -95,6 +99,27 @@ class TestDataRepository(
 		val sql = """
 			INSERT INTO arrangor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer, navn)
 			VALUES (:id, :overordnet_enhet_organisasjonsnummer, :overordnet_enhet_navn, :organisasjonsnummer, :navn)
+		""".trimIndent()
+
+		template.update(
+			sql, parameters(
+				"id" to cmd.id,
+				"overordnet_enhet_organisasjonsnummer" to cmd.overordnetEnhetOrganisasjonsnummer,
+				"overordnet_enhet_navn" to cmd.overordnetEnhetNavn,
+				"organisasjonsnummer" to cmd.organisasjonsnummer,
+				"navn" to cmd.navn,
+			)
+		)
+	}
+
+	fun updateArrangor(cmd: ArrangorInput) {
+		val sql = """
+			UPDATE arrangor
+			SET overordnet_enhet_navn = :overordnet_enhet_navn,
+				overordnet_enhet_organisasjonsnummer = :overordnet_enhet_organisasjonsnummer,
+				organisasjonsnummer = :organisasjonsnummer,
+				navn = :navn
+			WHERE id = :id
 		""".trimIndent()
 
 		template.update(
@@ -249,6 +274,22 @@ class TestDataRepository(
 		val sql = """
 			INSERT INTO tiltak(id, navn, type)
 			VALUES (:id, :navn, :type)
+		""".trimIndent()
+
+		template.update(
+			sql, parameters(
+				"id" to cmd.id,
+				"navn" to cmd.navn,
+				"type" to cmd.type
+			)
+		)
+	}
+
+	fun updateTiltak(cmd: TiltakInput) {
+		val sql = """
+			UPDATE tiltak
+			SET navn = :navn, type = :type
+			WHERE id = :id
 		""".trimIndent()
 
 		template.update(

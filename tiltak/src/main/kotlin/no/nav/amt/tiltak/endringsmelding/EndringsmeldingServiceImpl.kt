@@ -5,6 +5,8 @@ import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.exceptions.EndringsmeldingIkkeAktivException
 import no.nav.amt.tiltak.core.port.AuditLoggerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
+import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
@@ -16,6 +18,7 @@ open class EndringsmeldingServiceImpl(
 	private val endringsmeldingRepository: EndringsmeldingRepository,
 	private val auditLoggerService: AuditLoggerService,
 	private val transactionTemplate: TransactionTemplate,
+	private val publisherService: DataPublisherService
 ) : EndringsmeldingService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -57,6 +60,7 @@ open class EndringsmeldingServiceImpl(
 		endringsmeldingRepository.markerSomUtfort(endringsmeldingId, navAnsattId)
 
 		auditLoggerService.navAnsattBehandletEndringsmeldingAuditLog(navAnsattId, endringsmelding.deltakerId)
+		publisherService.publish(endringsmeldingId, DataPublishType.ENDRINGSMELDING)
 	}
 
 	override fun markerSomTilbakekalt(id: UUID) {
@@ -69,7 +73,7 @@ open class EndringsmeldingServiceImpl(
 		}
 
 		endringsmeldingRepository.markerSomTilbakekalt(id)
-
+		publisherService.publish(id, DataPublishType.ENDRINGSMELDING)
 		log.info("Endringsmelding med id $id er tilbakekalt av arrangor ansatt")
 	}
 
@@ -212,7 +216,7 @@ open class EndringsmeldingServiceImpl(
 		}
 
 		log.info("Endringsmelding av type ${innhold.type().name} opprettet med id $id for deltaker $deltakerId")
-
+		publisherService.publish(id, DataPublishType.ENDRINGSMELDING)
 	}
 
 }

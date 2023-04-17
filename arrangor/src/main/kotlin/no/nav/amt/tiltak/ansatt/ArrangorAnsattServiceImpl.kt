@@ -8,6 +8,8 @@ import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.PersonService
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
+import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
@@ -19,6 +21,7 @@ class ArrangorAnsattServiceImpl(
 	private val arrangorAnsattRepository: ArrangorAnsattRepository,
 	private val personService: PersonService,
 	private val arrangorService: ArrangorService,
+	private val dataPublisherService: DataPublisherService
 ) : ArrangorAnsattService {
 
 	// Forhindrer circular dependency, må fikses når vi rydder opp i arkitekturen
@@ -95,6 +98,7 @@ class ArrangorAnsattServiceImpl(
 		)
 
 		return getAnsatt(nyAnsattId)
+			.also { dataPublisherService.publish(it.id, DataPublishType.ARRANGOR_ANSATT) }
 	}
 
 	private fun hentTilknyttedeArrangorer(ansattId: UUID): List<TilknyttetArrangor> {

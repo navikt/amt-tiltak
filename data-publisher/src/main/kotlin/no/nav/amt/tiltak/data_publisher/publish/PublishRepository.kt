@@ -35,7 +35,7 @@ class PublishRepository(
 
 		val parameters = sqlParameters(
 			"id" to id,
-			"type" to type,
+			"type" to type.name,
 			"hash" to hash
 		)
 
@@ -48,12 +48,12 @@ class PublishRepository(
 
 	private fun get(id: UUID, type: DataPublishType): PublishDbo? {
 		val sql = """
-
+			SELECT * FROM publish where id = :id AND type = :type
 		""".trimIndent()
 
 		val parameters = sqlParameters(
 			"id" to id,
-			"type" to type
+			"type" to type.name
 		)
 
 		return template.query(sql, parameters, rowMapper)

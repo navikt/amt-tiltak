@@ -9,7 +9,7 @@ data class DeltakerPublishDto(
 	val id: UUID,
 	val deltakerlisteId: UUID,
 	val personalia: DeltakerPersonaliaDto,
-	val status: String,
+	val status: String?,
 	val dagerPerUke: Int?,
 	val prosentStilling: Double?,
 	val oppstartsdato: LocalDate?,

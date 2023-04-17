@@ -93,6 +93,10 @@
             <groupId>com.github.navikt.poao-tilgang</groupId>
             <artifactId>client</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>data-publisher</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

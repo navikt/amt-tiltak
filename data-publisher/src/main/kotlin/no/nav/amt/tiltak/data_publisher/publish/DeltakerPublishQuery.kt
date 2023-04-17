@@ -12,8 +12,8 @@ class DeltakerPublishQuery(
 	private val template: NamedParameterJdbcTemplate
 ) {
 
-	fun execute(id: UUID): DeltakerPublishDto {
-		val deltaker = getDeltaker(id)
+	fun execute(id: UUID): DeltakerPublishDto? {
+		val deltaker = getDeltaker(id) ?: return null
 
 		val navVeileder = if (deltaker.navAnsattId != null) {
 			DeltakerNavVeilederDto(
@@ -51,7 +51,7 @@ class DeltakerPublishQuery(
 		)
 	}
 
-	private fun getDeltaker(id: UUID): DeltakerDbo {
+	private fun getDeltaker(deltakerId: UUID): DeltakerDbo? {
 		val sql = """
 			select deltaker.id                                                                            as deltakerId,
 				   deltaker.gjennomforing_id                                                              as deltakerlisteId,
@@ -81,9 +81,9 @@ class DeltakerPublishQuery(
 
 		return template.query(
 			sql,
-			sqlParameters("id" to id),
+			sqlParameters("deltakerId" to deltakerId),
 			DeltakerDbo.rowMapper
-		).first()
+		).firstOrNull()
 	}
 
 
@@ -96,7 +96,7 @@ class DeltakerPublishQuery(
 		val etternavn: String,
 		val telefonnummer: String?,
 		val epost: String?,
-		val status: String,
+		val status: String?,
 		val dagerPerUke: Int?,
 		val prosentStilling: Double?,
 		val startDato: LocalDate?,
@@ -113,7 +113,7 @@ class DeltakerPublishQuery(
 				DeltakerDbo(
 					id = rs.getUUID("deltakerId"),
 					deltakerlisteId = rs.getUUID("deltakerlisteId"),
-					personligIdent = rs.getString("personlig_ident"),
+					personligIdent = rs.getString("person_ident"),
 					fornavn = rs.getString("fornavn"),
 					mellomnavn = rs.getNullableString("mellomnavn"),
 					etternavn = rs.getString("etternavn"),

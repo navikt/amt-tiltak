@@ -76,10 +76,18 @@ class DataPublisherService(
 	private fun publishDeltaker(id: UUID, forcePublish: Boolean = false) {
 		val currentData = DeltakerPublishQuery(template).execute(id)
 
-		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKER, currentData.digest())) {
+		if (currentData == null) {
+			val key = id.toString().toByteArray()
+			val value = "".toByteArray()
+			val record = ProducerRecord(kafkaTopicProperties.amtDeltakerTopic, key, value)
+			logger.info("Legger inn Tombstone på DELTAKER med id $id")
+			kafkaProducerClient.sendSync(record)
+		}
+
+		else if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKER, currentData.digest())) {
 			val key = id.toString().toByteArray()
 			val value = JsonUtils.toJsonString(currentData).toByteArray()
-			val record = ProducerRecord(kafkaTopicProperties.amtArrangorTopic, key, value)
+			val record = ProducerRecord(kafkaTopicProperties.amtDeltakerTopic, key, value)
 			logger.info("Republiserer DELTAKER med id $id")
 			kafkaProducerClient.sendSync(record)
 			publishRepository.set(id, DataPublishType.DELTAKER, currentData.digest())
