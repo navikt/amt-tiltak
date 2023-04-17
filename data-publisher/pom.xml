@@ -37,10 +37,9 @@
             <artifactId>json</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.common</groupId>
-            <artifactId>kafka</artifactId>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>kafka-producer</artifactId>
         </dependency>
-
         <!-- BEGIN Test Dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
