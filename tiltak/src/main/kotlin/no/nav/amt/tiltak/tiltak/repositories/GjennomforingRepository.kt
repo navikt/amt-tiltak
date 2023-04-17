@@ -1,7 +1,10 @@
 package no.nav.amt.tiltak.tiltak.repositories
 
+import no.nav.amt.tiltak.common.db_utils.getUUID
+import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
+import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.utils.getNullableUUID
 import org.springframework.jdbc.core.RowMapper
@@ -27,6 +30,31 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 			lopenr = rs.getInt("lopenr"),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime(),
+		)
+	}
+
+	private val rowMapperGjennomforing = RowMapper { rs, _ ->
+		Gjennomforing(
+			id = UUID.fromString(rs.getString("gjennomforing_id")),
+			arrangor = Arrangor(
+				id = rs.getUUID("arrangor_id"),
+				navn = rs.getString("arrangor_navn"),
+				organisasjonsnummer = rs.getString("organisasjonsnummer"),
+				overordnetEnhetNavn = rs.getString("overordnet_enhet_navn"),
+				overordnetEnhetOrganisasjonsnummer = rs.getString("overordnet_enhet_organisasjonsnummer")
+			),
+			tiltak = Tiltak(
+				id = UUID.fromString(rs.getString("tiltak_id")),
+				navn = rs.getString("tiltak_navn"),
+				kode = rs.getString("type"),
+			),
+			navn = rs.getString("gjennomforing_navn"),
+			status = Gjennomforing.Status.valueOf(rs.getString("status")),
+			startDato = rs.getDate("start_dato")?.toLocalDate(),
+			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
+			navEnhetId = rs.getNullableUUID("nav_enhet_id"),
+			opprettetAar = rs.getInt("opprettet_aar"),
+			lopenr = rs.getInt("lopenr")
 		)
 	}
 
@@ -124,6 +152,37 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 		val parameters = MapSqlParameterSource().addValues(mapOf("ids" to gjennomforingIder))
 
 		return template.query(sql, parameters, rowMapper)
+	}
+
+	fun getGjennomforingWithArrangorAndTiltak(gjennomforingIder: List<UUID>): List<Gjennomforing> {
+		if (gjennomforingIder.isEmpty()) return emptyList()
+
+		val sql = """
+			SELECT gjennomforing.id as gjennomforing_id,
+			gjennomforing.navn as gjennomforing_navn,
+			gjennomforing.status,
+			gjennomforing.start_dato,
+			gjennomforing.slutt_dato,
+			gjennomforing.nav_enhet_id,
+			gjennomforing.opprettet_aar,
+			gjennomforing.lopenr,
+			gjennomforing.arrangor_id,
+			gjennomforing.tiltak_id,
+			arrangor.navn as arrangor_navn,
+			arrangor.organisasjonsnummer,
+			arrangor.overordnet_enhet_navn,
+			arrangor.overordnet_enhet_organisasjonsnummer,
+			tiltak.navn as tiltak_navn,
+			tiltak.type
+			FROM gjennomforing
+			         INNER JOIN arrangor ON arrangor.id = gjennomforing.arrangor_id
+			         INNER JOIN tiltak ON tiltak.id = gjennomforing.tiltak_id
+			WHERE gjennomforing.id IN (:ids);
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(mapOf("ids" to gjennomforingIder))
+
+		return template.query(sql, parameters, rowMapperGjennomforing)
 	}
 
 
