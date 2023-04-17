@@ -112,7 +112,7 @@ open class DeltakerServiceImpl(
 
 	override fun erSkjermet(deltakerId: UUID) : Boolean {
 		val deltaker = hentDeltaker(deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
-		return brukerService.erSkjermet(deltaker.personIdent)
+		return deltaker.erSkjermet
 	}
 
 	override fun settSkjermet(personIdent: String, erSkjermet: Boolean) {
