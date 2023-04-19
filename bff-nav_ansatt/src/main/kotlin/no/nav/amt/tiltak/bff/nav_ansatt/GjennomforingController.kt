@@ -6,8 +6,11 @@ import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
+import no.nav.common.featuretoggle.UnleashClient
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController("GjennomforingControllerNavAnsatt")
@@ -17,7 +20,9 @@ class GjennomforingController(
 	private val gjennomforingService: GjennomforingService,
 	private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService,
 	private val tiltaksansvarligAutoriseringService: TiltaksansvarligAutoriseringService,
-	private val controllerService: NavAnsattControllerService
+	private val controllerService: NavAnsattControllerService,
+	private val unleashClient: UnleashClient
+
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
@@ -43,6 +48,10 @@ class GjennomforingController(
 		tiltaksansvarligAutoriseringService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId)
 
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
+
+		if(gjennomforing.erKurs && !kursTiltakToggleEnabled()) {
+			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Kan ikke aksessere kurstiltak $gjennomforingId")
+		}
 
 		val arrangor = gjennomforing.arrangor
 
@@ -75,21 +84,26 @@ class GjennomforingController(
 
 		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navAnsattAzureId)
 
-		return gjennomforingService.getByLopenr(lopenr).map {
-			HentGjennomforingMedLopenrDto(
-				id = it.id,
-				navn = it.navn,
-				lopenr = it.lopenr,
-				status = it.status,
-				startDato = it.startDato,
-				sluttDato = it.sluttDato,
-				opprettetAr = it.opprettetAar,
-				arrangorNavn = it.arrangor.overordnetEnhetNavn ?: it.arrangor.navn,
-				tiltak = TiltakDto(
-					kode = it.tiltak.kode,
-					navn = it.tiltak.navn,
-				),
+		return gjennomforingService.getByLopenr(lopenr)
+			.filter { !it.erKurs || kursTiltakToggleEnabled() }
+			.map {
+				HentGjennomforingMedLopenrDto(
+					id = it.id,
+					navn = it.navn,
+					lopenr = it.lopenr,
+					status = it.status,
+					startDato = it.startDato,
+					sluttDato = it.sluttDato,
+					opprettetAr = it.opprettetAar,
+					arrangorNavn = it.arrangor.overordnetEnhetNavn ?: it.arrangor.navn,
+					tiltak = TiltakDto(
+						kode = it.tiltak.kode,
+						navn = it.tiltak.navn,
+					)
 			)
 		}
+	}
+	private fun kursTiltakToggleEnabled(): Boolean {
+		return unleashClient.isEnabled("amt.eksponer-kurs")
 	}
 }

@@ -2,6 +2,8 @@ package no.nav.amt.tiltak.application
 
 import no.nav.common.audit_log.log.AuditLogger
 import no.nav.common.audit_log.log.AuditLoggerImpl
+import no.nav.common.featuretoggle.UnleashClient
+import no.nav.common.featuretoggle.UnleashClientImpl
 import no.nav.common.rest.filter.LogRequestFilter
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder
 import no.nav.common.token_client.client.MachineToMachineTokenClient
@@ -66,4 +68,9 @@ open class ApplicationConfig {
 		return registration
 	}
 
+	@Bean
+	open fun unleashClient(
+		@Value("\${app.env.unleashUrl}") unleashUrl: String) : UnleashClient {
+		return UnleashClientImpl(unleashUrl, "amt-tiltak")
+	}
 }

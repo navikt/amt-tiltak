@@ -361,6 +361,11 @@
                 <version>${common.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.github.navikt.common-java-modules</groupId>
+                <artifactId>feature-toggle</artifactId>
+                <version>${common.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.github.navikt.poao-tilgang</groupId>
                 <artifactId>client</artifactId>
                 <version>2023.04.12_11.17-8706c9ad4b87</version>

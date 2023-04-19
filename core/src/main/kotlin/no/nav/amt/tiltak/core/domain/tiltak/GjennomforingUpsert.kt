@@ -14,5 +14,6 @@ data class GjennomforingUpsert(
 	val navEnhetId: UUID?,
 	val opprettetAar: Int,
 	val lopenr: Int,
+	val erKurs: Boolean
 )
 

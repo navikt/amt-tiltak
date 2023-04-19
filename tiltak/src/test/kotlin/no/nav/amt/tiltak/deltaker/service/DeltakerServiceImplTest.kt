@@ -5,6 +5,7 @@ import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.common.json.JsonUtils
@@ -14,6 +15,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
 import no.nav.amt.tiltak.core.port.BrukerService
+import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
@@ -24,6 +26,7 @@ import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
 import no.nav.amt.tiltak.endringsmelding.EndringsmeldingServiceImpl
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
@@ -35,7 +38,9 @@ import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
+import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_KURS
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_2
+import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.test.database.data.TestData.createDeltakerInput
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.TestDataSeeder
@@ -60,6 +65,7 @@ class DeltakerServiceImplTest {
 	lateinit var endringsmeldingService: EndringsmeldingServiceImpl
 	lateinit var endringsmeldingRepository: EndringsmeldingRepository
 	lateinit var skjultDeltakerRepository: SkjultDeltakerRepository
+	lateinit var gjennomforingService: GjennomforingService
 	lateinit var kafkaProducerService: KafkaProducerService
 	lateinit var objectMapper: ObjectMapper
 
@@ -80,6 +86,7 @@ class DeltakerServiceImplTest {
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		skjultDeltakerRepository = SkjultDeltakerRepository(jdbcTemplate)
+		gjennomforingService = mockk()
 		endringsmeldingRepository = EndringsmeldingRepository(jdbcTemplate, objectMapper)
 		endringsmeldingService = EndringsmeldingServiceImpl(endringsmeldingRepository, mockk(), transactionTemplate)
 
@@ -89,6 +96,7 @@ class DeltakerServiceImplTest {
 			brukerService = brukerService,
 			endringsmeldingService = endringsmeldingService,
 			skjultDeltakerRepository = skjultDeltakerRepository,
+			gjennomforingService = gjennomforingService,
 			transactionTemplate = transactionTemplate,
 			kafkaProducerService = kafkaProducerService,
 		)
@@ -103,7 +111,7 @@ class DeltakerServiceImplTest {
 	}
 
 	@Test
-	fun `oppdaterStatuser - Avslutter aktive deltakere med passert tildato`() {
+	fun `oppdaterStatuser - Sluttdato har passert, ikke kurs - Setter status til har slutta`() {
 		testDataRepository.insertBruker(BRUKER_2)
 		testDataRepository.insertDeltaker(DELTAKER_2)
 		testDataRepository.insertDeltakerStatus(DELTAKER_2_STATUS_1)
@@ -112,11 +120,61 @@ class DeltakerServiceImplTest {
 		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
 		forrigeStatus!!.type shouldBe DeltakerStatus.Type.DELTAR
 
-		deltakerServiceImpl.oppdaterStatuser()
+		every {
+			gjennomforingService.getGjennomforinger(any())
+		} returns listOf(GJENNOMFORING_1.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor()))
+
+		deltakerServiceImpl.progressStatuser()
 
 		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
 
 		status!!.type shouldBe DeltakerStatus.Type.HAR_SLUTTET
+
+	}
+
+	@Test
+	fun `oppdaterStatuser - Sluttdato har passert, kurs - Setter status til har slutta`() {
+		val gjennomforingInput = GJENNOMFORING_KURS.copy(sluttDato = LocalDate.now().minusDays(1))
+		testDataRepository.insertGjennomforing(gjennomforingInput)
+		testDataRepository.insertBruker(BRUKER_2)
+		testDataRepository.insertDeltaker(DELTAKER_2.copy(gjennomforingId = GJENNOMFORING_KURS.id, sluttDato = gjennomforingInput.sluttDato))
+		testDataRepository.insertDeltakerStatus(DELTAKER_2_STATUS_1)
+
+		every {
+			gjennomforingService.getGjennomforinger(any())
+		} returns listOf(gjennomforingInput.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor()))
+
+		// Valider testdata tilstand
+		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
+		forrigeStatus!!.type shouldBe DeltakerStatus.Type.DELTAR
+
+		deltakerServiceImpl.progressStatuser()
+
+		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
+		status!!.type shouldBe DeltakerStatus.Type.HAR_SLUTTET
+
+	}
+
+	@Test
+	fun `oppdaterStatuser - Sluttdato har passert og er før kursets sluttdato, kurs - Setter status til avbrutt`() {
+		val gjennomforingInput = GJENNOMFORING_KURS.copy(sluttDato = LocalDate.now().minusDays(1))
+		testDataRepository.insertGjennomforing(gjennomforingInput)
+		testDataRepository.insertBruker(BRUKER_2)
+		testDataRepository.insertDeltaker(DELTAKER_2.copy(gjennomforingId = GJENNOMFORING_KURS.id, sluttDato = gjennomforingInput.sluttDato.minusDays(1)))
+		testDataRepository.insertDeltakerStatus(DELTAKER_2_STATUS_1)
+
+		every {
+			gjennomforingService.getGjennomforinger(any())
+		} returns listOf(GJENNOMFORING_KURS.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor()))
+
+		// Valider testdata tilstand
+		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
+		forrigeStatus!!.type shouldBe DeltakerStatus.Type.DELTAR
+
+		deltakerServiceImpl.progressStatuser()
+
+		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
+		status!!.type shouldBe DeltakerStatus.Type.AVBRUTT
 
 	}
 
@@ -128,12 +186,16 @@ class DeltakerServiceImplTest {
 		testDataRepository.insertDeltaker(DELTAKER_1.copy(gjennomforingId = GJENNOMFORING_2.id))
 		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1)
 
+		every {
+			gjennomforingService.getGjennomforinger(any())
+		} returns listOf(GJENNOMFORING_2.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor()))
+
 		// Valider testdata tilstand
 		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
 		GJENNOMFORING_2.status shouldBe Gjennomforing.Status.AVSLUTTET.name
 		forrigeStatus!!.type shouldBe DeltakerStatus.Type.DELTAR
 
-		deltakerServiceImpl.oppdaterStatuser()
+		deltakerServiceImpl.progressStatuser()
 
 		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
 
@@ -142,19 +204,23 @@ class DeltakerServiceImplTest {
 	}
 
 	@Test
-	fun `oppdaterStatuser - Setter til ikke aktuell, aktive deltakere deltakere på avsluttede gjennomføringer`() {
+	fun `oppdaterStatuser - aktive deltakere deltakere på avsluttede gjennomføringer - Setter til ikke aktuell`() {
 		testDataRepository.insertArrangor(ARRANGOR_2)
 		testDataRepository.insertNavEnhet(NAV_ENHET_2)
 		testDataRepository.insertGjennomforing(GJENNOMFORING_2)
 		testDataRepository.insertDeltaker(DELTAKER_1.copy(gjennomforingId = GJENNOMFORING_2.id))
 		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_2)
 
+		every {
+			gjennomforingService.getGjennomforinger(any())
+		} returns listOf(GJENNOMFORING_2.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_2.toArrangor()))
+
 		// Valider testdata tilstand
 		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
 		GJENNOMFORING_2.status shouldBe Gjennomforing.Status.AVSLUTTET.name
 		forrigeStatus!!.type shouldBe DeltakerStatus.Type.VENTER_PA_OPPSTART
 
-		deltakerServiceImpl.oppdaterStatuser()
+		deltakerServiceImpl.progressStatuser()
 
 		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
 

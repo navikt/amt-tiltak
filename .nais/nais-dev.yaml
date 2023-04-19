@@ -122,6 +122,8 @@ spec:
       value: api://dev-gcp.team-mulighetsrommet.mulighetsrommet-api/.default
     - name: MULIGHETSROMMET_API_URL
       value: http://mulighetsrommet-api.team-mulighetsrommet.svc.cluster.local
+    - name: UNLEASH_URL
+      value: https://unleash.nais.io/api/
     # Kafka topics
     - name: SISTE_TILORDNET_VEILEDER_TOPIC
       value: pto.siste-tilordnet-veileder-v1

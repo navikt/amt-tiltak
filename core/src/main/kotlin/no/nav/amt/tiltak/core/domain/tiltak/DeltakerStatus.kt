@@ -27,11 +27,31 @@ data class DeltakerStatus(
 	}
 
 	enum class Type {
-		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, FEILREGISTRERT, PABEGYNT_REGISTRERING, PABEGYNT
+		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, FEILREGISTRERT, PABEGYNT_REGISTRERING, PABEGYNT,
+		SOKT_INN, VURDERES, VENTELISTE, AVBRUTT // kurs statuser
 		//PABEGYNT er erstattet av PABEGYNT_REGISTRERING, men må beholdes så lenge statusen er på topicen
 	}
 
 }
 
+val AVSLUTTENDE_STATUSER = listOf(
+	DeltakerStatus.Type.HAR_SLUTTET,
+	DeltakerStatus.Type.IKKE_AKTUELL,
+	DeltakerStatus.Type.FEILREGISTRERT,
+	DeltakerStatus.Type.AVBRUTT
+)
 
+
+val VENTER_PAA_PLASS_STATUSER = listOf(
+	DeltakerStatus.Type.SOKT_INN,
+	DeltakerStatus.Type.VURDERES,
+	DeltakerStatus.Type.VENTELISTE,
+	DeltakerStatus.Type.PABEGYNT_REGISTRERING
+)
+
+val HAR_IKKE_STARTET_STATUSER = listOf(DeltakerStatus.Type.VENTER_PA_OPPSTART).plus(VENTER_PAA_PLASS_STATUSER)
+
+fun DeltakerStatus.harIkkeStartet() : Boolean {
+	return type in HAR_IKKE_STARTET_STATUSER
+}
 
