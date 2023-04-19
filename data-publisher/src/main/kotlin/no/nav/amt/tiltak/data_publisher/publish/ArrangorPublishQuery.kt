@@ -4,6 +4,7 @@ import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.data_publisher.model.ArrangorPublishDto
+import no.nav.amt.tiltak.data_publisher.model.OrganisasjonDto
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.util.*
@@ -12,16 +13,23 @@ class ArrangorPublishQuery(
 	private val template: NamedParameterJdbcTemplate
 ) {
 
-	fun execute(id: UUID): ArrangorPublishDto {
+	fun get(id: UUID): ArrangorPublishDto {
 		val arrangor = getArrangor(id)
 		val deltakerlister = getDeltakerlisterForArrangor(id)
 
 		return ArrangorPublishDto(
 			id = arrangor.id,
-			navn = arrangor.navn,
-			organisasjonsnummer = arrangor.organisasjonsnummer,
-			overordnetEnhetOrganisasjonsnummer = arrangor.overordnetEnhetOrganisasjonsnummer,
-			overordnetEnhetNavn = arrangor.overordnetEnhetNavn,
+			organisasjon = OrganisasjonDto(
+				nummer = arrangor.organisasjonsnummer,
+				navn = arrangor.navn
+			),
+			overordnetOrganisasjon = arrangor.overordnetEnhetOrganisasjonsnummer?.let {
+				OrganisasjonDto(
+					nummer = arrangor.overordnetEnhetOrganisasjonsnummer,
+					navn = arrangor.overordnetEnhetNavn
+						?: throw IllegalStateException("Forventet at overordnet enhets navn er satt når den har orgnr")
+				)
+			},
 			deltakerlister = deltakerlister
 		)
 	}

@@ -16,7 +16,7 @@ class ArrangorAnsattPublishQuery(
 	private val template: NamedParameterJdbcTemplate
 ) {
 
-	fun execute(id: UUID): ArrangorAnsattPublishDto {
+	fun get(id: UUID): ArrangorAnsattPublishDto {
 		val ansatt = getAnsattDetaljer(id)
 		val roller = getAnsattRoller(id)
 		val veileder = getAnsattVeileder(id)
@@ -27,10 +27,10 @@ class ArrangorAnsattPublishQuery(
 		return ArrangorAnsattPublishDto(
 			id = ansatt.id,
 			personalia = PersonPublishDto(
-				personligIdent = ansatt.personligIdent,
+				personident = ansatt.personligIdent,
 				navn = Navn(
 					fornavn = ansatt.fornavn,
-					mellomnevn = ansatt.mellomnavn,
+					mellomnavn = ansatt.mellomnavn,
 					etternavn = ansatt.etternavn
 				)
 			),

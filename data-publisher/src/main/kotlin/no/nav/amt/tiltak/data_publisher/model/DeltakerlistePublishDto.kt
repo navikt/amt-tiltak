@@ -11,9 +11,15 @@ data class DeltakerlistePublishDto(
 	val type: String,
 	val navn: String,
 	val status: String,
-	val tiltakNavn: String,
+	val arrangor: OrganisasjonDto,
+	val tiltak: TiltakDto,
 	val startDato: LocalDate,
 	val sluttDato: LocalDate?
 ) {
 	fun digest() = DigestUtils.md5DigestAsHex(JsonUtils.toJson(this).toByteArray())
 }
+
+data class TiltakDto(
+	val navn: String,
+	val type: String,
+)

@@ -61,7 +61,7 @@ class DataPublisherService(
 	}
 
 	private fun publishDeltakerliste(id: UUID, forcePublish: Boolean = false) {
-		val currentData = DeltakerlistePublishQuery(template).execute(id)
+		val currentData = DeltakerlistePublishQuery(template).get(id)
 
 		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKERLISTE, currentData.digest())) {
 			val key = id.toString().toByteArray()
@@ -74,17 +74,14 @@ class DataPublisherService(
 	}
 
 	private fun publishDeltaker(id: UUID, forcePublish: Boolean = false) {
-		val currentData = DeltakerPublishQuery(template).execute(id)
+		val currentData = DeltakerPublishQuery(template).get(id)
 
 		if (currentData == null) {
 			val key = id.toString().toByteArray()
-			val value = "".toByteArray()
-			val record = ProducerRecord(kafkaTopicProperties.amtDeltakerTopic, key, value)
+			val record = ProducerRecord<ByteArray, ByteArray?>(kafkaTopicProperties.amtDeltakerTopic, key, null)
 			logger.info("Legger inn Tombstone på DELTAKER med id $id")
 			kafkaProducerClient.sendSync(record)
-		}
-
-		else if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKER, currentData.digest())) {
+		} else if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKER, currentData.digest())) {
 			val key = id.toString().toByteArray()
 			val value = JsonUtils.toJsonString(currentData).toByteArray()
 			val record = ProducerRecord(kafkaTopicProperties.amtDeltakerTopic, key, value)
@@ -96,7 +93,7 @@ class DataPublisherService(
 	}
 
 	private fun publishArrangor(id: UUID, forcePublish: Boolean = false) {
-		val currentData = ArrangorPublishQuery(template).execute(id)
+		val currentData = ArrangorPublishQuery(template).get(id)
 
 		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.ARRANGOR, currentData.digest())) {
 			val key = id.toString().toByteArray()
@@ -109,7 +106,7 @@ class DataPublisherService(
 	}
 
 	private fun publishArrangorAnsatt(id: UUID, forcePublish: Boolean = false) {
-		val currentData = ArrangorAnsattPublishQuery(template).execute(id)
+		val currentData = ArrangorAnsattPublishQuery(template).get(id)
 
 		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.ARRANGOR_ANSATT, currentData.digest())) {
 			val key = id.toString().toByteArray()
@@ -122,7 +119,7 @@ class DataPublisherService(
 	}
 
 	private fun publishEndringsmelding(id: UUID, forcePublish: Boolean = false) {
-		val currentData = EndringsmeldingPublishQuery(template).execute(id)
+		val currentData = EndringsmeldingPublishQuery(template).get(id)
 
 		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.ENDRINGSMELDING, currentData.digest())) {
 			val key = id.toString().toByteArray()
@@ -142,9 +139,7 @@ class DataPublisherService(
 		var ids: List<UUID>
 		do {
 			ids = idProvider.invoke(offset)
-			ids.forEach {
-				publisher.invoke(it)
-			}
+			ids.forEach { publisher.invoke(it) }
 			offset += ids.size
 		} while (ids.isNotEmpty())
 	}

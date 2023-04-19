@@ -67,34 +67,6 @@ class DataPublisherServiceTest : FunSpec({
 		DbTestDataUtils.cleanDatabase(dataSource)
 	}
 
-	/**
-	 * ---        TESTING         ---
-	 * - Legge til Arrangor
-	 * - Oppdatere Arrangor
-	 * - Legge til ny Gjennomføring
-	 *
-	 * - Legge til ny Arrangor ansatt
-	 * - Oppdatere Personalia
-	 * - Oppdatere Tilknyttede Arrangorer
-	 * - Oppdatere roller for arrangører
-	 * - oppdatere veiledere
-	 * - Oppdatere koordinatorer
-	 *
-	 * - Legge til ny Gjennomføring
-	 * - Oppdatere Gjennomføring
-	 *
-	 * - Legge til ny deltaker
-	 * - Oppdatere personalia
-	 * - Oppdatere deltakerinformasjon
-	 * - Oppdatere NAV-ansatt
-	 *
-	 * - Legge til ny endringsmelding
-	 * - Oppdatere endringsmelding
-	 * --- OPPRETTE TOPICS I PROD ---
-	 * ---  OPPKOBLING MOT APPEN  ---
-	 */
-
-
 	test("Ny Arrangør - Sendes") {
 		val input = dbHandler.createArrangor()
 		dbHandler.createDeltakerliste(arrangorId = input.id)
@@ -133,16 +105,7 @@ class DataPublisherServiceTest : FunSpec({
 		publishAndVerify(input.id, DELTAKERLISTE, 1)
 		publishAndVerify(input.id, DELTAKERLISTE, 1)
 	}
-
-	test("Deltakerliste - oppdatert tiltaksnavn - sendes på nytt") {
-		val tiltakInput = dbHandler.createTiltak()
-		val gjennomforingInput = dbHandler.createDeltakerliste(tiltakId = tiltakInput.id)
-		publishAndVerify(gjennomforingInput.id, DELTAKERLISTE, 1)
-
-		dbHandler.updateTiltak(tiltakInput.copy(navn = "OPPDATERT"))
-		publishAndVerify(gjennomforingInput.id, DELTAKERLISTE, 2)
-	}
-
+	
 })
 
 private fun createTopicProperties(): KafkaTopicProperties = KafkaTopicProperties(

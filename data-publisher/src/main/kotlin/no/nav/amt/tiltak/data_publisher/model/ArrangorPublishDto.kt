@@ -6,11 +6,14 @@ import java.util.*
 
 data class ArrangorPublishDto(
 	val id: UUID,
-	val navn: String,
-	val organisasjonsnummer: String,
-	val overordnetEnhetOrganisasjonsnummer: String?,
-	val overordnetEnhetNavn: String?,
+	val organisasjon: OrganisasjonDto,
+	val overordnetOrganisasjon: OrganisasjonDto?,
 	val deltakerlister: List<UUID>,
 ) {
 	fun digest() = DigestUtils.md5DigestAsHex(JsonUtils.toJson(this).toByteArray())
 }
+
+data class OrganisasjonDto(
+	val nummer: String,
+	val navn: String
+)

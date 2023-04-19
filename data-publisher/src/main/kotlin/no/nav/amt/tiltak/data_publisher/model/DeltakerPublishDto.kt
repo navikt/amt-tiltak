@@ -24,7 +24,7 @@ data class DeltakerPublishDto(
 }
 
 data class DeltakerPersonaliaDto(
-	val personligIdent: String,
+	val personident: String,
 	val navn: Navn,
 	val kontaktinformasjon: DeltakerKontaktinformasjonDto
 )

@@ -12,7 +12,7 @@ class DeltakerPublishQuery(
 	private val template: NamedParameterJdbcTemplate
 ) {
 
-	fun execute(id: UUID): DeltakerPublishDto? {
+	fun get(id: UUID): DeltakerPublishDto? {
 		val deltaker = getDeltaker(id) ?: return null
 
 		val navVeileder = if (deltaker.navAnsattId != null) {
@@ -27,10 +27,10 @@ class DeltakerPublishQuery(
 			deltaker.id,
 			deltakerlisteId = deltaker.deltakerlisteId,
 			personalia = DeltakerPersonaliaDto(
-				personligIdent = deltaker.personligIdent,
+				personident = deltaker.personligIdent,
 				navn = Navn(
 					fornavn = deltaker.fornavn,
-					mellomnevn = deltaker.mellomnavn,
+					mellomnavn = deltaker.mellomnavn,
 					etternavn = deltaker.etternavn
 				),
 				kontaktinformasjon = DeltakerKontaktinformasjonDto(

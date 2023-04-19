@@ -13,13 +13,13 @@ data class ArrangorAnsattPublishDto(
 }
 
 data class PersonPublishDto(
-	val personligIdent: String,
+	val personident: String,
 	val navn: Navn
 )
 
 data class Navn(
 	val fornavn: String,
-	val mellomnevn: String?,
+	val mellomnavn: String?,
 	val etternavn: String
 )
 
