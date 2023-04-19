@@ -55,6 +55,7 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
 			navEnhetId = rs.getNullableUUID("nav_enhet_id"),
 			opprettetAar = rs.getInt("opprettet_aar"),
+			erKurs = rs.getBoolean("er_kurs"),
 			lopenr = rs.getInt("lopenr")
 		)
 	}
@@ -173,6 +174,7 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 			gjennomforing.lopenr,
 			gjennomforing.arrangor_id,
 			gjennomforing.tiltak_id,
+			gjennomforing.er_kurs,
 			arrangor.navn as arrangor_navn,
 			arrangor.organisasjonsnummer,
 			arrangor.overordnet_enhet_navn,
