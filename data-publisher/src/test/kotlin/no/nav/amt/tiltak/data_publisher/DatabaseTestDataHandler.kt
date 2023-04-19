@@ -20,7 +20,10 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 
 	fun updateArrangor(input: ArrangorInput) = testDataRepository.updateArrangor(input)
 
-	fun createDeltakerliste(arrangorId: UUID = createArrangor().id, tiltakId: UUID = createTiltak().id): GjennomforingInput =
+	fun createDeltakerliste(
+		arrangorId: UUID = createArrangor().id,
+		tiltakId: UUID = createTiltak().id
+	): GjennomforingInput =
 		gjennomforingInput(tiltakId = tiltakId, arrangorId = arrangorId)
 			.also { testDataRepository.insertGjennomforing(it) }
 
@@ -29,6 +32,26 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		.also { testDataRepository.insertTiltak(it) }
 
 	fun updateTiltak(input: TiltakInput) = testDataRepository.updateTiltak(input)
+
+	fun createDeltaker(
+		brukerId: UUID = createBruker().id,
+		gjennomforingId: UUID = createDeltakerliste().id
+	): DeltakerInput = deltakerInput(brukerId, gjennomforingId)
+		.also { testDataRepository.insertDeltaker(it) }
+
+	fun createBruker(
+		ansvarligVeilederId: UUID? = createNavAnsatt().id,
+		navEnhetId: UUID = createNavEnhet().id
+	): BrukerInput = brukerInput(ansvarligVeilederId, navEnhetId)
+		.also { testDataRepository.insertBruker(it) }
+
+	fun createNavEnhet(): NavEnhetInput = navEnhetInput()
+		.also { testDataRepository.insertNavEnhet(it) }
+
+
+	fun createNavAnsatt(): NavAnsattInput = navAnsattInput()
+		.also { testDataRepository.insertNavAnsatt(it) }
+
 
 	private fun arrangorInput(
 		id: UUID = UUID.randomUUID(),
@@ -83,6 +106,7 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 	)
 
 	private fun brukerInput(
+		ansvarligVeilederId: UUID?,
 		navEnhetId: UUID
 	): BrukerInput = BrukerInput(
 		id = UUID.randomUUID(),
@@ -92,7 +116,7 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		etternavn = UUID.randomUUID().toString(),
 		telefonnummer = UUID.randomUUID().toString(),
 		epost = UUID.randomUUID().toString(),
-		ansvarligVeilederId = null,
+		ansvarligVeilederId = ansvarligVeilederId,
 		navEnhetId = navEnhetId,
 		erSkjermet = false
 	)
@@ -110,6 +134,14 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		prosentStilling = 100.0F,
 		registrertDato = LocalDateTime.now(),
 		innsokBegrunnelse = UUID.randomUUID().toString()
+	)
+
+	private fun navAnsattInput(): NavAnsattInput = NavAnsattInput(
+		id = UUID.randomUUID(),
+		navIdent = UUID.randomUUID().toString(),
+		navn = UUID.randomUUID().toString(),
+		telefonnummer = UUID.randomUUID().toString(),
+		epost = UUID.randomUUID().toString()
 	)
 
 	private fun arrangorVeilederInput(

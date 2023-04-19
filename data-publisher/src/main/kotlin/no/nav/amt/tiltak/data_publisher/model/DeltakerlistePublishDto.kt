@@ -7,17 +7,22 @@ import java.util.*
 
 data class DeltakerlistePublishDto(
 	val id: UUID,
-	val arrangorId: UUID,
 	val type: String,
 	val navn: String,
 	val status: String,
-	val arrangor: OrganisasjonDto,
+	val arrangor: DeltakerlisteArrangorDto,
 	val tiltak: TiltakDto,
 	val startDato: LocalDate,
 	val sluttDato: LocalDate?
 ) {
 	fun digest() = DigestUtils.md5DigestAsHex(JsonUtils.toJson(this).toByteArray())
 }
+
+data class DeltakerlisteArrangorDto(
+	val id: UUID,
+	val organisasjonsnummer: String,
+	val navn: String
+)
 
 data class TiltakDto(
 	val navn: String,

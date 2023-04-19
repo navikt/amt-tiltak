@@ -14,7 +14,6 @@ data class DeltakerPublishDto(
 	val prosentStilling: Double?,
 	val oppstartsdato: LocalDate?,
 	val sluttdato: LocalDate?,
-	val innsoktPa: String?,
 	val innsoktDato: LocalDate,
 	val bestillingTekst: String?,
 	val navKontor: String?,
@@ -26,7 +25,8 @@ data class DeltakerPublishDto(
 data class DeltakerPersonaliaDto(
 	val personident: String,
 	val navn: Navn,
-	val kontaktinformasjon: DeltakerKontaktinformasjonDto
+	val kontaktinformasjon: DeltakerKontaktinformasjonDto,
+	val skjermet: Boolean
 )
 
 data class DeltakerKontaktinformasjonDto(

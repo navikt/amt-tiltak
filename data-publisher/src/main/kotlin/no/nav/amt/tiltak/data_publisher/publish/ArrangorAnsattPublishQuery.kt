@@ -63,7 +63,7 @@ class ArrangorAnsattPublishQuery(
 			"SELECT * FROM arrangor_ansatt_rolle where ansatt_id = :ansattId",
 			sqlParameters("ansattId" to ansattId),
 			AnsattRoller.rowMapper
-		).filter { it.gyldigTil != null && it.gyldigTil.isBefore(LocalDate.of(2500, 1, 1).atStartOfDay()) }
+		).filter { isGyldig(it.gyldigTil) }
 	}
 
 	private fun getAnsattVeileder(ansattId: UUID): List<AnsattVeileder> {
@@ -84,7 +84,7 @@ class ArrangorAnsattPublishQuery(
 			sql,
 			sqlParameters("ansattId" to ansattId),
 			AnsattVeileder.rowMapper
-		).filter { it.gyldigTil != null && it.gyldigTil.isBefore(LocalDate.of(2500, 1, 1).atStartOfDay()) }
+		).filter { isGyldig(it.gyldigTil) }
 	}
 
 	private fun getAnsattKoordinator(ansattId: UUID): List<AnsattKoordinator> {
@@ -103,7 +103,11 @@ class ArrangorAnsattPublishQuery(
 			sql,
 			sqlParameters("ansattId" to ansattId),
 			AnsattKoordinator.rowMapper
-		).filter { it.gyldigTil != null && it.gyldigTil.isBefore(LocalDate.of(2500, 1, 1).atStartOfDay()) }
+		).filter { isGyldig(it.gyldigTil) }
+	}
+
+	fun isGyldig(gyldigTil: LocalDateTime?): Boolean {
+		return gyldigTil == null || gyldigTil.isAfter(LocalDateTime.now())
 	}
 
 	private data class AnsattKoordinator(

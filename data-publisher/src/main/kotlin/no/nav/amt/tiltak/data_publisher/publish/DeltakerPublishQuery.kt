@@ -36,14 +36,14 @@ class DeltakerPublishQuery(
 				kontaktinformasjon = DeltakerKontaktinformasjonDto(
 					telefonnummer = deltaker.telefonnummer,
 					epost = deltaker.epost
-				)
+				),
+				skjermet = deltaker.skjermet
 			),
 			status = deltaker.status,
 			dagerPerUke = deltaker.dagerPerUke,
 			prosentStilling = deltaker.prosentStilling,
 			oppstartsdato = deltaker.startDato,
 			sluttdato = deltaker.sluttDato,
-			innsoktPa = null,
 			innsoktDato = deltaker.registrertDato,
 			bestillingTekst = deltaker.innsokBegrunnelse,
 			navKontor = deltaker.navEnhetNavn,
@@ -58,6 +58,7 @@ class DeltakerPublishQuery(
 				   bruker.person_ident,
 				   bruker.fornavn,
 				   bruker.mellomnavn,
+			       bruker.er_skjermet                                                                     as er_skjermet,
 				   bruker.etternavn,
 				   bruker.telefonnummer,
 				   bruker.epost,
@@ -94,6 +95,7 @@ class DeltakerPublishQuery(
 		val fornavn: String,
 		val mellomnavn: String?,
 		val etternavn: String,
+		val skjermet: Boolean,
 		val telefonnummer: String?,
 		val epost: String?,
 		val status: String?,
@@ -117,6 +119,7 @@ class DeltakerPublishQuery(
 					fornavn = rs.getString("fornavn"),
 					mellomnavn = rs.getNullableString("mellomnavn"),
 					etternavn = rs.getString("etternavn"),
+					skjermet = rs.getBoolean("er_skjermet"),
 					telefonnummer = rs.getNullableString("telefonnummer"),
 					epost = rs.getNullableString("epost"),
 					status = rs.getString("status"),

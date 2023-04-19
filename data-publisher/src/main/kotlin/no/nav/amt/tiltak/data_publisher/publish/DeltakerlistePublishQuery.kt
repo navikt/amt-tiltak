@@ -4,8 +4,8 @@ import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getLocalDate
 import no.nav.amt.tiltak.common.db_utils.getNullableLocalDate
 import no.nav.amt.tiltak.common.db_utils.getUUID
+import no.nav.amt.tiltak.data_publisher.model.DeltakerlisteArrangorDto
 import no.nav.amt.tiltak.data_publisher.model.DeltakerlistePublishDto
-import no.nav.amt.tiltak.data_publisher.model.OrganisasjonDto
 import no.nav.amt.tiltak.data_publisher.model.TiltakDto
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -21,12 +21,15 @@ class DeltakerlistePublishQuery(
 
 		return DeltakerlistePublishDto(
 			id = deltakerliste.id,
-			arrangorId = deltakerliste.arrangorId,
 			type = deltakerliste.type,
 			navn = deltakerliste.navn,
 			status = deltakerliste.status,
 			tiltak = TiltakDto(deltakerliste.navn, deltakerliste.tiltakType),
-			arrangor = OrganisasjonDto(deltakerliste.arrangorOrgNr, deltakerliste.arrangorNavn),
+			arrangor = DeltakerlisteArrangorDto(
+				id = deltakerliste.arrangorId,
+				organisasjonsnummer = deltakerliste.arrangorOrgNr,
+				navn = deltakerliste.arrangorNavn
+			),
 			startDato = deltakerliste.startDato,
 			sluttDato = deltakerliste.sluttDato
 		)
