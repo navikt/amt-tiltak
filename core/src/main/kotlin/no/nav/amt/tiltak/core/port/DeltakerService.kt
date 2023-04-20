@@ -16,7 +16,7 @@ interface DeltakerService {
 
 	fun hentDeltakere(deltakerIder: List<UUID>): List<Deltaker>
 
-	fun oppdaterStatuser()
+	fun progressStatuser()
 
 	fun slettDeltaker(deltakerId: UUID)
 
@@ -58,4 +58,5 @@ interface DeltakerService {
 
 	fun republiserAlleDeltakerePaKafka(batchSize: Int = 500)
 
+	fun slettDeltakerePaaGjennomforing(gjennomforingId: UUID)
 }

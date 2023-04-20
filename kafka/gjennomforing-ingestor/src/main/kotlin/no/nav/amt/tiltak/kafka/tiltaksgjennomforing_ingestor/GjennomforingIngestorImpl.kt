@@ -4,10 +4,7 @@ import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.MulighetsrommetApiCl
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.kafka.GjennomforingIngestor
-import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.core.port.NavEnhetService
-import no.nav.amt.tiltak.core.port.TiltakService
+import no.nav.amt.tiltak.core.port.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.*
@@ -16,6 +13,7 @@ import java.util.*
 class GjennomforingIngestorImpl(
 	private val arrangorService: ArrangorService,
 	private val gjennomforingService: GjennomforingService,
+	private val deltakerService: DeltakerService,
 	private val tiltakService: TiltakService,
 	private val navEnhetService: NavEnhetService,
 	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
@@ -27,7 +25,16 @@ class GjennomforingIngestorImpl(
 		"AVKLARAG",
 		"VASV",
 		"ARBRRHDAG",
-		"DIGIOPPARB"
+		"DIGIOPPARB",
+		"JOBBK",
+		"GRUPPEAMO",
+		"GRUFAGYRKE"
+	)
+
+	private val kursTiltak = setOf(
+		"JOBBK",
+		"GRUPPEAMO",
+		"GRUFAGYRKE"
 	)
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -35,10 +42,12 @@ class GjennomforingIngestorImpl(
 		if (recordValue == null) {
 			val id = UUID.fromString(gjennomforingId)
 			log.info("Mottok melding om å slette gjennomføring med id $id")
+			deltakerService.slettDeltakerePaaGjennomforing(id)
 			gjennomforingService.slettGjennomforing(id)
 			return
 		}
 		val gjennomforing = fromJsonString<GjennomforingMessage>(recordValue)
+		val erKurs = kursTiltak.contains(gjennomforing.tiltakstype.arenaKode)
 
 		if (!stottedeTiltak.contains(gjennomforing.tiltakstype.arenaKode)) {
 			log.info("Lagrer ikke gjennomføring med id ${gjennomforing.id} og tiltakstype ${gjennomforing.tiltakstype.arenaKode} fordi tiltaket ikke er støttet.")
@@ -74,6 +83,7 @@ class GjennomforingIngestorImpl(
 				navEnhetId = navEnhet?.id,
 				lopenr = arenaData.lopenr,
 				opprettetAar = arenaData.opprettetAar,
+				erKurs = erKurs
 			)
 		)
 

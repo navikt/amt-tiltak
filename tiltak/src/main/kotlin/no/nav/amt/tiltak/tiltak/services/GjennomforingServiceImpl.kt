@@ -5,7 +5,6 @@ import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
@@ -15,16 +14,13 @@ import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.utils.UpdateStatus
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import org.springframework.transaction.support.TransactionTemplate
 import java.util.*
 
 @Service
 class GjennomforingServiceImpl(
 	private val gjennomforingRepository: GjennomforingRepository,
 	private val tiltakService: TiltakService,
-	private val deltakerService: DeltakerService,
 	private val arrangorService: ArrangorService,
-	private val transactionTemplate: TransactionTemplate,
 	private val publisherService: DataPublisherService
 ) : GjennomforingService {
 
@@ -67,7 +63,8 @@ class GjennomforingServiceImpl(
 				sluttDato = updatedGjennomforing.sluttDato,
 				navEnhetId = updatedGjennomforing.navEnhetId,
 				lopenr = updatedGjennomforing.lopenr,
-				opprettetAar = updatedGjennomforing.opprettetAar
+				opprettetAar = updatedGjennomforing.opprettetAar,
+				erKurs = updatedGjennomforing.erKurs
 			)
 		)
 
@@ -77,23 +74,20 @@ class GjennomforingServiceImpl(
 	}
 
 	override fun slettGjennomforing(gjennomforingId: UUID) {
-		transactionTemplate.execute {
-			deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId).forEach {
-				deltakerService.slettDeltaker(it.id)
-			}
-
-			gjennomforingRepository.delete(gjennomforingId)
-		}
-
+		gjennomforingRepository.delete(gjennomforingId)
 		log.info("Gjennomføring med id=$gjennomforingId er slettet")
 		publisherService.publish(gjennomforingId, DataPublishType.DELTAKERLISTE)
 	}
 
 	override fun getGjennomforing(id: UUID): Gjennomforing {
+		return getGjennomforingOrNull(id) ?: throw NoSuchElementException("Fant ikke gjennomforing: $id")
+	}
+
+	override fun getGjennomforingOrNull(id: UUID): Gjennomforing? {
 		return gjennomforingRepository.get(id)?.let { gjennomforingDbo ->
 			val (tiltak, arrangor) = getTiltakOgArrangor(gjennomforingDbo.tiltakId, gjennomforingDbo.arrangorId)
 			return@let gjennomforingDbo.toGjennomforing(tiltak, arrangor)
-		} ?: throw NoSuchElementException("Fant ikke gjennomforing: $id")
+		}
 	}
 
 	override fun getGjennomforinger(gjennomforingIder: List<UUID>): List<Gjennomforing> {

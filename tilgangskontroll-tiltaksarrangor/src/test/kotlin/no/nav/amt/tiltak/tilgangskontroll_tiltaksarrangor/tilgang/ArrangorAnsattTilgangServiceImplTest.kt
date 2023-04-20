@@ -80,7 +80,8 @@ class ArrangorAnsattTilgangServiceImplTest {
 		sluttDato = null,
 		navEnhetId = null,
 		opprettetAar = 2022,
-		lopenr = 3837
+		lopenr = 3837,
+		erKurs = false
 	)
 
 	val deltaker = Deltaker(

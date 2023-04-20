@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.deltaker.repositories
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getNullableUUID
+import no.nav.amt.tiltak.core.domain.tiltak.AVSLUTTENDE_STATUSER
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
@@ -214,17 +215,21 @@ open class DeltakerRepository(
 			.firstOrNull()
 	}
 
-	fun skalAvsluttes(): List<DeltakerDbo> {
+	fun sluttDatoPassert(): List<DeltakerDbo> {
 		val sql = """
 			SELECT deltaker.*, bruker.*
 			FROM deltaker_status
 					 inner join deltaker on deltaker_status.deltaker_id = deltaker.id
 					 inner join bruker on bruker.id = deltaker.bruker_id
 			WHERE deltaker_status.aktiv = TRUE
-				AND deltaker_status.status IN ('DELTAR', 'VENTER_PA_OPPSTART')
+				AND deltaker_status.status IN (:gjennomforende_statuser)
 				AND deltaker.slutt_dato < CURRENT_DATE
 		""".trimIndent()
-		val parameters = MapSqlParameterSource()
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf("gjennomforende_statuser" to listOf(
+				DeltakerStatus.Type.DELTAR.name,
+				DeltakerStatus.Type.VENTER_PA_OPPSTART.name))
+		)
 		return template.query(sql, parameters, rowMapper)
 	}
 
@@ -241,7 +246,7 @@ open class DeltakerRepository(
 		""".trimIndent()
 		val parameters = MapSqlParameterSource().addValues(
 			mapOf(
-				"avsluttende_statuser" to listOf(DeltakerStatus.Type.HAR_SLUTTET.name, DeltakerStatus.Type.IKKE_AKTUELL.name),
+				"avsluttende_statuser" to AVSLUTTENDE_STATUSER.map { it.name },
 				"gjennomforing_status" to Gjennomforing.Status.AVSLUTTET.name
 			)
 		)
@@ -255,7 +260,7 @@ open class DeltakerRepository(
 					 inner join deltaker on deltaker_status.deltaker_id = deltaker.id
 					 inner join bruker on bruker.id = deltaker.bruker_id
 			WHERE deltaker_status.aktiv = TRUE
-				AND deltaker_status.status = 'VENTER_PA_OPPSTART'
+				AND deltaker_status.status = '${DeltakerStatus.Type.VENTER_PA_OPPSTART.name}'
 				AND deltaker.start_dato <= CURRENT_DATE
 				AND deltaker.slutt_dato >= CURRENT_DATE
 		""".trimIndent()

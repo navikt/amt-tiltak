@@ -83,6 +83,43 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
+	fun `ingest deltaker - gjennomforing er kurs - ingestes uten feil`() {
+		val mockBruker = MockPdlBruker()
+		val gjennomforing = ingestGjennomforing(tiltakKode = "GRUPPEAMO")
+		val message = DeltakerMessage(gjennomforingId = gjennomforing.id, status = DeltakerStatus.Type.VURDERES)
+
+		mockVeilarboppfolgingHttpServer.mockHentVeilederIdent(message.personIdent, NAV_ANSATT_1.navIdent)
+		mockVeilarbarenaHttpServer.mockHentBrukerOppfolgingsenhetId(message.personIdent, NAV_ENHET_1.enhetId)
+		mockDkifHttpServer.mockHentBrukerKontaktinformasjon(MockKontaktinformasjon("epost", "mobil"))
+		mockPoaoTilgangHttpServer.addErSkjermetResponse(mapOf(message.personIdent to false))
+
+		mockPdlHttpServer.mockHentBruker(message.personIdent, mockBruker)
+		kafkaMessageSender.sendTilAmtTiltakTopic(KafkaMessageCreator.opprettAmtTiltakDeltakerMessage(message))
+
+		AsyncUtils.eventually {
+			val maybeDeltaker = deltakerService.hentDeltaker(message.id)
+
+			maybeDeltaker shouldNotBe null
+
+			val deltaker = maybeDeltaker!!
+			deltaker.personIdent shouldBe message.personIdent
+			deltaker.gjennomforingId shouldBe message.gjennomforingId
+			deltaker.prosentStilling shouldBe 0.0
+			deltaker.dagerPerUke shouldBe message.dagerPerUke
+			deltaker.registrertDato shouldBeEqualTo message.registrertDato
+			deltaker.startDato shouldBe message.startDato
+			deltaker.sluttDato shouldBe message.sluttDato
+			deltaker.status.type shouldBe message.status
+			deltaker.status.aarsak shouldBe message.statusAarsak
+			deltaker.innsokBegrunnelse shouldBe message.innsokBegrunnelse
+			deltaker.erSkjermet shouldBe false
+			deltaker.fornavn shouldBe mockBruker.fornavn
+			deltaker.etternavn shouldBe mockBruker.etternavn
+		}
+
+	}
+
+	@Test
 	fun `ingest deltaker - deltaker er skjermet - skal inserte ny deltaker med skjermingsdata `() {
 		val mockBruker = MockPdlBruker()
 
@@ -142,7 +179,7 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	fun `skal slette deltaker med operation DELETED`() {
+	fun `ingest deltaker - DELETE operation - skal slette deltaker`() {
 		deltakerService.hentDeltaker(DELTAKER_1.id) shouldNotBe null
 
 		val message = DeltakerMessage(id = DELTAKER_1.id, gjennomforingId = DELTAKER_1.gjennomforingId, operation = "DELETED")
@@ -155,7 +192,7 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	fun `deltaker som er tidligere skjult skal oppheves når deltakerstatus oppdateres`() {
+	fun `ingest deltaker - deltaker er tidligere skjult - skal oppheves når deltakerstatus oppdateres`() {
 		val skjultDeltaker = DELTAKER_1.copy(id = UUID.randomUUID())
 
 		testDataRepository.insertDeltaker(skjultDeltaker)
@@ -182,7 +219,7 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 	}
 
 
-	private fun ingestGjennomforing(): GjennomforingMessage {
+	private fun ingestGjennomforing(tiltakKode: String = "INDOPPFAG"): GjennomforingMessage {
 		val enhetsregisterEnhet = EnhetDto(
 			organisasjonsnummer = "999888777",
 			navn = "Arrangor",
@@ -198,7 +235,7 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 			status = "GJENNOMFOR",
 		)
 
-		val gjennomforingMessage = GjennomforingMessage()
+		val gjennomforingMessage = GjennomforingMessage(tiltakArenaKode = tiltakKode)
 		val jsonObjekt = KafkaMessageCreator.opprettGjennomforingMessage(gjennomforingMessage)
 
 		mockMulighetsrommetApiServer.gjennomforingArenaData(gjennomforingMessage.id, gjennomforingArenaData)

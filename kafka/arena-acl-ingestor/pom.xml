@@ -78,6 +78,14 @@
             <artifactId>arrangor</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>mulighetsrommet-api-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>gjennomforing-ingestor</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

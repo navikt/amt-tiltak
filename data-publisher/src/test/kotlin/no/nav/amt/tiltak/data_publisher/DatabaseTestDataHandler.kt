@@ -96,7 +96,7 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		opprettetAar: Int = LocalDate.now().year,
 		lopenr: Int = Random().nextInt()
 	): GjennomforingInput = GjennomforingInput(
-		id, tiltakId, arrangorId, navn, status, startDato, sluttDato, navEnhetId, opprettetAar, lopenr
+		id, tiltakId, arrangorId, navn, status, startDato, sluttDato, navEnhetId, opprettetAar, lopenr, false
 	)
 
 	private fun navEnhetInput(): NavEnhetInput = NavEnhetInput(

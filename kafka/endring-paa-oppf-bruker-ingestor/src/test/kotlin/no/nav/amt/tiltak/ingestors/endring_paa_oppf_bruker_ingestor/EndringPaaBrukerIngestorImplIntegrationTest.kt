@@ -70,6 +70,7 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 			brukerService,
 			endringsmeldingService,
 			mockk(),
+			mockk(),
 			TransactionTemplate(),
 			mockk(),
 			publisherService

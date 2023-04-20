@@ -39,6 +39,25 @@ class MulighetsrommetApiClientImpl(
 		}
 	}
 
+	override fun hentGjennomforing(id: UUID): Gjennomforing {
+		val request = Request.Builder()
+			.url("$baseUrl/api/v1/tiltaksgjennomforinger/$id")
+			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
+			.get()
+			.build()
+
+		httpClient.newCall(request).execute().use { response ->
+			if (!response.isSuccessful) {
+				throw RuntimeException("Klarte ikke å hente gjennomføring arenadata fra Mulighetsrommet. status=${response.code}")
+			}
+
+			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
+
+			return fromJsonString(body)
+
+		}
+	}
+
 	object HentGjennomforingArenaData {
 		data class Response(
 			val opprettetAar: Int,
