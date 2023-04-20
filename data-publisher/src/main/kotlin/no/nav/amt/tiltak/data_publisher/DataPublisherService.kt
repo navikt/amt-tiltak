@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.data_publisher
 
+import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.data_publisher.publish.*
@@ -16,6 +17,7 @@ class DataPublisherService(
 	private val kafkaTopicProperties: KafkaTopicProperties,
 	private val kafkaProducerClient: KafkaProducerClient<ByteArray, ByteArray>,
 	private val template: NamedParameterJdbcTemplate,
+	private val enhetsregisterClient: EnhetsregisterClient,
 	private val publishRepository: PublishRepository
 ) {
 
@@ -93,7 +95,7 @@ class DataPublisherService(
 	}
 
 	private fun publishArrangor(id: UUID, forcePublish: Boolean = false) {
-		val currentData = ArrangorPublishQuery(template).get(id)
+		val currentData = ArrangorPublishQuery(template, enhetsregisterClient).get(id)
 
 		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.ARRANGOR, currentData.digest())) {
 			val key = id.toString().toByteArray()

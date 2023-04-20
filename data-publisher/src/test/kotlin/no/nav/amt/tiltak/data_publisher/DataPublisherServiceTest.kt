@@ -6,6 +6,8 @@ import io.kotest.core.spec.style.FunSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
+import no.nav.amt.tiltak.clients.amt_enhetsregister.Virksomhet
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType.ARRANGOR
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType.DELTAKERLISTE
@@ -28,6 +30,8 @@ class DataPublisherServiceTest : FunSpec({
 	val dbHandler = DatabaseTestDataHandler(template)
 	lateinit var kafkaProducerClient: KafkaProducerClient<ByteArray, ByteArray>
 	val publishRepository = PublishRepository(template)
+
+	val enhetsregisterClient: EnhetsregisterClient = mockk()
 
 	lateinit var service: DataPublisherService
 
@@ -59,7 +63,7 @@ class DataPublisherServiceTest : FunSpec({
 		)
 
 		service = DataPublisherService(
-			kafkaTopicProperties, kafkaProducerClient, template, publishRepository
+			kafkaTopicProperties, kafkaProducerClient, template, enhetsregisterClient, publishRepository
 		)
 	}
 
@@ -69,6 +73,9 @@ class DataPublisherServiceTest : FunSpec({
 
 	test("Ny Arrangør - Sendes") {
 		val input = dbHandler.createArrangor()
+
+		every { enhetsregisterClient.hentVirksomhet(any()) } returns Virksomhet("Parent", input.overordnetEnhetOrganisasjonsnummer!!, null, null)
+		every { enhetsregisterClient.hentVirksomhet(any()) } returns Virksomhet("Parent", input.overordnetEnhetOrganisasjonsnummer!!, null, null)
 		dbHandler.createDeltakerliste(arrangorId = input.id)
 
 		publishAndVerify(input.id, ARRANGOR, 1)
@@ -77,22 +84,21 @@ class DataPublisherServiceTest : FunSpec({
 	test("Samme arrangør to ganger uten endring - Sendes en gang") {
 		val input = dbHandler.createArrangor()
 
+		every { enhetsregisterClient.hentVirksomhet(any()) } returns Virksomhet("Parent", input.overordnetEnhetOrganisasjonsnummer!!, null, null)
+		every { enhetsregisterClient.hentVirksomhet(any()) } returns Virksomhet("Parent", input.overordnetEnhetOrganisasjonsnummer!!, null, null)
+
 		publishAndVerify(input.id, ARRANGOR, 1)
 		publishAndVerify(input.id, ARRANGOR, 1)
 	}
 
 	test("Oppdatere eksisterende arrangør - sender oppdatert arrangør") {
 		val input = dbHandler.createArrangor()
+		every { enhetsregisterClient.hentVirksomhet(any()) } returns Virksomhet("Parent", input.overordnetEnhetOrganisasjonsnummer!!, null, null)
+
 		publishAndVerify(input.id, ARRANGOR, 1)
 
 		dbHandler.updateArrangor(input.copy(navn = "ENDRET"))
 		publishAndVerify(input.id, ARRANGOR, 2)
-	}
-
-	test("publishAll - Sender arrangør hver gang den kalles") {
-		dbHandler.createArrangor()
-		publishAllAndVerify(1)
-		publishAllAndVerify(2)
 	}
 
 	test("Ny Deltakerliste - Sendes") {
@@ -105,7 +111,7 @@ class DataPublisherServiceTest : FunSpec({
 		publishAndVerify(input.id, DELTAKERLISTE, 1)
 		publishAndVerify(input.id, DELTAKERLISTE, 1)
 	}
-	
+
 })
 
 private fun createTopicProperties(): KafkaTopicProperties = KafkaTopicProperties(

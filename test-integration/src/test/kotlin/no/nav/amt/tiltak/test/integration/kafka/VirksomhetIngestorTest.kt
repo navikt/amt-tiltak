@@ -24,6 +24,7 @@ class VirksomhetIngestorTest : IntegrationTestBase() {
 	@BeforeEach
 	fun setup() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		mockEnhetsregisterServer.addEnhet(ARRANGOR_1.toDto())
 	}
 
 	@Test
@@ -96,6 +97,12 @@ class VirksomhetIngestorTest : IntegrationTestBase() {
 		)
 
 		mockEnhetsregisterServer.addEnhet(nyOverordnetEnhet)
+		mockEnhetsregisterServer.addEnhet(EnhetDto(
+			organisasjonsnummer = msg.organisasjonsnummer,
+			navn = msg.navn,
+			overordnetEnhetOrganisasjonsnummer = msg.overordnetEnhetOrganisasjonsnummer,
+			overordnetEnhetNavn = ""
+		))
 
 		kafkaMessageSender.sendTilVirksomhetTopic(
 			KafkaMessageCreator.opprettVirksomhetMessage(msg)
@@ -117,6 +124,13 @@ class VirksomhetIngestorTest : IntegrationTestBase() {
 			overordnetEnhetOrganisasjonsnummer = "42",
 		)
 
+		mockEnhetsregisterServer.addEnhet(EnhetDto(
+			organisasjonsnummer = msg.organisasjonsnummer,
+			navn = msg.navn,
+			overordnetEnhetOrganisasjonsnummer = msg.overordnetEnhetOrganisasjonsnummer,
+			overordnetEnhetNavn = ""
+		))
+
 		kafkaMessageSender.sendTilVirksomhetTopic(
 			KafkaMessageCreator.opprettVirksomhetMessage(msg)
 		)
@@ -128,6 +142,13 @@ class VirksomhetIngestorTest : IntegrationTestBase() {
 			oppdatertArrangor.overordnetEnhetNavn shouldBe msg.navn
 		}
 	}
+
+	fun ArrangorInput.toDto(): EnhetDto = EnhetDto(
+		organisasjonsnummer = organisasjonsnummer,
+		navn = navn,
+		overordnetEnhetOrganisasjonsnummer = overordnetEnhetOrganisasjonsnummer,
+		overordnetEnhetNavn = overordnetEnhetNavn
+	)
 
 
 }

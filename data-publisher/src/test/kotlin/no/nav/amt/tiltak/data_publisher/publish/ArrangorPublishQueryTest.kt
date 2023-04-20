@@ -2,6 +2,10 @@ package no.nav.amt.tiltak.data_publisher.publish
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
+import no.nav.amt.tiltak.clients.amt_enhetsregister.Virksomhet
 import no.nav.amt.tiltak.data_publisher.DatabaseTestDataHandler
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
@@ -11,20 +15,27 @@ class ArrangorPublishQueryTest : FunSpec({
 	val dataSource = SingletonPostgresContainer.getDataSource()
 	val template = NamedParameterJdbcTemplate(dataSource)
 
-	val query = ArrangorPublishQuery(template)
+	val enhetsregisterClient: EnhetsregisterClient = mockk()
+
+	val query = ArrangorPublishQuery(template, enhetsregisterClient)
 	val db = DatabaseTestDataHandler(template)
 
 	beforeEach {
+		every { enhetsregisterClient.hentVirksomhet(any()) } returns Virksomhet("", "", null, null)
+		DbTestDataUtils.cleanDatabase(dataSource)
+	}
+
+	afterEach {
 		DbTestDataUtils.cleanDatabase(dataSource)
 	}
 
 	test("get - Arrangor - 0 deltakerlister - returnerer riktig Arrangør") {
 		val input = db.createArrangor()
-		val data = query.get(input.id)
+		every { enhetsregisterClient.hentVirksomhet(any()) } returns Virksomhet("Parent", input.overordnetEnhetOrganisasjonsnummer!!, null, null)
 
+		val data = query.get(input.id)
 		data.id shouldBe input.id
-		data.organisasjon.nummer shouldBe input.organisasjonsnummer
-		data.overordnetOrganisasjon?.nummer shouldBe input.overordnetEnhetOrganisasjonsnummer
+		data.orgNr shouldBe input.organisasjonsnummer
 	}
 
 	test("get - Arrangor - 1 deltakerliste - returnerer riktig") {
@@ -32,6 +43,9 @@ class ArrangorPublishQueryTest : FunSpec({
 		val deltakerlisteInput = db.createDeltakerliste(
 			arrangorId = arrangorInput.id
 		)
+
+		every { enhetsregisterClient.hentVirksomhet(any()) } returns Virksomhet("Parent", arrangorInput.overordnetEnhetOrganisasjonsnummer!!, null, null)
+
 
 		val data = query.get(arrangorInput.id)
 

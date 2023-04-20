@@ -18,6 +18,10 @@ class DeltakerPublishQueryTest : FunSpec({
 		DbTestDataUtils.cleanDatabase(dataSource)
 	}
 
+	afterEach {
+		DbTestDataUtils.cleanDatabase(dataSource)
+	}
+
 	test("get") {
 		val input = db.createDeltaker()
 		val data = query.get(input.id)
