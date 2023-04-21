@@ -28,7 +28,7 @@ class DataPublisherServiceTest : FunSpec({
 
 	val kafkaTopicProperties = createTopicProperties()
 	val dbHandler = DatabaseTestDataHandler(template)
-	lateinit var kafkaProducerClient: KafkaProducerClient<ByteArray, ByteArray>
+	lateinit var kafkaProducerClient: KafkaProducerClient<String, String>
 	val publishRepository = PublishRepository(template)
 
 	val enhetsregisterClient: EnhetsregisterClient = mockk()

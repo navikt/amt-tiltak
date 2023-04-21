@@ -15,7 +15,7 @@ import java.util.*
 @Service
 class DataPublisherService(
 	private val kafkaTopicProperties: KafkaTopicProperties,
-	private val kafkaProducerClient: KafkaProducerClient<ByteArray, ByteArray>,
+	private val stringKafkaProducer: KafkaProducerClient<String, String>,
 	private val template: NamedParameterJdbcTemplate,
 	private val enhetsregisterClient: EnhetsregisterClient,
 	private val publishRepository: PublishRepository
@@ -66,11 +66,11 @@ class DataPublisherService(
 		val currentData = DeltakerlistePublishQuery(template).get(id)
 
 		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKERLISTE, currentData.digest())) {
-			val key = id.toString().toByteArray()
-			val value = JsonUtils.toJsonString(currentData).toByteArray()
+			val key = id.toString()
+			val value = JsonUtils.toJsonString(currentData)
 			val record = ProducerRecord(kafkaTopicProperties.amtArrangorTopic, key, value)
 			logger.info("Republiserer DELTAKERLISTE med id $id")
-			kafkaProducerClient.sendSync(record)
+			stringKafkaProducer.sendSync(record)
 			publishRepository.set(id, DataPublishType.DELTAKERLISTE, currentData.digest())
 		}
 	}
@@ -79,16 +79,16 @@ class DataPublisherService(
 		val currentData = DeltakerPublishQuery(template).get(id)
 
 		if (currentData == null) {
-			val key = id.toString().toByteArray()
-			val record = ProducerRecord<ByteArray, ByteArray?>(kafkaTopicProperties.amtDeltakerTopic, key, null)
+			val key = id.toString()
+			val record = ProducerRecord<String, String?>(kafkaTopicProperties.amtDeltakerTopic, key, null)
 			logger.info("Legger inn Tombstone på DELTAKER med id $id")
-			kafkaProducerClient.sendSync(record)
+			stringKafkaProducer.sendSync(record)
 		} else if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKER, currentData.digest())) {
-			val key = id.toString().toByteArray()
-			val value = JsonUtils.toJsonString(currentData).toByteArray()
+			val key = id.toString()
+			val value = JsonUtils.toJsonString(currentData)
 			val record = ProducerRecord(kafkaTopicProperties.amtDeltakerTopic, key, value)
 			logger.info("Republiserer DELTAKER med id $id")
-			kafkaProducerClient.sendSync(record)
+			stringKafkaProducer.sendSync(record)
 			publishRepository.set(id, DataPublishType.DELTAKER, currentData.digest())
 		}
 
@@ -98,11 +98,11 @@ class DataPublisherService(
 		val currentData = ArrangorPublishQuery(template, enhetsregisterClient).get(id)
 
 		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.ARRANGOR, currentData.digest())) {
-			val key = id.toString().toByteArray()
-			val value = JsonUtils.toJsonString(currentData).toByteArray()
+			val key = id.toString()
+			val value = JsonUtils.toJsonString(currentData)
 			val record = ProducerRecord(kafkaTopicProperties.amtArrangorTopic, key, value)
 			logger.info("Republiserer ARRANGOR med id $id")
-			kafkaProducerClient.sendSync(record)
+			stringKafkaProducer.sendSync(record)
 			publishRepository.set(id, DataPublishType.ARRANGOR, currentData.digest())
 		}
 	}
@@ -111,11 +111,11 @@ class DataPublisherService(
 		val currentData = ArrangorAnsattPublishQuery(template).get(id)
 
 		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.ARRANGOR_ANSATT, currentData.digest())) {
-			val key = id.toString().toByteArray()
-			val value = JsonUtils.toJsonString(currentData).toByteArray()
+			val key = id.toString()
+			val value = JsonUtils.toJsonString(currentData)
 			val record = ProducerRecord(kafkaTopicProperties.amtArrangorAnsattTopic, key, value)
 			logger.info("Republiserer ARRANGOR_ANSATT med id $id")
-			kafkaProducerClient.sendSync(record)
+			stringKafkaProducer.sendSync(record)
 			publishRepository.set(id, DataPublishType.ARRANGOR_ANSATT, currentData.digest())
 		}
 	}
@@ -124,11 +124,11 @@ class DataPublisherService(
 		val currentData = EndringsmeldingPublishQuery(template).get(id)
 
 		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.ENDRINGSMELDING, currentData.digest())) {
-			val key = id.toString().toByteArray()
-			val value = JsonUtils.toJsonString(currentData).toByteArray()
+			val key = id.toString()
+			val value = JsonUtils.toJsonString(currentData)
 			val record = ProducerRecord(kafkaTopicProperties.amtArrangorAnsattTopic, key, value)
 			logger.info("Republiserer ENDRINGSMELDING med id $id")
-			kafkaProducerClient.sendSync(record)
+			stringKafkaProducer.sendSync(record)
 			publishRepository.set(id, DataPublishType.ENDRINGSMELDING, currentData.digest())
 		}
 	}
