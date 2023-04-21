@@ -119,7 +119,7 @@ class DeltakerProcessor(
 				tiltakId = tiltak.id,
 				arrangorId = arrangor.id,
 				navn = gjennomforing.navn,
-				status = GjennomforingStatusConverter.convert(gjennomforingArenaData.status),
+				status = GjennomforingStatusConverter.convert(gjennomforing.status.name),
 				startDato = gjennomforing.startDato,
 				sluttDato = gjennomforing.sluttDato,
 				navEnhetId = navEnhet?.id,

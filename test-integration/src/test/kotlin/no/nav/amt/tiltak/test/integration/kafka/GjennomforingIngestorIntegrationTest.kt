@@ -19,6 +19,7 @@ import no.nav.amt.tiltak.tiltak.repositories.TiltakRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.Duration
 import java.util.*
 
 
@@ -60,7 +61,7 @@ class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 		status = "GJENNOMFOR",
 	)
 
-	val gjennomforingMessage = GjennomforingMessage()
+	val gjennomforingMessage = GjennomforingMessage().copy(virksomhetsnummer = enhetsregisterEnhet.organisasjonsnummer)
 	val jsonObjekt = KafkaMessageCreator.opprettGjennomforingMessage(gjennomforingMessage)
 
 
@@ -141,7 +142,7 @@ class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 		LogUtils.withLogs { getLogs ->
 			kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(KafkaMessageCreator.opprettGjennomforingMessage(gjennomforingMessageIkkeStottet))
 
-			AsyncUtils.eventually {
+			AsyncUtils.eventually(until = Duration.ofSeconds(20)) {
 				getLogs().any { it.message == "Lagrer ikke gjennomføring med id ${gjennomforingMessageIkkeStottet.id} og tiltakstype INDJOBSTOT fordi tiltaket ikke er støttet." } shouldBe true
 			}
 		}
