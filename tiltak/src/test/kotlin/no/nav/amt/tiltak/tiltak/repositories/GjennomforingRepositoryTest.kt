@@ -88,7 +88,7 @@ internal class GjennomforingRepositoryTest : FunSpec({
 					arrangorId = UUID.randomUUID(),
 					tiltakId = UUID.randomUUID(),
 					navn = "idosfja",
-					status = Gjennomforing.Status.IKKE_STARTET,
+					status = Gjennomforing.Status.APENT_FOR_INNSOK,
 					startDato = null,
 					sluttDato = null,
 					navEnhetId = null,

@@ -18,7 +18,6 @@ data class Gjennomforing(
 	val erKurs: Boolean
 ) {
 	enum class Status {
-		IKKE_STARTET, //Skal slettes, erstattet av APENT_FOR_INNSOK
 		APENT_FOR_INNSOK, GJENNOMFORES, AVSLUTTET
 	}
 }
