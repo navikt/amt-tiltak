@@ -61,7 +61,7 @@ open class KafkaBeans {
 	@Bean(name = ["stringKafkaProducer"])
 	@Profile("default")
 	open fun stringKafkaProducer(kafkaProperties: KafkaProperties): KafkaProducerClient<String, String> {
-		val properties = KafkaPropertiesPreset.aivenByteProducerProperties("amt-tiltak-producer-2")
+		val properties = KafkaPropertiesPreset.aivenDefaultProducerProperties("amt-tiltak-producer-2")
 		return KafkaProducerClientImpl(properties)
 	}
 }
