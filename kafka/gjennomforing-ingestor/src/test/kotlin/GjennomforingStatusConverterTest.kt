@@ -13,7 +13,7 @@ class GjennomforingStatusConverterTest {
 
 	@Test
 	fun `convert() - konverterer planlagt til IKKE_STARTET`() {
-		GjennomforingStatusConverter.convert(GjennomforingMessage.Status.APENT_FOR_INNSOK.name) shouldBe Gjennomforing.Status.IKKE_STARTET
+		GjennomforingStatusConverter.convert(GjennomforingMessage.Status.APENT_FOR_INNSOK.name) shouldBe Gjennomforing.Status.APENT_FOR_INNSOK
 	}
 
 	@Test

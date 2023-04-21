@@ -11,7 +11,7 @@ object GjennomforingStatusConverter {
 	fun convert (status: String) : Gjennomforing.Status {
 		return when (status) {
 			in avsluttendeStatuser -> Gjennomforing.Status.AVSLUTTET
-			in ikkeStartetStatuser -> Gjennomforing.Status.IKKE_STARTET
+			in ikkeStartetStatuser -> Gjennomforing.Status.APENT_FOR_INNSOK
 			in gjennomforesStatuser -> Gjennomforing.Status.GJENNOMFORES
 			else -> throw RuntimeException("Ukjent status fra mulighetsrommet: $status")
 		}

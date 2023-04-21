@@ -45,7 +45,7 @@ internal class GjennomforingRepositoryTest : FunSpec({
 	test("insert() should insert gjennomforing and return object") {
 		val id = UUID.randomUUID()
 		val navn = "TEST Tiltaksgjennomforing"
-		val status = Gjennomforing.Status.IKKE_STARTET
+		val status = Gjennomforing.Status.APENT_FOR_INNSOK
 		val startDato = LocalDate.now().plusDays(2)
 		val sluttDato = LocalDate.now().plusDays(10)
 
