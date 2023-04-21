@@ -4,16 +4,16 @@ import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 
 object GjennomforingStatusConverter {
 
-	private val avsluttendeStatuser = listOf("AVLYST", "AVBRUTT", "AVSLUTT")
-	private val ikkeStartetStatuser = listOf("PLANLAGT")
-	private val gjennomforesStatuser = listOf("GJENNOMFOR")
+	private val avsluttendeStatuser = listOf(GjennomforingMessage.Status.AVLYST, GjennomforingMessage.Status.AVSLUTTET, GjennomforingMessage.Status.AVBRUTT).map { it.name }
+	private val ikkeStartetStatuser = listOf(GjennomforingMessage.Status.APENT_FOR_INNSOK.name)
+	private val gjennomforesStatuser = listOf(GjennomforingMessage.Status.GJENNOMFORES.name)
 
-	fun convert (arenaStatus: String) : Gjennomforing.Status {
-		return when (arenaStatus) {
+	fun convert (status: String) : Gjennomforing.Status {
+		return when (status) {
 			in avsluttendeStatuser -> Gjennomforing.Status.AVSLUTTET
 			in ikkeStartetStatuser -> Gjennomforing.Status.IKKE_STARTET
 			in gjennomforesStatuser -> Gjennomforing.Status.GJENNOMFORES
-			else -> throw RuntimeException("Ukjent status fra arena: $arenaStatus")
+			else -> throw RuntimeException("Ukjent status fra mulighetsrommet: $status")
 		}
 
 	}

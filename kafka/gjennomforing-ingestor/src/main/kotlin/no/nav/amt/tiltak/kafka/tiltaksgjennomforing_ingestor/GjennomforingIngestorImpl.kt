@@ -55,13 +55,7 @@ class GjennomforingIngestorImpl(
 		}
 
 		val arenaData = mulighetsrommetApiClient.hentGjennomforingArenaData(gjennomforing.id)
-
-		if (arenaData.virksomhetsnummer == null) {
-			log.info("Lagrer ikke gjennomføring med id ${gjennomforing.id} og tiltakstype ${gjennomforing.tiltakstype.arenaKode} fordi virksomhetsnummer mangler.")
-			return
-		}
-
-		val arrangor = arrangorService.upsertArrangor(arenaData.virksomhetsnummer!!)
+		val arrangor = arrangorService.upsertArrangor(gjennomforing.virksomhetsnummer)
 
 		val tiltak = tiltakService.upsertTiltak(
 			gjennomforing.tiltakstype.id,
@@ -76,8 +70,8 @@ class GjennomforingIngestorImpl(
 				id = gjennomforing.id,
 				tiltakId = tiltak.id,
 				arrangorId = arrangor.id,
-				navn = gjennomforing.navn ?: "",
-				status = GjennomforingStatusConverter.convert(arenaData.status),
+				navn = gjennomforing.navn,
+				status = GjennomforingStatusConverter.convert(gjennomforing.status.name),
 				startDato = gjennomforing.startDato,
 				sluttDato = gjennomforing.sluttDato,
 				navEnhetId = navEnhet?.id,
