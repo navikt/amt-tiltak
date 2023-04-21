@@ -8,6 +8,7 @@ import no.nav.amt.tiltak.kafka.config.KafkaTopicProperties
 import no.nav.common.kafka.producer.KafkaProducerClient
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Service
 import java.util.*
@@ -18,7 +19,12 @@ class DataPublisherService(
 	private val stringKafkaProducer: KafkaProducerClient<String, String>,
 	private val template: NamedParameterJdbcTemplate,
 	private val enhetsregisterClient: EnhetsregisterClient,
-	private val publishRepository: PublishRepository
+	private val publishRepository: PublishRepository,
+	@Value("\${publish.arrangor:true}") private val publishArrangor: Boolean = true,
+	@Value("\${publish.arrangorAnsatt:true}") private val publishArrangorAnsatt: Boolean = true,
+	@Value("\${publish.deltaker:true}") private val publishDeltaker: Boolean = true,
+	@Value("\${publish.deltakerliste:true}") private val publishDeltakerliste: Boolean = true,
+	@Value("\${publish.endringsmelding:true}") private val publishEndringsmelding: Boolean = true
 ) {
 
 	private val logger = LoggerFactory.getLogger(javaClass)
@@ -33,33 +39,44 @@ class DataPublisherService(
 		}
 	}
 
-	fun publishAll(batchSize: Int = 100) {
+	fun publishAll(batchSize: Int = 100, forcePublish: Boolean = true) {
 		val idQueries = IdQueries(template)
 
-		publishBatch(
-			idProvider = { offset -> idQueries.hentDeltakerlisteIds(offset, batchSize) },
-			publisher = { id -> publishDeltakerliste(id, true) }
-		)
+		if (publishDeltakerliste) {
+			publishBatch(
+				idProvider = { offset -> idQueries.hentDeltakerlisteIds(offset, batchSize) },
+				publisher = { id -> publishDeltakerliste(id, forcePublish) }
+			)
+		}
 
-		publishBatch(
-			idProvider = { offset -> idQueries.hentDeltakerIds(offset, batchSize) },
-			publisher = { id -> publishDeltaker(id, true) }
-		)
+		if (publishDeltaker) {
+			publishBatch(
+				idProvider = { offset -> idQueries.hentDeltakerIds(offset, batchSize) },
+				publisher = { id -> publishDeltaker(id, forcePublish) }
+			)
 
-		publishBatch(
-			idProvider = { offset -> idQueries.hentArrangorIds(offset, batchSize) },
-			publisher = { id -> publishArrangor(id, true) }
-		)
+		}
 
-		publishBatch(
-			idProvider = { offset -> idQueries.hentArrangorAnsattIds(offset, batchSize) },
-			publisher = { id -> publishArrangorAnsatt(id, true) }
-		)
+		if (publishArrangor) {
+			publishBatch(
+				idProvider = { offset -> idQueries.hentArrangorIds(offset, batchSize) },
+				publisher = { id -> publishArrangor(id, forcePublish) }
+			)
+		}
 
-		publishBatch(
-			idProvider = { offset -> idQueries.hentEndringsmeldingIds(offset, batchSize) },
-			publisher = { id -> publishEndringsmelding(id, true) }
-		)
+		if (publishArrangorAnsatt) {
+			publishBatch(
+				idProvider = { offset -> idQueries.hentArrangorAnsattIds(offset, batchSize) },
+				publisher = { id -> publishArrangorAnsatt(id, forcePublish) }
+			)
+		}
+
+		if (publishEndringsmelding) {
+			publishBatch(
+				idProvider = { offset -> idQueries.hentEndringsmeldingIds(offset, batchSize) },
+				publisher = { id -> publishEndringsmelding(id, forcePublish) }
+			)
+		}
 	}
 
 	private fun publishDeltakerliste(id: UUID, forcePublish: Boolean = false) {
@@ -68,7 +85,7 @@ class DataPublisherService(
 		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKERLISTE, currentData.digest())) {
 			val key = id.toString()
 			val value = JsonUtils.toJsonString(currentData)
-			val record = ProducerRecord(kafkaTopicProperties.amtArrangorTopic, key, value)
+			val record = ProducerRecord(kafkaTopicProperties.amtDeltakerlisteTopic, key, value)
 			logger.info("Republiserer DELTAKERLISTE med id $id")
 			stringKafkaProducer.sendSync(record)
 			publishRepository.set(id, DataPublishType.DELTAKERLISTE, currentData.digest())
@@ -126,7 +143,7 @@ class DataPublisherService(
 		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.ENDRINGSMELDING, currentData.digest())) {
 			val key = id.toString()
 			val value = JsonUtils.toJsonString(currentData)
-			val record = ProducerRecord(kafkaTopicProperties.amtArrangorAnsattTopic, key, value)
+			val record = ProducerRecord(kafkaTopicProperties.amtEndringsmeldingTopic, key, value)
 			logger.info("Republiserer ENDRINGSMELDING med id $id")
 			stringKafkaProducer.sendSync(record)
 			publishRepository.set(id, DataPublishType.ENDRINGSMELDING, currentData.digest())

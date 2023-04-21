@@ -21,6 +21,14 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>utils</artifactId>
+        </dependency>
+        <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>db_utils</artifactId>
         </dependency>
