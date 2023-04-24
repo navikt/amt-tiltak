@@ -7,6 +7,8 @@ import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltakService
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
+import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.utils.UpdateStatus
@@ -19,6 +21,7 @@ class GjennomforingServiceImpl(
 	private val gjennomforingRepository: GjennomforingRepository,
 	private val tiltakService: TiltakService,
 	private val arrangorService: ArrangorService,
+	private val publisherService: DataPublisherService
 ) : GjennomforingService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -34,8 +37,10 @@ class GjennomforingServiceImpl(
 
 		if (storedGjennomforing != null) {
 			updateGjennomforing(storedGjennomforing, gjennomforing)
+			publisherService.publish(storedGjennomforing.id, DataPublishType.DELTAKERLISTE)
 		} else {
 			gjennomforingRepository.insert(gjennomforing)
+			publisherService.publish(gjennomforing.id, DataPublishType.DELTAKERLISTE)
 		}
 	}
 
@@ -71,6 +76,7 @@ class GjennomforingServiceImpl(
 	override fun slettGjennomforing(gjennomforingId: UUID) {
 		gjennomforingRepository.delete(gjennomforingId)
 		log.info("Gjennomføring med id=$gjennomforingId er slettet")
+		publisherService.publish(gjennomforingId, DataPublishType.DELTAKERLISTE)
 	}
 
 	override fun getGjennomforing(id: UUID): Gjennomforing {

@@ -4,6 +4,7 @@ import no.nav.amt.tiltak.kafka.config.KafkaProperties
 import no.nav.common.kafka.util.KafkaPropertiesBuilder
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.kafka.common.serialization.ByteArraySerializer
+import org.apache.kafka.common.serialization.Serializer
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.utility.DockerImageName
@@ -20,7 +21,7 @@ object SingletonKafkaProvider {
 	private var kafkaContainer: KafkaContainer? = null
 
 
-	fun getKafkaProperties(): KafkaProperties {
+	fun <K, V> getKafkaProperties(keySerializer: Serializer<K>, valueSerializer: Serializer<V>): KafkaProperties {
 		val host = getHost()
 
 		val properties = object : KafkaProperties {
@@ -38,7 +39,7 @@ object SingletonKafkaProvider {
 					.withBrokerUrl(host)
 					.withBaseProperties()
 					.withProducerId(producerId)
-					.withSerializers(ByteArraySerializer::class.java, ByteArraySerializer::class.java)
+					.withSerializers(keySerializer::class.java, valueSerializer::class.java)
 					.build()
 			}
 		}

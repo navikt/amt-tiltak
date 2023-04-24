@@ -14,6 +14,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.AltinnService
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.ArrangorAnsattRoller
@@ -44,6 +45,8 @@ class ArrangorAnsattTilgangServiceImplTest {
 	lateinit var gjennomforingService: GjennomforingService
 
 	lateinit var arrangorVeilederService: ArrangorVeilederService
+
+	lateinit var publisherService: DataPublisherService
 
 	val personligIdent = "fnr"
 
@@ -126,10 +129,12 @@ class ArrangorAnsattTilgangServiceImplTest {
 
 		gjennomforingService = mockk()
 
+		publisherService = mockk()
+
 		arrangorAnsattTilgangServiceImpl = ArrangorAnsattTilgangServiceImpl(
 			arrangorAnsattService, ansattRolleService,
 			deltakerService, gjennomforingService, altinnService, mineDeltakerlisterService, arrangorVeilederService,
-			arrangorService, TransactionTemplate(DataSourceTransactionManager(datasource))
+			arrangorService, TransactionTemplate(DataSourceTransactionManager(datasource)), publisherService
 		)
 
 		every {

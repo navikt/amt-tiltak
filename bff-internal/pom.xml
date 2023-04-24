@@ -32,6 +32,10 @@
             <groupId>no.nav.security</groupId>
             <artifactId>token-validation-spring</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>data-publisher</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.kotest</groupId>

@@ -7,6 +7,7 @@ import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeilederInput
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_2
@@ -38,6 +39,8 @@ class ArrangorVeilederServiceImplTest {
 
 	lateinit var transactionTemplate: TransactionTemplate
 
+	lateinit var publisherService: DataPublisherService
+
 	@BeforeEach
 	fun setup() {
 		arrangorVeilederRepository = mockk(relaxUnitFun = true)
@@ -45,6 +48,7 @@ class ArrangorVeilederServiceImplTest {
 		deltakerService = mockk()
 		gjennomforingService = mockk()
 		transactionTemplate = mockk()
+		publisherService = mockk()
 
 		arrangorVeilederServiceImpl = ArrangorVeilederServiceImpl(
 			arrangorAnsattService = arrangorAnsattService,
@@ -52,7 +56,10 @@ class ArrangorVeilederServiceImplTest {
 			deltakerService = deltakerService,
 			gjennomforingService = gjennomforingService,
 			transactionTemplate = transactionTemplate,
+			publisherService = publisherService
 		)
+
+		every { publisherService.publish(any(), any()) } returns Unit
 	}
 
 	@Test

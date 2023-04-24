@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
 import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.repositories.SkjultDeltakerRepository
@@ -56,6 +57,8 @@ class GjennomforingServiceImplTest : FunSpec({
 
 	lateinit var skjulDeltakerRepository: SkjultDeltakerRepository
 
+	lateinit var publisherService: DataPublisherService
+
 
 	beforeEach {
 		val parameterTemplate = NamedParameterJdbcTemplate(dataSource)
@@ -81,10 +84,14 @@ class GjennomforingServiceImplTest : FunSpec({
 
 		skjulDeltakerRepository = mockk()
 
+		publisherService = mockk()
+
+
 		gjennomforingService = GjennomforingServiceImpl(
 			gjennomforingRepository,
 			tiltakService,
-			arrangorService
+			arrangorService,
+			publisherService
 		)
 
 		deltakerService = DeltakerServiceImpl(
@@ -95,15 +102,18 @@ class GjennomforingServiceImplTest : FunSpec({
 			skjulDeltakerRepository,
 			gjennomforingService,
 			transactionTemplate,
-			kafkaProducerService
+			kafkaProducerService,
+			publisherService
 		)
 
 		service = GjennomforingServiceImpl(
 			gjennomforingRepository = gjennomforingRepository,
 			tiltakService = tiltakService,
 			arrangorService = arrangorService,
+			publisherService = publisherService
 		)
 
+		every { publisherService.publish(any(), any()) } returns Unit
 		DbTestDataUtils.cleanDatabase(dataSource)
 	}
 

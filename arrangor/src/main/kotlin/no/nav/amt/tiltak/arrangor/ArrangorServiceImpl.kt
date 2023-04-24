@@ -4,6 +4,8 @@ import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorUpdate
 import no.nav.amt.tiltak.core.port.ArrangorService
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
+import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.*
@@ -12,6 +14,7 @@ import java.util.*
 class ArrangorServiceImpl(
 	private val enhetsregisterClient: EnhetsregisterClient,
 	private val arrangorRepository: ArrangorRepository,
+	private val dataPublisherService: DataPublisherService
 ) : ArrangorService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -25,6 +28,7 @@ class ArrangorServiceImpl(
 			overordnetEnhetNavn = arrangor.overordnetEnhetNavn,
 			overordnetEnhetOrganisasjonsnummer = arrangor.overordnetEnhetOrganisasjonsnummer,
 		).toArrangor()
+			.also { dataPublisherService.publish(it.id, DataPublishType.ARRANGOR) }
 	}
 
 	override fun getArrangorById(id: UUID): Arrangor {
@@ -74,6 +78,7 @@ class ArrangorServiceImpl(
 				overordnetEnhetOrganisasjonsnummer = overordnetEnhet.organisasjonsnummer,
 			)
 		)
+			.also { dataPublisherService.publish(arrangor.id, DataPublishType.ARRANGOR) }
 
 		log.info("Oppdaterte arrangør ${arrangor.id}")
 	}
@@ -100,6 +105,7 @@ class ArrangorServiceImpl(
 		)
 
 		return arrangorRepository.getById(id).toArrangor()
+			.also { dataPublisherService.publish(it.id, DataPublishType.ARRANGOR) }
 	}
 
 	private data class OverordnetEnhet(

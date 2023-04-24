@@ -7,19 +7,24 @@ import io.mockk.verify
 import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.clients.amt_enhetsregister.Virksomhet
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorUpdate
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import java.time.LocalDateTime
 import java.util.*
 
 class ArrangorServiceImplTest: FunSpec({
 	lateinit var enhetsregisterClient: EnhetsregisterClient
 	lateinit var arrangorRepository: ArrangorRepository
+	lateinit var publisherService: DataPublisherService
 
 	lateinit var arrangorService: ArrangorServiceImpl
 
 	beforeEach {
 		enhetsregisterClient = mockk()
 		arrangorRepository = mockk(relaxUnitFun = true)
-		arrangorService = ArrangorServiceImpl(enhetsregisterClient, arrangorRepository)
+		publisherService = mockk()
+		arrangorService = ArrangorServiceImpl(enhetsregisterClient, arrangorRepository, publisherService)
+
+		every { publisherService.publish(any(), any()) } returns Unit
 	}
 
 	test("getOrCreateArrangor - skal opprette arrangor hvis ikke finnes") {

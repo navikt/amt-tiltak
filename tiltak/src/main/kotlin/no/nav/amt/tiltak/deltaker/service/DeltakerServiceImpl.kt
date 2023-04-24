@@ -5,6 +5,8 @@ import no.nav.amt.tiltak.core.kafka.KafkaProducerService
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
+import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.deltaker.dbo.*
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
@@ -26,7 +28,8 @@ open class DeltakerServiceImpl(
 	private val skjultDeltakerRepository: SkjultDeltakerRepository,
 	private val gjennomforingService: GjennomforingService,
 	private val transactionTemplate: TransactionTemplate,
-	private val kafkaProducerService: KafkaProducerService
+	private val kafkaProducerService: KafkaProducerService,
+	private val publisherService: DataPublisherService
 ) : DeltakerService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -47,6 +50,8 @@ open class DeltakerServiceImpl(
 				?: throw IllegalStateException("Fant ikke deltaker med id ${deltaker.id}")
 
 			kafkaProducerService.publiserDeltaker(oppdatertDeltaker)
+			publisherService.publish(oppdatertDeltaker.id, DataPublishType.DELTAKER)
+			publisherService.publish(oppdatertDeltaker.gjennomforingId, DataPublishType.DELTAKERLISTE)
 		}
 
 	}
@@ -59,6 +64,8 @@ open class DeltakerServiceImpl(
 				?: throw IllegalStateException("Fant ikke deltaker med id ${status.deltakerId}")
 
 			kafkaProducerService.publiserDeltaker(oppdatertDeltaker)
+			publisherService.publish(oppdatertDeltaker.id, DataPublishType.DELTAKER)
+			publisherService.publish(oppdatertDeltaker.gjennomforingId, DataPublishType.DELTAKERLISTE)
 		}
 	}
 
@@ -93,6 +100,10 @@ open class DeltakerServiceImpl(
 		progressStatuser(deltakere)
 		oppdaterStatuser(deltakerRepository.skalHaStatusDeltar().map { it.id }, nyStatus = DeltakerStatus.Type.DELTAR)
 
+		deltakere.forEach { deltaker ->
+			publisherService.publish(deltaker.id, DataPublishType.DELTAKER)
+			publisherService.publish(deltaker.gjennomforingId, DataPublishType.DELTAKERLISTE)
+		}
 	}
 
 	override fun slettDeltakerePaaGjennomforing(gjennomforingId: UUID) {
@@ -111,10 +122,12 @@ open class DeltakerServiceImpl(
 		}
 
 		log.info("Deltaker med id=$deltakerId er slettet")
+		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
 	}
 
 	override fun oppdaterNavEnhet(personIdent: String, navEnhet: NavEnhet?) {
 		brukerService.oppdaterNavEnhet(personIdent, navEnhet)
+
 	}
 
 	override fun erSkjermet(deltakerId: UUID) : Boolean {
@@ -138,6 +151,8 @@ open class DeltakerServiceImpl(
 		)
 
 		deltakerRepository.update(toUpdate)
+		publisherService.publish(deltaker.id, DataPublishType.DELTAKER)
+		publisherService.publish(deltaker.gjennomforingId, DataPublishType.DELTAKERLISTE)
 	}
 
 	private fun oppdaterStatus(status: DeltakerStatusInsert) {
@@ -156,6 +171,8 @@ open class DeltakerServiceImpl(
 			forrigeStatus?.let { deltakerStatusRepository.deaktiver(it.id) }
 			deltakerStatusRepository.insert(nyStatus)
 		}
+
+		publisherService.publish(status.deltakerId, DataPublishType.DELTAKER)
 	}
 
 	private fun progressStatuser(deltakere: List<Deltaker>) {
@@ -199,6 +216,9 @@ open class DeltakerServiceImpl(
 		)
 
 		deltakerRepository.insert(toInsert)
+		publisherService.publish(toInsert.id, DataPublishType.DELTAKER)
+		publisherService.publish(toInsert.gjennomforingId, DataPublishType.DELTAKERLISTE)
+
 	}
 
 	private fun hentStatusOrThrow(deltakerId: UUID) : DeltakerStatus {
@@ -243,14 +263,17 @@ open class DeltakerServiceImpl(
 
 	override fun leggTilOppstartsdato(deltakerId: UUID, arrangorAnsattId: UUID, oppstartsdato: LocalDate) {
 		endringsmeldingService.opprettLeggTilOppstartsdatoEndringsmelding(deltakerId, arrangorAnsattId, oppstartsdato)
+		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
 	}
 
 	override fun endreOppstartsdato(deltakerId: UUID, arrangorAnsattId: UUID, oppstartsdato: LocalDate) {
 		endringsmeldingService.opprettEndreOppstartsdatoEndringsmelding(deltakerId, arrangorAnsattId, oppstartsdato)
+		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
 	}
 
 	override fun forlengDeltakelse(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate) {
 		endringsmeldingService.opprettForlengDeltakelseEndringsmelding(deltakerId, arrangorAnsattId, sluttdato)
+		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
 	}
 
 	override fun endreDeltakelsesprosent(deltakerId: UUID, arrangorAnsattId: UUID, deltakerProsent: Int, gyldigFraDato: LocalDate?) {
@@ -260,6 +283,7 @@ open class DeltakerServiceImpl(
 			deltakerProsent = deltakerProsent,
 			gyldigFraDato = gyldigFraDato
 		)
+		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
 	}
 
 	override fun avsluttDeltakelse(
@@ -269,10 +293,12 @@ open class DeltakerServiceImpl(
 		statusAarsak: DeltakerStatus.Aarsak
 	) {
 		endringsmeldingService.opprettAvsluttDeltakelseEndringsmelding(deltakerId, arrangorAnsattId, sluttdato, statusAarsak)
+		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
 	}
 
 	override fun deltakerIkkeAktuell(deltakerId: UUID, arrangorAnsattId: UUID, statusAarsak: DeltakerStatus.Aarsak) {
 		endringsmeldingService.opprettDeltakerIkkeAktuellEndringsmelding(deltakerId, arrangorAnsattId, statusAarsak)
+		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
 	}
 
 	override fun hentDeltakerMap(deltakerIder: List<UUID>): Map<UUID, Deltaker> {
@@ -297,6 +323,7 @@ open class DeltakerServiceImpl(
 
 	override fun opphevSkjulDeltakerForTiltaksarrangor(deltakerId: UUID) {
 		skjultDeltakerRepository.opphevSkjulDeltaker(deltakerId)
+		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
 	}
 
 	override fun erSkjultForTiltaksarrangor(deltakerId: UUID): Boolean {
@@ -328,6 +355,8 @@ open class DeltakerServiceImpl(
 				val deltaker = it.toDeltaker(status)
 
 				kafkaProducerService.publiserDeltaker(deltaker)
+				publisherService.publish(deltaker.id, DataPublishType.DELTAKER)
+				publisherService.publish(deltaker.gjennomforingId, DataPublishType.DELTAKERLISTE)
 			}
 
 			offset += deltakere.size
