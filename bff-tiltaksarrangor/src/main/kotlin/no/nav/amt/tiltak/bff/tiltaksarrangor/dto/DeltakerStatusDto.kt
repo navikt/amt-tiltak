@@ -9,7 +9,7 @@ data class DeltakerStatusDto(
 )
 
 enum class StatusTypeDto {
-	VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL
+	VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, VURDERES, AVBRUTT
 }
 
 fun DeltakerStatus.toDto() = DeltakerStatusDto(

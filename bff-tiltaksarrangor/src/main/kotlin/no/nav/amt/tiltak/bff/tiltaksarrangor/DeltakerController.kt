@@ -7,7 +7,7 @@ import no.nav.amt.tiltak.bff.tiltaksarrangor.request.*
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.skjulesForAlleAktorer
 import no.nav.amt.tiltak.core.exceptions.SkjultDeltakerException
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.exceptions.ValidationException
@@ -38,7 +38,7 @@ class DeltakerController(
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansatt.id, gjennomforingId)
 
 		var deltakere = deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
-			.filter { it.status.type != DeltakerStatus.Type.PABEGYNT && it.status.type != DeltakerStatus.Type.PABEGYNT_REGISTRERING }
+			.filter { !it.status.skjulesForAlleAktorer() }
 			.filter { !it.erUtdatert }
 
 		val erSkjultMap = deltakerService.erSkjultForTiltaksarrangor(deltakere.map { it.id })
