@@ -12,6 +12,7 @@ data class GjennomforingDto(
 	val status: Gjennomforing.Status,
 	val tiltak: TiltakDto,
 	val arrangor: ArrangorDto,
+	val erKurs: Boolean
 )
 
 fun Gjennomforing.toDto() = GjennomforingDto(
@@ -22,4 +23,5 @@ fun Gjennomforing.toDto() = GjennomforingDto(
 	status = this.status,
 	tiltak = this.tiltak.toDto(),
 	arrangor = this.arrangor.toDto(),
+	erKurs = this.erKurs
 )
