@@ -80,6 +80,11 @@ class DataPublisherService(
 	}
 
 	private fun publishDeltakerliste(id: UUID, forcePublish: Boolean = false) {
+		if (!publishDeltakerliste) {
+			logger.info("Publisering av deltakerlister er ikke skrudd på")
+			return
+		}
+
 		val currentData = DeltakerlistePublishQuery(template).get(id)
 
 		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKERLISTE, currentData.digest())) {
@@ -93,6 +98,11 @@ class DataPublisherService(
 	}
 
 	private fun publishDeltaker(id: UUID, forcePublish: Boolean = false) {
+		if (!publishDeltaker) {
+			logger.info("Publisering av deltakere er ikke skrudd på")
+			return
+		}
+
 		val currentData = DeltakerPublishQuery(template).get(id)
 
 		if (currentData == null) {
@@ -112,6 +122,11 @@ class DataPublisherService(
 	}
 
 	private fun publishArrangor(id: UUID, forcePublish: Boolean = false) {
+		if (!publishArrangor) {
+			logger.info("Publisering av arangør er ikke skrudd på")
+			return
+		}
+
 		val currentData = ArrangorPublishQuery(template, enhetsregisterClient).get(id)
 
 		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.ARRANGOR, currentData.digest())) {
@@ -125,6 +140,11 @@ class DataPublisherService(
 	}
 
 	private fun publishArrangorAnsatt(id: UUID, forcePublish: Boolean = false) {
+		if (!publishArrangorAnsatt) {
+			logger.info("Publisering av Ansatte er ikke skrudd på")
+			return
+		}
+
 		val currentData = ArrangorAnsattPublishQuery(template).get(id)
 
 		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.ARRANGOR_ANSATT, currentData.digest())) {
@@ -138,6 +158,11 @@ class DataPublisherService(
 	}
 
 	private fun publishEndringsmelding(id: UUID, forcePublish: Boolean = false) {
+		if (!publishEndringsmelding) {
+			logger.info("Publisering av Endringsmeldinger er ikke skrudd på")
+			return
+		}
+
 		val currentData = EndringsmeldingPublishQuery(template).get(id)
 
 		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.ENDRINGSMELDING, currentData.digest())) {
