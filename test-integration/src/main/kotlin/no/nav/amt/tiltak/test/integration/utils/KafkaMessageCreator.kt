@@ -41,6 +41,8 @@ object KafkaMessageCreator {
 					"navn": "${msg.tiltakNavn}",
 					"arenaKode": "${msg.tiltakArenaKode}"
 				},
+				"virksomhetsnummer":"${msg.virksomhetsnummer}",
+				"status": "${msg.status}",
 				"navn": "${msg.navn}",
 				"startDato": ${nullableStringJsonValue(msg.startDato?.toString())},
 				"sluttDato": ${nullableStringJsonValue(msg.sluttDato?.toString())}
@@ -74,6 +76,8 @@ data class GjennomforingMessage (
 	val tiltakNavn: String = "Oppfølging",
 	val tiltakArenaKode: String = "INDOPPFAG",
 	val navn: String = "Gjennomføring",
+	val virksomhetsnummer: String = "123",
+	val status: String = "GJENNOMFORES",
 	val startDato: LocalDate? = LocalDate.now().minusMonths(6),
 	val sluttDato: LocalDate? = LocalDate.now().plusMonths(12),
 )

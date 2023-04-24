@@ -235,7 +235,7 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 			status = "GJENNOMFOR",
 		)
 
-		val gjennomforingMessage = GjennomforingMessage(tiltakArenaKode = tiltakKode)
+		val gjennomforingMessage = GjennomforingMessage(tiltakArenaKode = tiltakKode, virksomhetsnummer = enhetsregisterEnhet.organisasjonsnummer)
 		val jsonObjekt = KafkaMessageCreator.opprettGjennomforingMessage(gjennomforingMessage)
 
 		mockMulighetsrommetApiServer.gjennomforingArenaData(gjennomforingMessage.id, gjennomforingArenaData)
