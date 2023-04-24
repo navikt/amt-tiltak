@@ -35,7 +35,7 @@ class ArrangorPublishQueryTest : FunSpec({
 
 		val data = query.get(input.id)
 		data.id shouldBe input.id
-		data.orgNr shouldBe input.organisasjonsnummer
+		data.organisasjonsnummer shouldBe input.organisasjonsnummer
 	}
 
 	test("get - Arrangor - 1 deltakerliste - returnerer riktig") {

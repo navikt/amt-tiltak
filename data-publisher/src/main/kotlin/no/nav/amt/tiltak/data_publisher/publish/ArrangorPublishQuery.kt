@@ -23,9 +23,9 @@ class ArrangorPublishQuery(
 
 		return ArrangorPublishDto(
 			id = arrangor.id,
-			orgNavn = arrangor.navn,
-			orgNr = arrangor.organisasjonsnummer,
-			overordnetArrangor = overordnetArrangorId,
+			navn = arrangor.navn,
+			organisasjonsnummer = arrangor.organisasjonsnummer,
+			overordnetArrangorId = overordnetArrangorId,
 			deltakerlister = deltakerlister
 		)
 	}
