@@ -6,9 +6,13 @@ import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeileder
 import no.nav.amt.tiltak.core.domain.tiltak.skjulesForAlleAktorer
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.ArrangorAnsattService
+import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.NavAnsattService
+import no.nav.amt.tiltak.core.port.NavEnhetService
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.UUID
 
 @Service
 open class ControllerService(
@@ -26,7 +30,7 @@ open class ControllerService(
 		val navEnhet = deltaker.navEnhetId?.let { navEnhetService.getNavEnhet(it) }
 		val gjennomforing = deltaker.gjennomforingId.let { gjennomforingService.getGjennomforing(it) }
 
-		if (deltaker.status.skjulesForAlleAktorer())
+		if (deltaker.status.type.skjulesForAlleAktorer())
 			throw UnauthorizedException("Har ikke tilgang til id $deltakerId")
 
 		return DeltakerDetaljerDto(

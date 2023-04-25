@@ -38,7 +38,7 @@ class DeltakerController(
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansatt.id, gjennomforingId)
 
 		var deltakere = deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
-			.filter { !it.status.skjulesForAlleAktorer() }
+			.filter { !it.status.type.skjulesForAlleAktorer() }
 			.filter { !it.erUtdatert }
 
 		val erSkjultMap = deltakerService.erSkjultForTiltaksarrangor(deltakere.map { it.id })
