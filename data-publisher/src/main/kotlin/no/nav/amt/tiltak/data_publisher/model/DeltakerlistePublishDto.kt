@@ -7,9 +7,8 @@ import java.util.*
 
 data class DeltakerlistePublishDto(
 	val id: UUID,
-	val type: String,
 	val navn: String,
-	val status: String,
+	val status: DeltakerlisteStatus,
 	val arrangor: DeltakerlisteArrangorDto,
 	val tiltak: TiltakDto,
 	val startDato: LocalDate,
@@ -28,3 +27,7 @@ data class TiltakDto(
 	val navn: String,
 	val type: String,
 )
+
+enum class DeltakerlisteStatus {
+	APENT_FOR_INNSOK, GJENNOMFORES, AVSLUTTET
+}

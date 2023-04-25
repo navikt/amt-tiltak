@@ -6,6 +6,7 @@ import no.nav.amt.tiltak.common.db_utils.getNullableLocalDate
 import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.data_publisher.model.DeltakerlisteArrangorDto
 import no.nav.amt.tiltak.data_publisher.model.DeltakerlistePublishDto
+import no.nav.amt.tiltak.data_publisher.model.DeltakerlisteStatus
 import no.nav.amt.tiltak.data_publisher.model.TiltakDto
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -21,9 +22,8 @@ class DeltakerlistePublishQuery(
 
 		return DeltakerlistePublishDto(
 			id = deltakerliste.id,
-			type = deltakerliste.type,
 			navn = deltakerliste.navn,
-			status = deltakerliste.status,
+			status = DeltakerlisteStatus.valueOf(deltakerliste.status),
 			tiltak = TiltakDto(deltakerliste.navn, deltakerliste.tiltakType),
 			arrangor = DeltakerlisteArrangorDto(
 				id = deltakerliste.arrangorId,
@@ -39,7 +39,6 @@ class DeltakerlistePublishQuery(
 		val sql = """
 			select gjennomforing.id,
 				   gjennomforing.arrangor_id,
-				   tiltak.type,
 				   gjennomforing.navn           as navn,
 				   gjennomforing.status,
 				   tiltak.type                  as tiltak_type,
@@ -64,7 +63,6 @@ class DeltakerlistePublishQuery(
 	private data class Deltakerliste(
 		val id: UUID,
 		val arrangorId: UUID,
-		val type: String,
 		val navn: String,
 		val status: String,
 		val tiltakType: String,
@@ -79,7 +77,6 @@ class DeltakerlistePublishQuery(
 				Deltakerliste(
 					id = rs.getUUID("id"),
 					arrangorId = rs.getUUID("arrangor_id"),
-					type = rs.getString("type"),
 					navn = rs.getString("navn"),
 					status = rs.getString("status"),
 					tiltakType = rs.getString("tiltak_type"),
