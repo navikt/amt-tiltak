@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.core.domain.tiltak
 
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class DeltakerStatus(
 	val id: UUID,
@@ -59,8 +59,8 @@ val SKJULES_ALLTID_STATUSER = listOf(
 
 val HAR_IKKE_STARTET_STATUSER = listOf(DeltakerStatus.Type.VENTER_PA_OPPSTART).plus(VENTER_PAA_PLASS_STATUSER)
 
-fun DeltakerStatus.skjulesForAlleAktorer() : Boolean {
-	return type in SKJULES_ALLTID_STATUSER
+fun DeltakerStatus.Type.skjulesForAlleAktorer() : Boolean {
+	return this in SKJULES_ALLTID_STATUSER
 }
 fun DeltakerStatus.harIkkeStartet() : Boolean {
 	return type in HAR_IKKE_STARTET_STATUSER

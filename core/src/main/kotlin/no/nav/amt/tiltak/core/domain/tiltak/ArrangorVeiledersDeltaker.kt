@@ -19,4 +19,12 @@ data class ArrangorVeiledersDeltaker(
 	val gjennomforingType: String,
 	val arrangorId: UUID,
 	val erMedveilederFor: Boolean
-)
+) {
+	private val skalFjernesDato = if ((status == DeltakerStatus.Type.HAR_SLUTTET || status == DeltakerStatus.Type.IKKE_AKTUELL) && sluttDato != null) {
+		sluttDato.plusWeeks(2)
+	} else {
+		null
+	}
+
+	val erUtdatert = skalFjernesDato != null && LocalDate.now().isAfter(skalFjernesDato)
+}
