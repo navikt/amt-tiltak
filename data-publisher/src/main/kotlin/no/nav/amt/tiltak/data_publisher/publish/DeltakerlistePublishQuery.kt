@@ -47,7 +47,8 @@ class DeltakerlistePublishQuery(
 				   arrangor.organisasjonsnummer as arrangor_organisasjonsnummer,
 				   arrangor.navn                as arrangor_navn,
 				   gjennomforing.start_dato,
-				   gjennomforing.slutt_dato
+				   gjennomforing.slutt_dato,
+				   gjennomforing.er_kurs
 			from gjennomforing
 					 left join tiltak on gjennomforing.tiltak_id = tiltak.id
 					 left join arrangor on gjennomforing.arrangor_id = arrangor.id
