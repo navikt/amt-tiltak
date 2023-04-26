@@ -12,7 +12,8 @@ data class DeltakerlistePublishDto(
 	val arrangor: DeltakerlisteArrangorDto,
 	val tiltak: TiltakDto,
 	val startDato: LocalDate,
-	val sluttDato: LocalDate?
+	val sluttDato: LocalDate?,
+	val erKurs: Boolean
 ) {
 	fun digest() = DigestUtils.md5DigestAsHex(JsonUtils.toJson(this).toByteArray())
 }

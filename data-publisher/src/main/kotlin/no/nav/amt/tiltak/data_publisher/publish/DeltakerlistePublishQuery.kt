@@ -31,7 +31,8 @@ class DeltakerlistePublishQuery(
 				navn = deltakerliste.arrangorNavn
 			),
 			startDato = deltakerliste.startDato,
-			sluttDato = deltakerliste.sluttDato
+			sluttDato = deltakerliste.sluttDato,
+			erKurs = deltakerliste.erKurs
 		)
 	}
 
@@ -70,7 +71,8 @@ class DeltakerlistePublishQuery(
 		val arrangorOrgNr: String,
 		val arrangorNavn: String,
 		val startDato: LocalDate,
-		val sluttDato: LocalDate?
+		val sluttDato: LocalDate?,
+		val erKurs: Boolean
 	) {
 		companion object {
 			val rowMapper = RowMapper { rs, _ ->
@@ -84,7 +86,8 @@ class DeltakerlistePublishQuery(
 					arrangorOrgNr = rs.getString("arrangor_organisasjonsnummer"),
 					arrangorNavn = rs.getString("arrangor_navn"),
 					startDato = rs.getLocalDate("start_dato"),
-					sluttDato = rs.getNullableLocalDate("slutt_dato")
+					sluttDato = rs.getNullableLocalDate("slutt_dato"),
+					erKurs = rs.getBoolean("er_kurs")
 				)
 			}
 		}
