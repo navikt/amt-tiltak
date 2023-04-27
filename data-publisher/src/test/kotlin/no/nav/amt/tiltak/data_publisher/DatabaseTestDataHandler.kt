@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.data_publisher
 
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.data_publisher.model.AnsattRolle
 import no.nav.amt.tiltak.data_publisher.model.VeilederType
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
@@ -38,6 +39,18 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		gjennomforingId: UUID = createDeltakerliste().id
 	): DeltakerInput = deltakerInput(brukerId, gjennomforingId)
 		.also { testDataRepository.insertDeltaker(it) }
+		.also { testDataRepository.insertDeltakerStatus(createDeltakerStatus(it.id)) }
+
+	fun createDeltakerStatus(
+		deltakerId: UUID
+	): DeltakerStatusInput = DeltakerStatusInput(
+		id= UUID.randomUUID(),
+		deltakerId = deltakerId,
+		gyldigFra = LocalDateTime.now(),
+		status = DeltakerStatus.Type.DELTAR.name,
+		aktiv = true,
+		createdAt = ZonedDateTime.now()
+	)
 
 	fun createBruker(
 		ansvarligVeilederId: UUID? = createNavAnsatt().id,

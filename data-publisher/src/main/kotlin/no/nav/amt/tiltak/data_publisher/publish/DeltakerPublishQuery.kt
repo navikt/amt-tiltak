@@ -2,10 +2,12 @@ package no.nav.amt.tiltak.data_publisher.publish
 
 import no.nav.amt.tiltak.common.db_utils.*
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.data_publisher.model.*
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 class DeltakerPublishQuery(
@@ -14,14 +16,6 @@ class DeltakerPublishQuery(
 
 	fun get(id: UUID): DeltakerPublishDto? {
 		val deltaker = getDeltaker(id) ?: return null
-
-		val navVeileder = if (deltaker.navAnsattId != null) {
-			DeltakerNavVeilederDto(
-				id = deltaker.navAnsattId,
-				navn = deltaker.navAnsattNavn!!,
-				epost = deltaker.navAnsattEpost!!
-			)
-		} else null
 
 		return DeltakerPublishDto(
 			deltaker.id,
@@ -39,7 +33,6 @@ class DeltakerPublishQuery(
 				),
 				skjermet = deltaker.skjermet
 			),
-			status = deltaker.status,
 			dagerPerUke = deltaker.dagerPerUke,
 			prosentStilling = deltaker.prosentStilling,
 			oppstartsdato = deltaker.startDato,
@@ -47,37 +40,64 @@ class DeltakerPublishQuery(
 			innsoktDato = deltaker.registrertDato,
 			bestillingTekst = deltaker.innsokBegrunnelse,
 			navKontor = deltaker.navEnhetNavn,
-			navVeileder = navVeileder
+			navVeileder = deltaker.navAnsattId?.let {
+				DeltakerNavVeilederDto(
+					id = deltaker.navAnsattId,
+					navn = deltaker.navAnsattNavn!!,
+					epost = deltaker.navAnsattEpost!!
+				)
+			},
+			status = DeltakerStatusDto(
+				type = DeltakerStatus.Type.valueOf(deltaker.status),
+				aarsak = deltaker.statusAarsak?.let { DeltakerStatus.Aarsak.Type.valueOf(it) },
+				gyldigFra = deltaker.statusGyldigFra,
+				opprettetDato = deltaker.statusCreatedAt
+			),
+			skjult = deltaker.skjultAvAnsattId?.let {
+				DeltakerSkjultDto(
+					skjultAvAnsattId = deltaker.skjultAvAnsattId,
+					dato = deltaker.skjultCreatedAt!!
+				)
+			}
 		)
 	}
 
 	private fun getDeltaker(deltakerId: UUID): DeltakerDbo? {
 		val sql = """
-			select deltaker.id                                                                            as deltakerId,
-				   deltaker.gjennomforing_id                                                              as deltakerlisteId,
-				   bruker.person_ident,
-				   bruker.fornavn,
-				   bruker.mellomnavn,
-			       bruker.er_skjermet                                                                     as er_skjermet,
-				   bruker.etternavn,
-				   bruker.telefonnummer,
-				   bruker.epost,
-				   (select status from deltaker_status where deltaker_id = deltaker.id and aktiv is true) as status,
-				   deltaker.dager_per_uke,
-				   deltaker.prosent_stilling,
-				   deltaker.start_dato,
-				   deltaker.slutt_dato,
-				   deltaker.registrert_dato,
-				   deltaker.innsok_begrunnelse,
-				   nav_enhet.navn                                                                         as nav_enhet_navn,
-				   nav_ansatt.id                                                                          as nav_ansatt_id,
-				   nav_ansatt.navn                                                                        as nav_ansatt_navn,
-				   nav_ansatt.epost                                                                       as nav_ansatt_epost
-			from deltaker
-					 left join bruker on deltaker.bruker_id = bruker.id
-					 left join nav_enhet on bruker.nav_enhet_id = nav_enhet.id
-					 left join nav_ansatt on bruker.ansvarlig_veileder_id = nav_ansatt.id
-			where deltaker.id = :deltakerId
+		select deltaker.id                                  as deltakerId,
+			   deltaker.gjennomforing_id                    as deltakerlisteId,
+			   bruker.person_ident,
+			   bruker.fornavn,
+			   bruker.mellomnavn,
+			   bruker.er_skjermet                           as er_skjermet,
+			   bruker.etternavn,
+			   bruker.telefonnummer,
+			   bruker.epost,
+			   deltaker.dager_per_uke,
+			   deltaker.prosent_stilling,
+			   deltaker.start_dato,
+			   deltaker.slutt_dato,
+			   deltaker.registrert_dato,
+			   deltaker.innsok_begrunnelse,
+			   nav_enhet.navn                               as nav_enhet_navn,
+			   nav_ansatt.id                                as nav_ansatt_id,
+			   nav_ansatt.navn                              as nav_ansatt_navn,
+			   nav_ansatt.epost                             as nav_ansatt_epost,
+			   status.status                                as status,
+			   status.aarsak                                as status_aarsak,
+			   status.gyldig_fra                            as status_gyldig_fra,
+			   status.created_at                            as status_opprettet_dato,
+			   skjult_deltaker.skjult_av_arrangor_ansatt_id as skjult_av_arrangor_id,
+			   skjult_deltaker.created_at                   as skjult_pa_dato
+		from deltaker
+				 left join bruker on deltaker.bruker_id = bruker.id
+				 left join nav_enhet on bruker.nav_enhet_id = nav_enhet.id
+				 left join nav_ansatt on bruker.ansvarlig_veileder_id = nav_ansatt.id
+				 left join (select deltaker_id, status, aarsak, gyldig_fra, created_at
+							from deltaker_status
+							where aktiv is true) status on status.deltaker_id = deltaker.id
+				 left join skjult_deltaker on skjult_deltaker.deltaker_id = deltaker.id
+		where deltaker.id = :deltakerId
 		""".trimIndent()
 
 		return template.query(
@@ -98,7 +118,6 @@ class DeltakerPublishQuery(
 		val skjermet: Boolean,
 		val telefonnummer: String?,
 		val epost: String?,
-		val status: String?,
 		val dagerPerUke: Int?,
 		val prosentStilling: Double?,
 		val startDato: LocalDate?,
@@ -108,7 +127,13 @@ class DeltakerPublishQuery(
 		val navEnhetNavn: String?,
 		val navAnsattId: UUID?,
 		val navAnsattNavn: String?,
-		val navAnsattEpost: String?
+		val navAnsattEpost: String?,
+		val status: String,
+		val statusAarsak: String?,
+		val statusGyldigFra: LocalDateTime,
+		val statusCreatedAt: LocalDateTime,
+		val skjultAvAnsattId: UUID?,
+		val skjultCreatedAt: LocalDateTime?
 	) {
 		companion object {
 			val rowMapper = RowMapper { rs, _ ->
@@ -122,7 +147,6 @@ class DeltakerPublishQuery(
 					skjermet = rs.getBoolean("er_skjermet"),
 					telefonnummer = rs.getNullableString("telefonnummer"),
 					epost = rs.getNullableString("epost"),
-					status = rs.getString("status"),
 					dagerPerUke = rs.getInt("dager_per_uke"),
 					prosentStilling = rs.getDouble("prosent_stilling"),
 					startDato = rs.getNullableLocalDate("start_dato"),
@@ -132,7 +156,13 @@ class DeltakerPublishQuery(
 					navEnhetNavn = rs.getString("nav_enhet_navn"),
 					navAnsattId = rs.getNullableUUID("nav_ansatt_id"),
 					navAnsattNavn = rs.getNullableString("nav_ansatt_navn"),
-					navAnsattEpost = rs.getNullableString("nav_ansatt_epost")
+					navAnsattEpost = rs.getNullableString("nav_ansatt_epost"),
+					status = rs.getString("status"),
+					statusAarsak = rs.getNullableString("status_aarsak"),
+					statusGyldigFra = rs.getLocalDateTime("status_gyldig_fra"),
+					statusCreatedAt = rs.getLocalDateTime("status_opprettet_dato"),
+					skjultAvAnsattId = rs.getNullableUUID("skjult_av_arrangor_id"),
+					skjultCreatedAt = rs.getNullableLocalDateTime("skjult_pa_dato")
 				)
 			}
 		}
