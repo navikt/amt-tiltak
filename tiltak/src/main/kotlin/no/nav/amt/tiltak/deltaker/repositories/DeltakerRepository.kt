@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.UUID
 
 @Component
 open class DeltakerRepository(
@@ -283,7 +283,14 @@ open class DeltakerRepository(
 		return template.query(sql, parameters, rowMapper)
 	}
 
-	fun slett(deltakerId: UUID) {
+	fun slettVeilederrelasjonOgDeltaker(deltakerId: UUID) {
+		template.update(
+			"DELETE FROM arrangor_veileder WHERE deltaker_id = :deltakerId",
+			MapSqlParameterSource().addValues(
+				mapOf(
+					"deltakerId" to deltakerId
+				))
+		)
 		val sql = "DELETE FROM deltaker WHERE id = :deltakerId"
 
 		val parameters = MapSqlParameterSource().addValues(

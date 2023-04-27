@@ -23,7 +23,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.UUID
 
 internal class DeltakerRepositoryTest : FunSpec({
 
@@ -362,7 +362,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		repository.insert(deltakerInsertDbo)
 		repository.get(deltakerInsertDbo.id) shouldNotBe null
-		repository.slett(deltakerInsertDbo.id)
+		repository.slettVeilederrelasjonOgDeltaker(deltakerInsertDbo.id)
 		repository.get(deltakerInsertDbo.id) shouldBe null
 	}
 

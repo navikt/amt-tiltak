@@ -117,7 +117,7 @@ open class DeltakerServiceImpl(
 			endringsmeldingService.slett(deltakerId)
 			deltakerStatusRepository.slett(deltakerId)
 			skjultDeltakerRepository.slett(deltakerId)
-			deltakerRepository.slett(deltakerId)
+			deltakerRepository.slettVeilederrelasjonOgDeltaker(deltakerId)
 			kafkaProducerService.publiserSlettDeltaker(deltakerId)
 		}
 
