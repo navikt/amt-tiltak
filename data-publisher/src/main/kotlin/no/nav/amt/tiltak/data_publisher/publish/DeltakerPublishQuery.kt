@@ -1,5 +1,8 @@
 package no.nav.amt.tiltak.data_publisher.publish
 
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import no.nav.amt.tiltak.common.db_utils.*
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
@@ -14,8 +17,10 @@ class DeltakerPublishQuery(
 	private val template: NamedParameterJdbcTemplate
 ) {
 
-	fun get(id: UUID): DeltakerPublishDto? {
-		val deltaker = getDeltaker(id) ?: return null
+	fun get(id: UUID): Either<PublishState, DeltakerPublishDto> {
+		val deltaker = getDeltaker(id) ?: return PublishState.PUBLISH_TOMBSTONE.left()
+
+		if (deltaker.status == null) return PublishState.DONT_PUBLISH.left()
 
 		return DeltakerPublishDto(
 			deltaker.id,
@@ -50,8 +55,8 @@ class DeltakerPublishQuery(
 			status = DeltakerStatusDto(
 				type = DeltakerStatus.Type.valueOf(deltaker.status),
 				aarsak = deltaker.statusAarsak?.let { DeltakerStatus.Aarsak.Type.valueOf(it) },
-				gyldigFra = deltaker.statusGyldigFra,
-				opprettetDato = deltaker.statusCreatedAt
+				gyldigFra = deltaker.statusGyldigFra!!,
+				opprettetDato = deltaker.statusCreatedAt!!
 			),
 			skjult = deltaker.skjultAvAnsattId?.let {
 				DeltakerSkjultDto(
@@ -59,7 +64,7 @@ class DeltakerPublishQuery(
 					dato = deltaker.skjultCreatedAt!!
 				)
 			}
-		)
+		).right()
 	}
 
 	private fun getDeltaker(deltakerId: UUID): DeltakerDbo? {
@@ -128,10 +133,10 @@ class DeltakerPublishQuery(
 		val navAnsattId: UUID?,
 		val navAnsattNavn: String?,
 		val navAnsattEpost: String?,
-		val status: String,
+		val status: String?,
 		val statusAarsak: String?,
-		val statusGyldigFra: LocalDateTime,
-		val statusCreatedAt: LocalDateTime,
+		val statusGyldigFra: LocalDateTime?,
+		val statusCreatedAt: LocalDateTime?,
 		val skjultAvAnsattId: UUID?,
 		val skjultCreatedAt: LocalDateTime?
 	) {
@@ -159,8 +164,8 @@ class DeltakerPublishQuery(
 					navAnsattEpost = rs.getNullableString("nav_ansatt_epost"),
 					status = rs.getString("status"),
 					statusAarsak = rs.getNullableString("status_aarsak"),
-					statusGyldigFra = rs.getLocalDateTime("status_gyldig_fra"),
-					statusCreatedAt = rs.getLocalDateTime("status_opprettet_dato"),
+					statusGyldigFra = rs.getNullableLocalDateTime("status_gyldig_fra"),
+					statusCreatedAt = rs.getNullableLocalDateTime("status_opprettet_dato"),
 					skjultAvAnsattId = rs.getNullableUUID("skjult_av_arrangor_id"),
 					skjultCreatedAt = rs.getNullableLocalDateTime("skjult_pa_dato")
 				)
