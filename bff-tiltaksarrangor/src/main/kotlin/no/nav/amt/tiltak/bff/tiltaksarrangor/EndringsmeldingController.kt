@@ -34,12 +34,7 @@ class EndringsmeldingController(
 			throw SkjultDeltakerException("Deltaker med id $deltakerId er skjult for tiltaksarrangør")
 
 		return endringsmeldingService.hentAktiveEndringsmeldingerForDeltaker(deltakerId)
-			.map {
-				EndringsmeldingDto(
-					id = it.id,
-					innhold = it.innhold.toDto(),
-				)
-			}
+			.map { it.toDto() }
 	}
 
 	@PatchMapping("/{id}/tilbakekall")

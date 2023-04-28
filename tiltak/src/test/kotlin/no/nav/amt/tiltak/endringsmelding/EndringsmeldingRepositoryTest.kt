@@ -150,12 +150,32 @@ class EndringsmeldingRepositoryTest : FunSpec({
 			deltakerId = DELTAKER_1.id,
 			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
 			innhold = innhold,
+			type = EndringsmeldingDbo.Type.LEGG_TIL_OPPSTARTSDATO
 		)
 
 		val endringsmelding = repository.get(id)
 
 		endringsmelding.type shouldBe EndringsmeldingDbo.Type.LEGG_TIL_OPPSTARTSDATO
 		endringsmelding.innhold shouldBe innhold
+		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
+	}
+
+	test("insert - skal inserte Tilby plass endringsmelding") {
+		val id = UUID.randomUUID()
+
+		repository.insert(
+			id = id,
+			deltakerId = DELTAKER_1.id,
+			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+			innhold = null,
+			type = EndringsmeldingDbo.Type.TILBY_PLASS
+
+		)
+
+		val endringsmelding = repository.get(id)
+
+		endringsmelding.type shouldBe EndringsmeldingDbo.Type.TILBY_PLASS
+		endringsmelding.innhold shouldBe null
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 	}
 
@@ -168,6 +188,8 @@ class EndringsmeldingRepositoryTest : FunSpec({
 			deltakerId = DELTAKER_1.id,
 			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
 			innhold = innhold,
+			type = EndringsmeldingDbo.Type.ENDRE_OPPSTARTSDATO
+
 		)
 
 		val endringsmelding = repository.get(id)
@@ -186,6 +208,8 @@ class EndringsmeldingRepositoryTest : FunSpec({
 			deltakerId = DELTAKER_1.id,
 			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
 			innhold = innhold,
+			type = EndringsmeldingDbo.Type.FORLENG_DELTAKELSE
+
 		)
 
 		val endringsmelding = repository.get(id)
@@ -207,6 +231,8 @@ class EndringsmeldingRepositoryTest : FunSpec({
 			deltakerId = DELTAKER_1.id,
 			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
 			innhold = innhold,
+			type = EndringsmeldingDbo.Type.AVSLUTT_DELTAKELSE
+
 		)
 
 		val endringsmelding = repository.get(id)
@@ -227,6 +253,8 @@ class EndringsmeldingRepositoryTest : FunSpec({
 			deltakerId = DELTAKER_1.id,
 			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
 			innhold = innhold,
+			type = EndringsmeldingDbo.Type.DELTAKER_IKKE_AKTUELL
+
 		)
 
 		val endringsmelding = repository.get(id)

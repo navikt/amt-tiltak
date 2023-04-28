@@ -45,6 +45,7 @@ class NavAnsattControllerServiceTest {
 			opprettet = ZonedDateTime.now(),
 			status = Endringsmelding.Status.AKTIV,
 			innhold = Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(LocalDate.now()),
+			type = Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO
 		)
 
 		val deltaker = DELTAKER_1.toDeltaker(BRUKER_1, DELTAKER_1_STATUS_1)
@@ -78,6 +79,7 @@ class NavAnsattControllerServiceTest {
 			opprettet = ZonedDateTime.now(),
 			status = Endringsmelding.Status.AKTIV,
 			innhold = Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(LocalDate.now()),
+			type = Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO
 		)
 
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
@@ -111,6 +113,7 @@ class NavAnsattControllerServiceTest {
 			opprettet = ZonedDateTime.now(),
 			status = Endringsmelding.Status.AKTIV,
 			innhold = Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(LocalDate.now()),
+			type = Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO
 		)
 
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)

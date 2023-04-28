@@ -87,6 +87,7 @@ open class EndringsmeldingServiceImpl(
 			deltakerId,
 			arrangorAnsattId,
 			innhold,
+			EndringsmeldingDbo.Type.LEGG_TIL_OPPSTARTSDATO
 		)
 	}
 
@@ -100,6 +101,7 @@ open class EndringsmeldingServiceImpl(
 			deltakerId,
 			arrangorAnsattId,
 			innhold,
+			EndringsmeldingDbo.Type.ENDRE_OPPSTARTSDATO
 		)
 	}
 
@@ -113,6 +115,7 @@ open class EndringsmeldingServiceImpl(
 			deltakerId,
 			arrangorAnsattId,
 			innhold,
+			EndringsmeldingDbo.Type.FORLENG_DELTAKELSE
 		)
 	}
 
@@ -130,7 +133,9 @@ open class EndringsmeldingServiceImpl(
 		opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
-			innhold
+			innhold,
+			EndringsmeldingDbo.Type.ENDRE_DELTAKELSE_PROSENT
+
 		)
 	}
 
@@ -146,6 +151,8 @@ open class EndringsmeldingServiceImpl(
 			deltakerId,
 			arrangorAnsattId,
 			innhold,
+			EndringsmeldingDbo.Type.AVSLUTT_DELTAKELSE
+
 		)
 	}
 
@@ -160,6 +167,45 @@ open class EndringsmeldingServiceImpl(
 			deltakerId,
 			arrangorAnsattId,
 			innhold,
+			EndringsmeldingDbo.Type.DELTAKER_IKKE_AKTUELL
+		)
+	}
+
+	override fun opprettTilbyPlassEndringsmelding(
+		deltakerId: UUID,
+		arrangorAnsattId: UUID,
+	) {
+		opprettOgMarkerAktiveSomUtdatert(
+			deltakerId,
+			arrangorAnsattId,
+			null,
+			EndringsmeldingDbo.Type.TILBY_PLASS
+		)
+	}
+
+	override fun opprettSettPaaVentelisteEndringsmelding(
+		deltakerId: UUID,
+		arrangorAnsattId: UUID,
+	) {
+		opprettOgMarkerAktiveSomUtdatert(
+			deltakerId,
+			arrangorAnsattId,
+			null,
+			EndringsmeldingDbo.Type.SETT_PAA_VENTELISTE
+		)
+	}
+
+	override fun opprettEndresluttdatoEndringsmelding(
+		deltakerId: UUID,
+		arrangorAnsattId: UUID,
+		sluttdato: LocalDate
+	) {
+		val innhold = EndringsmeldingDbo.Innhold.EndreSluttdatoInnhold(sluttdato)
+		opprettOgMarkerAktiveSomUtdatert(
+			deltakerId,
+			arrangorAnsattId,
+			innhold,
+			EndringsmeldingDbo.Type.ENDRE_SLUTTDATO
 		)
 	}
 
@@ -176,46 +222,63 @@ open class EndringsmeldingServiceImpl(
 			utfortTidspunkt = utfortTidspunkt,
 			opprettetAvArrangorAnsattId = opprettetAvArrangorAnsattId,
 			status = status,
-			innhold = mapEndringsmeldingInnhold(innhold),
+			innhold = innhold?.toModel(),
 			opprettet = createdAt,
+			type = type.toModel()
 		)
 	}
 
-	private fun mapEndringsmeldingInnhold(innhold: EndringsmeldingDbo.Innhold): Endringsmelding.Innhold {
-		return when(innhold) {
+	private fun EndringsmeldingDbo.Type.toModel(): Endringsmelding.Type {
+		return when (this) {
+			EndringsmeldingDbo.Type.LEGG_TIL_OPPSTARTSDATO -> Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO
+			EndringsmeldingDbo.Type.ENDRE_OPPSTARTSDATO -> Endringsmelding.Type.ENDRE_OPPSTARTSDATO
+			EndringsmeldingDbo.Type.FORLENG_DELTAKELSE -> Endringsmelding.Type.FORLENG_DELTAKELSE
+			EndringsmeldingDbo.Type.AVSLUTT_DELTAKELSE -> Endringsmelding.Type.AVSLUTT_DELTAKELSE
+			EndringsmeldingDbo.Type.DELTAKER_IKKE_AKTUELL -> Endringsmelding.Type.DELTAKER_IKKE_AKTUELL
+			EndringsmeldingDbo.Type.ENDRE_DELTAKELSE_PROSENT -> Endringsmelding.Type.ENDRE_DELTAKELSE_PROSENT
+			EndringsmeldingDbo.Type.TILBY_PLASS -> Endringsmelding.Type.TILBY_PLASS
+			EndringsmeldingDbo.Type.SETT_PAA_VENTELISTE -> Endringsmelding.Type.SETT_PAA_VENTELISTE
+			EndringsmeldingDbo.Type.ENDRE_SLUTTDATO -> Endringsmelding.Type.ENDRE_SLUTTDATO
+		}
+	}
+
+	private fun EndringsmeldingDbo.Innhold.toModel(): Endringsmelding.Innhold {
+		return when(this) {
 			is EndringsmeldingDbo.Innhold.LeggTilOppstartsdatoInnhold ->
-				Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(innhold.oppstartsdato)
+				Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(this.oppstartsdato)
 			is EndringsmeldingDbo.Innhold.EndreOppstartsdatoInnhold ->
-				Endringsmelding.Innhold.EndreOppstartsdatoInnhold(innhold.oppstartsdato)
+				Endringsmelding.Innhold.EndreOppstartsdatoInnhold(this.oppstartsdato)
 			is EndringsmeldingDbo.Innhold.ForlengDeltakelseInnhold ->
-				Endringsmelding.Innhold.ForlengDeltakelseInnhold(innhold.sluttdato)
+				Endringsmelding.Innhold.ForlengDeltakelseInnhold(this.sluttdato)
 			is EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold ->
 				Endringsmelding.Innhold.AvsluttDeltakelseInnhold(
-					innhold.sluttdato, DeltakerStatus.Aarsak(innhold.aarsak.type, innhold.aarsak.beskrivelse)
+					this.sluttdato, DeltakerStatus.Aarsak(this.aarsak.type, this.aarsak.beskrivelse)
 				)
 			is EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold ->
 				Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold(
-					DeltakerStatus.Aarsak(innhold.aarsak.type, innhold.aarsak.beskrivelse)
+					DeltakerStatus.Aarsak(this.aarsak.type, this.aarsak.beskrivelse)
 				)
 
 			is EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold ->
 				Endringsmelding.Innhold.EndreDeltakelseProsentInnhold(
-					deltakelseProsent = innhold.nyDeltakelseProsent,
-					gyldigFraDato = innhold.gyldigFraDato
+					deltakelseProsent = this.nyDeltakelseProsent,
+					gyldigFraDato = this.gyldigFraDato
 				)
+			is EndringsmeldingDbo.Innhold.EndreSluttdatoInnhold ->
+				Endringsmelding.Innhold.EndreSluttdatoInnhold(this.sluttdato)
 		}
 	}
 
 	private fun opprettOgMarkerAktiveSomUtdatert(
-		deltakerId: UUID, opprettetAvArrangorAnsattId: UUID, innhold: EndringsmeldingDbo.Innhold
+		deltakerId: UUID, opprettetAvArrangorAnsattId: UUID, innhold: EndringsmeldingDbo.Innhold?, type: EndringsmeldingDbo.Type
 	) {
 		val id = UUID.randomUUID()
 		transactionTemplate.executeWithoutResult {
-			endringsmeldingRepository.markerAktiveSomUtdatert(deltakerId, innhold.type())
-			endringsmeldingRepository.insert(id, deltakerId, opprettetAvArrangorAnsattId, innhold)
+			endringsmeldingRepository.markerAktiveSomUtdatert(deltakerId, type)
+			endringsmeldingRepository.insert(id, deltakerId, opprettetAvArrangorAnsattId, type, innhold)
 		}
 
-		log.info("Endringsmelding av type ${innhold.type().name} opprettet med id $id for deltaker $deltakerId")
+		log.info("Endringsmelding av type ${type.name} opprettet med id $id for deltaker $deltakerId")
 		publisherService.publish(id, DataPublishType.ENDRINGSMELDING)
 	}
 

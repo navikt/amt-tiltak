@@ -1,21 +1,30 @@
 package no.nav.amt.tiltak.deltaker.service
 
-import no.nav.amt.tiltak.core.domain.tiltak.*
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
+import no.nav.amt.tiltak.core.domain.tiltak.harIkkeStartet
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
+import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
-import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.deltaker.dbo.*
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpdateDbo
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.repositories.SkjultDeltakerRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -259,46 +268,6 @@ open class DeltakerServiceImpl(
 
 	override fun oppdaterAnsvarligVeileder(personIdent: String, navAnsattId: UUID) {
 		brukerService.oppdaterAnsvarligVeileder(personIdent, navAnsattId)
-	}
-
-	override fun leggTilOppstartsdato(deltakerId: UUID, arrangorAnsattId: UUID, oppstartsdato: LocalDate) {
-		endringsmeldingService.opprettLeggTilOppstartsdatoEndringsmelding(deltakerId, arrangorAnsattId, oppstartsdato)
-		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
-	}
-
-	override fun endreOppstartsdato(deltakerId: UUID, arrangorAnsattId: UUID, oppstartsdato: LocalDate) {
-		endringsmeldingService.opprettEndreOppstartsdatoEndringsmelding(deltakerId, arrangorAnsattId, oppstartsdato)
-		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
-	}
-
-	override fun forlengDeltakelse(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate) {
-		endringsmeldingService.opprettForlengDeltakelseEndringsmelding(deltakerId, arrangorAnsattId, sluttdato)
-		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
-	}
-
-	override fun endreDeltakelsesprosent(deltakerId: UUID, arrangorAnsattId: UUID, deltakerProsent: Int, gyldigFraDato: LocalDate?) {
-		endringsmeldingService.opprettEndreDeltakelseProsentEndringsmelding(
-			deltakerId = deltakerId,
-			arrangorAnsattId = arrangorAnsattId,
-			deltakerProsent = deltakerProsent,
-			gyldigFraDato = gyldigFraDato
-		)
-		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
-	}
-
-	override fun avsluttDeltakelse(
-		deltakerId: UUID,
-		arrangorAnsattId: UUID,
-		sluttdato: LocalDate,
-		statusAarsak: DeltakerStatus.Aarsak
-	) {
-		endringsmeldingService.opprettAvsluttDeltakelseEndringsmelding(deltakerId, arrangorAnsattId, sluttdato, statusAarsak)
-		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
-	}
-
-	override fun deltakerIkkeAktuell(deltakerId: UUID, arrangorAnsattId: UUID, statusAarsak: DeltakerStatus.Aarsak) {
-		endringsmeldingService.opprettDeltakerIkkeAktuellEndringsmelding(deltakerId, arrangorAnsattId, statusAarsak)
-		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
 	}
 
 	override fun hentDeltakerMap(deltakerIder: List<UUID>): Map<UUID, Deltaker> {

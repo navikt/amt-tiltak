@@ -89,7 +89,7 @@ class DeltakerController(
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		verifiserErIkkeSkjult(deltakerId)
 
-		deltakerService.leggTilOppstartsdato(deltakerId, ansatt.id, request.oppstartsdato)
+		endringsmeldingService.opprettLeggTilOppstartsdatoEndringsmelding(deltakerId, ansatt.id, request.oppstartsdato)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -103,7 +103,7 @@ class DeltakerController(
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		verifiserErIkkeSkjult(deltakerId)
 
-		deltakerService.endreOppstartsdato(deltakerId, ansatt.id, request.oppstartsdato)
+		endringsmeldingService.opprettEndreOppstartsdatoEndringsmelding(deltakerId, ansatt.id, request.oppstartsdato)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -117,7 +117,7 @@ class DeltakerController(
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		verifiserErIkkeSkjult(deltakerId)
 
-		deltakerService.avsluttDeltakelse(deltakerId, ansatt.id, request.sluttdato, request.aarsak.toModel())
+		endringsmeldingService.opprettAvsluttDeltakelseEndringsmelding(deltakerId, ansatt.id, request.sluttdato, request.aarsak.toModel())
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -131,7 +131,7 @@ class DeltakerController(
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		verifiserErIkkeSkjult(deltakerId)
 
-		deltakerService.forlengDeltakelse(deltakerId, ansatt.id, request.sluttdato)
+		endringsmeldingService.opprettForlengDeltakelseEndringsmelding(deltakerId, ansatt.id, request.sluttdato)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -148,7 +148,7 @@ class DeltakerController(
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		verifiserErIkkeSkjult(deltakerId)
 
-		deltakerService.endreDeltakelsesprosent(deltakerId, ansatt.id, body.deltakelseProsent, body.gyldigFraDato)
+		endringsmeldingService.opprettEndreDeltakelseProsentEndringsmelding(deltakerId, ansatt.id, body.deltakelseProsent, body.gyldigFraDato)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -162,7 +162,47 @@ class DeltakerController(
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		verifiserErIkkeSkjult(deltakerId)
 
-		deltakerService.deltakerIkkeAktuell(deltakerId, ansatt.id, request.aarsak.toModel())
+		endringsmeldingService.opprettDeltakerIkkeAktuellEndringsmelding(deltakerId, ansatt.id, request.aarsak.toModel())
+	}
+
+	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
+	@PatchMapping("/{deltakerId}/tilby-plass")
+	fun tilbyPlass(
+		@PathVariable("deltakerId") deltakerId: UUID,
+	) {
+		val ansatt = hentInnloggetAnsatt()
+
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		verifiserErIkkeSkjult(deltakerId)
+
+		endringsmeldingService.opprettTilbyPlassEndringsmelding(deltakerId, ansatt.id)
+	}
+
+	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
+	@PatchMapping("/{deltakerId}/sett-paa-venteliste")
+	fun settPaaVenteliste(
+		@PathVariable("deltakerId") deltakerId: UUID,
+	) {
+		val ansatt = hentInnloggetAnsatt()
+
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		verifiserErIkkeSkjult(deltakerId)
+
+		endringsmeldingService.opprettSettPaaVentelisteEndringsmelding(deltakerId, ansatt.id)
+	}
+
+	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
+	@PatchMapping("/{deltakerId}/endre-sluttdato")
+	fun endreSluttdato(
+		@PathVariable("deltakerId") deltakerId: UUID,
+		@RequestBody request: EndreSluttdatoRequest,
+	) {
+		val ansatt = hentInnloggetAnsatt()
+
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		verifiserErIkkeSkjult(deltakerId)
+
+		endringsmeldingService.opprettEndresluttdatoEndringsmelding(deltakerId, ansatt.id, request.sluttdato)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)

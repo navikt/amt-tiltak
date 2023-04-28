@@ -1,6 +1,10 @@
 package no.nav.amt.tiltak.bff.nav_ansatt
 
-import no.nav.amt.tiltak.bff.nav_ansatt.dto.*
+import no.nav.amt.tiltak.bff.nav_ansatt.dto.DeltakerDto
+import no.nav.amt.tiltak.bff.nav_ansatt.dto.EndringsmeldingDto
+import no.nav.amt.tiltak.bff.nav_ansatt.dto.HentGjennomforingerDto
+import no.nav.amt.tiltak.bff.nav_ansatt.dto.TiltakDto
+import no.nav.amt.tiltak.bff.nav_ansatt.dto.toDto
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
@@ -63,9 +67,24 @@ class NavAnsattControllerService(
 		id = id,
 		deltaker = deltakerDto,
 		status = status.toDto(),
-		innhold = innhold.toDto(),
+		innhold = innhold?.toDto(),
 		opprettetDato = opprettet,
+		type = type.toDto()
 	)
+
+	private fun Endringsmelding.Type.toDto(): EndringsmeldingDto.Type {
+		return when (this) {
+			Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO -> EndringsmeldingDto.Type.LEGG_TIL_OPPSTARTSDATO
+			Endringsmelding.Type.ENDRE_OPPSTARTSDATO -> EndringsmeldingDto.Type.ENDRE_OPPSTARTSDATO
+			Endringsmelding.Type.FORLENG_DELTAKELSE -> EndringsmeldingDto.Type.FORLENG_DELTAKELSE
+			Endringsmelding.Type.AVSLUTT_DELTAKELSE -> EndringsmeldingDto.Type.AVSLUTT_DELTAKELSE
+			Endringsmelding.Type.DELTAKER_IKKE_AKTUELL -> EndringsmeldingDto.Type.DELTAKER_IKKE_AKTUELL
+			Endringsmelding.Type.ENDRE_DELTAKELSE_PROSENT -> EndringsmeldingDto.Type.ENDRE_DELTAKELSE_PROSENT
+			Endringsmelding.Type.TILBY_PLASS -> EndringsmeldingDto.Type.TILBY_PLASS
+			Endringsmelding.Type.SETT_PAA_VENTELISTE -> EndringsmeldingDto.Type.SETT_PAA_VENTELISTE
+			Endringsmelding.Type.ENDRE_SLUTTDATO -> EndringsmeldingDto.Type.ENDRE_SLUTTDATO
+		}
+	}
 
 	private fun Deltaker.toDto() = DeltakerDto(
 		fornavn = fornavn,
