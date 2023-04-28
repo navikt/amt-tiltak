@@ -1,7 +1,9 @@
 package no.nav.amt.tiltak.core.port
 
-import no.nav.amt.tiltak.core.domain.tiltak.*
-import java.time.LocalDate
+import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
+import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import java.util.*
 
 interface DeltakerService {
@@ -27,18 +29,6 @@ interface DeltakerService {
 	fun finnesBruker(personIdent: String): Boolean
 
 	fun oppdaterAnsvarligVeileder(personIdent: String, navAnsattId: UUID)
-
-	fun leggTilOppstartsdato(deltakerId: UUID, arrangorAnsattId: UUID, oppstartsdato: LocalDate)
-
-	fun endreOppstartsdato(deltakerId: UUID, arrangorAnsattId: UUID, oppstartsdato: LocalDate)
-
-	fun forlengDeltakelse(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate)
-
-	fun endreDeltakelsesprosent(deltakerId: UUID, arrangorAnsattId: UUID, deltakerProsent: Int, gyldigFraDato: LocalDate?)
-
-	fun avsluttDeltakelse(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate, statusAarsak: DeltakerStatus.Aarsak)
-
-	fun deltakerIkkeAktuell(deltakerId: UUID, arrangorAnsattId: UUID, statusAarsak: DeltakerStatus.Aarsak)
 
 	fun erSkjermet(deltakerId: UUID): Boolean
 

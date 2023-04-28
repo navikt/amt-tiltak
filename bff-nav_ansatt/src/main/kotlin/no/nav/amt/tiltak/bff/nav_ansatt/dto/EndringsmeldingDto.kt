@@ -10,11 +10,14 @@ import java.util.*
 data class EndringsmeldingDto(
 	val id: UUID,
 	val deltaker: DeltakerDto,
-	val innhold: Innhold,
+	val innhold: Innhold?,
 	val status: Status,
 	val opprettetDato: ZonedDateTime,
+	val type: Type
 ) {
-	val type = innhold.type()
+	enum class Status {
+		AKTIV, TILBAKEKALT, UTDATERT, UTFORT
+	}
 
 	enum class Type {
 		LEGG_TIL_OPPSTARTSDATO,
@@ -23,10 +26,9 @@ data class EndringsmeldingDto(
 		AVSLUTT_DELTAKELSE,
 		DELTAKER_IKKE_AKTUELL,
 		ENDRE_DELTAKELSE_PROSENT,
-	}
-
-	enum class Status {
-		AKTIV, TILBAKEKALT, UTDATERT, UTFORT
+		TILBY_PLASS,
+		SETT_PAA_VENTELISTE,
+		ENDRE_SLUTTDATO
 	}
 
 	sealed class Innhold {
@@ -56,16 +58,9 @@ data class EndringsmeldingDto(
 			val gyldigFraDato: LocalDate?
 		) : Innhold()
 
-		fun type(): Type {
-			return when(this) {
-				is LeggTilOppstartsdatoInnhold -> Type.LEGG_TIL_OPPSTARTSDATO
-				is EndreOppstartsdatoInnhold -> Type.ENDRE_OPPSTARTSDATO
-				is ForlengDeltakelseInnhold -> Type.FORLENG_DELTAKELSE
-				is AvsluttDeltakelseInnhold -> Type.AVSLUTT_DELTAKELSE
-				is DeltakerIkkeAktuellInnhold -> Type.DELTAKER_IKKE_AKTUELL
-				is EndreDeltakelseProsentInnhold -> Type.ENDRE_DELTAKELSE_PROSENT
-			}
-		}
+		data class EndreSluttdatoInnhold(
+			val sluttdato: LocalDate
+		) : Innhold()
 	}
 }
 
@@ -86,6 +81,8 @@ fun Endringsmelding.Innhold.toDto(): EndringsmeldingDto.Innhold {
 				deltakelseProsent = this.deltakelseProsent,
 				gyldigFraDato = this.gyldigFraDato
 			)
+		is Endringsmelding.Innhold.EndreSluttdatoInnhold ->
+			EndringsmeldingDto.Innhold.EndreSluttdatoInnhold(sluttdato = this.sluttdato)
 	}
 }
 

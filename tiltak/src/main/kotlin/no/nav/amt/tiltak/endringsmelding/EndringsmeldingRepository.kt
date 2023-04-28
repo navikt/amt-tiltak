@@ -132,7 +132,7 @@ open class EndringsmeldingRepository(
 	}
 
 
-	fun insert(id: UUID, deltakerId: UUID, opprettetAvArrangorAnsattId: UUID, innhold: EndringsmeldingDbo.Innhold) {
+	fun insert(id: UUID, deltakerId: UUID, opprettetAvArrangorAnsattId: UUID, type: EndringsmeldingDbo.Type, innhold: EndringsmeldingDbo.Innhold?) {
 		val sql = """
 			INSERT INTO endringsmelding(id, deltaker_id, opprettet_av_arrangor_ansatt_id, type, innhold, status)
 			VALUES(:id, :deltakerId, :opprettetAvArrangorAnsattId, :type, CAST(:innhold as jsonb), 'AKTIV')
@@ -142,8 +142,8 @@ open class EndringsmeldingRepository(
 			"id" to id,
 			"deltakerId" to deltakerId,
 			"opprettetAvArrangorAnsattId" to opprettetAvArrangorAnsattId,
-			"type" to innhold.type().name,
-			"innhold" to objectMapper.writeValueAsString(innhold),
+			"type" to type.name,
+			"innhold" to  objectMapper.writeValueAsString(innhold),
 		)
 		template.update(sql, params)
 	}
@@ -160,7 +160,7 @@ open class EndringsmeldingRepository(
 		template.update(sql, params)
 	}
 
-	private fun parseInnholdJson(innholdJson: String, type: EndringsmeldingDbo.Type): EndringsmeldingDbo.Innhold {
+	private fun parseInnholdJson(innholdJson: String, type: EndringsmeldingDbo.Type): EndringsmeldingDbo.Innhold? {
 		return when(type) {
 			EndringsmeldingDbo.Type.LEGG_TIL_OPPSTARTSDATO ->
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.LeggTilOppstartsdatoInnhold>(innholdJson)
@@ -174,6 +174,11 @@ open class EndringsmeldingRepository(
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold>(innholdJson)
 			EndringsmeldingDbo.Type.ENDRE_DELTAKELSE_PROSENT ->
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold>(innholdJson)
+			EndringsmeldingDbo.Type.ENDRE_SLUTTDATO ->
+				objectMapper.readValue<EndringsmeldingDbo.Innhold.EndreSluttdatoInnhold>(innholdJson)
+			EndringsmeldingDbo.Type.TILBY_PLASS,
+			EndringsmeldingDbo.Type.SETT_PAA_VENTELISTE -> null
+
 		}
 
 	}

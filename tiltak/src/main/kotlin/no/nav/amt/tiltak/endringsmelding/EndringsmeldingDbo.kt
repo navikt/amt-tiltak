@@ -14,7 +14,7 @@ data class EndringsmeldingDbo(
 	val opprettetAvArrangorAnsattId: UUID,
 	val status: Endringsmelding.Status,
 	val type: Type,
-	val innhold: Innhold,
+	val innhold: Innhold?,
 	val createdAt: ZonedDateTime,
 	val modifiedAt: ZonedDateTime
 ) {
@@ -26,6 +26,9 @@ data class EndringsmeldingDbo(
 		FORLENG_DELTAKELSE,
 		AVSLUTT_DELTAKELSE,
 		DELTAKER_IKKE_AKTUELL,
+		TILBY_PLASS,
+		SETT_PAA_VENTELISTE,
+		ENDRE_SLUTTDATO
 	}
 
 	data class DeltakerStatusAarsak(
@@ -60,15 +63,8 @@ data class EndringsmeldingDbo(
 			val gyldigFraDato: LocalDate?
 		): Innhold()
 
-		fun type(): Type {
-			return when(this) {
-				is LeggTilOppstartsdatoInnhold -> Type.LEGG_TIL_OPPSTARTSDATO
-				is EndreOppstartsdatoInnhold -> Type.ENDRE_OPPSTARTSDATO
-				is ForlengDeltakelseInnhold -> Type.FORLENG_DELTAKELSE
-				is AvsluttDeltakelseInnhold -> Type.AVSLUTT_DELTAKELSE
-				is DeltakerIkkeAktuellInnhold -> Type.DELTAKER_IKKE_AKTUELL
-				is EndreDeltakelseProsentInnhold -> Type.ENDRE_DELTAKELSE_PROSENT
-			}
-		}
+		data class EndreSluttdatoInnhold(
+			val sluttdato: LocalDate
+		) : Innhold()
 	}
 }

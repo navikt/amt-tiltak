@@ -15,7 +15,7 @@ data class EndringsmeldingPublishDto(
 	val utfortTidspunkt: LocalDateTime?,
 	val status: String,
 	val type: Type,
-	val innhold: Innhold,
+	val innhold: Innhold?,
 	val createdAt: LocalDateTime
 ) {
 	fun digest() = DigestUtils.md5DigestAsHex(JsonUtils.toJson(this).toByteArray())
@@ -28,6 +28,9 @@ enum class Type {
 	FORLENG_DELTAKELSE,
 	AVSLUTT_DELTAKELSE,
 	DELTAKER_IKKE_AKTUELL,
+	TILBY_PLASS,
+	SETT_PAA_VENTELISTE,
+	ENDRE_SLUTTDATO
 }
 
 data class DeltakerStatusAarsak(
@@ -62,14 +65,8 @@ sealed class Innhold {
 		val gyldigFraDato: LocalDate?
 	) : Innhold()
 
-	fun type(): Type {
-		return when (this) {
-			is LeggTilOppstartsdatoInnhold -> Type.LEGG_TIL_OPPSTARTSDATO
-			is EndreOppstartsdatoInnhold -> Type.ENDRE_OPPSTARTSDATO
-			is ForlengDeltakelseInnhold -> Type.FORLENG_DELTAKELSE
-			is AvsluttDeltakelseInnhold -> Type.AVSLUTT_DELTAKELSE
-			is DeltakerIkkeAktuellInnhold -> Type.DELTAKER_IKKE_AKTUELL
-			is EndreDeltakelseProsentInnhold -> Type.ENDRE_DELTAKELSE_PROSENT
-		}
-	}
+	data class EndreSluttdatoInnhold(
+		val sluttdato: LocalDate
+	) : Innhold()
+
 }

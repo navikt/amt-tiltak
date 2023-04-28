@@ -12,12 +12,24 @@ data class Endringsmelding(
 	val opprettetAvArrangorAnsattId: UUID,
 	val opprettet: ZonedDateTime,
 	val status: Status,
-	val innhold: Innhold,
+	val innhold: Innhold?,
+	val type: Type
 ) {
 	enum class Status {
 		AKTIV, TILBAKEKALT, UTDATERT, UTFORT
 	}
 
+	enum class Type {
+		LEGG_TIL_OPPSTARTSDATO,
+		ENDRE_OPPSTARTSDATO,
+		FORLENG_DELTAKELSE,
+		AVSLUTT_DELTAKELSE,
+		DELTAKER_IKKE_AKTUELL,
+		ENDRE_DELTAKELSE_PROSENT,
+		TILBY_PLASS,
+		SETT_PAA_VENTELISTE,
+		ENDRE_SLUTTDATO
+	}
 	sealed class Innhold {
 		data class LeggTilOppstartsdatoInnhold(
 			val oppstartsdato: LocalDate
@@ -43,6 +55,10 @@ data class Endringsmelding(
 		data class EndreDeltakelseProsentInnhold(
 			val deltakelseProsent: Int,
 			val gyldigFraDato: LocalDate?
+		) : Innhold()
+
+		data class EndreSluttdatoInnhold(
+			val sluttdato: LocalDate
 		) : Innhold()
 	}
 }

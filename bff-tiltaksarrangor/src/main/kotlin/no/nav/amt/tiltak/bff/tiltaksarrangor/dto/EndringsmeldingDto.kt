@@ -8,9 +8,9 @@ import java.util.*
 
 data class EndringsmeldingDto(
 	val id: UUID,
-	val innhold: Innhold,
+	val innhold: Innhold?,
+	val type: Type
 ) {
-	val type = innhold.type()
 
 	enum class Type {
 		LEGG_TIL_OPPSTARTSDATO,
@@ -19,6 +19,9 @@ data class EndringsmeldingDto(
 		AVSLUTT_DELTAKELSE,
 		DELTAKER_IKKE_AKTUELL,
 		ENDRE_DELTAKELSE_PROSENT,
+		TILBY_PLASS,
+		SETT_PAA_VENTELISTE,
+		ENDRE_SLUTTDATO
 	}
 
 	sealed class Innhold {
@@ -48,17 +51,9 @@ data class EndringsmeldingDto(
 			val aarsak: DeltakerStatusAarsak,
 		) : Innhold()
 
-		fun type(): Type {
-			return when(this) {
-				is LeggTilOppstartsdatoInnhold -> Type.LEGG_TIL_OPPSTARTSDATO
-				is EndreOppstartsdatoInnhold -> Type.ENDRE_OPPSTARTSDATO
-				is ForlengDeltakelseInnhold -> Type.FORLENG_DELTAKELSE
-				is AvsluttDeltakelseInnhold -> Type.AVSLUTT_DELTAKELSE
-				is DeltakerIkkeAktuellInnhold -> Type.DELTAKER_IKKE_AKTUELL
-				is EndreDeltakelseProsentInnhold -> Type.ENDRE_DELTAKELSE_PROSENT
-			}
-		}
-
+		data class EndreSluttdatoInnhold(
+			val sluttdato: LocalDate
+		) : Innhold()
 	}
 
 }
@@ -80,7 +75,22 @@ fun Endringsmelding.Innhold.toDto(): EndringsmeldingDto.Innhold {
 				deltakelseProsent = this.deltakelseProsent,
 				gyldigFraDato = this.gyldigFraDato
 			)
+		is Endringsmelding.Innhold.EndreSluttdatoInnhold -> EndringsmeldingDto.Innhold.EndreSluttdatoInnhold(this.sluttdato)
 	}
 }
 
-fun Endringsmelding.toDto() = EndringsmeldingDto(id = id, innhold = innhold.toDto())
+fun Endringsmelding.Type.toDto(): EndringsmeldingDto.Type {
+	return when (this) {
+		Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO -> EndringsmeldingDto.Type.LEGG_TIL_OPPSTARTSDATO
+		Endringsmelding.Type.ENDRE_OPPSTARTSDATO -> EndringsmeldingDto.Type.ENDRE_OPPSTARTSDATO
+		Endringsmelding.Type.FORLENG_DELTAKELSE -> EndringsmeldingDto.Type.FORLENG_DELTAKELSE
+		Endringsmelding.Type.AVSLUTT_DELTAKELSE -> EndringsmeldingDto.Type.AVSLUTT_DELTAKELSE
+		Endringsmelding.Type.DELTAKER_IKKE_AKTUELL -> EndringsmeldingDto.Type.DELTAKER_IKKE_AKTUELL
+		Endringsmelding.Type.ENDRE_DELTAKELSE_PROSENT -> EndringsmeldingDto.Type.ENDRE_DELTAKELSE_PROSENT
+		Endringsmelding.Type.TILBY_PLASS -> EndringsmeldingDto.Type.TILBY_PLASS
+		Endringsmelding.Type.SETT_PAA_VENTELISTE -> EndringsmeldingDto.Type.SETT_PAA_VENTELISTE
+		Endringsmelding.Type.ENDRE_SLUTTDATO -> EndringsmeldingDto.Type.ENDRE_SLUTTDATO
+	}
+}
+
+fun Endringsmelding.toDto() = EndringsmeldingDto(id = id, innhold = innhold?.toDto(), type=type.toDto())
