@@ -1,8 +1,10 @@
 package no.nav.amt.tiltak.data_publisher
 
+import arrow.core.getOrElse
 import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
+import no.nav.amt.tiltak.data_publisher.model.PublishState
 import no.nav.amt.tiltak.data_publisher.publish.*
 import no.nav.amt.tiltak.kafka.config.KafkaTopicProperties
 import no.nav.common.kafka.producer.KafkaProducerClient
@@ -103,22 +105,28 @@ class DataPublisherService(
 			return
 		}
 
-		val currentData = DeltakerPublishQuery(template).get(id)
+		DeltakerPublishQuery(template).get(id).getOrElse {
+			when (it) {
+				PublishState.DONT_PUBLISH -> return
+				PublishState.PUBLISH_TOMBSTONE -> {
+					val key = id.toString()
+					val record = ProducerRecord<String, String?>(kafkaTopicProperties.amtDeltakerTopic, key, null)
+					logger.info("Legger inn Tombstone på DELTAKER med id $id")
+					stringKafkaProducer.sendSync(record)
+					return
+				}
+			}
+		}.let { currentData ->
+			if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKER, currentData.digest())) {
+				val key = id.toString()
+				val value = JsonUtils.toJsonString(currentData)
+				val record = ProducerRecord(kafkaTopicProperties.amtDeltakerTopic, key, value)
+				logger.info("Republiserer DELTAKER med id $id")
+				stringKafkaProducer.sendSync(record)
+				publishRepository.set(id, DataPublishType.DELTAKER, currentData.digest())
 
-		if (currentData == null) {
-			val key = id.toString()
-			val record = ProducerRecord<String, String?>(kafkaTopicProperties.amtDeltakerTopic, key, null)
-			logger.info("Legger inn Tombstone på DELTAKER med id $id")
-			stringKafkaProducer.sendSync(record)
-		} else if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKER, currentData.digest())) {
-			val key = id.toString()
-			val value = JsonUtils.toJsonString(currentData)
-			val record = ProducerRecord(kafkaTopicProperties.amtDeltakerTopic, key, value)
-			logger.info("Republiserer DELTAKER med id $id")
-			stringKafkaProducer.sendSync(record)
-			publishRepository.set(id, DataPublishType.DELTAKER, currentData.digest())
+			}
 		}
-
 	}
 
 	private fun publishArrangor(id: UUID, forcePublish: Boolean = false) {

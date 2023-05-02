@@ -26,6 +26,6 @@ class DeltakerPublishQueryTest : FunSpec({
 		val input = db.createDeltaker()
 		val data = query.get(input.id)
 
-		data?.id shouldBe input.id
+		data.getOrNull()?.id shouldBe input.id
 	}
 })
