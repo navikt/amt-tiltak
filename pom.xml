@@ -49,7 +49,7 @@
         <testcontainers.version>1.17.6</testcontainers.version>
         <mockito-kotlin.version>4.1.0</mockito-kotlin.version>
         <schedlock.version>5.2.0</schedlock.version>
-        <nimbus.version>10.7.1</nimbus.version>
+        <nimbus.version>10.8</nimbus.version>
         <mockk.version>1.13.4</mockk.version>
         <kotest.version>5.5.5</kotest.version>
         <okhttp.version>4.10.0</okhttp.version>
