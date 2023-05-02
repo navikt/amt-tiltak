@@ -56,7 +56,7 @@
         <token-support.version>3.0.10</token-support.version>
         <mock-oauth2-server.version>0.5.8</mock-oauth2-server.version>
         <common.version>3.2023.04.11_09.05-411b59915166</common.version>
-        <logstash.version>7.2</logstash.version>
+        <logstash.version>7.3</logstash.version>
     </properties>
 
     <repositories>
