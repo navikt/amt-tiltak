@@ -11,8 +11,9 @@ env:
 jobs:
   test-build-and-push:
     permissions:
-      contents: "read"
+      contents: "write"
       id-token: "write"
+      security-events: "write"
     name: Test, build and push
     runs-on: ubuntu-latest
     steps:
@@ -31,6 +32,8 @@ jobs:
           restore-keys: ${{ runner.os }}-maven-
       - name: Build maven artifacts
         run: mvn -B package
+      - name: Dependency submission (for dependabot)
+        uses: advanced-security/maven-dependency-submission-action@v3
       - name: docker-build-push
         uses: nais/docker-build-push@v0
         id: docker-build-push
