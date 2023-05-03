@@ -22,11 +22,6 @@ class DataPublisherService(
 	private val template: NamedParameterJdbcTemplate,
 	private val enhetsregisterClient: EnhetsregisterClient,
 	private val publishRepository: PublishRepository,
-	@Value("\${publish.arrangor:true}") private val publishArrangor: Boolean = true,
-	@Value("\${publish.arrangorAnsatt:true}") private val publishArrangorAnsatt: Boolean = true,
-	@Value("\${publish.deltaker:true}") private val publishDeltaker: Boolean = true,
-	@Value("\${publish.deltakerliste:true}") private val publishDeltakerliste: Boolean = true,
-	@Value("\${publish.endringsmelding:true}") private val publishEndringsmelding: Boolean = true
 ) {
 
 	private val logger = LoggerFactory.getLogger(javaClass)
@@ -44,48 +39,33 @@ class DataPublisherService(
 	fun publishAll(batchSize: Int = 100, forcePublish: Boolean = true) {
 		val idQueries = IdQueries(template)
 
-		if (publishDeltakerliste) {
 			publishBatch(
 				idProvider = { offset -> idQueries.hentDeltakerlisteIds(offset, batchSize) },
 				publisher = { id -> publishDeltakerliste(id, forcePublish) }
 			)
-		}
 
-		if (publishDeltaker) {
 			publishBatch(
 				idProvider = { offset -> idQueries.hentDeltakerIds(offset, batchSize) },
 				publisher = { id -> publishDeltaker(id, forcePublish) }
 			)
 
-		}
-
-		if (publishArrangor) {
 			publishBatch(
 				idProvider = { offset -> idQueries.hentArrangorIds(offset, batchSize) },
 				publisher = { id -> publishArrangor(id, forcePublish) }
 			)
-		}
 
-		if (publishArrangorAnsatt) {
 			publishBatch(
 				idProvider = { offset -> idQueries.hentArrangorAnsattIds(offset, batchSize) },
 				publisher = { id -> publishArrangorAnsatt(id, forcePublish) }
 			)
-		}
 
-		if (publishEndringsmelding) {
 			publishBatch(
 				idProvider = { offset -> idQueries.hentEndringsmeldingIds(offset, batchSize) },
 				publisher = { id -> publishEndringsmelding(id, forcePublish) }
 			)
-		}
 	}
 
 	private fun publishDeltakerliste(id: UUID, forcePublish: Boolean = false) {
-		if (!publishDeltakerliste) {
-			logger.info("Publisering av deltakerlister er ikke skrudd på")
-			return
-		}
 
 		val currentData = DeltakerlistePublishQuery(template).get(id)
 
@@ -100,10 +80,6 @@ class DataPublisherService(
 	}
 
 	private fun publishDeltaker(id: UUID, forcePublish: Boolean = false) {
-		if (!publishDeltaker) {
-			logger.info("Publisering av deltakere er ikke skrudd på")
-			return
-		}
 
 		DeltakerPublishQuery(template).get(id).getOrElse {
 			when (it) {
@@ -130,10 +106,6 @@ class DataPublisherService(
 	}
 
 	private fun publishArrangor(id: UUID, forcePublish: Boolean = false) {
-		if (!publishArrangor) {
-			logger.info("Publisering av arangør er ikke skrudd på")
-			return
-		}
 
 		val currentData = ArrangorPublishQuery(template, enhetsregisterClient).get(id)
 
@@ -148,10 +120,6 @@ class DataPublisherService(
 	}
 
 	private fun publishArrangorAnsatt(id: UUID, forcePublish: Boolean = false) {
-		if (!publishArrangorAnsatt) {
-			logger.info("Publisering av Ansatte er ikke skrudd på")
-			return
-		}
 
 		val currentData = ArrangorAnsattPublishQuery(template).get(id)
 
@@ -166,10 +134,6 @@ class DataPublisherService(
 	}
 
 	private fun publishEndringsmelding(id: UUID, forcePublish: Boolean = false) {
-		if (!publishEndringsmelding) {
-			logger.info("Publisering av Endringsmeldinger er ikke skrudd på")
-			return
-		}
 
 		val currentData = EndringsmeldingPublishQuery(template).get(id)
 
