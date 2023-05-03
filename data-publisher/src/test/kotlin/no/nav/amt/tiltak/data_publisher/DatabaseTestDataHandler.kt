@@ -1,6 +1,8 @@
 package no.nav.amt.tiltak.data_publisher
 
+import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.data_publisher.model.AnsattRolle
 import no.nav.amt.tiltak.data_publisher.model.VeilederType
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
@@ -41,10 +43,38 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		.also { testDataRepository.insertDeltaker(it) }
 		.also { testDataRepository.insertDeltakerStatus(createDeltakerStatus(it.id)) }
 
+	fun createEndringsmelding(
+		deltakerId: UUID = createDeltaker().id,
+		opprettetAv: UUID = createArrangorAnsatt().id
+	): EndringsmeldingInput = endringsmeldingInput(deltakerId, opprettetAv)
+		.also { testDataRepository.insertEndringsmelding(it) }
+
+	fun endringsmeldingInput(
+		deltakerId: UUID,
+		opprettetAv: UUID
+	) = EndringsmeldingInput(
+		id = UUID.randomUUID(),
+		deltakerId = deltakerId,
+		opprettetAvArrangorAnsattId = opprettetAv,
+		type = Endringsmelding.Type.ENDRE_SLUTTDATO.name,
+		innhold = JsonUtils.toJsonString(Endringsmelding.Innhold.EndreSluttdatoInnhold(LocalDate.now())),
+		status = Endringsmelding.Status.AKTIV
+	)
+
+	fun createArrangorAnsatt() = arrangorAnsattInput()
+		.also { testDataRepository.insertArrangorAnsatt(it) }
+
+	fun arrangorAnsattInput() = ArrangorAnsattInput(
+		id = UUID.randomUUID(),
+		personligIdent = UUID.randomUUID().toString(),
+		fornavn = UUID.randomUUID().toString(),
+		etternavn = UUID.randomUUID().toString()
+	)
+
 	fun createDeltakerStatus(
 		deltakerId: UUID
 	): DeltakerStatusInput = DeltakerStatusInput(
-		id= UUID.randomUUID(),
+		id = UUID.randomUUID(),
 		deltakerId = deltakerId,
 		gyldigFra = LocalDateTime.now(),
 		status = DeltakerStatus.Type.DELTAR.name,
