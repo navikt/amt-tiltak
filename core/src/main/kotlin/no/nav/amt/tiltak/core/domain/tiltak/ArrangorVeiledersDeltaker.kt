@@ -20,7 +20,7 @@ data class ArrangorVeiledersDeltaker(
 	val arrangorId: UUID,
 	val erMedveilederFor: Boolean
 ) {
-	private val skalFjernesDato = if ((status == DeltakerStatus.Type.HAR_SLUTTET || status == DeltakerStatus.Type.IKKE_AKTUELL) && sluttDato != null) {
+	private val skalFjernesDato = if (status in STATUSER_SOM_KAN_SKJULES && sluttDato != null) {
 		sluttDato.plusWeeks(2)
 	} else {
 		null

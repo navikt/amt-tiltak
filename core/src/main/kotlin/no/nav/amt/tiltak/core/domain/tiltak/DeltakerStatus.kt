@@ -57,6 +57,12 @@ val SKJULES_ALLTID_STATUSER = listOf(
 	DeltakerStatus.Type.FEILREGISTRERT
 )
 
+val STATUSER_SOM_KAN_SKJULES = listOf(
+	DeltakerStatus.Type.IKKE_AKTUELL,
+	DeltakerStatus.Type.HAR_SLUTTET,
+	DeltakerStatus.Type.AVBRUTT
+)
+
 val HAR_IKKE_STARTET_STATUSER = listOf(DeltakerStatus.Type.VENTER_PA_OPPSTART).plus(VENTER_PAA_PLASS_STATUSER)
 
 fun DeltakerStatus.Type.skjulesForAlleAktorer() : Boolean {

@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.core.domain.tiltak
 
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class Deltaker(
 	val id: UUID = UUID.randomUUID(),
@@ -24,7 +24,7 @@ data class Deltaker(
 	val prosentStilling: Float? = null,
 	val innsokBegrunnelse: String? = null
 ) {
-	val skalFjernesDato = if(status.type == DeltakerStatus.Type.HAR_SLUTTET || status.type == DeltakerStatus.Type.IKKE_AKTUELL) status.gyldigFra.plusWeeks(2) else null
+	val skalFjernesDato = if(status.type in STATUSER_SOM_KAN_SKJULES) status.gyldigFra.plusWeeks(2) else null
 	val erUtdatert = skalFjernesDato != null && LocalDateTime.now().isAfter(skalFjernesDato)
 }
 
