@@ -6,6 +6,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
+import no.nav.amt.tiltak.core.domain.tiltak.STATUSER_SOM_KAN_SKJULES
 import no.nav.amt.tiltak.core.domain.tiltak.harIkkeStartet
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
 import no.nav.amt.tiltak.core.port.BrukerService
@@ -276,11 +277,9 @@ open class DeltakerServiceImpl(
 	}
 
 	override fun kanDeltakerSkjulesForTiltaksarrangor(deltakerId: UUID): Boolean {
-		val statuserSomKanSkjules = listOf(DeltakerStatus.Type.IKKE_AKTUELL, DeltakerStatus.Type.HAR_SLUTTET, DeltakerStatus.Type.AVBRUTT)
-
 		val deltakerStatus = hentStatusOrThrow(deltakerId)
 
-		return statuserSomKanSkjules.contains(deltakerStatus.type)
+		return STATUSER_SOM_KAN_SKJULES.contains(deltakerStatus.type)
 	}
 
 	override fun skjulDeltakerForTiltaksarrangor(deltakerId: UUID, arrangorAnsattId: UUID) {
