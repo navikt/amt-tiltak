@@ -113,7 +113,7 @@ spec:
     - name: DIGDIR_KRR_PROXY_SCOPE
       value: api://dev-gcp.team-rocket.digdir-krr-proxy/.default
     - name: DIGDIR_KRR_PROXY_URL
-      value: https://digdir-krr-stub.intern.dev.nav.no
+      value: https://digdir-krr-proxy.intern.dev.nav.no
     - name: POAO_TILGANG_URL
       value: http://poao-tilgang.poao.svc.cluster.local
     - name: POAO_TILGANG_SCOPE
