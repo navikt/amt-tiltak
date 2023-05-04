@@ -26,7 +26,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.Random
+import java.util.UUID
 
 class VeilederControllerIntegrationTest : IntegrationTestBase() {
 
