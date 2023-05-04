@@ -400,7 +400,7 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson =
-			"""{"veilederInfo":{"veilederFor":1,"medveilederFor":0},"koordinatorInfo":{"deltakerlister":[{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","type":"Tiltak1","startdato":null,"sluttdato":null}]}}""".trimIndent()
+			"""{"veilederInfo":{"veilederFor":1,"medveilederFor":0},"koordinatorInfo":{"deltakerlister":[{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","type":"Tiltak1","startdato":"2022-02-01","sluttdato":"2050-12-30","erKurs":false}]}}""".trimIndent()
 
 		response.code shouldBe 200
 		response.body?.string() shouldBe expectedJson

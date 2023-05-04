@@ -170,9 +170,7 @@ fun ArrangorVeiledersDeltaker.toVeiledersDeltakerDto(endringsmeldinger: List<End
 		deltakerliste = DeltakerlisteDto(
 			id = gjennomforingId,
 			navn = gjennomforingNavn,
-			type = gjennomforingType,
-			startdato = null,
-			sluttdato = null
+			type = gjennomforingType
 		),
 		erMedveilederFor = erMedveilederFor,
 		aktiveEndringsmeldinger = endringsmeldinger

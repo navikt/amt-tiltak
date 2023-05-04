@@ -168,14 +168,14 @@ class GjennomforingController(
 		)
 	}
 
-	private fun getDeltakerlister(ansattPersonligIdent: String): List<DeltakerlisteDto> {
+	private fun getDeltakerlister(ansattPersonligIdent: String): List<KoordinatorInfoDto.DeltakerlisteDto> {
 		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
 		val gjennomforingIder = mineDeltakerlisterService.hent(ansattId)
 
 		return gjennomforingService.getGjennomforinger(gjennomforingIder)
 			.filter { erSynligForArrangor(it) }
 			.filter { !it.erKurs || kursTiltakToggleEnabled() }
-			.map { it.toDeltakerlisteDto() }
+			.map { it.toKoordinatorInfoDeltakerlisteDto() }
 	}
 
 	private fun erSynligForArrangor(gjennomforing: Gjennomforing): Boolean {
