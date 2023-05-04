@@ -70,7 +70,7 @@ spec:
         - host: norg2.dev-fss-pub.nais.io
         - host: veilarbarena.dev-fss-pub.nais.io
         - host: veilarboppfolging.dev-fss-pub.nais.io
-        - host: digdir-krr-proxy.dev.intern.nav.no
+        - host: digdir-krr-proxy.intern.dev.nav.no
   kafka:
     pool: nav-dev
   secureLogs:
@@ -113,7 +113,7 @@ spec:
     - name: DIGDIR_KRR_PROXY_SCOPE
       value: api://dev-gcp.team-rocket.digdir-krr-proxy/.default
     - name: DIGDIR_KRR_PROXY_URL
-      value: https://digdir-krr-proxy.dev.intern.nav.no
+      value: https://digdir-krr-proxy.intern.dev.nav.no
     - name: POAO_TILGANG_URL
       value: http://poao-tilgang.poao.svc.cluster.local
     - name: POAO_TILGANG_SCOPE
