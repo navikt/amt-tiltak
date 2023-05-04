@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.endringsmelding
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
+import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getNullableZonedDateTime
 import no.nav.amt.tiltak.common.db_utils.getZonedDateTime
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
@@ -28,7 +29,7 @@ open class EndringsmeldingRepository(
 			opprettetAvArrangorAnsattId = rs.getUUID("opprettet_av_arrangor_ansatt_id"),
 			status = Endringsmelding.Status.valueOf(rs.getString("status")),
 			type = type,
-			innhold = parseInnholdJson(rs.getString("innhold"), type),
+			innhold = rs.getNullableString("innhold")?.let { parseInnholdJson(it, type)},
 			createdAt = rs.getZonedDateTime("created_at"),
 			modifiedAt = rs.getZonedDateTime("modified_at"),
 		)
@@ -143,7 +144,7 @@ open class EndringsmeldingRepository(
 			"deltakerId" to deltakerId,
 			"opprettetAvArrangorAnsattId" to opprettetAvArrangorAnsattId,
 			"type" to type.name,
-			"innhold" to  objectMapper.writeValueAsString(innhold),
+			"innhold" to innhold?.let { objectMapper.writeValueAsString(innhold) },
 		)
 		template.update(sql, params)
 	}

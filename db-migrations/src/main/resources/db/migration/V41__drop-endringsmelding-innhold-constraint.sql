@@ -1,0 +1,2 @@
+ALTER TABLE endringsmelding
+ALTER COLUMN innhold DROP NOT NULL

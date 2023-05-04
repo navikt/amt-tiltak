@@ -31,7 +31,7 @@ class EndringsmeldingPublishQuery(
 			utfortTidspunkt = rs.getNullableLocalDateTime("utfort_tidspunkt"),
 			status = rs.getString("status"),
 			type = type,
-			innhold = parseInnholdJson(rs.getString("innhold"), type),
+			innhold = rs.getString("innhold")?.let { parseInnholdJson(it, type) },
 			createdAt = rs.getLocalDateTime("created_at")
 		)
 	}
