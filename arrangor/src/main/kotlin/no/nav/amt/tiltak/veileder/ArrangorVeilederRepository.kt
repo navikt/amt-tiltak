@@ -8,7 +8,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.UUID
 
 @Component
 open class ArrangorVeilederRepository(
@@ -42,6 +42,7 @@ open class ArrangorVeilederRepository(
 			gjennomforingId = rs.getUUID("gjennomforing_id"),
 			gjennomforingNavn = rs.getString("gjennomforing_navn"),
 			gjennomforingType = rs.getString("tiltak_navn"),
+			erKurs = rs.getBoolean("er_kurs"),
 			arrangorId = rs.getUUID("arrangor_id"),
 			erMedveilederFor = rs.getBoolean("er_medveileder")
 		)
@@ -205,6 +206,7 @@ open class ArrangorVeilederRepository(
 				   bruker.mellomnavn,
 				   bruker.etternavn,
 				   gjennomforing.arrangor_id,
+				   gjennomforing.er_kurs,
 				   gjennomforing.navn AS gjennomforing_navn,
 				   tiltak.navn        AS tiltak_navn
 			FROM arrangor_veileder
