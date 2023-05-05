@@ -49,6 +49,7 @@ abstract class IntegrationTestBase {
 	companion object {
 		val mockOAuthServer = MockOAuthServer()
 		val mockEnhetsregisterServer = MockAmtEnhetsregisterServer()
+		val mockArrangorServer = MockAmtArrangorServer()
 		val mockNorgHttpServer = MockNorgHttpServer()
 		val mockPoaoTilgangHttpServer = MockPoaoTilgangHttpServer()
 		val mockNomHttpServer = MockNomHttpServer()
@@ -69,6 +70,10 @@ abstract class IntegrationTestBase {
 
 			registry.add("no.nav.security.jwt.issuer.tokenx.discovery-url") { mockOAuthServer.getDiscoveryUrl("tokenx") }
 			registry.add("no.nav.security.jwt.issuer.tokenx.accepted-audience") { "test-aud" }
+
+			mockArrangorServer.start()
+			registry.add("amt-arrangor.url") { mockArrangorServer.serverUrl() }
+			registry.add("amt-arrangor.scope") { "test.arrangor" }
 
 			mockDkifHttpServer.start()
 			registry.add("digdir-krr-proxy.url") { mockDkifHttpServer.serverUrl() }

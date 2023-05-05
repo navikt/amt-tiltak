@@ -90,6 +90,10 @@ spec:
       value: api://dev-gcp.amt.amt-altinn-acl/.default
     - name: AMT_ALTINN_ACL_URL
       value: http://amt-altinn-acl.amt.svc.cluster.local
+    - name: AMT_ARRANGOR_SCOPE
+      value: api://dev-gcp.amt.amt-arrangor/.default
+    - name: AMT_ARRANGOR_URL
+      value: http://amt-arrangor.amt.svc.cluster.local
     - name: AMT_ENHETSREGISTER_SCOPE
       value: api://dev-gcp.amt.amt-enhetsregister/.default
     - name: AMT_ENHETSREGISTER_URL
