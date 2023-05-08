@@ -5,7 +5,7 @@ import no.nav.common.json.JsonUtils
 import org.springframework.util.DigestUtils
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class DeltakerPublishDto(
 	val id: UUID,
@@ -20,7 +20,8 @@ data class DeltakerPublishDto(
 	val bestillingTekst: String?,
 	val navKontor: String?,
 	val navVeileder: DeltakerNavVeilederDto?,
-	val skjult: DeltakerSkjultDto?
+	val skjult: DeltakerSkjultDto?,
+	val deltarPaKurs: Boolean
 ) {
 	fun digest() = DigestUtils.md5DigestAsHex(JsonUtils.toJson(this).toByteArray())
 }
