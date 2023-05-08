@@ -3,15 +3,27 @@ package no.nav.amt.tiltak.data_publisher.publish
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import no.nav.amt.tiltak.common.db_utils.*
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
+import no.nav.amt.tiltak.common.db_utils.getLocalDate
+import no.nav.amt.tiltak.common.db_utils.getNullableLocalDate
+import no.nav.amt.tiltak.common.db_utils.getNullableLocalDateTime
+import no.nav.amt.tiltak.common.db_utils.getNullableString
+import no.nav.amt.tiltak.common.db_utils.getNullableUUID
+import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
-import no.nav.amt.tiltak.data_publisher.model.*
+import no.nav.amt.tiltak.data_publisher.model.DeltakerKontaktinformasjonDto
+import no.nav.amt.tiltak.data_publisher.model.DeltakerNavVeilederDto
+import no.nav.amt.tiltak.data_publisher.model.DeltakerPersonaliaDto
+import no.nav.amt.tiltak.data_publisher.model.DeltakerPublishDto
+import no.nav.amt.tiltak.data_publisher.model.DeltakerSkjultDto
+import no.nav.amt.tiltak.data_publisher.model.DeltakerStatusDto
+import no.nav.amt.tiltak.data_publisher.model.Navn
+import no.nav.amt.tiltak.data_publisher.model.PublishState
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 class DeltakerPublishQuery(
 	private val template: NamedParameterJdbcTemplate
@@ -63,7 +75,8 @@ class DeltakerPublishQuery(
 					skjultAvAnsattId = deltaker.skjultAvAnsattId,
 					dato = deltaker.skjultCreatedAt!!
 				)
-			}
+			},
+			deltarPaKurs = deltaker.deltarPaKurs
 		).right()
 	}
 
@@ -93,8 +106,10 @@ class DeltakerPublishQuery(
 			   status.gyldig_fra                            as status_gyldig_fra,
 			   status.created_at                            as status_opprettet_dato,
 			   skjult_deltaker.skjult_av_arrangor_ansatt_id as skjult_av_arrangor_id,
-			   skjult_deltaker.created_at                   as skjult_pa_dato
+			   skjult_deltaker.created_at                   as skjult_pa_dato,
+			   gjennomforing.er_kurs
 		from deltaker
+				 left join gjennomforing on deltaker.gjennomforing_id = gjennomforing.id
 				 left join bruker on deltaker.bruker_id = bruker.id
 				 left join nav_enhet on bruker.nav_enhet_id = nav_enhet.id
 				 left join nav_ansatt on bruker.ansvarlig_veileder_id = nav_ansatt.id
@@ -138,7 +153,8 @@ class DeltakerPublishQuery(
 		val statusGyldigFra: LocalDateTime?,
 		val statusCreatedAt: LocalDateTime?,
 		val skjultAvAnsattId: UUID?,
-		val skjultCreatedAt: LocalDateTime?
+		val skjultCreatedAt: LocalDateTime?,
+		val deltarPaKurs: Boolean
 	) {
 		companion object {
 			val rowMapper = RowMapper { rs, _ ->
@@ -167,7 +183,8 @@ class DeltakerPublishQuery(
 					statusGyldigFra = rs.getNullableLocalDateTime("status_gyldig_fra"),
 					statusCreatedAt = rs.getNullableLocalDateTime("status_opprettet_dato"),
 					skjultAvAnsattId = rs.getNullableUUID("skjult_av_arrangor_id"),
-					skjultCreatedAt = rs.getNullableLocalDateTime("skjult_pa_dato")
+					skjultCreatedAt = rs.getNullableLocalDateTime("skjult_pa_dato"),
+					deltarPaKurs = rs.getBoolean("er_kurs")
 				)
 			}
 		}
