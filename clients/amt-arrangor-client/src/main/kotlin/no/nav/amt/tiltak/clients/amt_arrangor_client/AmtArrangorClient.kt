@@ -18,7 +18,7 @@ class AmtArrangorClient(
 
 	fun hentArrangor(id: UUID): Result<ArrangorDto> {
 		val request = Request.Builder()
-			.url("$baseUrl/api/$id")
+			.url("$baseUrl/api/ansatt/$id")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
 			.get()
 			.build()
@@ -41,7 +41,7 @@ class AmtArrangorClient(
 
 	fun hentArrangor(organisasjonsnummer: String): Result<ArrangorDto> {
 		val request = Request.Builder()
-			.url("$baseUrl/api/organisasjonsnummer/$organisasjonsnummer")
+			.url("$baseUrl/api/ansatt/organisasjonsnummer/$organisasjonsnummer")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
 			.get()
 			.build()
