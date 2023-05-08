@@ -179,7 +179,7 @@ class GjennomforingController(
 	}
 
 	private fun erSynligForArrangor(gjennomforing: Gjennomforing): Boolean {
-		if (gjennomforing.status == Gjennomforing.Status.GJENNOMFORES) return true
+		if (gjennomforing.status in listOf(Gjennomforing.Status.GJENNOMFORES, Gjennomforing.Status.APENT_FOR_INNSOK)) return true
 		else if (
 			gjennomforing.status == Gjennomforing.Status.AVSLUTTET
 			&& gjennomforing.sluttDato != null
