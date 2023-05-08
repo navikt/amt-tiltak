@@ -8,7 +8,7 @@ data class DeltakerStatusAarsak (
 	val beskrivelse: String? = null,
 ) {
 	enum class Type {
-		SYK, FATT_JOBB, TRENGER_ANNEN_STOTTE, FIKK_IKKE_PLASS, UTDANNING, FERDIG, AVLYST_KONTRAKT, IKKE_MOTT, FEILREGISTRERT, ANNET;
+		SYK, FATT_JOBB, TRENGER_ANNEN_STOTTE, FIKK_IKKE_PLASS, UTDANNING, FERDIG, AVLYST_KONTRAKT, IKKE_MOTT, FEILREGISTRERT, OPPFYLLER_IKKE_KRAVENE, ANNET;
 	}
 }
 
@@ -23,6 +23,7 @@ fun DeltakerStatus.Aarsak.toDto(): DeltakerStatusAarsak {
 		DeltakerStatus.Aarsak.Type.AVLYST_KONTRAKT -> DeltakerStatusAarsak(DeltakerStatusAarsak.Type.AVLYST_KONTRAKT)
 		DeltakerStatus.Aarsak.Type.IKKE_MOTT -> DeltakerStatusAarsak(DeltakerStatusAarsak.Type.IKKE_MOTT)
 		DeltakerStatus.Aarsak.Type.FEILREGISTRERT -> DeltakerStatusAarsak(DeltakerStatusAarsak.Type.FEILREGISTRERT)
+		DeltakerStatus.Aarsak.Type.OPPFYLLER_IKKE_KRAVENE -> DeltakerStatusAarsak(DeltakerStatusAarsak.Type.OPPFYLLER_IKKE_KRAVENE, this.beskrivelse)
 		DeltakerStatus.Aarsak.Type.ANNET -> DeltakerStatusAarsak(DeltakerStatusAarsak.Type.ANNET, this.beskrivelse)
 	}
 }
