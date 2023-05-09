@@ -12,7 +12,7 @@ import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import org.springframework.stereotype.Service
-import java.util.UUID
+import java.util.*
 
 @Service
 open class ControllerService(
@@ -30,7 +30,7 @@ open class ControllerService(
 		val navEnhet = deltaker.navEnhetId?.let { navEnhetService.getNavEnhet(it) }
 		val gjennomforing = deltaker.gjennomforingId.let { gjennomforingService.getGjennomforing(it) }
 
-		if (deltaker.status.type.skjulesForAlleAktorer())
+		if (deltaker.status.type.skjulesForAlleAktorer() || deltaker.erUtdatert)
 			throw UnauthorizedException("Har ikke tilgang til id $deltakerId")
 
 		return DeltakerDetaljerDto(
