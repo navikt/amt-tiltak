@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 @Service
 open class EndringsmeldingServiceImpl(
@@ -123,10 +123,12 @@ open class EndringsmeldingServiceImpl(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
 		deltakerProsent: Int,
+		dagerPerUke: Int?,
 		gyldigFraDato: LocalDate?
 	) {
 		val innhold = EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold(
 			nyDeltakelseProsent = deltakerProsent,
+			dagerPerUke = dagerPerUke,
 			gyldigFraDato = gyldigFraDato
 		)
 
@@ -262,6 +264,7 @@ open class EndringsmeldingServiceImpl(
 			is EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold ->
 				Endringsmelding.Innhold.EndreDeltakelseProsentInnhold(
 					deltakelseProsent = this.nyDeltakelseProsent,
+					dagerPerUke = this.dagerPerUke,
 					gyldigFraDato = this.gyldigFraDato
 				)
 			is EndringsmeldingDbo.Innhold.EndreSluttdatoInnhold ->
