@@ -16,7 +16,7 @@ data class DeltakerStatus(
 		val beskrivelse: String? = null,
 	) {
 		init {
-		    if (beskrivelse != null && type != Type.ANNET) {
+		    if (beskrivelse != null && type != Type.ANNET && type != Type.OPPFYLLER_IKKE_KRAVENE) {
 				throw IllegalStateException("Aarsak $type skal ikke ha beskrivelse")
 			}
 		}
