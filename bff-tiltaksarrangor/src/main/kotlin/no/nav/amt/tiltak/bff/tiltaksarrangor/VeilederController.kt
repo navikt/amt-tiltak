@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeilederInput
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tiltak.ArrangorVeiledersDeltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.skjulesForAlleAktorer
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.exceptions.ValidationException
@@ -116,7 +117,8 @@ class VeilederController (
 		val deltakerliste = arrangorVeilederService.hentDeltakerliste(ansatt.id).filter {
 			arrangorAnsattTilgangService.harRolleHosArrangor(ansatt.id, it.arrangorId, ArrangorAnsattRolle.VEILEDER) &&
 				!it.erUtdatert &&
-				!it.status.skjulesForAlleAktorer()
+				!it.status.skjulesForAlleAktorer() &&
+				!(it.erKurs && it.status == DeltakerStatus.Type.IKKE_AKTUELL)
 		}
 
 		val endringmeldingerMap =
