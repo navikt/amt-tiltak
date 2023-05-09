@@ -379,7 +379,7 @@
             <dependency>
                 <groupId>com.github.navikt.poao-tilgang</groupId>
                 <artifactId>client</artifactId>
-                <version>2023.05.05_15.07-cda6237528ee</version>
+                <version>2023.05.09_11.05-0770efb9ea1e</version>
             </dependency>
 
             <dependency>
