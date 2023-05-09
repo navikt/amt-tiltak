@@ -61,7 +61,7 @@ class DeltakerPublishQuery(
 				DeltakerNavVeilederDto(
 					id = deltaker.navAnsattId,
 					navn = deltaker.navAnsattNavn!!,
-					epost = deltaker.navAnsattEpost!!
+					epost = deltaker.navAnsattEpost
 				)
 			},
 			status = DeltakerStatusDto(
