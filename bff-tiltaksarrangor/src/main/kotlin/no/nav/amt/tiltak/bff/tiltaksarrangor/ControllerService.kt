@@ -42,6 +42,7 @@ open class ControllerService(
 			telefonnummer = deltaker.telefonnummer,
 			epost = deltaker.epost,
 			deltakelseProsent = deltaker.prosentStilling?.toInt(),
+			dagerPerUke = deltaker.dagerPerUke,
 			navEnhet = navEnhet?.toDto(),
 			navVeileder = navVeileder?.toDto(),
 			startDato = deltaker.startDato,
