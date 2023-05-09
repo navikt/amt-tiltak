@@ -4,6 +4,7 @@ import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerDetaljerDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.VeilederDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeileder
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.skjulesForAlleAktorer
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
@@ -30,8 +31,9 @@ open class ControllerService(
 		val navEnhet = deltaker.navEnhetId?.let { navEnhetService.getNavEnhet(it) }
 		val gjennomforing = deltaker.gjennomforingId.let { gjennomforingService.getGjennomforing(it) }
 
-		if (deltaker.status.type.skjulesForAlleAktorer() || deltaker.erUtdatert)
-			throw UnauthorizedException("Har ikke tilgang til id $deltakerId")
+		if (deltaker.status.type.skjulesForAlleAktorer() ||
+			deltaker.erUtdatert ||
+			(gjennomforing.erKurs && deltaker.status.type == DeltakerStatus.Type.IKKE_AKTUELL)) throw UnauthorizedException("Har ikke tilgang til id $deltakerId")
 
 		return DeltakerDetaljerDto(
 			id = deltaker.id,
