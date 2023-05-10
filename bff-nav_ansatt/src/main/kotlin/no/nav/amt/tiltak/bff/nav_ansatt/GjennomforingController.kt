@@ -6,7 +6,6 @@ import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
-import no.nav.common.featuretoggle.UnleashClient
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -21,8 +20,6 @@ class GjennomforingController(
 	private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService,
 	private val tiltaksansvarligAutoriseringService: TiltaksansvarligAutoriseringService,
 	private val controllerService: NavAnsattControllerService,
-	private val unleashClient: UnleashClient
-
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
@@ -49,8 +46,8 @@ class GjennomforingController(
 
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
 
-		if(gjennomforing.erKurs && !kursTiltakToggleEnabled()) {
-			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Kan ikke aksessere kurstiltak $gjennomforingId")
+		if(gjennomforing.tiltak.kode == "GRUFAGYRKE") {
+			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Kan ikke aksessere GRUFAGYRKE $gjennomforingId")
 		}
 
 		val arrangor = gjennomforing.arrangor
@@ -85,7 +82,7 @@ class GjennomforingController(
 		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navAnsattAzureId)
 
 		return gjennomforingService.getByLopenr(lopenr)
-			.filter { !it.erKurs || kursTiltakToggleEnabled() }
+			.filter { it.tiltak.kode != "GRUFAGYRKE"}
 			.map {
 				HentGjennomforingMedLopenrDto(
 					id = it.id,
@@ -102,8 +99,5 @@ class GjennomforingController(
 					)
 			)
 		}
-	}
-	private fun kursTiltakToggleEnabled(): Boolean {
-		return unleashClient.isEnabled("amt.eksponer-kurs")
 	}
 }
