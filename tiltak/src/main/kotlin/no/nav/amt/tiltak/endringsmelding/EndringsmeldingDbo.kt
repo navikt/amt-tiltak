@@ -4,7 +4,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 data class EndringsmeldingDbo(
 	val id: UUID,
@@ -60,6 +60,7 @@ data class EndringsmeldingDbo(
 
 		data class EndreDeltakelseProsentInnhold(
 			val nyDeltakelseProsent: Int,
+			val dagerPerUke: Int?,
 			val gyldigFraDato: LocalDate?
 		): Innhold()
 

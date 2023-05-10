@@ -5,7 +5,7 @@ import no.nav.amt.tiltak.bff.tiltaksarrangor.type.toDto
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 data class EndringsmeldingDto(
 	val id: UUID,
@@ -55,6 +55,7 @@ data class EndringsmeldingDto(
 
 		data class EndreDeltakelseProsentInnhold(
 			val deltakelseProsent: Int,
+			val dagerPerUke: Int?,
 			val gyldigFraDato: LocalDate?
 		) : Innhold()
 
@@ -79,6 +80,7 @@ fun Endringsmelding.Innhold.toDto(): EndringsmeldingDto.Innhold {
 		is Endringsmelding.Innhold.EndreDeltakelseProsentInnhold ->
 			EndringsmeldingDto.Innhold.EndreDeltakelseProsentInnhold(
 				deltakelseProsent = this.deltakelseProsent,
+				dagerPerUke = this.dagerPerUke,
 				gyldigFraDato = this.gyldigFraDato
 			)
 		is Endringsmelding.Innhold.EndreSluttdatoInnhold ->

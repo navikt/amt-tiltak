@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.core.domain.tiltak
 
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 data class Endringsmelding(
 	val id: UUID,
@@ -54,6 +54,7 @@ data class Endringsmelding(
 
 		data class EndreDeltakelseProsentInnhold(
 			val deltakelseProsent: Int,
+			val dagerPerUke: Int?,
 			val gyldigFraDato: LocalDate?
 		) : Innhold()
 
