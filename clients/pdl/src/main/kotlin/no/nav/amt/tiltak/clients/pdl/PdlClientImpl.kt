@@ -18,6 +18,8 @@ class PdlClientImpl(
 
 	private val mediaTypeJson = "application/json".toMediaType()
 
+	private val behandlingsnummer = "B446" // https://behandlingskatalog.nais.adeo.no/process/team/5345bce7-e076-4b37-8bf4-49030901a4c3/b3003849-c4bb-4c60-a4cb-e07ce6025623
+
 	override fun hentBruker(brukerFnr: String): PdlBruker {
 		val requestBody = toJsonString(
 			Graphql.GraphqlQuery(
@@ -79,6 +81,7 @@ class PdlClientImpl(
 			.url("$baseUrl/graphql")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
 			.addHeader("Tema", "GEN")
+			.addHeader("behandlingsnummer", behandlingsnummer)
 			.post(jsonPayload.toRequestBody(mediaTypeJson))
 			.build()
 	}
