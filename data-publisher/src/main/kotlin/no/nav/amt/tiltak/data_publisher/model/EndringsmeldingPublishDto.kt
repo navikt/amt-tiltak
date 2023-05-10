@@ -5,7 +5,7 @@ import no.nav.common.json.JsonUtils
 import org.springframework.util.DigestUtils
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class EndringsmeldingPublishDto(
 	val id: UUID,
@@ -62,6 +62,7 @@ sealed class Innhold {
 
 	data class EndreDeltakelseProsentInnhold(
 		val nyDeltakelseProsent: Int,
+		val dagerPerUke: Int?,
 		val gyldigFraDato: LocalDate?
 	) : Innhold()
 
