@@ -11,14 +11,14 @@ import no.nav.amt.tiltak.data_publisher.model.TiltakDto
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 class DeltakerlistePublishQuery(
 	private val template: NamedParameterJdbcTemplate
 ) {
 
-	fun get(id: UUID): DeltakerlistePublishDto {
-		val deltakerliste = getDeltakerliste(id)
+	fun get(id: UUID): DeltakerlistePublishDto? {
+		val deltakerliste = getDeltakerliste(id) ?: return null
 
 		return DeltakerlistePublishDto(
 			id = deltakerliste.id,
@@ -36,7 +36,7 @@ class DeltakerlistePublishQuery(
 		)
 	}
 
-	private fun getDeltakerliste(gjennomforingId: UUID): Deltakerliste {
+	private fun getDeltakerliste(gjennomforingId: UUID): Deltakerliste? {
 		val sql = """
 			select gjennomforing.id,
 				   gjennomforing.arrangor_id,
@@ -59,7 +59,7 @@ class DeltakerlistePublishQuery(
 			sql,
 			sqlParameters("gjennomforingId" to gjennomforingId),
 			Deltakerliste.rowMapper
-		).first()
+		).firstOrNull()
 	}
 
 	private data class Deltakerliste(
