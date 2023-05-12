@@ -213,7 +213,7 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 	fun delete(gjennomforingId: UUID) {
 		deleteTiltaksansvarligGjennomforingTilgang(gjennomforingId)
 		deleteTiltaksarrangorGjennomforingTilgang(gjennomforingId)
-		
+
 		val sql = "DELETE FROM gjennomforing WHERE id = :gjennomforingId"
 
 		val parameters = MapSqlParameterSource().addValues(
