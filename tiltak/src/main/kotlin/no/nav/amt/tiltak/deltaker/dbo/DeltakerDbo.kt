@@ -4,7 +4,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class DeltakerDbo(
 	val id: UUID,
@@ -16,6 +16,7 @@ data class DeltakerDbo(
 	val personIdent: String,
 	val erSkjermet: Boolean,
 	val navEnhetId: UUID?,
+	val navKontor: String?,
 	val navVeilederId: UUID?,
 	val gjennomforingId: UUID,
 	val startDato: LocalDate?,
@@ -42,6 +43,7 @@ data class DeltakerDbo(
 			personIdent = personIdent,
 			erSkjermet = erSkjermet,
 			navEnhetId = navEnhetId,
+			navKontor = navKontor,
 			navVeilederId = navVeilederId,
 			startDato = startDato,
 			sluttDato = sluttDato,

@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.bff.tiltaksarrangor.dto
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class DeltakerDto(
 	val id: UUID,
@@ -17,6 +17,7 @@ data class DeltakerDto(
 	val registrertDato: LocalDateTime,
 	val aktiveEndringsmeldinger: List<EndringsmeldingDto>,
 	val aktiveVeiledere: List<VeilederDto>,
+	val navKontor: String?
 )
 
 
@@ -32,4 +33,5 @@ fun Deltaker.toDto(aktiveEndringsmeldinger: List<EndringsmeldingDto>, aktiveVeil
 	registrertDato = registrertDato,
 	aktiveEndringsmeldinger = aktiveEndringsmeldinger,
 	aktiveVeiledere = aktiveVeiledere,
+	navKontor = navKontor
 )

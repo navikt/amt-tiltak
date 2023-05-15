@@ -2,11 +2,24 @@ package no.nav.amt.tiltak.test.database.data
 
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
-import no.nav.amt.tiltak.test.database.data.inputs.*
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattGjennomforingTilgangInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattRolleInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorVeilederDboInput
+import no.nav.amt.tiltak.test.database.data.inputs.BrukerInput
+import no.nav.amt.tiltak.test.database.data.inputs.DeltakerInput
+import no.nav.amt.tiltak.test.database.data.inputs.DeltakerStatusInput
+import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
+import no.nav.amt.tiltak.test.database.data.inputs.GjennomforingInput
+import no.nav.amt.tiltak.test.database.data.inputs.NavAnsattInput
+import no.nav.amt.tiltak.test.database.data.inputs.NavEnhetInput
+import no.nav.amt.tiltak.test.database.data.inputs.TiltakInput
+import no.nav.amt.tiltak.test.database.data.inputs.TiltaksansvarligGjennomforingTilgangInput
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 object TestData {
 
@@ -48,6 +61,7 @@ object TestData {
 			epost = "bruker@example.com",
 			ansvarligVeilederId = null,
 			navEnhetId = navEnhet.id,
+			navKontor = navEnhet.navn,
 			erSkjermet = false
 		)
 
@@ -251,6 +265,7 @@ object TestData {
 		epost = "bruker1@example.com",
 		ansvarligVeilederId = NAV_ANSATT_1.id,
 		navEnhetId = NAV_ENHET_1.id,
+		navKontor = NAV_ENHET_1.navn,
 		erSkjermet = false
 	)
 
@@ -263,6 +278,7 @@ object TestData {
 		epost = "skjermet@example.com",
 		ansvarligVeilederId = NAV_ANSATT_1.id,
 		navEnhetId = NAV_ENHET_1.id,
+		navKontor = NAV_ENHET_1.navn,
 		erSkjermet = true
 	)
 
@@ -307,6 +323,7 @@ object TestData {
 		epost = "bruker2@example.com",
 		ansvarligVeilederId = null,
 		navEnhetId = NAV_ENHET_1.id,
+		navKontor = NAV_ENHET_1.navn,
 		erSkjermet = false
 	)
 
@@ -341,6 +358,7 @@ object TestData {
 		epost = "bruker3@example.com",
 		ansvarligVeilederId = null,
 		navEnhetId = NAV_ENHET_1.id,
+		navKontor = NAV_ENHET_1.navn,
 		erSkjermet = false
 	)
 
@@ -355,6 +373,7 @@ object TestData {
 		epost = "bruker4@example.com",
 		ansvarligVeilederId = null,
 		navEnhetId = NAV_ENHET_1.id,
+		navKontor = NAV_ENHET_1.navn,
 		erSkjermet = false
 	)
 
