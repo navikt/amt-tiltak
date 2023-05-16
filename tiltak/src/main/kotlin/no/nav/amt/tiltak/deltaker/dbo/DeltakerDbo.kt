@@ -2,9 +2,10 @@ package no.nav.amt.tiltak.deltaker.dbo
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.nav_enhet.NavEnhetDbo
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class DeltakerDbo(
 	val id: UUID,
@@ -15,7 +16,7 @@ data class DeltakerDbo(
 	val epost: String?,
 	val personIdent: String,
 	val erSkjermet: Boolean,
-	val navEnhetId: UUID?,
+	val navEnhet: NavEnhetDbo?,
 	val navVeilederId: UUID?,
 	val gjennomforingId: UUID,
 	val startDato: LocalDate?,
@@ -41,7 +42,7 @@ data class DeltakerDbo(
 			epost = epost,
 			personIdent = personIdent,
 			erSkjermet = erSkjermet,
-			navEnhetId = navEnhetId,
+			navEnhet = navEnhet?.toNavEnhet(),
 			navVeilederId = navVeilederId,
 			startDato = startDato,
 			sluttDato = sluttDato,

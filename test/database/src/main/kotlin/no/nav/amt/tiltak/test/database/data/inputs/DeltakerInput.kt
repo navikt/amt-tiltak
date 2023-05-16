@@ -6,7 +6,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 data class DeltakerInput(
 	val id: UUID,
@@ -30,7 +30,7 @@ data class DeltakerInput(
 		erSkjermet = brukerInput.erSkjermet,
 		epost = brukerInput.epost,
 		personIdent = brukerInput.personIdent,
-		navEnhetId = brukerInput.navEnhetId,
+		navEnhet = brukerInput.navEnhet?.toNavEnhet(),
 		navVeilederId = brukerInput.ansvarligVeilederId,
 		startDato = startDato,
 		sluttDato = sluttDato,

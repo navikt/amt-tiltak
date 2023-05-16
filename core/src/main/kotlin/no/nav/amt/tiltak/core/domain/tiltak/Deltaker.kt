@@ -14,7 +14,7 @@ data class Deltaker(
 	val erSkjermet: Boolean,
 	val epost: String?,
 	val personIdent: String,
-	val navEnhetId: UUID?,
+	val navEnhet: NavEnhet?,
 	val navVeilederId: UUID?,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,

@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.test.database.data.inputs
 
-import java.util.*
+import java.util.UUID
 
 data class BrukerInput(
     val id: UUID,
@@ -11,7 +11,7 @@ data class BrukerInput(
     val telefonnummer: String,
     val epost: String,
     val ansvarligVeilederId: UUID?,
-    val navEnhetId: UUID,
+    val navEnhet: NavEnhetInput?,
 	val erSkjermet: Boolean
 )
 

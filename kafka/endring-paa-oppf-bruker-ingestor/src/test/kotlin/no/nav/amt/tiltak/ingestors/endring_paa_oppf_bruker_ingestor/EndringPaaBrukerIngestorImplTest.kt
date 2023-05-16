@@ -12,7 +12,7 @@ import no.nav.amt.tiltak.core.port.NavEnhetService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 class EndringPaaBrukerIngestorImplTest {
 
@@ -32,7 +32,7 @@ class EndringPaaBrukerIngestorImplTest {
 		telefonnummer = "1234",
 		epost = "foo@bar.baz",
 		navVeilederId = UUID.randomUUID(),
-		navEnhetId = navEnhet.id,
+		navEnhet = navEnhet,
 		startDato = null,
 		sluttDato = null,
 		status = DeltakerStatus(
