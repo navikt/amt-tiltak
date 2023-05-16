@@ -11,7 +11,7 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.UUID
 
 @Component
 open class GjennomforingRepository(private val template: NamedParameterJdbcTemplate) {
@@ -211,6 +211,9 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 
 
 	fun delete(gjennomforingId: UUID) {
+		deleteTiltaksansvarligGjennomforingTilgang(gjennomforingId)
+		deleteTiltaksarrangorGjennomforingTilgang(gjennomforingId)
+
 		val sql = "DELETE FROM gjennomforing WHERE id = :gjennomforingId"
 
 		val parameters = MapSqlParameterSource().addValues(
@@ -222,5 +225,27 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 		template.update(sql, parameters)
 	}
 
+	private fun deleteTiltaksansvarligGjennomforingTilgang(gjennomforingId: UUID) {
+		val sql = "DELETE FROM tiltaksansvarlig_gjennomforing_tilgang WHERE gjennomforing_id = :gjennomforingId"
 
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"gjennomforingId" to gjennomforingId
+			)
+		)
+
+		template.update(sql, parameters)
+	}
+
+	private fun deleteTiltaksarrangorGjennomforingTilgang(gjennomforingId: UUID) {
+		val sql = "DELETE FROM arrangor_ansatt_gjennomforing_tilgang WHERE gjennomforing_id = :gjennomforingId"
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"gjennomforingId" to gjennomforingId
+			)
+		)
+
+		template.update(sql, parameters)
+	}
 }

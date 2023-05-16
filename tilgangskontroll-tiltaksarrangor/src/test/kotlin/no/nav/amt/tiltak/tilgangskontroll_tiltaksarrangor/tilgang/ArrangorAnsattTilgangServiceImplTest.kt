@@ -13,7 +13,11 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.ArrangorAnsattService
+import no.nav.amt.tiltak.core.port.ArrangorService
+import no.nav.amt.tiltak.core.port.ArrangorVeilederService
+import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.AltinnService
@@ -24,7 +28,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 class ArrangorAnsattTilgangServiceImplTest {
 
@@ -89,7 +93,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 		fornavn = "fornavn",
 		etternavn = "etternavn",
 		personIdent = personligIdent,
-		navEnhetId = null,
+		navEnhet = null,
 		navVeilederId = null,
 		telefonnummer = "123",
 		epost = "foo",

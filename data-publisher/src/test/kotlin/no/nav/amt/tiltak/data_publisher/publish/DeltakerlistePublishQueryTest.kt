@@ -27,7 +27,7 @@ class DeltakerlistePublishQueryTest : FunSpec({
 
 		val data = query.get(input.id)
 
-		data.id shouldBe input.id
-		data.arrangor.id shouldBe input.arrangorId
+		data?.id shouldBe input.id
+		data?.arrangor?.id shouldBe input.arrangorId
 	}
 })

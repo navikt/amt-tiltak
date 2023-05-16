@@ -32,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
@@ -105,7 +105,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 			headers = createAnsatt1AuthHeader()
 		)
 		val expectedBody = """
-{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","telefonnummer":"73404782","epost":"bruker1@example.com","deltakelseProsent":100,"navEnhet":{"navn":"NAV Testheim"},"navVeileder":{"navn":"Vashnir Veiledersen","telefon":"88776655","epost":"vashnir.veiledersen@nav.no"},"startDato":"2022-02-13","sluttDato":"2030-02-14","registrertDato":"2022-02-13T12:12:00","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"gjennomforing":{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","startDato":"2022-02-01","sluttDato":"2050-12-30","status":"GJENNOMFORES","tiltak":{"tiltakskode":"AMO","tiltaksnavn":"Tiltak1"},"arrangor":{"virksomhetNavn":"Tiltaksarrangør 1","organisasjonNavn":"Org Tiltaksarrangør 1","virksomhetOrgnr":"111111111"},"erKurs":false},"fjernesDato":null,"innsokBegrunnelse":"begrunnelse deltaker 1"}
+{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","telefonnummer":"73404782","epost":"bruker1@example.com","deltakelseProsent":100,"dagerPerUke":5,"navEnhet":{"navn":"NAV Testheim"},"navVeileder":{"navn":"Vashnir Veiledersen","telefon":"88776655","epost":"vashnir.veiledersen@nav.no"},"startDato":"2022-02-13","sluttDato":"2030-02-14","registrertDato":"2022-02-13T12:12:00","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"gjennomforing":{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","startDato":"2022-02-01","sluttDato":"2050-12-30","status":"GJENNOMFORES","tiltak":{"tiltakskode":"AMO","tiltaksnavn":"Tiltak1"},"arrangor":{"virksomhetNavn":"Tiltaksarrangør 1","organisasjonNavn":"Org Tiltaksarrangør 1","virksomhetOrgnr":"111111111"},"erKurs":false},"fjernesDato":null,"innsokBegrunnelse":"begrunnelse deltaker 1"}
 """.trimIndent()
 
 
@@ -134,7 +134,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-			[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-13T12:12:00","aktiveEndringsmeldinger":[],"aktiveVeiledere":[]},{"id":"8a0b7158-4d5e-4563-88be-b9bce5662879","fornavn":"Bruker 2 fornavn","mellomnavn":null,"etternavn":"Bruker 2 etternavn","fodselsnummer":"7908432423","startDato":"2022-02-10","sluttDato":"2022-02-12","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-10T12:12:00","aktiveEndringsmeldinger":[],"aktiveVeiledere":[]}]
+			[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-13T12:12:00","aktiveEndringsmeldinger":[],"aktiveVeiledere":[],"navKontor":"NAV Testheim"},{"id":"8a0b7158-4d5e-4563-88be-b9bce5662879","fornavn":"Bruker 2 fornavn","mellomnavn":null,"etternavn":"Bruker 2 etternavn","fodselsnummer":"7908432423","startDato":"2022-02-10","sluttDato":"2022-02-12","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-10T12:12:00","aktiveEndringsmeldinger":[],"aktiveVeiledere":[],"navKontor":"NAV Testheim"}]
 		""".trimIndent()
 		response.code shouldBe 200
 		response.body?.string() shouldBe expectedJson
@@ -173,7 +173,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-			[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-13T12:12:00","aktiveEndringsmeldinger":[{"id":"9830e130-b18a-46b8-8e3e-6c06734d797e","innhold":{"oppstartsdato":"2022-11-11"},"type":"LEGG_TIL_OPPSTARTSDATO"}],"aktiveVeiledere":[]},{"id":"8a0b7158-4d5e-4563-88be-b9bce5662879","fornavn":"Bruker 2 fornavn","mellomnavn":null,"etternavn":"Bruker 2 etternavn","fodselsnummer":"7908432423","startDato":"2022-02-10","sluttDato":"2022-02-12","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-10T12:12:00","aktiveEndringsmeldinger":[{"id":"3fc16362-ba8b-4c0f-af93-b2ed56f12cd5","innhold":{"oppstartsdato":"2022-11-09"},"type":"LEGG_TIL_OPPSTARTSDATO"}],"aktiveVeiledere":[]}]
+			[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-13T12:12:00","aktiveEndringsmeldinger":[{"id":"9830e130-b18a-46b8-8e3e-6c06734d797e","innhold":{"oppstartsdato":"2022-11-11"},"type":"LEGG_TIL_OPPSTARTSDATO"}],"aktiveVeiledere":[],"navKontor":"NAV Testheim"},{"id":"8a0b7158-4d5e-4563-88be-b9bce5662879","fornavn":"Bruker 2 fornavn","mellomnavn":null,"etternavn":"Bruker 2 etternavn","fodselsnummer":"7908432423","startDato":"2022-02-10","sluttDato":"2022-02-12","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-10T12:12:00","aktiveEndringsmeldinger":[{"id":"3fc16362-ba8b-4c0f-af93-b2ed56f12cd5","innhold":{"oppstartsdato":"2022-11-09"},"type":"LEGG_TIL_OPPSTARTSDATO"}],"aktiveVeiledere":[],"navKontor":"NAV Testheim"}]
 		""".trimIndent()
 		response.code shouldBe 200
 		response.body?.string() shouldBe expectedJson
@@ -190,7 +190,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-			[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-13T12:12:00","aktiveEndringsmeldinger":[],"aktiveVeiledere":[{"id":"af238302-e96b-436a-8978-ec2aa5f2ee66","ansattId":"6321c7dc-6cfb-47b0-b566-32979be5041f","deltakerId":"dc600c70-124f-4fe7-a687-b58439beb214","erMedveileder":false,"fornavn":"Ansatt 1 fornavn","mellomnavn":"Ansatt 1 mellomnavn","etternavn":"Ansatt 1 etternavn"},{"id":"bbadfe46-eaf3-4ee8-bb53-2e9e15ea7ef0","ansattId":"a24e659c-2651-4fbb-baad-01cacb2412f0","deltakerId":"dc600c70-124f-4fe7-a687-b58439beb214","erMedveileder":true,"fornavn":"Ansatt 2 fornavn","mellomnavn":null,"etternavn":"Ansatt 2 etternavn"}]},{"id":"8a0b7158-4d5e-4563-88be-b9bce5662879","fornavn":"Bruker 2 fornavn","mellomnavn":null,"etternavn":"Bruker 2 etternavn","fodselsnummer":"7908432423","startDato":"2022-02-10","sluttDato":"2022-02-12","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-10T12:12:00","aktiveEndringsmeldinger":[],"aktiveVeiledere":[]}]
+			[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-13T12:12:00","aktiveEndringsmeldinger":[],"aktiveVeiledere":[{"id":"af238302-e96b-436a-8978-ec2aa5f2ee66","ansattId":"6321c7dc-6cfb-47b0-b566-32979be5041f","deltakerId":"dc600c70-124f-4fe7-a687-b58439beb214","erMedveileder":false,"fornavn":"Ansatt 1 fornavn","mellomnavn":"Ansatt 1 mellomnavn","etternavn":"Ansatt 1 etternavn"},{"id":"bbadfe46-eaf3-4ee8-bb53-2e9e15ea7ef0","ansattId":"a24e659c-2651-4fbb-baad-01cacb2412f0","deltakerId":"dc600c70-124f-4fe7-a687-b58439beb214","erMedveileder":true,"fornavn":"Ansatt 2 fornavn","mellomnavn":null,"etternavn":"Ansatt 2 etternavn"}],"navKontor":"NAV Testheim"},{"id":"8a0b7158-4d5e-4563-88be-b9bce5662879","fornavn":"Bruker 2 fornavn","mellomnavn":null,"etternavn":"Bruker 2 etternavn","fodselsnummer":"7908432423","startDato":"2022-02-10","sluttDato":"2022-02-12","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-10T12:12:00","aktiveEndringsmeldinger":[],"aktiveVeiledere":[],"navKontor":"NAV Testheim"}]
 		""".trimIndent()
 		response.code shouldBe 200
 		response.body?.string() shouldBe expectedJson
@@ -333,6 +333,32 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 		(endringsmelding.innhold as Endringsmelding.Innhold.EndreDeltakelseProsentInnhold).deltakelseProsent shouldBe deltakelseProsent
 		(endringsmelding.innhold as Endringsmelding.Innhold.EndreDeltakelseProsentInnhold).gyldigFraDato shouldBe gyldigFraDato
+	}
+
+	@Test
+	internal fun `endreDeltakelsesprosent med dagerPerUke skal returnere 200 og opprette endringsmelding`() {
+		val deltakelseProsent = 95
+		val gyldigFraDato = LocalDate.now()
+
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/deltakelse-prosent",
+			headers = createAnsatt1AuthHeader(),
+			body = """{"deltakelseProsent": $deltakelseProsent, "dagerPerUke": 3, "gyldigFraDato": "$gyldigFraDato"}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 200
+
+		val endringsmeldinger = endringsmeldingService.hentAktiveEndringsmeldingerForDeltaker(DELTAKER_1.id)
+
+		endringsmeldinger shouldHaveSize 1
+
+		val endringsmelding = endringsmeldinger.first()
+		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.EndreDeltakelseProsentInnhold>()
+		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
+		(endringsmelding.innhold as Endringsmelding.Innhold.EndreDeltakelseProsentInnhold).deltakelseProsent shouldBe deltakelseProsent
+		(endringsmelding.innhold as Endringsmelding.Innhold.EndreDeltakelseProsentInnhold).gyldigFraDato shouldBe gyldigFraDato
+		(endringsmelding.innhold as Endringsmelding.Innhold.EndreDeltakelseProsentInnhold).dagerPerUke shouldBe 3
 	}
 
 	@Test

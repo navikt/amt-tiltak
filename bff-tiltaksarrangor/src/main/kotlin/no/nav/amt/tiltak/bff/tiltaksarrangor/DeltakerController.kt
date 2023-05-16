@@ -143,12 +143,22 @@ class DeltakerController(
 		if (body.deltakelseProsent <= 0) throw ValidationException("Deltakelsesprosent kan ikke være mindre eller lik 0")
 		if (body.deltakelseProsent > 100) throw ValidationException("Deltakelsesprosent kan ikke være over 100%")
 
+		body.dagerPerUke?.let {
+			if (it < 1 || it > 5) throw ValidationException("Antall dager i uken må være mellom 1 og 5")
+		}
+
 		val ansatt = hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		verifiserErIkkeSkjult(deltakerId)
 
-		endringsmeldingService.opprettEndreDeltakelseProsentEndringsmelding(deltakerId, ansatt.id, body.deltakelseProsent, body.gyldigFraDato)
+		endringsmeldingService.opprettEndreDeltakelseProsentEndringsmelding(
+			deltakerId = deltakerId,
+			arrangorAnsattId = ansatt.id,
+			deltakerProsent = body.deltakelseProsent,
+			dagerPerUke = body.dagerPerUke,
+			gyldigFraDato = body.gyldigFraDato
+		)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -228,6 +238,7 @@ class DeltakerController(
 
 	data class EndreDeltakelsesprosentRequestBody(
 		val deltakelseProsent: Int,
+		val dagerPerUke: Int?,
 		val gyldigFraDato: LocalDate?
 	)
 }

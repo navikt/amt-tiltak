@@ -20,7 +20,7 @@ import no.nav.common.audit_log.log.AuditLogger
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 class AuditLoggerServiceImplTest {
 
@@ -69,7 +69,7 @@ class AuditLoggerServiceImplTest {
 			mellomnavn = null,
 			etternavn = "",
 			personIdent = "12345678900",
-			navEnhetId = null,
+			navEnhet = null,
 			navVeilederId = null,
 			epost = null,
 			telefonnummer = null,
@@ -121,7 +121,7 @@ class AuditLoggerServiceImplTest {
 			mellomnavn = null,
 			etternavn = "",
 			personIdent = "12345678900",
-			navEnhetId = null,
+			navEnhet = null,
 			navVeilederId = null,
 			epost = null,
 			telefonnummer = null,

@@ -39,7 +39,7 @@ class GjennomforingController(
 
 		return gjennomforingService.getGjennomforinger(deltakerlisterLagtTil)
 			.filter { arrangorAnsattTilgangService.harRolleHosArrangor(ansatt.id, it.arrangor.id, KOORDINATOR) }
-			.filter { !it.erKurs || kursTiltakToggleEnabled() }
+			.filter { !it.erKurs || kursTiltakToggleEnabled() || erPilot(it.id) }
 			.filter(this::erSynligForArrangor)
 			.map { it.toDto() }
 	}
@@ -57,7 +57,7 @@ class GjennomforingController(
 			.filter { it.roller.contains(KOORDINATOR) }
 			.map { gjennomforingService.getByArrangorId(it.arrangorId) }
 			.flatten()
-			.filter { !it.erKurs || kursTiltakToggleEnabled() }
+			.filter { !it.erKurs || kursTiltakToggleEnabled() || erPilot(it.id)}
 			.filter(this::erSynligForArrangor)
 			.map { it.toDto() }
 	}
@@ -69,7 +69,7 @@ class GjennomforingController(
 		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
 
-		if (!erSynligForArrangor(gjennomforing) || (gjennomforing.erKurs && !kursTiltakToggleEnabled())) {
+		if (!erSynligForArrangor(gjennomforing) || (gjennomforing.erKurs && !kursTiltakToggleEnabled() && !erPilot(gjennomforingId))) {
 			throw ResponseStatusException(HttpStatus.FORBIDDEN)
 		}
 
@@ -104,7 +104,7 @@ class GjennomforingController(
 		if (!harLagtTilListe){
 			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ansatt $ansattId kan ikke hente deltaker før den er lagt til")
 		}
-		if(gjennomforing.erKurs && !kursTiltakToggleEnabled()) {
+		if(gjennomforing.erKurs && !kursTiltakToggleEnabled() && !erPilot(gjennomforingId)) {
 			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ansatt $ansattId kan hente kurstiltak")
 		}
 
@@ -174,12 +174,12 @@ class GjennomforingController(
 
 		return gjennomforingService.getGjennomforinger(gjennomforingIder)
 			.filter { erSynligForArrangor(it) }
-			.filter { !it.erKurs || kursTiltakToggleEnabled() }
+			.filter { !it.erKurs || kursTiltakToggleEnabled() || erPilot(it.id)}
 			.map { it.toKoordinatorInfoDeltakerlisteDto() }
 	}
 
 	private fun erSynligForArrangor(gjennomforing: Gjennomforing): Boolean {
-		if (gjennomforing.status == Gjennomforing.Status.GJENNOMFORES) return true
+		if (gjennomforing.status in listOf(Gjennomforing.Status.GJENNOMFORES, Gjennomforing.Status.APENT_FOR_INNSOK)) return true
 		else if (
 			gjennomforing.status == Gjennomforing.Status.AVSLUTTET
 			&& gjennomforing.sluttDato != null
@@ -192,5 +192,9 @@ class GjennomforingController(
 
 	private fun kursTiltakToggleEnabled(): Boolean {
 		return unleashClient.isEnabled("amt.eksponer-kurs")
+	}
+
+	private fun erPilot(gjennomforingId: UUID): Boolean {
+		return gjennomforingId.toString() in listOf("69afc1b8-50b9-472a-8b92-254dec821c3a", "e41ef5c5-2c2e-41f6-97a2-36fca4902b86")
 	}
 }

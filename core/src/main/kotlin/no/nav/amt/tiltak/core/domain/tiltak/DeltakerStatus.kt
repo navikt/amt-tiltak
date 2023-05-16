@@ -16,13 +16,13 @@ data class DeltakerStatus(
 		val beskrivelse: String? = null,
 	) {
 		init {
-		    if (beskrivelse != null && type != Type.ANNET) {
+		    if (beskrivelse != null && type != Type.ANNET && type != Type.OPPFYLLER_IKKE_KRAVENE) {
 				throw IllegalStateException("Aarsak $type skal ikke ha beskrivelse")
 			}
 		}
 
 		enum class Type {
-			SYK, FATT_JOBB, TRENGER_ANNEN_STOTTE, FIKK_IKKE_PLASS, UTDANNING, FERDIG, AVLYST_KONTRAKT, IKKE_MOTT, FEILREGISTRERT, ANNET
+			SYK, FATT_JOBB, TRENGER_ANNEN_STOTTE, FIKK_IKKE_PLASS, UTDANNING, FERDIG, AVLYST_KONTRAKT, IKKE_MOTT, FEILREGISTRERT, OPPFYLLER_IKKE_KRAVENE, ANNET
 		}
 	}
 

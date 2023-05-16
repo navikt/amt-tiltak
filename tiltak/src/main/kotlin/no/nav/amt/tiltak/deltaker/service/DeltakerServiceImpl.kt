@@ -206,9 +206,14 @@ open class DeltakerServiceImpl(
 	}
 
 	private fun sluttetForTidlig(gjennomforinger: List<Gjennomforing>, deltaker: Deltaker): Boolean {
-		val gjennomforing = gjennomforinger.find { it.id == deltaker.gjennomforingId }
-		val sluttetForTidlig = deltaker.sluttDato?.isBefore(gjennomforing!!.sluttDato) == true
-		return gjennomforing!!.erKurs && sluttetForTidlig
+		val gjennomforing = gjennomforinger.find { it.id == deltaker.gjennomforingId } ?: throw RuntimeException("Fant ikke gjennomføring med id ${deltaker.gjennomforingId}")
+		if (!gjennomforing.erKurs) {
+			return false
+		}
+		gjennomforing.sluttDato?.let {
+			return deltaker.sluttDato?.isBefore(it) == true
+		}
+		return false
 	}
 
 	private fun insertDeltaker(fodselsnummer: String, deltaker: DeltakerUpsert) {

@@ -1,16 +1,17 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor
 
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerDetaljerDto
+import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.NavEnhetDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.VeilederDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeileder
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.skjulesForAlleAktorer
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavAnsattService
-import no.nav.amt.tiltak.core.port.NavEnhetService
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -19,19 +20,18 @@ open class ControllerService(
 	private val arrangorAnsattService: ArrangorAnsattService,
 	private val deltakerService: DeltakerService,
 	private val gjennomforingService: GjennomforingService,
-	private val navAnsattService: NavAnsattService,
-	private val navEnhetService: NavEnhetService,
+	private val navAnsattService: NavAnsattService
 ) {
 
 	open fun getDeltakerDetaljerById(deltakerId: UUID): DeltakerDetaljerDto {
 		val deltaker = deltakerService.hentDeltaker(deltakerId)
 			?: throw NoSuchElementException("Deltaker med id $deltakerId finnes ikke")
 		val navVeileder = deltaker.navVeilederId?.let { navAnsattService.getNavAnsatt(it)}
-		val navEnhet = deltaker.navEnhetId?.let { navEnhetService.getNavEnhet(it) }
 		val gjennomforing = deltaker.gjennomforingId.let { gjennomforingService.getGjennomforing(it) }
 
-		if (deltaker.status.type.skjulesForAlleAktorer())
-			throw UnauthorizedException("Har ikke tilgang til id $deltakerId")
+		if (deltaker.status.type.skjulesForAlleAktorer() ||
+			deltaker.erUtdatert ||
+			(gjennomforing.erKurs && deltaker.status.type == DeltakerStatus.Type.IKKE_AKTUELL)) throw UnauthorizedException("Har ikke tilgang til id $deltakerId")
 
 		return DeltakerDetaljerDto(
 			id = deltaker.id,
@@ -42,7 +42,8 @@ open class ControllerService(
 			telefonnummer = deltaker.telefonnummer,
 			epost = deltaker.epost,
 			deltakelseProsent = deltaker.prosentStilling?.toInt(),
-			navEnhet = navEnhet?.toDto(),
+			dagerPerUke = deltaker.dagerPerUke,
+			navEnhet = deltaker.navEnhet?.let { NavEnhetDto(it.navn) },
 			navVeileder = navVeileder?.toDto(),
 			startDato = deltaker.startDato,
 			sluttDato = deltaker.sluttDato,

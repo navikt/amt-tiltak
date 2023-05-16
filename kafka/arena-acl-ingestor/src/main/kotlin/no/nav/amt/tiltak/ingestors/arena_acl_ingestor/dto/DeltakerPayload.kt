@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto
 
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class DeltakerPayload(
 	val id: UUID,
@@ -34,6 +34,7 @@ data class DeltakerPayload(
 		FERDIG,
 		AVLYST_KONTRAKT,
 		IKKE_MOTT,
+		OPPFYLLER_IKKE_KRAVENE,
 		ANNET
 	}
 }

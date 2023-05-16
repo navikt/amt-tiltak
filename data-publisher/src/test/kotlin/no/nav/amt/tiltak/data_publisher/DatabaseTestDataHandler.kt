@@ -6,12 +6,24 @@ import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.data_publisher.model.AnsattRolle
 import no.nav.amt.tiltak.data_publisher.model.VeilederType
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
-import no.nav.amt.tiltak.test.database.data.inputs.*
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattRolleInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorVeilederDboInput
+import no.nav.amt.tiltak.test.database.data.inputs.BrukerInput
+import no.nav.amt.tiltak.test.database.data.inputs.DeltakerInput
+import no.nav.amt.tiltak.test.database.data.inputs.DeltakerStatusInput
+import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
+import no.nav.amt.tiltak.test.database.data.inputs.GjennomforingInput
+import no.nav.amt.tiltak.test.database.data.inputs.NavAnsattInput
+import no.nav.amt.tiltak.test.database.data.inputs.NavEnhetInput
+import no.nav.amt.tiltak.test.database.data.inputs.TiltakInput
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.Random
+import java.util.UUID
 
 class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 
@@ -84,8 +96,8 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 
 	fun createBruker(
 		ansvarligVeilederId: UUID? = createNavAnsatt().id,
-		navEnhetId: UUID = createNavEnhet().id
-	): BrukerInput = brukerInput(ansvarligVeilederId, navEnhetId)
+		navEnhet: NavEnhetInput = createNavEnhet()
+	): BrukerInput = brukerInput(ansvarligVeilederId, navEnhet)
 		.also { testDataRepository.insertBruker(it) }
 
 	fun createNavEnhet(): NavEnhetInput = navEnhetInput()
@@ -150,7 +162,7 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 
 	private fun brukerInput(
 		ansvarligVeilederId: UUID?,
-		navEnhetId: UUID
+		navEnhet: NavEnhetInput?
 	): BrukerInput = BrukerInput(
 		id = UUID.randomUUID(),
 		personIdent = UUID.randomUUID().toString(),
@@ -160,7 +172,7 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		telefonnummer = UUID.randomUUID().toString(),
 		epost = UUID.randomUUID().toString(),
 		ansvarligVeilederId = ansvarligVeilederId,
-		navEnhetId = navEnhetId,
+		navEnhet = navEnhet,
 		erSkjermet = false
 	)
 

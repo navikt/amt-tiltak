@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.core.port
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 interface EndringsmeldingService {
 
@@ -23,7 +23,7 @@ interface EndringsmeldingService {
 
 	fun opprettForlengDeltakelseEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate)
 
-	fun opprettEndreDeltakelseProsentEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, deltakerProsent: Int, gyldigFraDato: LocalDate?)
+	fun opprettEndreDeltakelseProsentEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, deltakerProsent: Int, dagerPerUke: Int?, gyldigFraDato: LocalDate?)
 
 	fun opprettAvsluttDeltakelseEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate, statusAarsak: DeltakerStatus.Aarsak)
 

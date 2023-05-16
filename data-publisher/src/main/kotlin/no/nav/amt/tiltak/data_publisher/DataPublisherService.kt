@@ -5,15 +5,20 @@ import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.data_publisher.model.PublishState
-import no.nav.amt.tiltak.data_publisher.publish.*
+import no.nav.amt.tiltak.data_publisher.publish.ArrangorAnsattPublishQuery
+import no.nav.amt.tiltak.data_publisher.publish.ArrangorPublishQuery
+import no.nav.amt.tiltak.data_publisher.publish.DeltakerPublishQuery
+import no.nav.amt.tiltak.data_publisher.publish.DeltakerlistePublishQuery
+import no.nav.amt.tiltak.data_publisher.publish.EndringsmeldingPublishQuery
+import no.nav.amt.tiltak.data_publisher.publish.IdQueries
+import no.nav.amt.tiltak.data_publisher.publish.PublishRepository
 import no.nav.amt.tiltak.kafka.config.KafkaTopicProperties
 import no.nav.common.kafka.producer.KafkaProducerClient
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.UUID
 
 @Service
 class DataPublisherService(
@@ -66,16 +71,22 @@ class DataPublisherService(
 	}
 
 	private fun publishDeltakerliste(id: UUID, forcePublish: Boolean = false) {
+		val deltakerlistePublishDto = DeltakerlistePublishQuery(template).get(id)
 
-		val currentData = DeltakerlistePublishQuery(template).get(id)
-
-		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKERLISTE, currentData.digest())) {
+		if (deltakerlistePublishDto == null) {
 			val key = id.toString()
-			val value = JsonUtils.toJsonString(currentData)
-			val record = ProducerRecord(kafkaTopicProperties.amtDeltakerlisteTopic, key, value)
-			logger.info("Republiserer DELTAKERLISTE med id $id")
+			val record = ProducerRecord<String, String?>(kafkaTopicProperties.amtDeltakerlisteTopic, key, null)
 			stringKafkaProducer.sendSync(record)
-			publishRepository.set(id, DataPublishType.DELTAKERLISTE, currentData.digest())
+			logger.info("Tombstonet DELTAKERLISTE med id $id")
+		} else {
+			if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKERLISTE, deltakerlistePublishDto.digest())) {
+				val key = id.toString()
+				val value = JsonUtils.toJsonString(deltakerlistePublishDto)
+				val record = ProducerRecord(kafkaTopicProperties.amtDeltakerlisteTopic, key, value)
+				logger.info("Republiserer DELTAKERLISTE med id $id")
+				stringKafkaProducer.sendSync(record)
+				publishRepository.set(id, DataPublishType.DELTAKERLISTE, deltakerlistePublishDto.digest())
+			}
 		}
 	}
 

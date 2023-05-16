@@ -225,8 +225,7 @@ open class ArrangorVeilederRepository(
 				(
 					SELECT *
 					FROM skjult_deltaker sd
-					WHERE sd.skjult_av_arrangor_ansatt_id = ansatt_id
-					  AND sd.deltaker_id = deltaker.id
+					WHERE sd.deltaker_id = deltaker.id
 					  AND sd.skjult_til > CURRENT_TIMESTAMP
 				)
 		""".trimIndent()

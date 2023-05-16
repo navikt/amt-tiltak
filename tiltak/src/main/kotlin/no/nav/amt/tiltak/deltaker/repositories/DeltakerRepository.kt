@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpdateDbo
+import no.nav.amt.tiltak.nav_enhet.NavEnhetDbo
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -30,7 +31,13 @@ open class DeltakerRepository(
 			telefonnummer = rs.getString("telefonnummer"),
 			epost = rs.getString("epost"),
 			erSkjermet = rs.getBoolean("er_skjermet"),
-			navEnhetId = rs.getNullableUUID("nav_enhet_id"),
+			navEnhet = rs.getNullableUUID("nav_enhet_id")?.let {
+				NavEnhetDbo(
+					id = it,
+					enhetId = rs.getString("enhet_id"),
+					navn = rs.getString("navkontor")
+				)
+			},
 			navVeilederId = rs.getNullableUUID("ansvarlig_veileder_id"),
 			startDato = rs.getDate("start_dato")?.toLocalDate(),
 			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
@@ -78,9 +85,10 @@ open class DeltakerRepository(
 
 	fun getDeltakerePaaTiltak(id: UUID): List<DeltakerDbo> {
 		val sql = """
-			SELECT deltaker.*, bruker.*
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
+					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
 			WHERE deltaker.gjennomforing_id = :gjennomforing_id
 		""".trimIndent()
 
@@ -122,9 +130,10 @@ open class DeltakerRepository(
 
 	fun get(id: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.*, bruker.*
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
+					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
 			WHERE deltaker.id = :deltakerId
 		""".trimIndent()
 
@@ -140,9 +149,10 @@ open class DeltakerRepository(
 
 	fun get(brukerId: UUID, gjennomforingId: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.*, bruker.*
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
+					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
 			WHERE bruker.id = :brukerId
 				AND deltaker.gjennomforing_id = :gjennomforingId
 		""".trimIndent()
@@ -162,9 +172,10 @@ open class DeltakerRepository(
 		if (deltakerIder.isEmpty()) return emptyList()
 
 		val sql = """
-			SELECT deltaker.*, bruker.*
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
+					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
 			WHERE deltaker.id in (:deltakerIder)
 		""".trimIndent()
 
@@ -180,9 +191,10 @@ open class DeltakerRepository(
 
 	fun getDeltakereMedPersonIdent(personIdent: String): List<DeltakerDbo> {
 		val sql = """
-			SELECT deltaker.*, bruker.*
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
+					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
 			WHERE bruker.person_ident = :bruker_person_ident
 		""".trimIndent()
 
@@ -197,9 +209,10 @@ open class DeltakerRepository(
 
 	fun get(personIdent: String, gjennomforingId: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.*, bruker.*
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
+					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
 			WHERE bruker.person_ident = :bruker_person_ident
 				AND deltaker.gjennomforing_id = :gjennomforingId
 		""".trimIndent()
@@ -217,10 +230,11 @@ open class DeltakerRepository(
 
 	fun sluttDatoPassert(): List<DeltakerDbo> {
 		val sql = """
-			SELECT deltaker.*, bruker.*
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker_status
 					 inner join deltaker on deltaker_status.deltaker_id = deltaker.id
 					 inner join bruker on bruker.id = deltaker.bruker_id
+					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
 			WHERE deltaker_status.aktiv = TRUE
 				AND deltaker_status.status IN (:gjennomforende_statuser)
 				AND deltaker.slutt_dato < CURRENT_DATE
@@ -235,11 +249,12 @@ open class DeltakerRepository(
 
 	fun erPaaAvsluttetGjennomforing(): List<DeltakerDbo> {
 		val sql = """
-			SELECT deltaker.*, bruker.*
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker_status
          		inner join deltaker on deltaker_status.deltaker_id = deltaker.id
          		inner join bruker on bruker.id = deltaker.bruker_id
          		inner join gjennomforing on deltaker.gjennomforing_id = gjennomforing.id
+		 		LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
 			WHERE deltaker_status.aktiv = TRUE
 				AND deltaker_status.status not in (:avsluttende_statuser)
 				AND gjennomforing.status = :gjennomforing_status
@@ -255,10 +270,11 @@ open class DeltakerRepository(
 
 	fun skalHaStatusDeltar(): List<DeltakerDbo> {
 		val sql = """
-			SELECT deltaker.*, bruker.*
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker_status
 					 inner join deltaker on deltaker_status.deltaker_id = deltaker.id
 					 inner join bruker on bruker.id = deltaker.bruker_id
+					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
 			WHERE deltaker_status.aktiv = TRUE
 				AND deltaker_status.status = '${DeltakerStatus.Type.VENTER_PA_OPPSTART.name}'
 				AND deltaker.start_dato <= CURRENT_DATE
@@ -270,8 +286,9 @@ open class DeltakerRepository(
 
 	fun hentDeltakere(offset: Int, limit: Int): List<DeltakerDbo> {
 		val sql = """
-			SELECT deltaker.*, bruker.*
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker inner join bruker on bruker.id = deltaker.bruker_id
+				LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
 			ORDER BY deltaker.id OFFSET :offset LIMIT :limit
 		""".trimIndent()
 
@@ -301,5 +318,4 @@ open class DeltakerRepository(
 
 		template.update(sql, parameters)
 	}
-
 }
