@@ -61,6 +61,7 @@ spec:
         - application: amt-altinn-acl
           namespace: amt
           cluster: prod-gcp
+        - application: amt-arrangor
         - application: mulighetsrommet-api
           namespace: team-mulighetsrommet
           cluster: prod-gcp

@@ -60,6 +60,7 @@ spec:
           cluster: dev-gcp
         - application: amt-altinn-acl
           namespace: amt
+        - application: amt-arrangor
           cluster: dev-gcp
         - application: mulighetsrommet-api
           namespace: team-mulighetsrommet

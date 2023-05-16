@@ -20,7 +20,10 @@ class ArrangorClientTestController(
 	@GetMapping("{id}")
 	fun getById(@PathVariable("id") id: UUID, request: HttpServletRequest): AmtArrangorClient.ArrangorDto {
 		return isInternal(request).let { internal ->
-			if (internal) arrangorClient.hentArrangor(id).getOrThrow()
+			if (internal) when (val res = arrangorClient.hentArrangor(id)) {
+				is AmtArrangorClient.Result.OK -> res.result
+				is AmtArrangorClient.Result.NotFound -> throw NoSuchElementException()
+			}
 			else throw UnauthorizedException("Not authorized to access this resource")
 		}
 	}
@@ -28,14 +31,15 @@ class ArrangorClientTestController(
 	@GetMapping("/organisasjonsnummer/{orgNr}")
 	fun getByOrgNr(@PathVariable("orgNr") orgNr: String, request: HttpServletRequest): AmtArrangorClient.ArrangorDto {
 		return isInternal(request).let { internal ->
-			if (internal) arrangorClient.hentArrangor(orgNr).getOrThrow()
+			if (internal) when (val res = arrangorClient.hentArrangor(orgNr)) {
+				is AmtArrangorClient.Result.OK -> res.result
+				is AmtArrangorClient.Result.NotFound -> throw NoSuchElementException()
+			}
 			else throw UnauthorizedException("Not authorized to access this resource")
 		}
 	}
 
-	private fun isInternal(request: HttpServletRequest): Boolean {
-		return request.remoteAddr == "127.0.0.1"
-	}
+	private fun isInternal(request: HttpServletRequest) = request.remoteAddr == "127.0.0.1"
 
 
 }

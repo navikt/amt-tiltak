@@ -5,12 +5,17 @@ import no.nav.amt.tiltak.common.db_utils.getLocalDateTime
 import no.nav.amt.tiltak.common.db_utils.getNullableLocalDateTime
 import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getUUID
-import no.nav.amt.tiltak.data_publisher.model.*
+import no.nav.amt.tiltak.data_publisher.model.AnsattRolle
+import no.nav.amt.tiltak.data_publisher.model.ArrangorAnsattPublishDto
+import no.nav.amt.tiltak.data_publisher.model.Navn
+import no.nav.amt.tiltak.data_publisher.model.PersonPublishDto
+import no.nav.amt.tiltak.data_publisher.model.TilknyttetArrangor
+import no.nav.amt.tiltak.data_publisher.model.Veileder
+import no.nav.amt.tiltak.data_publisher.model.VeilederType
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 class ArrangorAnsattPublishQuery(
 	private val template: NamedParameterJdbcTemplate
