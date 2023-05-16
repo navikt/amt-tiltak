@@ -81,7 +81,6 @@ class AmtArrangorClient(
 		.let { it.body?.string() ?: throw IllegalStateException("Forventet body") }
 		.let { Result.OK(JsonUtils.fromJsonString(it)) }
 
-
 	sealed class Result<T> {
 		data class OK<T>(val result: T) : Result<T>()
 		class NotFound<T> : Result<T>()
@@ -116,9 +115,18 @@ class AmtArrangorClient(
 
 	data class TilknyttetArrangorDto(
 		val arrangorId: UUID,
+		val arrangor: Arrangor,
+		val overordnetArrangor: Arrangor?,
+		val deltakerlister: Set<UUID>,
 		val roller: List<AnsattRolle>,
 		val veileder: List<VeilederDto>,
 		val koordinator: List<UUID>
+	)
+
+	data class Arrangor(
+		val id: UUID,
+		val navn: String,
+		val organisasjonsnummer: String
 	)
 
 	data class VeilederDto(
