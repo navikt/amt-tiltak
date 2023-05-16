@@ -33,5 +33,5 @@ fun Deltaker.toDto(aktiveEndringsmeldinger: List<EndringsmeldingDto>, aktiveVeil
 	registrertDato = registrertDato,
 	aktiveEndringsmeldinger = aktiveEndringsmeldinger,
 	aktiveVeiledere = aktiveVeiledere,
-	navKontor = navKontor
+	navKontor = navEnhet?.navn
 )

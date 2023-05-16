@@ -97,7 +97,7 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 	fun createBruker(
 		ansvarligVeilederId: UUID? = createNavAnsatt().id,
 		navEnhet: NavEnhetInput = createNavEnhet()
-	): BrukerInput = brukerInput(ansvarligVeilederId, navEnhet.id, navEnhet.navn)
+	): BrukerInput = brukerInput(ansvarligVeilederId, navEnhet)
 		.also { testDataRepository.insertBruker(it) }
 
 	fun createNavEnhet(): NavEnhetInput = navEnhetInput()
@@ -162,8 +162,7 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 
 	private fun brukerInput(
 		ansvarligVeilederId: UUID?,
-		navEnhetId: UUID,
-		navKontor: String
+		navEnhet: NavEnhetInput?
 	): BrukerInput = BrukerInput(
 		id = UUID.randomUUID(),
 		personIdent = UUID.randomUUID().toString(),
@@ -173,8 +172,7 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		telefonnummer = UUID.randomUUID().toString(),
 		epost = UUID.randomUUID().toString(),
 		ansvarligVeilederId = ansvarligVeilederId,
-		navEnhetId = navEnhetId,
-		navKontor = navKontor,
+		navEnhet = navEnhet,
 		erSkjermet = false
 	)
 

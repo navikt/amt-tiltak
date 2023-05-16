@@ -32,8 +32,7 @@ class EndringPaaBrukerIngestorImplTest {
 		telefonnummer = "1234",
 		epost = "foo@bar.baz",
 		navVeilederId = UUID.randomUUID(),
-		navEnhetId = navEnhet.id,
-		navKontor = navEnhet.navn,
+		navEnhet = navEnhet,
 		startDato = null,
 		sluttDato = null,
 		status = DeltakerStatus(

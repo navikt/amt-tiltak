@@ -60,8 +60,7 @@ object TestData {
 			telefonnummer = (1000..9999).random().toString(),
 			epost = "bruker@example.com",
 			ansvarligVeilederId = null,
-			navEnhetId = navEnhet.id,
-			navKontor = navEnhet.navn,
+			navEnhet = navEnhet,
 			erSkjermet = false
 		)
 
@@ -264,8 +263,7 @@ object TestData {
 		telefonnummer = "73404782",
 		epost = "bruker1@example.com",
 		ansvarligVeilederId = NAV_ANSATT_1.id,
-		navEnhetId = NAV_ENHET_1.id,
-		navKontor = NAV_ENHET_1.navn,
+		navEnhet = NAV_ENHET_1,
 		erSkjermet = false
 	)
 
@@ -277,8 +275,7 @@ object TestData {
 		telefonnummer = "432432423",
 		epost = "skjermet@example.com",
 		ansvarligVeilederId = NAV_ANSATT_1.id,
-		navEnhetId = NAV_ENHET_1.id,
-		navKontor = NAV_ENHET_1.navn,
+		navEnhet = NAV_ENHET_1,
 		erSkjermet = true
 	)
 
@@ -322,8 +319,7 @@ object TestData {
 		telefonnummer = "65443532",
 		epost = "bruker2@example.com",
 		ansvarligVeilederId = null,
-		navEnhetId = NAV_ENHET_1.id,
-		navKontor = NAV_ENHET_1.navn,
+		navEnhet = NAV_ENHET_1,
 		erSkjermet = false
 	)
 
@@ -357,8 +353,7 @@ object TestData {
 		telefonnummer = "39057809",
 		epost = "bruker3@example.com",
 		ansvarligVeilederId = null,
-		navEnhetId = NAV_ENHET_1.id,
-		navKontor = NAV_ENHET_1.navn,
+		navEnhet = NAV_ENHET_1,
 		erSkjermet = false
 	)
 
@@ -372,8 +367,7 @@ object TestData {
 		telefonnummer = "11223344",
 		epost = "bruker4@example.com",
 		ansvarligVeilederId = null,
-		navEnhetId = NAV_ENHET_1.id,
-		navKontor = NAV_ENHET_1.navn,
+		navEnhet = NAV_ENHET_1,
 		erSkjermet = false
 	)
 

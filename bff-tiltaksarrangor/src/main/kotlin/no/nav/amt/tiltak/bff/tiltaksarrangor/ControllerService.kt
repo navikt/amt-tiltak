@@ -43,7 +43,7 @@ open class ControllerService(
 			epost = deltaker.epost,
 			deltakelseProsent = deltaker.prosentStilling?.toInt(),
 			dagerPerUke = deltaker.dagerPerUke,
-			navEnhet = deltaker.navKontor?.let { NavEnhetDto(it) },
+			navEnhet = deltaker.navEnhet?.let { NavEnhetDto(it.navn) },
 			navVeileder = navVeileder?.toDto(),
 			startDato = deltaker.startDato,
 			sluttDato = deltaker.sluttDato,
