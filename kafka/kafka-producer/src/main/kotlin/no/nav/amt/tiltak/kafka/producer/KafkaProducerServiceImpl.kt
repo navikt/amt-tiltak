@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
 import no.nav.amt.tiltak.kafka.config.KafkaTopicProperties
 import no.nav.amt.tiltak.kafka.producer.dto.DeltakerV1Dto
+import no.nav.amt.tiltak.kafka.producer.dto.toDto
 import no.nav.common.kafka.producer.KafkaProducerClient
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.springframework.stereotype.Service
@@ -23,10 +24,11 @@ open class KafkaProducerServiceImpl(
 			personIdent = deltaker.personIdent,
 			startDato = deltaker.startDato,
 			sluttDato = deltaker.sluttDato,
-			status = deltaker.status.type,
+			status = deltaker.status.toDto(),
 			registrertDato = deltaker.registrertDato,
 			dagerPerUke = deltaker.dagerPerUke,
 			prosentStilling = deltaker.prosentStilling,
+			endretDato = deltaker.endretDato
 		)
 
 		val key = deltaker.id.toString().toByteArray()

@@ -2,7 +2,20 @@ package no.nav.amt.tiltak.test.database.data
 
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
-import no.nav.amt.tiltak.test.database.data.inputs.*
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattGjennomforingTilgangInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattRolleInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorVeilederDboInput
+import no.nav.amt.tiltak.test.database.data.inputs.BrukerInput
+import no.nav.amt.tiltak.test.database.data.inputs.DeltakerInput
+import no.nav.amt.tiltak.test.database.data.inputs.DeltakerStatusInput
+import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
+import no.nav.amt.tiltak.test.database.data.inputs.GjennomforingInput
+import no.nav.amt.tiltak.test.database.data.inputs.NavAnsattInput
+import no.nav.amt.tiltak.test.database.data.inputs.NavEnhetInput
+import no.nav.amt.tiltak.test.database.data.inputs.TiltakInput
+import no.nav.amt.tiltak.test.database.data.inputs.TiltaksansvarligGjennomforingTilgangInput
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
@@ -276,6 +289,7 @@ object TestData {
 		prosentStilling = 100f,
 		registrertDato = LocalDateTime.of(2022, 2, 13, 12, 12),
 		innsokBegrunnelse = "begrunnelse deltaker 1",
+		endretDato = LocalDateTime.of(2022, 2, 13, 12, 12)
 	)
 
 

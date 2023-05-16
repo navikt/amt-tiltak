@@ -5,7 +5,21 @@ import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.common.db_utils.getZonedDateTime
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.test.database.DbTestDataUtils.parameters
-import no.nav.amt.tiltak.test.database.data.inputs.*
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattGjennomforingTilgangInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattRolleInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorInput
+import no.nav.amt.tiltak.test.database.data.inputs.ArrangorVeilederDboInput
+import no.nav.amt.tiltak.test.database.data.inputs.BrukerInput
+import no.nav.amt.tiltak.test.database.data.inputs.DeltakerInput
+import no.nav.amt.tiltak.test.database.data.inputs.DeltakerStatusInput
+import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
+import no.nav.amt.tiltak.test.database.data.inputs.GjennomforingInput
+import no.nav.amt.tiltak.test.database.data.inputs.NavAnsattInput
+import no.nav.amt.tiltak.test.database.data.inputs.NavEnhetInput
+import no.nav.amt.tiltak.test.database.data.inputs.SkjultDeltakerInput
+import no.nav.amt.tiltak.test.database.data.inputs.TiltakInput
+import no.nav.amt.tiltak.test.database.data.inputs.TiltaksansvarligGjennomforingTilgangInput
 import no.nav.amt.tiltak.test.database.data.outputs.ArrangorAnsattGjennomforingTilgangOutput
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -158,11 +172,11 @@ class TestDataRepository(
 		val sql = """
 			INSERT INTO deltaker (
 				id, bruker_id, gjennomforing_id, start_dato,
-				slutt_dato, dager_per_uke, prosent_stilling, registrert_dato, innsok_begrunnelse
+				slutt_dato, dager_per_uke, prosent_stilling, registrert_dato, innsok_begrunnelse, modified_at
 			 )
 			VALUES (
 				:id, :bruker_id, :gjennomforing_id, :start_dato,
-				:slutt_dato, :dager_per_uke, :prosent_stilling, :registrert_dato, :innsok_begrunnelse
+				:slutt_dato, :dager_per_uke, :prosent_stilling, :registrert_dato, :innsok_begrunnelse, :modified_at
 			);
 		""".trimIndent()
 
@@ -176,8 +190,10 @@ class TestDataRepository(
 				"dager_per_uke" to cmd.dagerPerUke,
 				"prosent_stilling" to cmd.prosentStilling,
 				"registrert_dato" to cmd.registrertDato,
-				"innsok_begrunnelse" to cmd.innsokBegrunnelse
-			)
+				"innsok_begrunnelse" to cmd.innsokBegrunnelse,
+				"modified_at" to cmd.endretDato,
+
+				)
 		)
 	}
 

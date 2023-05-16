@@ -13,7 +13,11 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.ArrangorAnsattService
+import no.nav.amt.tiltak.core.port.ArrangorService
+import no.nav.amt.tiltak.core.port.ArrangorVeilederService
+import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.AltinnService
@@ -107,7 +111,8 @@ class ArrangorAnsattTilgangServiceImplTest {
 		dagerPerUke = 5,
 		prosentStilling = 100F,
 		gjennomforingId = gjennomforingId,
-		erSkjermet = true
+		erSkjermet = true,
+		endretDato = LocalDateTime.now()
 	)
 	@BeforeEach
 	fun beforeEach() {

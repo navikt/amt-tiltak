@@ -47,7 +47,8 @@ class EndringPaaBrukerIngestorImplTest {
 		dagerPerUke = null,
 		prosentStilling = null,
 		innsokBegrunnelse = null,
-		erSkjermet = false
+		erSkjermet = false,
+		endretDato = LocalDateTime.now()
 	)
 
 

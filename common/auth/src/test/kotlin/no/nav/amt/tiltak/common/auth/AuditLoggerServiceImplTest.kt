@@ -77,7 +77,8 @@ class AuditLoggerServiceImplTest {
 			sluttDato = null,
 			status = DeltakerStatus(UUID.randomUUID(), DeltakerStatus.Type.DELTAR, null, LocalDateTime.now(), LocalDateTime.now(), true),
 			registrertDato = LocalDateTime.now(),
-			erSkjermet = false
+			erSkjermet = false,
+			endretDato = LocalDateTime.now()
 		)
 
 		val messageSlot = slot<CefMessage>()
@@ -129,7 +130,8 @@ class AuditLoggerServiceImplTest {
 			sluttDato = null,
 			status = DeltakerStatus(UUID.randomUUID(), DeltakerStatus.Type.DELTAR, null, LocalDateTime.now(), LocalDateTime.now(), true),
 			registrertDato = LocalDateTime.now(),
-			erSkjermet = false
+			erSkjermet = false,
+			endretDato = LocalDateTime.now()
 		)
 
 		every {
