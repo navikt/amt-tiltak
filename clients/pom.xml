@@ -22,6 +22,7 @@
         <module>veilarbarena</module>
         <module>veilarboppfolging</module>
         <module>mulighetsrommet-api-client</module>
+        <module>amt-person</module>
     </modules>
 
 </project>
