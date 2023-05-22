@@ -21,6 +21,10 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>amt-person</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>auth</artifactId>
         </dependency>
         <dependency>

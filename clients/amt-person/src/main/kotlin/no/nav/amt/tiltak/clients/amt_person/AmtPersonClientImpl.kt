@@ -1,8 +1,7 @@
-package no.nav.amt.tiltak.clients.amt_person_service
+package no.nav.amt.tiltak.clients.amt_person
 
-import no.nav.amt.tiltak.clients.amt_person_service.dto.NavAnsattDto
-import no.nav.amt.tiltak.clients.amt_person_service.dto.NavBrukerDto
-import no.nav.amt.tiltak.clients.amt_person_service.model.NavBruker
+import no.nav.amt.tiltak.clients.amt_person.dto.*
+import no.nav.amt.tiltak.clients.amt_person.model.NavBruker
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.common.json.JsonUtils.toJsonString
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
@@ -12,15 +11,17 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.slf4j.LoggerFactory
 import java.util.function.Supplier
 
-class AmtPersonServiceClientImpl(
+class AmtPersonClientImpl(
     private val baseUrl: String,
     private val tokenProvider: Supplier<String>,
     private val httpClient: OkHttpClient = baseClient(),
-) : AmtPersonServiceClient {
+) : AmtPersonClient {
 
 	private val mediaTypeJson = "application/json".toMediaType()
+	private val log = LoggerFactory.getLogger(javaClass)
 	override fun hentNavBruker(personIdent: String): Result<NavBruker> {
 		return hentEllerOpprett("nav-bruker", NavBrukerRequest(personIdent)) { body ->
 			val navBruker = fromJsonString<NavBrukerDto>(body)
@@ -67,12 +68,50 @@ class AmtPersonServiceClientImpl(
 		}
 	}
 
+	override fun migrerNavBruker(navBrukerDto: OpprettNavBrukerDto) {
+		val response = httpClient.newCall(buildRequest("migrer/nav-bruker", navBrukerDto)).execute()
+
+		if (!response.isSuccessful) {
+			log.error("Klarte ikke å opprette nav bruker med id: ${navBrukerDto.id}. Status=${response.code}")
+		}
+	}
+
+	override fun migrerNavAnsatt(navAnsatt: NavAnsatt) {
+		val navAnsattDto = NavAnsattDto(
+			id = navAnsatt.id,
+			navIdent = navAnsatt.navIdent,
+			navn = navAnsatt.navn,
+			telefon = navAnsatt.telefonnummer,
+			epost = navAnsatt.epost,
+		)
+
+		val response = httpClient.newCall(buildRequest("migrer/nav-ansatt", navAnsattDto)).execute()
+
+		if (!response.isSuccessful) {
+			log.error("Klarte ikke å opprette nav ansatt med id: ${navAnsattDto.id}. Status=${response.code}")
+		}
+	}
+
+	override fun migrerNavEnhet(navEnhet: NavEnhet) {
+		val navEnhetDto = NavEnhetDto(id = navEnhet.id, enhetId = navEnhet.enhetId, navn = navEnhet.navn)
+		val response = httpClient.newCall(buildRequest("migrer/nav-enhet", navEnhetDto)).execute()
+
+		if (!response.isSuccessful) {
+			log.error("Klarte ikke å opprette nav ansatt med id: ${navEnhetDto.id}. Status=${response.code}")
+		}
+	}
+
+	override fun migrerArrangorAnsatt(arrangorAnsattDto: OpprettArrangorAnsattDto) {
+		val response = httpClient.newCall(buildRequest("migrer/arrangor-ansatt", arrangorAnsattDto)).execute()
+
+		if (!response.isSuccessful) {
+			log.error("Klarte ikke å opprette nav ansatt med id: ${arrangorAnsattDto.id}. Status=${response.code}")
+		}
+	}
+
+
 	private fun <T> hentEllerOpprett(endepunkt: String, requestBody: Any, fn: (body: String) -> T): Result<T> {
-		val request = Request.Builder()
-			.url("$baseUrl/api/$endepunkt")
-			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
-			.post(toJsonString(requestBody).toRequestBody(mediaTypeJson))
-			.build()
+		val request = buildRequest(endepunkt, requestBody)
 
 		httpClient.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
@@ -82,6 +121,12 @@ class AmtPersonServiceClientImpl(
 			return Result.success(fn(body))
 		}
 	}
+
+	private fun buildRequest(endepunkt: String, requestBody: Any) = Request.Builder()
+		.url("$baseUrl/api/$endepunkt")
+		.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
+		.post(toJsonString(requestBody).toRequestBody(mediaTypeJson))
+		.build()
 
 }
 

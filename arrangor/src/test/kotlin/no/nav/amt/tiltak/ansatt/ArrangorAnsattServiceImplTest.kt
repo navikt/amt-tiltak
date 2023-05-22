@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.ansatt
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.PersonService
@@ -19,6 +20,7 @@ class ArrangorAnsattServiceImplTest {
 	lateinit var arrangorAnsattTilgangService: ArrangorAnsattTilgangService
 	lateinit var arrangorService: ArrangorService
 	lateinit var publisherService: DataPublisherService
+	lateinit var amtPersonClient: AmtPersonClient
 
 	lateinit var arrangorAnsattService: ArrangorAnsattServiceImpl
 
@@ -29,12 +31,15 @@ class ArrangorAnsattServiceImplTest {
 		arrangorService = mockk()
 		arrangorAnsattTilgangService = mockk()
 		publisherService = mockk()
+		amtPersonClient = mockk(relaxUnitFun = true)
+
 
 		arrangorAnsattService = ArrangorAnsattServiceImpl(
 			arrangorAnsattRepository = arrangorAnsattRepository,
 			personService = personService,
 			arrangorService = arrangorService,
-			dataPublisherService = publisherService
+			dataPublisherService = publisherService,
+			amtPersonClient = amtPersonClient,
 		)
 
 		every { publisherService.publish(any(), any()) } returns Unit

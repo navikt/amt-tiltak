@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.clients.amt_person_service
+package no.nav.amt.tiltak.clients.amt_person
 
 import no.nav.common.token_client.client.MachineToMachineTokenClient
 import org.springframework.beans.factory.annotation.Value
@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration
 
 
 @Configuration
-open class AmtPersonServiceConfig {
+open class AmtPersonConfig {
 
 	@Value("\${amt-person.url}")
 	lateinit var url: String
@@ -16,8 +16,8 @@ open class AmtPersonServiceConfig {
 	lateinit var scope: String
 
 	@Bean
-	open fun amtPersonServiceClient(machineToMachineTokenClient: MachineToMachineTokenClient): AmtPersonServiceClient {
-		return AmtPersonServiceClientImpl(
+	open fun amtPersonClient(machineToMachineTokenClient: MachineToMachineTokenClient): AmtPersonClient {
+		return AmtPersonClientImpl(
 			baseUrl = url,
 			tokenProvider = { machineToMachineTokenClient.createMachineToMachineToken(scope) },
 		)

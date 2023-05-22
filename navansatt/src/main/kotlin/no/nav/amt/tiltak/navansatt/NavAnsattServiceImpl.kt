@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.navansatt
 
+import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
 import no.nav.amt.tiltak.clients.nom.NomClient
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.domain.nav_ansatt.UpsertNavAnsattInput
@@ -12,6 +13,7 @@ import java.util.*
 internal class NavAnsattServiceImpl(
 	private val navAnsattRepository: NavAnsattRepository,
 	private val nomClient: NomClient,
+	private val amtPersonClient: AmtPersonClient,
 ) : NavAnsattService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -45,11 +47,32 @@ internal class NavAnsattServiceImpl(
 			telefonnummer = nyNavAnsatt.telefonnummer,
 		))
 
-		return navAnsattRepository.get(nyAnsattId).toNavAnsatt()
+		val ansatt = navAnsattRepository.get(nyAnsattId).toNavAnsatt()
+
+		amtPersonClient.migrerNavAnsatt(ansatt)
+
+		return ansatt
 	}
 
 	override fun upsertNavAnsatt(input: UpsertNavAnsattInput) {
 		navAnsattRepository.upsert(input)
+	}
+
+	override fun migrerAlle() {
+		var offset = 0
+		var ansatte: List<NavAnsattDbo>
+
+		log.info("Migrerer nav ansatte fra amt-tiltak til amt-person-service")
+		do {
+			ansatte = navAnsattRepository.getAnsatte(offset)
+
+			ansatte.forEach { ansatt -> amtPersonClient.migrerNavAnsatt(ansatt.toNavAnsatt()) }
+
+			log.info("Migrerte nav ansatte fra offset: $offset til: ${offset + ansatte.size}")
+			offset += ansatte.size
+		} while (ansatte.isNotEmpty())
+
+		log.info("Migrering fullført. $offset nav ansatte ble migrert.")
 	}
 
 	private fun NavAnsattDbo.toNavAnsatt() = NavAnsatt(

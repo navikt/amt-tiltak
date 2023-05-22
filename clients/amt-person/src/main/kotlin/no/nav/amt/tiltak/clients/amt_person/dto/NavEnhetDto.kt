@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.clients.amt_person_service.dto
+package no.nav.amt.tiltak.clients.amt_person.dto
 
 import java.util.*
 

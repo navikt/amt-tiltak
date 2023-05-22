@@ -1,9 +1,13 @@
 package no.nav.amt.tiltak.clients.amt_person_service
 
 import io.kotest.matchers.shouldBe
-import no.nav.amt.tiltak.clients.amt_person_service.dto.NavAnsattDto
-import no.nav.amt.tiltak.clients.amt_person_service.dto.NavBrukerDto
-import no.nav.amt.tiltak.clients.amt_person_service.dto.NavEnhetDto
+import no.nav.amt.tiltak.clients.amt_person.AmtPersonClientImpl
+import no.nav.amt.tiltak.clients.amt_person.NavAnsattRequest
+import no.nav.amt.tiltak.clients.amt_person.NavBrukerRequest
+import no.nav.amt.tiltak.clients.amt_person.NavEnhetRequest
+import no.nav.amt.tiltak.clients.amt_person.dto.NavAnsattDto
+import no.nav.amt.tiltak.clients.amt_person.dto.NavBrukerDto
+import no.nav.amt.tiltak.clients.amt_person.dto.NavEnhetDto
 import no.nav.amt.tiltak.common.json.JsonUtils
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -11,14 +15,14 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.*
 
-class AmtPersonServiceClientImplTest {
+class AmtPersonClientImplTest {
 	lateinit var server: MockWebServer
-	lateinit var client: AmtPersonServiceClientImpl
+	lateinit var client: AmtPersonClientImpl
 
 	@BeforeEach
 	fun setup() {
 		server = MockWebServer()
-		client = AmtPersonServiceClientImpl(
+		client = AmtPersonClientImpl(
 			baseUrl = server.url("").toString().removeSuffix("/"),
 			tokenProvider = { "TOKEN" },
 		)

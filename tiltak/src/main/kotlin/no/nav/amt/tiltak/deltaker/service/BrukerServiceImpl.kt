@@ -1,5 +1,7 @@
 package no.nav.amt.tiltak.deltaker.service
 
+import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
+import no.nav.amt.tiltak.clients.amt_person.dto.OpprettNavBrukerDto
 import no.nav.amt.tiltak.core.domain.tiltak.IdentType
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.port.BrukerService
@@ -20,6 +22,7 @@ class BrukerServiceImpl(
 	private val personService: PersonService,
 	private val navAnsattService: NavAnsattService,
 	private val navEnhetService: NavEnhetService,
+	private val amtPersonClient: AmtPersonClient,
 ) : BrukerService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -143,6 +146,23 @@ class BrukerServiceImpl(
 		log.info("Brukere oppdatert. Det var $brukereOppdatert oppdateringer.")
 	}
 
+	override fun migrerAlle() {
+		var offset = 0
+		var brukere: List<BrukerDbo>
+
+		log.info("Migrerer brukere fra amt-tiltak til amt-person-service")
+		do {
+			brukere = brukerRepository.getBrukere(offset)
+
+			brukere.forEach { bruker -> migrerBruker(bruker) }
+
+			log.info("Migrerte brukere fra offset: $offset til: ${offset + brukere.size}")
+			offset += brukere.size
+		} while (brukere.isNotEmpty())
+
+		log.info("Migrering fullført. $offset brukere migrert.")
+	}
+
 	private fun createBruker(fodselsnummer: String): BrukerDbo {
 		val tildeltVeilederNavIdent = personService.hentTildeltVeilederNavIdent(fodselsnummer)
 
@@ -168,7 +188,30 @@ class BrukerServiceImpl(
 			erSkjermet = erSkjermet
 		)
 
-		return brukerRepository.upsert(bruker)
+		val brukerDbo = brukerRepository.upsert(bruker)
+
+		migrerBruker(brukerDbo)
+
+		return brukerDbo
+	}
+
+	private fun migrerBruker(bruker: BrukerDbo) {
+		amtPersonClient.migrerNavBruker(
+			OpprettNavBrukerDto(
+				id = bruker.id,
+				personIdent = bruker.personIdent,
+				personIdentType = bruker.personIdentType?.name,
+				historiskeIdenter = bruker.historiskeIdenter,
+				fornavn = bruker.fornavn,
+				mellomnavn = bruker.mellomnavn,
+				etternavn = bruker.etternavn,
+				navVeilederId = bruker.ansvarligVeilederId,
+				navEnhetId = bruker.navEnhetId,
+				telefon = bruker.telefonnummer,
+				epost = bruker.epost,
+				erSkjermet = bruker.erSkjermet,
+			)
+		)
 	}
 
 

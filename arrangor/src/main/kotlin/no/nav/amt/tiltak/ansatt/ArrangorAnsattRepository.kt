@@ -84,6 +84,24 @@ open class ArrangorAnsattRepository(
 		return template.query(sql, parameters, rowMapper)
 	}
 
+	fun getAnsatte(offset: Int, limit: Int = 500): List<AnsattDbo> {
+		val sql = """
+			SELECT *
+			FROM arrangor_ansatt
+			ORDER BY id
+			OFFSET :offset
+			LIMIT :limit;
+		""".trimIndent()
+
+		val parameters = sqlParameters(
+			"offset" to offset,
+			"limit" to limit
+		)
+
+		return template.query(sql, parameters, rowMapper)
+
+	}
+
 	fun getAnsatteForGjennomforing(gjennomforingId: UUID, rolle: ArrangorAnsattRolle): List<AnsattDbo> {
 		val sql = """
 			SELECT distinct a.*

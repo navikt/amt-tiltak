@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
 import no.nav.amt.tiltak.clients.norg.NorgClient
 import no.nav.amt.tiltak.clients.norg.NorgNavEnhet
 import no.nav.amt.tiltak.clients.veilarbarena.VeilarbarenaClient
@@ -14,11 +15,13 @@ class NavEnhetServiceImplTest : FunSpec({
 	val norgClient = mockk<NorgClient>()
 	val navEnhetRepositoy = mockk<NavEnhetRepository>()
 	val veilarbarenaClient = mockk<VeilarbarenaClient>()
+	val amtPersonClient = mockk<AmtPersonClient>(relaxUnitFun = true)
 
 	val service = NavEnhetServiceImpl(
 		norgClient = norgClient,
 		navEnhetRepository = navEnhetRepositoy,
-		veilarbarenaClient = veilarbarenaClient
+		veilarbarenaClient = veilarbarenaClient,
+		amtPersonClient = amtPersonClient,
 	)
 
 	test("getNavEnhetForBruker - skal inserte enhet hvis den ikke finnes i database") {

@@ -1,4 +1,4 @@
-package no.nav.amt.tiltak.clients.amt_person_service.model
+package no.nav.amt.tiltak.clients.amt_person.model
 
 import java.util.*
 
