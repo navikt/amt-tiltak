@@ -9,10 +9,10 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 open class AmtPersonServiceConfig {
 
-	@Value("\${amt-person-service.url}")
+	@Value("\${amt-person.url}")
 	lateinit var url: String
 
-	@Value("\${amt-person-service.scope}")
+	@Value("\${amt-person.scope}")
 	lateinit var scope: String
 
 	@Bean
