@@ -1,18 +1,25 @@
 package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang
+
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.ArrangorAnsattService
+import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
+import no.nav.amt.tiltak.core.port.ArrangorService
+import no.nav.amt.tiltak.core.port.ArrangorVeilederService
+import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.MineDeltakerlisterService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.log.SecureLog.secureLog
-import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.AltinnService
+import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.arrangor.AmtArrangorService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Service
 open class ArrangorAnsattTilgangServiceImpl(
@@ -20,12 +27,12 @@ open class ArrangorAnsattTilgangServiceImpl(
 	private val ansattRolleService: AnsattRolleService,
 	private val deltakerService: DeltakerService,
 	private val gjennomforingService: GjennomforingService,
-	private val altinnService: AltinnService,
 	private val mineDeltakerlisterService: MineDeltakerlisterService,
 	private val arrangorVeilederService: ArrangorVeilederService,
 	private val arrangorService: ArrangorService,
 	private val transactionTemplate: TransactionTemplate,
-	private val publisherService: DataPublisherService
+	private val publisherService: DataPublisherService,
+	private val amtArrangorService: AmtArrangorService
 ) : ArrangorAnsattTilgangService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -100,7 +107,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 	}
 
 	private fun synkroniserAltinnRettigheter(ansattPersonligIdent: String) {
-		val altinnRoller = altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent)
+		val altinnRoller = amtArrangorService.hentTiltaksarrangorRoller(ansattPersonligIdent)
 		val maybeAnsatt = arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
 		if (altinnRoller.isEmpty() && maybeAnsatt == null) {
 			log.warn("En ikke-ansatt har logget inn, men hadde ikke tilganger i Altinn.")

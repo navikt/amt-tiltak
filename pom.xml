@@ -28,7 +28,6 @@
         <module>tilgangskontroll-tiltaksarrangor</module>
         <module>test-integration</module>
         <module>data-publisher</module>
-        <module>clients/amt-arrangor-client</module>
     </modules>
 
     <name>AMT-Tiltak</name>
@@ -168,11 +167,6 @@
             <dependency>
                 <groupId>no.nav.amt</groupId>
                 <artifactId>amt-arrangor-client</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>amt-altinn-acl</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

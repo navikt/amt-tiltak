@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.test.integration.tiltaksarrangor
 
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.port.ArrangorVeilederService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -496,11 +497,22 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 	@Test
 	internal fun `veileder mister rollen i altinn - inaktiveres for tildelte deltakere`() {
 		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_2_VEILEDER_1)
-		mockAmtAltinnAclHttpServer.clearResponses()
-		mockAmtAltinnAclHttpServer.addRoller(
-			norskIdent = ARRANGOR_ANSATT_2.personligIdent,
-			orgNr = ARRANGOR_1.organisasjonsnummer,
-			roller = emptyList(),
+		mockArrangorServer.addAnsattResponse(
+			ansattDto = AmtArrangorClient.AnsattDto(
+				id = UUID.randomUUID(),
+				personalia = AmtArrangorClient.PersonaliaDto(ARRANGOR_ANSATT_2.personligIdent, null, AmtArrangorClient.Navn("", null, "")),
+				arrangorer = listOf(
+					AmtArrangorClient.TilknyttetArrangorDto(
+						arrangorId = ARRANGOR_1.id,
+						arrangor = AmtArrangorClient.Arrangor(ARRANGOR_1.id, ARRANGOR_1.navn, ARRANGOR_1.organisasjonsnummer),
+						overordnetArrangor = null,
+						deltakerlister = emptySet(),
+						roller = emptyList(),
+						veileder = emptyList(),
+						koordinator = emptyList()
+					)
+				)
+			)
 		)
 
 		sendRequest(

@@ -7,18 +7,17 @@ import okhttp3.mockwebserver.MockResponse
 
 class MockAmtArrangorServer : MockHttpServer("amt-arrangor-server") {
 
-	fun addArrangorById(arrangor: AmtArrangorClient.ArrangorDto) = addResponseHandler(
-		path = "/api/${arrangor.id}",
-		response = MockResponse()
-			.setResponseCode(200)
-			.setBody(JsonUtils.toJsonString(arrangor))
-	)
+	fun reset() {
+		resetHttpServer()
+	}
 
-	fun addArrangorByOrgNr(arrangor: AmtArrangorClient.ArrangorDto) = addResponseHandler(
-		path = "/api/organisasjonsnummer/${arrangor.organisasjonsnummer}",
-		response = MockResponse()
+	fun addAnsattResponse(
+		ansattDto: AmtArrangorClient.AnsattDto
+	) {
+		val response = MockResponse()
 			.setResponseCode(200)
-			.setBody(JsonUtils.toJsonString(arrangor))
+			.setBody(JsonUtils.toJsonString(ansattDto))
 
-	)
+		addResponseHandler("/api/ansatt", response)
+	}
 }

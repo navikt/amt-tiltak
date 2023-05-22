@@ -58,9 +58,6 @@ spec:
         - application: poao-tilgang
           namespace: poao
           cluster: prod-gcp
-        - application: amt-altinn-acl
-          namespace: amt
-          cluster: prod-gcp
         - application: amt-arrangor
         - application: mulighetsrommet-api
           namespace: team-mulighetsrommet
@@ -87,14 +84,10 @@ spec:
       value: api://prod-fss.pdl.pdl-api/.default
     - name: PDL_URL
       value: https://pdl-api.prod-fss-pub.nais.io
-    - name: AMT_ALTINN_ACL_SCOPE
-      value: api://prod-gcp.amt.amt-altinn-acl/.default
-    - name: AMT_ALTINN_ACL_URL
-      value: http://amt-altinn-acl.amt.svc.cluster.local
     - name: AMT_ARRANGOR_SCOPE
       value: api://prod-gcp.amt.amt-arrangor/.default
     - name: AMT_ARRANGOR_URL
-      value: http://amt-arrangor.amt.svc.cluster.local
+      value: http://amt-arrangor
     - name: AMT_ENHETSREGISTER_SCOPE
       value: api://prod-gcp.amt.amt-enhetsregister/.default
     - name: AMT_ENHETSREGISTER_URL

@@ -20,8 +20,8 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.AltinnService
-import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.altinn.ArrangorAnsattRoller
+import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.arrangor.AmtArrangorService
+import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.arrangor.ArrangorAnsattRoller
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
@@ -42,7 +42,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 
 	lateinit var mineDeltakerlisterService: MineDeltakerlisterServiceImpl
 
-	lateinit var altinnService: AltinnService
+	lateinit var amtArrangorService: AmtArrangorService
 
 	lateinit var arrangorService: ArrangorService
 
@@ -123,7 +123,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 
 		mineDeltakerlisterService = mockk(relaxUnitFun = true)
 
-		altinnService = mockk()
+		amtArrangorService = mockk()
 
 		arrangorService = mockk()
 
@@ -137,8 +137,8 @@ class ArrangorAnsattTilgangServiceImplTest {
 
 		arrangorAnsattTilgangServiceImpl = ArrangorAnsattTilgangServiceImpl(
 			arrangorAnsattService, ansattRolleService,
-			deltakerService, gjennomforingService, altinnService, mineDeltakerlisterService, arrangorVeilederService,
-			arrangorService, TransactionTemplate(DataSourceTransactionManager(datasource)), publisherService
+			deltakerService, gjennomforingService, mineDeltakerlisterService, arrangorVeilederService,
+			arrangorService, TransactionTemplate(DataSourceTransactionManager(datasource)), publisherService, amtArrangorService
 		)
 
 		every {
@@ -340,7 +340,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 		val arrangorId = UUID.randomUUID()
 		val organisasjonsnummer = "5678"
 
-		every { altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
+		every { amtArrangorService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
 			ArrangorAnsattRoller(organisasjonsnummer, listOf(KOORDINATOR))
 		)
 		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
@@ -379,7 +379,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 		val arrangorId = UUID.randomUUID()
 		val organisasjonsnummer = "5678"
 
-		every { altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
+		every { amtArrangorService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
 			ArrangorAnsattRoller(organisasjonsnummer, listOf(KOORDINATOR))
 		)
 		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
@@ -419,7 +419,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 		val organisasjonsnummer = "5678"
 
 		val organisasjonsnummer2 = "9999"
-		every { altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
+		every { amtArrangorService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
 			ArrangorAnsattRoller(organisasjonsnummer2, listOf(KOORDINATOR, VEILEDER))
 		)
 		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
@@ -464,7 +464,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 	fun `synkroniserRettigheterMedAltinn - skal returne tidlig hvis ingen rolle og ikke ansatt`() {
 		val ansattPersonligIdent = "1234"
 
-		every { altinnService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf()
+		every { amtArrangorService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf()
 		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
 
 		arrangorAnsattTilgangServiceImpl.synkroniserRettigheterMedAltinn(ansattPersonligIdent)
