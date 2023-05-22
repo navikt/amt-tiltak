@@ -16,7 +16,7 @@ class AmtArrangorClient(
 
 	fun hentAnsatt(personident: String): AnsattDto {
 		val request = Request.Builder()
-			.url("$baseUrl/api/ansatt")
+			.url("$baseUrl/api/service/ansatt")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
 			.post(JsonUtils.toJsonString(AnsattRequestBody(personident)).toRequestBody())
 			.build()

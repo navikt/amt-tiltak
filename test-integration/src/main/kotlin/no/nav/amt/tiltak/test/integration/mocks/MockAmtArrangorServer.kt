@@ -18,6 +18,6 @@ class MockAmtArrangorServer : MockHttpServer("amt-arrangor-server") {
 			.setResponseCode(200)
 			.setBody(JsonUtils.toJsonString(ansattDto))
 
-		addResponseHandler("/api/ansatt", response)
+		addResponseHandler("/api/service/ansatt", response)
 	}
 }
