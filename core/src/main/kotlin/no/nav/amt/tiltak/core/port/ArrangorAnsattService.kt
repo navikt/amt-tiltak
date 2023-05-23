@@ -1,12 +1,13 @@
 package no.nav.amt.tiltak.core.port
 
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
+import no.nav.amt.tiltak.core.domain.arrangor.ArrangorAnsatt
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 interface ArrangorAnsattService {
 
-	fun opprettAnsattHvisIkkeFinnes(personIdent: String): Ansatt
+	fun createOrUpdateAnsatt(arrangorAnsatt: ArrangorAnsatt)
 
 	fun getAnsatt(ansattId: UUID): Ansatt
 

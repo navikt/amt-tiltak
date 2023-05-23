@@ -2,11 +2,14 @@ package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang
 
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrowExactly
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
+import no.nav.amt.tiltak.core.domain.arrangor.ArrangorAnsatt
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.KOORDINATOR
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.VEILEDER
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
@@ -21,7 +24,6 @@ import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.arrangor.AmtArrangorService
-import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.arrangor.ArrangorAnsattRoller
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
@@ -340,25 +342,36 @@ class ArrangorAnsattTilgangServiceImplTest {
 		val arrangorId = UUID.randomUUID()
 		val organisasjonsnummer = "5678"
 
-		every { amtArrangorService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
-			ArrangorAnsattRoller(organisasjonsnummer, listOf(KOORDINATOR))
-		)
-		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
-		every { arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent) } returns Ansatt(
+		every { amtArrangorService.getAnsatt(ansattPersonligIdent) } returns ArrangorAnsatt(
 			id = ansattId,
-			personligIdent = ansattPersonligIdent,
-			fornavn = "",
-			mellomnavn = null,
-			etternavn = "",
-			arrangorer = emptyList(),
+			personalia = ArrangorAnsatt.PersonaliaDto(
+				personident = ansattPersonligIdent,
+				personId = UUID.randomUUID(),
+				navn = ArrangorAnsatt.Navn("", null, "")
+				),
+			arrangorer = listOf(
+				ArrangorAnsatt.TilknyttetArrangorDto(
+				arrangorId = arrangorId,
+				arrangor = ArrangorAnsatt.Arrangor(
+					id = arrangorId,
+					navn = "",
+					organisasjonsnummer = organisasjonsnummer
+				),
+				overordnetArrangor = null,
+				deltakerlister = emptySet(),
+					roller = listOf(ArrangorAnsatt.AnsattRolle.KOORDINATOR),
+					veileder = emptyList(),
+					koordinator = emptyList()
+			))
 		)
+		every { arrangorAnsattService.createOrUpdateAnsatt(match { it.id == ansattId }) } just Runs
 		every { ansattRolleService.hentAktiveRoller(ansattId) } returns listOf(
 			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
 				arrangorId = arrangorId,
 				roller = listOf(VEILEDER)
 			)
 		)
-		every { arrangorService.getOrCreateArrangor(organisasjonsnummer) } returns Arrangor(
+		every { arrangorService.getOrCreateArrangor(match { it.organisasjonsnummer == organisasjonsnummer }) } returns Arrangor(
 			id = arrangorId,
 			navn = "",
 			organisasjonsnummer = organisasjonsnummer,
@@ -379,25 +392,36 @@ class ArrangorAnsattTilgangServiceImplTest {
 		val arrangorId = UUID.randomUUID()
 		val organisasjonsnummer = "5678"
 
-		every { amtArrangorService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
-			ArrangorAnsattRoller(organisasjonsnummer, listOf(KOORDINATOR))
-		)
-		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
-		every { arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent) } returns Ansatt(
+		every { amtArrangorService.getAnsatt(ansattPersonligIdent) } returns ArrangorAnsatt(
 			id = ansattId,
-			personligIdent = ansattPersonligIdent,
-			fornavn = "",
-			mellomnavn = null,
-			etternavn = "",
-			arrangorer = emptyList(),
+			personalia = ArrangorAnsatt.PersonaliaDto(
+				personident = ansattPersonligIdent,
+				personId = UUID.randomUUID(),
+				navn = ArrangorAnsatt.Navn("", null, "")
+			),
+			arrangorer = listOf(
+				ArrangorAnsatt.TilknyttetArrangorDto(
+					arrangorId = arrangorId,
+					arrangor = ArrangorAnsatt.Arrangor(
+						id = arrangorId,
+						navn = "",
+						organisasjonsnummer = organisasjonsnummer
+					),
+					overordnetArrangor = null,
+					deltakerlister = emptySet(),
+					roller = listOf(ArrangorAnsatt.AnsattRolle.KOORDINATOR),
+					veileder = emptyList(),
+					koordinator = emptyList()
+				))
 		)
+		every { arrangorAnsattService.createOrUpdateAnsatt(match { it.id == ansattId }) } just Runs
 		every { ansattRolleService.hentAktiveRoller(ansattId) } returns listOf(
 			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
 				arrangorId = arrangorId,
 				roller = listOf(KOORDINATOR)
 			)
 		)
-		every { arrangorService.getOrCreateArrangor(organisasjonsnummer) } returns Arrangor(
+		every { arrangorService.getOrCreateArrangor(match { it.organisasjonsnummer == organisasjonsnummer }) } returns Arrangor(
 			id = arrangorId,
 			navn = "",
 			organisasjonsnummer = organisasjonsnummer,
@@ -418,33 +442,45 @@ class ArrangorAnsattTilgangServiceImplTest {
 		val arrangorId = UUID.randomUUID()
 		val organisasjonsnummer = "5678"
 
+		val arrangorId2 = UUID.randomUUID()
 		val organisasjonsnummer2 = "9999"
-		every { amtArrangorService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf(
-			ArrangorAnsattRoller(organisasjonsnummer2, listOf(KOORDINATOR, VEILEDER))
-		)
-		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
-		every { arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent) } returns Ansatt(
+		every { amtArrangorService.getAnsatt(ansattPersonligIdent) } returns ArrangorAnsatt(
 			id = ansattId,
-			personligIdent = ansattPersonligIdent,
-			fornavn = "",
-			mellomnavn = null,
-			etternavn = "",
-			arrangorer = emptyList(),
+			personalia = ArrangorAnsatt.PersonaliaDto(
+				personident = ansattPersonligIdent,
+				personId = UUID.randomUUID(),
+				navn = ArrangorAnsatt.Navn("", null, "")
+			),
+			arrangorer = listOf(
+				ArrangorAnsatt.TilknyttetArrangorDto(
+					arrangorId = arrangorId2,
+					arrangor = ArrangorAnsatt.Arrangor(
+						id = arrangorId2,
+						navn = "",
+						organisasjonsnummer = organisasjonsnummer2
+					),
+					overordnetArrangor = null,
+					deltakerlister = emptySet(),
+					roller = listOf(ArrangorAnsatt.AnsattRolle.KOORDINATOR, ArrangorAnsatt.AnsattRolle.VEILEDER),
+					veileder = emptyList(),
+					koordinator = emptyList()
+				))
 		)
+		every { arrangorAnsattService.createOrUpdateAnsatt(match { it.id == ansattId }) } just Runs
 		every { ansattRolleService.hentAktiveRoller(ansattId) } returns listOf(
 			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
 				arrangorId = arrangorId,
 				roller = listOf(KOORDINATOR, VEILEDER)
 			)
 		)
-		every { arrangorService.getOrCreateArrangor(organisasjonsnummer2) } returns Arrangor(
-			id = UUID.randomUUID(),
+		every { arrangorService.getOrCreateArrangor(match { it.organisasjonsnummer == organisasjonsnummer2 }) } returns Arrangor(
+			id = arrangorId2,
 			navn = "",
 			organisasjonsnummer = organisasjonsnummer2,
 			overordnetEnhetOrganisasjonsnummer = null,
 			overordnetEnhetNavn = null,
 		)
-		every { arrangorService.getOrCreateArrangor(organisasjonsnummer) } returns Arrangor(
+		every { arrangorService.getOrCreateArrangor(match { it.organisasjonsnummer == organisasjonsnummer }) } returns Arrangor(
 			id = arrangorId,
 			navn = "",
 			organisasjonsnummer = organisasjonsnummer,
@@ -461,11 +497,32 @@ class ArrangorAnsattTilgangServiceImplTest {
 	}
 
 	@Test
-	fun `synkroniserRettigheterMedAltinn - skal returne tidlig hvis ingen rolle og ikke ansatt`() {
+	fun `synkroniserRettigheterMedAltinn - skal returne tidlig hvis ikke ansatt`() {
 		val ansattPersonligIdent = "1234"
 
-		every { amtArrangorService.hentTiltaksarrangorRoller(ansattPersonligIdent) } returns listOf()
-		every { arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent) } returns null
+		every { amtArrangorService.getAnsatt(ansattPersonligIdent) } returns null
+
+		arrangorAnsattTilgangServiceImpl.synkroniserRettigheterMedAltinn(ansattPersonligIdent)
+
+		verify(exactly = 0) { ansattRolleService.opprettRolle(any(), any(), any(), any()) }
+		verify(exactly = 0) { ansattRolleService.deaktiverRolleHosArrangor(any(), any(), any()) }
+		verify(exactly = 0) { mineDeltakerlisterService.fjernAlleHosArrangor(any(), any()) }
+		verify(exactly = 0) { arrangorVeilederService.fjernAlleDeltakereForVeilederHosArrangor(any(), any()) }
+	}
+
+	@Test
+	fun `synkroniserRettigheterMedAltinn - skal returne tidlig hvis ingen roller`() {
+		val ansattPersonligIdent = "1234"
+
+		every { amtArrangorService.getAnsatt(ansattPersonligIdent) } returns ArrangorAnsatt(
+			id = UUID.randomUUID(),
+			personalia = ArrangorAnsatt.PersonaliaDto(
+				personident = ansattPersonligIdent,
+				personId = UUID.randomUUID(),
+				navn = ArrangorAnsatt.Navn("", null, "")
+			),
+			arrangorer = emptyList()
+		)
 
 		arrangorAnsattTilgangServiceImpl.synkroniserRettigheterMedAltinn(ansattPersonligIdent)
 

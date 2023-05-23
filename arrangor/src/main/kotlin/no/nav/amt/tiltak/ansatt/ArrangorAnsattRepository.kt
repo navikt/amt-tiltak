@@ -9,7 +9,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Component
 open class ArrangorAnsattRepository(
@@ -39,6 +39,25 @@ open class ArrangorAnsattRepository(
 		val parameters = sqlParameters(
 			"id" to id,
 			"personligIdent" to personligIdent,
+			"fornavn" to fornavn,
+			"mellomnavn" to mellomnavn,
+			"etternavn" to etternavn
+		)
+
+		template.update(sql, parameters)
+	}
+
+	fun oppdaterAnsatt(id: UUID, fornavn: String, mellomnavn: String?, etternavn: String) {
+		val sql = """
+			UPDATE arrangor_ansatt
+			SET fornavn    = :fornavn,
+				mellomnavn = :mellomnavn,
+				etternavn  = :etternavn
+			WHERE id = :id
+		""".trimIndent()
+
+		val parameters = sqlParameters(
+			"id" to id,
 			"fornavn" to fornavn,
 			"mellomnavn" to mellomnavn,
 			"etternavn" to etternavn

@@ -8,7 +8,7 @@ import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.UUID
 
 @Service
 class ArrangorServiceImpl(
@@ -43,11 +43,20 @@ class ArrangorServiceImpl(
 		return arrangorer
 	}
 
-	override fun getOrCreateArrangor(virksomhetsnummer: String): Arrangor {
-		val maybeArrangor = arrangorRepository.getByOrganisasjonsnummer(virksomhetsnummer)
+	override fun getOrCreateArrangor(arrangor: Arrangor): Arrangor {
+		val maybeArrangor = arrangorRepository.getByOrganisasjonsnummer(arrangor.organisasjonsnummer)
 		if (maybeArrangor != null) return maybeArrangor.toArrangor()
 
-		return opprettArrangor(virksomhetsnummer)
+		arrangorRepository.insert(
+			id = arrangor.id,
+			navn = arrangor.navn,
+			organisasjonsnummer = arrangor.organisasjonsnummer,
+			overordnetEnhetNavn = arrangor.overordnetEnhetNavn,
+			overordnetEnhetOrganisasjonsnummer = arrangor.overordnetEnhetOrganisasjonsnummer,
+		)
+
+		return arrangorRepository.getById(arrangor.id).toArrangor()
+			.also { dataPublisherService.publish(it.id, DataPublishType.ARRANGOR) }
 	}
 
 	override fun getArrangorByVirksomhetsnummer(virksomhetsnummer: String): Arrangor? {
@@ -91,21 +100,6 @@ class ArrangorServiceImpl(
 			return OverordnetEnhet(nyOverordnetEnhet?.navn, nyOverordnetEnhet?.organisasjonsnummer)
 		}
 		return OverordnetEnhet(original.overordnetEnhetNavn, original.overordnetEnhetOrganisasjonsnummer)
-	}
-
-	private fun opprettArrangor(virksomhetsnummer: String): Arrangor {
-		val arrangor = enhetsregisterClient.hentVirksomhet(virksomhetsnummer)
-		val id = UUID.randomUUID()
-		arrangorRepository.insert(
-			id = id,
-			navn = arrangor.navn,
-			organisasjonsnummer = arrangor.organisasjonsnummer,
-			overordnetEnhetNavn = arrangor.overordnetEnhetNavn,
-			overordnetEnhetOrganisasjonsnummer = arrangor.overordnetEnhetOrganisasjonsnummer,
-		)
-
-		return arrangorRepository.getById(id).toArrangor()
-			.also { dataPublisherService.publish(it.id, DataPublishType.ARRANGOR) }
 	}
 
 	private data class OverordnetEnhet(

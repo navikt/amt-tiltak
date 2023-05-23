@@ -13,6 +13,7 @@ import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.log.SecureLog.secureLog
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.arrangor.AmtArrangorService
+import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.arrangor.tilArrangorAnsattRoller
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -107,21 +108,20 @@ open class ArrangorAnsattTilgangServiceImpl(
 	}
 
 	private fun synkroniserAltinnRettigheter(ansattPersonligIdent: String) {
-		val altinnRoller = amtArrangorService.hentTiltaksarrangorRoller(ansattPersonligIdent)
-		val maybeAnsatt = arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
-		if (altinnRoller.isEmpty() && maybeAnsatt == null) {
+		val ansatt = amtArrangorService.getAnsatt(ansattPersonligIdent)
+		if (ansatt == null || ansatt.arrangorer.isEmpty()) {
 			log.warn("En ikke-ansatt har logget inn, men hadde ikke tilganger i Altinn.")
 			return
 		}
-
-		val ansatt = arrangorAnsattService.opprettAnsattHvisIkkeFinnes(ansattPersonligIdent)
+		arrangorAnsattService.createOrUpdateAnsatt(ansatt)
 
 		val lagredeAnsattTilganger = ansattRolleService.hentAktiveRoller(ansatt.id)
 			.flatMap { it.roller.map { r -> AnsattTilgang(it.arrangorId, r) } }
 
+		val altinnRoller = ansatt.tilArrangorAnsattRoller()
 		val altinnTilganger = altinnRoller
 			.flatMap {
-				val arrangor = arrangorService.getOrCreateArrangor(it.organisasjonsnummer)
+				val arrangor = arrangorService.getOrCreateArrangor(it.arrangor)
 
 				return@flatMap it.roller.map { rolle -> AnsattTilgang(arrangor.id, rolle) }
 			}

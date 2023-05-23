@@ -5,14 +5,14 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
-import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
+import no.nav.amt.tiltak.core.domain.arrangor.ArrangorAnsatt
 import java.util.UUID
 
 class AmtArrangorServiceTest : FunSpec({
 	val amtArrangorClient = mockk<AmtArrangorClient>()
 	val amtArrangorService = AmtArrangorService(amtArrangorClient)
 
-	test("Henter roller fra amt-arrangør") {
+	test("Henter ansatt fra amt-arrangør") {
 		val personident = "12345678910"
 		val orgnummer1 = "98879887"
 		val orgnummer2 = "12341234"
@@ -46,10 +46,10 @@ class AmtArrangorServiceTest : FunSpec({
 			)
 		)
 
-		val ansattRoller = amtArrangorService.hentTiltaksarrangorRoller(personident)
+		val ansatt = amtArrangorService.getAnsatt(personident)
 
-		ansattRoller.size shouldBe 2
-		ansattRoller.find { it.organisasjonsnummer == orgnummer1 }?.roller shouldBe listOf(ArrangorAnsattRolle.KOORDINATOR)
-		ansattRoller.find { it.organisasjonsnummer == orgnummer2 }?.roller shouldBe listOf(ArrangorAnsattRolle.VEILEDER)
+		ansatt?.arrangorer?.size shouldBe 2
+		ansatt?.arrangorer?.find { it.arrangor.organisasjonsnummer == orgnummer1 }?.roller shouldBe listOf(ArrangorAnsatt.AnsattRolle.KOORDINATOR)
+		ansatt?.arrangorer?.find { it.arrangor.organisasjonsnummer == orgnummer2 }?.roller shouldBe listOf(ArrangorAnsatt.AnsattRolle.VEILEDER)
 	}
 })

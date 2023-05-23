@@ -499,7 +499,7 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_2_VEILEDER_1)
 		mockArrangorServer.addAnsattResponse(
 			ansattDto = AmtArrangorClient.AnsattDto(
-				id = UUID.randomUUID(),
+				id = ARRANGOR_ANSATT_2.id,
 				personalia = AmtArrangorClient.PersonaliaDto(ARRANGOR_ANSATT_2.personligIdent, null, AmtArrangorClient.Navn("", null, "")),
 				arrangorer = listOf(
 					AmtArrangorClient.TilknyttetArrangorDto(

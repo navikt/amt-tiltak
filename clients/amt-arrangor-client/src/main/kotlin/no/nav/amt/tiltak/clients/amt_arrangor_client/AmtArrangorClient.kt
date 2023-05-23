@@ -5,6 +5,7 @@ import no.nav.common.rest.client.RestClient.baseClient
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.slf4j.LoggerFactory
 import java.util.UUID
 import java.util.function.Supplier
 
@@ -14,7 +15,9 @@ class AmtArrangorClient(
 	private val httpClient: OkHttpClient = baseClient()
 ) {
 
-	fun hentAnsatt(personident: String): AnsattDto {
+	private val log = LoggerFactory.getLogger(javaClass)
+
+	fun hentAnsatt(personident: String): AnsattDto? {
 		val request = Request.Builder()
 			.url("$baseUrl/api/service/ansatt")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
@@ -22,6 +25,10 @@ class AmtArrangorClient(
 			.build()
 		httpClient.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
+				if (response.code == 404) {
+					log.info("Ansatt finnes ikke hos amt-arrangør")
+					return null
+				}
 				throw RuntimeException("Kunne ikke hente ansatt fra amt-arrangør. Status=${response.code}")
 			}
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing")

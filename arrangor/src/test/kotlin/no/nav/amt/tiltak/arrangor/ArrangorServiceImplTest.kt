@@ -6,10 +6,11 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.clients.amt_enhetsregister.Virksomhet
+import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorUpdate
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 class ArrangorServiceImplTest: FunSpec({
 	lateinit var enhetsregisterClient: EnhetsregisterClient
@@ -32,15 +33,17 @@ class ArrangorServiceImplTest: FunSpec({
 		val organisasjonsnummer = "1234"
 		val overordnetEnhetNavn = "Test2"
 		val overordnetEnhetOrganisasjonsnummer = "5678"
-		every { arrangorRepository.getByOrganisasjonsnummer(organisasjonsnummer) } returns null
-		every { enhetsregisterClient.hentVirksomhet(organisasjonsnummer) } returns Virksomhet(
+		val arrangorId = UUID.randomUUID()
+		val arrangor = Arrangor(
+			id = arrangorId,
 			navn = navn,
 			organisasjonsnummer = organisasjonsnummer,
 			overordnetEnhetOrganisasjonsnummer = overordnetEnhetOrganisasjonsnummer,
-			overordnetEnhetNavn = overordnetEnhetNavn,
+			overordnetEnhetNavn = overordnetEnhetNavn
 		)
+		every { arrangorRepository.getByOrganisasjonsnummer(organisasjonsnummer) } returns null
 		every { arrangorRepository.getById(any()) } returns ArrangorDbo(
-			id = UUID.randomUUID(),
+			id = arrangorId,
 			navn = navn,
 			organisasjonsnummer = organisasjonsnummer,
 			overordnetEnhetOrganisasjonsnummer = overordnetEnhetOrganisasjonsnummer,
@@ -49,7 +52,7 @@ class ArrangorServiceImplTest: FunSpec({
 			modifiedAt = LocalDateTime.now(),
 		)
 
-		arrangorService.getOrCreateArrangor(organisasjonsnummer)
+		arrangorService.getOrCreateArrangor(arrangor)
 
 		verify(exactly = 1) { arrangorRepository.insert(any(), navn, organisasjonsnummer, overordnetEnhetNavn, overordnetEnhetOrganisasjonsnummer) }
 
@@ -60,8 +63,16 @@ class ArrangorServiceImplTest: FunSpec({
 		val organisasjonsnummer = "1234"
 		val overordnetEnhetNavn = "Test2"
 		val overordnetEnhetOrganisasjonsnummer = "5678"
+		val arrangorId = UUID.randomUUID()
+		val arrangor = Arrangor(
+			id = arrangorId,
+			navn = navn,
+			organisasjonsnummer = organisasjonsnummer,
+			overordnetEnhetOrganisasjonsnummer = overordnetEnhetOrganisasjonsnummer,
+			overordnetEnhetNavn = overordnetEnhetNavn
+		)
 		every { arrangorRepository.getByOrganisasjonsnummer(organisasjonsnummer) } returns ArrangorDbo(
-			id = UUID.randomUUID(),
+			id = arrangorId,
 			navn = navn,
 			organisasjonsnummer = organisasjonsnummer,
 			overordnetEnhetOrganisasjonsnummer = overordnetEnhetOrganisasjonsnummer,
@@ -70,7 +81,7 @@ class ArrangorServiceImplTest: FunSpec({
 			modifiedAt = LocalDateTime.now(),
 		)
 
-		arrangorService.getOrCreateArrangor(organisasjonsnummer)
+		arrangorService.getOrCreateArrangor(arrangor)
 
 		verify(exactly = 0) { arrangorRepository.insert(any(), any(), any(), any(), any()) }
 	}
