@@ -10,6 +10,7 @@ import no.nav.amt.tiltak.common.json.JsonUtils.toJsonString
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.common.rest.client.RestClient.baseClient
+import no.nav.common.utils.EnvironmentUtils
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -72,6 +73,9 @@ class AmtPersonClientImpl(
 	}
 
 	override fun migrerNavBruker(navBrukerDto: OpprettNavBrukerDto) {
+		// toggler av til NavAnsatt og NavEnhet er migrert
+		if (EnvironmentUtils.isDevelopment().orElse(false) || EnvironmentUtils.isProduction().orElse(false)) return
+
 		val response = httpClient.newCall(buildRequest("migrer/nav-bruker", navBrukerDto)).execute()
 
 		if (!response.isSuccessful) {
