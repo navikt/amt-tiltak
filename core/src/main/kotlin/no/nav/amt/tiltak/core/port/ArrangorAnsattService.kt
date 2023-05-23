@@ -23,5 +23,4 @@ interface ArrangorAnsattService {
 	fun getAnsatteSistSynkronisertEldreEnn(eldreEnn: LocalDateTime, maksAntall: Int): List<Ansatt>
 	fun setVellykketInnlogging(ansattId: UUID)
 	fun getAnsattIdByPersonligIdent(personIdent: String): UUID
-	fun migrerAlle()
 }

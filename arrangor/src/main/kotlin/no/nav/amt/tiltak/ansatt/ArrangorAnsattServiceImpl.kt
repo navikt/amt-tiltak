@@ -1,7 +1,5 @@
 package no.nav.amt.tiltak.ansatt
 
-import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
-import no.nav.amt.tiltak.clients.amt_person.dto.OpprettArrangorAnsattDto
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.TilknyttetArrangor
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
@@ -25,7 +23,6 @@ class ArrangorAnsattServiceImpl(
 	private val personService: PersonService,
 	private val arrangorService: ArrangorService,
 	private val dataPublisherService: DataPublisherService,
-	private val amtPersonClient: AmtPersonClient,
 ) : ArrangorAnsattService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -90,37 +87,6 @@ class ArrangorAnsattServiceImpl(
 		arrangorAnsattRepository.setVelykketInnlogging(ansattId)
 	}
 
-	override fun migrerAlle() {
-		var offset = 0
-		var ansatte: List<AnsattDbo>
-
-		log.info("Migrerer arrangør ansatte fra amt-tiltak til amt-person-service")
-		do {
-			ansatte = arrangorAnsattRepository.getAnsatte(offset)
-
-			ansatte.forEach { ansatt ->
-				migrerAnsatt(ansatt.toAnsatt(emptyList()))
-			}
-
-			log.info("Migrerte arrangør ansatte fra og med offset: $offset til: ${offset + ansatte.size}")
-			offset += ansatte.size
-		} while (ansatte.isNotEmpty())
-
-		log.info("Migrering fullført. $offset arrangør ansatte ble migrert.")
-	}
-
-	private fun migrerAnsatt(ansatt: Ansatt) {
-		amtPersonClient.migrerArrangorAnsatt(
-			OpprettArrangorAnsattDto(
-				id = ansatt.id,
-				personIdent = ansatt.personligIdent,
-				fornavn = ansatt.fornavn,
-				mellomnavn = ansatt.mellomnavn,
-				etternavn = ansatt.etternavn,
-			)
-		)
-	}
-
 	private fun createAnsatt(ansattPersonIdent: String): Ansatt {
 		val person = personService.hentPerson(ansattPersonIdent)
 
@@ -135,7 +101,6 @@ class ArrangorAnsattServiceImpl(
 		)
 
 		return getAnsatt(nyAnsattId)
-			.also { migrerAnsatt(it) }
 			.also { dataPublisherService.publish(it.id, DataPublishType.ARRANGOR_ANSATT) }
 	}
 

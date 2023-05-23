@@ -1,7 +1,6 @@
 package no.nav.amt.tiltak.bff.internal
 
 import jakarta.servlet.http.HttpServletRequest
-import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.common.job.JobRunner
@@ -18,7 +17,6 @@ import org.springframework.web.server.ResponseStatusException
 class MigreringsController(
 	private val brukerService: BrukerService,
 	private val navAnsattService: NavAnsattService,
-	private val arrangorAnsattService: ArrangorAnsattService,
 ) {
 
 	@PostMapping("/nav-bruker")
@@ -34,15 +32,6 @@ class MigreringsController(
 	fun migrerNavAnsatte(request: HttpServletRequest) {
 		if (isInternal(request)) {
 			JobRunner.runAsync("migrer_nav_ansatte_til_amt_person", navAnsattService::migrerAlle)
-		} else {
-			throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
-		}
-	}
-
-	@PostMapping("/arrangor-ansatt")
-	fun migrerArrangorAnsatte(request: HttpServletRequest) {
-		if (isInternal(request)) {
-			JobRunner.runAsync("migrer_arrangor_ansatte_til_amt_person", arrangorAnsattService::migrerAlle)
 		} else {
 			throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
 		}

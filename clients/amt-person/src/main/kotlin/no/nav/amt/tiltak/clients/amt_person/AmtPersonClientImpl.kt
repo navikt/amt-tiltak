@@ -1,6 +1,9 @@
 package no.nav.amt.tiltak.clients.amt_person
 
-import no.nav.amt.tiltak.clients.amt_person.dto.*
+import no.nav.amt.tiltak.clients.amt_person.dto.NavAnsattDto
+import no.nav.amt.tiltak.clients.amt_person.dto.NavBrukerDto
+import no.nav.amt.tiltak.clients.amt_person.dto.NavEnhetDto
+import no.nav.amt.tiltak.clients.amt_person.dto.OpprettNavBrukerDto
 import no.nav.amt.tiltak.clients.amt_person.model.NavBruker
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.common.json.JsonUtils.toJsonString
@@ -100,15 +103,6 @@ class AmtPersonClientImpl(
 			log.error("Klarte ikke å opprette nav ansatt med id: ${navEnhetDto.id}. Status=${response.code}")
 		}
 	}
-
-	override fun migrerArrangorAnsatt(arrangorAnsattDto: OpprettArrangorAnsattDto) {
-		val response = httpClient.newCall(buildRequest("migrer/arrangor-ansatt", arrangorAnsattDto)).execute()
-
-		if (!response.isSuccessful) {
-			log.error("Klarte ikke å opprette nav ansatt med id: ${arrangorAnsattDto.id}. Status=${response.code}")
-		}
-	}
-
 
 	private fun <T> hentEllerOpprett(endepunkt: String, requestBody: Any, fn: (body: String) -> T): Result<T> {
 		val request = buildRequest(endepunkt, requestBody)
