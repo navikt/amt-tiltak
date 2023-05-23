@@ -8,8 +8,8 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.date.shouldBeAfter
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.common.json.JsonUtils
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.core.domain.tiltak.EndringsmeldingStatusAarsak
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.DbUtils.shouldBeCloseTo
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
@@ -223,7 +223,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		val id = UUID.randomUUID()
 		val innhold = EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold(
 			LocalDate.now(),
-			EndringsmeldingDbo.DeltakerStatusAarsak(DeltakerStatus.Aarsak.Type.UTDANNING)
+			EndringsmeldingStatusAarsak(EndringsmeldingStatusAarsak.Type.UTDANNING)
 		)
 
 		repository.insert(
@@ -245,7 +245,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 	test("insert - skal inserte aktiv deltakerIkkeAktuellEndringsmelding") {
 		val id = UUID.randomUUID()
 		val innhold = EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold(
-			EndringsmeldingDbo.DeltakerStatusAarsak(DeltakerStatus.Aarsak.Type.UTDANNING)
+			EndringsmeldingStatusAarsak(EndringsmeldingStatusAarsak.Type.UTDANNING)
 		)
 
 		repository.insert(

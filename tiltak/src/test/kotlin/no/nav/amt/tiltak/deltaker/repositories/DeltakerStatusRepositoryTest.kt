@@ -44,14 +44,14 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 			id = UUID.randomUUID(),
 			deltakerId = deltakerCmd.id,
 			type = VENTER_PA_OPPSTART,
-			aarsak=DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.FERDIG),
+			aarsak = DeltakerStatus.Aarsak.AVLYST_KONTRAKT,
 			gyldigFra = lastweek
 		)
 		val status2 = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
 			deltakerId = deltakerCmd.id,
 			type = DELTAR,
-			aarsak= DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.ANNET, null),
+			aarsak= DeltakerStatus.Aarsak.ANNET,
 			gyldigFra = yesterday
 		)
 		val now = LocalDateTime.now()

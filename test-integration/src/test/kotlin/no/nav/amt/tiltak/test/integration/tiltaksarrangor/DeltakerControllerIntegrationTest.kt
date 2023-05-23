@@ -7,6 +7,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.beInstanceOf
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.core.domain.tiltak.EndringsmeldingStatusAarsak
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -32,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
-import java.util.UUID
+import java.util.*
 
 class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
@@ -415,7 +416,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.AvsluttDeltakelseInnhold>()
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 		(endringsmelding.innhold as Endringsmelding.Innhold.AvsluttDeltakelseInnhold).sluttdato shouldBe LocalDate.parse(dato)
-		(endringsmelding.innhold as Endringsmelding.Innhold.AvsluttDeltakelseInnhold).aarsak.type shouldBe DeltakerStatus.Aarsak.Type.FATT_JOBB
+		(endringsmelding.innhold as Endringsmelding.Innhold.AvsluttDeltakelseInnhold).aarsak.type shouldBe EndringsmeldingStatusAarsak.Type.FATT_JOBB
 	}
 
 	@Test
@@ -528,7 +529,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val endringsmelding = endringsmeldinger.first()
 		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold>()
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
-		(endringsmelding.innhold as Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold).aarsak.type shouldBe DeltakerStatus.Aarsak.Type.FATT_JOBB
+		(endringsmelding.innhold as Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold).aarsak.type shouldBe EndringsmeldingStatusAarsak.Type.FATT_JOBB
 	}
 
 	@Test

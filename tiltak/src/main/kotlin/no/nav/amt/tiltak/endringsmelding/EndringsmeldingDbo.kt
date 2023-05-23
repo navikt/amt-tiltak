@@ -1,10 +1,10 @@
 package no.nav.amt.tiltak.endringsmelding
 
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.core.domain.tiltak.EndringsmeldingStatusAarsak
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import java.util.UUID
+import java.util.*
 
 data class EndringsmeldingDbo(
 	val id: UUID,
@@ -31,11 +31,6 @@ data class EndringsmeldingDbo(
 		ENDRE_SLUTTDATO
 	}
 
-	data class DeltakerStatusAarsak(
-		val type: DeltakerStatus.Aarsak.Type,
-		val beskrivelse: String? = null,
-	)
-
 	sealed class Innhold {
 		data class LeggTilOppstartsdatoInnhold(
 			val oppstartsdato: LocalDate
@@ -51,11 +46,11 @@ data class EndringsmeldingDbo(
 
 		data class AvsluttDeltakelseInnhold(
 			val sluttdato: LocalDate,
-			val aarsak: DeltakerStatusAarsak,
+			val aarsak: EndringsmeldingStatusAarsak,
 		) : Innhold()
 
 		data class DeltakerIkkeAktuellInnhold(
-			val aarsak: DeltakerStatusAarsak,
+			val aarsak: EndringsmeldingStatusAarsak,
 		) : Innhold()
 
 		data class EndreDeltakelseProsentInnhold(

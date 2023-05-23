@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.endringsmelding
 
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.core.domain.tiltak.EndringsmeldingStatusAarsak
 import no.nav.amt.tiltak.core.exceptions.EndringsmeldingIkkeAktivException
 import no.nav.amt.tiltak.core.port.AuditLoggerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 @Service
 open class EndringsmeldingServiceImpl(
@@ -145,10 +145,9 @@ open class EndringsmeldingServiceImpl(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
 		sluttdato: LocalDate,
-		statusAarsak: DeltakerStatus.Aarsak
+		statusAarsak: EndringsmeldingStatusAarsak
 	) {
-		val aarsak = EndringsmeldingDbo.DeltakerStatusAarsak(statusAarsak.type, statusAarsak.beskrivelse)
-		val innhold = EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold(sluttdato, aarsak)
+		val innhold = EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold(sluttdato, statusAarsak)
 		opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
@@ -161,10 +160,9 @@ open class EndringsmeldingServiceImpl(
 	override fun opprettDeltakerIkkeAktuellEndringsmelding(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
-		statusAarsak: DeltakerStatus.Aarsak
+		statusAarsak: EndringsmeldingStatusAarsak
 	) {
-		val aarsak = EndringsmeldingDbo.DeltakerStatusAarsak(statusAarsak.type, statusAarsak.beskrivelse)
-		val innhold = EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold(aarsak)
+		val innhold = EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold(statusAarsak)
 		opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
@@ -254,11 +252,11 @@ open class EndringsmeldingServiceImpl(
 				Endringsmelding.Innhold.ForlengDeltakelseInnhold(this.sluttdato)
 			is EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold ->
 				Endringsmelding.Innhold.AvsluttDeltakelseInnhold(
-					this.sluttdato, DeltakerStatus.Aarsak(this.aarsak.type, this.aarsak.beskrivelse)
+					this.sluttdato, EndringsmeldingStatusAarsak(this.aarsak.type, this.aarsak.beskrivelse)
 				)
 			is EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold ->
 				Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold(
-					DeltakerStatus.Aarsak(this.aarsak.type, this.aarsak.beskrivelse)
+					EndringsmeldingStatusAarsak(this.aarsak.type, this.aarsak.beskrivelse)
 				)
 
 			is EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold ->

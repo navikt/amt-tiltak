@@ -18,7 +18,7 @@ import no.nav.amt.tiltak.kafka.tiltaksgjennomforing_ingestor.GjennomforingStatus
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
-import java.util.UUID
+import java.util.*
 
 @Service
 class DeltakerProcessor(
@@ -155,16 +155,13 @@ class DeltakerProcessor(
 
 	private fun tilDeltakerAarsak(aarsak: DeltakerPayload.StatusAarsak?): DeltakerStatus.Aarsak? {
 		return when(aarsak){
-			DeltakerPayload.StatusAarsak.SYK -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.SYK)
-			DeltakerPayload.StatusAarsak.FATT_JOBB -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.FATT_JOBB)
-			DeltakerPayload.StatusAarsak.TRENGER_ANNEN_STOTTE -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.TRENGER_ANNEN_STOTTE)
-			DeltakerPayload.StatusAarsak.FIKK_IKKE_PLASS -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.FIKK_IKKE_PLASS)
-			DeltakerPayload.StatusAarsak.UTDANNING -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.UTDANNING)
-			DeltakerPayload.StatusAarsak.FERDIG -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.FERDIG)
-			DeltakerPayload.StatusAarsak.AVLYST_KONTRAKT -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.AVLYST_KONTRAKT)
-			DeltakerPayload.StatusAarsak.IKKE_MOTT -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.IKKE_MOTT)
-			DeltakerPayload.StatusAarsak.OPPFYLLER_IKKE_KRAVENE -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.OPPFYLLER_IKKE_KRAVENE, null)
-			DeltakerPayload.StatusAarsak.ANNET -> DeltakerStatus.Aarsak(DeltakerStatus.Aarsak.Type.ANNET, null)
+			DeltakerPayload.StatusAarsak.SYK -> DeltakerStatus.Aarsak.SYK
+			DeltakerPayload.StatusAarsak.FATT_JOBB -> DeltakerStatus.Aarsak.FATT_JOBB
+			DeltakerPayload.StatusAarsak.TRENGER_ANNEN_STOTTE -> DeltakerStatus.Aarsak.TRENGER_ANNEN_STOTTE
+			DeltakerPayload.StatusAarsak.FIKK_IKKE_PLASS -> DeltakerStatus.Aarsak.FIKK_IKKE_PLASS
+			DeltakerPayload.StatusAarsak.AVLYST_KONTRAKT -> DeltakerStatus.Aarsak.AVLYST_KONTRAKT
+			DeltakerPayload.StatusAarsak.IKKE_MOTT -> DeltakerStatus.Aarsak.IKKE_MOTT
+			DeltakerPayload.StatusAarsak.ANNET -> DeltakerStatus.Aarsak.ANNET
 			else -> null
 		}
 	}

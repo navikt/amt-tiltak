@@ -1,11 +1,10 @@
 package no.nav.amt.tiltak.data_publisher.model
-
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.EndringsmeldingStatusAarsak
 import no.nav.common.json.JsonUtils
 import org.springframework.util.DigestUtils
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 data class EndringsmeldingPublishDto(
 	val id: UUID,
@@ -33,8 +32,8 @@ enum class Type {
 	ENDRE_SLUTTDATO
 }
 
-data class DeltakerStatusAarsak(
-	val type: DeltakerStatus.Aarsak.Type,
+data class EndringsmeldingStatusAarsakDto(
+	val type: EndringsmeldingStatusAarsak.Type,
 	val beskrivelse: String? = null,
 )
 
@@ -53,11 +52,11 @@ sealed class Innhold {
 
 	data class AvsluttDeltakelseInnhold(
 		val sluttdato: LocalDate,
-		val aarsak: DeltakerStatusAarsak,
+		val aarsak: EndringsmeldingStatusAarsakDto,
 	) : Innhold()
 
 	data class DeltakerIkkeAktuellInnhold(
-		val aarsak: DeltakerStatusAarsak,
+		val aarsak: EndringsmeldingStatusAarsakDto,
 	) : Innhold()
 
 	data class EndreDeltakelseProsentInnhold(
