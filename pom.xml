@@ -17,7 +17,6 @@
         <module>core</module>
         <module>db-migrations</module>
         <module>kafka</module>
-        <module>mocks</module>
         <module>navansatt</module>
         <module>test</module>
         <module>tiltak</module>
@@ -435,12 +434,6 @@
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>test-utils</artifactId>
-                <version>${project.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>mocks</artifactId>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
