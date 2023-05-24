@@ -29,6 +29,7 @@ class AmtArrangorClient(
 					log.info("Ansatt finnes ikke hos amt-arrangør")
 					return null
 				}
+				log.error("Kunne ikke hente ansatt fra amt-arrangør. Status=${response.code}")
 				throw RuntimeException("Kunne ikke hente ansatt fra amt-arrangør. Status=${response.code}")
 			}
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
@@ -48,6 +49,7 @@ class AmtArrangorClient(
 					log.info("Arrangør med orgnummer $orgnummer finnes ikke hos amt-arrangør")
 					return null
 				}
+				log.error("Kunne ikke hente arrangør med orgnummer $orgnummer fra amt-arrangør. Status=${response.code}")
 				throw RuntimeException("Kunne ikke hente arrangør med orgnummer $orgnummer fra amt-arrangør. Status=${response.code}")
 			}
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
