@@ -1,9 +1,9 @@
 package no.nav.amt.tiltak.core.port
 
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.core.domain.tiltak.EndringsmeldingStatusAarsak
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 interface EndringsmeldingService {
 
@@ -25,9 +25,9 @@ interface EndringsmeldingService {
 
 	fun opprettEndreDeltakelseProsentEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, deltakerProsent: Int, dagerPerUke: Int?, gyldigFraDato: LocalDate?)
 
-	fun opprettAvsluttDeltakelseEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate, statusAarsak: DeltakerStatus.Aarsak)
+	fun opprettAvsluttDeltakelseEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate, statusAarsak: EndringsmeldingStatusAarsak)
 
-	fun opprettDeltakerIkkeAktuellEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, statusAarsak: DeltakerStatus.Aarsak)
+	fun opprettDeltakerIkkeAktuellEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, statusAarsak: EndringsmeldingStatusAarsak)
 
     fun markerSomTilbakekalt(id: UUID)
 
