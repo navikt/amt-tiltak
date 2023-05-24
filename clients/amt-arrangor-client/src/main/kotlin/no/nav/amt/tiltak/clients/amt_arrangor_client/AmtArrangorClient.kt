@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.clients.amt_arrangor_client
 
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.common.rest.client.RestClient.baseClient
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -16,12 +17,13 @@ class AmtArrangorClient(
 ) {
 
 	private val log = LoggerFactory.getLogger(javaClass)
+	private val mediaTypeJson = "application/json".toMediaType()
 
 	fun hentAnsatt(personident: String): AnsattDto? {
 		val request = Request.Builder()
 			.url("$baseUrl/api/service/ansatt")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
-			.post(JsonUtils.toJsonString(AnsattRequestBody(personident)).toRequestBody())
+			.post(JsonUtils.toJsonString(AnsattRequestBody(personident)).toRequestBody(mediaTypeJson))
 			.build()
 		httpClient.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
