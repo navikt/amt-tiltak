@@ -4,6 +4,8 @@ import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerDetaljerDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.NavEnhetDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.VeilederDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
+import no.nav.amt.tiltak.common.auth.AuthService
+import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeileder
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.skjulesForAlleAktorer
@@ -12,15 +14,17 @@ import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavAnsattService
+import org.slf4j.MDC
 import org.springframework.stereotype.Service
-import java.util.UUID
+import java.util.*
 
 @Service
 open class ControllerService(
 	private val arrangorAnsattService: ArrangorAnsattService,
 	private val deltakerService: DeltakerService,
 	private val gjennomforingService: GjennomforingService,
-	private val navAnsattService: NavAnsattService
+	private val navAnsattService: NavAnsattService,
+	private val authService: AuthService
 ) {
 
 	open fun getDeltakerDetaljerById(deltakerId: UUID): DeltakerDetaljerDto {
@@ -73,6 +77,13 @@ open class ControllerService(
 				etternavn = ansatt.etternavn,
 			)
 		}
+	}
+
+	fun hentInnloggetAnsatt(): Ansatt {
+		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
+		return arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
+			.also { MDC.put("ansatt-id", it?.id.toString()) }
+			?: throw UnauthorizedException("Arrangor ansatt finnes ikke")
 	}
 
 }
