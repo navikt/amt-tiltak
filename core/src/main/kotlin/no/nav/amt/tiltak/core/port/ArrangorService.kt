@@ -6,7 +6,7 @@ import java.util.UUID
 
 interface ArrangorService {
 
-	fun upsertArrangor(virksomhetsnummer: String): Arrangor//
+	fun upsertArrangor(virksomhetsnummer: String): Arrangor
 
 	fun getArrangorByVirksomhetsnummer(virksomhetsnummer: String): Arrangor?
 
@@ -16,6 +16,6 @@ interface ArrangorService {
 
 	fun getOrCreateArrangor(arrangor: Arrangor): Arrangor
 
-	fun oppdaterArrangor(arrangorUpdate: ArrangorUpdate)//
+	fun oppdaterArrangor(arrangorUpdate: ArrangorUpdate)
 
 }

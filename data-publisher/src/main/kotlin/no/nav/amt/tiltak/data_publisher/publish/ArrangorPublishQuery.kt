@@ -1,17 +1,17 @@
 package no.nav.amt.tiltak.data_publisher.publish
 
-import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
+import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.data_publisher.model.ArrangorPublishDto
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.util.*
+import java.util.UUID
 
 class ArrangorPublishQuery(
 	private val template: NamedParameterJdbcTemplate,
-	private val enhetsregisterClient: EnhetsregisterClient
+	private val amtArrangorClient: AmtArrangorClient
 ) {
 
 	fun get(id: UUID): ArrangorPublishDto {
@@ -56,13 +56,13 @@ class ArrangorPublishQuery(
 															overordnet_enhet_organisasjonsnummer = :overordnetEnhetOrganisasjonsnummer
 		""".trimIndent()
 
-		enhetsregisterClient.hentVirksomhet(orgNr).let { virksomhet ->
+		amtArrangorClient.hentArrangor(orgNr)?.let { arrangor ->
 			val params = sqlParameters(
-				"id" to UUID.randomUUID(),
-				"navn" to virksomhet.navn,
-				"organisasjonsnummer" to virksomhet.organisasjonsnummer,
-				"overordnetEnhetOrganisasjonsnummer" to virksomhet.overordnetEnhetOrganisasjonsnummer,
-				"overordnetEnhetNavn" to virksomhet.overordnetEnhetNavn
+				"id" to arrangor.id,
+				"navn" to arrangor.navn,
+				"organisasjonsnummer" to arrangor.organisasjonsnummer,
+				"overordnetEnhetOrganisasjonsnummer" to arrangor.overordnetArrangorOrgnummer,
+				"overordnetEnhetNavn" to arrangor.overordnetArrangorNavn
 			)
 
 			template.update(sql, params)

@@ -48,7 +48,6 @@ abstract class IntegrationTestBase {
 
 	companion object {
 		val mockOAuthServer = MockOAuthServer()
-		val mockEnhetsregisterServer = MockAmtEnhetsregisterServer()
 		val mockArrangorServer = MockAmtArrangorServer()
 		val mockNorgHttpServer = MockNorgHttpServer()
 		val mockPoaoTilgangHttpServer = MockPoaoTilgangHttpServer()
@@ -90,10 +89,6 @@ abstract class IntegrationTestBase {
 			registry.add("mulighetsrommet-api.url") { mockMulighetsrommetApiServer.serverUrl() }
 			registry.add("mulighetsrommet-api.scope") { "test.mulighetsrommet-api" }
 
-			mockEnhetsregisterServer.start()
-			registry.add("amt-enhetsregister.url") { mockEnhetsregisterServer.serverUrl() }
-			registry.add("amt-enhetsregister.scope") { "test.amt-enhetsregister" }
-
 			mockNorgHttpServer.start()
 			registry.add("norg.url") { mockNorgHttpServer.serverUrl() }
 
@@ -127,7 +122,6 @@ abstract class IntegrationTestBase {
 	}
 
 	fun resetMockServers() {
-		mockEnhetsregisterServer.reset()
 		mockNorgHttpServer.reset()
 		mockPoaoTilgangHttpServer.reset()
 		mockNomHttpServer.reset()

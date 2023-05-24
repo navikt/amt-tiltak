@@ -1,18 +1,18 @@
 package no.nav.amt.tiltak.arrangor
 
-import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorUpdate
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
+import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.arrangor.AmtArrangorService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
 class ArrangorServiceImpl(
-	private val enhetsregisterClient: EnhetsregisterClient,
+	private val amtArrangorService: AmtArrangorService,
 	private val arrangorRepository: ArrangorRepository,
 	private val dataPublisherService: DataPublisherService
 ) : ArrangorService {
@@ -20,9 +20,10 @@ class ArrangorServiceImpl(
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun upsertArrangor(virksomhetsnummer: String): Arrangor {
-		val arrangor = enhetsregisterClient.hentVirksomhet(virksomhetsnummer)
+		val arrangor = amtArrangorService.getArrangor(virksomhetsnummer) ?: throw RuntimeException("Kunne ikke hente arrangør med orgnummer $virksomhetsnummer")
 
 		return arrangorRepository.upsert(
+			id = arrangor.id,
 			navn = arrangor.navn,
 			organisasjonsnummer = arrangor.organisasjonsnummer,
 			overordnetEnhetNavn = arrangor.overordnetEnhetNavn,
@@ -95,7 +96,7 @@ class ArrangorServiceImpl(
 	private fun hentOverordnetEnhet(arrangorUpdate: ArrangorUpdate, original: Arrangor) : OverordnetEnhet {
 		if (arrangorUpdate.overordnetEnhetOrganisasjonsnummer != original.overordnetEnhetOrganisasjonsnummer) {
 			val nyOverordnetEnhet = arrangorUpdate.overordnetEnhetOrganisasjonsnummer?.let {
-				enhetsregisterClient.hentVirksomhet(it)
+				amtArrangorService.getArrangor(it) ?: throw RuntimeException("Kunne ikke hente arrangør med orgnummer $it")
 			}
 			return OverordnetEnhet(nyOverordnetEnhet?.navn, nyOverordnetEnhet?.organisasjonsnummer)
 		}

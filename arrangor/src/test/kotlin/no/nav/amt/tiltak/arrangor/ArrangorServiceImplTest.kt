@@ -4,26 +4,25 @@ import io.kotest.core.spec.style.FunSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
-import no.nav.amt.tiltak.clients.amt_enhetsregister.Virksomhet
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorUpdate
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
+import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.arrangor.AmtArrangorService
 import java.time.LocalDateTime
 import java.util.UUID
 
 class ArrangorServiceImplTest: FunSpec({
-	lateinit var enhetsregisterClient: EnhetsregisterClient
+	lateinit var amtArrangorService: AmtArrangorService
 	lateinit var arrangorRepository: ArrangorRepository
 	lateinit var publisherService: DataPublisherService
 
 	lateinit var arrangorService: ArrangorServiceImpl
 
 	beforeEach {
-		enhetsregisterClient = mockk()
+		amtArrangorService = mockk()
 		arrangorRepository = mockk(relaxUnitFun = true)
 		publisherService = mockk()
-		arrangorService = ArrangorServiceImpl(enhetsregisterClient, arrangorRepository, publisherService)
+		arrangorService = ArrangorServiceImpl(amtArrangorService, arrangorRepository, publisherService)
 
 		every { publisherService.publish(any(), any()) } returns Unit
 	}
@@ -103,7 +102,8 @@ class ArrangorServiceImplTest: FunSpec({
 
 		val nyttOverordnetEnhetNavn = "Ny Overordnet Enhet"
 
-		every { enhetsregisterClient.hentVirksomhet(arrangorUpdate.overordnetEnhetOrganisasjonsnummer!!) } returns Virksomhet(
+		every { amtArrangorService.getArrangor(arrangorUpdate.overordnetEnhetOrganisasjonsnummer!!) } returns Arrangor(
+			id = id,
 			navn = nyttOverordnetEnhetNavn,
 			organisasjonsnummer = arrangorUpdate.overordnetEnhetOrganisasjonsnummer!!,
 			overordnetEnhetNavn = "Baz",
@@ -112,7 +112,7 @@ class ArrangorServiceImplTest: FunSpec({
 
 		arrangorService.oppdaterArrangor(arrangorUpdate)
 
-		verify(exactly = 1) { enhetsregisterClient.hentVirksomhet(any()) }
+		verify(exactly = 1) { amtArrangorService.getArrangor(any()) }
 		verify(exactly = 1) { arrangorRepository.updateUnderenheterIfAny(arrangorUpdate.organisasjonsnummer, arrangorUpdate.navn) }
 
 		verify(exactly = 1) { arrangorRepository.update( ArrangorUpdateDbo(

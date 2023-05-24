@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.test.integration.kafka
 
 import io.kotest.matchers.shouldBe
-import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetDto
+import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
@@ -13,18 +13,35 @@ import no.nav.amt.tiltak.test.utils.AsyncUtils
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.util.*
+import java.util.UUID
 
 class VirksomhetIngestorTest : IntegrationTestBase() {
 
 	@Autowired
 	lateinit var arrangorService: ArrangorService
 
-
 	@BeforeEach
 	fun setup() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
-		mockEnhetsregisterServer.addEnhet(ARRANGOR_1.toDto())
+		val overordnetArrangor = AmtArrangorClient.ArrangorMedOverordnetArrangor(
+			id = UUID.randomUUID(),
+			navn = ARRANGOR_1.overordnetEnhetNavn!!,
+			organisasjonsnummer = ARRANGOR_1.overordnetEnhetOrganisasjonsnummer!!,
+			overordnetArrangorId = null,
+			overordnetArrangorNavn = null,
+			overordnetArrangorOrgnummer = null,
+			deltakerlister = emptySet()
+		)
+		mockArrangorServer.addArrangorResponse(overordnetArrangor)
+		mockArrangorServer.addArrangorResponse(AmtArrangorClient.ArrangorMedOverordnetArrangor(
+			id = ARRANGOR_1.id,
+			navn = ARRANGOR_1.navn,
+			organisasjonsnummer = ARRANGOR_1.organisasjonsnummer,
+			overordnetArrangorId = overordnetArrangor.id,
+			overordnetArrangorNavn = overordnetArrangor.overordnetArrangorNavn,
+			overordnetArrangorOrgnummer = overordnetArrangor.overordnetArrangorOrgnummer,
+			deltakerlister = emptySet()
+		))
 	}
 
 	@Test
@@ -83,26 +100,23 @@ class VirksomhetIngestorTest : IntegrationTestBase() {
 
 	@Test
 	fun `ingest - nytt overordnet enhet orgnr - skal oppdatere overordnet enhet navn og orgnr`() {
-		val nyOverordnetEnhet = EnhetDto(
-			organisasjonsnummer = "999123456",
+		val nyOverordnetArrangor = AmtArrangorClient.ArrangorMedOverordnetArrangor(
+			id = UUID.randomUUID(),
 			navn = "Ny Overordnet Enhet",
-			overordnetEnhetNavn = "Mor Org",
-			overordnetEnhetOrganisasjonsnummer = "888666555",
+			organisasjonsnummer = "999123456",
+			overordnetArrangorId = UUID.randomUUID(),
+			overordnetArrangorNavn = "Mor Org",
+			overordnetArrangorOrgnummer = "888666555",
+			deltakerlister = emptySet()
 		)
 
 		val msg = VirksomhetMessage(
 			organisasjonsnummer = ARRANGOR_1.organisasjonsnummer,
 			navn = ARRANGOR_1.navn,
-			overordnetEnhetOrganisasjonsnummer = nyOverordnetEnhet.organisasjonsnummer,
+			overordnetEnhetOrganisasjonsnummer = nyOverordnetArrangor.organisasjonsnummer,
 		)
 
-		mockEnhetsregisterServer.addEnhet(nyOverordnetEnhet)
-		mockEnhetsregisterServer.addEnhet(EnhetDto(
-			organisasjonsnummer = msg.organisasjonsnummer,
-			navn = msg.navn,
-			overordnetEnhetOrganisasjonsnummer = msg.overordnetEnhetOrganisasjonsnummer,
-			overordnetEnhetNavn = ""
-		))
+		mockArrangorServer.addArrangorResponse(nyOverordnetArrangor)
 
 		kafkaMessageSender.sendTilVirksomhetTopic(
 			KafkaMessageCreator.opprettVirksomhetMessage(msg)
@@ -111,8 +125,8 @@ class VirksomhetIngestorTest : IntegrationTestBase() {
 		AsyncUtils.eventually {
 			val oppdatertArrangor = arrangorService.getArrangorById(ARRANGOR_1.id)
 
-			oppdatertArrangor.overordnetEnhetOrganisasjonsnummer shouldBe nyOverordnetEnhet.organisasjonsnummer
-			oppdatertArrangor.overordnetEnhetNavn shouldBe nyOverordnetEnhet.navn
+			oppdatertArrangor.overordnetEnhetOrganisasjonsnummer shouldBe nyOverordnetArrangor.organisasjonsnummer
+			oppdatertArrangor.overordnetEnhetNavn shouldBe nyOverordnetArrangor.navn
 		}
 	}
 
@@ -124,12 +138,17 @@ class VirksomhetIngestorTest : IntegrationTestBase() {
 			overordnetEnhetOrganisasjonsnummer = "42",
 		)
 
-		mockEnhetsregisterServer.addEnhet(EnhetDto(
-			organisasjonsnummer = msg.organisasjonsnummer,
-			navn = msg.navn,
-			overordnetEnhetOrganisasjonsnummer = msg.overordnetEnhetOrganisasjonsnummer,
-			overordnetEnhetNavn = ""
-		))
+		mockArrangorServer.addArrangorResponse(
+			AmtArrangorClient.ArrangorMedOverordnetArrangor(
+				id = ARRANGOR_1.id,
+				organisasjonsnummer = msg.organisasjonsnummer,
+				navn = msg.navn,
+				overordnetArrangorId = UUID.randomUUID(),
+				overordnetArrangorOrgnummer = msg.overordnetEnhetOrganisasjonsnummer,
+				overordnetArrangorNavn = "",
+				deltakerlister = emptySet()
+			)
+		)
 
 		kafkaMessageSender.sendTilVirksomhetTopic(
 			KafkaMessageCreator.opprettVirksomhetMessage(msg)
@@ -142,13 +161,4 @@ class VirksomhetIngestorTest : IntegrationTestBase() {
 			oppdatertArrangor.overordnetEnhetNavn shouldBe msg.navn
 		}
 	}
-
-	fun ArrangorInput.toDto(): EnhetDto = EnhetDto(
-		organisasjonsnummer = organisasjonsnummer,
-		navn = navn,
-		overordnetEnhetOrganisasjonsnummer = overordnetEnhetOrganisasjonsnummer,
-		overordnetEnhetNavn = overordnetEnhetNavn
-	)
-
-
 }

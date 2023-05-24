@@ -17,9 +17,19 @@ class AmtArrangorService(
 		.expireAfterWrite(Duration.ofHours(1))
 		.build<String, ArrangorAnsatt>()
 
+	private val orgnummerToArrangorCache = Caffeine.newBuilder()
+		.expireAfterWrite(Duration.ofHours(1))
+		.build<String, Arrangor>()
+
 	fun getAnsatt(ansattPersonident: String): ArrangorAnsatt? {
 		return CacheUtils.tryCacheFirstNullable(personidentToAnsattCache, ansattPersonident) {
 			return@tryCacheFirstNullable amtArrangorClient.hentAnsatt(ansattPersonident)?.tilArrangorAnsatt()
+		}
+	}
+
+	fun getArrangor(orgnummer: String): Arrangor? {
+		return CacheUtils.tryCacheFirstNullable(orgnummerToArrangorCache, orgnummer) {
+			return@tryCacheFirstNullable amtArrangorClient.hentArrangor(orgnummer)?.tilArrangor()
 		}
 	}
 }
@@ -62,6 +72,16 @@ fun AmtArrangorClient.AnsattDto.tilArrangorAnsatt(): ArrangorAnsatt {
 				koordinator = it.koordinator
 			)
 		}
+	)
+}
+
+fun AmtArrangorClient.ArrangorMedOverordnetArrangor.tilArrangor(): Arrangor {
+	return Arrangor(
+		id = id,
+		navn = navn,
+		organisasjonsnummer = organisasjonsnummer,
+		overordnetEnhetOrganisasjonsnummer = overordnetArrangorOrgnummer,
+		overordnetEnhetNavn = overordnetArrangorNavn
 	)
 }
 

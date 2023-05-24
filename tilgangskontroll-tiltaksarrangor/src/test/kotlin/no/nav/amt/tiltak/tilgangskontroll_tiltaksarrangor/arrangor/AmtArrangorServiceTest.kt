@@ -52,4 +52,28 @@ class AmtArrangorServiceTest : FunSpec({
 		ansatt?.arrangorer?.find { it.arrangor.organisasjonsnummer == orgnummer1 }?.roller shouldBe listOf(ArrangorAnsatt.AnsattRolle.KOORDINATOR)
 		ansatt?.arrangorer?.find { it.arrangor.organisasjonsnummer == orgnummer2 }?.roller shouldBe listOf(ArrangorAnsatt.AnsattRolle.VEILEDER)
 	}
+
+	test("Henter arrangør fra amt-arrangør") {
+		val orgnummer = "98879887"
+		val arrangorId = UUID.randomUUID()
+		val overordnetArrangorId = UUID.randomUUID()
+
+		every { amtArrangorClient.hentArrangor(orgnummer) } returns AmtArrangorClient.ArrangorMedOverordnetArrangor(
+			id = arrangorId,
+			navn = "Arrangør",
+			organisasjonsnummer = orgnummer,
+			overordnetArrangorId = overordnetArrangorId,
+			overordnetArrangorNavn = "Overordnet",
+			overordnetArrangorOrgnummer = "123456",
+			deltakerlister = emptySet()
+		)
+
+		val arrangor = amtArrangorService.getArrangor(orgnummer)
+
+		arrangor?.id shouldBe arrangorId
+		arrangor?.organisasjonsnummer shouldBe orgnummer
+		arrangor?.navn shouldBe "Arrangør"
+		arrangor?.overordnetEnhetNavn shouldBe "Overordnet"
+		arrangor?.overordnetEnhetOrganisasjonsnummer shouldBe "123456"
+	}
 })

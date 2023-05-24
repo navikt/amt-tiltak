@@ -20,4 +20,14 @@ class MockAmtArrangorServer : MockHttpServer("amt-arrangor-server") {
 
 		addResponseHandler("/api/service/ansatt", response)
 	}
+
+	fun addArrangorResponse(
+		arrangor: AmtArrangorClient.ArrangorMedOverordnetArrangor
+	) {
+		val response = MockResponse()
+			.setResponseCode(200)
+			.setBody(JsonUtils.toJsonString(arrangor))
+
+		addResponseHandler("/api/service/arrangor/organisasjonsnummer/${arrangor.organisasjonsnummer}", response)
+	}
 }
