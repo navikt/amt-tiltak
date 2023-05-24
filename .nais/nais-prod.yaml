@@ -52,9 +52,6 @@ spec:
         - application: amt-tiltaksarrangor-bff
     outbound:
       rules:
-        - application: amt-enhetsregister
-          namespace: amt
-          cluster: prod-gcp
         - application: poao-tilgang
           namespace: poao
           cluster: prod-gcp
@@ -88,10 +85,6 @@ spec:
       value: api://prod-gcp.amt.amt-arrangor/.default
     - name: AMT_ARRANGOR_URL
       value: http://amt-arrangor
-    - name: AMT_ENHETSREGISTER_SCOPE
-      value: api://prod-gcp.amt.amt-enhetsregister/.default
-    - name: AMT_ENHETSREGISTER_URL
-      value: http://amt-enhetsregister.amt.svc.cluster.local
     - name: NOM_SCOPE
       value: api://prod-gcp.nom.nom-api/.default
     - name: NOM_URL
