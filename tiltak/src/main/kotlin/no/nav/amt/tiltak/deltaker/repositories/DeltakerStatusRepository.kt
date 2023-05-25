@@ -19,12 +19,11 @@ open class DeltakerStatusRepository(
 ) {
 
 	private val rowMapper = RowMapper { rs, _ ->
-		val aarsak = rs.getNullableString("aarsak")?.let { DeltakerStatus.Aarsak.Type.valueOf(it) }
 		DeltakerStatusDbo(
 			id = rs.getUUID("id"),
 			deltakerId = rs.getUUID("deltaker_id"),
 			type = DeltakerStatus.Type.valueOf(rs.getString("status")),
-			aarsak = aarsak?.let { DeltakerStatus.Aarsak(it, null) },
+			aarsak = rs.getNullableString("aarsak")?.let { DeltakerStatus.Aarsak.valueOf(it) },
 			aktiv = rs.getBoolean("aktiv"),
 			gyldigFra = rs.getLocalDateTime("gyldig_fra"),
 			opprettetDato = rs.getTimestamp("created_at").toLocalDateTime(),
@@ -52,7 +51,7 @@ open class DeltakerStatusRepository(
 			"deltaker_id" to status.deltakerId,
 			"gyldig_fra" to status.gyldigFra,
 			"status" to status.type.name,
-			"aarsak" to status.aarsak?.type?.name
+			"aarsak" to status.aarsak?.name
 		)
 
 		template.update(sql, params)

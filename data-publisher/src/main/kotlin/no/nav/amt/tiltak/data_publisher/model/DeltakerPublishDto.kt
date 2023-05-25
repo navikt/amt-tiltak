@@ -5,7 +5,7 @@ import no.nav.common.json.JsonUtils
 import org.springframework.util.DigestUtils
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 data class DeltakerPublishDto(
 	val id: UUID,
@@ -39,10 +39,10 @@ data class DeltakerSkjultDto(
 )
 
 data class DeltakerStatusDto(
-	val type: DeltakerStatus.Type,
-	val aarsak: DeltakerStatus.Aarsak.Type?,
-	val gyldigFra: LocalDateTime,
-	val opprettetDato: LocalDateTime
+    val type: DeltakerStatus.Type,
+    val aarsak: DeltakerStatus.Aarsak?,
+    val gyldigFra: LocalDateTime,
+    val opprettetDato: LocalDateTime
 )
 
 data class DeltakerKontaktinformasjonDto(

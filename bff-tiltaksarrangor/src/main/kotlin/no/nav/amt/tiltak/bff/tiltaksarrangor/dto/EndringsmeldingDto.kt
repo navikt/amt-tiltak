@@ -1,10 +1,9 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor.dto
 
-import no.nav.amt.tiltak.bff.tiltaksarrangor.type.DeltakerStatusAarsak
-import no.nav.amt.tiltak.bff.tiltaksarrangor.type.toDto
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.core.domain.tiltak.EndringsmeldingStatusAarsak
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 data class EndringsmeldingDto(
 	val id: UUID,
@@ -45,11 +44,11 @@ data class EndringsmeldingDto(
 
 		data class AvsluttDeltakelseInnhold(
 			val sluttdato: LocalDate,
-			val aarsak: DeltakerStatusAarsak,
+			val aarsak: EndringsmeldingStatusAarsakDto,
 		) : Innhold()
 
 		data class DeltakerIkkeAktuellInnhold(
-			val aarsak: DeltakerStatusAarsak,
+			val aarsak: EndringsmeldingStatusAarsakDto,
 		) : Innhold()
 
 		data class EndreSluttdatoInnhold(
@@ -78,6 +77,18 @@ fun Endringsmelding.Innhold.toDto(): EndringsmeldingDto.Innhold {
 				gyldigFraDato = this.gyldigFraDato
 			)
 		is Endringsmelding.Innhold.EndreSluttdatoInnhold -> EndringsmeldingDto.Innhold.EndreSluttdatoInnhold(this.sluttdato)
+	}
+}
+
+fun EndringsmeldingStatusAarsak.toDto(): EndringsmeldingStatusAarsakDto {
+	return when(this.type) {
+		EndringsmeldingStatusAarsak.Type.SYK -> EndringsmeldingStatusAarsakDto(EndringsmeldingStatusAarsakDto.Type.SYK)
+		EndringsmeldingStatusAarsak.Type.FATT_JOBB -> EndringsmeldingStatusAarsakDto(EndringsmeldingStatusAarsakDto.Type.FATT_JOBB)
+		EndringsmeldingStatusAarsak.Type.TRENGER_ANNEN_STOTTE -> EndringsmeldingStatusAarsakDto(EndringsmeldingStatusAarsakDto.Type.TRENGER_ANNEN_STOTTE)
+		EndringsmeldingStatusAarsak.Type.UTDANNING -> EndringsmeldingStatusAarsakDto(EndringsmeldingStatusAarsakDto.Type.UTDANNING)
+		EndringsmeldingStatusAarsak.Type.IKKE_MOTT -> EndringsmeldingStatusAarsakDto(EndringsmeldingStatusAarsakDto.Type.IKKE_MOTT)
+		EndringsmeldingStatusAarsak.Type.OPPFYLLER_IKKE_KRAVENE -> EndringsmeldingStatusAarsakDto(EndringsmeldingStatusAarsakDto.Type.OPPFYLLER_IKKE_KRAVENE, this.beskrivelse)
+		EndringsmeldingStatusAarsak.Type.ANNET -> EndringsmeldingStatusAarsakDto(EndringsmeldingStatusAarsakDto.Type.ANNET, this.beskrivelse)
 	}
 }
 

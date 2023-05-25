@@ -23,7 +23,7 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 class DeltakerPublishQuery(
 	private val template: NamedParameterJdbcTemplate
@@ -66,7 +66,7 @@ class DeltakerPublishQuery(
 			},
 			status = DeltakerStatusDto(
 				type = DeltakerStatus.Type.valueOf(deltaker.status),
-				aarsak = deltaker.statusAarsak?.let { DeltakerStatus.Aarsak.Type.valueOf(it) },
+				aarsak = deltaker.statusAarsak?.let { DeltakerStatus.Aarsak.valueOf(it) },
 				gyldigFra = deltaker.statusGyldigFra!!,
 				opprettetDato = deltaker.statusCreatedAt!!
 			),

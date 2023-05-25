@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.core.domain.tiltak
 
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 data class DeltakerStatus(
 	val id: UUID,
@@ -11,25 +11,14 @@ data class DeltakerStatus(
 	val opprettetDato: LocalDateTime,
 	val aktiv: Boolean,
 ) {
-	data class Aarsak(
-		val type: Type,
-		val beskrivelse: String? = null,
-	) {
-		init {
-		    if (beskrivelse != null && type != Type.ANNET && type != Type.OPPFYLLER_IKKE_KRAVENE) {
-				throw IllegalStateException("Aarsak $type skal ikke ha beskrivelse")
-			}
-		}
-
-		enum class Type {
-			SYK, FATT_JOBB, TRENGER_ANNEN_STOTTE, FIKK_IKKE_PLASS, UTDANNING, FERDIG, AVLYST_KONTRAKT, IKKE_MOTT, FEILREGISTRERT, OPPFYLLER_IKKE_KRAVENE, ANNET
-		}
+	enum class Aarsak {
+		SYK, FATT_JOBB, TRENGER_ANNEN_STOTTE, FIKK_IKKE_PLASS, IKKE_MOTT, ANNET, AVLYST_KONTRAKT
 	}
 
 	enum class Type {
 		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, FEILREGISTRERT,
 		SOKT_INN, VURDERES, VENTELISTE, AVBRUTT, // kurs statuser
-		PABEGYNT_REGISTRERING, PABEGYNT, //PABEGYNT er erstattet av PABEGYNT_REGISTRERING, men må beholdes så lenge statusen er på topicen		SOKT_INN, VURDERES, VENTELISTE, AVBRUTT // kurs statuser
+		PABEGYNT_REGISTRERING, PABEGYNT, //PABEGYNT er erstattet av PABEGYNT_REGISTRERING, men må beholdes så lenge statusen er på topicen
 	}
 
 }

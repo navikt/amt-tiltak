@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.core.domain.tiltak
 
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import java.util.UUID
+import java.util.*
 
 data class Endringsmelding(
 	val id: UUID,
@@ -45,11 +45,11 @@ data class Endringsmelding(
 
 		data class AvsluttDeltakelseInnhold(
 			val sluttdato: LocalDate,
-			val aarsak: DeltakerStatus.Aarsak,
+			val aarsak: EndringsmeldingStatusAarsak,
 		) : Innhold()
 
 		data class DeltakerIkkeAktuellInnhold(
-			val aarsak: DeltakerStatus.Aarsak,
+			val aarsak: EndringsmeldingStatusAarsak,
 		) : Innhold()
 
 		data class EndreDeltakelseProsentInnhold(
@@ -63,4 +63,3 @@ data class Endringsmelding(
 		) : Innhold()
 	}
 }
-
