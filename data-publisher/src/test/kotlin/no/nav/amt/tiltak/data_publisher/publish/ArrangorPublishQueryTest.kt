@@ -21,7 +21,7 @@ class ArrangorPublishQueryTest : FunSpec({
 	val db = DatabaseTestDataHandler(template)
 
 	beforeEach {
-		every { amtArrangorClient.hentArrangor(any()) } returns AmtArrangorClient.ArrangorMedOverordnetArrangor(UUID.randomUUID(), "", "", null, null, null, emptySet())
+		every { amtArrangorClient.hentArrangor(any()) } returns AmtArrangorClient.ArrangorMedOverordnetArrangor(UUID.randomUUID(), "", "", null)
 		DbTestDataUtils.cleanDatabase(dataSource)
 	}
 
@@ -35,10 +35,7 @@ class ArrangorPublishQueryTest : FunSpec({
 			id = UUID.randomUUID(),
 			navn = "Parent",
 			organisasjonsnummer = input.overordnetEnhetOrganisasjonsnummer!!,
-			overordnetArrangorId = null,
-			overordnetArrangorOrgnummer = null,
-			overordnetArrangorNavn = null,
-			deltakerlister = emptySet()
+			overordnetArrangor = null
 		)
 
 		val data = query.get(input.id)

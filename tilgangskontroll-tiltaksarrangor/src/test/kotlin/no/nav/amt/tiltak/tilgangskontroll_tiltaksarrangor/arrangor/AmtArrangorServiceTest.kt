@@ -29,7 +29,6 @@ class AmtArrangorServiceTest : FunSpec({
 					arrangorId = UUID.randomUUID(),
 					arrangor = AmtArrangorClient.Arrangor(UUID.randomUUID(), "Arrangør 1", orgnummer1),
 					overordnetArrangor = null,
-					deltakerlister = emptySet(),
 					roller = listOf(AmtArrangorClient.AnsattRolle.KOORDINATOR),
 					veileder = emptyList(),
 					koordinator = emptyList()
@@ -38,7 +37,6 @@ class AmtArrangorServiceTest : FunSpec({
 					arrangorId = UUID.randomUUID(),
 					arrangor = AmtArrangorClient.Arrangor(UUID.randomUUID(), "Arrangør 2", orgnummer2),
 					overordnetArrangor = null,
-					deltakerlister = emptySet(),
 					roller = listOf(AmtArrangorClient.AnsattRolle.VEILEDER),
 					veileder = emptyList(),
 					koordinator = emptyList()
@@ -62,10 +60,11 @@ class AmtArrangorServiceTest : FunSpec({
 			id = arrangorId,
 			navn = "Arrangør",
 			organisasjonsnummer = orgnummer,
-			overordnetArrangorId = overordnetArrangorId,
-			overordnetArrangorNavn = "Overordnet",
-			overordnetArrangorOrgnummer = "123456",
-			deltakerlister = emptySet()
+			overordnetArrangor = AmtArrangorClient.Arrangor(
+				id = overordnetArrangorId,
+				navn = "Overordnet",
+				organisasjonsnummer = "123456"
+			)
 		)
 
 		val arrangor = amtArrangorService.getArrangor(orgnummer)

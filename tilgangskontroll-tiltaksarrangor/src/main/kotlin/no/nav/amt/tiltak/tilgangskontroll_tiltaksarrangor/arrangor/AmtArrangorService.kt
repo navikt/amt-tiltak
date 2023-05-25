@@ -61,7 +61,6 @@ fun AmtArrangorClient.AnsattDto.tilArrangorAnsatt(): ArrangorAnsatt {
 						organisasjonsnummer = overordnetArrangor.organisasjonsnummer
 					)
 				},
-				deltakerlister = it.deltakerlister,
 				roller = it.roller.map { rolle -> ArrangorAnsatt.AnsattRolle.valueOf(rolle.name) },
 				veileder = it.veileder.map { veileder ->
 					ArrangorAnsatt.VeilederDto(
@@ -80,8 +79,8 @@ fun AmtArrangorClient.ArrangorMedOverordnetArrangor.tilArrangor(): Arrangor {
 		id = id,
 		navn = navn,
 		organisasjonsnummer = organisasjonsnummer,
-		overordnetEnhetOrganisasjonsnummer = overordnetArrangorOrgnummer,
-		overordnetEnhetNavn = overordnetArrangorNavn
+		overordnetEnhetOrganisasjonsnummer = overordnetArrangor?.organisasjonsnummer,
+		overordnetEnhetNavn = overordnetArrangor?.navn
 	)
 }
 

@@ -44,7 +44,6 @@ class AnsattControllerIntegrationTest : IntegrationTestBase() {
 						arrangorId = ARRANGOR_1.id,
 						arrangor = AmtArrangorClient.Arrangor(ARRANGOR_1.id, ARRANGOR_1.navn, ARRANGOR_1.organisasjonsnummer),
 						overordnetArrangor = null,
-						deltakerlister = emptySet(),
 						roller = emptyList(),
 						veileder = emptyList(),
 						koordinator = emptyList()
@@ -76,7 +75,6 @@ class AnsattControllerIntegrationTest : IntegrationTestBase() {
 						arrangorId = ARRANGOR_1.id,
 						arrangor = AmtArrangorClient.Arrangor(ARRANGOR_1.id, ARRANGOR_1.navn, ARRANGOR_1.organisasjonsnummer),
 						overordnetArrangor = null,
-						deltakerlister = emptySet(),
 						roller = listOf(AmtArrangorClient.AnsattRolle.KOORDINATOR),
 						veileder = emptyList(),
 						koordinator = emptyList()
@@ -85,7 +83,6 @@ class AnsattControllerIntegrationTest : IntegrationTestBase() {
 						arrangorId = ARRANGOR_2.id,
 						arrangor = AmtArrangorClient.Arrangor(ARRANGOR_2.id, ARRANGOR_2.navn, ARRANGOR_2.organisasjonsnummer),
 						overordnetArrangor = null,
-						deltakerlister = emptySet(),
 						roller = listOf(AmtArrangorClient.AnsattRolle.KOORDINATOR),
 						veileder = emptyList(),
 						koordinator = emptyList()
@@ -119,7 +116,6 @@ class AnsattControllerIntegrationTest : IntegrationTestBase() {
 						arrangorId = ARRANGOR_1.id,
 						arrangor = AmtArrangorClient.Arrangor(ARRANGOR_1.id, ARRANGOR_1.navn, ARRANGOR_1.organisasjonsnummer),
 						overordnetArrangor = null,
-						deltakerlister = emptySet(),
 						roller = listOf(AmtArrangorClient.AnsattRolle.KOORDINATOR),
 						veileder = emptyList(),
 						koordinator = emptyList()
@@ -128,7 +124,6 @@ class AnsattControllerIntegrationTest : IntegrationTestBase() {
 						arrangorId = ARRANGOR_2.id,
 						arrangor = AmtArrangorClient.Arrangor(ARRANGOR_2.id, ARRANGOR_2.navn, ARRANGOR_2.organisasjonsnummer),
 						overordnetArrangor = null,
-						deltakerlister = emptySet(),
 						roller = listOf(AmtArrangorClient.AnsattRolle.VEILEDER),
 						veileder = emptyList(),
 						koordinator = emptyList()

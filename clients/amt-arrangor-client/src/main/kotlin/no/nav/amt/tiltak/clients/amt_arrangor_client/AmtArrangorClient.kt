@@ -81,7 +81,6 @@ class AmtArrangorClient(
 		val arrangorId: UUID,
 		val arrangor: Arrangor,
 		val overordnetArrangor: Arrangor?,
-		val deltakerlister: Set<UUID>,
 		val roller: List<AnsattRolle>,
 		val veileder: List<VeilederDto>,
 		val koordinator: List<UUID>
@@ -116,9 +115,6 @@ class AmtArrangorClient(
 		val id: UUID,
 		val navn: String,
 		val organisasjonsnummer: String,
-		val overordnetArrangorId: UUID?,
-		val overordnetArrangorNavn: String?,
-		val overordnetArrangorOrgnummer: String?,
-		val deltakerlister: Set<UUID>
+		val overordnetArrangor: Arrangor?
 	)
 }

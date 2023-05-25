@@ -23,7 +23,6 @@ data class ArrangorAnsatt(
 		val arrangorId: UUID,
 		val arrangor: Arrangor,
 		val overordnetArrangor: Arrangor?,
-		val deltakerlister: Set<UUID>,
 		val roller: List<AnsattRolle>,
 		val veileder: List<VeilederDto>,
 		val koordinator: List<UUID>

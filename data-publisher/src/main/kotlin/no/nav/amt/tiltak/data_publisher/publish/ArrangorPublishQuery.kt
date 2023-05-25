@@ -58,8 +58,8 @@ class ArrangorPublishQuery(
 				"id" to arrangor.id,
 				"navn" to arrangor.navn,
 				"organisasjonsnummer" to arrangor.organisasjonsnummer,
-				"overordnetEnhetOrganisasjonsnummer" to arrangor.overordnetArrangorOrgnummer,
-				"overordnetEnhetNavn" to arrangor.overordnetArrangorNavn
+				"overordnetEnhetOrganisasjonsnummer" to arrangor.overordnetArrangor?.organisasjonsnummer,
+				"overordnetEnhetNavn" to arrangor.overordnetArrangor?.navn
 			)
 
 			template.update(sql, params)

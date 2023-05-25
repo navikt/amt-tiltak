@@ -506,7 +506,6 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 						arrangorId = ARRANGOR_1.id,
 						arrangor = AmtArrangorClient.Arrangor(ARRANGOR_1.id, ARRANGOR_1.navn, ARRANGOR_1.organisasjonsnummer),
 						overordnetArrangor = null,
-						deltakerlister = emptySet(),
 						roller = emptyList(),
 						veileder = emptyList(),
 						koordinator = emptyList()

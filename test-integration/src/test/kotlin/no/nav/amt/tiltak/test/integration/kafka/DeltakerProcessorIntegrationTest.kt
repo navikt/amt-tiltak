@@ -223,19 +223,17 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 			id = UUID.randomUUID(),
 			organisasjonsnummer = "888666555",
 			navn = "Arrangor Org",
-			overordnetArrangorId = null,
-			overordnetArrangorNavn = null,
-			overordnetArrangorOrgnummer = null,
-			deltakerlister = emptySet()
+			overordnetArrangor = null
 		)
 		val arrangor = AmtArrangorClient.ArrangorMedOverordnetArrangor(
 			id = UUID.randomUUID(),
 			organisasjonsnummer = "999888777",
 			navn = "Arrangor",
-			overordnetArrangorId = overordnetArrangor.id,
-			overordnetArrangorNavn = overordnetArrangor.overordnetArrangorNavn,
-			overordnetArrangorOrgnummer = overordnetArrangor.overordnetArrangorOrgnummer,
-			deltakerlister = emptySet()
+			overordnetArrangor = AmtArrangorClient.Arrangor(
+				id = overordnetArrangor.id,
+				navn = overordnetArrangor.navn,
+				organisasjonsnummer = overordnetArrangor.organisasjonsnummer
+			)
 		)
 
 		val gjennomforingArenaData = GjennomforingArenaData(

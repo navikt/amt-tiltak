@@ -351,18 +351,18 @@ class ArrangorAnsattTilgangServiceImplTest {
 				),
 			arrangorer = listOf(
 				ArrangorAnsatt.TilknyttetArrangorDto(
-				arrangorId = arrangorId,
-				arrangor = ArrangorAnsatt.Arrangor(
-					id = arrangorId,
-					navn = "",
-					organisasjonsnummer = organisasjonsnummer
-				),
-				overordnetArrangor = null,
-				deltakerlister = emptySet(),
+					arrangorId = arrangorId,
+					arrangor = ArrangorAnsatt.Arrangor(
+						id = arrangorId,
+						navn = "",
+						organisasjonsnummer = organisasjonsnummer
+					),
+					overordnetArrangor = null,
 					roller = listOf(ArrangorAnsatt.AnsattRolle.KOORDINATOR),
 					veileder = emptyList(),
 					koordinator = emptyList()
-			))
+				)
+			)
 		)
 		every { arrangorAnsattService.createOrUpdateAnsatt(match { it.id == ansattId }) } just Runs
 		every { ansattRolleService.hentAktiveRoller(ansattId) } returns listOf(
@@ -408,7 +408,6 @@ class ArrangorAnsattTilgangServiceImplTest {
 						organisasjonsnummer = organisasjonsnummer
 					),
 					overordnetArrangor = null,
-					deltakerlister = emptySet(),
 					roller = listOf(ArrangorAnsatt.AnsattRolle.KOORDINATOR),
 					veileder = emptyList(),
 					koordinator = emptyList()
@@ -460,7 +459,6 @@ class ArrangorAnsattTilgangServiceImplTest {
 						organisasjonsnummer = organisasjonsnummer2
 					),
 					overordnetArrangor = null,
-					deltakerlister = emptySet(),
 					roller = listOf(ArrangorAnsatt.AnsattRolle.KOORDINATOR, ArrangorAnsatt.AnsattRolle.VEILEDER),
 					veileder = emptyList(),
 					koordinator = emptyList()

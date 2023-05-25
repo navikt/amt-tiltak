@@ -77,10 +77,7 @@ class DataPublisherServiceTest : FunSpec({
 			id = UUID.randomUUID(),
 			navn = "Parent",
 			organisasjonsnummer = input.overordnetEnhetOrganisasjonsnummer!!,
-			overordnetArrangorId = null,
-			overordnetArrangorOrgnummer = null,
-			overordnetArrangorNavn = null,
-			deltakerlister = emptySet()
+			overordnetArrangor = null
 		)
 		dbHandler.createDeltakerliste(arrangorId = input.id)
 
@@ -94,10 +91,7 @@ class DataPublisherServiceTest : FunSpec({
 			id = UUID.randomUUID(),
 			navn = "Parent",
 			organisasjonsnummer = input.overordnetEnhetOrganisasjonsnummer!!,
-			overordnetArrangorId = null,
-			overordnetArrangorOrgnummer = null,
-			overordnetArrangorNavn = null,
-			deltakerlister = emptySet()
+			overordnetArrangor = null
 		)
 
 		publishAndVerify(input.id, ARRANGOR, 1)
@@ -110,10 +104,7 @@ class DataPublisherServiceTest : FunSpec({
 			id = UUID.randomUUID(),
 			navn = "Parent",
 			organisasjonsnummer = input.overordnetEnhetOrganisasjonsnummer!!,
-			overordnetArrangorId = null,
-			overordnetArrangorOrgnummer = null,
-			overordnetArrangorNavn = null,
-			deltakerlister = emptySet()
+			overordnetArrangor = null
 		)
 
 		publishAndVerify(input.id, ARRANGOR, 1)

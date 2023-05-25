@@ -27,20 +27,18 @@ class VirksomhetIngestorTest : IntegrationTestBase() {
 			id = UUID.randomUUID(),
 			navn = ARRANGOR_1.overordnetEnhetNavn!!,
 			organisasjonsnummer = ARRANGOR_1.overordnetEnhetOrganisasjonsnummer!!,
-			overordnetArrangorId = null,
-			overordnetArrangorNavn = null,
-			overordnetArrangorOrgnummer = null,
-			deltakerlister = emptySet()
+			overordnetArrangor = null
 		)
 		mockArrangorServer.addArrangorResponse(overordnetArrangor)
 		mockArrangorServer.addArrangorResponse(AmtArrangorClient.ArrangorMedOverordnetArrangor(
 			id = ARRANGOR_1.id,
 			navn = ARRANGOR_1.navn,
 			organisasjonsnummer = ARRANGOR_1.organisasjonsnummer,
-			overordnetArrangorId = overordnetArrangor.id,
-			overordnetArrangorNavn = overordnetArrangor.overordnetArrangorNavn,
-			overordnetArrangorOrgnummer = overordnetArrangor.overordnetArrangorOrgnummer,
-			deltakerlister = emptySet()
+			overordnetArrangor = AmtArrangorClient.Arrangor(
+				id = overordnetArrangor.id,
+				navn = overordnetArrangor.navn,
+				organisasjonsnummer = overordnetArrangor.organisasjonsnummer
+			)
 		))
 	}
 
@@ -104,10 +102,11 @@ class VirksomhetIngestorTest : IntegrationTestBase() {
 			id = UUID.randomUUID(),
 			navn = "Ny Overordnet Enhet",
 			organisasjonsnummer = "999123456",
-			overordnetArrangorId = UUID.randomUUID(),
-			overordnetArrangorNavn = "Mor Org",
-			overordnetArrangorOrgnummer = "888666555",
-			deltakerlister = emptySet()
+			overordnetArrangor = AmtArrangorClient.Arrangor(
+				id = UUID.randomUUID(),
+				navn = "Mor Org",
+				organisasjonsnummer = "888666555"
+			)
 		)
 
 		val msg = VirksomhetMessage(
@@ -143,10 +142,11 @@ class VirksomhetIngestorTest : IntegrationTestBase() {
 				id = ARRANGOR_1.id,
 				organisasjonsnummer = msg.organisasjonsnummer,
 				navn = msg.navn,
-				overordnetArrangorId = UUID.randomUUID(),
-				overordnetArrangorOrgnummer = msg.overordnetEnhetOrganisasjonsnummer,
-				overordnetArrangorNavn = "",
-				deltakerlister = emptySet()
+				overordnetArrangor = AmtArrangorClient.Arrangor(
+					id = UUID.randomUUID(),
+					organisasjonsnummer = msg.overordnetEnhetOrganisasjonsnummer!!,
+					navn = ""
+				)
 			)
 		)
 

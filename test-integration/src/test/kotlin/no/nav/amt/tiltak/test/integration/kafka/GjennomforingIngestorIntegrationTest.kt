@@ -49,19 +49,17 @@ class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 		id = UUID.randomUUID(),
 		organisasjonsnummer = "888666555",
 		navn = "Arrangor Org",
-		overordnetArrangorId = null,
-		overordnetArrangorNavn = null,
-		overordnetArrangorOrgnummer = null,
-		deltakerlister = emptySet()
+		overordnetArrangor = null
 	)
 	val arrangorMedOverordnetArrangor = AmtArrangorClient.ArrangorMedOverordnetArrangor(
 		id = UUID.randomUUID(),
 		organisasjonsnummer = "999888777",
 		navn = "Arrangor",
-		overordnetArrangorId = overordnetArrangor.id,
-		overordnetArrangorNavn = overordnetArrangor.overordnetArrangorNavn,
-		overordnetArrangorOrgnummer = overordnetArrangor.overordnetArrangorOrgnummer,
-		deltakerlister = emptySet()
+		overordnetArrangor = AmtArrangorClient.Arrangor(
+			id = overordnetArrangor.id,
+			navn = overordnetArrangor.navn,
+			organisasjonsnummer = overordnetArrangor.organisasjonsnummer
+		)
 	)
 
 	val gjennomforingArenaData = GjennomforingArenaData(
@@ -108,8 +106,8 @@ class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 				val arrangor = arrangorService.getArrangorById(gjennomforing.arrangorId)
 				arrangor.organisasjonsnummer shouldBe arrangorMedOverordnetArrangor.organisasjonsnummer
 				arrangor.navn shouldBe arrangorMedOverordnetArrangor.navn
-				arrangor.overordnetEnhetNavn shouldBe arrangorMedOverordnetArrangor.overordnetArrangorNavn
-				arrangor.overordnetEnhetOrganisasjonsnummer shouldBe arrangorMedOverordnetArrangor.overordnetArrangorOrgnummer
+				arrangor.overordnetEnhetNavn shouldBe arrangorMedOverordnetArrangor.overordnetArrangor?.navn
+				arrangor.overordnetEnhetOrganisasjonsnummer shouldBe arrangorMedOverordnetArrangor.overordnetArrangor?.organisasjonsnummer
 
 				val navEnhet = navEnhetService.getNavEnhet(gjennomforing.navEnhetId!!)
 				navEnhet.enhetId shouldBe gjennomforingArenaData.ansvarligNavEnhetId
