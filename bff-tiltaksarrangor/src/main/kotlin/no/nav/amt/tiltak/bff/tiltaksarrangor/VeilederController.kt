@@ -3,15 +3,12 @@ package no.nav.amt.tiltak.bff.tiltaksarrangor
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.*
 import no.nav.amt.tiltak.bff.tiltaksarrangor.request.LeggTilVeiledereBulkRequest
 import no.nav.amt.tiltak.bff.tiltaksarrangor.request.LeggTilVeiledereRequest
-import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
-import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeilederInput
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tiltak.ArrangorVeiledersDeltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.skjulesForAlleAktorer
-import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.exceptions.ValidationException
 import no.nav.amt.tiltak.core.port.*
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -24,8 +21,6 @@ import java.util.*
 @RequestMapping("/api/tiltaksarrangor")
 class VeilederController (
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
-	private val authService: AuthService,
-	private val arrangorAnsattService: ArrangorAnsattService,
 	private val arrangorVeilederService: ArrangorVeilederService,
 	private val gjennomforingService: GjennomforingService,
 	private val controllerService: ControllerService,
@@ -36,7 +31,7 @@ class VeilederController (
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@PatchMapping("/veiledere")
 	fun leggTilVeiledere(@RequestBody request: LeggTilVeiledereBulkRequest) {
-		val ansatt = hentInnloggetAnsatt()
+		val ansatt = controllerService.hentInnloggetAnsatt()
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(
 			ansatt.id,
 			request.gjennomforingId,
@@ -51,7 +46,7 @@ class VeilederController (
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/veiledere", params = ["deltakerId"])
 	fun hentVeiledereForDeltaker(@RequestParam("deltakerId") deltakerId: UUID) : List<VeilederDto> {
-		val ansatt = hentInnloggetAnsatt()
+		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 
@@ -66,7 +61,7 @@ class VeilederController (
 		@RequestParam("deltakerId") deltakerId: UUID,
 		@RequestBody request: LeggTilVeiledereRequest,
 	) {
-		val ansatt = hentInnloggetAnsatt()
+		val ansatt = controllerService.hentInnloggetAnsatt()
 		val deltaker = deltakerService.hentDeltaker(deltakerId) ?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansatt.id, deltaker.gjennomforingId)
@@ -81,7 +76,7 @@ class VeilederController (
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/veiledere", params = ["gjennomforingId"])
 	fun hentAktiveVeiledereForGjennomforing(@RequestParam("gjennomforingId") gjennomforingId: UUID) : List<VeilederDto> {
-		val ansatt = hentInnloggetAnsatt()
+		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(
 			ansatt.id,
@@ -96,7 +91,7 @@ class VeilederController (
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/veiledere/tilgjengelig")
 	fun hentTilgjengeligeVeiledere(@RequestParam("gjennomforingId") gjennomforingId: UUID) : List<TilgjengeligVeilederDto> {
-		val ansatt = hentInnloggetAnsatt()
+		val ansatt = controllerService.hentInnloggetAnsatt()
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(
 			ansatt.id,
 			gjennomforingId,
@@ -110,7 +105,7 @@ class VeilederController (
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/veileder/deltakerliste")
 	fun hentDeltakerliste(): List<VeiledersDeltakerDto> {
-		val ansatt = hentInnloggetAnsatt()
+		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserHarRolleAnywhere(ansatt.id, ArrangorAnsattRolle.VEILEDER)
 
@@ -129,12 +124,6 @@ class VeilederController (
 				.map { e -> e.toDto() }
 			it.toVeiledersDeltakerDto(endringsmeldinger)
 		}
-	}
-
-	private fun hentInnloggetAnsatt(): Ansatt {
-		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-		return arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
-			?: throw UnauthorizedException("Arrangor ansatt finnes ikke")
 	}
 
 	private fun verifiserVeilederTilganger(deltakerIder: List<UUID>, veilederIder: List<UUID>) {

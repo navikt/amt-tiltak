@@ -15,6 +15,7 @@ interface ArrangorAnsattService {
 
  	fun getAnsattByPersonligIdent(personIdent: String): Ansatt?
 
+
 	fun getKoordinatorerForGjennomforing(gjennomforingId: UUID): List<Ansatt>
 
 	fun getVeiledereForArrangor(arrangorId: UUID) : List<Ansatt>
