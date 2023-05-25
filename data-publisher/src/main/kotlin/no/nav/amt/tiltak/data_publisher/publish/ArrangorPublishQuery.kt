@@ -19,14 +19,11 @@ class ArrangorPublishQuery(
 
 		val overordnetArrangorId = arrangor.overordnetEnhetOrganisasjonsnummer?.let { getOverordnetArrangorId(it) }
 
-		val deltakerlister = getDeltakerlisterForArrangor(id)
-
 		return ArrangorPublishDto(
 			id = arrangor.id,
 			navn = arrangor.navn,
 			organisasjonsnummer = arrangor.organisasjonsnummer,
-			overordnetArrangorId = overordnetArrangorId,
-			deltakerlister = deltakerlister
+			overordnetArrangorId = overordnetArrangorId
 		)
 	}
 
@@ -80,13 +77,6 @@ class ArrangorPublishQuery(
 		).firstOrNull()
 	}
 
-	private fun getDeltakerlisterForArrangor(arrangorId: UUID): List<UUID> {
-		return template.query(
-			"SELECT id FROM gjennomforing where arrangor_id = :arrangorId",
-			sqlParameters("arrangorId" to arrangorId)
-		) { rs, _ -> rs.getUUID("id") }
-	}
-
 	private data class ArrangorDbo(
 		val id: UUID,
 		val navn: String,
@@ -108,5 +98,4 @@ class ArrangorPublishQuery(
 
 		}
 	}
-
 }

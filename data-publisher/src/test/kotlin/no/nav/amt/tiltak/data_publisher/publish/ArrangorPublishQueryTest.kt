@@ -29,7 +29,7 @@ class ArrangorPublishQueryTest : FunSpec({
 		DbTestDataUtils.cleanDatabase(dataSource)
 	}
 
-	test("get - Arrangor - 0 deltakerlister - returnerer riktig Arrangør") {
+	test("get - Arrangor - returnerer riktig Arrangør") {
 		val input = db.createArrangor()
 		every { amtArrangorClient.hentArrangor(any()) } returns AmtArrangorClient.ArrangorMedOverordnetArrangor(
 			id = UUID.randomUUID(),
@@ -44,27 +44,5 @@ class ArrangorPublishQueryTest : FunSpec({
 		val data = query.get(input.id)
 		data.id shouldBe input.id
 		data.organisasjonsnummer shouldBe input.organisasjonsnummer
-	}
-
-	test("get - Arrangor - 1 deltakerliste - returnerer riktig") {
-		val arrangorInput = db.createArrangor()
-		val deltakerlisteInput = db.createDeltakerliste(
-			arrangorId = arrangorInput.id
-		)
-		every { amtArrangorClient.hentArrangor(any()) } returns AmtArrangorClient.ArrangorMedOverordnetArrangor(
-			id = UUID.randomUUID(),
-			navn = "Parent",
-			organisasjonsnummer = arrangorInput.overordnetEnhetOrganisasjonsnummer!!,
-			overordnetArrangorId = null,
-			overordnetArrangorOrgnummer = null,
-			overordnetArrangorNavn = null,
-			deltakerlister = emptySet()
-		)
-
-		val data = query.get(arrangorInput.id)
-
-		data.id shouldBe arrangorInput.id
-		data.deltakerlister.size shouldBe 1
-		data.deltakerlister.first() shouldBe deltakerlisteInput.id
 	}
 })
