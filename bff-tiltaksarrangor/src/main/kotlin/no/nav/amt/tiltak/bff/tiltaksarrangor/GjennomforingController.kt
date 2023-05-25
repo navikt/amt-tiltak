@@ -6,7 +6,6 @@ import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.KOORDINATOR
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.VEILEDER
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.*
 import no.nav.common.featuretoggle.UnleashClient
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -25,16 +24,14 @@ class GjennomforingController(
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
 	private val arrangorVeilederService: ArrangorVeilederService,
 	private val mineDeltakerlisterService: MineDeltakerlisterService,
-	private val unleashClient: UnleashClient
+	private val unleashClient: UnleashClient,
+	private val controllerService: ControllerService
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/gjennomforing")
 	fun hentDeltakerlisterLagtTil(): List<GjennomforingDto> {
-		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-		val ansatt = arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
-			?: throw UnauthorizedException("Innlogget ansatt har ikke tilgang til gjennomføringer")
-
+		val ansatt = controllerService.hentInnloggetAnsatt()
 		val deltakerlisterLagtTil = mineDeltakerlisterService.hent(ansatt.id)
 
 		return gjennomforingService.getGjennomforinger(deltakerlisterLagtTil)
@@ -48,9 +45,7 @@ class GjennomforingController(
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/gjennomforing/tilgjengelig")
 	fun hentTilgjengeligeGjennomforinger(): List<GjennomforingDto> {
-		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
-
+		val ansattId = controllerService.hentInnloggetAnsatt().id
 		arrangorAnsattTilgangService.verifiserHarRolleAnywhere(ansattId, KOORDINATOR)
 
 		return arrangorAnsattTilgangService.hentAnsattTilganger(ansattId)
@@ -65,8 +60,7 @@ class GjennomforingController(
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@PostMapping("/gjennomforing/{gjennomforingId}/tilgang")
 	fun opprettTilgangTilGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID) {
-		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
+		val ansattId = controllerService.hentInnloggetAnsatt().id
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
 
 		if (!erSynligForArrangor(gjennomforing) || (gjennomforing.erKurs && !kursTiltakToggleEnabled() && !erPilot(gjennomforingId))) {
@@ -85,8 +79,7 @@ class GjennomforingController(
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@DeleteMapping("/gjennomforing/{gjennomforingId}/tilgang")
 	fun fjernTilgangTilGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID) {
-		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
+		val ansattId = controllerService.hentInnloggetAnsatt().id
 		val arrangorId = gjennomforingService.getArrangorId(gjennomforingId)
 
 		arrangorAnsattTilgangService.verifiserRolleHosArrangor(ansattId, arrangorId, KOORDINATOR)
@@ -96,8 +89,7 @@ class GjennomforingController(
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/gjennomforing/{gjennomforingId}")
 	fun hentGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID): GjennomforingDto {
-		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
+		val ansattId = controllerService.hentInnloggetAnsatt().id
 		val harLagtTilListe = mineDeltakerlisterService.erLagtTil(ansattId, gjennomforingId)
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
 
@@ -116,8 +108,7 @@ class GjennomforingController(
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/gjennomforing/{gjennomforingId}/koordinatorer")
 	fun hentKoordinatorerPaGjennomforing(@PathVariable("gjennomforingId") gjennomforingId: UUID): List<KoordinatorDto> {
-		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-		val ansattId = arrangorAnsattService.getAnsattIdByPersonligIdent(ansattPersonligIdent)
+		val ansattId = controllerService.hentInnloggetAnsatt().id
 
 		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansattId, gjennomforingId)
 
@@ -135,9 +126,7 @@ class GjennomforingController(
 	@GetMapping("/deltakeroversikt")
 	fun hentDeltakeroversikt(): DeltakeroversiktDto {
 		val ansattPersonligIdent = authService.hentPersonligIdentTilInnloggetBruker()
-		val ansatt = arrangorAnsattService.getAnsattByPersonligIdent(ansattPersonligIdent)
-			?: throw UnauthorizedException("Arrangor-ansatt finnes ikke")
-
+		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		val roller = ansatt.arrangorer
 			.flatMap { it.roller }
