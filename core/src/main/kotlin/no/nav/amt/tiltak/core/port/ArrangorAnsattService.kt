@@ -7,7 +7,7 @@ import java.util.UUID
 
 interface ArrangorAnsattService {
 
-	fun createOrUpdateAnsatt(arrangorAnsatt: ArrangorAnsatt)
+	fun upsertAnsatt(arrangorAnsatt: ArrangorAnsatt)
 
 	fun getAnsatt(ansattId: UUID): Ansatt
 

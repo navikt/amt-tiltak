@@ -113,7 +113,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 			log.warn("En ikke-ansatt har logget inn, men hadde ikke tilganger i Altinn.")
 			return
 		}
-		arrangorAnsattService.createOrUpdateAnsatt(ansatt)
+		arrangorAnsattService.upsertAnsatt(ansatt)
 
 		val lagredeAnsattTilganger = ansattRolleService.hentAktiveRoller(ansatt.id)
 			.flatMap { it.roller.map { r -> AnsattTilgang(it.arrangorId, r) } }

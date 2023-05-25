@@ -48,15 +48,13 @@ class ArrangorServiceImpl(
 		val maybeArrangor = arrangorRepository.getByOrganisasjonsnummer(arrangor.organisasjonsnummer)
 		if (maybeArrangor != null) return maybeArrangor.toArrangor()
 
-		arrangorRepository.insert(
+		return arrangorRepository.upsert(
 			id = arrangor.id,
 			navn = arrangor.navn,
 			organisasjonsnummer = arrangor.organisasjonsnummer,
 			overordnetEnhetNavn = arrangor.overordnetEnhetNavn,
 			overordnetEnhetOrganisasjonsnummer = arrangor.overordnetEnhetOrganisasjonsnummer,
-		)
-
-		return arrangorRepository.getById(arrangor.id).toArrangor()
+		).toArrangor()
 			.also { dataPublisherService.publish(it.id, DataPublishType.ARRANGOR) }
 	}
 

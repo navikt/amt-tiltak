@@ -364,7 +364,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 				)
 			)
 		)
-		every { arrangorAnsattService.createOrUpdateAnsatt(match { it.id == ansattId }) } just Runs
+		every { arrangorAnsattService.upsertAnsatt(match { it.id == ansattId }) } just Runs
 		every { ansattRolleService.hentAktiveRoller(ansattId) } returns listOf(
 			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
 				arrangorId = arrangorId,
@@ -413,7 +413,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 					koordinator = emptyList()
 				))
 		)
-		every { arrangorAnsattService.createOrUpdateAnsatt(match { it.id == ansattId }) } just Runs
+		every { arrangorAnsattService.upsertAnsatt(match { it.id == ansattId }) } just Runs
 		every { ansattRolleService.hentAktiveRoller(ansattId) } returns listOf(
 			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
 				arrangorId = arrangorId,
@@ -464,7 +464,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 					koordinator = emptyList()
 				))
 		)
-		every { arrangorAnsattService.createOrUpdateAnsatt(match { it.id == ansattId }) } just Runs
+		every { arrangorAnsattService.upsertAnsatt(match { it.id == ansattId }) } just Runs
 		every { ansattRolleService.hentAktiveRoller(ansattId) } returns listOf(
 			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
 				arrangorId = arrangorId,

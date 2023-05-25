@@ -28,26 +28,18 @@ class ArrangorAnsattServiceImpl(
 	@Autowired
 	lateinit var arrangorAnsattTilgangService: ArrangorAnsattTilgangService
 
-	override fun createOrUpdateAnsatt(arrangorAnsatt: ArrangorAnsatt) {
+	override fun upsertAnsatt(arrangorAnsatt: ArrangorAnsatt) {
 		val maybeAnsatt = arrangorAnsattRepository.getByPersonligIdent(arrangorAnsatt.personalia.personident)
-		if (maybeAnsatt == null) {
-			arrangorAnsattRepository.opprettAnsatt(
-				id = arrangorAnsatt.id,
-				personligIdent = arrangorAnsatt.personalia.personident,
-				fornavn = arrangorAnsatt.personalia.navn.fornavn,
-				mellomnavn = arrangorAnsatt.personalia.navn.mellomnavn,
-				etternavn = arrangorAnsatt.personalia.navn.etternavn
-			)
-		} else if (maybeAnsatt.id != arrangorAnsatt.id) {
+		if (maybeAnsatt != null && maybeAnsatt.id != arrangorAnsatt.id) {
 			throw IllegalStateException("Det finnes allerede en ansatt for samme personident: gammel id: ${maybeAnsatt.id}, ny id: ${arrangorAnsatt.id}")
-		} else {
-			arrangorAnsattRepository.oppdaterAnsatt(
-				id = arrangorAnsatt.id,
-				fornavn = arrangorAnsatt.personalia.navn.fornavn,
-				mellomnavn = arrangorAnsatt.personalia.navn.mellomnavn,
-				etternavn = arrangorAnsatt.personalia.navn.etternavn
-			)
 		}
+		arrangorAnsattRepository.upsertAnsatt(
+			id = arrangorAnsatt.id,
+			personligIdent = arrangorAnsatt.personalia.personident,
+			fornavn = arrangorAnsatt.personalia.navn.fornavn,
+			mellomnavn = arrangorAnsatt.personalia.navn.mellomnavn,
+			etternavn = arrangorAnsatt.personalia.navn.etternavn
+		)
 
 		dataPublisherService.publish(arrangorAnsatt.id, DataPublishType.ARRANGOR_ANSATT)
 	}

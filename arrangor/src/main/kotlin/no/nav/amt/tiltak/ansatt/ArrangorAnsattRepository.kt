@@ -30,34 +30,18 @@ open class ArrangorAnsattRepository(
 		)
 	}
 
-	fun opprettAnsatt(id: UUID, personligIdent: String, fornavn: String, mellomnavn: String?, etternavn: String) {
+	fun upsertAnsatt(id: UUID, personligIdent: String, fornavn: String, mellomnavn: String?, etternavn: String) {
 		val sql = """
 			INSERT INTO arrangor_ansatt(id, personlig_ident, fornavn, mellomnavn, etternavn)
 				VALUES(:id, :personligIdent, :fornavn, :mellomnavn, :etternavn)
+			ON CONFLICT (id) DO UPDATE SET fornavn = :fornavn,
+										   mellomnavn = :mellomnavn,
+										   etternavn  = :etternavn
 		""".trimIndent()
 
 		val parameters = sqlParameters(
 			"id" to id,
 			"personligIdent" to personligIdent,
-			"fornavn" to fornavn,
-			"mellomnavn" to mellomnavn,
-			"etternavn" to etternavn
-		)
-
-		template.update(sql, parameters)
-	}
-
-	fun oppdaterAnsatt(id: UUID, fornavn: String, mellomnavn: String?, etternavn: String) {
-		val sql = """
-			UPDATE arrangor_ansatt
-			SET fornavn    = :fornavn,
-				mellomnavn = :mellomnavn,
-				etternavn  = :etternavn
-			WHERE id = :id
-		""".trimIndent()
-
-		val parameters = sqlParameters(
-			"id" to id,
 			"fornavn" to fornavn,
 			"mellomnavn" to mellomnavn,
 			"etternavn" to etternavn

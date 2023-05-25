@@ -41,7 +41,7 @@ class ArrangorServiceImplTest: FunSpec({
 			overordnetEnhetNavn = overordnetEnhetNavn
 		)
 		every { arrangorRepository.getByOrganisasjonsnummer(organisasjonsnummer) } returns null
-		every { arrangorRepository.getById(any()) } returns ArrangorDbo(
+		every { arrangorRepository.upsert(any(), any(), organisasjonsnummer, any(), any()) } returns ArrangorDbo(
 			id = arrangorId,
 			navn = navn,
 			organisasjonsnummer = organisasjonsnummer,
@@ -53,7 +53,7 @@ class ArrangorServiceImplTest: FunSpec({
 
 		arrangorService.getOrCreateArrangor(arrangor)
 
-		verify(exactly = 1) { arrangorRepository.insert(any(), navn, organisasjonsnummer, overordnetEnhetNavn, overordnetEnhetOrganisasjonsnummer) }
+		verify(exactly = 1) { arrangorRepository.upsert(any(), navn, organisasjonsnummer, overordnetEnhetNavn, overordnetEnhetOrganisasjonsnummer) }
 
 	}
 
@@ -82,7 +82,7 @@ class ArrangorServiceImplTest: FunSpec({
 
 		arrangorService.getOrCreateArrangor(arrangor)
 
-		verify(exactly = 0) { arrangorRepository.insert(any(), any(), any(), any(), any()) }
+		verify(exactly = 0) { arrangorRepository.upsert(any(), any(), any(), any(), any()) }
 	}
 
 	test("oppdaterArrangor - ny overordnet enhet orgnummer - skal hente ny enhet og oppdatere arrangor") {

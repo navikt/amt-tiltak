@@ -93,7 +93,7 @@ internal class ArrangorRepositoryTest {
 		val virksomhetsnummer = "123456798"
 		val id = UUID.randomUUID()
 
-		repository.insert(
+		repository.upsert(
 			id = id,
 			overordnetEnhetNavn = organisasjonsnavn,
 			overordnetEnhetOrganisasjonsnummer = organisasjonsnummer,
