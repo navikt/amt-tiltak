@@ -24,9 +24,7 @@ data class DeltakerDbo(
 	val dagerPerUke: Int?,
 	val prosentStilling: Float?,
 	val createdAt: LocalDateTime? = null,
-	// Setter modified til nå. Dersom oppretter objektet, så er det to grunner til det.
-	// Enten hentes fra db og man leser verdi fra db, ellers oppretter man dbo-objektet for å oppdatere/inserte i db
-	val modifiedAt: LocalDateTime? = LocalDateTime.now(),
+	val modifiedAt: LocalDateTime,
 	val registrertDato: LocalDateTime,
 	val innsokBegrunnelse: String?
 ) {
@@ -50,7 +48,8 @@ data class DeltakerDbo(
 			prosentStilling = prosentStilling,
 			registrertDato = registrertDato,
 			status = status,
-			innsokBegrunnelse = innsokBegrunnelse
+			innsokBegrunnelse = innsokBegrunnelse,
+			endretDato = modifiedAt
 		)
 	}
 

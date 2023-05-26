@@ -113,7 +113,8 @@ class ArrangorAnsattTilgangServiceImplTest {
 		dagerPerUke = 5,
 		prosentStilling = 100F,
 		gjennomforingId = gjennomforingId,
-		erSkjermet = true
+		erSkjermet = true,
+		endretDato = LocalDateTime.now()
 	)
 	@BeforeEach
 	fun beforeEach() {

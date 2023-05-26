@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.kafka.producer.dto
 
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -11,9 +10,10 @@ data class DeltakerV1Dto(
 	val personIdent: String,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
-	val status: DeltakerStatus.Type,
+	val status: DeltakerStatusDto,
 	val registrertDato: LocalDateTime,
 	val dagerPerUke: Int?,
 	val prosentStilling: Float?,
+	val endretDato: LocalDateTime
 )
 
