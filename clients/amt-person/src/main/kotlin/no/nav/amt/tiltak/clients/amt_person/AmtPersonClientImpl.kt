@@ -9,19 +9,20 @@ import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.common.json.JsonUtils.toJsonString
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
-import no.nav.common.rest.client.RestClient.baseClient
+import no.nav.common.rest.client.RestClient.baseClientBuilder
 import no.nav.common.utils.EnvironmentUtils
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.slf4j.LoggerFactory
+import java.time.Duration
 import java.util.function.Supplier
 
 class AmtPersonClientImpl(
-    private val baseUrl: String,
-    private val tokenProvider: Supplier<String>,
-    private val httpClient: OkHttpClient = baseClient(),
+	private val baseUrl: String,
+	private val tokenProvider: Supplier<String>,
+	private val httpClient: OkHttpClient = baseClientBuilder().readTimeout(Duration.ofSeconds(15)).build(),
 ) : AmtPersonClient {
 
 	private val mediaTypeJson = "application/json".toMediaType()
