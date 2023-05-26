@@ -74,7 +74,7 @@ class AmtPersonClientImpl(
 
 	override fun migrerNavBruker(navBrukerDto: OpprettNavBrukerDto) {
 		// toggler av til NavAnsatt og NavEnhet er migrert
-		if (EnvironmentUtils.isDevelopment().orElse(false) || EnvironmentUtils.isProduction().orElse(false)) return
+		if (EnvironmentUtils.isProduction().orElse(false)) return
 
 		val response = httpClient.newCall(buildRequest("migrer/nav-bruker", navBrukerDto)).execute()
 
