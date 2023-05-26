@@ -18,7 +18,8 @@ data class DeltakerInput(
 	val prosentStilling: Float,
 	val registrertDato: LocalDateTime,
 	val innsokBegrunnelse: String?,
-	val createdAt: ZonedDateTime = ZonedDateTime.of(2022, 2, 13, 0, 0, 0, 0, ZoneId.systemDefault())
+	val createdAt: ZonedDateTime = ZonedDateTime.of(2022, 2, 13, 0, 0, 0, 0, ZoneId.systemDefault()),
+	val endretDato: LocalDateTime = LocalDateTime.now()
 ) {
 	fun toDeltaker(brukerInput: BrukerInput, statusInput: DeltakerStatusInput) = Deltaker(
 		id = id,
@@ -46,5 +47,6 @@ data class DeltakerInput(
 		dagerPerUke = dagerPerUke,
 		prosentStilling = prosentStilling,
 		innsokBegrunnelse = innsokBegrunnelse,
+		endretDato = endretDato
 	)
 }

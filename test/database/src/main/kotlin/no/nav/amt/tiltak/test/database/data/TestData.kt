@@ -289,6 +289,7 @@ object TestData {
 		prosentStilling = 100f,
 		registrertDato = LocalDateTime.of(2022, 2, 13, 12, 12),
 		innsokBegrunnelse = "begrunnelse deltaker 1",
+		endretDato = LocalDateTime.of(2022, 2, 13, 12, 12)
 	)
 
 
