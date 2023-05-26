@@ -19,7 +19,7 @@ spec:
             namespace: amt
             severity: critical
         - alert: høy feilrate i logger
-          expr: (100 * sum by (app, namespace) (rate(log_messages_errors{app="amt-tiltak",level="Error"}[3m])) / sum by (app, namespace) (rate(log_messages_total{app="amt-tiltak}[3m]))) > 10
+          expr: (100 * sum by (app, namespace) (rate(log_messages_errors{app="amt-tiltak",level="Error"}[3m])) / sum by (app, namespace) (rate(log_messages_total{app="amt-tiltak"}[3m]))) > 10
           for: 3m
           annotations:
             action: "Sjekk loggene til app amt-tiltak i namespace amt, for å se hvorfor det er så mye feil"
