@@ -34,6 +34,6 @@ interface EndringsmeldingService {
 	fun hentAktiveEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding>
 
 	fun slett(deltakerId: UUID)
-	fun opprettTilbyPlassEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID)
+	fun opprettErAktuellEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID)
 	fun opprettEndresluttdatoEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate)
 }
