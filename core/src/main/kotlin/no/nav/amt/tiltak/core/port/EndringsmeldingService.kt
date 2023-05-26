@@ -35,6 +35,5 @@ interface EndringsmeldingService {
 
 	fun slett(deltakerId: UUID)
 	fun opprettTilbyPlassEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID)
-	fun opprettSettPaaVentelisteEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID)
 	fun opprettEndresluttdatoEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate)
 }

@@ -184,19 +184,6 @@ class DeltakerController(
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
-	@PatchMapping("/{deltakerId}/sett-paa-venteliste")
-	fun settPaaVenteliste(
-		@PathVariable("deltakerId") deltakerId: UUID,
-	) {
-		val ansatt = controllerService.hentInnloggetAnsatt()
-
-		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		verifiserErIkkeSkjult(deltakerId)
-
-		endringsmeldingService.opprettSettPaaVentelisteEndringsmelding(deltakerId, ansatt.id)
-	}
-
-	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@PatchMapping("/{deltakerId}/endre-sluttdato")
 	fun endreSluttdato(
 		@PathVariable("deltakerId") deltakerId: UUID,
