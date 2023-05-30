@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.data_publisher.publish
 
+import io.kotest.assertions.fail
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.data_publisher.DatabaseTestDataHandler
@@ -24,8 +25,10 @@ class DeltakerPublishQueryTest : FunSpec({
 
 	test("get") {
 		val input = db.createDeltaker()
-		val data = query.get(input.id)
 
-		data.getOrNull()?.id shouldBe input.id
+		when (val data = query.get(input.id)) {
+			is DeltakerPublishQuery.Result.OK -> data.result.id shouldBe input.id
+			else -> fail("Should be ok, was $data")
+		}
 	}
 })
