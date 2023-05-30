@@ -27,10 +27,11 @@ class ArrangorAnsattServiceImplTest {
 		arrangorAnsattTilgangService = mockk()
 		publisherService = mockk()
 
+
 		arrangorAnsattService = ArrangorAnsattServiceImpl(
 			arrangorAnsattRepository = arrangorAnsattRepository,
 			arrangorService = arrangorService,
-			dataPublisherService = publisherService
+			dataPublisherService = publisherService,
 		)
 
 		every { publisherService.publish(any(), any()) } returns Unit

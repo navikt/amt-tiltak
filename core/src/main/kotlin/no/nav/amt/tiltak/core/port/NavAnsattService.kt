@@ -11,5 +11,6 @@ interface NavAnsattService {
 	fun getNavAnsatt(navIdent: String): NavAnsatt
 
 	fun upsertNavAnsatt(input: UpsertNavAnsattInput)
+	fun migrerAlle()
 
 }

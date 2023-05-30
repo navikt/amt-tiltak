@@ -4,6 +4,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
 import no.nav.amt.tiltak.core.port.*
@@ -46,6 +47,7 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 	val navEnhetService: NavEnhetService = mockk()
 	val endringsmeldingService: EndringsmeldingService = mockk()
 	val publisherService: DataPublisherService = mockk()
+	val amtPersonClient: AmtPersonClient = mockk(relaxUnitFun = true)
 
 	lateinit var dataSource: DataSource
 	lateinit var jdbcTemplate: NamedParameterJdbcTemplate
@@ -63,7 +65,7 @@ class EndringPaaBrukerIngestorImplIntegrationTest {
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		gjennomforingRepository = GjennomforingRepository(jdbcTemplate)
 
-		brukerService = BrukerServiceImpl(brukerRepository, personService, navAnsattService, navEnhetService)
+		brukerService = BrukerServiceImpl(brukerRepository, personService, navAnsattService, navEnhetService, amtPersonClient)
 		deltakerService = DeltakerServiceImpl(
 			deltakerRepository,
 			deltakerStatusRepository,

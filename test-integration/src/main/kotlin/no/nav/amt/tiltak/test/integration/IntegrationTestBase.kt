@@ -58,6 +58,7 @@ abstract class IntegrationTestBase {
 		val mockVeilarboppfolgingHttpServer = MockVeilarboppfolgingHttpServer()
 		val mockVeilarbarenaHttpServer = MockVeilarbarenaHttpServer()
 		val mockDkifHttpServer = MockDkifHttpServer()
+		val mockAmtPersonHttpServer = MockAmtPersonHttpServer()
 
 		@JvmStatic
 		@DynamicPropertySource
@@ -88,6 +89,10 @@ abstract class IntegrationTestBase {
 			mockMulighetsrommetApiServer.start()
 			registry.add("mulighetsrommet-api.url") { mockMulighetsrommetApiServer.serverUrl() }
 			registry.add("mulighetsrommet-api.scope") { "test.mulighetsrommet-api" }
+
+			mockAmtPersonHttpServer.start()
+			registry.add("amt-person.url") { mockAmtPersonHttpServer.serverUrl() }
+			registry.add("amt-person.scope") { "test.amt-person" }
 
 			mockNorgHttpServer.start()
 			registry.add("norg.url") { mockNorgHttpServer.serverUrl() }

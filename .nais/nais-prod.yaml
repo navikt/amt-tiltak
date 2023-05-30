@@ -52,6 +52,9 @@ spec:
         - application: amt-tiltaksarrangor-bff
     outbound:
       rules:
+        - application: amt-person-service
+          namespace: amt
+          cluster: prod-gcp
         - application: poao-tilgang
           namespace: poao
           cluster: prod-gcp
@@ -85,6 +88,10 @@ spec:
       value: api://prod-gcp.amt.amt-arrangor/.default
     - name: AMT_ARRANGOR_URL
       value: http://amt-arrangor
+    - name: AMT_PERSON_URL
+      value: http://amt-person-service.amt.svc.cluster.local
+    - name: AMT_PERSON_SCOPE
+      value: api://prod-gcp.amt.amt-person-service/.default
     - name: NOM_SCOPE
       value: api://prod-gcp.nom.nom-api/.default
     - name: NOM_URL

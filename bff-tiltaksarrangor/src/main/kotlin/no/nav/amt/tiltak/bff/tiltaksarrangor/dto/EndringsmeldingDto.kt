@@ -18,8 +18,7 @@ data class EndringsmeldingDto(
 		AVSLUTT_DELTAKELSE,
 		DELTAKER_IKKE_AKTUELL,
 		ENDRE_DELTAKELSE_PROSENT,
-		TILBY_PLASS,
-		SETT_PAA_VENTELISTE,
+		DELTAKER_ER_AKTUELL,
 		ENDRE_SLUTTDATO
 	}
 
@@ -100,8 +99,7 @@ fun Endringsmelding.Type.toDto(): EndringsmeldingDto.Type {
 		Endringsmelding.Type.AVSLUTT_DELTAKELSE -> EndringsmeldingDto.Type.AVSLUTT_DELTAKELSE
 		Endringsmelding.Type.DELTAKER_IKKE_AKTUELL -> EndringsmeldingDto.Type.DELTAKER_IKKE_AKTUELL
 		Endringsmelding.Type.ENDRE_DELTAKELSE_PROSENT -> EndringsmeldingDto.Type.ENDRE_DELTAKELSE_PROSENT
-		Endringsmelding.Type.TILBY_PLASS -> EndringsmeldingDto.Type.TILBY_PLASS
-		Endringsmelding.Type.SETT_PAA_VENTELISTE -> EndringsmeldingDto.Type.SETT_PAA_VENTELISTE
+		Endringsmelding.Type.DELTAKER_ER_AKTUELL -> EndringsmeldingDto.Type.DELTAKER_ER_AKTUELL
 		Endringsmelding.Type.ENDRE_SLUTTDATO -> EndringsmeldingDto.Type.ENDRE_SLUTTDATO
 	}
 }
