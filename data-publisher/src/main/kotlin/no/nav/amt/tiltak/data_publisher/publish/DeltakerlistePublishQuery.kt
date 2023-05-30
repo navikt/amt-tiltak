@@ -18,10 +18,6 @@ class DeltakerlistePublishQuery(
 ) {
 
 	fun get(id: UUID): DeltakerlistePublishDto? {
-		if(IgnoredDeltakerlister.deltakerlisteIds.contains(id)) {
-			return null
-		}
-
 		val deltakerliste = getDeltakerliste(id) ?: return null
 
 		return DeltakerlistePublishDto(

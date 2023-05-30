@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.data_publisher.publish.DeltakerPublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.DeltakerlistePublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.EndringsmeldingPublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.IdQueries
+import no.nav.amt.tiltak.data_publisher.publish.IgnoredDeltakerlister
 import no.nav.amt.tiltak.data_publisher.publish.PublishRepository
 import no.nav.amt.tiltak.kafka.config.KafkaTopicProperties
 import no.nav.common.kafka.producer.KafkaProducerClient
@@ -69,6 +70,10 @@ class DataPublisherService(
 	}
 
 	private fun publishDeltakerliste(id: UUID, forcePublish: Boolean = false) {
+		if (IgnoredDeltakerlister.deltakerlisteIds.contains(id)) {
+			return
+		}
+
 		val deltakerlistePublishDto = DeltakerlistePublishQuery(template).get(id)
 
 		if (deltakerlistePublishDto == null) {
@@ -94,7 +99,7 @@ class DataPublisherService(
 	}
 
 	private fun publishDeltaker(id: UUID, forcePublish: Boolean = false) {
-		when (val ret = DeltakerPublishQuery(template).get(id)) {
+		when (val result = DeltakerPublishQuery(template).get(id)) {
 			is DeltakerPublishQuery.Result.DontPublish -> return
 			is DeltakerPublishQuery.Result.PublishTombstone -> {
 				ProducerRecord<String, String?>(kafkaTopicProperties.amtDeltakerTopic, id.toString(), null)
@@ -103,11 +108,15 @@ class DataPublisherService(
 			}
 
 			is DeltakerPublishQuery.Result.OK -> {
-				if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKER, ret.result.digest())) {
-					ProducerRecord(kafkaTopicProperties.amtDeltakerTopic, id.toString(), JsonUtils.toJsonString(ret.result))
+				if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKER, result.result.digest())) {
+					ProducerRecord(
+						kafkaTopicProperties.amtDeltakerTopic,
+						id.toString(),
+						JsonUtils.toJsonString(result.result)
+					)
 						.also { logger.info("Republiserer DELTAKER med id $id") }
 						.also { stringKafkaProducer.sendSync(it) }
-						.also { publishRepository.set(id, DataPublishType.DELTAKER, ret.result.digest()) }
+						.also { publishRepository.set(id, DataPublishType.DELTAKER, result.result.digest()) }
 				}
 			}
 		}
