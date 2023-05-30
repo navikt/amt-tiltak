@@ -80,7 +80,7 @@ class AmtPersonClientImpl(
 		val response = httpClient.newCall(buildRequest("migrer/nav-bruker", navBrukerDto)).execute()
 
 		if (!response.isSuccessful) {
-			log.error("Klarte ikke å opprette nav bruker med id: ${navBrukerDto.id}. Status=${response.code}")
+			log.error("Klarte ikke å opprette nav bruker i amt-person med id: ${navBrukerDto.id}. Status=${response.code}")
 		}
 	}
 
@@ -96,7 +96,7 @@ class AmtPersonClientImpl(
 		val response = httpClient.newCall(buildRequest("migrer/nav-ansatt", navAnsattDto)).execute()
 
 		if (!response.isSuccessful) {
-			log.error("Klarte ikke å opprette nav ansatt med id: ${navAnsattDto.id}. Status=${response.code}")
+			log.error("Klarte ikke å opprette nav ansatt i amt-person med id: ${navAnsattDto.id}. Status=${response.code}")
 		}
 	}
 
@@ -105,7 +105,7 @@ class AmtPersonClientImpl(
 		val response = httpClient.newCall(buildRequest("migrer/nav-enhet", navEnhetDto)).execute()
 
 		if (!response.isSuccessful) {
-			log.error("Klarte ikke å opprette nav ansatt med id: ${navEnhetDto.id}. Status=${response.code}")
+			log.error("Klarte ikke å opprette nav enhet i amt-person med id: ${navEnhetDto.id}. Status=${response.code}")
 		}
 	}
 

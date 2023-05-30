@@ -14,7 +14,7 @@ import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.log.SecureLog.secureLog
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.UUID
 
 @Service
 class BrukerServiceImpl(
@@ -144,23 +144,6 @@ class BrukerServiceImpl(
 		} while (brukere.isNotEmpty())
 
 		log.info("Brukere oppdatert. Det var $brukereOppdatert oppdateringer.")
-	}
-
-	override fun migrerAlle() {
-		var offset = 0
-		var brukere: List<BrukerDbo>
-
-		log.info("Migrerer brukere fra amt-tiltak til amt-person-service")
-		do {
-			brukere = brukerRepository.getBrukere(offset)
-
-			brukere.forEach { bruker -> migrerBruker(bruker) }
-
-			log.info("Migrerte brukere fra offset: $offset til: ${offset + brukere.size}")
-			offset += brukere.size
-		} while (brukere.isNotEmpty())
-
-		log.info("Migrering fullført. $offset brukere migrert.")
 	}
 
 	private fun createBruker(fodselsnummer: String): BrukerDbo {
