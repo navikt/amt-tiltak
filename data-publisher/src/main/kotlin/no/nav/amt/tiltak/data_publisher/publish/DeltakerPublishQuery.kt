@@ -1,8 +1,5 @@
 package no.nav.amt.tiltak.data_publisher.publish
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getLocalDate
 import no.nav.amt.tiltak.common.db_utils.getNullableLocalDate
@@ -18,21 +15,24 @@ import no.nav.amt.tiltak.data_publisher.model.DeltakerPublishDto
 import no.nav.amt.tiltak.data_publisher.model.DeltakerSkjultDto
 import no.nav.amt.tiltak.data_publisher.model.DeltakerStatusDto
 import no.nav.amt.tiltak.data_publisher.model.Navn
-import no.nav.amt.tiltak.data_publisher.model.PublishState
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 class DeltakerPublishQuery(
 	private val template: NamedParameterJdbcTemplate
 ) {
 
-	fun get(id: UUID): Either<PublishState, DeltakerPublishDto> {
-		val deltaker = getDeltaker(id) ?: return PublishState.PUBLISH_TOMBSTONE.left()
+	fun get(id: UUID): Result<DeltakerPublishDto> {
+		val deltaker = getDeltaker(id) ?: return Result.PublishTombstone()
 
-		if (deltaker.status == null) return PublishState.DONT_PUBLISH.left()
+		if (IgnoredDeltakerlister.deltakerlisteIds.contains(deltaker.deltakerlisteId)) {
+			return Result.DontPublish()
+		}
+
+		if (deltaker.status == null) return Result.DontPublish()
 
 		return DeltakerPublishDto(
 			deltaker.id,
@@ -77,7 +77,7 @@ class DeltakerPublishQuery(
 				)
 			},
 			deltarPaKurs = deltaker.deltarPaKurs
-		).right()
+		).let { Result.OK(it) }
 	}
 
 	private fun getDeltaker(deltakerId: UUID): DeltakerDbo? {
@@ -188,5 +188,11 @@ class DeltakerPublishQuery(
 				)
 			}
 		}
+	}
+
+	sealed class Result<T> {
+		data class OK<T>(val result: T) : Result<T>()
+		class PublishTombstone<T> : Result<T>()
+		class DontPublish<T> : Result<T>()
 	}
 }

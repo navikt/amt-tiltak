@@ -1,16 +1,15 @@
 package no.nav.amt.tiltak.data_publisher
 
-import arrow.core.getOrElse
 import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
-import no.nav.amt.tiltak.data_publisher.model.PublishState
 import no.nav.amt.tiltak.data_publisher.publish.ArrangorAnsattPublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.ArrangorPublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.DeltakerPublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.DeltakerlistePublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.EndringsmeldingPublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.IdQueries
+import no.nav.amt.tiltak.data_publisher.publish.IgnoredDeltakerlister
 import no.nav.amt.tiltak.data_publisher.publish.PublishRepository
 import no.nav.amt.tiltak.kafka.config.KafkaTopicProperties
 import no.nav.common.kafka.producer.KafkaProducerClient
@@ -44,33 +43,37 @@ class DataPublisherService(
 	fun publishAll(batchSize: Int = 100, forcePublish: Boolean = true) {
 		val idQueries = IdQueries(template)
 
-			publishBatch(
-				idProvider = { offset -> idQueries.hentDeltakerlisteIds(offset, batchSize) },
-				publisher = { id -> publishDeltakerliste(id, forcePublish) }
-			)
+		publishBatch(
+			idProvider = { offset -> idQueries.hentDeltakerlisteIds(offset, batchSize) },
+			publisher = { id -> publishDeltakerliste(id, forcePublish) }
+		)
 
-			publishBatch(
-				idProvider = { offset -> idQueries.hentDeltakerIds(offset, batchSize) },
-				publisher = { id -> publishDeltaker(id, forcePublish) }
-			)
+		publishBatch(
+			idProvider = { offset -> idQueries.hentDeltakerIds(offset, batchSize) },
+			publisher = { id -> publishDeltaker(id, forcePublish) }
+		)
 
-			publishBatch(
-				idProvider = { offset -> idQueries.hentArrangorIds(offset, batchSize) },
-				publisher = { id -> publishArrangor(id, forcePublish) }
-			)
+		publishBatch(
+			idProvider = { offset -> idQueries.hentArrangorIds(offset, batchSize) },
+			publisher = { id -> publishArrangor(id, forcePublish) }
+		)
 
-			publishBatch(
-				idProvider = { offset -> idQueries.hentArrangorAnsattIds(offset, batchSize) },
-				publisher = { id -> publishArrangorAnsatt(id, forcePublish) }
-			)
+		publishBatch(
+			idProvider = { offset -> idQueries.hentArrangorAnsattIds(offset, batchSize) },
+			publisher = { id -> publishArrangorAnsatt(id, forcePublish) }
+		)
 
-			publishBatch(
-				idProvider = { offset -> idQueries.hentEndringsmeldingIds(offset, batchSize) },
-				publisher = { id -> publishEndringsmelding(id, forcePublish) }
-			)
+		publishBatch(
+			idProvider = { offset -> idQueries.hentEndringsmeldingIds(offset, batchSize) },
+			publisher = { id -> publishEndringsmelding(id, forcePublish) }
+		)
 	}
 
 	private fun publishDeltakerliste(id: UUID, forcePublish: Boolean = false) {
+		if (IgnoredDeltakerlister.deltakerlisteIds.contains(id)) {
+			return
+		}
+
 		val deltakerlistePublishDto = DeltakerlistePublishQuery(template).get(id)
 
 		if (deltakerlistePublishDto == null) {
@@ -79,7 +82,12 @@ class DataPublisherService(
 			stringKafkaProducer.sendSync(record)
 			logger.info("Tombstonet DELTAKERLISTE med id $id")
 		} else {
-			if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKERLISTE, deltakerlistePublishDto.digest())) {
+			if (forcePublish || !publishRepository.hasHash(
+					id,
+					DataPublishType.DELTAKERLISTE,
+					deltakerlistePublishDto.digest()
+				)
+			) {
 				val key = id.toString()
 				val value = JsonUtils.toJsonString(deltakerlistePublishDto)
 				val record = ProducerRecord(kafkaTopicProperties.amtDeltakerlisteTopic, key, value)
@@ -91,27 +99,25 @@ class DataPublisherService(
 	}
 
 	private fun publishDeltaker(id: UUID, forcePublish: Boolean = false) {
-
-		DeltakerPublishQuery(template).get(id).getOrElse {
-			when (it) {
-				PublishState.DONT_PUBLISH -> return
-				PublishState.PUBLISH_TOMBSTONE -> {
-					val key = id.toString()
-					val record = ProducerRecord<String, String?>(kafkaTopicProperties.amtDeltakerTopic, key, null)
-					logger.info("Legger inn Tombstone på DELTAKER med id $id")
-					stringKafkaProducer.sendSync(record)
-					return
-				}
+		when (val result = DeltakerPublishQuery(template).get(id)) {
+			is DeltakerPublishQuery.Result.DontPublish -> return
+			is DeltakerPublishQuery.Result.PublishTombstone -> {
+				ProducerRecord<String, String?>(kafkaTopicProperties.amtDeltakerTopic, id.toString(), null)
+					.let { stringKafkaProducer.sendSync(it) }
+					.also { logger.info("Legger inn Tombstone på DELTAKER med id $id") }
 			}
-		}.let { currentData ->
-			if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKER, currentData.digest())) {
-				val key = id.toString()
-				val value = JsonUtils.toJsonString(currentData)
-				val record = ProducerRecord(kafkaTopicProperties.amtDeltakerTopic, key, value)
-				logger.info("Republiserer DELTAKER med id $id")
-				stringKafkaProducer.sendSync(record)
-				publishRepository.set(id, DataPublishType.DELTAKER, currentData.digest())
 
+			is DeltakerPublishQuery.Result.OK -> {
+				if (forcePublish || !publishRepository.hasHash(id, DataPublishType.DELTAKER, result.result.digest())) {
+					ProducerRecord(
+						kafkaTopicProperties.amtDeltakerTopic,
+						id.toString(),
+						JsonUtils.toJsonString(result.result)
+					)
+						.also { logger.info("Republiserer DELTAKER med id $id") }
+						.also { stringKafkaProducer.sendSync(it) }
+						.also { publishRepository.set(id, DataPublishType.DELTAKER, result.result.digest()) }
+				}
 			}
 		}
 	}
