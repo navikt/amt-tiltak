@@ -1,5 +1,7 @@
 package no.nav.amt.tiltak.deltaker.service
 
+import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
+import no.nav.amt.tiltak.clients.amt_person.dto.OpprettNavBrukerDto
 import no.nav.amt.tiltak.core.domain.tiltak.IdentType
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.port.BrukerService
@@ -12,7 +14,7 @@ import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.log.SecureLog.secureLog
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.UUID
 
 @Service
 class BrukerServiceImpl(
@@ -20,6 +22,7 @@ class BrukerServiceImpl(
 	private val personService: PersonService,
 	private val navAnsattService: NavAnsattService,
 	private val navEnhetService: NavEnhetService,
+	private val amtPersonClient: AmtPersonClient,
 ) : BrukerService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -168,7 +171,30 @@ class BrukerServiceImpl(
 			erSkjermet = erSkjermet
 		)
 
-		return brukerRepository.upsert(bruker)
+		val brukerDbo = brukerRepository.upsert(bruker)
+
+		migrerBruker(brukerDbo)
+
+		return brukerDbo
+	}
+
+	private fun migrerBruker(bruker: BrukerDbo) {
+		amtPersonClient.migrerNavBruker(
+			OpprettNavBrukerDto(
+				id = bruker.id,
+				personIdent = bruker.personIdent,
+				personIdentType = bruker.personIdentType?.name,
+				historiskeIdenter = bruker.historiskeIdenter,
+				fornavn = bruker.fornavn,
+				mellomnavn = bruker.mellomnavn,
+				etternavn = bruker.etternavn,
+				navVeilederId = bruker.ansvarligVeilederId,
+				navEnhetId = bruker.navEnhetId,
+				telefon = bruker.telefonnummer,
+				epost = bruker.epost,
+				erSkjermet = bruker.erSkjermet,
+			)
+		)
 	}
 
 

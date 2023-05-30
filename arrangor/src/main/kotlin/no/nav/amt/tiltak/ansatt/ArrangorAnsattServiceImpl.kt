@@ -10,6 +10,7 @@ import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
@@ -21,8 +22,10 @@ class ArrangorAnsattServiceImpl(
 	private val arrangorAnsattRepository: ArrangorAnsattRepository,
 	private val personService: PersonService,
 	private val arrangorService: ArrangorService,
-	private val dataPublisherService: DataPublisherService
+	private val dataPublisherService: DataPublisherService,
 ) : ArrangorAnsattService {
+
+	private val log = LoggerFactory.getLogger(javaClass)
 
 	// Forhindrer circular dependency, må fikses når vi rydder opp i arkitekturen
 	@Lazy

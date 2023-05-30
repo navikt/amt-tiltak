@@ -55,6 +55,9 @@ spec:
         - application: amt-enhetsregister
           namespace: amt
           cluster: dev-gcp
+        - application: amt-person-service
+          namespace: amt
+          cluster: dev-gcp
         - application: poao-tilgang
           namespace: poao
           cluster: dev-gcp
@@ -94,6 +97,10 @@ spec:
       value: api://dev-gcp.amt.amt-enhetsregister/.default
     - name: AMT_ENHETSREGISTER_URL
       value: http://amt-enhetsregister.amt.svc.cluster.local
+    - name: AMT_PERSON_URL
+      value: http://amt-person-service.amt.svc.cluster.local
+    - name: AMT_PERSON_SCOPE
+      value: api://dev-gcp.amt.amt-person-service/.default
     - name: NOM_SCOPE
       value: api://dev-gcp.nom.nom-api/.default
     - name: NOM_URL

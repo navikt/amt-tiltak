@@ -8,6 +8,7 @@ import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
@@ -70,6 +71,7 @@ class DeltakerServiceImplTest {
 	lateinit var kafkaProducerService: KafkaProducerService
 	lateinit var objectMapper: ObjectMapper
 	lateinit var publisherService: DataPublisherService
+	lateinit var amtPersonClient: AmtPersonClient
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 	val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
@@ -84,7 +86,8 @@ class DeltakerServiceImplTest {
 		endringsmeldingService = mockk()
 		kafkaProducerService = mockk(relaxUnitFun = true)
 		publisherService = mockk()
-		brukerService = BrukerServiceImpl(brukerRepository, mockk(), mockk(), navEnhetService)
+		amtPersonClient = mockk(relaxUnitFun = true)
+		brukerService = BrukerServiceImpl(brukerRepository, mockk(), mockk(), navEnhetService, amtPersonClient)
 		objectMapper = JsonUtils.objectMapper
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
