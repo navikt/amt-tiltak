@@ -207,6 +207,12 @@ class DeltakerController(
 		deltakerService.skjulDeltakerForTiltaksarrangor(deltakerId, ansatt.id)
 	}
 
+	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
+	@GetMapping("/{deltakerId}/bruker-id")
+	fun hentBrukerId(@PathVariable("deltakerId") deltakerId: UUID): UUID {
+		return deltakerService.hentBrukerId(deltakerId)
+	}
+
 	private fun verifiserErIkkeSkjult(deltakerId: UUID) {
 		if (deltakerService.erSkjultForTiltaksarrangor(deltakerId))
 			throw SkjultDeltakerException("Deltaker med id $deltakerId er skjult for tiltaksarrangør")

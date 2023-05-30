@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.deltaker.repositories
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getNullableUUID
+import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.core.domain.tiltak.AVSLUTTENDE_STATUSER
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
@@ -317,5 +318,16 @@ open class DeltakerRepository(
 		)
 
 		template.update(sql, parameters)
+	}
+
+	fun hentBrukerId(deltakerId: UUID): UUID {
+		val sql = """
+			select bruker_id from deltaker where id = :deltakerId
+		""".trimIndent()
+
+		val parameters = sqlParameters("deltakerId" to deltakerId)
+
+		return template.query(sql, parameters) { rs, _ -> rs.getUUID("bruker_id") }.first()
+
 	}
 }

@@ -4,7 +4,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
-import java.util.*
+import java.util.UUID
 
 interface DeltakerService {
 
@@ -49,4 +49,7 @@ interface DeltakerService {
 	fun republiserAlleDeltakerePaKafka(batchSize: Int = 500)
 
 	fun slettDeltakerePaaGjennomforing(gjennomforingId: UUID)
+
+	fun hentBrukerId(deltakerId: UUID): UUID
+
 }

@@ -149,6 +149,10 @@ open class DeltakerServiceImpl(
 		brukerService.settErSkjermet(personIdent, erSkjermet)
 	}
 
+	override fun hentBrukerId(deltakerId: UUID): UUID {
+		return deltakerRepository.hentBrukerId(deltakerId)
+	}
+
 	private fun update(deltaker: DeltakerUpsert) {
 		val toUpdate = DeltakerUpdateDbo(
 			id = deltaker.id,
