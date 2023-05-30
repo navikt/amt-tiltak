@@ -160,7 +160,7 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 	}
 
-	test("insert - skal inserte Tilby plass endringsmelding") {
+	test("insert - skal inserte Er aktuell endringsmelding") {
 		val id = UUID.randomUUID()
 
 		repository.insert(
@@ -168,13 +168,13 @@ class EndringsmeldingRepositoryTest : FunSpec({
 			deltakerId = DELTAKER_1.id,
 			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
 			innhold = null,
-			type = EndringsmeldingDbo.Type.TILBY_PLASS
+			type = EndringsmeldingDbo.Type.DELTAKER_ER_AKTUELL
 
 		)
 
 		val endringsmelding = repository.get(id)
 
-		endringsmelding.type shouldBe EndringsmeldingDbo.Type.TILBY_PLASS
+		endringsmelding.type shouldBe EndringsmeldingDbo.Type.DELTAKER_ER_AKTUELL
 		endringsmelding.innhold shouldBe null
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 	}
