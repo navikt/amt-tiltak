@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.core.port
 
+import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
@@ -50,6 +51,6 @@ interface DeltakerService {
 
 	fun slettDeltakerePaaGjennomforing(gjennomforingId: UUID)
 
-	fun hentBrukerInfo(deltakerId: UUID): Map<String, UUID?>
+	fun hentBruker(deltakerId: UUID): Bruker
 
 }

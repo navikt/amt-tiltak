@@ -714,7 +714,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		response.code shouldBe 200
-		response.body!!.string() shouldBe """{"brukerId":"23b04c3a-a36c-451f-b9cf-30b6a6b586b8","navEnhetId":"09405517-99c0-49e5-9eb3-31c61b9579cf"}"""
+		response.body!!.string() shouldBe """{"brukerId":"23b04c3a-a36c-451f-b9cf-30b6a6b586b8","personIdentType":null,"historiskeIdenter":[],"navEnhetId":"09405517-99c0-49e5-9eb3-31c61b9579cf"}""".trimMargin()
 	}
 
 

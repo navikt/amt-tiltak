@@ -209,8 +209,14 @@ class DeltakerController(
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@GetMapping("/{deltakerId}/bruker-info")
-	fun hentBrukerInfo(@PathVariable("deltakerId") deltakerId: UUID): Map<String, UUID?> {
-		return deltakerService.hentBrukerInfo(deltakerId)
+	fun hentBrukerInfo(@PathVariable("deltakerId") deltakerId: UUID): BrukerInfo {
+		val bruker = deltakerService.hentBruker(deltakerId)
+		return BrukerInfo(
+			bruker.id,
+			bruker.personIdentType?.name,
+			bruker.historiskeIdenter,
+			bruker.navEnhetId,
+		)
 	}
 
 	private fun verifiserErIkkeSkjult(deltakerId: UUID) {
@@ -224,3 +230,11 @@ class DeltakerController(
 		val gyldigFraDato: LocalDate?
 	)
 }
+
+
+data class BrukerInfo(
+	val brukerId: UUID,
+	val personIdentType: String?,
+	val historiskeIdenter: List<String>,
+	val navEnhetId: UUID?,
+)

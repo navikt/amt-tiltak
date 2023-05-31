@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.deltaker.service
 
 import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
 import no.nav.amt.tiltak.clients.amt_person.dto.OpprettNavBrukerDto
+import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.IdentType
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.port.BrukerService
@@ -50,6 +51,24 @@ class BrukerServiceImpl(
 		return bruker.id
 	}
 
+	override fun hentBruker(id: UUID): Bruker {
+		val brukerDbo = brukerRepository.get(id) ?: throw NoSuchElementException("Fant ikke bruker med id: $id")
+		return Bruker(
+			id = brukerDbo.id ,
+			personIdent = brukerDbo.personIdent,
+			personIdentType = brukerDbo.personIdentType,
+			historiskeIdenter = brukerDbo.historiskeIdenter,
+			fornavn = brukerDbo.fornavn,
+			mellomnavn = brukerDbo.mellomnavn,
+			etternavn = brukerDbo.etternavn,
+			telefonnummer = brukerDbo.telefonnummer,
+			epost = brukerDbo.epost,
+			ansvarligVeilederId = brukerDbo.ansvarligVeilederId,
+			navEnhetId = brukerDbo.navEnhetId,
+			erSkjermet = brukerDbo.erSkjermet,
+		)
+
+	}
 	override fun finnesBruker(personIdent: String): Boolean {
 		return brukerRepository.get(personIdent) != null
 	}
