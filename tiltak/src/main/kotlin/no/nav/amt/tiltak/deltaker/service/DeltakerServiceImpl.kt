@@ -149,8 +149,12 @@ open class DeltakerServiceImpl(
 		brukerService.settErSkjermet(personIdent, erSkjermet)
 	}
 
-	override fun hentBrukerId(deltakerId: UUID): UUID {
-		return deltakerRepository.hentBrukerId(deltakerId)
+	override fun hentBrukerInfo(deltakerId: UUID): Map<String, UUID?>  {
+		val navEnhetId = deltakerRepository.get(deltakerId)?.navEnhet?.id
+		return mapOf(
+			"brukerId" to deltakerRepository.hentBrukerId(deltakerId),
+			"navEnhetId" to navEnhetId,
+		)
 	}
 
 	private fun update(deltaker: DeltakerUpsert) {

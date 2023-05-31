@@ -208,9 +208,9 @@ class DeltakerController(
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
-	@GetMapping("/{deltakerId}/bruker-id")
-	fun hentBrukerId(@PathVariable("deltakerId") deltakerId: UUID): UUID {
-		return deltakerService.hentBrukerId(deltakerId)
+	@GetMapping("/{deltakerId}/bruker-info")
+	fun hentBrukerInfo(@PathVariable("deltakerId") deltakerId: UUID): Map<String, UUID?> {
+		return deltakerService.hentBrukerInfo(deltakerId)
 	}
 
 	private fun verifiserErIkkeSkjult(deltakerId: UUID) {

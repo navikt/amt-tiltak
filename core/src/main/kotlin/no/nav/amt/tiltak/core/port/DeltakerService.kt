@@ -50,6 +50,6 @@ interface DeltakerService {
 
 	fun slettDeltakerePaaGjennomforing(gjennomforingId: UUID)
 
-	fun hentBrukerId(deltakerId: UUID): UUID
+	fun hentBrukerInfo(deltakerId: UUID): Map<String, UUID?>
 
 }

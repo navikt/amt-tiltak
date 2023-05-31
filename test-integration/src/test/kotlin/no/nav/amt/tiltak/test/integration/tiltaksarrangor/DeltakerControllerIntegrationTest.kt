@@ -15,7 +15,6 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_VEILEDER_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2_VEILEDER_1
-import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
@@ -707,15 +706,15 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	fun `hentBrukerId - deltaker finnes - skal ha status 200 og returnere brukerId`() {
+	fun `hentBrukerInfo - deltaker finnes - skal ha status 200 og returnere info`() {
 		val response = sendRequest(
 			method = "GET",
-			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/bruker-id",
+			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/bruker-info",
 			headers =  mapOf("Authorization" to "Bearer ${mockOAuthServer.issueAzureAdM2MToken()}")
 		)
 
 		response.code shouldBe 200
-		response.body!!.string().trim('"') shouldBe BRUKER_1.id.toString()
+		response.body!!.string() shouldBe """{"brukerId":"23b04c3a-a36c-451f-b9cf-30b6a6b586b8","navEnhetId":"09405517-99c0-49e5-9eb3-31c61b9579cf"}"""
 	}
 
 
