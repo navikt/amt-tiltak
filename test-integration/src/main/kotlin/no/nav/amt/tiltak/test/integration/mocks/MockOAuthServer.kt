@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.test.integration.mocks
 
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.slf4j.LoggerFactory
-import java.util.*
+import java.util.UUID
 
 open class MockOAuthServer {
 
@@ -66,4 +66,14 @@ open class MockOAuthServer {
 		return server.issueToken(tokenXIssuer, subject, audience, claims).serialize()
 	}
 
+	fun issueAzureAdM2MToken(
+		subject: String = "test",
+		audience: String = "test-aud",
+		claims: Map<String, Any> = emptyMap()
+	): String {
+		val claimsWithRoles = claims.toMutableMap()
+		claimsWithRoles["roles"] = arrayOf("access_as_application")
+
+		return server.issueToken(azureAdIssuer, subject, audience, claimsWithRoles).serialize()
+	}
 }
