@@ -54,6 +54,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 class DeltakerServiceImplTest {
@@ -533,12 +534,13 @@ class DeltakerServiceImplTest {
 		gyldigFra = LocalDateTime.now().minusDays(7),
 	)
 
+
 	val deltaker = DeltakerUpsert(
 		id = deltakerId,
 		statusInsert = statusInsert,
 		startDato = null,
 		sluttDato = null,
-		registrertDato = LocalDateTime.now(),
+		registrertDato = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
 		dagerPerUke = null,
 		prosentStilling = null,
 		gjennomforingId = GJENNOMFORING_1.id,

@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.core.domain.tiltak
 
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 data class DeltakerUpsert(
@@ -15,22 +16,15 @@ data class DeltakerUpsert(
 	val prosentStilling: Float? = null,
 	val innsokBegrunnelse: String?
 ) {
-	fun compareTo(deltaker: Deltaker) = this == DeltakerUpsert(
-			id = deltaker.id,
-			statusInsert = DeltakerStatusInsert(
-				id = deltaker.status.id,
-				deltakerId = deltaker.id,
-				type = deltaker.status.type,
-				aarsak = deltaker.status.aarsak,
-				gyldigFra = deltaker.status.gyldigFra
-			),
-			gjennomforingId = deltaker.gjennomforingId,
-			startDato = deltaker.startDato,
-			sluttDato = deltaker.sluttDato,
-			registrertDato = deltaker.registrertDato,
-			dagerPerUke = deltaker.dagerPerUke,
-			prosentStilling = deltaker.prosentStilling,
-			innsokBegrunnelse = deltaker.innsokBegrunnelse
-		)
+	fun compareTo(deltaker: Deltaker): Boolean {
+		// Her kan man ikke enkelt sammenlikne hele objektet fordi sammenlikning av localdatetime må rundes av pga ms presisjon
+		val statusEquals = statusInsert.type == deltaker.status.type && statusInsert.aarsak == deltaker.status.aarsak
+		val deltakerEquals = id == deltaker.id && startDato == deltaker.startDato && sluttDato == deltaker.sluttDato
+			&& registrertDato.truncatedTo(ChronoUnit.MILLIS) == deltaker.registrertDato.truncatedTo(ChronoUnit.MILLIS)
+			&& dagerPerUke == deltaker.dagerPerUke && prosentStilling == deltaker.prosentStilling
+			&& innsokBegrunnelse == deltaker.innsokBegrunnelse
+
+		return statusEquals && deltakerEquals
+	}
 
 }

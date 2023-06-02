@@ -299,7 +299,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			sluttDato = LocalDate.now().plusDays(2),
 			dagerPerUke = 2,
 			prosentStilling = 20.0f,
-			registrertDato = LocalDateTime.now().minusDays(10)
+			registrertDato = now.minusDays(10)
 		)
 		val statusInsertDbo = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
