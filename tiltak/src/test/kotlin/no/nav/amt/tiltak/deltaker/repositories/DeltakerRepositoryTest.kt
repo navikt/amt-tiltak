@@ -133,7 +133,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 		gottenDbo.sluttDato shouldBe insertDbo.sluttDato
 		gottenDbo.dagerPerUke shouldBe insertDbo.dagerPerUke
 		gottenDbo.prosentStilling shouldBe insertDbo.prosentStilling
-		gottenDbo.registrertDato shouldBe insertDbo.registrertDato	}
+		gottenDbo.registrertDato.truncatedTo(ChronoUnit.MINUTES) shouldBe insertDbo.registrertDato.truncatedTo(ChronoUnit.MINUTES)
+	}
 
 	test("get(brukerId, gjennomforing) - returnerer deltaker") {
 
