@@ -4,8 +4,10 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-data class DeltakerUpdateDbo(
+data class DeltakerUpsertDbo(
 	val id: UUID,
+	val brukerId: UUID,
+	val gjennomforingId: UUID,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val registrertDato: LocalDateTime,

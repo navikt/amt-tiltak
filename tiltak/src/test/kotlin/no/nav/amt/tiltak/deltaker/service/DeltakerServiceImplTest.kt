@@ -250,6 +250,32 @@ class DeltakerServiceImplTest {
 	}
 
 	@Test
+	fun `upsertDeltaker - republiserer ikke uendrede deltakere`() {
+		verify(exactly = 0) { kafkaProducerService.publiserDeltaker(any()) }
+
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
+
+		verify(exactly = 1) { kafkaProducerService.publiserDeltaker(any()) }
+	}
+
+	@Test
+	fun `upsertDeltaker - oppdaterer forrige deltaker`() {
+		val dagerPerUke = 5
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker.copy(dagerPerUke = dagerPerUke))
+
+		val nyDeltaker = deltakerRepository.get(BRUKER_1.personIdent, deltaker.gjennomforingId)
+
+		nyDeltaker shouldNotBe null
+		nyDeltaker!!.id shouldBe deltaker.id
+		nyDeltaker.gjennomforingId shouldBe deltaker.gjennomforingId
+		nyDeltaker.dagerPerUke shouldBe dagerPerUke
+
+		verify(exactly = 2) { kafkaProducerService.publiserDeltaker(any()) }
+	}
+
+	@Test
 	fun `insertStatus - skal publisere endring på kafka`() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 

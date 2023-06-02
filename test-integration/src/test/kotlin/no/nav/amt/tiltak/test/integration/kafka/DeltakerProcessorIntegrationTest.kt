@@ -10,7 +10,6 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.DbUtils.shouldBeEqualTo
 import no.nav.amt.tiltak.test.database.data.TestData
-import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
@@ -67,7 +66,7 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 			val deltaker = maybeDeltaker!!
 			deltaker.personIdent shouldBe message.personIdent
 			deltaker.gjennomforingId shouldBe message.gjennomforingId
-			deltaker.prosentStilling shouldBe 0.0 // message.prosentDeltid - NULL i databasen blir konvertert til 0.0
+			deltaker.prosentStilling shouldBe message.prosentDeltid
 			deltaker.dagerPerUke shouldBe message.dagerPerUke
 			deltaker.registrertDato shouldBeEqualTo message.registrertDato
 			deltaker.startDato shouldBe message.startDato
@@ -104,7 +103,7 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 			val deltaker = maybeDeltaker!!
 			deltaker.personIdent shouldBe message.personIdent
 			deltaker.gjennomforingId shouldBe message.gjennomforingId
-			deltaker.prosentStilling shouldBe 0.0
+			deltaker.prosentStilling shouldBe message.prosentDeltid
 			deltaker.dagerPerUke shouldBe message.dagerPerUke
 			deltaker.registrertDato shouldBeEqualTo message.registrertDato
 			deltaker.startDato shouldBe message.startDato

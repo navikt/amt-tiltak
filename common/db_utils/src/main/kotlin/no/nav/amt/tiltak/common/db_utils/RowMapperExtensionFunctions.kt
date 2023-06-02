@@ -1,7 +1,11 @@
 package no.nav.amt.tiltak.common.db_utils
 
 import java.sql.ResultSet
-import java.time.*
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.util.*
 
 fun ResultSet.getUUID(columnLabel: String): UUID {
@@ -40,4 +44,16 @@ fun ResultSet.getZonedDateTime(columnLabel: String): ZonedDateTime {
 
 fun ResultSet.getNullableString(columnLabel: String): String? {
 	return this.getString(columnLabel)
+}
+
+fun ResultSet.getNullableInt(columnLabel: String): Int? {
+	val value = this.getInt(columnLabel)
+	if (this.wasNull()) return null
+	return value
+}
+
+fun ResultSet.getNullableFloat(columnLabel: String): Float? {
+	val value = this.getFloat(columnLabel)
+	if (this.wasNull()) return null
+	return value
 }
