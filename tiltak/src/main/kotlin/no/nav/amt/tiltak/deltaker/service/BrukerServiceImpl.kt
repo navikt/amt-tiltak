@@ -67,8 +67,28 @@ class BrukerServiceImpl(
 			navEnhetId = brukerDbo.navEnhetId,
 			erSkjermet = brukerDbo.erSkjermet,
 		)
-
 	}
+
+	override fun hentBruker(personIdent: String): Bruker? {
+		val brukerDbo = brukerRepository.get(personIdent)
+		return brukerDbo?.let {
+			Bruker(
+				id = it.id,
+				personIdent = it.personIdent,
+				personIdentType = it.personIdentType,
+				historiskeIdenter = it.historiskeIdenter,
+				fornavn = it.fornavn,
+				mellomnavn = it.mellomnavn,
+				etternavn = it.etternavn,
+				telefonnummer = it.telefonnummer,
+				epost = it.epost,
+				ansvarligVeilederId = it.ansvarligVeilederId,
+				navEnhetId = it.navEnhetId,
+				erSkjermet = it.erSkjermet,
+			)
+		}
+	}
+
 	override fun finnesBruker(personIdent: String): Boolean {
 		return brukerRepository.get(personIdent) != null
 	}
