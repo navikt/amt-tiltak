@@ -31,4 +31,6 @@ interface BrukerService {
 	fun slettBruker(personIdent: String)
 
 	fun hentBruker(id: UUID): Bruker
+
+	fun hentBruker(personIdent: String): Bruker?
 }

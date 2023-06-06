@@ -53,4 +53,6 @@ interface DeltakerService {
 
 	fun hentBruker(deltakerId: UUID): Bruker
 
+	fun hentBruker(personIdent: String): Bruker?
+
 }

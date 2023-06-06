@@ -156,6 +156,10 @@ open class DeltakerServiceImpl(
 		return brukerService.hentBruker(brukerId)
 	}
 
+	override fun hentBruker(personIdent: String): Bruker? {
+		return brukerService.hentBruker(personIdent)
+	}
+
 	private fun update(deltaker: DeltakerUpsert) {
 		val toUpdate = DeltakerUpdateDbo(
 			id = deltaker.id,
