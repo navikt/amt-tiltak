@@ -219,6 +219,20 @@ class DeltakerController(
 		)
 	}
 
+	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
+	@PostMapping("/bruker-info")
+	fun hentBrukerInfoForPersonident(@RequestBody request: HentBrukerInfoRequest): BrukerInfo {
+		val bruker = deltakerService.hentBruker(request.personident)
+		return bruker?.let {
+			BrukerInfo(
+				brukerId = it.id,
+				personIdentType = it.personIdentType?.name,
+				historiskeIdenter = it.historiskeIdenter,
+				navEnhetId = it.navEnhetId
+			)
+		} ?: throw NoSuchElementException("Fant ikke forespurt bruker")
+	}
+
 	private fun verifiserErIkkeSkjult(deltakerId: UUID) {
 		if (deltakerService.erSkjultForTiltaksarrangor(deltakerId))
 			throw SkjultDeltakerException("Deltaker med id $deltakerId er skjult for tiltaksarrangør")
