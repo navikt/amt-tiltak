@@ -50,6 +50,7 @@ spec:
         - application: amt-tiltaksarrangor-flate
         - application: amt-tiltaksansvarlig-flate
         - application: amt-tiltaksarrangor-bff
+        - application: amt-person-service
     outbound:
       rules:
         - application: amt-person-service

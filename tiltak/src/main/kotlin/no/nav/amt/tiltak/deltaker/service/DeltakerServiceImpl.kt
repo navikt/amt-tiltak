@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.deltaker.service
 
+import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
@@ -39,7 +40,7 @@ open class DeltakerServiceImpl(
 	private val gjennomforingService: GjennomforingService,
 	private val transactionTemplate: TransactionTemplate,
 	private val kafkaProducerService: KafkaProducerService,
-	private val publisherService: DataPublisherService
+	private val publisherService: DataPublisherService,
 ) : DeltakerService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -147,6 +148,12 @@ open class DeltakerServiceImpl(
 
 	override fun settSkjermet(personIdent: String, erSkjermet: Boolean) {
 		brukerService.settErSkjermet(personIdent, erSkjermet)
+	}
+
+	override fun hentBruker(deltakerId: UUID): Bruker {
+		val brukerId = deltakerRepository.hentBrukerId(deltakerId)
+
+		return brukerService.hentBruker(brukerId)
 	}
 
 	private fun update(deltaker: DeltakerUpsert) {
