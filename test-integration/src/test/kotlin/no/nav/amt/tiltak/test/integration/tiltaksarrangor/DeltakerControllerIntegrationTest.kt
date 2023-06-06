@@ -33,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
@@ -67,8 +67,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/avslutt-deltakelse"),
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/forleng-deltakelse"),
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/ikke-aktuell"),
-			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/tilby-plass"),
-			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/sett-paa-venteliste"),
+			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/er-aktuell"),
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/endre-sluttdato"),
 
 
@@ -601,10 +600,10 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	fun `tilbyPlass() skal returnere 200 og opprette endringsmelding`() {
+	fun `deltakerErAktuell() skal returnere 200 og opprette endringsmelding`() {
 		val response = sendRequest(
 			method = "PATCH",
-			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/tilby-plass",
+			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/er-aktuell",
 			headers = createAnsatt1AuthHeader()
 		)
 
@@ -616,26 +615,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		val endringsmelding = endringsmeldinger.first()
 		endringsmelding.innhold shouldBe null
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
-		endringsmelding.type shouldBe Endringsmelding.Type.TILBY_PLASS
-	}
-
-	@Test
-	fun `settPaaVenteliste() skal returnere 200 og opprette endringsmelding`() {
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/sett-paa-venteliste",
-			headers = createAnsatt1AuthHeader()
-		)
-
-		response.code shouldBe 200
-
-		val endringsmeldinger = endringsmeldingService.hentAktiveEndringsmeldingerForDeltaker(DELTAKER_1.id)
-		endringsmeldinger shouldHaveSize 1
-
-		val endringsmelding = endringsmeldinger.first()
-		endringsmelding.innhold shouldBe null
-		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
-		endringsmelding.type shouldBe Endringsmelding.Type.SETT_PAA_VENTELISTE
+		endringsmelding.type shouldBe Endringsmelding.Type.DELTAKER_ER_AKTUELL
 	}
 
 	@Test
@@ -723,6 +703,18 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 
 		response.code shouldBe 403
+	}
+
+	@Test
+	fun `hentBrukerInfo - deltaker finnes - skal ha status 200 og returnere info`() {
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/bruker-info",
+			headers =  mapOf("Authorization" to "Bearer ${mockOAuthServer.issueAzureAdM2MToken()}")
+		)
+
+		response.code shouldBe 200
+		response.body!!.string() shouldBe """{"brukerId":"23b04c3a-a36c-451f-b9cf-30b6a6b586b8","personIdentType":null,"historiskeIdenter":[],"navEnhetId":"09405517-99c0-49e5-9eb3-31c61b9579cf"}""".trimMargin()
 	}
 
 

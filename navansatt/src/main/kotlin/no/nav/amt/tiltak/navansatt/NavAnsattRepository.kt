@@ -75,4 +75,22 @@ internal class NavAnsattRepository(
 		rowMapper
 	)
 
+	fun getAnsatte(offset: Int, limit: Int = 500): List<NavAnsattDbo> {
+		val sql = """
+			SELECT *
+			FROM nav_ansatt
+			ORDER BY id
+			OFFSET :offset
+			LIMIT :limit;
+		""".trimIndent()
+
+		val parameters = sqlParameters(
+			"offset" to offset,
+			"limit" to limit
+		)
+
+		return template.query(sql, parameters, rowMapper)
+
+	}
+
 }

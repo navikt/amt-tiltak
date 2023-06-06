@@ -1,8 +1,9 @@
 package no.nav.amt.tiltak.core.port
 
+import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.IdentType
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
-import java.util.*
+import java.util.UUID
 
 interface BrukerService {
 	fun updateBrukerByPersonIdent(personIdent: String, fornavn: String, mellomnavn: String?, etternavn: String)
@@ -28,4 +29,6 @@ interface BrukerService {
 	fun oppdaterPersonIdenter(gjeldendeIdent: String, identType: IdentType, historiskeIdenter: List<String>)
 
 	fun slettBruker(personIdent: String)
+
+	fun hentBruker(id: UUID): Bruker
 }

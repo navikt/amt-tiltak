@@ -171,7 +171,7 @@ open class EndringsmeldingServiceImpl(
 		)
 	}
 
-	override fun opprettTilbyPlassEndringsmelding(
+	override fun opprettErAktuellEndringsmelding(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
 	) {
@@ -179,19 +179,7 @@ open class EndringsmeldingServiceImpl(
 			deltakerId,
 			arrangorAnsattId,
 			null,
-			EndringsmeldingDbo.Type.TILBY_PLASS
-		)
-	}
-
-	override fun opprettSettPaaVentelisteEndringsmelding(
-		deltakerId: UUID,
-		arrangorAnsattId: UUID,
-	) {
-		opprettOgMarkerAktiveSomUtdatert(
-			deltakerId,
-			arrangorAnsattId,
-			null,
-			EndringsmeldingDbo.Type.SETT_PAA_VENTELISTE
+			EndringsmeldingDbo.Type.DELTAKER_ER_AKTUELL
 		)
 	}
 
@@ -236,8 +224,7 @@ open class EndringsmeldingServiceImpl(
 			EndringsmeldingDbo.Type.AVSLUTT_DELTAKELSE -> Endringsmelding.Type.AVSLUTT_DELTAKELSE
 			EndringsmeldingDbo.Type.DELTAKER_IKKE_AKTUELL -> Endringsmelding.Type.DELTAKER_IKKE_AKTUELL
 			EndringsmeldingDbo.Type.ENDRE_DELTAKELSE_PROSENT -> Endringsmelding.Type.ENDRE_DELTAKELSE_PROSENT
-			EndringsmeldingDbo.Type.TILBY_PLASS -> Endringsmelding.Type.TILBY_PLASS
-			EndringsmeldingDbo.Type.SETT_PAA_VENTELISTE -> Endringsmelding.Type.SETT_PAA_VENTELISTE
+			EndringsmeldingDbo.Type.DELTAKER_ER_AKTUELL -> Endringsmelding.Type.DELTAKER_ER_AKTUELL
 			EndringsmeldingDbo.Type.ENDRE_SLUTTDATO -> Endringsmelding.Type.ENDRE_SLUTTDATO
 		}
 	}

@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.nav_enhet
 
+import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
 import no.nav.amt.tiltak.clients.norg.NorgClient
 import no.nav.amt.tiltak.clients.veilarbarena.VeilarbarenaClient
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
@@ -12,7 +13,8 @@ import java.util.*
 open class NavEnhetServiceImpl(
 	private val norgClient: NorgClient,
 	private val navEnhetRepository: NavEnhetRepository,
-	private val veilarbarenaClient: VeilarbarenaClient
+	private val veilarbarenaClient: VeilarbarenaClient,
+	private val amtPersonClient: AmtPersonClient,
 ) : NavEnhetService {
 
 	override fun getNavEnhetForBruker(personIdent: String): NavEnhet? {
@@ -46,7 +48,9 @@ open class NavEnhetServiceImpl(
 
 		navEnhetRepository.insert(insertInput)
 
-		return getNavEnhet(id)
+		val enhet = getNavEnhet(id)
+		amtPersonClient.migrerNavEnhet(enhet)
+		return enhet
 	}
 
 }

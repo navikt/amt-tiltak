@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.data_publisher.publish.DeltakerPublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.DeltakerlistePublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.EndringsmeldingPublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.IdQueries
+import no.nav.amt.tiltak.data_publisher.publish.IgnoredDeltakerlister
 import no.nav.amt.tiltak.data_publisher.publish.PublishRepository
 import no.nav.amt.tiltak.kafka.config.KafkaTopicProperties
 import no.nav.common.kafka.producer.KafkaProducerClient
@@ -69,6 +70,10 @@ class DataPublisherService(
 	}
 
 	private fun publishDeltakerliste(id: UUID, forcePublish: Boolean = false) {
+		if (IgnoredDeltakerlister.deltakerlisteIds.contains(id)) {
+			return
+		}
+
 		val deltakerlistePublishDto = DeltakerlistePublishQuery(template).get(id)
 
 		if (deltakerlistePublishDto == null) {

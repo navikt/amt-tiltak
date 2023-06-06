@@ -177,8 +177,7 @@ open class EndringsmeldingRepository(
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold>(innholdJson)
 			EndringsmeldingDbo.Type.ENDRE_SLUTTDATO ->
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.EndreSluttdatoInnhold>(innholdJson)
-			EndringsmeldingDbo.Type.TILBY_PLASS,
-			EndringsmeldingDbo.Type.SETT_PAA_VENTELISTE -> null
+			EndringsmeldingDbo.Type.DELTAKER_ER_AKTUELL -> null
 
 		}
 

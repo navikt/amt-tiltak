@@ -171,8 +171,8 @@ class DeltakerController(
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
-	@PatchMapping("/{deltakerId}/tilby-plass")
-	fun tilbyPlass(
+	@PatchMapping("/{deltakerId}/er-aktuell")
+	fun deltakerErAktuell(
 		@PathVariable("deltakerId") deltakerId: UUID,
 	) {
 		val ansatt = controllerService.hentInnloggetAnsatt()
@@ -180,20 +180,7 @@ class DeltakerController(
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		verifiserErIkkeSkjult(deltakerId)
 
-		endringsmeldingService.opprettTilbyPlassEndringsmelding(deltakerId, ansatt.id)
-	}
-
-	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
-	@PatchMapping("/{deltakerId}/sett-paa-venteliste")
-	fun settPaaVenteliste(
-		@PathVariable("deltakerId") deltakerId: UUID,
-	) {
-		val ansatt = controllerService.hentInnloggetAnsatt()
-
-		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		verifiserErIkkeSkjult(deltakerId)
-
-		endringsmeldingService.opprettSettPaaVentelisteEndringsmelding(deltakerId, ansatt.id)
+		endringsmeldingService.opprettErAktuellEndringsmelding(deltakerId, ansatt.id)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -220,6 +207,18 @@ class DeltakerController(
 		deltakerService.skjulDeltakerForTiltaksarrangor(deltakerId, ansatt.id)
 	}
 
+	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
+	@GetMapping("/{deltakerId}/bruker-info")
+	fun hentBrukerInfo(@PathVariable("deltakerId") deltakerId: UUID): BrukerInfo {
+		val bruker = deltakerService.hentBruker(deltakerId)
+		return BrukerInfo(
+			bruker.id,
+			bruker.personIdentType?.name,
+			bruker.historiskeIdenter,
+			bruker.navEnhetId,
+		)
+	}
+
 	private fun verifiserErIkkeSkjult(deltakerId: UUID) {
 		if (deltakerService.erSkjultForTiltaksarrangor(deltakerId))
 			throw SkjultDeltakerException("Deltaker med id $deltakerId er skjult for tiltaksarrangør")
@@ -231,3 +230,11 @@ class DeltakerController(
 		val gyldigFraDato: LocalDate?
 	)
 }
+
+
+data class BrukerInfo(
+	val brukerId: UUID,
+	val personIdentType: String?,
+	val historiskeIdenter: List<String>,
+	val navEnhetId: UUID?,
+)
