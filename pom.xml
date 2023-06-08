@@ -27,6 +27,7 @@
         <module>tilgangskontroll-tiltaksarrangor</module>
         <module>test-integration</module>
         <module>data-publisher</module>
+        <module>external-api</module>
     </modules>
 
     <name>AMT-Tiltak</name>
@@ -316,6 +317,11 @@
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>data-publisher</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.amt-tiltak</groupId>
+                <artifactId>external-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
