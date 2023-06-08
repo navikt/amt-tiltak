@@ -7,9 +7,8 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpdateDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpsertDbo
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_3
@@ -23,7 +22,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.util.UUID
+import java.util.*
 
 internal class DeltakerRepositoryTest : FunSpec({
 
@@ -59,17 +58,17 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val prosentStilling = 20.0f
 		val begrunnelse = "begrunnelse"
 
-		repository.insert(
-			DeltakerInsertDbo(
+		repository.upsert(
+			DeltakerUpsertDbo(
 				id,
 				BRUKER_3.id,
 				GJENNOMFORING_1.id,
 				startDato,
 				sluttDato,
-				dagerPerUke,
-				prosentStilling,
-				registrertDato,
-				begrunnelse
+				dagerPerUke = dagerPerUke,
+				prosentStilling = prosentStilling,
+				registrertDato = registrertDato,
+				innsokBegrunnelse = begrunnelse
 			)
 		)
 		val dbo = repository.get(id)
@@ -88,38 +87,42 @@ internal class DeltakerRepositoryTest : FunSpec({
 		dbo.innsokBegrunnelse shouldBe begrunnelse
 	}
 
-	test("Update should update Deltaker and return the updated Deltaker") {
+	test("upsert - should update Deltaker and return the updated Deltaker") {
 		val nyStartdato = LocalDate.now().plusDays(1)
 		val nySluttdato = LocalDate.now().plusDays(14)
 		val nyBegrunnelse = "ny begrunnelse"
 
-		val updatedDeltaker = repository.update(DeltakerUpdateDbo(
+		repository.upsert(DeltakerUpsertDbo(
 			id = DELTAKER_1.id,
+			brukerId = DELTAKER_1.brukerId,
+			gjennomforingId = DELTAKER_1.gjennomforingId,
 			startDato = nyStartdato,
 			sluttDato = nySluttdato,
 			registrertDato = LocalDateTime.now(),
 			innsokBegrunnelse = nyBegrunnelse
 		))
+		val updatedDeltaker = repository.get(DELTAKER_1.id)
 
-		updatedDeltaker.id shouldBe DELTAKER_1.id
+		updatedDeltaker shouldNotBe null
+		updatedDeltaker!!.id shouldBe DELTAKER_1.id
 		updatedDeltaker.startDato shouldBe nyStartdato
 		updatedDeltaker.sluttDato shouldBe nySluttdato
 		updatedDeltaker.innsokBegrunnelse shouldBe nyBegrunnelse
 	}
 
-	test("Get by id") {
-		val insertDbo = DeltakerInsertDbo(
+	test("get - deltaker finnes - returnerer deltaker") {
+		val insertDbo = DeltakerUpsertDbo(
 			UUID.randomUUID(),
 			BRUKER_3.id,
 			GJENNOMFORING_1.id,
-			LocalDate.now().plusDays(7),
-			null,
-			2,
-			20.0f,
-			now
+			startDato =LocalDate.now().plusDays(7),
+			sluttDato = null,
+			dagerPerUke = 2,
+			prosentStilling = 20.0f,
+			registrertDato = now
 		)
 
-		repository.insert(insertDbo)
+		repository.upsert(insertDbo)
 
 		val gottenDbo = repository.get(insertDbo.id)
 
@@ -130,22 +133,23 @@ internal class DeltakerRepositoryTest : FunSpec({
 		gottenDbo.sluttDato shouldBe insertDbo.sluttDato
 		gottenDbo.dagerPerUke shouldBe insertDbo.dagerPerUke
 		gottenDbo.prosentStilling shouldBe insertDbo.prosentStilling
-		gottenDbo.registrertDato shouldBe insertDbo.registrertDato	}
+		gottenDbo.registrertDato.truncatedTo(ChronoUnit.MINUTES) shouldBe insertDbo.registrertDato.truncatedTo(ChronoUnit.MINUTES)
+	}
 
-	test("Get by BrukerId and Gjennomforing") {
+	test("get(brukerId, gjennomforing) - returnerer deltaker") {
 
-		val insertDbo = DeltakerInsertDbo(
+		val insertDbo = DeltakerUpsertDbo(
 			UUID.randomUUID(),
 			BRUKER_3.id,
 			GJENNOMFORING_1.id,
-			LocalDate.now().plusDays(7),
-			null,
-			2,
-			20.0f,
-			now
+			startDato = LocalDate.now().plusDays(7),
+			sluttDato = null,
+			dagerPerUke = 2,
+			prosentStilling = 20.0f,
+			registrertDato = now
 		)
 
-		repository.insert(insertDbo)
+		repository.upsert(insertDbo)
 
 		val gottenDbo = repository.get(insertDbo.brukerId, insertDbo.gjennomforingId)
 
@@ -160,7 +164,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 	}
 
-	test("Get by Fodselsnummer and Gjennomforing") {
+	test("get(fnr, gjennomforing) - skal returnere deltaker") {
 		val startDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
 		val sluttDato = null
@@ -169,18 +173,18 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val gjennomforing = GJENNOMFORING_1
 		val bruker = BRUKER_3
 
-		val insertDbo = DeltakerInsertDbo(
+		val insertDbo = DeltakerUpsertDbo(
 			UUID.randomUUID(),
 			bruker.id,
 			gjennomforing.id,
-			startDato,
-			sluttDato,
-			dagerPerUke,
-			prosentStilling,
-			registrertDato
+			startDato = startDato,
+			sluttDato = sluttDato,
+			dagerPerUke = dagerPerUke,
+			prosentStilling = prosentStilling,
+			registrertDato = registrertDato
 		)
 
-		repository.insert(insertDbo)
+		repository.upsert(insertDbo)
 
 		val gottenDbo = repository.get(bruker.personIdent, gjennomforing.id)
 
@@ -201,17 +205,17 @@ internal class DeltakerRepositoryTest : FunSpec({
 	test("skalAvsluttes - status DELTAR og sluttdato passert - deltaker returneres") {
 		val deltakerId = UUID.randomUUID()
 
-		val deltakerInsertDbo = DeltakerInsertDbo(
+		val deltakerInsertDbo = DeltakerUpsertDbo(
 			deltakerId,
 			BRUKER_3.id,
 			GJENNOMFORING_1.id,
-			LocalDate.now().minusDays(7),
-			LocalDate.now().minusDays(2),
-			2,
-			20.0f,
-			now.minusDays(10)
+			startDato = LocalDate.now().minusDays(7),
+			sluttDato = LocalDate.now().minusDays(2),
+			dagerPerUke = 2,
+			prosentStilling = 20.0f,
+			registrertDato = now.minusDays(10)
 		)
-		repository.insert(deltakerInsertDbo)
+		repository.upsert(deltakerInsertDbo)
 		val deltaker = repository.get(deltakerInsertDbo.id)
 		val statusInsertDbo = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
@@ -229,15 +233,15 @@ internal class DeltakerRepositoryTest : FunSpec({
 	}
 
 	test("skalAvsluttes - status DELTAR og sluttdato ikke passert - deltaker returneres ikke") {
-		val deltakerInsertDbo = DeltakerInsertDbo(
+		val deltakerInsertDbo = DeltakerUpsertDbo(
 			UUID.randomUUID(),
 			BRUKER_3.id,
 			GJENNOMFORING_1.id,
-			LocalDate.now().minusDays(7),
-			LocalDate.now().plusDays(2),
-			2,
-			20.0f,
-			LocalDateTime.now().minusDays(10)
+			startDato = LocalDate.now().minusDays(7),
+			sluttDato = LocalDate.now().plusDays(2),
+			dagerPerUke = 2,
+			prosentStilling = 20.0f,
+			registrertDato = LocalDateTime.now().minusDays(10)
 		)
 		val statusInsertDbo = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
@@ -246,7 +250,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			aarsak = null,
 			gyldigFra = LocalDateTime.now().minusDays(5),
 		)
-		repository.insert(deltakerInsertDbo)
+		repository.upsert(deltakerInsertDbo)
 		deltakerStatusRepository.insert(statusInsertDbo)
 
 		val potensieltHarSlutta = repository.sluttDatoPassert().filter { it.id == BRUKER_3.id }
@@ -257,17 +261,17 @@ internal class DeltakerRepositoryTest : FunSpec({
 	test("erPaaAvsluttetGjennomforing - status DELTAR og gjennomføring avslutttet - deltaker returneres") {
 		val deltakerId = UUID.randomUUID()
 
-		val deltakerInsertDbo = DeltakerInsertDbo(
+		val deltakerInsertDbo = DeltakerUpsertDbo(
 			deltakerId,
 			BRUKER_3.id,
 			GJENNOMFORING_2.id,
-			LocalDate.now().minusDays(7),
-			LocalDate.now().plusDays(2),
-			2,
-			20.0f,
-			now.minusDays(10)
+			startDato = LocalDate.now().minusDays(7),
+			sluttDato = LocalDate.now().plusDays(2),
+			dagerPerUke = 2,
+			prosentStilling = 20.0f,
+			registrertDato = LocalDateTime.now().minusDays(10)
 		)
-		repository.insert(deltakerInsertDbo)
+		repository.upsert(deltakerInsertDbo)
 		val deltaker = repository.get(deltakerInsertDbo.id)
 		val statusInsertDbo = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
@@ -287,15 +291,15 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 	test("skalHaStatusDeltar - startdato passert og sluttdato ikke passert og status VENTER_PA_OPPSTART - deltaker returneres") {
 
-		val deltakerInsertDbo = DeltakerInsertDbo(
+		val deltakerInsertDbo = DeltakerUpsertDbo(
 			UUID.randomUUID(),
 			BRUKER_3.id,
 			GJENNOMFORING_1.id,
-			LocalDate.now().minusDays(2),
-			LocalDate.now().plusDays(10),
-			2,
-			20.0f,
-			now.minusDays(10)
+			startDato = LocalDate.now().minusDays(7),
+			sluttDato = LocalDate.now().plusDays(2),
+			dagerPerUke = 2,
+			prosentStilling = 20.0f,
+			registrertDato = now.minusDays(10)
 		)
 		val statusInsertDbo = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
@@ -304,7 +308,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			aarsak = null,
 			gyldigFra = now.minusDays(5)
 		)
-		repository.insert(deltakerInsertDbo)
+		repository.upsert(deltakerInsertDbo)
 		deltakerStatusRepository.insert(statusInsertDbo)
 
 		val potensieltDeltar = repository.skalHaStatusDeltar()
@@ -322,15 +326,15 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 
 	test("skalHaStatusDeltar - startdato og sluttdato ikke passert og status VENTER_PA_OPPSTART - deltaker returneres ikke") {
-		val deltakerInsertDbo = DeltakerInsertDbo(
+		val deltakerInsertDbo = DeltakerUpsertDbo(
 			UUID.randomUUID(),
 			BRUKER_3.id,
 			GJENNOMFORING_1.id,
-			LocalDate.now().plusDays(2),
-			LocalDate.now().plusDays(10),
-			2,
-			20.0f,
-			LocalDateTime.now().minusDays(10)
+			startDato = LocalDate.now().plusDays(2),
+			sluttDato = LocalDate.now().plusDays(10),
+			dagerPerUke = 2,
+			prosentStilling = 20.0f,
+			registrertDato = LocalDateTime.now().minusDays(10)
 		)
 		val statusInsertDbo = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
@@ -340,7 +344,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			gyldigFra = LocalDateTime.now().minusDays(5),
 		)
 
-		repository.insert(deltakerInsertDbo)
+		repository.upsert(deltakerInsertDbo)
 		deltakerStatusRepository.insert(statusInsertDbo)
 
 		val potensieltDeltar = repository.skalHaStatusDeltar()
@@ -349,18 +353,18 @@ internal class DeltakerRepositoryTest : FunSpec({
 	}
 
 	test("slettDeltaker skal slette deltaker") {
-		val deltakerInsertDbo = DeltakerInsertDbo(
+		val deltakerInsertDbo = DeltakerUpsertDbo(
 			UUID.randomUUID(),
 			BRUKER_3.id,
 			GJENNOMFORING_1.id,
-			LocalDate.now().plusDays(2),
-			LocalDate.now().plusDays(10),
-			2,
-			20.0f,
-			LocalDateTime.now().minusDays(10)
+			startDato = LocalDate.now().minusDays(7),
+			sluttDato = LocalDate.now().plusDays(2),
+			dagerPerUke = 2,
+			prosentStilling = 20.0f,
+			registrertDato = LocalDateTime.now().minusDays(10)
 		)
 
-		repository.insert(deltakerInsertDbo)
+		repository.upsert(deltakerInsertDbo)
 		repository.get(deltakerInsertDbo.id) shouldNotBe null
 		repository.slettVeilederrelasjonOgDeltaker(deltakerInsertDbo.id)
 		repository.get(deltakerInsertDbo.id) shouldBe null

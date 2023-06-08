@@ -66,7 +66,7 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 			val deltaker = maybeDeltaker!!
 			deltaker.personIdent shouldBe message.personIdent
 			deltaker.gjennomforingId shouldBe message.gjennomforingId
-			deltaker.prosentStilling shouldBe 0.0 // message.prosentDeltid - NULL i databasen blir konvertert til 0.0
+			deltaker.prosentStilling shouldBe message.prosentDeltid
 			deltaker.dagerPerUke shouldBe message.dagerPerUke
 			deltaker.registrertDato shouldBeEqualTo message.registrertDato
 			deltaker.startDato shouldBe message.startDato
@@ -103,7 +103,7 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 			val deltaker = maybeDeltaker!!
 			deltaker.personIdent shouldBe message.personIdent
 			deltaker.gjennomforingId shouldBe message.gjennomforingId
-			deltaker.prosentStilling shouldBe 0.0
+			deltaker.prosentStilling shouldBe message.prosentDeltid
 			deltaker.dagerPerUke shouldBe message.dagerPerUke
 			deltaker.registrertDato shouldBeEqualTo message.registrertDato
 			deltaker.startDato shouldBe message.startDato

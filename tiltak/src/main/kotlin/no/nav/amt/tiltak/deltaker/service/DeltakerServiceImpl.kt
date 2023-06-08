@@ -17,10 +17,9 @@ import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpdateDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.repositories.SkjultDeltakerRepository
@@ -28,7 +27,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 @Service
 open class DeltakerServiceImpl(
@@ -47,14 +46,11 @@ open class DeltakerServiceImpl(
 
 	override fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert) {
 		val lagretDeltaker = hentDeltaker(deltaker.id)
+		val brukerId = brukerService.getOrCreate(personIdent)
 
-		transactionTemplate.executeWithoutResult {
-			if (lagretDeltaker == null) {
-				insertDeltaker(personIdent, deltaker)
-			} else if(!deltaker.compareTo(lagretDeltaker)){
-				update(deltaker)
-			}
-
+		if(lagretDeltaker == null || !deltaker.compareTo(lagretDeltaker)) {
+			val deltakerUpsertDbo = deltaker.toUpsertDbo(brukerId)
+			deltakerRepository.upsert(deltakerUpsertDbo)
 			oppdaterStatus(deltaker.statusInsert)
 
 			val oppdatertDeltaker = hentDeltaker(deltaker.id)
@@ -64,7 +60,6 @@ open class DeltakerServiceImpl(
 			publisherService.publish(oppdatertDeltaker.id, DataPublishType.DELTAKER)
 			publisherService.publish(oppdatertDeltaker.gjennomforingId, DataPublishType.DELTAKERLISTE)
 		}
-
 	}
 
 	override fun insertStatus(status: DeltakerStatusInsert) {
@@ -160,22 +155,6 @@ open class DeltakerServiceImpl(
 		return brukerService.hentBruker(personIdent)
 	}
 
-	private fun update(deltaker: DeltakerUpsert) {
-		val toUpdate = DeltakerUpdateDbo(
-			id = deltaker.id,
-			startDato = deltaker.startDato,
-			sluttDato = deltaker.sluttDato,
-			registrertDato = deltaker.registrertDato,
-			dagerPerUke = deltaker.dagerPerUke,
-			prosentStilling = deltaker.prosentStilling,
-			innsokBegrunnelse = deltaker.innsokBegrunnelse
-		)
-
-		deltakerRepository.update(toUpdate)
-		publisherService.publish(deltaker.id, DataPublishType.DELTAKER)
-		publisherService.publish(deltaker.gjennomforingId, DataPublishType.DELTAKERLISTE)
-	}
-
 	private fun oppdaterStatus(status: DeltakerStatusInsert) {
 		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(status.deltakerId)
 		if (forrigeStatus?.type == status.type && forrigeStatus.aarsak == status.aarsak) return
@@ -225,26 +204,6 @@ open class DeltakerServiceImpl(
 			return deltaker.sluttDato?.isBefore(it) == true
 		}
 		return false
-	}
-
-	private fun insertDeltaker(fodselsnummer: String, deltaker: DeltakerUpsert) {
-		val brukerId = brukerService.getOrCreate(fodselsnummer)
-		val toInsert = DeltakerInsertDbo(
-			id = deltaker.id,
-			brukerId = brukerId,
-			gjennomforingId = deltaker.gjennomforingId,
-			startDato = deltaker.startDato,
-			sluttDato = deltaker.sluttDato,
-			dagerPerUke = deltaker.dagerPerUke,
-			prosentStilling = deltaker.prosentStilling,
-			registrertDato = deltaker.registrertDato,
-			innsokBegrunnelse = deltaker.innsokBegrunnelse
-		)
-
-		deltakerRepository.insert(toInsert)
-		publisherService.publish(toInsert.id, DataPublishType.DELTAKER)
-		publisherService.publish(toInsert.gjennomforingId, DataPublishType.DELTAKERLISTE)
-
 	}
 
 	private fun hentStatusOrThrow(deltakerId: UUID) : DeltakerStatus {
@@ -350,6 +309,18 @@ open class DeltakerServiceImpl(
 
 		log.info("Ferdig med republisering av deltakere på kafka")
 	}
+
+	fun DeltakerUpsert.toUpsertDbo(brukerId: UUID) = DeltakerUpsertDbo(
+		id = this.id,
+		brukerId = brukerId,
+		gjennomforingId = this.gjennomforingId,
+		startDato = this.startDato,
+		sluttDato = this.sluttDato,
+		registrertDato = this.registrertDato,
+		dagerPerUke = this.dagerPerUke,
+		prosentStilling = this.prosentStilling,
+		innsokBegrunnelse = this.innsokBegrunnelse
+	)
 
 }
 

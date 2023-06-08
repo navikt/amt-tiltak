@@ -1,6 +1,8 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
+import no.nav.amt.tiltak.common.db_utils.getNullableFloat
+import no.nav.amt.tiltak.common.db_utils.getNullableInt
 import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getNullableUUID
 import no.nav.amt.tiltak.common.db_utils.getUUID
@@ -8,14 +10,13 @@ import no.nav.amt.tiltak.core.domain.tiltak.AVSLUTTENDE_STATUSER
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerInsertDbo
-import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpdateDbo
+import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpsertDbo
 import no.nav.amt.tiltak.nav_enhet.NavEnhetDbo
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
-import java.util.UUID
+import java.util.*
 
 @Component
 open class DeltakerRepository(
@@ -43,8 +44,8 @@ open class DeltakerRepository(
 			startDato = rs.getDate("start_dato")?.toLocalDate(),
 			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
 			gjennomforingId = UUID.fromString(rs.getString("gjennomforing_id")),
-			dagerPerUke = rs.getInt("dager_per_uke"),
-			prosentStilling = rs.getFloat("prosent_stilling"),
+			dagerPerUke = rs.getNullableInt("dager_per_uke"),
+			prosentStilling = rs.getNullableFloat("prosent_stilling"),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime(),
 			registrertDato = rs.getTimestamp("registrert_dato").toLocalDateTime(),
@@ -52,7 +53,7 @@ open class DeltakerRepository(
 		)
 	}
 
-	fun insert(deltaker: DeltakerInsertDbo) {
+	fun upsert(deltaker: DeltakerUpsertDbo) {
 		val sql = """
 			INSERT INTO deltaker(id, bruker_id, gjennomforing_id, start_dato, slutt_dato,
 								 dager_per_uke, prosent_stilling, registrert_dato, innsok_begrunnelse)
@@ -65,6 +66,14 @@ open class DeltakerRepository(
 					:prosentStilling,
 					:registrertDato,
 					:innsokBegrunnelse)
+			ON CONFLICT (id) DO
+			UPDATE SET
+				start_dato = :startdato,
+				slutt_dato    = :sluttdato,
+				dager_per_uke = :dagerPerUke,
+				prosent_stilling = :prosentStilling,
+				innsok_begrunnelse = :innsokBegrunnelse,
+				modified_at = CURRENT_TIMESTAMP
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
@@ -98,35 +107,6 @@ open class DeltakerRepository(
 		)
 
 		return template.query(sql, parameters, rowMapper)
-	}
-
-	fun update(deltaker: DeltakerUpdateDbo): DeltakerDbo {
-		val sql = """
-			UPDATE deltaker
-			SET start_dato = :startDato,
-				slutt_dato    = :sluttDato,
-				dager_per_uke = :dagerPerUke,
-				prosent_stilling = :prosentStilling,
-				innsok_begrunnelse = :innsokBegrunnelse,
-				modified_at = CURRENT_TIMESTAMP
-			WHERE id = :deltakerId
-	""".trimIndent()
-
-		val parameters = MapSqlParameterSource().addValues(
-			mapOf(
-				"startDato" to deltaker.startDato,
-				"sluttDato" to deltaker.sluttDato,
-				"dagerPerUke" to deltaker.dagerPerUke,
-				"prosentStilling" to deltaker.prosentStilling,
-				"deltakerId" to deltaker.id,
-				"innsokBegrunnelse" to deltaker.innsokBegrunnelse
-			)
-		)
-
-		template.update(sql, parameters)
-
-		return get(deltaker.id)
-			?: throw NoSuchElementException("Kan ikke oppdatere deltaker:${deltaker.id} fordi den finnes ikke")
 	}
 
 	fun get(id: UUID): DeltakerDbo? {
