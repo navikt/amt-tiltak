@@ -5,17 +5,15 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 class ArrangorAnsattServiceImplTest {
 
 	lateinit var arrangorAnsattRepository: ArrangorAnsattRepository
-	lateinit var personService: PersonService
 	lateinit var arrangorAnsattTilgangService: ArrangorAnsattTilgangService
 	lateinit var arrangorService: ArrangorService
 	lateinit var publisherService: DataPublisherService
@@ -25,7 +23,6 @@ class ArrangorAnsattServiceImplTest {
 	@BeforeEach
 	internal fun setUp() {
 		arrangorAnsattRepository = mockk()
-		personService = mockk()
 		arrangorService = mockk()
 		arrangorAnsattTilgangService = mockk()
 		publisherService = mockk()
@@ -33,7 +30,6 @@ class ArrangorAnsattServiceImplTest {
 
 		arrangorAnsattService = ArrangorAnsattServiceImpl(
 			arrangorAnsattRepository = arrangorAnsattRepository,
-			personService = personService,
 			arrangorService = arrangorService,
 			dataPublisherService = publisherService,
 		)

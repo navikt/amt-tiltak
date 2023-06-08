@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.test.integration.kafka
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetDto
+import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.GjennomforingArenaData
 import no.nav.amt.tiltak.clients.pdl.AdressebeskyttelseGradering
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
@@ -10,7 +10,6 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.DbUtils.shouldBeEqualTo
 import no.nav.amt.tiltak.test.database.data.TestData
-import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
@@ -29,7 +28,7 @@ import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.util.*
+import java.util.UUID
 
 class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 
@@ -220,27 +219,38 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 
 
 	private fun ingestGjennomforing(tiltakKode: String = "INDOPPFAG"): GjennomforingMessage {
-		val enhetsregisterEnhet = EnhetDto(
+		val overordnetArrangor = AmtArrangorClient.ArrangorMedOverordnetArrangor(
+			id = UUID.randomUUID(),
+			organisasjonsnummer = "888666555",
+			navn = "Arrangor Org",
+			overordnetArrangor = null
+		)
+		val arrangor = AmtArrangorClient.ArrangorMedOverordnetArrangor(
+			id = UUID.randomUUID(),
 			organisasjonsnummer = "999888777",
 			navn = "Arrangor",
-			overordnetEnhetNavn = "Arrangor Org",
-			overordnetEnhetOrganisasjonsnummer = "888666555",
+			overordnetArrangor = AmtArrangorClient.Arrangor(
+				id = overordnetArrangor.id,
+				navn = overordnetArrangor.navn,
+				organisasjonsnummer = overordnetArrangor.organisasjonsnummer
+			)
 		)
 
 		val gjennomforingArenaData = GjennomforingArenaData(
 			opprettetAar = 2022,
 			lopenr = 123,
-			virksomhetsnummer = enhetsregisterEnhet.organisasjonsnummer,
+			virksomhetsnummer = arrangor.organisasjonsnummer,
 			ansvarligNavEnhetId = "58749854",
 			status = "GJENNOMFOR",
 		)
 
-		val gjennomforingMessage = GjennomforingMessage(tiltakArenaKode = tiltakKode, virksomhetsnummer = enhetsregisterEnhet.organisasjonsnummer)
+		val gjennomforingMessage = GjennomforingMessage(tiltakArenaKode = tiltakKode, virksomhetsnummer = arrangor.organisasjonsnummer)
 		val jsonObjekt = KafkaMessageCreator.opprettGjennomforingMessage(gjennomforingMessage)
 
 		mockMulighetsrommetApiServer.gjennomforingArenaData(gjennomforingMessage.id, gjennomforingArenaData)
 
-		mockEnhetsregisterServer.addEnhet(enhetsregisterEnhet)
+		mockArrangorServer.addArrangorResponse(arrangor)
+		mockArrangorServer.addArrangorResponse(overordnetArrangor)
 
 		mockNorgHttpServer.addNavEnhet(gjennomforingArenaData.ansvarligNavEnhetId, "navEnhetNavn")
 

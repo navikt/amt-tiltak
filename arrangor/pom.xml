@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>amt_enhetsregister</artifactId>
+            <artifactId>tilgangskontroll-tiltaksarrangor</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>

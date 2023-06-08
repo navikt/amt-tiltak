@@ -36,7 +36,6 @@
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>data-publisher</artifactId>
         </dependency>
-
         <dependency>
             <groupId>io.kotest</groupId>
             <artifactId>kotest-assertions-core-jvm</artifactId>

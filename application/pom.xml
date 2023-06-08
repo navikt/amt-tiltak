@@ -63,10 +63,6 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>amt_enhetsregister</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>amt-person</artifactId>
         </dependency>
         <dependency>
@@ -208,11 +204,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>mocks</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

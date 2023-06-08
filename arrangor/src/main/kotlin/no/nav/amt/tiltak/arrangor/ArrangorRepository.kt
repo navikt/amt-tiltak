@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.UUID
 
 @Component
 open class ArrangorRepository(
@@ -28,51 +28,12 @@ open class ArrangorRepository(
 
 
     fun upsert(
-		navn: String,
-		organisasjonsnummer: String,
-		overordnetEnhetNavn: String?,
-		overordnetEnhetOrganisasjonsnummer: String?,
-    ): ArrangorDbo {
-        val savedArrangor = getByOrganisasjonsnummer(organisasjonsnummer)
-
-        if (savedArrangor != null) {
-            return savedArrangor
-        }
-
-        val sql = """
-			INSERT INTO arrangor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer, navn)
-			VALUES (:id,
-					:overordnetEnhetOrganisasjonsnummer,
-					:overordnetEnhetNavn,
-					:organisasjonsnummer,
-					:navn)
-		""".trimIndent()
-
-        val id = UUID.randomUUID()
-
-        val parameters = MapSqlParameterSource().addValues(
-            mapOf(
-                "id" to id,
-                "navn" to navn,
-                "organisasjonsnummer" to organisasjonsnummer,
-                "overordnetEnhetOrganisasjonsnummer" to overordnetEnhetOrganisasjonsnummer,
-                "overordnetEnhetNavn" to overordnetEnhetNavn,
-            )
-        )
-
-        template.update(sql, parameters)
-
-        return getByOrganisasjonsnummer(organisasjonsnummer)
-            ?: throw NoSuchElementException("Virksomhet med organisasjonsnummer $organisasjonsnummer finnes ikke")
-    }
-
-	open fun insert(
 		id: UUID,
 		navn: String,
 		organisasjonsnummer: String,
 		overordnetEnhetNavn: String?,
 		overordnetEnhetOrganisasjonsnummer: String?,
-	) {
+    ): ArrangorDbo {
 		val sql = """
 			INSERT INTO arrangor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer, navn)
 			VALUES (:id,
@@ -80,6 +41,10 @@ open class ArrangorRepository(
 					:overordnetEnhetNavn,
 					:organisasjonsnummer,
 					:navn)
+			ON CONFLICT (organisasjonsnummer) DO UPDATE SET navn = :navn,
+															overordnet_enhet_navn = :overordnetEnhetNavn,
+															overordnet_enhet_organisasjonsnummer = :overordnetEnhetOrganisasjonsnummer,
+															modified_at = CURRENT_TIMESTAMP
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource().addValues(
@@ -93,7 +58,10 @@ open class ArrangorRepository(
 		)
 
 		template.update(sql, parameters)
-	}
+
+        return getByOrganisasjonsnummer(organisasjonsnummer)
+            ?: throw NoSuchElementException("Virksomhet med organisasjonsnummer $organisasjonsnummer finnes ikke")
+    }
 
     fun getByOrganisasjonsnummer(organisasjonsnummer: String): ArrangorDbo? {
         val sql = """

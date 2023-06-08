@@ -53,18 +53,13 @@ spec:
         - application: amt-person-service
     outbound:
       rules:
-        - application: amt-enhetsregister
-          namespace: amt
-          cluster: dev-gcp
         - application: amt-person-service
           namespace: amt
           cluster: dev-gcp
         - application: poao-tilgang
           namespace: poao
           cluster: dev-gcp
-        - application: amt-altinn-acl
-          namespace: amt
-          cluster: dev-gcp
+        - application: amt-arrangor
         - application: mulighetsrommet-api
           namespace: team-mulighetsrommet
           cluster: dev-gcp
@@ -90,14 +85,10 @@ spec:
       value: api://dev-fss.pdl.pdl-api/.default
     - name: PDL_URL
       value: https://pdl-api.dev-fss-pub.nais.io
-    - name: AMT_ALTINN_ACL_SCOPE
-      value: api://dev-gcp.amt.amt-altinn-acl/.default
-    - name: AMT_ALTINN_ACL_URL
-      value: http://amt-altinn-acl.amt.svc.cluster.local
-    - name: AMT_ENHETSREGISTER_SCOPE
-      value: api://dev-gcp.amt.amt-enhetsregister/.default
-    - name: AMT_ENHETSREGISTER_URL
-      value: http://amt-enhetsregister.amt.svc.cluster.local
+    - name: AMT_ARRANGOR_SCOPE
+      value: api://dev-gcp.amt.amt-arrangor/.default
+    - name: AMT_ARRANGOR_URL
+      value: http://amt-arrangor
     - name: AMT_PERSON_URL
       value: http://amt-person-service.amt.svc.cluster.local
     - name: AMT_PERSON_SCOPE

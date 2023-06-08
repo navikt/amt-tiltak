@@ -9,7 +9,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Component
 open class ArrangorAnsattRepository(
@@ -30,10 +30,13 @@ open class ArrangorAnsattRepository(
 		)
 	}
 
-	fun opprettAnsatt(id: UUID, personligIdent: String, fornavn: String, mellomnavn: String?, etternavn: String) {
+	fun upsertAnsatt(id: UUID, personligIdent: String, fornavn: String, mellomnavn: String?, etternavn: String) {
 		val sql = """
 			INSERT INTO arrangor_ansatt(id, personlig_ident, fornavn, mellomnavn, etternavn)
 				VALUES(:id, :personligIdent, :fornavn, :mellomnavn, :etternavn)
+			ON CONFLICT (id) DO UPDATE SET fornavn = :fornavn,
+										   mellomnavn = :mellomnavn,
+										   etternavn  = :etternavn
 		""".trimIndent()
 
 		val parameters = sqlParameters(

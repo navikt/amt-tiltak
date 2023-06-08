@@ -1,13 +1,13 @@
 package no.nav.amt.tiltak.ansatt
 
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
+import no.nav.amt.tiltak.core.domain.arrangor.ArrangorAnsatt
 import no.nav.amt.tiltak.core.domain.arrangor.TilknyttetArrangor
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import org.slf4j.LoggerFactory
@@ -15,12 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Service
 class ArrangorAnsattServiceImpl(
 	private val arrangorAnsattRepository: ArrangorAnsattRepository,
-	private val personService: PersonService,
 	private val arrangorService: ArrangorService,
 	private val dataPublisherService: DataPublisherService,
 ) : ArrangorAnsattService {
@@ -32,9 +31,20 @@ class ArrangorAnsattServiceImpl(
 	@Autowired
 	lateinit var arrangorAnsattTilgangService: ArrangorAnsattTilgangService
 
-	override fun opprettAnsattHvisIkkeFinnes(personIdent: String): Ansatt {
-		return getAnsattByPersonligIdent(personIdent)
-			?: createAnsatt(personIdent)
+	override fun upsertAnsatt(arrangorAnsatt: ArrangorAnsatt) {
+		val maybeAnsatt = arrangorAnsattRepository.getByPersonligIdent(arrangorAnsatt.personalia.personident)
+		if (maybeAnsatt != null && maybeAnsatt.id != arrangorAnsatt.id) {
+			throw IllegalStateException("Det finnes allerede en ansatt for samme personident: gammel id: ${maybeAnsatt.id}, ny id: ${arrangorAnsatt.id}")
+		}
+		arrangorAnsattRepository.upsertAnsatt(
+			id = arrangorAnsatt.id,
+			personligIdent = arrangorAnsatt.personalia.personident,
+			fornavn = arrangorAnsatt.personalia.navn.fornavn,
+			mellomnavn = arrangorAnsatt.personalia.navn.mellomnavn,
+			etternavn = arrangorAnsatt.personalia.navn.etternavn
+		)
+
+		dataPublisherService.publish(arrangorAnsatt.id, DataPublishType.ARRANGOR_ANSATT)
 	}
 
 	override fun getAnsatt(ansattId: UUID): Ansatt {
@@ -85,23 +95,6 @@ class ArrangorAnsattServiceImpl(
 
 	override fun setVellykketInnlogging(ansattId: UUID) {
 		arrangorAnsattRepository.setVelykketInnlogging(ansattId)
-	}
-
-	private fun createAnsatt(ansattPersonIdent: String): Ansatt {
-		val person = personService.hentPerson(ansattPersonIdent)
-
-		val nyAnsattId = UUID.randomUUID()
-
-		arrangorAnsattRepository.opprettAnsatt(
-			id = nyAnsattId,
-			personligIdent = ansattPersonIdent,
-			fornavn = person.fornavn,
-			mellomnavn = person.mellomnavn,
-			etternavn = person.etternavn
-		)
-
-		return getAnsatt(nyAnsattId)
-			.also { dataPublisherService.publish(it.id, DataPublishType.ARRANGOR_ANSATT) }
 	}
 
 	private fun hentTilknyttedeArrangorer(ansattId: UUID): List<TilknyttetArrangor> {

@@ -13,8 +13,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>amt-altinn-acl</module>
-        <module>amt_enhetsregister</module>
+        <module>amt-arrangor-client</module>
         <module>dkif</module>
         <module>nom</module>
         <module>norg</module>

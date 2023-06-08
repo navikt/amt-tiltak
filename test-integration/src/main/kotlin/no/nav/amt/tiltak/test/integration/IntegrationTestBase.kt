@@ -48,11 +48,10 @@ abstract class IntegrationTestBase {
 
 	companion object {
 		val mockOAuthServer = MockOAuthServer()
-		val mockEnhetsregisterServer = MockAmtEnhetsregisterServer()
+		val mockArrangorServer = MockAmtArrangorServer()
 		val mockNorgHttpServer = MockNorgHttpServer()
 		val mockPoaoTilgangHttpServer = MockPoaoTilgangHttpServer()
 		val mockNomHttpServer = MockNomHttpServer()
-		val mockAmtAltinnAclHttpServer = MockAmtAltinnAclHttpServer()
 		val mockPdlHttpServer = MockPdlHttpServer()
 		val mockMachineToMachineHttpServer = MockMachineToMachineHttpServer()
 		val mockMulighetsrommetApiServer = MockMulighetsrommetApiServer()
@@ -71,6 +70,10 @@ abstract class IntegrationTestBase {
 			registry.add("no.nav.security.jwt.issuer.tokenx.discovery-url") { mockOAuthServer.getDiscoveryUrl("tokenx") }
 			registry.add("no.nav.security.jwt.issuer.tokenx.accepted-audience") { "test-aud" }
 
+			mockArrangorServer.start()
+			registry.add("amt-arrangor.url") { mockArrangorServer.serverUrl() }
+			registry.add("amt-arrangor.scope") { "test.arrangor" }
+
 			mockDkifHttpServer.start()
 			registry.add("digdir-krr-proxy.url") { mockDkifHttpServer.serverUrl() }
 			registry.add("digdir-krr-proxy.scope") { "test.digdir-krr-proxy" }
@@ -87,10 +90,6 @@ abstract class IntegrationTestBase {
 			registry.add("mulighetsrommet-api.url") { mockMulighetsrommetApiServer.serverUrl() }
 			registry.add("mulighetsrommet-api.scope") { "test.mulighetsrommet-api" }
 
-			mockEnhetsregisterServer.start()
-			registry.add("amt-enhetsregister.url") { mockEnhetsregisterServer.serverUrl() }
-			registry.add("amt-enhetsregister.scope") { "test.amt-enhetsregister" }
-
 			mockAmtPersonHttpServer.start()
 			registry.add("amt-person.url") { mockAmtPersonHttpServer.serverUrl() }
 			registry.add("amt-person.scope") { "test.amt-person" }
@@ -105,10 +104,6 @@ abstract class IntegrationTestBase {
 			mockNomHttpServer.start()
 			registry.add("nom.url") { mockNomHttpServer.serverUrl() }
 			registry.add("nom.scope") { "test.nom" }
-
-			mockAmtAltinnAclHttpServer.start()
-			registry.add("amt-altinn-acl.url") { mockAmtAltinnAclHttpServer.serverUrl() }
-			registry.add("amt-altinn-acl.scope") { "test.amt-altinn-acl" }
 
 			mockPdlHttpServer.start()
 			registry.add("pdl.url") { mockPdlHttpServer.serverUrl() }
@@ -132,11 +127,10 @@ abstract class IntegrationTestBase {
 	}
 
 	fun resetMockServers() {
-		mockEnhetsregisterServer.reset()
 		mockNorgHttpServer.reset()
 		mockPoaoTilgangHttpServer.reset()
 		mockNomHttpServer.reset()
-		mockAmtAltinnAclHttpServer.reset()
+		mockArrangorServer.reset()
 		mockPdlHttpServer.reset()
 		mockMulighetsrommetApiServer.reset()
 		mockVeilarboppfolgingHttpServer.resetHttpServer()
@@ -148,7 +142,6 @@ abstract class IntegrationTestBase {
 		resetMockServers()
 		mockNorgHttpServer.addDefaultData()
 		mockNomHttpServer.addDefaultData()
-		mockAmtAltinnAclHttpServer.addDefaultData()
 	}
 
 	fun serverUrl() = "http://localhost:$port"

@@ -6,8 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.amt.tiltak.clients.amt_enhetsregister.EnhetsregisterClient
-import no.nav.amt.tiltak.clients.amt_enhetsregister.Virksomhet
+import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType.ARRANGOR
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType.DELTAKERLISTE
@@ -20,7 +19,7 @@ import org.apache.kafka.clients.producer.RecordMetadata
 import org.apache.kafka.common.TopicPartition
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.util.*
+import java.util.UUID
 
 class DataPublisherServiceTest : FunSpec({
 	val dataSource = SingletonPostgresContainer.getDataSource()
@@ -31,7 +30,7 @@ class DataPublisherServiceTest : FunSpec({
 	lateinit var kafkaProducerClient: KafkaProducerClient<String, String>
 	val publishRepository = PublishRepository(template)
 
-	val enhetsregisterClient: EnhetsregisterClient = mockk()
+	val amtArrangorClient: AmtArrangorClient = mockk()
 
 	lateinit var service: DataPublisherService
 
@@ -63,7 +62,7 @@ class DataPublisherServiceTest : FunSpec({
 		)
 
 		service = DataPublisherService(
-			kafkaTopicProperties, kafkaProducerClient, template, enhetsregisterClient, publishRepository
+			kafkaTopicProperties, kafkaProducerClient, template, amtArrangorClient, publishRepository
 		)
 	}
 
@@ -74,8 +73,12 @@ class DataPublisherServiceTest : FunSpec({
 	test("Ny Arrangør - Sendes") {
 		val input = dbHandler.createArrangor()
 
-		every { enhetsregisterClient.hentVirksomhet(any()) } returns Virksomhet("Parent", input.overordnetEnhetOrganisasjonsnummer!!, null, null)
-		every { enhetsregisterClient.hentVirksomhet(any()) } returns Virksomhet("Parent", input.overordnetEnhetOrganisasjonsnummer!!, null, null)
+		every { amtArrangorClient.hentArrangor(any()) } returns AmtArrangorClient.ArrangorMedOverordnetArrangor(
+			id = UUID.randomUUID(),
+			navn = "Parent",
+			organisasjonsnummer = input.overordnetEnhetOrganisasjonsnummer!!,
+			overordnetArrangor = null
+		)
 		dbHandler.createDeltakerliste(arrangorId = input.id)
 
 		publishAndVerify(input.id, ARRANGOR, 1)
@@ -84,8 +87,12 @@ class DataPublisherServiceTest : FunSpec({
 	test("Samme arrangør to ganger uten endring - Sendes en gang") {
 		val input = dbHandler.createArrangor()
 
-		every { enhetsregisterClient.hentVirksomhet(any()) } returns Virksomhet("Parent", input.overordnetEnhetOrganisasjonsnummer!!, null, null)
-		every { enhetsregisterClient.hentVirksomhet(any()) } returns Virksomhet("Parent", input.overordnetEnhetOrganisasjonsnummer!!, null, null)
+		every { amtArrangorClient.hentArrangor(any()) } returns AmtArrangorClient.ArrangorMedOverordnetArrangor(
+			id = UUID.randomUUID(),
+			navn = "Parent",
+			organisasjonsnummer = input.overordnetEnhetOrganisasjonsnummer!!,
+			overordnetArrangor = null
+		)
 
 		publishAndVerify(input.id, ARRANGOR, 1)
 		publishAndVerify(input.id, ARRANGOR, 1)
@@ -93,7 +100,12 @@ class DataPublisherServiceTest : FunSpec({
 
 	test("Oppdatere eksisterende arrangør - sender oppdatert arrangør") {
 		val input = dbHandler.createArrangor()
-		every { enhetsregisterClient.hentVirksomhet(any()) } returns Virksomhet("Parent", input.overordnetEnhetOrganisasjonsnummer!!, null, null)
+		every { amtArrangorClient.hentArrangor(any()) } returns AmtArrangorClient.ArrangorMedOverordnetArrangor(
+			id = UUID.randomUUID(),
+			navn = "Parent",
+			organisasjonsnummer = input.overordnetEnhetOrganisasjonsnummer!!,
+			overordnetArrangor = null
+		)
 
 		publishAndVerify(input.id, ARRANGOR, 1)
 

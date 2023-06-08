@@ -15,7 +15,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.util.*
+import java.util.UUID
 
 internal class ArrangorRepositoryTest {
 
@@ -41,8 +41,10 @@ internal class ArrangorRepositoryTest {
 		val organisasjonsnummer = "483726374"
 		val virksomhetsnavn = "Test Virksomhet"
 		val virksomhetsnummer = "123456798"
+		val id = UUID.randomUUID()
 
 		val savedDto = repository.upsert(
+			id = id,
 			overordnetEnhetNavn = organisasjonsnavn,
 			overordnetEnhetOrganisasjonsnummer = organisasjonsnummer,
 			navn = virksomhetsnavn,
@@ -63,14 +65,17 @@ internal class ArrangorRepositoryTest {
 		val overordnetEnhetOrganisasjonsnummer = "483726374"
 		val navn = "Test Virksomhet"
 		val organisasjonsnummer = "123456798"
+		val id = UUID.randomUUID()
 
 		val savedOne = repository.upsert(
+			id = id,
 			overordnetEnhetNavn = overordnetEnhetNavn,
 			overordnetEnhetOrganisasjonsnummer = overordnetEnhetOrganisasjonsnummer,
 			navn = navn,
 			organisasjonsnummer = organisasjonsnummer
 		)
 		val savedTwo = repository.upsert(
+			id = id,
 			overordnetEnhetNavn = overordnetEnhetNavn,
 			overordnetEnhetOrganisasjonsnummer = overordnetEnhetOrganisasjonsnummer,
 			navn = navn,
@@ -88,7 +93,7 @@ internal class ArrangorRepositoryTest {
 		val virksomhetsnummer = "123456798"
 		val id = UUID.randomUUID()
 
-		repository.insert(
+		repository.upsert(
 			id = id,
 			overordnetEnhetNavn = organisasjonsnavn,
 			overordnetEnhetOrganisasjonsnummer = organisasjonsnummer,
