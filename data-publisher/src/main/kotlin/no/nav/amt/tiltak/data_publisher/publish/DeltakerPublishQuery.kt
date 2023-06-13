@@ -28,10 +28,6 @@ class DeltakerPublishQuery(
 	fun get(id: UUID): Result<DeltakerPublishDto> {
 		val deltaker = getDeltaker(id) ?: return Result.PublishTombstone()
 
-		if (IgnoredDeltakerlister.deltakerlisteIds.contains(deltaker.deltakerlisteId)) {
-			return Result.DontPublish()
-		}
-
 		if (deltaker.status == null) return Result.DontPublish()
 
 		return DeltakerPublishDto(
