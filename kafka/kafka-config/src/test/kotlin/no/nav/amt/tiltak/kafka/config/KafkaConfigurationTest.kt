@@ -1,6 +1,13 @@
 package no.nav.amt.tiltak.kafka.config
 
-import no.nav.amt.tiltak.core.kafka.*
+import no.nav.amt.tiltak.core.kafka.AktorV2Ingestor
+import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
+import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
+import no.nav.amt.tiltak.core.kafka.GjennomforingIngestor
+import no.nav.amt.tiltak.core.kafka.LeesahIngestor
+import no.nav.amt.tiltak.core.kafka.SkjermetPersonIngestor
+import no.nav.amt.tiltak.core.kafka.TildeltVeilederIngestor
+import no.nav.amt.tiltak.core.port.AmtArrangorIngestor
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.common.kafka.producer.KafkaProducerClientImpl
 import no.nav.common.kafka.producer.util.ProducerUtils.toJsonProducerRecord
@@ -15,7 +22,7 @@ import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
-import java.util.*
+import java.util.Properties
 import java.util.concurrent.atomic.AtomicInteger
 
 @Testcontainers
@@ -29,6 +36,7 @@ class KafkaConfigurationTest {
 	private val leesahTopic: String = "test.leesah-v1"
 	private val deltakerTopic: String = "test.deltaker-v1"
 	private val aktorV2Topic: String = "test.aktor-v2"
+	private val amtArrangorTopic: String = "test.arranog-v1"
 	private val virksomhetTopic: String = "test.virksomheter-v1"
 
 	@Container
@@ -48,9 +56,8 @@ class KafkaConfigurationTest {
 			leesahTopic = leesahTopic,
 			deltakerTopic = deltakerTopic,
 			aktorV2Topic = aktorV2Topic,
-			virksomhetTopic = virksomhetTopic,
 			amtArrangorAnsattTopic = "",
-			amtArrangorTopic = "",
+			amtArrangorTopic = amtArrangorTopic,
 			amtDeltakerTopic = "",
 			amtDeltakerlisteTopic = "",
 			amtEndringsmeldingTopic = ""
@@ -119,12 +126,12 @@ class KafkaConfigurationTest {
 			}
 		}
 
-		val virksomhetIngestor = object : VirksomhetIngestor {
-			override fun ingestKafkaRecord(recordValue: String) {
+		val amtArrangorIngestor = object : AmtArrangorIngestor {
+			override fun ingestArrangor(recordValue: String?) {
 				counter.incrementAndGet()
 			}
-		}
 
+		}
 
 		val config = KafkaConfiguration(
 			kafkaTopicProperties,
@@ -137,7 +144,7 @@ class KafkaConfigurationTest {
 			gjennomforingIngestor,
 			leesahIngestor,
 			aktorV2Ingestor,
-			virksomhetIngestor,
+			amtArrangorIngestor
 		)
 
 		config.onApplicationEvent(null)
@@ -158,7 +165,7 @@ class KafkaConfigurationTest {
 
 		Thread.sleep(3000)
 
-		assertEquals(6, counter.get())
+		assertEquals(5, counter.get())
 	}
 
 }

@@ -1,12 +1,9 @@
 package no.nav.amt.tiltak.core.port
 
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
-import no.nav.amt.tiltak.core.domain.arrangor.ArrangorUpdate
 import java.util.UUID
 
 interface ArrangorService {
-
-	fun upsertArrangor(virksomhetsnummer: String): Arrangor
 
 	fun getArrangorByVirksomhetsnummer(virksomhetsnummer: String): Arrangor?
 
@@ -16,6 +13,6 @@ interface ArrangorService {
 
 	fun getOrCreateArrangor(arrangor: Arrangor): Arrangor
 
-	fun oppdaterArrangor(arrangorUpdate: ArrangorUpdate)
-
+	fun getOrCreateArrangorByOrgnr(organisasjonsnummer: String): Arrangor
+	fun updateArrangor(arrangor: Arrangor): Arrangor
 }

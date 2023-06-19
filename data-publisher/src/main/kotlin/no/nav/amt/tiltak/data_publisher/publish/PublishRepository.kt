@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Component
 class PublishRepository(

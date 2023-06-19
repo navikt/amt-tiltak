@@ -4,10 +4,14 @@ import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.MulighetsrommetApiCl
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.kafka.GjennomforingIngestor
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.ArrangorService
+import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.NavEnhetService
+import no.nav.amt.tiltak.core.port.TiltakService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.UUID
 
 @Service
 class GjennomforingIngestorImpl(
@@ -17,7 +21,7 @@ class GjennomforingIngestorImpl(
 	private val tiltakService: TiltakService,
 	private val navEnhetService: NavEnhetService,
 	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
-): GjennomforingIngestor {
+) : GjennomforingIngestor {
 
 	private val stottedeTiltak = setOf(
 		"INDOPPFAG",
@@ -55,7 +59,7 @@ class GjennomforingIngestorImpl(
 		}
 
 		val arenaData = mulighetsrommetApiClient.hentGjennomforingArenaData(gjennomforing.id)
-		val arrangor = arrangorService.upsertArrangor(gjennomforing.virksomhetsnummer)
+		val arrangor = arrangorService.getOrCreateArrangorByOrgnr(gjennomforing.virksomhetsnummer)
 
 		val tiltak = tiltakService.upsertTiltak(
 			gjennomforing.tiltakstype.id,

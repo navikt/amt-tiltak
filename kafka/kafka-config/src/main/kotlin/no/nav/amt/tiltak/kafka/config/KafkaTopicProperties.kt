@@ -12,8 +12,6 @@ data class KafkaTopicProperties(
 	val leesahTopic: String,
 	val deltakerTopic: String,
 	val aktorV2Topic: String,
-	val virksomhetTopic: String,
-
 
 	//Internal publish topics
 	val amtArrangorTopic: String,

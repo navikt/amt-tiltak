@@ -18,7 +18,7 @@ import no.nav.amt.tiltak.kafka.tiltaksgjennomforing_ingestor.GjennomforingStatus
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
-import java.util.*
+import java.util.UUID
 
 @Service
 class DeltakerProcessor(
@@ -108,7 +108,7 @@ class DeltakerProcessor(
 			throw IllegalStateException("Lagrer ikke gjennomføring med id ${gjennomforing.id} og tiltakstype ${gjennomforing.tiltakstype.arenaKode} fordi virksomhetsnummer mangler.")
 		}
 
-		val arrangor = arrangorService.upsertArrangor(gjennomforingArenaData.virksomhetsnummer!!)
+		val arrangor = arrangorService.getOrCreateArrangorByOrgnr(gjennomforingArenaData.virksomhetsnummer!!)
 
 		val tiltak = tiltakService.upsertTiltak(
 			gjennomforing.tiltakstype.id,
@@ -136,8 +136,9 @@ class DeltakerProcessor(
 		return gjennomforing
 
 	}
+
 	private fun tilDeltakerStatusType(status: DeltakerPayload.Status): DeltakerStatus.Type {
-		return when(status){
+		return when (status) {
 			DeltakerPayload.Status.VENTER_PA_OPPSTART -> DeltakerStatus.Type.VENTER_PA_OPPSTART
 			DeltakerPayload.Status.DELTAR -> DeltakerStatus.Type.DELTAR
 			DeltakerPayload.Status.HAR_SLUTTET -> DeltakerStatus.Type.HAR_SLUTTET
@@ -154,7 +155,7 @@ class DeltakerProcessor(
 	}
 
 	private fun tilDeltakerAarsak(aarsak: DeltakerPayload.StatusAarsak?): DeltakerStatus.Aarsak? {
-		return when(aarsak){
+		return when (aarsak) {
 			DeltakerPayload.StatusAarsak.SYK -> DeltakerStatus.Aarsak.SYK
 			DeltakerPayload.StatusAarsak.FATT_JOBB -> DeltakerStatus.Aarsak.FATT_JOBB
 			DeltakerPayload.StatusAarsak.TRENGER_ANNEN_STOTTE -> DeltakerStatus.Aarsak.TRENGER_ANNEN_STOTTE

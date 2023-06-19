@@ -6,6 +6,7 @@ import java.util.*
 
 data class ArrangorAnsattPublishDto(
 	val id: UUID,
+	val source: String? = "amt-tiltak",
 	val personalia: PersonPublishDto,
 	val arrangorer: List<TilknyttetArrangor>,
 ) {

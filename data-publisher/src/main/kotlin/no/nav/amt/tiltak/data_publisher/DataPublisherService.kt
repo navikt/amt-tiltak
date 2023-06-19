@@ -1,15 +1,12 @@
 package no.nav.amt.tiltak.data_publisher
 
-import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.data_publisher.publish.ArrangorAnsattPublishQuery
-import no.nav.amt.tiltak.data_publisher.publish.ArrangorPublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.DeltakerPublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.DeltakerlistePublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.EndringsmeldingPublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.IdQueries
-import no.nav.amt.tiltak.data_publisher.publish.IgnoredDeltakerlister
 import no.nav.amt.tiltak.data_publisher.publish.PublishRepository
 import no.nav.amt.tiltak.kafka.config.KafkaTopicProperties
 import no.nav.common.kafka.producer.KafkaProducerClient
@@ -24,7 +21,6 @@ class DataPublisherService(
 	private val kafkaTopicProperties: KafkaTopicProperties,
 	private val stringKafkaProducer: KafkaProducerClient<String, String>,
 	private val template: NamedParameterJdbcTemplate,
-	private val amtArrangorClient: AmtArrangorClient,
 	private val publishRepository: PublishRepository,
 ) {
 
@@ -32,7 +28,6 @@ class DataPublisherService(
 
 	fun publish(id: UUID, type: DataPublishType) {
 		when (type) {
-			DataPublishType.ARRANGOR -> publishArrangor(id)
 			DataPublishType.ARRANGOR_ANSATT -> publishArrangorAnsatt(id)
 			DataPublishType.DELTAKER -> publishDeltaker(id)
 			DataPublishType.DELTAKERLISTE -> publishDeltakerliste(id)
@@ -54,11 +49,6 @@ class DataPublisherService(
 		)
 
 		publishBatch(
-			idProvider = { offset -> idQueries.hentArrangorIds(offset, batchSize) },
-			publisher = { id -> publishArrangor(id, forcePublish) }
-		)
-
-		publishBatch(
 			idProvider = { offset -> idQueries.hentArrangorAnsattIds(offset, batchSize) },
 			publisher = { id -> publishArrangorAnsatt(id, forcePublish) }
 		)
@@ -70,10 +60,6 @@ class DataPublisherService(
 	}
 
 	private fun publishDeltakerliste(id: UUID, forcePublish: Boolean = false) {
-		if (IgnoredDeltakerlister.deltakerlisteIds.contains(id)) {
-			return
-		}
-
 		val deltakerlistePublishDto = DeltakerlistePublishQuery(template).get(id)
 
 		if (deltakerlistePublishDto == null) {
@@ -119,20 +105,6 @@ class DataPublisherService(
 						.also { publishRepository.set(id, DataPublishType.DELTAKER, result.result.digest()) }
 				}
 			}
-		}
-	}
-
-	private fun publishArrangor(id: UUID, forcePublish: Boolean = false) {
-
-		val currentData = ArrangorPublishQuery(template, amtArrangorClient).get(id)
-
-		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.ARRANGOR, currentData.digest())) {
-			val key = id.toString()
-			val value = JsonUtils.toJsonString(currentData)
-			val record = ProducerRecord(kafkaTopicProperties.amtArrangorTopic, key, value)
-			logger.info("Republiserer ARRANGOR med id $id")
-			stringKafkaProducer.sendSync(record)
-			publishRepository.set(id, DataPublishType.ARRANGOR, currentData.digest())
 		}
 	}
 

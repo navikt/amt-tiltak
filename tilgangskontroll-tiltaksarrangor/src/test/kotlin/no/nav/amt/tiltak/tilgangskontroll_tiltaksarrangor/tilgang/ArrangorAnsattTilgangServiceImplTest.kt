@@ -349,7 +349,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 				personident = ansattPersonligIdent,
 				personId = UUID.randomUUID(),
 				navn = ArrangorAnsatt.Navn("", null, "")
-				),
+			),
 			arrangorer = listOf(
 				ArrangorAnsatt.TilknyttetArrangorDto(
 					arrangorId = arrangorId,

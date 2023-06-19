@@ -6,9 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
-import no.nav.amt.tiltak.data_publisher.model.DataPublishType.ARRANGOR
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType.DELTAKERLISTE
 import no.nav.amt.tiltak.data_publisher.publish.PublishRepository
 import no.nav.amt.tiltak.kafka.config.KafkaTopicProperties
@@ -30,17 +28,10 @@ class DataPublisherServiceTest : FunSpec({
 	lateinit var kafkaProducerClient: KafkaProducerClient<String, String>
 	val publishRepository = PublishRepository(template)
 
-	val amtArrangorClient: AmtArrangorClient = mockk()
-
 	lateinit var service: DataPublisherService
 
 	val publishAndVerify = fun(id: UUID, type: DataPublishType, expected: Int) {
 		service.publish(id, type)
-		verify(exactly = expected) { kafkaProducerClient.sendSync(any()) }
-	}
-
-	val publishAllAndVerify = fun(expected: Int) {
-		service.publishAll()
 		verify(exactly = expected) { kafkaProducerClient.sendSync(any()) }
 	}
 
@@ -62,55 +53,12 @@ class DataPublisherServiceTest : FunSpec({
 		)
 
 		service = DataPublisherService(
-			kafkaTopicProperties, kafkaProducerClient, template, amtArrangorClient, publishRepository
+			kafkaTopicProperties, kafkaProducerClient, template, publishRepository
 		)
 	}
 
 	afterEach {
 		DbTestDataUtils.cleanDatabase(dataSource)
-	}
-
-	test("Ny Arrangør - Sendes") {
-		val input = dbHandler.createArrangor()
-
-		every { amtArrangorClient.hentArrangor(any()) } returns AmtArrangorClient.ArrangorMedOverordnetArrangor(
-			id = UUID.randomUUID(),
-			navn = "Parent",
-			organisasjonsnummer = input.overordnetEnhetOrganisasjonsnummer!!,
-			overordnetArrangor = null
-		)
-		dbHandler.createDeltakerliste(arrangorId = input.id)
-
-		publishAndVerify(input.id, ARRANGOR, 1)
-	}
-
-	test("Samme arrangør to ganger uten endring - Sendes en gang") {
-		val input = dbHandler.createArrangor()
-
-		every { amtArrangorClient.hentArrangor(any()) } returns AmtArrangorClient.ArrangorMedOverordnetArrangor(
-			id = UUID.randomUUID(),
-			navn = "Parent",
-			organisasjonsnummer = input.overordnetEnhetOrganisasjonsnummer!!,
-			overordnetArrangor = null
-		)
-
-		publishAndVerify(input.id, ARRANGOR, 1)
-		publishAndVerify(input.id, ARRANGOR, 1)
-	}
-
-	test("Oppdatere eksisterende arrangør - sender oppdatert arrangør") {
-		val input = dbHandler.createArrangor()
-		every { amtArrangorClient.hentArrangor(any()) } returns AmtArrangorClient.ArrangorMedOverordnetArrangor(
-			id = UUID.randomUUID(),
-			navn = "Parent",
-			organisasjonsnummer = input.overordnetEnhetOrganisasjonsnummer!!,
-			overordnetArrangor = null
-		)
-
-		publishAndVerify(input.id, ARRANGOR, 1)
-
-		dbHandler.updateArrangor(input.copy(navn = "ENDRET"))
-		publishAndVerify(input.id, ARRANGOR, 2)
 	}
 
 	test("Ny Deltakerliste - Sendes") {
@@ -135,7 +83,6 @@ private fun createTopicProperties(): KafkaTopicProperties = KafkaTopicProperties
 	leesahTopic = "",
 	deltakerTopic = "",
 	aktorV2Topic = "",
-	virksomhetTopic = "",
 	amtArrangorTopic = "",
 	amtEndringsmeldingTopic = "",
 	amtDeltakerlisteTopic = "",

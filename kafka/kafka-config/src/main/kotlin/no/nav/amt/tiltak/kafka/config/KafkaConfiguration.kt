@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.kafka.config
 
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider
 import no.nav.amt.tiltak.core.kafka.*
+import no.nav.amt.tiltak.core.port.AmtArrangorIngestor
 import no.nav.common.kafka.consumer.KafkaConsumerClient
 import no.nav.common.kafka.consumer.feilhandtering.KafkaConsumerRecordProcessor
 import no.nav.common.kafka.consumer.feilhandtering.util.KafkaConsumerRecordProcessorBuilder
@@ -33,10 +34,10 @@ open class KafkaConfiguration(
 	gjennomforingIngestor: GjennomforingIngestor,
 	leesahIngestor: LeesahIngestor,
 	aktorV2Ingestor: AktorV2Ingestor,
-	virksomhetIngestor: VirksomhetIngestor,
+	amtArrangorIngestor: AmtArrangorIngestor
 ) {
 	private val log = LoggerFactory.getLogger(javaClass)
-    private var client: KafkaConsumerClient
+	private var client: KafkaConsumerClient
 	private var consumerRepository = PostgresJdbcTemplateConsumerRepository(jdbcTemplate)
 	private var consumerRecordProcessor: KafkaConsumerRecordProcessor
 
@@ -99,7 +100,12 @@ open class KafkaConfiguration(
 					kafkaTopicProperties.sisteTiltaksgjennomforingerTopic,
 					stringDeserializer(),
 					stringDeserializer(),
-					Consumer<ConsumerRecord<String, String>> { gjennomforingIngestor.ingestKafkaRecord(it.key(), it.value()) }
+					Consumer<ConsumerRecord<String, String>> {
+						gjennomforingIngestor.ingestKafkaRecord(
+							it.key(),
+							it.value()
+						)
+					}
 				)
 		)
 
@@ -111,7 +117,12 @@ open class KafkaConfiguration(
 					kafkaTopicProperties.leesahTopic,
 					stringDeserializer(),
 					ByteArrayDeserializer(),
-					Consumer<ConsumerRecord<String, ByteArray>> { leesahIngestor.ingestKafkaRecord(it.key(), it.value()) }
+					Consumer<ConsumerRecord<String, ByteArray>> {
+						leesahIngestor.ingestKafkaRecord(
+							it.key(),
+							it.value()
+						)
+					}
 				)
 		)
 
@@ -123,7 +134,12 @@ open class KafkaConfiguration(
 					kafkaTopicProperties.aktorV2Topic,
 					stringDeserializer(),
 					ByteArrayDeserializer(),
-					Consumer<ConsumerRecord<String, ByteArray>> { aktorV2Ingestor.ingestKafkaRecord(it.key(), it.value()) }
+					Consumer<ConsumerRecord<String, ByteArray>> {
+						aktorV2Ingestor.ingestKafkaRecord(
+							it.key(),
+							it.value()
+						)
+					}
 				)
 		)
 
@@ -132,12 +148,17 @@ open class KafkaConfiguration(
 				.withLogging()
 				.withStoreOnFailure(consumerRepository)
 				.withConsumerConfig(
-					kafkaTopicProperties.virksomhetTopic,
+					kafkaTopicProperties.amtArrangorTopic,
 					stringDeserializer(),
 					stringDeserializer(),
-					Consumer<ConsumerRecord<String, String>> { virksomhetIngestor.ingestKafkaRecord(it.value()) }
+					Consumer<ConsumerRecord<String, String>> {
+						amtArrangorIngestor.ingestArrangor(
+							it.value()
+						)
+					}
 				)
 		)
+
 
 		consumerRecordProcessor = KafkaConsumerRecordProcessorBuilder
 			.builder()
@@ -148,10 +169,10 @@ open class KafkaConfiguration(
 			.build()
 
 		client = KafkaConsumerClientBuilder.builder()
-            .withProperties(kafkaProperties.consumer())
-            .withTopicConfigs(topicConfigs.toImmutableList())
-            .build()
-    }
+			.withProperties(kafkaProperties.consumer())
+			.withTopicConfigs(topicConfigs.toImmutableList())
+			.build()
+	}
 
 	@EventListener
 	open fun onApplicationEvent(_event: ContextRefreshedEvent?) {

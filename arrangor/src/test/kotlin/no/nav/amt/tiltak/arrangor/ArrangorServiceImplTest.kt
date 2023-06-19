@@ -5,13 +5,12 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
-import no.nav.amt.tiltak.core.domain.arrangor.ArrangorUpdate
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.arrangor.AmtArrangorService
 import java.time.LocalDateTime
 import java.util.UUID
 
-class ArrangorServiceImplTest: FunSpec({
+class ArrangorServiceImplTest : FunSpec({
 	lateinit var amtArrangorService: AmtArrangorService
 	lateinit var arrangorRepository: ArrangorRepository
 	lateinit var publisherService: DataPublisherService
@@ -22,7 +21,7 @@ class ArrangorServiceImplTest: FunSpec({
 		amtArrangorService = mockk()
 		arrangorRepository = mockk(relaxUnitFun = true)
 		publisherService = mockk()
-		arrangorService = ArrangorServiceImpl(amtArrangorService, arrangorRepository, publisherService)
+		arrangorService = ArrangorServiceImpl(amtArrangorService, arrangorRepository)
 
 		every { publisherService.publish(any(), any()) } returns Unit
 	}
@@ -84,75 +83,5 @@ class ArrangorServiceImplTest: FunSpec({
 
 		verify(exactly = 0) { arrangorRepository.upsert(any(), any(), any(), any(), any()) }
 	}
-
-	test("oppdaterArrangor - ny overordnet enhet orgnummer - skal hente ny enhet og oppdatere arrangor") {
-		val id = UUID.randomUUID()
-		val arrangorUpdate = ArrangorUpdate("Foo", "1234", "6789")
-		val eksisterendeArrangor = ArrangorDbo(
-			id = id,
-			navn = arrangorUpdate.navn,
-			organisasjonsnummer = arrangorUpdate.organisasjonsnummer,
-			overordnetEnhetOrganisasjonsnummer = "9876",
-			overordnetEnhetNavn = "Bar",
-			createdAt = LocalDateTime.now(),
-			modifiedAt = LocalDateTime.now(),
-		)
-		every { arrangorRepository.getByOrganisasjonsnummer(arrangorUpdate.organisasjonsnummer) } returns eksisterendeArrangor
-		every { arrangorRepository.updateUnderenheterIfAny(any(), any()) } returns 0
-
-		val nyttOverordnetEnhetNavn = "Ny Overordnet Enhet"
-
-		every { amtArrangorService.getArrangor(arrangorUpdate.overordnetEnhetOrganisasjonsnummer!!) } returns Arrangor(
-			id = id,
-			navn = nyttOverordnetEnhetNavn,
-			organisasjonsnummer = arrangorUpdate.overordnetEnhetOrganisasjonsnummer!!,
-			overordnetEnhetNavn = "Baz",
-			overordnetEnhetOrganisasjonsnummer = "4321",
-		)
-
-		arrangorService.oppdaterArrangor(arrangorUpdate)
-
-		verify(exactly = 1) { amtArrangorService.getArrangor(any()) }
-		verify(exactly = 1) { arrangorRepository.updateUnderenheterIfAny(arrangorUpdate.organisasjonsnummer, arrangorUpdate.navn) }
-
-		verify(exactly = 1) { arrangorRepository.update( ArrangorUpdateDbo(
-			id = eksisterendeArrangor.id,
-			navn = arrangorUpdate.navn,
-			overordnetEnhetOrganisasjonsnummer = arrangorUpdate.overordnetEnhetOrganisasjonsnummer,
-			overordnetEnhetNavn = nyttOverordnetEnhetNavn,
-		)) }
-
-	}
-
-	test("oppdaterArrangor - endret navn på enhet - oppdaterer enhet og underenheter") {
-		val id = UUID.randomUUID()
-		val arrangorUpdate = ArrangorUpdate("nytt enhetsnavn", "1234", "6789")
-		val eksisterendeArrangor = ArrangorDbo(
-			id = id,
-			navn = "enhetsnavn",
-			organisasjonsnummer = arrangorUpdate.organisasjonsnummer,
-			overordnetEnhetOrganisasjonsnummer = arrangorUpdate.overordnetEnhetOrganisasjonsnummer,
-			overordnetEnhetNavn = "Baz",
-			createdAt = LocalDateTime.now(),
-			modifiedAt = LocalDateTime.now(),
-		)
-
-		every { arrangorRepository.getByOrganisasjonsnummer(arrangorUpdate.organisasjonsnummer) } returns eksisterendeArrangor
-		every { arrangorRepository.updateUnderenheterIfAny(any(), any()) } returns 1
-
-		arrangorService.oppdaterArrangor(arrangorUpdate)
-
-		verify(exactly = 1) { arrangorRepository.update(any()) }
-
-		verify(exactly = 1) { arrangorRepository.updateUnderenheterIfAny(arrangorUpdate.organisasjonsnummer, arrangorUpdate.navn) }
-		verify(exactly = 1) { arrangorRepository.update( ArrangorUpdateDbo(
-			id = eksisterendeArrangor.id,
-			navn = arrangorUpdate.navn,
-			overordnetEnhetOrganisasjonsnummer = eksisterendeArrangor.overordnetEnhetOrganisasjonsnummer,
-			overordnetEnhetNavn = eksisterendeArrangor.overordnetEnhetNavn,
-		)) }
-
-	}
-
 })
 
