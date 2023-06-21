@@ -68,6 +68,7 @@ class ArrangorAnsattServiceImpl(
 	private fun getAnsattDbo(personIdent: String):AnsattDbo? {
 		val ansattDbo = arrangorAnsattRepository.getByPersonligIdent(personIdent)
 		return if (ansattDbo == null) {
+			log.info("Fant ikke ansatt i databasen, forsøker å hente fra amt-arrangør")
 			arrangorAnsattTilgangService.synkroniserRettigheterMedAltinn(personIdent)
 			arrangorAnsattRepository.getByPersonligIdent(personIdent)
 		} else {
