@@ -59,10 +59,21 @@ class ArrangorAnsattServiceImpl(
 	}
 
 	override fun getAnsattByPersonligIdent(personIdent: String): Ansatt? {
-		val ansattDbo = arrangorAnsattRepository.getByPersonligIdent(personIdent) ?: return null
+		val ansattDbo = getAnsattDbo(personIdent) ?: return null
 		val arrangorer = hentTilknyttedeArrangorer(ansattDbo.id)
 
 		return ansattDbo.toAnsatt(arrangorer)
+	}
+
+	private fun getAnsattDbo(personIdent: String):AnsattDbo? {
+		val ansattDbo = arrangorAnsattRepository.getByPersonligIdent(personIdent)
+		return if (ansattDbo == null) {
+			log.info("Fant ikke ansatt i databasen, forsøker å hente fra amt-arrangør")
+			arrangorAnsattTilgangService.synkroniserRettigheterMedAltinn(personIdent)
+			arrangorAnsattRepository.getByPersonligIdent(personIdent)
+		} else {
+			ansattDbo
+		}
 	}
 
 	override fun getAnsattIdByPersonligIdent(personIdent: String) : UUID {
