@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.port.AmtArrangorIngestor
 import no.nav.amt.tiltak.core.port.ArrangorService
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -14,10 +15,13 @@ class AmtArrangorIngestorImpl(
 	private val amtArrangorClient: AmtArrangorClient
 ) : AmtArrangorIngestor {
 
+	private val logger = LoggerFactory.getLogger(javaClass)
+
 	override fun ingestArrangor(recordValue: String?) {
 		if (recordValue != null) {
 			val arrangorDto = JsonUtils.fromJsonString<ArrangorDto>(recordValue)
 			if (arrangorDto.source != "amt-tiltak") {
+				logger.info("Oppdaterer arrangør med id ${arrangorDto.id}")
 				if (arrangorDto.overordnetArrangorId != null) {
 					amtArrangorClient.hentArrangor(arrangorDto.organisasjonsnummer)?.let {
 						arrangorService.updateArrangor(
