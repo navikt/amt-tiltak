@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.navansatt
 
-import no.nav.amt.tiltak.clients.nom.NomClient
+import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
 import no.nav.amt.tiltak.core.domain.nav_ansatt.Bucket
 import no.nav.amt.tiltak.core.domain.nav_ansatt.UpsertNavAnsattInput
 import no.nav.amt.tiltak.core.port.NavAnsattService
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 
 @Component
 internal class NavAnsattUpdater(
-	private val nomClient: NomClient,
+	private val amtPersonClient: AmtPersonClient,
 	private val navAnsattRepository: NavAnsattRepository,
 	private val navAnsattService: NavAnsattService
 ) {
@@ -18,10 +18,8 @@ internal class NavAnsattUpdater(
 
 	fun oppdaterBatch() {
 		navAnsattRepository.getNavAnsattInBucket(Bucket.forTidspunkt()).forEach { lagretNavAnsatt ->
-			val nomNavAnsatt = nomClient.hentNavAnsatt(lagretNavAnsatt.navIdent)
-
-			if (nomNavAnsatt == null) {
-				log.warn("Fant ikke nav ansatt med ident=${lagretNavAnsatt.navIdent} i NOM")
+			val nomNavAnsatt = amtPersonClient.hentNavAnsatt(lagretNavAnsatt.navIdent).getOrElse {
+				log.warn("Fant ikke nav ansatt med ident=${lagretNavAnsatt.navIdent} i amt-person")
 				return@forEach
 			}
 
