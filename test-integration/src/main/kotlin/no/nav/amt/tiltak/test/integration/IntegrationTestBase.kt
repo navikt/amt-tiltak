@@ -51,7 +51,6 @@ abstract class IntegrationTestBase {
 		val mockArrangorServer = MockAmtArrangorServer()
 		val mockNorgHttpServer = MockNorgHttpServer()
 		val mockPoaoTilgangHttpServer = MockPoaoTilgangHttpServer()
-		val mockNomHttpServer = MockNomHttpServer()
 		val mockPdlHttpServer = MockPdlHttpServer()
 		val mockMachineToMachineHttpServer = MockMachineToMachineHttpServer()
 		val mockMulighetsrommetApiServer = MockMulighetsrommetApiServer()
@@ -101,10 +100,6 @@ abstract class IntegrationTestBase {
 			registry.add("poao-tilgang.url") { mockPoaoTilgangHttpServer.serverUrl() }
 			registry.add("poao-tilgang.scope") { "test.poao-tilgang" }
 
-			mockNomHttpServer.start()
-			registry.add("nom.url") { mockNomHttpServer.serverUrl() }
-			registry.add("nom.scope") { "test.nom" }
-
 			mockPdlHttpServer.start()
 			registry.add("pdl.url") { mockPdlHttpServer.serverUrl() }
 			registry.add("pdl.scope") { "test.pdl" }
@@ -129,7 +124,6 @@ abstract class IntegrationTestBase {
 	fun resetMockServers() {
 		mockNorgHttpServer.reset()
 		mockPoaoTilgangHttpServer.reset()
-		mockNomHttpServer.reset()
 		mockArrangorServer.reset()
 		mockPdlHttpServer.reset()
 		mockMulighetsrommetApiServer.reset()
@@ -141,7 +135,6 @@ abstract class IntegrationTestBase {
 	fun resetMockServersAndAddDefaultData() {
 		resetMockServers()
 		mockNorgHttpServer.addDefaultData()
-		mockNomHttpServer.addDefaultData()
 	}
 
 	fun serverUrl() = "http://localhost:$port"

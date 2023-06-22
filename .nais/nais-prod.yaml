@@ -65,7 +65,6 @@ spec:
           cluster: prod-gcp
       external:
         - host: pdl-api.prod-fss-pub.nais.io
-        - host: nom-api.intern.nav.no
         - host: norg2.prod-fss-pub.nais.io
         - host: veilarbarena.prod-fss-pub.nais.io
         - host: veilarboppfolging.prod-fss-pub.nais.io
@@ -93,12 +92,6 @@ spec:
       value: http://amt-person-service.amt.svc.cluster.local
     - name: AMT_PERSON_SCOPE
       value: api://prod-gcp.amt.amt-person-service/.default
-    - name: NOM_SCOPE
-      value: api://prod-gcp.nom.nom-api/.default
-    - name: NOM_URL
-      value: https://nom-api.intern.nav.no
-    - name: NOM_MOCK
-      value: "false"
     - name: NORG_URL
       value: https://norg2.prod-fss-pub.nais.io
     - name: VEILARBARENA_URL
