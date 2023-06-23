@@ -40,33 +40,56 @@ class DataPublisherService(
 		}
 	}
 
-	fun publishAll(batchSize: Int = 100, forcePublish: Boolean = true) {
+	fun publish(type: DataPublishType, batchSize: Int = 100, forcePublish: Boolean = true) {
 		val idQueries = IdQueries(template)
 
-		publishBatch(
-			idProvider = { offset -> idQueries.hentDeltakerlisteIds(offset, batchSize) },
-			publisher = { id -> publishDeltakerliste(id, forcePublish) }
-		)
+		when (type) {
+			DataPublishType.ARRANGOR -> {
+				publishBatch(
+					idProvider = { offset -> idQueries.hentArrangorIds(offset, batchSize) },
+					publisher = { id -> publishArrangor(id, forcePublish) }
+				)
+			}
 
-		publishBatch(
-			idProvider = { offset -> idQueries.hentDeltakerIds(offset, batchSize) },
-			publisher = { id -> publishDeltaker(id, forcePublish) }
-		)
+			DataPublishType.ARRANGOR_ANSATT -> {
+				publishBatch(
+					idProvider = { offset -> idQueries.hentArrangorAnsattIds(offset, batchSize) },
+					publisher = { id -> publishArrangorAnsatt(id, forcePublish) }
+				)
+			}
 
-		publishBatch(
-			idProvider = { offset -> idQueries.hentArrangorIds(offset, batchSize) },
-			publisher = { id -> publishArrangor(id, forcePublish) }
-		)
+			DataPublishType.DELTAKER -> {
+				publishBatch(
+					idProvider = { offset -> idQueries.hentDeltakerIds(offset, batchSize) },
+					publisher = { id -> publishDeltaker(id, forcePublish) }
+				)
+			}
 
-		publishBatch(
-			idProvider = { offset -> idQueries.hentArrangorAnsattIds(offset, batchSize) },
-			publisher = { id -> publishArrangorAnsatt(id, forcePublish) }
-		)
+			DataPublishType.DELTAKERLISTE -> {
+				publishBatch(
+					idProvider = { offset -> idQueries.hentDeltakerlisteIds(offset, batchSize) },
+					publisher = { id -> publishDeltakerliste(id, forcePublish) }
+				)
 
-		publishBatch(
-			idProvider = { offset -> idQueries.hentEndringsmeldingIds(offset, batchSize) },
-			publisher = { id -> publishEndringsmelding(id, forcePublish) }
-		)
+			}
+
+			DataPublishType.ENDRINGSMELDING -> {
+				publishBatch(
+					idProvider = { offset -> idQueries.hentEndringsmeldingIds(offset, batchSize) },
+					publisher = { id -> publishEndringsmelding(id, forcePublish) }
+				)
+			}
+		}
+	}
+
+	fun publishAll(batchSize: Int = 100, forcePublish: Boolean = true) {
+		DataPublishType.values().forEach {
+			publish(
+				type = it,
+				batchSize = batchSize,
+				forcePublish = forcePublish
+			)
+		}
 	}
 
 	private fun publishDeltakerliste(id: UUID, forcePublish: Boolean = false) {
