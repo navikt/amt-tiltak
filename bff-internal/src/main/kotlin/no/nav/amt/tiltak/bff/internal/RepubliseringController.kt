@@ -37,6 +37,17 @@ class RepubliseringController(
 		}
 	}
 
+	@PostMapping("/{type}")
+	fun republishType(
+		@PathVariable("type") type: DataPublishType,
+		request: HttpServletRequest
+	) {
+		if (isInternal(request)) {
+			JobRunner.runAsync("republiser_${type}") { dataPublisher.publish(type = type) }
+		}
+	}
+
+
 	@PostMapping("/{type}/{id}")
 	fun republish(
 		@PathVariable("type") type: DataPublishType,

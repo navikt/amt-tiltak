@@ -34,7 +34,7 @@ class ArrangorAnsattServiceImplTest {
 			dataPublisherService = publisherService,
 		)
 
-		every { publisherService.publish(any(), any()) } returns Unit
+		every { publisherService.publish(id = any(), type = any()) } returns Unit
 
 		arrangorAnsattService.arrangorAnsattTilgangService = arrangorAnsattTilgangService
 	}
