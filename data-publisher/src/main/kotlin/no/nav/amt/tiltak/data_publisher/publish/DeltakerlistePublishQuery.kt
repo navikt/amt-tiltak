@@ -24,7 +24,10 @@ class DeltakerlistePublishQuery(
 			id = deltakerliste.id,
 			navn = deltakerliste.navn,
 			status = DeltakerlisteStatus.valueOf(deltakerliste.status),
-			tiltak = TiltakDto(deltakerliste.navn, deltakerliste.tiltakType),
+			tiltak = TiltakDto(
+				navn = deltakerliste.tiltakNavn,
+				type = deltakerliste.tiltakType
+			),
 			arrangor = DeltakerlisteArrangorDto(
 				id = deltakerliste.arrangorId,
 				organisasjonsnummer = deltakerliste.arrangorOrgNr,
