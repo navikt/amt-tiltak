@@ -111,7 +111,7 @@ class DeltakerServiceImplTest {
 		testDataRepository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
 
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource, TestDataSeeder::insertMinimum)
-		every { publisherService.publish(any(), any()) } returns Unit
+		every { publisherService.publish(id = any(), type = any()) } returns Unit
 	}
 
 	@AfterEach

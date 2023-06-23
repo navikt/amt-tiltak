@@ -59,7 +59,7 @@ class ArrangorVeilederServiceImplTest {
 			publisherService = publisherService
 		)
 
-		every { publisherService.publish(any(), any()) } returns Unit
+		every { publisherService.publish(id = any(), type = any()) } returns Unit
 	}
 
 	@Test

@@ -66,7 +66,7 @@ class MineDeltakerlisterServiceTest : FunSpec({
 
 
 		DbTestDataUtils.cleanDatabase(dataSource)
-		every { publisherService.publish(any(), any()) } returns Unit
+		every { publisherService.publish(id = any(), type = any()) } returns Unit
 
 		testRepository.insertNavEnhet(NAV_ENHET_1)
 		testRepository.insertArrangor(ARRANGOR_1)
