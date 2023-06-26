@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Service
 open class DeltakerServiceImpl(
@@ -262,6 +262,7 @@ open class DeltakerServiceImpl(
 			throw IllegalStateException("Kan ikke skjule deltaker $deltakerId. Ugyldig status")
 
 		skjultDeltakerRepository.skjulDeltaker(UUID.randomUUID(), deltakerId, arrangorAnsattId)
+		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
 	}
 
 	override fun opphevSkjulDeltakerForTiltaksarrangor(deltakerId: UUID) {
