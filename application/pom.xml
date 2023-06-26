@@ -59,10 +59,6 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>nom</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>amt-person</artifactId>
         </dependency>
         <dependency>

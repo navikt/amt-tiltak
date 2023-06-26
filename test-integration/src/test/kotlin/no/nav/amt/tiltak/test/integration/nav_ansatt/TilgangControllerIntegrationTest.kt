@@ -12,14 +12,13 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 class TilgangControllerIntegrationTest : IntegrationTestBase() {
 
 	@BeforeEach
 	internal fun setUp() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
-		mockNomHttpServer.addDefaultData()
 	}
 
 	@Test
