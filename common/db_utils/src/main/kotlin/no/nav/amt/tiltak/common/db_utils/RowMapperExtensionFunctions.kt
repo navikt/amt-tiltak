@@ -6,7 +6,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 fun ResultSet.getUUID(columnLabel: String): UUID {
 	return getNullableUUID(columnLabel) ?: throw IllegalStateException("Expected $columnLabel not to be null")
@@ -54,6 +54,12 @@ fun ResultSet.getNullableInt(columnLabel: String): Int? {
 
 fun ResultSet.getNullableFloat(columnLabel: String): Float? {
 	val value = this.getFloat(columnLabel)
+	if (this.wasNull()) return null
+	return value
+}
+
+fun ResultSet.getNullableDouble(columnLabel: String): Double? {
+	val value = this.getDouble(columnLabel)
 	if (this.wasNull()) return null
 	return value
 }
