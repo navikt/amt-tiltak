@@ -31,6 +31,16 @@ class ExternalControllerTest: IntegrationTestBase() {
 	}
 
 	@Test
+	fun `hentDeltakelserForPerson - mangler token - returnerer 401`() {
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/external/deltakelser?personIdent=${TestData.BRUKER_1.personIdent}",
+		)
+
+		response.code shouldBe 401
+	}
+
+	@Test
 	fun `hentDeltakelserForPerson - gyldig token - returnerer 200`() {
 		val response = sendRequest(
 			method = "GET",
