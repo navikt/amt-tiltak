@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
-import java.util.UUID
+import java.util.*
 
 class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
@@ -706,6 +706,16 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		response.code shouldBe 403
 	}
 
+	@Test
+	fun `hentBrukerInfo - ikke m2m token - skal returnere 401`() {
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/bruker-info",
+			headers =  mapOf("Authorization" to "Bearer ${mockOAuthServer.issueAzureAdToken(ident = "", oid = UUID.randomUUID())}")
+		)
+
+		response.code shouldBe 401
+	}
 	@Test
 	fun `hentBrukerInfo - deltaker finnes - skal ha status 200 og returnere info`() {
 		val response = sendRequest(

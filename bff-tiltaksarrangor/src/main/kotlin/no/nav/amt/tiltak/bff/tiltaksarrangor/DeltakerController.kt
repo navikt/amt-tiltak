@@ -4,6 +4,7 @@ import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerDetaljerDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.request.*
+import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.tiltak.skjulesForAlleAktorer
 import no.nav.amt.tiltak.core.exceptions.SkjultDeltakerException
@@ -23,6 +24,7 @@ class DeltakerController(
 	private val auditLoggerService: AuditLoggerService,
 	private val deltakerService: DeltakerService,
 	private val endringsmeldingService: EndringsmeldingService,
+	private val authService: AuthService
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -210,6 +212,8 @@ class DeltakerController(
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@GetMapping("/{deltakerId}/bruker-info")
 	fun hentBrukerInfo(@PathVariable("deltakerId") deltakerId: UUID): BrukerInfo {
+		authService.validerErM2MToken()
+
 		val bruker = deltakerService.hentBruker(deltakerId)
 		return BrukerInfo(
 			bruker.id,
@@ -222,6 +226,8 @@ class DeltakerController(
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@PostMapping("/bruker-info")
 	fun hentBrukerInfoForPersonident(@RequestBody request: HentBrukerInfoRequest): BrukerInfo {
+		authService.validerErM2MToken()
+
 		val bruker = deltakerService.hentBruker(request.personident)
 		return bruker?.let {
 			BrukerInfo(
