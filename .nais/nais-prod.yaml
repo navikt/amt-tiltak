@@ -51,6 +51,8 @@ spec:
         - application: amt-tiltaksansvarlig-flate
         - application: amt-tiltaksarrangor-bff
         - application: amt-person-service
+        - application: tiltakspenger-tiltak
+          namespace: tpts
     outbound:
       rules:
         - application: amt-person-service
