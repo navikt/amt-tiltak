@@ -57,7 +57,8 @@ class DeltakerPublishQuery(
 				DeltakerNavVeilederDto(
 					id = deltaker.navAnsattId,
 					navn = deltaker.navAnsattNavn!!,
-					epost = deltaker.navAnsattEpost
+					epost = deltaker.navAnsattEpost,
+					telefonnummer = deltaker.navAnsattTelefonnummer
 				)
 			},
 			status = DeltakerStatusDto(
@@ -97,6 +98,7 @@ class DeltakerPublishQuery(
 			   nav_ansatt.id                                as nav_ansatt_id,
 			   nav_ansatt.navn                              as nav_ansatt_navn,
 			   nav_ansatt.epost                             as nav_ansatt_epost,
+			   nav_ansatt.telefonnummer                     as nav_ansatt_telefonnummer,
 			   status.status                                as status,
 			   status.aarsak                                as status_aarsak,
 			   status.gyldig_fra                            as status_gyldig_fra,
@@ -144,6 +146,7 @@ class DeltakerPublishQuery(
 		val navAnsattId: UUID?,
 		val navAnsattNavn: String?,
 		val navAnsattEpost: String?,
+		val navAnsattTelefonnummer: String?,
 		val status: String?,
 		val statusAarsak: String?,
 		val statusGyldigFra: LocalDateTime?,
@@ -174,6 +177,7 @@ class DeltakerPublishQuery(
 					navAnsattId = rs.getNullableUUID("nav_ansatt_id"),
 					navAnsattNavn = rs.getNullableString("nav_ansatt_navn"),
 					navAnsattEpost = rs.getNullableString("nav_ansatt_epost"),
+					navAnsattTelefonnummer = rs.getNullableString("nav_ansatt_telefonnummer"),
 					status = rs.getString("status"),
 					statusAarsak = rs.getNullableString("status_aarsak"),
 					statusGyldigFra = rs.getNullableLocalDateTime("status_gyldig_fra"),
