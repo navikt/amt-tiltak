@@ -5,7 +5,7 @@ import no.nav.common.json.JsonUtils
 import org.springframework.util.DigestUtils
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class DeltakerPublishDto(
 	val id: UUID,
@@ -53,5 +53,6 @@ data class DeltakerKontaktinformasjonDto(
 data class DeltakerNavVeilederDto(
 	val id: UUID,
 	val navn: String,
-	val epost: String?
+	val epost: String?,
+	val telefonnummer: String?
 )
