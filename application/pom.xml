@@ -63,6 +63,10 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>external-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>pdl</artifactId>
         </dependency>
         <dependency>
