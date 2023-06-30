@@ -35,6 +35,7 @@ class ExternalController(
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@GetMapping("/deltakelser")
 	fun hentDeltakelserForPerson(@RequestParam("personIdent") personIdent: String): List<DeltakerDto> {
+		authService.validerErM2MToken()
 		return hentDeltakelser(personIdent)
 	}
 
