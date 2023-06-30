@@ -36,8 +36,9 @@ class ExternalControllerTest: IntegrationTestBase() {
 	@Test
 	fun `hentDeltakelserForPerson - mangler token - returnerer 401`() {
 		val response = sendRequest(
-			method = "GET",
-			url = "/api/external/deltakelser?personIdent=${TestData.BRUKER_1.personIdent}",
+			method = "POST",
+			body = """{"personIdent": "${TestData.BRUKER_1.personIdent}"}""".toJsonRequestBody(),
+			url = "/api/external/deltakelser",
 		)
 
 		response.code shouldBe 401
@@ -46,8 +47,9 @@ class ExternalControllerTest: IntegrationTestBase() {
 	@Test
 	fun `hentDeltakelserForPerson - gyldig m2m token - returnerer 200`() {
 		val response = sendRequest(
-			method = "GET",
-			url = "/api/external/deltakelser?personIdent=${TestData.BRUKER_1.personIdent}",
+			method = "POST",
+			body = """{"personIdent": "${TestData.BRUKER_1.personIdent}"}""".toJsonRequestBody(),
+			url = "/api/external/deltakelser",
 			headers =  getAzureAdM2MToken()
 		)
 
@@ -57,8 +59,9 @@ class ExternalControllerTest: IntegrationTestBase() {
 	@Test
 	fun `hentDeltakelserForPerson - gyldig obo token - returnerer 401`() {
 		val response = sendRequest(
-			method = "GET",
-			url = "/api/external/deltakelser?personIdent=${TestData.BRUKER_1.personIdent}",
+			method = "POST",
+			url = "/api/external/deltakelser",
+			body = """{"personIdent": "${TestData.BRUKER_1.personIdent}"}""".toJsonRequestBody(),
 			headers =  getAzureAToken()
 		)
 

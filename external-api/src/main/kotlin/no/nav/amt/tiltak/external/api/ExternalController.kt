@@ -12,8 +12,9 @@ import no.nav.amt.tiltak.external.api.dto.GjennomforingDto
 import no.nav.amt.tiltak.external.api.dto.toDto
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
@@ -33,10 +34,10 @@ class ExternalController(
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
-	@GetMapping("/deltakelser")
-	fun hentDeltakelserForPerson(@RequestParam("personIdent") personIdent: String): List<DeltakerDto> {
+	@PostMapping("/deltakelser")
+	fun hentDeltakelserForPerson(@RequestBody body: HentDeltakelserRequest): List<DeltakerDto> {
 		authService.validerErM2MToken()
-		return hentDeltakelser(personIdent)
+		return hentDeltakelser(body.personIdent)
 	}
 
 	private fun hentDeltakelser(personIdent: String): List<DeltakerDto> {
@@ -46,6 +47,10 @@ class ExternalController(
 			}
 	}
 }
+
+data class HentDeltakelserRequest(
+	val personIdent: String
+)
 
 fun Deltaker.toDto(gjennomforing: Gjennomforing) = DeltakerDto(
 	id = id,
