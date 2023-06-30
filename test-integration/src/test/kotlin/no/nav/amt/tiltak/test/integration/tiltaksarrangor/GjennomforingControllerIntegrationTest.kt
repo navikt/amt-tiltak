@@ -4,6 +4,7 @@ import com.jayway.jsonpath.JsonPath
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.GjennomforingDto
+import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -28,6 +29,49 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 	internal fun setUp() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 		resetMockServersAndAddDefaultData()
+
+		mockArrangorServer.addAnsattResponse(
+			ansattDto = AmtArrangorClient.AnsattDto(
+				id = ARRANGOR_ANSATT_1.id,
+				personalia = AmtArrangorClient.PersonaliaDto(ARRANGOR_ANSATT_1.personligIdent, null, AmtArrangorClient.Navn(
+					ARRANGOR_ANSATT_1.fornavn, ARRANGOR_ANSATT_1.mellomnavn, ARRANGOR_ANSATT_1.etternavn)),
+				arrangorer = listOf(
+					AmtArrangorClient.TilknyttetArrangorDto(
+						arrangorId = TestData.ARRANGOR_1.id,
+						arrangor = AmtArrangorClient.Arrangor(TestData.ARRANGOR_1.id, TestData.ARRANGOR_1.navn, TestData.ARRANGOR_1.organisasjonsnummer),
+						overordnetArrangor = null,
+						roller = listOf(AmtArrangorClient.AnsattRolle.KOORDINATOR),
+						veileder = emptyList(),
+						koordinator = emptyList()
+					),
+					AmtArrangorClient.TilknyttetArrangorDto(
+						arrangorId = TestData.ARRANGOR_2.id,
+						arrangor = AmtArrangorClient.Arrangor(TestData.ARRANGOR_2.id, TestData.ARRANGOR_2.navn, TestData.ARRANGOR_2.organisasjonsnummer),
+						overordnetArrangor = null,
+						roller = listOf(AmtArrangorClient.AnsattRolle.VEILEDER),
+						veileder = emptyList(),
+						koordinator = emptyList()
+					)
+				)
+			)
+		)
+		mockArrangorServer.addAnsattResponse(
+			ansattDto = AmtArrangorClient.AnsattDto(
+				id = ARRANGOR_ANSATT_2.id,
+				personalia = AmtArrangorClient.PersonaliaDto(ARRANGOR_ANSATT_2.personligIdent, null, AmtArrangorClient.Navn(
+					ARRANGOR_ANSATT_2.fornavn, ARRANGOR_ANSATT_2.mellomnavn, ARRANGOR_ANSATT_2.etternavn)),
+				arrangorer = listOf(
+					AmtArrangorClient.TilknyttetArrangorDto(
+						arrangorId = TestData.ARRANGOR_1.id,
+						arrangor = AmtArrangorClient.Arrangor(TestData.ARRANGOR_1.id, TestData.ARRANGOR_1.navn, TestData.ARRANGOR_1.organisasjonsnummer),
+						overordnetArrangor = null,
+						roller = listOf(AmtArrangorClient.AnsattRolle.VEILEDER),
+						veileder = emptyList(),
+						koordinator = emptyList()
+					)
+				)
+			)
+		)
 	}
 
 	@Test

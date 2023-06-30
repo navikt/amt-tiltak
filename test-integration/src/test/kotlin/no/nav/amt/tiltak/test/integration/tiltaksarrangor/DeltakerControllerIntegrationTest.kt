@@ -5,12 +5,14 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.beInstanceOf
+import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.domain.tiltak.EndringsmeldingStatusAarsak
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_VEILEDER_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
@@ -34,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
@@ -56,6 +58,49 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		testDataRepository.insertDeltaker(deltakerIkkeTilgang)
 		testDataRepository.insertDeltakerStatus(deltakerIkkeTilgangStatus)
 		testDataRepository.deleteAllEndringsmeldinger()
+
+		mockArrangorServer.addAnsattResponse(
+			ansattDto = AmtArrangorClient.AnsattDto(
+				id = ARRANGOR_ANSATT_1.id,
+				personalia = AmtArrangorClient.PersonaliaDto(ARRANGOR_ANSATT_1.personligIdent, null, AmtArrangorClient.Navn(
+					ARRANGOR_ANSATT_1.fornavn, ARRANGOR_ANSATT_1.mellomnavn, ARRANGOR_ANSATT_1.etternavn)),
+				arrangorer = listOf(
+					AmtArrangorClient.TilknyttetArrangorDto(
+						arrangorId = TestData.ARRANGOR_1.id,
+						arrangor = AmtArrangorClient.Arrangor(TestData.ARRANGOR_1.id, TestData.ARRANGOR_1.navn, TestData.ARRANGOR_1.organisasjonsnummer),
+						overordnetArrangor = null,
+						roller = listOf(AmtArrangorClient.AnsattRolle.KOORDINATOR),
+						veileder = emptyList(),
+						koordinator = emptyList()
+					),
+					AmtArrangorClient.TilknyttetArrangorDto(
+						arrangorId = TestData.ARRANGOR_2.id,
+						arrangor = AmtArrangorClient.Arrangor(TestData.ARRANGOR_2.id, TestData.ARRANGOR_2.navn, TestData.ARRANGOR_2.organisasjonsnummer),
+						overordnetArrangor = null,
+						roller = listOf(AmtArrangorClient.AnsattRolle.VEILEDER),
+						veileder = emptyList(),
+						koordinator = emptyList()
+					)
+				)
+			)
+		)
+		mockArrangorServer.addAnsattResponse(
+			ansattDto = AmtArrangorClient.AnsattDto(
+				id = ARRANGOR_ANSATT_2.id,
+				personalia = AmtArrangorClient.PersonaliaDto(ARRANGOR_ANSATT_2.personligIdent, null, AmtArrangorClient.Navn(
+					ARRANGOR_ANSATT_2.fornavn, ARRANGOR_ANSATT_2.mellomnavn, ARRANGOR_ANSATT_2.etternavn)),
+				arrangorer = listOf(
+					AmtArrangorClient.TilknyttetArrangorDto(
+						arrangorId = TestData.ARRANGOR_1.id,
+						arrangor = AmtArrangorClient.Arrangor(TestData.ARRANGOR_1.id, TestData.ARRANGOR_1.navn, TestData.ARRANGOR_1.organisasjonsnummer),
+						overordnetArrangor = null,
+						roller = listOf(AmtArrangorClient.AnsattRolle.VEILEDER),
+						veileder = emptyList(),
+						koordinator = emptyList()
+					)
+				)
+			)
+		)
 	}
 
 	@Test
