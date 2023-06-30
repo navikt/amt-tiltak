@@ -4,11 +4,14 @@ import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import org.junit.jupiter.api.Test
+import java.util.*
 
 
 class ExternalControllerTest: IntegrationTestBase() {
 	val getTokenXAuthHeader = { mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(TestData.ARRANGOR_ANSATT_1.personligIdent)}") }
 	val getAzureAdM2MToken = { mapOf("Authorization" to "Bearer ${mockOAuthServer.issueAzureAdM2MToken()}") }
+	val getAzureAToken = { mapOf("Authorization" to "Bearer ${mockOAuthServer.issueAzureAdToken(ident = "", oid = UUID.randomUUID())}") }
+
 
 	@Test
 	fun `hentMineDeltakelser - mangler token - returnerer 401`() {
@@ -33,21 +36,35 @@ class ExternalControllerTest: IntegrationTestBase() {
 	@Test
 	fun `hentDeltakelserForPerson - mangler token - returnerer 401`() {
 		val response = sendRequest(
-			method = "GET",
-			url = "/api/external/deltakelser?personIdent=${TestData.BRUKER_1.personIdent}",
+			method = "POST",
+			body = """{"personIdent": "${TestData.BRUKER_1.personIdent}"}""".toJsonRequestBody(),
+			url = "/api/external/deltakelser",
 		)
 
 		response.code shouldBe 401
 	}
 
 	@Test
-	fun `hentDeltakelserForPerson - gyldig token - returnerer 200`() {
+	fun `hentDeltakelserForPerson - gyldig m2m token - returnerer 200`() {
 		val response = sendRequest(
-			method = "GET",
-			url = "/api/external/deltakelser?personIdent=${TestData.BRUKER_1.personIdent}",
+			method = "POST",
+			body = """{"personIdent": "${TestData.BRUKER_1.personIdent}"}""".toJsonRequestBody(),
+			url = "/api/external/deltakelser",
 			headers =  getAzureAdM2MToken()
 		)
 
 		response.code shouldBe 200
+	}
+
+	@Test
+	fun `hentDeltakelserForPerson - gyldig obo token - returnerer 401`() {
+		val response = sendRequest(
+			method = "POST",
+			url = "/api/external/deltakelser",
+			body = """{"personIdent": "${TestData.BRUKER_1.personIdent}"}""".toJsonRequestBody(),
+			headers =  getAzureAToken()
+		)
+
+		response.code shouldBe 401
 	}
 }

@@ -47,6 +47,10 @@ open class AuthService(
 
 	open fun harTilgangTilEndringsmeldinger() = harTilgangTilADGruppe(endringsmeldingGroupId)
 
+	fun validerErM2MToken() {
+		if(!erM2MToken()) throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Action only permitted by m2m token")
+	}
+
 	open fun hentAzureIdTilInnloggetBruker(): UUID = tokenValidationContextHolder
 		.tokenValidationContext
 		.getClaims(Issuer.AZURE_AD)
@@ -61,6 +65,14 @@ open class AuthService(
 		.getClaims(Issuer.AZURE_AD)
 		.getAsList("groups")
 		.mapNotNull(this::mapIdTilAdGruppe)
+
+	private fun erM2MToken() = hentAzureIdTilInnloggetBruker().equals(hentSubjectClaim())
+
+	private fun hentSubjectClaim(): UUID = tokenValidationContextHolder
+		.tokenValidationContext
+		.getClaims(Issuer.AZURE_AD)
+		.getStringClaim("sub").let { UUID.fromString(it.toString()) }
+		?: throw NotAuthenticatedException("Sub is missing")
 
 	private fun harTilgangTilADGruppe(id: String): Boolean = tokenValidationContextHolder
 		.tokenValidationContext
