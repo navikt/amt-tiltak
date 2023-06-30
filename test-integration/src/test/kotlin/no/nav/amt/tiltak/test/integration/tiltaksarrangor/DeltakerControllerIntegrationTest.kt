@@ -336,6 +336,8 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 		(endringsmelding.innhold as Endringsmelding.Innhold.EndreDeltakelseProsentInnhold).deltakelseProsent shouldBe deltakelseProsent
 		(endringsmelding.innhold as Endringsmelding.Innhold.EndreDeltakelseProsentInnhold).gyldigFraDato shouldBe gyldigFraDato
+
+		response.body?.string() shouldBe """{"id":"${endringsmelding.id}"}"""
 	}
 
 	@Test
@@ -419,6 +421,8 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 		(endringsmelding.innhold as Endringsmelding.Innhold.AvsluttDeltakelseInnhold).sluttdato shouldBe LocalDate.parse(dato)
 		(endringsmelding.innhold as Endringsmelding.Innhold.AvsluttDeltakelseInnhold).aarsak.type shouldBe EndringsmeldingStatusAarsak.Type.FATT_JOBB
+
+		response.body?.string() shouldBe """{"id":"${endringsmelding.id}"}"""
 	}
 
 	@Test
@@ -462,6 +466,8 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.ForlengDeltakelseInnhold>()
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 		(endringsmelding.innhold as Endringsmelding.Innhold.ForlengDeltakelseInnhold).sluttdato shouldBe LocalDate.parse(dato)
+
+		response.body?.string() shouldBe """{"id":"${endringsmelding.id}"}"""
 	}
 
 	@Test
@@ -532,6 +538,8 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold>()
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 		(endringsmelding.innhold as Endringsmelding.Innhold.DeltakerIkkeAktuellInnhold).aarsak.type shouldBe EndringsmeldingStatusAarsak.Type.FATT_JOBB
+
+		response.body?.string() shouldBe """{"id":"${endringsmelding.id}"}"""
 	}
 
 	@Test
@@ -576,6 +584,8 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold>()
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 		(endringsmelding.innhold as Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold).oppstartsdato shouldBe LocalDate.parse(dato)
+
+		response.body?.string() shouldBe """{"id":"${endringsmelding.id}"}"""
 	}
 
 	@Test
@@ -619,6 +629,8 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		endringsmelding.innhold shouldBe null
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 		endringsmelding.type shouldBe Endringsmelding.Type.DELTAKER_ER_AKTUELL
+
+		response.body?.string() shouldBe """{"id":"${endringsmelding.id}"}"""
 	}
 
 	@Test
@@ -639,6 +651,8 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.EndreSluttdatoInnhold>()
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 		(endringsmelding.innhold as Endringsmelding.Innhold.EndreSluttdatoInnhold).sluttdato shouldBe LocalDate.parse(dato)
+
+		response.body?.string() shouldBe """{"id":"${endringsmelding.id}"}"""
 	}
 	@Test
 	fun `skjulDeltakerForTiltaksarrangor() - skal skjule deltaker`() {
