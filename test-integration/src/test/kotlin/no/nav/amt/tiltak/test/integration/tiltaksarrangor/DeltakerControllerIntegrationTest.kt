@@ -53,6 +53,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	@BeforeEach
 	fun setup() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		resetMockServersAndAddDefaultData()
 		testDataRepository.insertDeltaker(deltakerIkkeTilgang)
 		testDataRepository.insertDeltakerStatus(deltakerIkkeTilgangStatus)
 		testDataRepository.deleteAllEndringsmeldinger()
