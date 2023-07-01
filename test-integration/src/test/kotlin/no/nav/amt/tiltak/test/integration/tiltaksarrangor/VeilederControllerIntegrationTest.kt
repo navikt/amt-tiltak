@@ -6,7 +6,7 @@ import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.port.ArrangorVeilederService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
-import no.nav.amt.tiltak.test.database.data.TestData
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_ROLLE_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_VEILEDER_1
@@ -46,49 +46,6 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 	internal fun setUp() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 		resetMockServersAndAddDefaultData()
-
-		mockArrangorServer.addAnsattResponse(
-			ansattDto = AmtArrangorClient.AnsattDto(
-				id = ARRANGOR_ANSATT_1.id,
-				personalia = AmtArrangorClient.PersonaliaDto(ARRANGOR_ANSATT_1.personligIdent, null, AmtArrangorClient.Navn(
-					ARRANGOR_ANSATT_1.fornavn, ARRANGOR_ANSATT_1.mellomnavn, ARRANGOR_ANSATT_1.etternavn)),
-				arrangorer = listOf(
-					AmtArrangorClient.TilknyttetArrangorDto(
-						arrangorId = TestData.ARRANGOR_1.id,
-						arrangor = AmtArrangorClient.Arrangor(TestData.ARRANGOR_1.id, TestData.ARRANGOR_1.navn, TestData.ARRANGOR_1.organisasjonsnummer),
-						overordnetArrangor = null,
-						roller = listOf(AmtArrangorClient.AnsattRolle.KOORDINATOR),
-						veileder = emptyList(),
-						koordinator = emptyList()
-					),
-					AmtArrangorClient.TilknyttetArrangorDto(
-						arrangorId = TestData.ARRANGOR_2.id,
-						arrangor = AmtArrangorClient.Arrangor(TestData.ARRANGOR_2.id, TestData.ARRANGOR_2.navn, TestData.ARRANGOR_2.organisasjonsnummer),
-						overordnetArrangor = null,
-						roller = listOf(AmtArrangorClient.AnsattRolle.VEILEDER),
-						veileder = emptyList(),
-						koordinator = emptyList()
-					)
-				)
-			)
-		)
-		mockArrangorServer.addAnsattResponse(
-			ansattDto = AmtArrangorClient.AnsattDto(
-				id = ARRANGOR_ANSATT_2.id,
-				personalia = AmtArrangorClient.PersonaliaDto(ARRANGOR_ANSATT_2.personligIdent, null, AmtArrangorClient.Navn(
-					ARRANGOR_ANSATT_2.fornavn, ARRANGOR_ANSATT_2.mellomnavn, ARRANGOR_ANSATT_2.etternavn)),
-				arrangorer = listOf(
-					AmtArrangorClient.TilknyttetArrangorDto(
-						arrangorId = TestData.ARRANGOR_1.id,
-						arrangor = AmtArrangorClient.Arrangor(TestData.ARRANGOR_1.id, TestData.ARRANGOR_1.navn, TestData.ARRANGOR_1.organisasjonsnummer),
-						overordnetArrangor = null,
-						roller = listOf(AmtArrangorClient.AnsattRolle.VEILEDER),
-						veileder = emptyList(),
-						koordinator = emptyList()
-					)
-				)
-			)
-		)
 	}
 
 	@Test
@@ -415,6 +372,29 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 		response.code shouldBe 403
 	}
 
+
+	@Test
+	internal fun `hentVeiledereForDeltaker - veiledere finnes - skal ha status 200 og returnerer veiledere`() {
+		testDataRepository.insertArrangorAnsattRolle(
+			ARRANGOR_ANSATT_1_ROLLE_1.copy(id = UUID.randomUUID(), rolle = "VEILEDER")
+		)
+
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_2_VEILEDER_1)
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/veiledere?deltakerId=${DELTAKER_1.id}",
+			headers = lagAnsatt1Header(),
+		)
+
+		response.code shouldBe 200
+
+		response.body!!.string() shouldBe """
+			[{"id":"af238302-e96b-436a-8978-ec2aa5f2ee66","ansattId":"6321c7dc-6cfb-47b0-b566-32979be5041f","deltakerId":"dc600c70-124f-4fe7-a687-b58439beb214","erMedveileder":false,"fornavn":"Ansatt 1 fornavn","mellomnavn":"Ansatt 1 mellomnavn","etternavn":"Ansatt 1 etternavn"},{"id":"bbadfe46-eaf3-4ee8-bb53-2e9e15ea7ef0","ansattId":"a24e659c-2651-4fbb-baad-01cacb2412f0","deltakerId":"dc600c70-124f-4fe7-a687-b58439beb214","erMedveileder":true,"fornavn":"Ansatt 2 fornavn","mellomnavn":null,"etternavn":"Ansatt 2 etternavn"}]
+		""".trimIndent()
+	}
+
 	@Test
 	internal fun `hentVeiledereForDeltaker - veiledere finnes ikke - skal ha status 200 og returnerer tom liste`() {
 		val response = sendRequest(
@@ -426,6 +406,42 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 		response.code shouldBe 200
 
 		response.body!!.string() shouldBe "[]"
+	}
+
+	@Test
+	internal fun `hentVeiledereForDeltaker - har ikke tilgang - skal kaste 403`() {
+		testDataRepository.deleteAllArrangorAnsattRoller()
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/veiledere?deltakerId=${DELTAKER_1.id}",
+			headers = lagAnsatt1Header(),
+		)
+
+		response.code shouldBe 403
+	}
+
+
+	@Test
+	internal fun `hentAktiveVeiledereForGjennomforing - veiledere finnes - skal ha status 200 og returnerer veiledere`() {
+		testDataRepository.insertArrangorAnsattRolle(
+			ARRANGOR_ANSATT_1_ROLLE_1.copy(id = UUID.randomUUID(), rolle = "VEILEDER")
+		)
+
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_2_VEILEDER_1)
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/veiledere?gjennomforingId=${GJENNOMFORING_1.id}",
+			headers = lagAnsatt1Header(),
+		)
+
+		response.code shouldBe 200
+
+		response.body!!.string() shouldBe """
+			[{"id":"af238302-e96b-436a-8978-ec2aa5f2ee66","ansattId":"6321c7dc-6cfb-47b0-b566-32979be5041f","deltakerId":"dc600c70-124f-4fe7-a687-b58439beb214","erMedveileder":false,"fornavn":"Ansatt 1 fornavn","mellomnavn":"Ansatt 1 mellomnavn","etternavn":"Ansatt 1 etternavn"},{"id":"bbadfe46-eaf3-4ee8-bb53-2e9e15ea7ef0","ansattId":"a24e659c-2651-4fbb-baad-01cacb2412f0","deltakerId":"dc600c70-124f-4fe7-a687-b58439beb214","erMedveileder":true,"fornavn":"Ansatt 2 fornavn","mellomnavn":null,"etternavn":"Ansatt 2 etternavn"}]
+		""".trimIndent()
 	}
 
 	@Test
@@ -476,6 +492,37 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 		response.body!!.string() shouldBe """
 			[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"deltakerliste":{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","type":"Tiltak1","erKurs":false},"erMedveilederFor":true,"aktiveEndringsmeldinger":[{"id":"9830e130-b18a-46b8-8e3e-6c06734d797e","innhold":{"oppstartsdato":"2022-11-11"},"type":"LEGG_TIL_OPPSTARTSDATO"},{"id":"07099997-e02e-45e3-be6f-3c1eaf694557","innhold":{"sluttdato":"2022-11-10","aarsak":{"type":"ANNET","beskrivelse":"Flyttet til utland"}},"type":"AVSLUTT_DELTAKELSE"}]}]
 		""".trimIndent()
+	}
+
+	@Test
+	internal fun `veileder mister rollen i altinn - inaktiveres for tildelte deltakere`() {
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_2_VEILEDER_1)
+		mockArrangorServer.addAnsattResponse(
+			ansattDto = AmtArrangorClient.AnsattDto(
+				id = ARRANGOR_ANSATT_2.id,
+				personalia = AmtArrangorClient.PersonaliaDto(ARRANGOR_ANSATT_2.personligIdent, null, AmtArrangorClient.Navn("", null, "")),
+				arrangorer = listOf(
+					AmtArrangorClient.TilknyttetArrangorDto(
+						arrangorId = ARRANGOR_1.id,
+						arrangor = AmtArrangorClient.Arrangor(ARRANGOR_1.id, ARRANGOR_1.navn, ARRANGOR_1.organisasjonsnummer),
+						overordnetArrangor = null,
+						roller = emptyList(),
+						veileder = emptyList(),
+						koordinator = emptyList()
+					)
+				)
+			)
+		)
+
+		sendRequest(
+			method = "GET",
+			url = "/api/tiltaksarrangor/ansatt/meg/roller",
+			headers = lagAnsatt2Header(),
+		)
+
+		AsyncUtils.eventually {
+			arrangorVeilederService.hentDeltakereForVeileder(ARRANGOR_ANSATT_2_VEILEDER_1.ansattId) shouldBe emptyList()
+		}
 	}
 
 	private fun lagOpprettVeiledereRequestBody(veiledere: List<Pair<UUID, Boolean>>): RequestBody {
