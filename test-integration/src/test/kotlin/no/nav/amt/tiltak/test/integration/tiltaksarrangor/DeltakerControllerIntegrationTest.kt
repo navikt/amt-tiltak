@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
@@ -53,6 +53,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	@BeforeEach
 	fun setup() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		resetMockServersAndAddDefaultData()
 		testDataRepository.insertDeltaker(deltakerIkkeTilgang)
 		testDataRepository.insertDeltakerStatus(deltakerIkkeTilgangStatus)
 		testDataRepository.deleteAllEndringsmeldinger()
