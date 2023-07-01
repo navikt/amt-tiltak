@@ -7,6 +7,7 @@ import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.port.ArrangorVeilederService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_ROLLE_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_VEILEDER_1
@@ -268,6 +269,25 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	internal fun `tildelVeiledereForDeltaker - ansatt som legges til har ikke rollen VEILEDER - skal kaste 403`() {
+		mockArrangorServer.reset()
+		mockArrangorServer.addAnsattResponse(
+			ansattDto = AmtArrangorClient.AnsattDto(
+				id = ARRANGOR_ANSATT_1.id,
+				personalia = AmtArrangorClient.PersonaliaDto(
+					ARRANGOR_ANSATT_1.personligIdent, null, AmtArrangorClient.Navn(
+						ARRANGOR_ANSATT_1.fornavn, ARRANGOR_ANSATT_1.mellomnavn, ARRANGOR_ANSATT_1.etternavn)),
+				arrangorer = listOf(
+					AmtArrangorClient.TilknyttetArrangorDto(
+						arrangorId = ARRANGOR_1.id,
+						arrangor = AmtArrangorClient.Arrangor(ARRANGOR_1.id, ARRANGOR_1.navn, ARRANGOR_1.organisasjonsnummer),
+						overordnetArrangor = null,
+						roller = listOf(AmtArrangorClient.AnsattRolle.KOORDINATOR),
+						veileder = emptyList(),
+						koordinator = listOf(GJENNOMFORING_1.id)
+					)
+				)
+			)
+		)
 		val response = sendRequest(
 			method = "PATCH",
 			url = "/api/tiltaksarrangor/veiledere?deltakerId=${DELTAKER_1.id}",
@@ -332,6 +352,30 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 		testDataRepository.insertArrangorAnsattRolle(
 				ARRANGOR_ANSATT_1_ROLLE_1.copy(id = UUID.randomUUID(), rolle = "VEILEDER")
 		)
+		mockArrangorServer.addAnsattResponse(ansattDto = AmtArrangorClient.AnsattDto(
+			id = ARRANGOR_ANSATT_1.id,
+			personalia = AmtArrangorClient.PersonaliaDto(
+				ARRANGOR_ANSATT_1.personligIdent, null, AmtArrangorClient.Navn(
+					ARRANGOR_ANSATT_1.fornavn, ARRANGOR_ANSATT_1.mellomnavn, ARRANGOR_ANSATT_1.etternavn)),
+			arrangorer = listOf(
+				AmtArrangorClient.TilknyttetArrangorDto(
+					arrangorId = ARRANGOR_1.id,
+					arrangor = AmtArrangorClient.Arrangor(ARRANGOR_1.id, ARRANGOR_1.navn, ARRANGOR_1.organisasjonsnummer),
+					overordnetArrangor = null,
+					roller = listOf(AmtArrangorClient.AnsattRolle.KOORDINATOR, AmtArrangorClient.AnsattRolle.VEILEDER),
+					veileder = listOf(AmtArrangorClient.VeilederDto(DELTAKER_1.id, AmtArrangorClient.VeilederType.VEILEDER)),
+					koordinator = listOf(GJENNOMFORING_1.id)
+				),
+				AmtArrangorClient.TilknyttetArrangorDto(
+					arrangorId = ARRANGOR_2.id,
+					arrangor = AmtArrangorClient.Arrangor(ARRANGOR_2.id, ARRANGOR_2.navn, ARRANGOR_2.organisasjonsnummer),
+					overordnetArrangor = null,
+					roller = listOf(AmtArrangorClient.AnsattRolle.VEILEDER),
+					veileder = emptyList(),
+					koordinator = emptyList()
+				)
+			)
+		))
 
 		val response = sendRequest(
 			method = "GET",
@@ -349,6 +393,23 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 	@Test
 	internal fun `hentTilgjengeligeVeiledere - veiledere finnes ikke - skal ha status 200 og returnerer tom liste`() {
 		testDataRepository.deleteAllArrangorAnsattRoller(ArrangorAnsattRolle.VEILEDER)
+		mockArrangorServer.reset()
+		mockArrangorServer.addAnsattResponse(ansattDto = AmtArrangorClient.AnsattDto(
+			id = ARRANGOR_ANSATT_1.id,
+			personalia = AmtArrangorClient.PersonaliaDto(
+				ARRANGOR_ANSATT_1.personligIdent, null, AmtArrangorClient.Navn(
+					ARRANGOR_ANSATT_1.fornavn, ARRANGOR_ANSATT_1.mellomnavn, ARRANGOR_ANSATT_1.etternavn)),
+			arrangorer = listOf(
+				AmtArrangorClient.TilknyttetArrangorDto(
+					arrangorId = ARRANGOR_1.id,
+					arrangor = AmtArrangorClient.Arrangor(ARRANGOR_1.id, ARRANGOR_1.navn, ARRANGOR_1.organisasjonsnummer),
+					overordnetArrangor = null,
+					roller = listOf(AmtArrangorClient.AnsattRolle.KOORDINATOR),
+					veileder = emptyList(),
+					koordinator = listOf(GJENNOMFORING_1.id)
+				)
+			)
+		))
 
 		val response = sendRequest(
 			method = "GET",
@@ -378,6 +439,49 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 		testDataRepository.insertArrangorAnsattRolle(
 			ARRANGOR_ANSATT_1_ROLLE_1.copy(id = UUID.randomUUID(), rolle = "VEILEDER")
 		)
+		mockArrangorServer.reset()
+		mockArrangorServer.addAnsattResponse(ansattDto = AmtArrangorClient.AnsattDto(
+			id = ARRANGOR_ANSATT_1.id,
+			personalia = AmtArrangorClient.PersonaliaDto(
+				ARRANGOR_ANSATT_1.personligIdent, null, AmtArrangorClient.Navn(
+					ARRANGOR_ANSATT_1.fornavn, ARRANGOR_ANSATT_1.mellomnavn, ARRANGOR_ANSATT_1.etternavn)),
+			arrangorer = listOf(
+				AmtArrangorClient.TilknyttetArrangorDto(
+					arrangorId = ARRANGOR_1.id,
+					arrangor = AmtArrangorClient.Arrangor(ARRANGOR_1.id, ARRANGOR_1.navn, ARRANGOR_1.organisasjonsnummer),
+					overordnetArrangor = null,
+					roller = listOf(AmtArrangorClient.AnsattRolle.KOORDINATOR, AmtArrangorClient.AnsattRolle.VEILEDER),
+					veileder = listOf(AmtArrangorClient.VeilederDto(DELTAKER_1.id, AmtArrangorClient.VeilederType.VEILEDER)),
+					koordinator = listOf(GJENNOMFORING_1.id)
+				),
+				AmtArrangorClient.TilknyttetArrangorDto(
+					arrangorId = ARRANGOR_2.id,
+					arrangor = AmtArrangorClient.Arrangor(ARRANGOR_2.id, ARRANGOR_2.navn, ARRANGOR_2.organisasjonsnummer),
+					overordnetArrangor = null,
+					roller = listOf(AmtArrangorClient.AnsattRolle.VEILEDER),
+					veileder = emptyList(),
+					koordinator = emptyList()
+				)
+			)
+		))
+		mockArrangorServer.addAnsattResponse(
+			ansattDto = AmtArrangorClient.AnsattDto(
+				id = ARRANGOR_ANSATT_2.id,
+				personalia = AmtArrangorClient.PersonaliaDto(
+					ARRANGOR_ANSATT_2.personligIdent, null, AmtArrangorClient.Navn(
+						ARRANGOR_ANSATT_2.fornavn, ARRANGOR_ANSATT_2.mellomnavn, ARRANGOR_ANSATT_2.etternavn)),
+				arrangorer = listOf(
+					AmtArrangorClient.TilknyttetArrangorDto(
+						arrangorId = ARRANGOR_1.id,
+						arrangor = AmtArrangorClient.Arrangor(ARRANGOR_1.id, ARRANGOR_1.navn, ARRANGOR_1.organisasjonsnummer),
+						overordnetArrangor = null,
+						roller = listOf(AmtArrangorClient.AnsattRolle.VEILEDER),
+						veileder = listOf(AmtArrangorClient.VeilederDto(DELTAKER_1.id, AmtArrangorClient.VeilederType.VEILEDER)),
+						koordinator = emptyList()
+					)
+				)
+			)
+		)
 
 		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
 		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_2_VEILEDER_1)
@@ -397,6 +501,49 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	internal fun `hentVeiledereForDeltaker - veiledere finnes ikke - skal ha status 200 og returnerer tom liste`() {
+		mockArrangorServer.reset()
+		mockArrangorServer.addAnsattResponse(ansattDto = AmtArrangorClient.AnsattDto(
+			id = ARRANGOR_ANSATT_1.id,
+			personalia = AmtArrangorClient.PersonaliaDto(
+				ARRANGOR_ANSATT_1.personligIdent, null, AmtArrangorClient.Navn(
+					ARRANGOR_ANSATT_1.fornavn, ARRANGOR_ANSATT_1.mellomnavn, ARRANGOR_ANSATT_1.etternavn)),
+			arrangorer = listOf(
+				AmtArrangorClient.TilknyttetArrangorDto(
+					arrangorId = ARRANGOR_1.id,
+					arrangor = AmtArrangorClient.Arrangor(ARRANGOR_1.id, ARRANGOR_1.navn, ARRANGOR_1.organisasjonsnummer),
+					overordnetArrangor = null,
+					roller = listOf(AmtArrangorClient.AnsattRolle.KOORDINATOR, AmtArrangorClient.AnsattRolle.VEILEDER),
+					veileder = emptyList(),
+					koordinator = listOf(GJENNOMFORING_1.id)
+				),
+				AmtArrangorClient.TilknyttetArrangorDto(
+					arrangorId = ARRANGOR_2.id,
+					arrangor = AmtArrangorClient.Arrangor(ARRANGOR_2.id, ARRANGOR_2.navn, ARRANGOR_2.organisasjonsnummer),
+					overordnetArrangor = null,
+					roller = listOf(AmtArrangorClient.AnsattRolle.VEILEDER),
+					veileder = emptyList(),
+					koordinator = emptyList()
+				)
+			)
+		))
+		mockArrangorServer.addAnsattResponse(
+			ansattDto = AmtArrangorClient.AnsattDto(
+				id = ARRANGOR_ANSATT_2.id,
+				personalia = AmtArrangorClient.PersonaliaDto(
+					ARRANGOR_ANSATT_2.personligIdent, null, AmtArrangorClient.Navn(
+						ARRANGOR_ANSATT_2.fornavn, ARRANGOR_ANSATT_2.mellomnavn, ARRANGOR_ANSATT_2.etternavn)),
+				arrangorer = listOf(
+					AmtArrangorClient.TilknyttetArrangorDto(
+						arrangorId = ARRANGOR_1.id,
+						arrangor = AmtArrangorClient.Arrangor(ARRANGOR_1.id, ARRANGOR_1.navn, ARRANGOR_1.organisasjonsnummer),
+						overordnetArrangor = null,
+						roller = listOf(AmtArrangorClient.AnsattRolle.VEILEDER),
+						veileder = emptyList(),
+						koordinator = emptyList()
+					)
+				)
+			)
+		)
 		val response = sendRequest(
 			method = "GET",
 			url = "/api/tiltaksarrangor/veiledere?deltakerId=${DELTAKER_1.id}",
@@ -410,6 +557,16 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	internal fun `hentVeiledereForDeltaker - har ikke tilgang - skal kaste 403`() {
+		mockArrangorServer.reset()
+		mockArrangorServer.addAnsattResponse(
+			ansattDto = AmtArrangorClient.AnsattDto(
+				id = ARRANGOR_ANSATT_1.id,
+				personalia = AmtArrangorClient.PersonaliaDto(
+					ARRANGOR_ANSATT_1.personligIdent, null, AmtArrangorClient.Navn(
+						ARRANGOR_ANSATT_1.fornavn, ARRANGOR_ANSATT_1.mellomnavn, ARRANGOR_ANSATT_1.etternavn)),
+				arrangorer = emptyList()
+			)
+		)
 		testDataRepository.deleteAllArrangorAnsattRoller()
 
 		val response = sendRequest(
@@ -430,6 +587,49 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 
 		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
 		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_2_VEILEDER_1)
+		mockArrangorServer.reset()
+		mockArrangorServer.addAnsattResponse(ansattDto = AmtArrangorClient.AnsattDto(
+			id = ARRANGOR_ANSATT_1.id,
+			personalia = AmtArrangorClient.PersonaliaDto(
+				ARRANGOR_ANSATT_1.personligIdent, null, AmtArrangorClient.Navn(
+					ARRANGOR_ANSATT_1.fornavn, ARRANGOR_ANSATT_1.mellomnavn, ARRANGOR_ANSATT_1.etternavn)),
+			arrangorer = listOf(
+				AmtArrangorClient.TilknyttetArrangorDto(
+					arrangorId = ARRANGOR_1.id,
+					arrangor = AmtArrangorClient.Arrangor(ARRANGOR_1.id, ARRANGOR_1.navn, ARRANGOR_1.organisasjonsnummer),
+					overordnetArrangor = null,
+					roller = listOf(AmtArrangorClient.AnsattRolle.KOORDINATOR, AmtArrangorClient.AnsattRolle.VEILEDER),
+					veileder = listOf(AmtArrangorClient.VeilederDto(DELTAKER_1.id, AmtArrangorClient.VeilederType.VEILEDER)),
+					koordinator = listOf(GJENNOMFORING_1.id)
+				),
+				AmtArrangorClient.TilknyttetArrangorDto(
+					arrangorId = ARRANGOR_2.id,
+					arrangor = AmtArrangorClient.Arrangor(ARRANGOR_2.id, ARRANGOR_2.navn, ARRANGOR_2.organisasjonsnummer),
+					overordnetArrangor = null,
+					roller = listOf(AmtArrangorClient.AnsattRolle.VEILEDER),
+					veileder = emptyList(),
+					koordinator = emptyList()
+				)
+			)
+		))
+		mockArrangorServer.addAnsattResponse(
+			ansattDto = AmtArrangorClient.AnsattDto(
+				id = ARRANGOR_ANSATT_2.id,
+				personalia = AmtArrangorClient.PersonaliaDto(
+					ARRANGOR_ANSATT_2.personligIdent, null, AmtArrangorClient.Navn(
+						ARRANGOR_ANSATT_2.fornavn, ARRANGOR_ANSATT_2.mellomnavn, ARRANGOR_ANSATT_2.etternavn)),
+				arrangorer = listOf(
+					AmtArrangorClient.TilknyttetArrangorDto(
+						arrangorId = ARRANGOR_1.id,
+						arrangor = AmtArrangorClient.Arrangor(ARRANGOR_1.id, ARRANGOR_1.navn, ARRANGOR_1.organisasjonsnummer),
+						overordnetArrangor = null,
+						roller = listOf(AmtArrangorClient.AnsattRolle.VEILEDER),
+						veileder = listOf(AmtArrangorClient.VeilederDto(DELTAKER_1.id, AmtArrangorClient.VeilederType.VEILEDER)),
+						koordinator = emptyList()
+					)
+				)
+			)
+		)
 
 		val response = sendRequest(
 			method = "GET",
@@ -496,6 +696,7 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	internal fun `veileder mister rollen i altinn - inaktiveres for tildelte deltakere`() {
+		mockArrangorServer.reset()
 		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_2_VEILEDER_1)
 		mockArrangorServer.addAnsattResponse(
 			ansattDto = AmtArrangorClient.AnsattDto(

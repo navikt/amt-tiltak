@@ -135,6 +135,7 @@ abstract class IntegrationTestBase {
 	fun resetMockServersAndAddDefaultData() {
 		resetMockServers()
 		mockNorgHttpServer.addDefaultData()
+		mockArrangorServer.addDefaultData()
 	}
 
 	fun serverUrl() = "http://localhost:$port"

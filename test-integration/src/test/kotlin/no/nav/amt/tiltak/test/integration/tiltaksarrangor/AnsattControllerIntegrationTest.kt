@@ -20,6 +20,7 @@ class AnsattControllerIntegrationTest : IntegrationTestBase() {
 	internal fun setUp() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 		resetMockServersAndAddDefaultData()
+		mockArrangorServer.reset()
 	}
 
 	@Test
