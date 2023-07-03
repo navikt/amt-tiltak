@@ -15,7 +15,6 @@
     <modules>
         <module>amt-arrangor-client</module>
         <module>dkif</module>
-        <module>norg</module>
         <module>pdl</module>
         <module>veilarbarena</module>
         <module>veilarboppfolging</module>

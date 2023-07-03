@@ -66,7 +66,7 @@ class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 		opprettetAar = 2022,
 		lopenr = 123,
 		virksomhetsnummer = arrangorMedOverordnetArrangor.organisasjonsnummer,
-		ansvarligNavEnhetId = "58749854",
+		ansvarligNavEnhetId = "621981",
 		status = "GJENNOMFOR",
 	)
 
@@ -79,7 +79,7 @@ class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 		mockMulighetsrommetApiServer.gjennomforingArenaData(gjennomforingMessage.id, gjennomforingArenaData)
 		mockArrangorServer.addArrangorResponse(arrangorMedOverordnetArrangor)
 		mockArrangorServer.addArrangorResponse(overordnetArrangor)
-		mockNorgHttpServer.addNavEnhet(gjennomforingArenaData.ansvarligNavEnhetId, navEnhetNavn)
+		mockAmtPersonHttpServer.addNavEnhetResponse(gjennomforingArenaData.ansvarligNavEnhetId, navEnhetNavn)
 
 		kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(jsonObjekt)
 

@@ -5,20 +5,17 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
-import no.nav.amt.tiltak.clients.norg.NorgClient
-import no.nav.amt.tiltak.clients.norg.NorgNavEnhet
 import no.nav.amt.tiltak.clients.veilarbarena.VeilarbarenaClient
-import java.util.*
+import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
+import java.util.UUID
 
 class NavEnhetServiceImplTest : FunSpec({
 
-	val norgClient = mockk<NorgClient>()
 	val navEnhetRepositoy = mockk<NavEnhetRepository>()
 	val veilarbarenaClient = mockk<VeilarbarenaClient>()
 	val amtPersonClient = mockk<AmtPersonClient>(relaxUnitFun = true)
 
 	val service = NavEnhetServiceImpl(
-		norgClient = norgClient,
 		navEnhetRepository = navEnhetRepositoy,
 		veilarbarenaClient = veilarbarenaClient,
 		amtPersonClient = amtPersonClient,
@@ -43,8 +40,8 @@ class NavEnhetServiceImplTest : FunSpec({
 		} returns NavEnhetDbo(id, enhetId, enhetNavn)
 
 		every {
-			norgClient.hentNavEnhet(enhetId)
-		} returns NorgNavEnhet(enhetId, enhetNavn)
+			amtPersonClient.hentNavEnhet(enhetId)
+		} returns Result.success(NavEnhet(id, enhetId, enhetNavn))
 
 		every {
 			navEnhetRepositoy.insert(any())
