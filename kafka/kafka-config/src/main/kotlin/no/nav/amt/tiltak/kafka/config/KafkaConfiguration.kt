@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.kafka.config
 
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider
 import no.nav.amt.tiltak.core.kafka.*
-import no.nav.amt.tiltak.core.port.AmtArrangorIngestor
+import no.nav.amt.tiltak.core.kafka.AmtArrangorIngestor
 import no.nav.common.kafka.consumer.KafkaConsumerClient
 import no.nav.common.kafka.consumer.feilhandtering.KafkaConsumerRecordProcessor
 import no.nav.common.kafka.consumer.feilhandtering.util.KafkaConsumerRecordProcessorBuilder
@@ -34,7 +34,6 @@ open class KafkaConfiguration(
 	gjennomforingIngestor: GjennomforingIngestor,
 	leesahIngestor: LeesahIngestor,
 	aktorV2Ingestor: AktorV2Ingestor,
-	virksomhetIngestor: VirksomhetIngestor,
 	arrangorIngestor: AmtArrangorIngestor
 ) {
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -126,18 +125,6 @@ open class KafkaConfiguration(
 					stringDeserializer(),
 					ByteArrayDeserializer(),
 					Consumer<ConsumerRecord<String, ByteArray>> { aktorV2Ingestor.ingestKafkaRecord(it.key(), it.value()) }
-				)
-		)
-
-		topicConfigs.add(
-			KafkaConsumerClientBuilder.TopicConfig<String, String>()
-				.withLogging()
-				.withStoreOnFailure(consumerRepository)
-				.withConsumerConfig(
-					kafkaTopicProperties.virksomhetTopic,
-					stringDeserializer(),
-					stringDeserializer(),
-					Consumer<ConsumerRecord<String, String>> { virksomhetIngestor.ingestKafkaRecord(it.value()) }
 				)
 		)
 

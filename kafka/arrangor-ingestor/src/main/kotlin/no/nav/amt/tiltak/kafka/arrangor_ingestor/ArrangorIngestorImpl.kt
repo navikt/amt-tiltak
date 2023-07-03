@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.kafka.arrangor_ingestor
 import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
-import no.nav.amt.tiltak.core.port.AmtArrangorIngestor
+import no.nav.amt.tiltak.core.kafka.AmtArrangorIngestor
 import no.nav.amt.tiltak.core.port.ArrangorService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component

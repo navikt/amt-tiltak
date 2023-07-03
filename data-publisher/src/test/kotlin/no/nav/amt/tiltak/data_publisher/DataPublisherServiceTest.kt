@@ -135,7 +135,6 @@ private fun createTopicProperties(): KafkaTopicProperties = KafkaTopicProperties
 	leesahTopic = "",
 	deltakerTopic = "",
 	aktorV2Topic = "",
-	virksomhetTopic = "",
 	amtArrangorTopic = "",
 	amtEndringsmeldingTopic = "",
 	amtDeltakerlisteTopic = "",

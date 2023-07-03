@@ -22,7 +22,6 @@
         <module>gjennomforing-ingestor</module>
         <module>pdl-leesah-ingestor</module>
         <module>pdl-aktor-v2-ingestor</module>
-        <module>virksomhet-ingestor</module>
         <module>arrangor-ingestor</module>
     </modules>
 </project>
