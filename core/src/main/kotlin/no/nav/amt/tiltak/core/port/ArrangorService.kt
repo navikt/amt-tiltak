@@ -8,6 +8,8 @@ interface ArrangorService {
 
 	fun upsertArrangor(virksomhetsnummer: String): Arrangor
 
+	fun upsertArrangor(arrangor: Arrangor)
+
 	fun getArrangorByVirksomhetsnummer(virksomhetsnummer: String): Arrangor?
 
 	fun getArrangorById(id: UUID): Arrangor

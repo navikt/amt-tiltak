@@ -32,6 +32,16 @@ class ArrangorServiceImpl(
 			.also { dataPublisherService.publish(it.id, DataPublishType.ARRANGOR) }
 	}
 
+	override fun upsertArrangor(arrangor: Arrangor) {
+		arrangorRepository.upsert(
+			id = arrangor.id,
+			navn = arrangor.navn,
+			organisasjonsnummer = arrangor.organisasjonsnummer,
+			overordnetEnhetNavn = arrangor.overordnetEnhetNavn,
+			overordnetEnhetOrganisasjonsnummer = arrangor.overordnetEnhetOrganisasjonsnummer,
+		)
+	}
+
 	override fun getArrangorById(id: UUID): Arrangor {
 		return arrangorRepository.getById(id).toArrangor()
 	}
