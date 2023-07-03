@@ -4,6 +4,7 @@ import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerDetaljerDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.request.*
+import no.nav.amt.tiltak.bff.tiltaksarrangor.response.OpprettEndringsmeldingResponse
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.tiltak.skjulesForAlleAktorer
@@ -80,13 +81,13 @@ class DeltakerController(
 	fun leggTilOppstartsdato(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestBody request: LeggTilOppstartsdatoRequest,
-	) {
+	): OpprettEndringsmeldingResponse {
 		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		verifiserErIkkeSkjult(deltakerId)
 
-		endringsmeldingService.opprettLeggTilOppstartsdatoEndringsmelding(deltakerId, ansatt.id, request.oppstartsdato)
+		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettLeggTilOppstartsdatoEndringsmelding(deltakerId, ansatt.id, request.oppstartsdato))
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -94,13 +95,13 @@ class DeltakerController(
 	fun endreOppstartsdato(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestBody request: EndreOppstartsdatoRequest,
-	) {
+	): OpprettEndringsmeldingResponse {
 		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		verifiserErIkkeSkjult(deltakerId)
 
-		endringsmeldingService.opprettEndreOppstartsdatoEndringsmelding(deltakerId, ansatt.id, request.oppstartsdato)
+		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettEndreOppstartsdatoEndringsmelding(deltakerId, ansatt.id, request.oppstartsdato))
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -108,13 +109,13 @@ class DeltakerController(
 	fun avsluttDeltakelse(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestBody request: AvsluttDeltakelseRequest,
-	) {
+	): OpprettEndringsmeldingResponse {
 		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		verifiserErIkkeSkjult(deltakerId)
 
-		endringsmeldingService.opprettAvsluttDeltakelseEndringsmelding(deltakerId, ansatt.id, request.sluttdato, request.aarsak.toModel())
+		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettAvsluttDeltakelseEndringsmelding(deltakerId, ansatt.id, request.sluttdato, request.aarsak.toModel()))
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -122,13 +123,13 @@ class DeltakerController(
 	fun forlengDeltakelse(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestBody request: ForlengDeltakelseRequest,
-	) {
+	): OpprettEndringsmeldingResponse {
 		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		verifiserErIkkeSkjult(deltakerId)
 
-		endringsmeldingService.opprettForlengDeltakelseEndringsmelding(deltakerId, ansatt.id, request.sluttdato)
+		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettForlengDeltakelseEndringsmelding(deltakerId, ansatt.id, request.sluttdato))
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -136,7 +137,7 @@ class DeltakerController(
 	fun endreDeltakelsesprosent(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestBody body: EndreDeltakelsesprosentRequestBody
-	) {
+	): OpprettEndringsmeldingResponse {
 		if (body.deltakelseProsent <= 0) throw ValidationException("Deltakelsesprosent kan ikke være mindre eller lik 0")
 		if (body.deltakelseProsent > 100) throw ValidationException("Deltakelsesprosent kan ikke være over 100%")
 
@@ -149,13 +150,13 @@ class DeltakerController(
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		verifiserErIkkeSkjult(deltakerId)
 
-		endringsmeldingService.opprettEndreDeltakelseProsentEndringsmelding(
+		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettEndreDeltakelseProsentEndringsmelding(
 			deltakerId = deltakerId,
 			arrangorAnsattId = ansatt.id,
 			deltakerProsent = body.deltakelseProsent,
 			dagerPerUke = body.dagerPerUke,
 			gyldigFraDato = body.gyldigFraDato
-		)
+		))
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -163,26 +164,26 @@ class DeltakerController(
 	fun deltakerIkkeAktuell(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestBody request: DeltakerIkkeAktuellRequest,
-	) {
+	): OpprettEndringsmeldingResponse {
 		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		verifiserErIkkeSkjult(deltakerId)
 
-		endringsmeldingService.opprettDeltakerIkkeAktuellEndringsmelding(deltakerId, ansatt.id, request.aarsak.toModel())
+		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettDeltakerIkkeAktuellEndringsmelding(deltakerId, ansatt.id, request.aarsak.toModel()))
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@PatchMapping("/{deltakerId}/er-aktuell")
 	fun deltakerErAktuell(
 		@PathVariable("deltakerId") deltakerId: UUID,
-	) {
+	): OpprettEndringsmeldingResponse {
 		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		verifiserErIkkeSkjult(deltakerId)
 
-		endringsmeldingService.opprettErAktuellEndringsmelding(deltakerId, ansatt.id)
+		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettErAktuellEndringsmelding(deltakerId, ansatt.id))
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -190,13 +191,13 @@ class DeltakerController(
 	fun endreSluttdato(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestBody request: EndreSluttdatoRequest,
-	) {
+	): OpprettEndringsmeldingResponse {
 		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 		verifiserErIkkeSkjult(deltakerId)
 
-		endringsmeldingService.opprettEndresluttdatoEndringsmelding(deltakerId, ansatt.id, request.sluttdato)
+		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettEndresluttdatoEndringsmelding(deltakerId, ansatt.id, request.sluttdato))
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)

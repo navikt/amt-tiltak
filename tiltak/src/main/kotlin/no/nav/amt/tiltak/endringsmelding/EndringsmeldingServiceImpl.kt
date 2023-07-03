@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 @Service
 open class EndringsmeldingServiceImpl(
@@ -81,9 +81,9 @@ open class EndringsmeldingServiceImpl(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
 		oppstartsdato: LocalDate
-	) {
+	): UUID {
 		val innhold = EndringsmeldingDbo.Innhold.LeggTilOppstartsdatoInnhold(oppstartsdato)
-		opprettOgMarkerAktiveSomUtdatert(
+		return opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
 			innhold,
@@ -95,9 +95,9 @@ open class EndringsmeldingServiceImpl(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
 		oppstartsdato: LocalDate
-	) {
+	): UUID {
 		val innhold = EndringsmeldingDbo.Innhold.EndreOppstartsdatoInnhold(oppstartsdato)
-		opprettOgMarkerAktiveSomUtdatert(
+		return opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
 			innhold,
@@ -109,9 +109,9 @@ open class EndringsmeldingServiceImpl(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
 		sluttdato: LocalDate
-	) {
+	): UUID {
 		val innhold = EndringsmeldingDbo.Innhold.ForlengDeltakelseInnhold(sluttdato)
-		opprettOgMarkerAktiveSomUtdatert(
+		return opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
 			innhold,
@@ -125,14 +125,14 @@ open class EndringsmeldingServiceImpl(
 		deltakerProsent: Int,
 		dagerPerUke: Int?,
 		gyldigFraDato: LocalDate?
-	) {
+	): UUID {
 		val innhold = EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold(
 			nyDeltakelseProsent = deltakerProsent,
 			dagerPerUke = dagerPerUke,
 			gyldigFraDato = gyldigFraDato
 		)
 
-		opprettOgMarkerAktiveSomUtdatert(
+		return opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
 			innhold,
@@ -146,9 +146,9 @@ open class EndringsmeldingServiceImpl(
 		arrangorAnsattId: UUID,
 		sluttdato: LocalDate,
 		statusAarsak: EndringsmeldingStatusAarsak
-	) {
+	): UUID {
 		val innhold = EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold(sluttdato, statusAarsak)
-		opprettOgMarkerAktiveSomUtdatert(
+		return opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
 			innhold,
@@ -161,9 +161,9 @@ open class EndringsmeldingServiceImpl(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
 		statusAarsak: EndringsmeldingStatusAarsak
-	) {
+	): UUID {
 		val innhold = EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold(statusAarsak)
-		opprettOgMarkerAktiveSomUtdatert(
+		return opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
 			innhold,
@@ -174,8 +174,8 @@ open class EndringsmeldingServiceImpl(
 	override fun opprettErAktuellEndringsmelding(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
-	) {
-		opprettOgMarkerAktiveSomUtdatert(
+	): UUID {
+		return opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
 			null,
@@ -187,9 +187,9 @@ open class EndringsmeldingServiceImpl(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
 		sluttdato: LocalDate
-	) {
+	): UUID {
 		val innhold = EndringsmeldingDbo.Innhold.EndreSluttdatoInnhold(sluttdato)
-		opprettOgMarkerAktiveSomUtdatert(
+		return opprettOgMarkerAktiveSomUtdatert(
 			deltakerId,
 			arrangorAnsattId,
 			innhold,
@@ -259,7 +259,7 @@ open class EndringsmeldingServiceImpl(
 
 	private fun opprettOgMarkerAktiveSomUtdatert(
 		deltakerId: UUID, opprettetAvArrangorAnsattId: UUID, innhold: EndringsmeldingDbo.Innhold?, type: EndringsmeldingDbo.Type
-	) {
+	): UUID {
 		val id = UUID.randomUUID()
 		transactionTemplate.executeWithoutResult {
 			endringsmeldingRepository.markerAktiveSomUtdatert(deltakerId, type)
@@ -268,6 +268,7 @@ open class EndringsmeldingServiceImpl(
 
 		log.info("Endringsmelding av type ${type.name} opprettet med id $id for deltaker $deltakerId")
 		publisherService.publish(id, DataPublishType.ENDRINGSMELDING)
+		return id
 	}
 
 }
