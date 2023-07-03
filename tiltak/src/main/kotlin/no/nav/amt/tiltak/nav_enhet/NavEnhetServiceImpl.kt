@@ -1,17 +1,15 @@
 package no.nav.amt.tiltak.nav_enhet
 
 import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
-import no.nav.amt.tiltak.clients.norg.NorgClient
 import no.nav.amt.tiltak.clients.veilarbarena.VeilarbarenaClient
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.log.SecureLog.secureLog
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.UUID
 
 @Service
 open class NavEnhetServiceImpl(
-	private val norgClient: NorgClient,
 	private val navEnhetRepository: NavEnhetRepository,
 	private val veilarbarenaClient: VeilarbarenaClient,
 	private val amtPersonClient: AmtPersonClient,
@@ -24,7 +22,7 @@ open class NavEnhetServiceImpl(
 		return getNavEnhet(oppfolgingsenhetId)
 			.also {
 				if (it == null) {
-					secureLog.warn("Bruker med fnr=$personIdent har enhetId=$oppfolgingsenhetId som ikke finnes i norg")
+					secureLog.warn("Bruker med fnr=$personIdent har enhetId=$oppfolgingsenhetId som ikke finnes i amt-person")
 				}
 			}
 	}
@@ -36,21 +34,21 @@ open class NavEnhetServiceImpl(
 	override fun getNavEnhet(id: UUID) = navEnhetRepository.get(id).toNavEnhet()
 
 	private fun opprettEnhet(enhetId: String): NavEnhet? {
-		val norgEnhet = norgClient.hentNavEnhet(enhetId) ?: return null
-
-		val id = UUID.randomUUID()
+		val navEnhet = amtPersonClient.hentNavEnhet(enhetId)
+			.recover {
+				if (it is NoSuchElementException) return null
+				else throw it
+			}.getOrThrow()
 
 		val insertInput = NavEnhetInsertInput(
-			id = id,
-			enhetId = enhetId,
-			navn = norgEnhet.navn
+			id = navEnhet.id,
+			enhetId = navEnhet.enhetId,
+			navn = navEnhet.navn
 		)
 
 		navEnhetRepository.insert(insertInput)
 
-		val enhet = getNavEnhet(id)
-		amtPersonClient.migrerNavEnhet(enhet)
-		return enhet
+		return navEnhet
 	}
 
 }

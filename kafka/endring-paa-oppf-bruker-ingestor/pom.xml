@@ -24,10 +24,6 @@
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>norg</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>

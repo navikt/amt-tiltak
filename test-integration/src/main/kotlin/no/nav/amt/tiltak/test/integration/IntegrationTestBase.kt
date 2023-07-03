@@ -49,7 +49,6 @@ abstract class IntegrationTestBase {
 	companion object {
 		val mockOAuthServer = MockOAuthServer()
 		val mockArrangorServer = MockAmtArrangorServer()
-		val mockNorgHttpServer = MockNorgHttpServer()
 		val mockPoaoTilgangHttpServer = MockPoaoTilgangHttpServer()
 		val mockPdlHttpServer = MockPdlHttpServer()
 		val mockMachineToMachineHttpServer = MockMachineToMachineHttpServer()
@@ -93,9 +92,6 @@ abstract class IntegrationTestBase {
 			registry.add("amt-person.url") { mockAmtPersonHttpServer.serverUrl() }
 			registry.add("amt-person.scope") { "test.amt-person" }
 
-			mockNorgHttpServer.start()
-			registry.add("norg.url") { mockNorgHttpServer.serverUrl() }
-
 			mockPoaoTilgangHttpServer.start()
 			registry.add("poao-tilgang.url") { mockPoaoTilgangHttpServer.serverUrl() }
 			registry.add("poao-tilgang.scope") { "test.poao-tilgang" }
@@ -122,7 +118,6 @@ abstract class IntegrationTestBase {
 	}
 
 	fun resetMockServers() {
-		mockNorgHttpServer.reset()
 		mockPoaoTilgangHttpServer.reset()
 		mockArrangorServer.reset()
 		mockPdlHttpServer.reset()
@@ -134,7 +129,6 @@ abstract class IntegrationTestBase {
 
 	fun resetMockServersAndAddDefaultData() {
 		resetMockServers()
-		mockNorgHttpServer.addDefaultData()
 		mockArrangorServer.addDefaultData()
 	}
 
