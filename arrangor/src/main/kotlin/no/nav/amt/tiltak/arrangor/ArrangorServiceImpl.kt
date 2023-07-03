@@ -2,21 +2,15 @@ package no.nav.amt.tiltak.arrangor
 
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.data_publisher.DataPublisherService
-import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.arrangor.AmtArrangorService
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
 class ArrangorServiceImpl(
 	private val amtArrangorService: AmtArrangorService,
-	private val arrangorRepository: ArrangorRepository,
-	private val dataPublisherService: DataPublisherService
+	private val arrangorRepository: ArrangorRepository
 ) : ArrangorService {
-
-	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun upsertArrangor(virksomhetsnummer: String): Arrangor {
 		val arrangor = amtArrangorService.getArrangor(virksomhetsnummer) ?: throw RuntimeException("Kunne ikke hente arrangør med orgnummer $virksomhetsnummer")
@@ -28,7 +22,6 @@ class ArrangorServiceImpl(
 			overordnetEnhetNavn = arrangor.overordnetEnhetNavn,
 			overordnetEnhetOrganisasjonsnummer = arrangor.overordnetEnhetOrganisasjonsnummer,
 		).toArrangor()
-			.also { dataPublisherService.publish(it.id, DataPublishType.ARRANGOR) }
 	}
 
 	override fun upsertArrangor(arrangor: Arrangor) {
@@ -64,6 +57,5 @@ class ArrangorServiceImpl(
 			overordnetEnhetNavn = arrangor.overordnetEnhetNavn,
 			overordnetEnhetOrganisasjonsnummer = arrangor.overordnetEnhetOrganisasjonsnummer,
 		).toArrangor()
-			.also { dataPublisherService.publish(it.id, DataPublishType.ARRANGOR) }
 	}
 }
