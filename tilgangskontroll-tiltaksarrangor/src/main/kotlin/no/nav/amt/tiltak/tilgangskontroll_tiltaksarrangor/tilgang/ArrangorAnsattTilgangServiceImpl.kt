@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang
 
+import no.nav.amt.tiltak.core.domain.arrangor.ArrangorAnsatt
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
@@ -66,10 +67,28 @@ open class ArrangorAnsattTilgangServiceImpl(
 
 	override fun synkroniserRettigheterMedAltinn(ansattPersonligIdent: String) {
 		try {
-			synkroniserAltinnRettigheter(ansattPersonligIdent)
+			val ansatt = amtArrangorService.getAnsatt(ansattPersonligIdent)
+			if (ansatt == null || ansatt.arrangorer.isEmpty()) {
+				log.warn("En ikke-ansatt har logget inn, men hadde ikke tilganger i Altinn.")
+				return
+			}
+			synkroniserAltinnRettigheter(ansatt)
 		} catch (t: Throwable) {
 			log.error("Feil under synkronisering av altinn rettigheter", t)
 			secureLog.error("Feil under synkronisering av altinn rettigheter for fnr=$ansattPersonligIdent", t)
+		}
+	}
+
+	override fun synkroniserRettigheterMedAltinn(ansattId: UUID) {
+		try {
+			val ansatt = amtArrangorService.getAnsatt(ansattId)
+			if (ansatt == null || ansatt.arrangorer.isEmpty()) {
+				log.error("Fant ikke ansatt med id $ansattId")
+				return
+			}
+			synkroniserAltinnRettigheter(ansatt)
+		} catch (t: Throwable) {
+			log.error("Feil under synkronisering av altinn rettigheter for ansatt med id $ansattId", t)
 		}
 	}
 
@@ -107,12 +126,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 		return gjennomforinger.contains(gjennomforingId)
 	}
 
-	private fun synkroniserAltinnRettigheter(ansattPersonligIdent: String) {
-		val ansatt = amtArrangorService.getAnsatt(ansattPersonligIdent)
-		if (ansatt == null || ansatt.arrangorer.isEmpty()) {
-			log.warn("En ikke-ansatt har logget inn, men hadde ikke tilganger i Altinn.")
-			return
-		}
+	private fun synkroniserAltinnRettigheter(ansatt: ArrangorAnsatt) {
 		arrangorAnsattService.upsertAnsatt(ansatt)
 
 		val lagredeAnsattTilganger = ansattRolleService.hentAktiveRoller(ansatt.id)

@@ -39,6 +39,26 @@ class AmtArrangorClient(
 		}
 	}
 
+	fun hentAnsatt(ansattId: UUID): AnsattDto? {
+		val request = Request.Builder()
+			.url("$baseUrl/api/service/ansatt/$ansattId")
+			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
+			.get()
+			.build()
+		httpClient.newCall(request).execute().use { response ->
+			if (!response.isSuccessful) {
+				if (response.code == 404) {
+					log.info("Ansatt finnes ikke hos amt-arrangør")
+					return null
+				}
+				log.error("Kunne ikke hente ansatt fra amt-arrangør. Status=${response.code}")
+				throw RuntimeException("Kunne ikke hente ansatt fra amt-arrangør. Status=${response.code}")
+			}
+			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
+			return JsonUtils.fromJsonString<AnsattDto>(body)
+		}
+	}
+
 	fun hentArrangor(orgnummer: String): ArrangorMedOverordnetArrangor? {
 		val request = Request.Builder()
 			.url("$baseUrl/api/service/arrangor/organisasjonsnummer/$orgnummer")
