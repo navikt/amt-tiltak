@@ -4,7 +4,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 object KafkaMessageCreator {
 	fun opprettAmtTiltakDeltakerMessage(msg: DeltakerMessage): String {
@@ -51,16 +51,6 @@ object KafkaMessageCreator {
 
 	}
 
-	fun opprettVirksomhetMessage(msg: VirksomhetMessage): String {
-		return """
-			{
-				"organisasjonsnummer": "${msg.organisasjonsnummer}",
-				"navn": "${msg.navn}",
-				"overordnetEnhetOrganisasjonsnummer": ${nullableStringJsonValue(msg.overordnetEnhetOrganisasjonsnummer)}
-			}
-		""".trimIndent()
-	}
-
 	private fun nullableStringJsonValue(str: String?): String {
 		return if (str == null) {
 			 "null"
@@ -96,10 +86,4 @@ data class DeltakerMessage (
 	val registrertDato: LocalDateTime = LocalDateTime.now().minusDays(1),
 	val statusEndretDato: LocalDateTime? = LocalDateTime.now().plusDays(1),
 	val innsokBegrunnelse: String? = "Begrunnelse",
-)
-
-data class VirksomhetMessage (
-	val organisasjonsnummer: String = "999888777",
-	val navn: String = "Virksomhetsnavn",
-	val overordnetEnhetOrganisasjonsnummer: String? = "111222333",
 )

@@ -1,6 +1,13 @@
 package no.nav.amt.tiltak.kafka.config
 
-import no.nav.amt.tiltak.core.kafka.*
+import no.nav.amt.tiltak.core.kafka.AktorV2Ingestor
+import no.nav.amt.tiltak.core.kafka.AmtArrangorIngestor
+import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
+import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
+import no.nav.amt.tiltak.core.kafka.GjennomforingIngestor
+import no.nav.amt.tiltak.core.kafka.LeesahIngestor
+import no.nav.amt.tiltak.core.kafka.SkjermetPersonIngestor
+import no.nav.amt.tiltak.core.kafka.TildeltVeilederIngestor
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.common.kafka.producer.KafkaProducerClientImpl
 import no.nav.common.kafka.producer.util.ProducerUtils.toJsonProducerRecord
@@ -15,7 +22,7 @@ import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
-import java.util.*
+import java.util.Properties
 import java.util.concurrent.atomic.AtomicInteger
 
 @Testcontainers
@@ -29,7 +36,7 @@ class KafkaConfigurationTest {
 	private val leesahTopic: String = "test.leesah-v1"
 	private val deltakerTopic: String = "test.deltaker-v1"
 	private val aktorV2Topic: String = "test.aktor-v2"
-	private val virksomhetTopic: String = "test.virksomheter-v1"
+	private val amtArrangorTopic: String = "test.arrangor-v1"
 
 	@Container
 	var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.2.1"))
@@ -48,9 +55,8 @@ class KafkaConfigurationTest {
 			leesahTopic = leesahTopic,
 			deltakerTopic = deltakerTopic,
 			aktorV2Topic = aktorV2Topic,
-			virksomhetTopic = virksomhetTopic,
 			amtArrangorAnsattTopic = "",
-			amtArrangorTopic = "",
+			amtArrangorTopic = amtArrangorTopic,
 			amtDeltakerTopic = "",
 			amtDeltakerlisteTopic = "",
 			amtEndringsmeldingTopic = ""
@@ -119,8 +125,8 @@ class KafkaConfigurationTest {
 			}
 		}
 
-		val virksomhetIngestor = object : VirksomhetIngestor {
-			override fun ingestKafkaRecord(recordValue: String) {
+		val arrangorIngestor = object : AmtArrangorIngestor {
+			override fun ingestArrangor(recordValue: String?) {
 				counter.incrementAndGet()
 			}
 		}
@@ -137,7 +143,7 @@ class KafkaConfigurationTest {
 			gjennomforingIngestor,
 			leesahIngestor,
 			aktorV2Ingestor,
-			virksomhetIngestor,
+			arrangorIngestor
 		)
 
 		config.onApplicationEvent(null)
@@ -150,7 +156,7 @@ class KafkaConfigurationTest {
 		kafkaProducer.sendSync(toJsonProducerRecord(endringPaaBrukerTopic, "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord(skjermetPersonTopic, "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord(sisteTiltaksgjennomforingerTopic, "1", value))
-		kafkaProducer.sendSync(toJsonProducerRecord(virksomhetTopic, "1", value))
+		kafkaProducer.sendSync(toJsonProducerRecord(amtArrangorTopic, "1", value))
 
 		kafkaProducer.close()
 

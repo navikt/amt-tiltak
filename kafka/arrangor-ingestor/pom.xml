@@ -8,7 +8,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>virksomhet-ingestor</artifactId>
+    <artifactId>arrangor-ingestor</artifactId>
 
     <dependencies>
         <dependency>
@@ -22,6 +22,14 @@
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>json</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>amt-arrangor-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>core</artifactId>
         </dependency>
     </dependencies>
 </project>

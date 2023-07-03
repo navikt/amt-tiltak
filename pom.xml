@@ -221,7 +221,7 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>virksomhet-ingestor</artifactId>
+                <artifactId>arrangor-ingestor</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

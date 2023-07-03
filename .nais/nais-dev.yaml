@@ -145,8 +145,6 @@ spec:
       value: amt.endringsmelding-v1
     - name: AKTOR_V2_TOPIC
       value: pdl.aktor-v2
-    - name: VIRKSOMHET_TOPIC
-      value: amt.virksomheter-v1
 
   gcp:
     sqlInstances:
