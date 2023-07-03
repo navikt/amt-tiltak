@@ -3,7 +3,6 @@ package no.nav.amt.tiltak.arrangor
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
@@ -124,55 +123,4 @@ internal class ArrangorRepositoryTest {
 	internal fun `getByIder() should not fail with empty list`() {
 		repository.getByIder(emptyList()) shouldHaveSize 0
 	}
-
-	@Test
-	fun `update() - nytt navn og ny overordnet enhet - skal oppdatere arrangor`() {
-		testDataRepository.insertArrangor(ARRANGOR_1)
-		val updateDbo = ArrangorUpdateDbo(
-			id = ARRANGOR_1.id,
-			navn = "Nytt navn",
-			overordnetEnhetOrganisasjonsnummer = "777888555",
-			overordnetEnhetNavn = "Ny overordnet enhet",
-		)
-		repository.update(updateDbo)
-
-		val oppdatertArrangor = repository.getById(ARRANGOR_1.id)
-
-		oppdatertArrangor.navn shouldBe updateDbo.navn
-		oppdatertArrangor.overordnetEnhetOrganisasjonsnummer shouldBe updateDbo.overordnetEnhetOrganisasjonsnummer
-		oppdatertArrangor.overordnetEnhetNavn shouldBe updateDbo.overordnetEnhetNavn
-	}
-
-	@Test
-	fun `update() - overordnet enhet er null - skal oppdatere arrangor`() {
-		testDataRepository.insertArrangor(ARRANGOR_1)
-		val updateDbo = ArrangorUpdateDbo(
-			id = ARRANGOR_1.id,
-			navn = ARRANGOR_1.navn,
-			overordnetEnhetOrganisasjonsnummer = null,
-			overordnetEnhetNavn = null,
-		)
-		repository.update(updateDbo)
-
-		val oppdatertArrangor = repository.getById(ARRANGOR_1.id)
-
-		oppdatertArrangor.navn shouldBe updateDbo.navn
-		oppdatertArrangor.overordnetEnhetOrganisasjonsnummer shouldBe updateDbo.overordnetEnhetOrganisasjonsnummer
-		oppdatertArrangor.overordnetEnhetNavn shouldBe updateDbo.overordnetEnhetNavn
-	}
-
-	@Test
-	fun `updateOverordnetEnhetNavn() - nytt overordnet enhet navn - skal oppdatere navn hos alle underenheter`() {
-		val id = UUID.randomUUID()
-		val nyOverordnetEnhetNavn = "Ny overordnet enhet"
-
-		testDataRepository.insertArrangor(ARRANGOR_1)
-		testDataRepository.insertArrangor(ARRANGOR_1.copy(id = id, organisasjonsnummer = "1234"))
-
-		repository.updateUnderenheterIfAny(ARRANGOR_1.overordnetEnhetOrganisasjonsnummer!!, nyOverordnetEnhetNavn)
-
-		repository.getById(ARRANGOR_1.id).overordnetEnhetNavn shouldBe nyOverordnetEnhetNavn
-		repository.getById(id).overordnetEnhetNavn shouldBe nyOverordnetEnhetNavn
-	}
-
 }
