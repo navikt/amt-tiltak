@@ -8,6 +8,7 @@ import no.nav.amt.tiltak.core.domain.arrangor.ArrangorAnsatt
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import org.springframework.stereotype.Service
 import java.time.Duration
+import java.util.UUID
 
 @Service
 class AmtArrangorService(
@@ -17,6 +18,10 @@ class AmtArrangorService(
 		.expireAfterWrite(Duration.ofHours(1))
 		.build<String, ArrangorAnsatt>()
 
+	private val ansattIdToAnsattCache = Caffeine.newBuilder()
+		.expireAfterWrite(Duration.ofHours(1))
+		.build<UUID, ArrangorAnsatt>()
+
 	private val orgnummerToArrangorCache = Caffeine.newBuilder()
 		.expireAfterWrite(Duration.ofHours(1))
 		.build<String, Arrangor>()
@@ -24,6 +29,12 @@ class AmtArrangorService(
 	fun getAnsatt(ansattPersonident: String): ArrangorAnsatt? {
 		return CacheUtils.tryCacheFirstNullable(personidentToAnsattCache, ansattPersonident) {
 			return@tryCacheFirstNullable amtArrangorClient.hentAnsatt(ansattPersonident)?.tilArrangorAnsatt()
+		}
+	}
+
+	fun getAnsatt(ansattId: UUID): ArrangorAnsatt? {
+		return CacheUtils.tryCacheFirstNullable(ansattIdToAnsattCache, ansattId) {
+			return@tryCacheFirstNullable amtArrangorClient.hentAnsatt(ansattId)?.tilArrangorAnsatt()
 		}
 	}
 

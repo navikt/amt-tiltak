@@ -48,10 +48,20 @@ class ArrangorAnsattServiceImpl(
 	}
 
 	override fun getAnsatt(ansattId: UUID): Ansatt {
-		val ansattDbo = arrangorAnsattRepository.get(ansattId) ?: throw NoSuchElementException("Ansatt ikke funnet")
+		val ansattDbo = getAnsattFraDbEllerAmtArrangor(ansattId) ?: throw NoSuchElementException("Ansatt ikke funnet")
 		val arrangorer = hentTilknyttedeArrangorer(ansattId)
 
 		return ansattDbo.toAnsatt(arrangorer)
+	}
+
+	private fun getAnsattFraDbEllerAmtArrangor(ansattId: UUID): AnsattDbo? {
+		val maybeAnsattDbo = arrangorAnsattRepository.get(ansattId)
+		if (maybeAnsattDbo != null) {
+			return maybeAnsattDbo
+		} else {
+			arrangorAnsattTilgangService.synkroniserRettigheterMedAltinn(ansattId)
+			return arrangorAnsattRepository.get(ansattId)
+		}
 	}
 
 	override fun getAnsatte(ansattIder: List<UUID>): List<Ansatt> {
