@@ -114,7 +114,10 @@ class AmtPersonClientImpl(
 
 		httpClient.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
-				return Result.failure(RuntimeException("Klarte ikke å hente $endepunkt fra amt-person-service. status=${response.code}"))
+				return when (response.code) {
+					404 -> Result.failure(NoSuchElementException("Klarte ikke å hente $endepunkt fra amt-person-service. status=${response.code}"))
+					else -> Result.failure(RuntimeException("Klarte ikke å hente $endepunkt fra amt-person-service. status=${response.code}"))
+				}
 			}
 			val body = response.body?.string() ?: return Result.failure(RuntimeException("Body is missing"))
 			return Result.success(fn(body))
