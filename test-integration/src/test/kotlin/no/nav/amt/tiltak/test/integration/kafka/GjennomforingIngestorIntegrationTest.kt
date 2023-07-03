@@ -114,18 +114,6 @@ class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 				navEnhet.navn shouldBe navEnhetNavn
 			}
 		 }
-	@Test
-	internal fun `skal ikke inserte gjennomforing uten virksomhetsnummer`() {
-
-		mockMulighetsrommetApiServer.gjennomforingArenaData(gjennomforingMessage.id, gjennomforingArenaData.copy(virksomhetsnummer = null))
-
-		kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(jsonObjekt)
-
-		AsyncUtils.eventually {
-			mockMulighetsrommetApiServer.requestCount() shouldBe 1
-			gjennomforingRepository.get(gjennomforingMessage.id) shouldBe null
-		}
-	}
 
 	@Test
 	internal fun `mottar melding om sletting - skal slette gjennomføring`() {

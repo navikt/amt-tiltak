@@ -3,13 +3,9 @@ package no.nav.amt.tiltak.data_publisher
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
-import no.nav.amt.tiltak.data_publisher.model.AnsattRolle
-import no.nav.amt.tiltak.data_publisher.model.VeilederType
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
-import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattRolleInput
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorInput
-import no.nav.amt.tiltak.test.database.data.inputs.ArrangorVeilederDboInput
 import no.nav.amt.tiltak.test.database.data.inputs.BrukerInput
 import no.nav.amt.tiltak.test.database.data.inputs.DeltakerInput
 import no.nav.amt.tiltak.test.database.data.inputs.DeltakerStatusInput
@@ -32,9 +28,6 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 	fun createArrangor(): ArrangorInput = arrangorInput()
 		.also { testDataRepository.insertArrangor(it) }
 
-
-	fun updateArrangor(input: ArrangorInput) = testDataRepository.updateArrangor(input)
-
 	fun createDeltakerliste(
 		arrangorId: UUID = createArrangor().id,
 		tiltakId: UUID = createTiltak().id
@@ -45,8 +38,6 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 
 	fun createTiltak(): TiltakInput = tiltakInput()
 		.also { testDataRepository.insertTiltak(it) }
-
-	fun updateTiltak(input: TiltakInput) = testDataRepository.updateTiltak(input)
 
 	fun createDeltaker(
 		brukerId: UUID = createBruker().id,
@@ -118,21 +109,6 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		id, overordnetEnhetOrganisasjonsnummer, overordnetEnhetNavn, organisasjonsnummer, navn
 	)
 
-	private fun arrangorAnsattInput(
-		id: UUID = UUID.randomUUID(),
-		personligIdent: String = UUID.randomUUID().toString(),
-		fornavn: String = UUID.randomUUID().toString(),
-		mellomnavn: String? = null,
-		etternavn: String = UUID.randomUUID().toString()
-	): ArrangorAnsattInput = ArrangorAnsattInput(id, personligIdent, fornavn, mellomnavn, etternavn)
-
-	private fun ansattRolleInput(
-		id: UUID = UUID.randomUUID(),
-		arrangorId: UUID,
-		ansattId: UUID,
-		rolle: AnsattRolle
-	): ArrangorAnsattRolleInput = ArrangorAnsattRolleInput(id, arrangorId, ansattId, rolle.name)
-
 	private fun tiltakInput(
 		id: UUID = UUID.randomUUID(),
 		navn: String = UUID.randomUUID().toString(),
@@ -198,18 +174,4 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		telefonnummer = UUID.randomUUID().toString(),
 		epost = UUID.randomUUID().toString()
 	)
-
-	private fun arrangorVeilederInput(
-		ansattId: UUID,
-		deltakerId: UUID,
-		type: VeilederType = VeilederType.VEILEDER
-	) = ArrangorVeilederDboInput(
-		id = UUID.randomUUID(),
-		ansattId = ansattId,
-		deltakerId = deltakerId,
-		erMedveileder = type == VeilederType.MEDVEILEDER,
-		gyldigFra = ZonedDateTime.now().minusDays(1),
-		gyldigTil = ZonedDateTime.now().plusDays(1)
-	)
-
 }

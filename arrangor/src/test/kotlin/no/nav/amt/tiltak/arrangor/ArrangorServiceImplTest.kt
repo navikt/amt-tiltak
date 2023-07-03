@@ -5,7 +5,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
-import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.arrangor.AmtArrangorService
 import java.time.LocalDateTime
 import java.util.UUID
@@ -13,17 +12,13 @@ import java.util.UUID
 class ArrangorServiceImplTest: FunSpec({
 	lateinit var amtArrangorService: AmtArrangorService
 	lateinit var arrangorRepository: ArrangorRepository
-	lateinit var publisherService: DataPublisherService
 
 	lateinit var arrangorService: ArrangorServiceImpl
 
 	beforeEach {
 		amtArrangorService = mockk()
 		arrangorRepository = mockk(relaxUnitFun = true)
-		publisherService = mockk()
-		arrangorService = ArrangorServiceImpl(amtArrangorService, arrangorRepository, publisherService)
-
-		every { publisherService.publish(id = any(), type = any()) } returns Unit
+		arrangorService = ArrangorServiceImpl(amtArrangorService, arrangorRepository)
 	}
 
 	test("getOrCreateArrangor - skal opprette arrangor hvis ikke finnes") {
