@@ -72,11 +72,13 @@ class DataPublisherService(
 
 	fun publishAll(batchSize: Int = 100, forcePublish: Boolean = true) {
 		DataPublishType.values().forEach {
-			publish(
-				type = it,
-				batchSize = batchSize,
-				forcePublish = forcePublish
-			)
+			if (it != DataPublishType.ARRANGOR_ANSATT) {
+				publish(
+					type = it,
+					batchSize = batchSize,
+					forcePublish = forcePublish
+				)
+			}
 		}
 	}
 
