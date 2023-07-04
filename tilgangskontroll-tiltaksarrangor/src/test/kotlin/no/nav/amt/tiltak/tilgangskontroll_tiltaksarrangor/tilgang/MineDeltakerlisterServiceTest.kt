@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
-import java.util.*
+import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
 class MineDeltakerlisterServiceTest : FunSpec({
@@ -62,7 +62,7 @@ class MineDeltakerlisterServiceTest : FunSpec({
 
 		publisherService = mockk()
 
-		service = MineDeltakerlisterServiceImpl(repository, gjennomforingService, transactionTemplate, publisherService)
+		service = MineDeltakerlisterServiceImpl(repository, gjennomforingService, transactionTemplate)
 
 
 		DbTestDataUtils.cleanDatabase(dataSource)

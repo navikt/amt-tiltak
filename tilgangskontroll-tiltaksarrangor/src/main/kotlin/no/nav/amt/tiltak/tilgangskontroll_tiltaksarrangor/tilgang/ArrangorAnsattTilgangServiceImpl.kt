@@ -11,8 +11,6 @@ import no.nav.amt.tiltak.core.port.ArrangorVeilederService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.MineDeltakerlisterService
-import no.nav.amt.tiltak.data_publisher.DataPublisherService
-import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.log.SecureLog.secureLog
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.arrangor.AmtArrangorService
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.arrangor.tilArrangorAnsattRoller
@@ -34,7 +32,6 @@ open class ArrangorAnsattTilgangServiceImpl(
 	private val arrangorVeilederService: ArrangorVeilederService,
 	private val arrangorService: ArrangorService,
 	private val transactionTemplate: TransactionTemplate,
-	private val publisherService: DataPublisherService,
 	private val amtArrangorService: AmtArrangorService
 ) : ArrangorAnsattTilgangService {
 
@@ -201,7 +198,6 @@ open class ArrangorAnsattTilgangServiceImpl(
 		}
 
 		arrangorAnsattService.setTilgangerSistSynkronisert(ansatt.id, LocalDateTime.now())
-			.also { publisherService.publish(ansatt.id, DataPublishType.ARRANGOR_ANSATT) }
 	}
 
 	private fun finnTilgangerSomSkalLeggesTil(

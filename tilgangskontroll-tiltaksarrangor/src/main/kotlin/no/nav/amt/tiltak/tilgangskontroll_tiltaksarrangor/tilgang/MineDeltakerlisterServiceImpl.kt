@@ -2,7 +2,6 @@ package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang
 
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.MineDeltakerlisterService
-import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.ZonedDateTime
@@ -12,8 +11,7 @@ import java.util.UUID
 open class MineDeltakerlisterServiceImpl(
 	private val mineDeltakerlisterRepository: MineDeltakerlisterRepository,
 	private val gjennomforingService: GjennomforingService,
-	private val transactionTemplate: TransactionTemplate,
-	private val publisherService: DataPublisherService
+	private val transactionTemplate: TransactionTemplate
 ): MineDeltakerlisterService {
 
 	private val defaultGyldigTil = ZonedDateTime.parse("3000-01-01T00:00:00.00000+00:00")

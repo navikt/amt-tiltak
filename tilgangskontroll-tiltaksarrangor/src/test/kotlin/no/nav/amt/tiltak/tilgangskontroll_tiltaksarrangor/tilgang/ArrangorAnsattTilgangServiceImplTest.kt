@@ -141,7 +141,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 		arrangorAnsattTilgangServiceImpl = ArrangorAnsattTilgangServiceImpl(
 			arrangorAnsattService, ansattRolleService,
 			deltakerService, gjennomforingService, mineDeltakerlisterService, arrangorVeilederService,
-			arrangorService, TransactionTemplate(DataSourceTransactionManager(datasource)), publisherService, amtArrangorService
+			arrangorService, TransactionTemplate(DataSourceTransactionManager(datasource)), amtArrangorService
 		)
 
 		every {

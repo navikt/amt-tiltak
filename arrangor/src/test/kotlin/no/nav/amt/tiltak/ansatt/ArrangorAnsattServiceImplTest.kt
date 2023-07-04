@@ -5,7 +5,6 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -16,7 +15,6 @@ class ArrangorAnsattServiceImplTest {
 	lateinit var arrangorAnsattRepository: ArrangorAnsattRepository
 	lateinit var arrangorAnsattTilgangService: ArrangorAnsattTilgangService
 	lateinit var arrangorService: ArrangorService
-	lateinit var publisherService: DataPublisherService
 
 	lateinit var arrangorAnsattService: ArrangorAnsattServiceImpl
 
@@ -25,16 +23,12 @@ class ArrangorAnsattServiceImplTest {
 		arrangorAnsattRepository = mockk()
 		arrangorService = mockk()
 		arrangorAnsattTilgangService = mockk()
-		publisherService = mockk()
 
 
 		arrangorAnsattService = ArrangorAnsattServiceImpl(
 			arrangorAnsattRepository = arrangorAnsattRepository,
-			arrangorService = arrangorService,
-			dataPublisherService = publisherService,
+			arrangorService = arrangorService
 		)
-
-		every { publisherService.publish(id = any(), type = any()) } returns Unit
 
 		arrangorAnsattService.arrangorAnsattTilgangService = arrangorAnsattTilgangService
 	}
