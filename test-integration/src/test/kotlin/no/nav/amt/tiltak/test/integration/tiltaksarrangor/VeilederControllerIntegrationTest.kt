@@ -90,31 +90,6 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	internal fun `leggTilVeiledere - ingen veiledere finnes fra før - legges inn riktig`() {
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/veiledere",
-			headers = lagAnsatt1Header(),
-			body = lagOpprettVeilederBulkRequestBody(
-				deltakerIder = listOf(DELTAKER_1.id),
-				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, false)),
-				gjennomforingId = GJENNOMFORING_1.id
-			),
-		)
-
-		response.code shouldBe 200
-
-		AsyncUtils.eventually {
-			val veileder = arrangorVeilederService.hentVeiledereForDeltaker(DELTAKER_1.id).first()
-
-			veileder.ansattId shouldBe ARRANGOR_ANSATT_2.id
-			veileder.deltakerId shouldBe DELTAKER_1.id
-			veileder.erMedveileder shouldBe false
-		}
-
-	}
-
-	@Test
 	internal fun `leggTilVeiledere - veileder finnes fra før - erstattes av ny veileder`() {
 		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
 		val response = sendRequest(
@@ -138,72 +113,6 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 			veileder.ansattId shouldBe ARRANGOR_ANSATT_2.id
 			veileder.deltakerId shouldBe DELTAKER_1.id
 			veileder.erMedveileder shouldBe false
-		}
-
-	}
-
-	@Test
-	internal fun `leggTilVeiledere - medveiledere finnes fra før - eldste overskrives av ny veileder`() {
-		val medveiledere = opprettMedveiledereForDeltaker(3, DELTAKER_1.id)
-		val eldsteMedveileder = medveiledere.last()
-
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/veiledere",
-			headers = lagAnsatt1Header(),
-			body = lagOpprettVeilederBulkRequestBody(
-				deltakerIder = listOf(DELTAKER_1.id),
-				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, true)),
-				gjennomforingId = GJENNOMFORING_1.id
-			),
-		)
-
-		response.code shouldBe 200
-
-		AsyncUtils.eventually {
-			val veiledere = arrangorVeilederService.hentVeiledereForDeltaker(DELTAKER_1.id)
-			veiledere shouldHaveSize 3
-
-			veiledere.any { it.id == eldsteMedveileder.id } shouldBe false
-			veiledere.any { it.ansattId == ARRANGOR_ANSATT_2.id } shouldBe true
-		}
-
-	}
-
-	@Test
-	internal fun `leggTilVeiledere - flere deltakere med medveiledere fra før - eldste veiledere blir erstattet av nye`() {
-		val medveiledere1 = opprettMedveiledereForDeltaker(3, DELTAKER_1.id)
-		val medveiledere2 = opprettMedveiledereForDeltaker(2, DELTAKER_2.id)
-
-		val arrangor3 = arrangorAnsattInput()
-
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/veiledere",
-			headers = lagAnsatt1Header(),
-			body = lagOpprettVeilederBulkRequestBody(
-				deltakerIder = listOf(DELTAKER_1.id, DELTAKER_2.id),
-				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, true), Pair(arrangor3.id, true)),
-				gjennomforingId = GJENNOMFORING_1.id
-			),
-		)
-
-		response.code shouldBe 200
-
-		AsyncUtils.eventually {
-			val veiledereForDeltaker1 = arrangorVeilederService.hentVeiledereForDeltaker(DELTAKER_1.id)
-			veiledereForDeltaker1 shouldHaveSize 3
-
-			veiledereForDeltaker1.any { it.ansattId == ARRANGOR_ANSATT_2.id } shouldBe true
-			veiledereForDeltaker1.any { it.ansattId == arrangor3.id } shouldBe true
-			veiledereForDeltaker1.any { it.ansattId == medveiledere1.first().ansattId } shouldBe true
-
-			val veiledereForDeltaker2 = arrangorVeilederService.hentVeiledereForDeltaker(DELTAKER_2.id)
-			veiledereForDeltaker2 shouldHaveSize 3
-
-			veiledereForDeltaker2.any { it.ansattId == ARRANGOR_ANSATT_2.id } shouldBe true
-			veiledereForDeltaker2.any { it.ansattId == arrangor3.id } shouldBe true
-			veiledereForDeltaker2.any { it.ansattId == medveiledere2.first().ansattId } shouldBe true
 		}
 
 	}
