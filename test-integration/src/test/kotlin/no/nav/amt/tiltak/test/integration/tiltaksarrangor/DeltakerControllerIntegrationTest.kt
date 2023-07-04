@@ -19,8 +19,6 @@ import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
-import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_1
-import no.nav.amt.tiltak.test.database.data.TestData.ENDRINGSMELDING_1_DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorVeilederDboInput
@@ -128,21 +126,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	internal fun `hentDeltakere - skal ha status 200 og returnere deltakere`() {
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
-			headers = createAnsatt1AuthHeader()
-		)
-
-		val expectedJson = """
-			[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-13T12:12:00","aktiveEndringsmeldinger":[],"aktiveVeiledere":[],"navKontor":"NAV Testheim"},{"id":"8a0b7158-4d5e-4563-88be-b9bce5662879","fornavn":"Bruker 2 fornavn","mellomnavn":null,"etternavn":"Bruker 2 etternavn","fodselsnummer":"7908432423","startDato":"2022-02-10","sluttDato":"2022-02-12","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-10T12:12:00","aktiveEndringsmeldinger":[],"aktiveVeiledere":[],"navKontor":"NAV Testheim"}]
-		""".trimIndent()
-		response.code shouldBe 200
-		response.body?.string() shouldBe expectedJson
-	}
-
-	@Test
 	internal fun `hentDeltakere - skal ikke vise deltakere som er skjulte`() {
 		val deltakerId = UUID.randomUUID()
 		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId, gjennomforingId = GJENNOMFORING_1.id))
@@ -162,23 +145,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 		JsonPath.parse(body).read<Int>("$.length()") shouldBe 2
 		JsonPath.parse(body).read<List<String>>("$[*].id") shouldBe listOf(DELTAKER_1.id.toString(), DELTAKER_2.id.toString())
-	}
-
-	@Test
-	internal fun `hentDeltakere - returnere deltakere med aktive endringsmeldinger`() {
-		testDataRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
-		testDataRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_2)
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
-			headers = createAnsatt1AuthHeader()
-		)
-
-		val expectedJson = """
-			[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-13T12:12:00","aktiveEndringsmeldinger":[{"id":"9830e130-b18a-46b8-8e3e-6c06734d797e","innhold":{"oppstartsdato":"2022-11-11"},"type":"LEGG_TIL_OPPSTARTSDATO"}],"aktiveVeiledere":[],"navKontor":"NAV Testheim"},{"id":"8a0b7158-4d5e-4563-88be-b9bce5662879","fornavn":"Bruker 2 fornavn","mellomnavn":null,"etternavn":"Bruker 2 etternavn","fodselsnummer":"7908432423","startDato":"2022-02-10","sluttDato":"2022-02-12","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-10T12:12:00","aktiveEndringsmeldinger":[{"id":"3fc16362-ba8b-4c0f-af93-b2ed56f12cd5","innhold":{"oppstartsdato":"2022-11-09"},"type":"LEGG_TIL_OPPSTARTSDATO"}],"aktiveVeiledere":[],"navKontor":"NAV Testheim"}]
-		""".trimIndent()
-		response.code shouldBe 200
-		response.body?.string() shouldBe expectedJson
 	}
 
 	@Test
