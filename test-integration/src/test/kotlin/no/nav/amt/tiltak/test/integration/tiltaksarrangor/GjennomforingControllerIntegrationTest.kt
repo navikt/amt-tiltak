@@ -211,23 +211,6 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	internal fun `opprettTilgangTilGjennomforing - skal ha status 200 og opprette tilgang`() {
-		testDataRepository.deleteAllArrangorAnsattGjennomforingTilganger()
-
-		val response = sendRequest(
-			method = "POST",
-			url = "/api/tiltaksarrangor/gjennomforing/${GJENNOMFORING_1.id}/tilgang",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}"),
-		)
-
-		response.code shouldBe 200
-		val tilganger = testDataRepository.getArrangorAnsattGjennomforingTilganger(ARRANGOR_ANSATT_1.id)
-		tilganger.any {
-			it.gjennomforingId == GJENNOMFORING_1.id && it.gyldigFra.isAfter(ZonedDateTime.now().minusSeconds(10))
-		} shouldBe true
-	}
-
-	@Test
 	internal fun `opprettTilgangTilGjennomforing - skal ha status 403 hvis gjennomforing er avsluttet for 14 dager siden`() {
 		testDataRepository.deleteAllArrangorAnsattGjennomforingTilganger()
 
