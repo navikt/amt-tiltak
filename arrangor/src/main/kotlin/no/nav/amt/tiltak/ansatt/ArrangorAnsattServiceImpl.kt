@@ -8,8 +8,6 @@ import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.data_publisher.DataPublisherService
-import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
@@ -20,8 +18,7 @@ import java.util.UUID
 @Service
 class ArrangorAnsattServiceImpl(
 	private val arrangorAnsattRepository: ArrangorAnsattRepository,
-	private val arrangorService: ArrangorService,
-	private val dataPublisherService: DataPublisherService,
+	private val arrangorService: ArrangorService
 ) : ArrangorAnsattService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -43,8 +40,6 @@ class ArrangorAnsattServiceImpl(
 			mellomnavn = arrangorAnsatt.personalia.navn.mellomnavn,
 			etternavn = arrangorAnsatt.personalia.navn.etternavn
 		)
-
-		dataPublisherService.publish(arrangorAnsatt.id, DataPublishType.ARRANGOR_ANSATT)
 	}
 
 	override fun getAnsatt(ansattId: UUID): Ansatt {

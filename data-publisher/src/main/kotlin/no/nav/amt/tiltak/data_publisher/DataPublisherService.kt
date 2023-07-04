@@ -2,7 +2,6 @@ package no.nav.amt.tiltak.data_publisher
 
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
-import no.nav.amt.tiltak.data_publisher.publish.ArrangorAnsattPublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.DeltakerPublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.DeltakerlistePublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.EndringsmeldingPublishQuery
@@ -28,7 +27,6 @@ class DataPublisherService(
 
 	fun publish(id: UUID, type: DataPublishType) {
 		when (type) {
-			DataPublishType.ARRANGOR_ANSATT -> publishArrangorAnsatt(id)
 			DataPublishType.DELTAKER -> publishDeltaker(id)
 			DataPublishType.DELTAKERLISTE -> publishDeltakerliste(id)
 			DataPublishType.ENDRINGSMELDING -> publishEndringsmelding(id)
@@ -39,13 +37,6 @@ class DataPublisherService(
 		val idQueries = IdQueries(template)
 
 		when (type) {
-			DataPublishType.ARRANGOR_ANSATT -> {
-				publishBatch(
-					idProvider = { offset -> idQueries.hentArrangorAnsattIds(offset, batchSize) },
-					publisher = { id -> publishArrangorAnsatt(id, forcePublish) }
-				)
-			}
-
 			DataPublishType.DELTAKER -> {
 				publishBatch(
 					idProvider = { offset -> idQueries.hentDeltakerIds(offset, batchSize) },
@@ -72,13 +63,11 @@ class DataPublisherService(
 
 	fun publishAll(batchSize: Int = 100, forcePublish: Boolean = true) {
 		DataPublishType.values().forEach {
-			if (it != DataPublishType.ARRANGOR_ANSATT) {
-				publish(
-					type = it,
-					batchSize = batchSize,
-					forcePublish = forcePublish
-				)
-			}
+			publish(
+				type = it,
+				batchSize = batchSize,
+				forcePublish = forcePublish
+			)
 		}
 	}
 
@@ -128,20 +117,6 @@ class DataPublisherService(
 						.also { publishRepository.set(id, DataPublishType.DELTAKER, result.result.digest()) }
 				}
 			}
-		}
-	}
-
-	private fun publishArrangorAnsatt(id: UUID, forcePublish: Boolean = false) {
-
-		val currentData = ArrangorAnsattPublishQuery(template).get(id)
-
-		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.ARRANGOR_ANSATT, currentData.digest())) {
-			val key = id.toString()
-			val value = JsonUtils.toJsonString(currentData)
-			val record = ProducerRecord(kafkaTopicProperties.amtArrangorAnsattTopic, key, value)
-			logger.info("Republiserer ARRANGOR_ANSATT med id $id")
-			stringKafkaProducer.sendSync(record)
-			publishRepository.set(id, DataPublishType.ARRANGOR_ANSATT, currentData.digest())
 		}
 	}
 

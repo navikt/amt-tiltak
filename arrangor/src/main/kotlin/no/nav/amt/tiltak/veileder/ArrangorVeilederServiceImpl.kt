@@ -9,12 +9,10 @@ import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorVeilederService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.data_publisher.DataPublisherService
-import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 @Service
 class ArrangorVeilederServiceImpl (
@@ -22,8 +20,7 @@ class ArrangorVeilederServiceImpl (
 	private val arrangorVeilederRepository: ArrangorVeilederRepository,
 	private val deltakerService: DeltakerService,
 	private val gjennomforingService: GjennomforingService,
-	private val transactionTemplate: TransactionTemplate,
-	private val publisherService: DataPublisherService
+	private val transactionTemplate: TransactionTemplate
 ): ArrangorVeilederService {
 
 	private val maksMedveiledere = 3
@@ -36,8 +33,6 @@ class ArrangorVeilederServiceImpl (
 			inaktiverVeiledereSomSkalErstattes(veiledere, deltakerIder)
 			arrangorVeilederRepository.opprettVeiledere(veiledere, deltakerIder)
 		}
-
-		veilederInputs.forEach { publisherService.publish(it.ansattId, DataPublishType.ARRANGOR_ANSATT) }
 	}
 
 	override fun opprettVeiledereForDeltaker(veilederInputs: List<ArrangorVeilederInput>, deltakerId: UUID) {
@@ -50,8 +45,6 @@ class ArrangorVeilederServiceImpl (
 			arrangorVeilederRepository.inaktiverAlleVeiledereForDeltaker(deltakerId)
 			arrangorVeilederRepository.opprettVeiledere(veiledere, deltakerId)
 		}
-
-		veilederInputs.forEach { publisherService.publish(it.ansattId, DataPublishType.ARRANGOR_ANSATT) }
 	}
 
 	override fun hentVeiledereForDeltaker(deltakerId: UUID): List<ArrangorVeileder> {
@@ -91,6 +84,22 @@ class ArrangorVeilederServiceImpl (
 		if (gjennomforingIder.isNotEmpty()) {
 			arrangorVeilederRepository.inaktiverVeilederPaGjennomforinger(ansattId, gjennomforingIder)
 		}
+	}
+
+	override fun leggTilAnsattSomVeileder(ansattId: UUID, deltakerId: UUID, erMedveileder: Boolean) {
+		arrangorVeilederRepository.lagreVeileder(
+			deltakerId = deltakerId,
+			opprettVeilederDbo = OpprettVeilederDbo(
+				ansattId = ansattId,
+				erMedveileder = erMedveileder,
+				gyldigFra = ZonedDateTime.now(),
+				gyldigTil = defaultGyldigTil
+			)
+		)
+	}
+
+	override fun fjernAnsattSomVeileder(ansattId: UUID, deltakerId: UUID, erMedveileder: Boolean) {
+		arrangorVeilederRepository.inaktiverVeileder(ansattId = ansattId, deltakerId = deltakerId, erMedveileder = erMedveileder)
 	}
 
 	private fun inaktiverVeiledereSomSkalErstattes(veiledere: List<OpprettVeilederDbo>, deltakerIder: List<UUID>) {

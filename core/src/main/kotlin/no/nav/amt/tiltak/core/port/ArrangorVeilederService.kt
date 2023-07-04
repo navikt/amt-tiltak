@@ -4,7 +4,7 @@ import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeileder
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeilederInput
 import no.nav.amt.tiltak.core.domain.tiltak.ArrangorVeiledersDeltaker
-import java.util.*
+import java.util.UUID
 
 interface ArrangorVeilederService {
 
@@ -25,4 +25,8 @@ interface ArrangorVeilederService {
 	fun hentDeltakerliste(ansattId: UUID): List<ArrangorVeiledersDeltaker>
 
 	fun fjernAlleDeltakereForVeilederHosArrangor(ansattId: UUID, arrangorId: UUID)
+
+	fun leggTilAnsattSomVeileder(ansattId: UUID, deltakerId: UUID, erMedveileder: Boolean)
+
+	fun fjernAnsattSomVeileder(ansattId: UUID, deltakerId: UUID, erMedveileder: Boolean)
 }

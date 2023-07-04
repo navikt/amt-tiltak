@@ -33,6 +33,12 @@ data class DeltakerPersonaliaDto(
 	val skjermet: Boolean
 )
 
+data class Navn(
+	val fornavn: String,
+	val mellomnavn: String?,
+	val etternavn: String
+)
+
 data class DeltakerSkjultDto(
 	val skjultAvAnsattId: UUID,
 	val dato: LocalDateTime

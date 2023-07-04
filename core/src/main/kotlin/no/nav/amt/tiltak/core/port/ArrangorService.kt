@@ -14,4 +14,6 @@ interface ArrangorService {
 	fun getArrangorerById(arrangorIder: List<UUID>): List<Arrangor>
 
 	fun getOrCreateArrangor(arrangor: Arrangor): Arrangor
+
+	fun getArrangorerSomMangler(arrangorIder: List<UUID>): List<UUID>
 }

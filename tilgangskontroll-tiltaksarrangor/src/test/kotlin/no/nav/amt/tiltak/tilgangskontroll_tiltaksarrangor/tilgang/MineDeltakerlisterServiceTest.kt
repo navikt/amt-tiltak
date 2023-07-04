@@ -2,7 +2,6 @@ package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
-import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.assertions.timing.eventually
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
@@ -26,7 +25,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
-import java.util.*
+import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
 class MineDeltakerlisterServiceTest : FunSpec({
@@ -62,7 +61,7 @@ class MineDeltakerlisterServiceTest : FunSpec({
 
 		publisherService = mockk()
 
-		service = MineDeltakerlisterServiceImpl(repository, gjennomforingService, transactionTemplate, publisherService)
+		service = MineDeltakerlisterServiceImpl(repository, gjennomforingService, transactionTemplate)
 
 
 		DbTestDataUtils.cleanDatabase(dataSource)
@@ -114,20 +113,6 @@ class MineDeltakerlisterServiceTest : FunSpec({
 
 			aktiveTilganger shouldHaveSize 1
 			aktiveTilganger.first().gjennomforingId shouldBe GJENNOMFORING_2.id
-		}
-	}
-
-	test("leggTil - skal kaste exception hvis tilgang er allerede opprettet") {
-		testRepository.insertMineDeltakerlister(
-			GJENNOMFORING_TILGANG_1.copy(
-				id = UUID.randomUUID(),
-				ansattId = ARRANGOR_ANSATT_1.id,
-				gjennomforingId = GJENNOMFORING_1.id
-			)
-		)
-
-		shouldThrowExactly<IllegalStateException> {
-			service.leggTil(UUID.randomUUID(), ARRANGOR_ANSATT_1.id, GJENNOMFORING_1.id)
 		}
 	}
 
