@@ -14,28 +14,16 @@ import java.util.UUID
 class AmtArrangorService(
 	private val amtArrangorClient: AmtArrangorClient
 ) {
-	private val personidentToAnsattCache = Caffeine.newBuilder()
-		.expireAfterWrite(Duration.ofHours(1))
-		.build<String, ArrangorAnsatt>()
-
-	private val ansattIdToAnsattCache = Caffeine.newBuilder()
-		.expireAfterWrite(Duration.ofHours(1))
-		.build<UUID, ArrangorAnsatt>()
-
 	private val orgnummerToArrangorCache = Caffeine.newBuilder()
 		.expireAfterWrite(Duration.ofHours(1))
 		.build<String, Arrangor>()
 
 	fun getAnsatt(ansattPersonident: String): ArrangorAnsatt? {
-		return CacheUtils.tryCacheFirstNullable(personidentToAnsattCache, ansattPersonident) {
-			return@tryCacheFirstNullable amtArrangorClient.hentAnsatt(ansattPersonident)?.tilArrangorAnsatt()
-		}
+		return amtArrangorClient.hentAnsatt(ansattPersonident)?.tilArrangorAnsatt()
 	}
 
 	fun getAnsatt(ansattId: UUID): ArrangorAnsatt? {
-		return CacheUtils.tryCacheFirstNullable(ansattIdToAnsattCache, ansattId) {
-			return@tryCacheFirstNullable amtArrangorClient.hentAnsatt(ansattId)?.tilArrangorAnsatt()
-		}
+		return amtArrangorClient.hentAnsatt(ansattId)?.tilArrangorAnsatt()
 	}
 
 	fun getArrangor(orgnummer: String): Arrangor? {
