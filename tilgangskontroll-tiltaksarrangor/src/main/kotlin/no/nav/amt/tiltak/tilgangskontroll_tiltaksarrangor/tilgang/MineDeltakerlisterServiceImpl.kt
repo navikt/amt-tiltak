@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang
 
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.MineDeltakerlisterService
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.ZonedDateTime
@@ -14,6 +15,7 @@ open class MineDeltakerlisterServiceImpl(
 	private val transactionTemplate: TransactionTemplate
 ): MineDeltakerlisterService {
 
+	private val log = LoggerFactory.getLogger(javaClass)
 	private val defaultGyldigTil = ZonedDateTime.parse("3000-01-01T00:00:00.00000+00:00")
 
 	override fun leggTil(id: UUID, arrangorAnsattId: UUID, gjennomforingId: UUID) {
@@ -21,9 +23,8 @@ open class MineDeltakerlisterServiceImpl(
 			.contains(gjennomforingId)
 
 		if (harAlleredeTilgang) {
-			throw IllegalStateException(
-				"Kan ikke opprette tilgang på gjennomføring siden arrangør ansatt allerede har tilgang"
-			)
+			log.warn("Kan ikke opprette tilgang på gjennomføring $id siden arrangør ansatt $arrangorAnsattId allerede har tilgang")
+			return
 		}
 
 		mineDeltakerlisterRepository.leggTil(
