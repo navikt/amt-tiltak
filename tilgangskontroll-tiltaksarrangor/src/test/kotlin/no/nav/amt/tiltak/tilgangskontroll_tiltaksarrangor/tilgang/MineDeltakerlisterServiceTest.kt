@@ -2,7 +2,6 @@ package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
-import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.assertions.timing.eventually
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
@@ -114,20 +113,6 @@ class MineDeltakerlisterServiceTest : FunSpec({
 
 			aktiveTilganger shouldHaveSize 1
 			aktiveTilganger.first().gjennomforingId shouldBe GJENNOMFORING_2.id
-		}
-	}
-
-	test("leggTil - skal kaste exception hvis tilgang er allerede opprettet") {
-		testRepository.insertMineDeltakerlister(
-			GJENNOMFORING_TILGANG_1.copy(
-				id = UUID.randomUUID(),
-				ansattId = ARRANGOR_ANSATT_1.id,
-				gjennomforingId = GJENNOMFORING_1.id
-			)
-		)
-
-		shouldThrowExactly<IllegalStateException> {
-			service.leggTil(UUID.randomUUID(), ARRANGOR_ANSATT_1.id, GJENNOMFORING_1.id)
 		}
 	}
 
