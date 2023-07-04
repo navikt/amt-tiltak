@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang
 
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorAnsatt
+import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeileder
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
@@ -72,7 +73,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 				log.warn("En ikke-ansatt har logget inn, men hadde ikke tilganger i Altinn.")
 				return
 			}
-			synkroniserAltinnRettigheter(ansatt)
+			oppdaterRollerOgTilganger(ansatt)
 		} catch (t: Throwable) {
 			log.error("Feil under synkronisering av altinn rettigheter", t)
 			secureLog.error("Feil under synkronisering av altinn rettigheter for fnr=$ansattPersonligIdent", t)
@@ -86,10 +87,14 @@ open class ArrangorAnsattTilgangServiceImpl(
 				log.error("Fant ikke ansatt med id $ansattId")
 				return
 			}
-			synkroniserAltinnRettigheter(ansatt)
+			oppdaterRollerOgTilganger(ansatt)
 		} catch (t: Throwable) {
 			log.error("Feil under synkronisering av altinn rettigheter for ansatt med id $ansattId", t)
 		}
+	}
+
+	override fun oppdaterRollerOgTilgangerForAnsatt(ansatt: ArrangorAnsatt) {
+		oppdaterRollerOgTilganger(ansatt)
 	}
 
 	override fun verifiserRolleHosArrangor(ansattId: UUID, arrangorId: UUID, rolle: ArrangorAnsattRolle) {
@@ -126,7 +131,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 		return gjennomforinger.contains(gjennomforingId)
 	}
 
-	private fun synkroniserAltinnRettigheter(ansatt: ArrangorAnsatt) {
+	private fun oppdaterRollerOgTilganger(ansatt: ArrangorAnsatt) {
 		arrangorAnsattService.upsertAnsatt(ansatt)
 
 		val lagredeAnsattTilganger = ansattRolleService.hentAktiveRoller(ansatt.id)
@@ -158,6 +163,43 @@ open class ArrangorAnsattTilgangServiceImpl(
 			log.info("Fjernet tilgang under synk med Altinn. ansattId=${ansatt.id} arrangorId=${tilgang.arrangorId} rolle=${tilgang.arrangorAnsattRolle}")
 		}
 
+		val lagredeDeltakerlister = mineDeltakerlisterService.hent(ansatt.id)
+		val deltakerlisterSomSkalLeggesTil = finnDeltakerlisterSomSkalLeggesTil(
+			amtArrangorDeltakerlister = ansatt.arrangorer.flatMap { it.koordinator },
+			lagredeDeltakerlister = lagredeDeltakerlister
+		)
+		val deltakerlisterSomSkalFjernes = finnDeltakerlisterSomSkalFjernes(
+			amtArrangorDeltakerlister = ansatt.arrangorer.flatMap { it.koordinator },
+			lagredeDeltakerlister = lagredeDeltakerlister
+		)
+		deltakerlisterSomSkalLeggesTil.forEach {
+			try {
+				mineDeltakerlisterService.leggTil(id = UUID.randomUUID(), arrangorAnsattId = ansatt.id, gjennomforingId = it)
+			} catch (e: IllegalStateException) {
+				log.info("Ansatt har allerede tilgang til deltakerliste, går videre")
+			}
+		}
+		deltakerlisterSomSkalFjernes.forEach {
+			mineDeltakerlisterService.fjern(arrangorAnsattId = ansatt.id, gjennomforingId = it)
+		}
+		log.info("Lagt til ${deltakerlisterSomSkalLeggesTil.size} deltakerlister og fjernet ${deltakerlisterSomSkalFjernes.size} for ansatt ${ansatt.id}")
+
+		val lagretVeilederFor = arrangorVeilederService.hentDeltakereForVeileder(ansatt.id)
+		val veilederKoblingerSomSkalLeggesTil = finnVeilederkoblingerSomSkalLeggesTil(
+			lagredeVeilederkoblinger = lagretVeilederFor,
+			amtArrangorVeiledere = ansatt.arrangorer.flatMap { it.veileder }
+		)
+		val veilederKoblingerSomSkalFjernes = finnVeilederkoblingerSomSkalFjernes(
+			lagredeVeilederkoblinger = lagretVeilederFor,
+			amtArrangorVeiledere = ansatt.arrangorer.flatMap { it.veileder }
+		)
+		veilederKoblingerSomSkalFjernes.forEach {
+			arrangorVeilederService.fjernAnsattSomVeileder(ansattId = ansatt.id, deltakerId = it.deltakerId, erMedveileder = it.type == ArrangorAnsatt.VeilederType.MEDVEILEDER)
+		}
+		veilederKoblingerSomSkalLeggesTil.forEach {
+			arrangorVeilederService.leggTilAnsattSomVeileder(ansattId = ansatt.id, deltakerId = it.deltakerId, erMedveileder = it.type == ArrangorAnsatt.VeilederType.MEDVEILEDER)
+		}
+
 		arrangorAnsattService.setTilgangerSistSynkronisert(ansatt.id, LocalDateTime.now())
 			.also { publisherService.publish(ansatt.id, DataPublishType.ARRANGOR_ANSATT) }
 	}
@@ -176,6 +218,51 @@ open class ArrangorAnsattTilgangServiceImpl(
 	): List<AnsattTilgang> {
 		// Returnerer alle lagredeTilganger som ikke finnes i altinnTilganger
 		return lagredeTilganger.subtract(altinnTilganger.toSet()).toList()
+	}
+
+	private fun finnDeltakerlisterSomSkalLeggesTil(
+		amtArrangorDeltakerlister: List<UUID>,
+		lagredeDeltakerlister: List<UUID>
+	): List<UUID> {
+		return amtArrangorDeltakerlister.filter { id -> lagredeDeltakerlister.find { it == id } == null }
+	}
+
+	private fun finnDeltakerlisterSomSkalFjernes(
+		amtArrangorDeltakerlister: List<UUID>,
+		lagredeDeltakerlister: List<UUID>
+	): List<UUID> {
+		return lagredeDeltakerlister.filter { id -> amtArrangorDeltakerlister.find { it == id } == null }
+	}
+
+	private fun finnVeilederkoblingerSomSkalLeggesTil(
+		lagredeVeilederkoblinger: List<ArrangorVeileder>,
+		amtArrangorVeiledere: List<ArrangorAnsatt.VeilederDto>
+	): List<ArrangorAnsatt.VeilederDto> {
+		val lagredeVeiledere = lagredeVeilederkoblinger.map { it.toVeilederDto() }
+		return amtArrangorVeiledere.filter { veileder ->
+				lagredeVeiledere.find { it.deltakerId == veileder.deltakerId && it.type == veileder.type } == null
+			}
+	}
+
+	private fun finnVeilederkoblingerSomSkalFjernes(
+		lagredeVeilederkoblinger: List<ArrangorVeileder>,
+		amtArrangorVeiledere: List<ArrangorAnsatt.VeilederDto>
+	): List<ArrangorAnsatt.VeilederDto> {
+		return lagredeVeilederkoblinger.map { it.toVeilederDto() }
+			.filter { veileder ->
+				amtArrangorVeiledere.find { it.deltakerId == veileder.deltakerId && it.type == veileder.type } == null
+			}
+	}
+
+	private fun ArrangorVeileder.toVeilederDto(): ArrangorAnsatt.VeilederDto {
+		return ArrangorAnsatt.VeilederDto(
+			deltakerId = deltakerId,
+			type = if (erMedveileder) {
+				ArrangorAnsatt.VeilederType.MEDVEILEDER
+			} else {
+				ArrangorAnsatt.VeilederType.VEILEDER
+			}
+		)
 	}
 
 	private fun harKoordinatorTilgang(ansattId: UUID, gjennomforingId: UUID, arrangorId: UUID): Boolean {

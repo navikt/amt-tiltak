@@ -58,4 +58,12 @@ class ArrangorServiceImpl(
 			overordnetEnhetOrganisasjonsnummer = arrangor.overordnetEnhetOrganisasjonsnummer,
 		).toArrangor()
 	}
+
+	override fun getArrangorerSomMangler(arrangorIder: List<UUID>): List<UUID> {
+		val arrangorer = arrangorRepository.getByIder(arrangorIder).map { it.toArrangor() }
+		if (arrangorer.size != arrangorIder.size) {
+			return arrangorIder.filter { arrangorId -> arrangorer.find { it.id == arrangorId } == null }
+		}
+		return emptyList()
+	}
 }

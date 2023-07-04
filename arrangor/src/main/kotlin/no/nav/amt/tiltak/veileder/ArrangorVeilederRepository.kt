@@ -98,6 +98,47 @@ open class ArrangorVeilederRepository(
 
 	}
 
+	internal fun inaktiverVeileder(ansattId: UUID, deltakerId: UUID, erMedveileder: Boolean) {
+		val sql = """
+			UPDATE arrangor_veileder
+			SET gyldig_til = current_timestamp, modified_at = current_timestamp
+			WHERE id = :ansattId AND deltaker_id = :deltakerId AND er_medveileder is :erMedveileder AND gyldig_til > current_timestamp
+		""".trimIndent()
+
+		val parameters = sqlParameters(
+			"ansattId" to ansattId,
+			"deltakerId" to deltakerId,
+			"erMedveileder" to erMedveileder
+		)
+
+		template.update(sql, parameters)
+	}
+
+	internal fun lagreVeileder(deltakerId: UUID, opprettVeilederDbo: OpprettVeilederDbo) {
+		val sql = """
+			INSERT INTO arrangor_veileder(
+				id,
+				ansatt_id,
+				deltaker_id,
+				gyldig_fra,
+				gyldig_til,
+				er_medveileder
+			)
+			VALUES(:id, :ansattId, :deltakerId, :gyldigFra, :gyldigTil, :erMedveileder)
+		""".trimIndent()
+
+		val parameters = sqlParameters(
+			"id" to UUID.randomUUID(),
+			"ansattId" to opprettVeilederDbo.ansattId,
+			"deltakerId" to deltakerId,
+			"gyldigFra" to opprettVeilederDbo.gyldigFra.toOffsetDateTime(),
+			"gyldigTil" to opprettVeilederDbo.gyldigTil.toOffsetDateTime(),
+			"erMedveileder" to opprettVeilederDbo.erMedveileder
+		)
+
+		template.update(sql, parameters)
+	}
+
 	internal fun inaktiverVeiledereForDeltakere(ansattIder: List<UUID>, deltakerIder: List<UUID>) {
 		if (ansattIder.isEmpty() || deltakerIder.isEmpty()) return
 

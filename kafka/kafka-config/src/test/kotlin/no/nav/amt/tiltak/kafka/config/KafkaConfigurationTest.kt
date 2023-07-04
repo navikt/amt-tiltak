@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.kafka.config
 
 import no.nav.amt.tiltak.core.kafka.AktorV2Ingestor
 import no.nav.amt.tiltak.core.kafka.AmtArrangorIngestor
+import no.nav.amt.tiltak.core.kafka.AnsattIngestor
 import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
 import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
 import no.nav.amt.tiltak.core.kafka.GjennomforingIngestor
@@ -37,6 +38,7 @@ class KafkaConfigurationTest {
 	private val deltakerTopic: String = "test.deltaker-v1"
 	private val aktorV2Topic: String = "test.aktor-v2"
 	private val amtArrangorTopic: String = "test.arrangor-v1"
+	private val amtArrangorAnsattTopic: String = "test.ansatt-v1"
 
 	@Container
 	var kafkaContainer: KafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.2.1"))
@@ -55,7 +57,7 @@ class KafkaConfigurationTest {
 			leesahTopic = leesahTopic,
 			deltakerTopic = deltakerTopic,
 			aktorV2Topic = aktorV2Topic,
-			amtArrangorAnsattTopic = "",
+			amtArrangorAnsattTopic = amtArrangorAnsattTopic,
 			amtArrangorTopic = amtArrangorTopic,
 			amtDeltakerTopic = "",
 			amtDeltakerlisteTopic = "",
@@ -131,6 +133,12 @@ class KafkaConfigurationTest {
 			}
 		}
 
+		val ansattIngestor = object : AnsattIngestor {
+			override fun ingestAnsatt(recordValue: String?) {
+				counter.incrementAndGet()
+			}
+		}
+
 
 		val config = KafkaConfiguration(
 			kafkaTopicProperties,
@@ -143,7 +151,8 @@ class KafkaConfigurationTest {
 			gjennomforingIngestor,
 			leesahIngestor,
 			aktorV2Ingestor,
-			arrangorIngestor
+			arrangorIngestor,
+			ansattIngestor
 		)
 
 		config.onApplicationEvent(null)
@@ -157,6 +166,7 @@ class KafkaConfigurationTest {
 		kafkaProducer.sendSync(toJsonProducerRecord(skjermetPersonTopic, "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord(sisteTiltaksgjennomforingerTopic, "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord(amtArrangorTopic, "1", value))
+		kafkaProducer.sendSync(toJsonProducerRecord(amtArrangorAnsattTopic, "1", value))
 
 		kafkaProducer.close()
 
@@ -164,7 +174,7 @@ class KafkaConfigurationTest {
 
 		Thread.sleep(3000)
 
-		assertEquals(6, counter.get())
+		assertEquals(7, counter.get())
 	}
 
 }
