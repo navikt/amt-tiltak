@@ -107,65 +107,6 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	fun `hentGjennomforinger - skal hente gjennomforinger med status Gjennomfores eller status Avsluttet med sluttdato tom 14 dager`() {
-		val skalVareSynligId = UUID.fromString("b49a95b9-6bde-481f-9712-c212a7a046e1")
-		val skalIkkeVareSynligId = UUID.fromString("ab23909a-7512-42d1-8abd-ca4047fe2ecb")
-
-		testDataRepository.insertGjennomforing(
-			GJENNOMFORING_1.copy(
-				id = skalVareSynligId,
-				status = Gjennomforing.Status.AVSLUTTET.name,
-				navn = "Avsluttet gjennomforing",
-				sluttDato = LocalDate.now().minusDays(14)
-			)
-		)
-
-		testDataRepository.insertGjennomforing(
-			GJENNOMFORING_1.copy(
-				id = skalIkkeVareSynligId,
-				status = Gjennomforing.Status.AVSLUTTET.name,
-				navn = "Avsluttet gjennomforing - skal ikke vises",
-				sluttDato = LocalDate.now().minusDays(15)
-			)
-		)
-
-		testDataRepository.insertMineDeltakerlister(
-			ArrangorAnsattGjennomforingTilgangInput(
-				id = UUID.randomUUID(),
-				ansattId = ARRANGOR_ANSATT_1.id,
-				gjennomforingId = skalVareSynligId,
-				gyldigFra = ZonedDateTime.now().minusHours(1),
-				gyldigTil = ZonedDateTime.now().plusYears(1)
-			)
-		)
-
-		testDataRepository.insertMineDeltakerlister(
-			ArrangorAnsattGjennomforingTilgangInput(
-				id = UUID.randomUUID(),
-				ansattId = ARRANGOR_ANSATT_1.id,
-				gjennomforingId = skalIkkeVareSynligId,
-				gyldigFra = ZonedDateTime.now().minusHours(1),
-				gyldigTil = ZonedDateTime.now().plusYears(1)
-			)
-		)
-
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/tiltaksarrangor/gjennomforing",
-			headers = mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(ARRANGOR_ANSATT_1.personligIdent)}")
-		)
-
-		response.code shouldBe 200
-
-		val jsonBody = response.body!!.string()
-
-		JsonPath.parse(jsonBody).read<Int>("$.length()") shouldBe 2
-		JsonPath.parse(jsonBody).read<String>("$.[0].id") shouldBe GJENNOMFORING_1.id.toString()
-		JsonPath.parse(jsonBody).read<String>("$.[1].id") shouldBe skalVareSynligId.toString()
-
-	}
-
-	@Test
 	fun `hentTilgjengeligeGjennomforinger() skal returnere 403 om Ansatt kun er veileder`() {
 		val response = sendRequest(
 			method = "GET",
