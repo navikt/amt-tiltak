@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorVeilederService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.ZonedDateTime
@@ -23,6 +24,7 @@ class ArrangorVeilederServiceImpl (
 	private val transactionTemplate: TransactionTemplate
 ): ArrangorVeilederService {
 
+	private val log = LoggerFactory.getLogger(javaClass)
 	private val maksMedveiledere = 3
 	private val defaultGyldigTil = ZonedDateTime.parse("3000-01-01T00:00Z")
 
@@ -87,15 +89,19 @@ class ArrangorVeilederServiceImpl (
 	}
 
 	override fun leggTilAnsattSomVeileder(ansattId: UUID, deltakerId: UUID, erMedveileder: Boolean) {
-		arrangorVeilederRepository.lagreVeileder(
-			deltakerId = deltakerId,
-			opprettVeilederDbo = OpprettVeilederDbo(
-				ansattId = ansattId,
-				erMedveileder = erMedveileder,
-				gyldigFra = ZonedDateTime.now(),
-				gyldigTil = defaultGyldigTil
+		if (deltakerService.hentDeltaker(deltakerId) == null) {
+			log.warn("Deltaker med id $deltakerId finnes ikke, kan ikke sette ansatt $ansattId som veileder")
+		} else {
+			arrangorVeilederRepository.lagreVeileder(
+				deltakerId = deltakerId,
+				opprettVeilederDbo = OpprettVeilederDbo(
+					ansattId = ansattId,
+					erMedveileder = erMedveileder,
+					gyldigFra = ZonedDateTime.now(),
+					gyldigTil = defaultGyldigTil
+				)
 			)
-		)
+		}
 	}
 
 	override fun fjernAnsattSomVeileder(ansattId: UUID, deltakerId: UUID, erMedveileder: Boolean) {
