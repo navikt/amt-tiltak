@@ -21,7 +21,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 class ArrangorVeilederRepositoryTest {
 
@@ -262,6 +262,15 @@ class ArrangorVeilederRepositoryTest {
 
 		repository.get(ARRANGOR_ANSATT_1_VEILEDER_1.id).gyldigTil shouldBeCloseTo ZonedDateTime.now()
 
+	}
+
+	@Test
+	fun `inaktiverVeileder - aktiv veileder - gyldigTil settes til nå`() {
+		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
+
+		repository.inaktiverVeileder(ARRANGOR_ANSATT_1_VEILEDER_1.ansattId, ARRANGOR_ANSATT_1_VEILEDER_1.deltakerId, ARRANGOR_ANSATT_1_VEILEDER_1.erMedveileder)
+
+		repository.get(ARRANGOR_ANSATT_1_VEILEDER_1.id).gyldigTil shouldBeCloseTo ZonedDateTime.now()
 	}
 
 	@Test
