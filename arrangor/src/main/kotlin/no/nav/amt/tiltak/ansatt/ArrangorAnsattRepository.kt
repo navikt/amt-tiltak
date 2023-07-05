@@ -87,27 +87,6 @@ open class ArrangorAnsattRepository(
 		return template.query(sql, parameters, rowMapper)
 	}
 
-	fun getAnsatteForGjennomforing(gjennomforingId: UUID, rolle: ArrangorAnsattRolle): List<AnsattDbo> {
-		val sql = """
-			SELECT distinct a.*
-			FROM arrangor_ansatt a
-					 INNER JOIN arrangor_ansatt_rolle aar on a.id = aar.ansatt_id
-					 INNER JOIN arrangor_ansatt_gjennomforing_tilgang aagt on aar.ansatt_id = aagt.ansatt_id
-			WHERE aagt.gjennomforing_id = :gjennomforingId
-			  AND aar.rolle = CAST(:rolle AS arrangor_rolle)
-			  AND aagt.gyldig_fra < CURRENT_TIMESTAMP
-			  AND aagt.gyldig_til > CURRENT_TIMESTAMP
-		""".trimIndent()
-		return template.query(
-			sql,
-			sqlParameters(
-				"gjennomforingId" to gjennomforingId,
-				"rolle" to rolle.name,
-			),
-			rowMapper
-		)
-	}
-
 	fun getAnsatteMedRolleForArrangor(arrangorId: UUID, rolle: ArrangorAnsattRolle): List<AnsattDbo> {
 		val sql = """
 			SELECT distinct a.*
@@ -157,13 +136,4 @@ open class ArrangorAnsattRepository(
 			rowMapper
 		)
 	}
-
-	fun setVelykketInnlogging(ansattId: UUID) {
-		val sql = """
-			UPDATE arrangor_ansatt SET sist_velykkede_innlogging = CURRENT_TIMESTAMP WHERE id = :ansattId
-		""".trimIndent()
-
-		template.update(sql, sqlParameters("ansattId" to ansattId))
-	}
-
 }

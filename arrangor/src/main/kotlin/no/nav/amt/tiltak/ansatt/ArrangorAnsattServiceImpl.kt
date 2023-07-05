@@ -8,7 +8,6 @@ import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.ArrangorService
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
@@ -20,8 +19,6 @@ class ArrangorAnsattServiceImpl(
 	private val arrangorAnsattRepository: ArrangorAnsattRepository,
 	private val arrangorService: ArrangorService
 ) : ArrangorAnsattService {
-
-	private val log = LoggerFactory.getLogger(javaClass)
 
 	// Forhindrer circular dependency, må fikses når vi rydder opp i arkitekturen
 	@Lazy
@@ -76,11 +73,6 @@ class ArrangorAnsattServiceImpl(
 			?: throw UnauthorizedException("Fant ikke ansatt")
 	}
 
-	override fun getKoordinatorerForGjennomforing(gjennomforingId: UUID): List<Ansatt> {
-		return arrangorAnsattRepository.getAnsatteForGjennomforing(gjennomforingId, ArrangorAnsattRolle.KOORDINATOR)
-			.map { it.toAnsatt(emptyList()) }
-	}
-
 	override fun getVeiledereForArrangor(arrangorId: UUID): List<Ansatt> {
 		return arrangorAnsattRepository.getAnsatteMedRolleForArrangor(arrangorId, ArrangorAnsattRolle.VEILEDER)
 			.map { it.toAnsatt(emptyList()) }
@@ -97,10 +89,6 @@ class ArrangorAnsattServiceImpl(
 				val arrangorer = hentTilknyttedeArrangorer(it.id)
 				it.toAnsatt(arrangorer)
 			}
-	}
-
-	override fun setVellykketInnlogging(ansattId: UUID) {
-		arrangorAnsattRepository.setVelykketInnlogging(ansattId)
 	}
 
 	private fun hentTilknyttedeArrangorer(ansattId: UUID): List<TilknyttetArrangor> {

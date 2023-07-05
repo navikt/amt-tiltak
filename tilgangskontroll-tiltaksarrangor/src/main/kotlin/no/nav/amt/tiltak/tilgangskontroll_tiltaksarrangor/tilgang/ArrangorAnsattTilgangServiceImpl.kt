@@ -170,11 +170,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 			lagredeDeltakerlister = lagredeDeltakerlister
 		)
 		deltakerlisterSomSkalLeggesTil.forEach {
-			try {
-				mineDeltakerlisterService.leggTil(id = UUID.randomUUID(), arrangorAnsattId = ansatt.id, gjennomforingId = it)
-			} catch (e: IllegalStateException) {
-				log.info("Ansatt har allerede tilgang til deltakerliste, går videre")
-			}
+			mineDeltakerlisterService.leggTil(id = UUID.randomUUID(), arrangorAnsattId = ansatt.id, gjennomforingId = it)
 		}
 		deltakerlisterSomSkalFjernes.forEach {
 			mineDeltakerlisterService.fjern(arrangorAnsattId = ansatt.id, gjennomforingId = it)
@@ -196,6 +192,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 		veilederKoblingerSomSkalLeggesTil.forEach {
 			arrangorVeilederService.leggTilAnsattSomVeileder(ansattId = ansatt.id, deltakerId = it.deltakerId, erMedveileder = it.type == ArrangorAnsatt.VeilederType.MEDVEILEDER)
 		}
+		log.info("Lagt til ${veilederKoblingerSomSkalLeggesTil.size} og fjernet ${veilederKoblingerSomSkalFjernes.size} veileder-relasjoner for ansatt ${ansatt.id}")
 
 		arrangorAnsattService.setTilgangerSistSynkronisert(ansatt.id, LocalDateTime.now())
 	}
