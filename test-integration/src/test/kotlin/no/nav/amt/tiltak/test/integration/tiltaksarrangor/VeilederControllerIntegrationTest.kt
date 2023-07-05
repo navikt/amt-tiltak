@@ -10,8 +10,6 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_VEILEDER_
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_3
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
-import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
-import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorVeilederDboInput
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
@@ -47,114 +45,9 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 	@Test
 	internal fun `skal teste token autentisering`() {
 		val requestBuilders = listOf(
-			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/veiledere"),
-			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/veiledere?deltakerId=${UUID.randomUUID()}"),
-			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/veiledere?gjennomforingId=${UUID.randomUUID()}"),
-			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/veiledere?deltakerId=${UUID.randomUUID()}"),
-			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/veiledere/tilgjengelig?gjennomforingId=${UUID.randomUUID()}"),
-			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/veileder/deltakerliste"),
+			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/veiledere?deltakerId=${UUID.randomUUID()}")
 		)
 		testTiltaksarrangorAutentisering(requestBuilders, client, mockOAuthServer)
-	}
-
-	@Test
-	internal fun `leggTilVeiledere - ansatt er ikke koordinator på gjennomføring - skal kaste 403`() {
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/veiledere",
-			headers = lagAnsatt2Header(),
-			body = lagOpprettVeilederBulkRequestBody(
-				deltakerIder = listOf(DELTAKER_1.id),
-				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, false)),
-				gjennomforingId = GJENNOMFORING_1.id
-			),
-		)
-
-		response.code shouldBe 403
-	}
-
-	@Test
-	internal fun `leggTilVeiledere - ansatt som legges til har ikke rollen VEILEDER - skal kaste 403`() {
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/veiledere",
-			headers = lagAnsatt1Header(),
-			body = lagOpprettVeilederBulkRequestBody(
-				deltakerIder = listOf(DELTAKER_1.id),
-				veiledere = listOf(Pair(ARRANGOR_ANSATT_1.id, false)),
-				gjennomforingId = GJENNOMFORING_1.id
-			),
-		)
-
-		response.code shouldBe 403
-	}
-
-	@Test
-	internal fun `leggTilVeiledere - veileder finnes fra før - erstattes av ny veileder`() {
-		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/veiledere",
-			headers = lagAnsatt1Header(),
-			body = lagOpprettVeilederBulkRequestBody(
-				deltakerIder = listOf(DELTAKER_1.id),
-				veiledere = listOf(Pair(ARRANGOR_ANSATT_2.id, false)),
-				gjennomforingId = GJENNOMFORING_1.id
-			),
-		)
-
-		response.code shouldBe 200
-
-		AsyncUtils.eventually {
-			val veiledere = arrangorVeilederService.hentVeiledereForDeltaker(DELTAKER_1.id)
-			veiledere shouldHaveSize 1
-
-			val veileder = veiledere.first()
-			veileder.ansattId shouldBe ARRANGOR_ANSATT_2.id
-			veileder.deltakerId shouldBe DELTAKER_1.id
-			veileder.erMedveileder shouldBe false
-		}
-
-	}
-
-	@Test
-	internal fun `leggTilVeiledere - flere enn 3 medveiledere - skal kaste 400`() {
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/veiledere",
-			headers = lagAnsatt1Header(),
-			body = lagOpprettVeilederBulkRequestBody(
-				deltakerIder = listOf(DELTAKER_1.id, DELTAKER_2.id),
-				veiledere = listOf(
-					Pair(arrangorAnsattInput().id, true),
-					Pair(arrangorAnsattInput().id, true),
-					Pair(arrangorAnsattInput().id, true),
-					Pair(arrangorAnsattInput().id, true),
-				),
-				gjennomforingId = GJENNOMFORING_1.id
-			),
-		)
-
-		response.code shouldBe 400
-	}
-
-	@Test
-	internal fun `leggTilVeiledere - flere enn 1 veileder - skal kaste 400`() {
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/veiledere",
-			headers = lagAnsatt1Header(),
-			body = lagOpprettVeilederBulkRequestBody(
-				deltakerIder = listOf(DELTAKER_1.id, DELTAKER_2.id),
-				veiledere = listOf(
-					Pair(arrangorAnsattInput().id, false),
-					Pair(arrangorAnsattInput().id, false),
-				),
-				gjennomforingId = GJENNOMFORING_1.id
-			),
-		)
-
-		response.code shouldBe 400
 	}
 
 	@Test
@@ -240,27 +133,6 @@ class VeilederControllerIntegrationTest : IntegrationTestBase() {
 		}
 
 		return """{ "veiledere": [$veiledereStr] }""".trimIndent().toJsonRequestBody()
-	}
-
-	private fun lagOpprettVeilederBulkRequestBody(
-		deltakerIder: List<UUID>,
-		veiledere: List<Pair<UUID, Boolean>>,
-		gjennomforingId: UUID,
-	): RequestBody {
-		val deltakerIderStr = deltakerIder.joinToString { "\"$it\"" }
-		val veiledereStr = veiledere.joinToString {
-			"""
-				{"ansattId": "${it.first}", "erMedveileder": ${it.second}}
-			""".trimIndent()
-		}
-
-		return """
-			{
-				"deltakerIder": [$deltakerIderStr],
-				"veiledere": [$veiledereStr],
-				"gjennomforingId": "$gjennomforingId"
-			}
-		""".trimIndent().toJsonRequestBody()
 	}
 
 	/**

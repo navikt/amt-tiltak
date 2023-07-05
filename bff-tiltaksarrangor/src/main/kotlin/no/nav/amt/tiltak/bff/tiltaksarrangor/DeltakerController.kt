@@ -1,13 +1,9 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor
 
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerDetaljerDto
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.DeltakerDto
-import no.nav.amt.tiltak.bff.tiltaksarrangor.dto.toDto
 import no.nav.amt.tiltak.bff.tiltaksarrangor.request.*
 import no.nav.amt.tiltak.bff.tiltaksarrangor.response.OpprettEndringsmeldingResponse
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
-import no.nav.amt.tiltak.core.domain.tiltak.skjulesForAlleAktorer
 import no.nav.amt.tiltak.core.exceptions.SkjultDeltakerException
 import no.nav.amt.tiltak.core.exceptions.ValidationException
 import no.nav.amt.tiltak.core.port.*
@@ -20,62 +16,11 @@ import java.util.*
 @RequestMapping("/api/tiltaksarrangor/deltaker")
 class DeltakerController(
 	private val controllerService: ControllerService,
-	private val arrangorVeilederService: ArrangorVeilederService,
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
-	private val auditLoggerService: AuditLoggerService,
 	private val deltakerService: DeltakerService,
 	private val endringsmeldingService: EndringsmeldingService,
 	private val authService: AuthService
 ) {
-
-	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
-	@GetMapping
-	fun hentDeltakere(@RequestParam("gjennomforingId") gjennomforingId: UUID): List<DeltakerDto> {
-		val ansatt = controllerService.hentInnloggetAnsatt()
-
-		arrangorAnsattTilgangService.verifiserTilgangTilGjennomforing(ansatt.id, gjennomforingId)
-
-		var deltakere = deltakerService.hentDeltakerePaaGjennomforing(gjennomforingId)
-			.filter { !it.status.type.skjulesForAlleAktorer() }
-			.filter { !it.erUtdatert }
-
-		val erSkjultMap = deltakerService.erSkjultForTiltaksarrangor(deltakere.map { it.id })
-
-		deltakere = deltakere.filter {
-			!erSkjultMap.getOrDefault(it.id, false)
-		}
-
-		val endringmeldingerMap =
-			endringsmeldingService.hentAktiveEndringsmeldingerForDeltakere(deltakere.map { it.id })
-
-		val veiledere = arrangorVeilederService.hentAktiveVeiledereForGjennomforing(gjennomforingId)
-		val veilederDtoer = controllerService.mapAnsatteTilVeilederDtoer(veiledere).groupBy { it.deltakerId }
-
-
-		return deltakere.map {
-			val endringsmeldinger = endringmeldingerMap.getOrDefault(it.id, emptyList())
-				.map { e -> e.toDto() }
-
-			val veiledereForDeltaker = veilederDtoer.getOrDefault(it.id, emptyList())
-
-			return@map it.toDto(endringsmeldinger, veiledereForDeltaker)
-		}
-	}
-
-	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
-	@GetMapping("/{tiltakDeltakerId}")
-	fun hentTiltakDeltakerDetaljer(@PathVariable("tiltakDeltakerId") deltakerId: UUID): DeltakerDetaljerDto {
-		val ansatt = controllerService.hentInnloggetAnsatt()
-		auditLoggerService.tiltaksarrangorAnsattDeltakerOppslagAuditLog(ansatt.id, deltakerId)
-		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-
-		val deltakerDetaljer = controllerService.getDeltakerDetaljerById(deltakerId)
-
-		verifiserErIkkeSkjult(deltakerId)
-
-		return deltakerDetaljer
-	}
-
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@PostMapping("/{deltakerId}/oppstartsdato")
 	fun leggTilOppstartsdato(

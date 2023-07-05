@@ -3,7 +3,6 @@ package no.nav.amt.tiltak.ansatt
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getLocalDateTime
 import no.nav.amt.tiltak.common.db_utils.getUUID
-import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -76,37 +75,6 @@ open class ArrangorAnsattRepository(
 			parameters,
 			rowMapper
 		).firstOrNull()
-	}
-
-	fun getAnsatte(ansattIder: List<UUID>): List<AnsattDbo> {
-		if (ansattIder.isEmpty()) return emptyList()
-
-		val sql = "SELECT * FROM arrangor_ansatt WHERE id in (:ansattIder)"
-		val parameters = sqlParameters("ansattIder" to ansattIder)
-
-		return template.query(sql, parameters, rowMapper)
-	}
-
-	fun getAnsatteMedRolleForArrangor(arrangorId: UUID, rolle: ArrangorAnsattRolle): List<AnsattDbo> {
-		val sql = """
-			SELECT distinct a.*
-			FROM arrangor_ansatt a
-				INNER JOIN arrangor_ansatt_rolle aar on a.id = aar.ansatt_id
-			WHERE aar.arrangor_id = :arrangorId
-			  AND aar.rolle = CAST(:rolle AS arrangor_rolle)
-			  AND aar.gyldig_fra < CURRENT_TIMESTAMP
-			  AND aar.gyldig_til > CURRENT_TIMESTAMP
-		""".trimIndent()
-
-		return template.query(
-			sql,
-			sqlParameters(
-				"arrangorId" to arrangorId,
-				"rolle" to rolle.name,
-			),
-			rowMapper
-		)
-
 	}
 
 	fun setSistOppdatertForAnsatt(ansattId: UUID, tilgangerSistSynkronisert: LocalDateTime) {

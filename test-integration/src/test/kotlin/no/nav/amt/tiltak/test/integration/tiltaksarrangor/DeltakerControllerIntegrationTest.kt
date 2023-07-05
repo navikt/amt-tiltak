@@ -1,28 +1,22 @@
 package no.nav.amt.tiltak.test.integration.tiltaksarrangor
 
-import com.jayway.jsonpath.JsonPath
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.beInstanceOf
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.domain.tiltak.EndringsmeldingStatusAarsak
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
-import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_VEILEDER_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
-import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2_VEILEDER_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
-import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorVeilederDboInput
-import no.nav.amt.tiltak.test.database.data.inputs.DeltakerStatusInput
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
 import okhttp3.Request
@@ -30,7 +24,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -60,8 +53,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	@Test
 	internal fun `skal teste token autentisering`() {
 		val requestBuilders = listOf(
-			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/deltaker?gjennomforingId=${UUID.randomUUID()}"),
-			Request.Builder().get().url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}"),
 			Request.Builder().post(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/oppstartsdato"),
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/oppstartsdato"),
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/avslutt-deltakelse"),
@@ -73,150 +64,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 			)
 		testTiltaksarrangorAutentisering(requestBuilders, client, mockOAuthServer)
-	}
-
-	@Test
-	fun `hentTiltakDeltakerDetaljer() should perform authorization check`() {
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}",
-			headers = createAnsatt1AuthHeader()
-		)
-
-		response.code shouldBe 404
-	}
-
-	@Test
-	fun `hentTiltakDeltakerDetaljer() skal returnere 400 hvis deltaker er skjult`() {
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/tiltaksarrangor/deltaker/${opprettSkjultDeltaker()}",
-			headers = createAnsatt1AuthHeader()
-		)
-
-		response.code shouldBe 400
-	}
-
-	@Test
-	fun `hentTiltakDeltakerDetaljer() should return 200 when authenticated`() {
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}",
-			headers = createAnsatt1AuthHeader()
-		)
-		val expectedBody = """
-{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","telefonnummer":"73404782","epost":"bruker1@example.com","deltakelseProsent":100,"dagerPerUke":5,"navEnhet":{"navn":"NAV Testheim"},"navVeileder":{"navn":"Vashnir Veiledersen","telefon":"88776655","epost":"vashnir.veiledersen@nav.no"},"startDato":"2022-02-13","sluttDato":"2030-02-14","registrertDato":"2022-02-13T12:12:00","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"gjennomforing":{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","startDato":"2022-02-01","sluttDato":"2050-12-30","status":"GJENNOMFORES","tiltak":{"tiltakskode":"AMO","tiltaksnavn":"Tiltak1"},"arrangor":{"virksomhetNavn":"Tiltaksarrangør 1","organisasjonNavn":"Org Tiltaksarrangør 1","virksomhetOrgnr":"111111111"},"erKurs":false},"fjernesDato":null,"innsokBegrunnelse":"begrunnelse deltaker 1"}
-""".trimIndent()
-
-
-		response.code shouldBe 200
-		response.body?.string() shouldBe expectedBody
-
-	}
-
-	@Test
-	internal fun `hentDeltakere - har ikke tilgang til gjennomforing - skal kaste 403`() {
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_2.id}",
-			headers = createAnsatt1AuthHeader()
-		)
-
-		response.code shouldBe 403
-	}
-
-	@Test
-	internal fun `hentDeltakere - skal ikke vise deltakere som er skjulte`() {
-		val deltakerId = UUID.randomUUID()
-		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId, gjennomforingId = GJENNOMFORING_1.id))
-		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerId, status = "IKKE_AKTUELL"))
-
-		deltakerService.skjulDeltakerForTiltaksarrangor(deltakerId, ARRANGOR_ANSATT_1.id)
-
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
-			headers = createAnsatt1AuthHeader()
-		)
-
-		response.code shouldBe 200
-
-		val body = response.body?.string()
-
-		JsonPath.parse(body).read<Int>("$.length()") shouldBe 2
-		JsonPath.parse(body).read<List<String>>("$[*].id") shouldBe listOf(DELTAKER_1.id.toString(), DELTAKER_2.id.toString())
-	}
-
-	@Test
-	internal fun `hentDeltakere - returnere deltakere med aktive veiledere`() {
-		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_1_VEILEDER_1)
-		testDataRepository.insertArrangorVeileder(ARRANGOR_ANSATT_2_VEILEDER_1)
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
-			headers = createAnsatt1AuthHeader()
-		)
-
-		val expectedJson = """
-			[{"id":"dc600c70-124f-4fe7-a687-b58439beb214","fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-13T12:12:00","aktiveEndringsmeldinger":[],"aktiveVeiledere":[{"id":"af238302-e96b-436a-8978-ec2aa5f2ee66","ansattId":"6321c7dc-6cfb-47b0-b566-32979be5041f","deltakerId":"dc600c70-124f-4fe7-a687-b58439beb214","erMedveileder":false,"fornavn":"Ansatt 1 fornavn","mellomnavn":"Ansatt 1 mellomnavn","etternavn":"Ansatt 1 etternavn"},{"id":"bbadfe46-eaf3-4ee8-bb53-2e9e15ea7ef0","ansattId":"a24e659c-2651-4fbb-baad-01cacb2412f0","deltakerId":"dc600c70-124f-4fe7-a687-b58439beb214","erMedveileder":true,"fornavn":"Ansatt 2 fornavn","mellomnavn":null,"etternavn":"Ansatt 2 etternavn"}],"navKontor":"NAV Testheim"},{"id":"8a0b7158-4d5e-4563-88be-b9bce5662879","fornavn":"Bruker 2 fornavn","mellomnavn":null,"etternavn":"Bruker 2 etternavn","fodselsnummer":"7908432423","startDato":"2022-02-10","sluttDato":"2022-02-12","status":{"type":"DELTAR","endretDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-10T12:12:00","aktiveEndringsmeldinger":[],"aktiveVeiledere":[],"navKontor":"NAV Testheim"}]
-		""".trimIndent()
-		response.code shouldBe 200
-		response.body?.string() shouldBe expectedJson
-	}
-
-	@Test
-	internal fun `hentDeltakere - returnere ikke deltakere med status avsluttet etter 14 dager`() {
-		testDataRepository.deleteAllDeltaker()
-
-		val deltaker = DELTAKER_1.copy(id = UUID.randomUUID())
-		testDataRepository.insertDeltaker(deltaker)
-
-		testDataRepository.insertDeltakerStatus(
-			DeltakerStatusInput(
-				id = UUID.randomUUID(),
-				deltakerId = deltaker.id,
-				gyldigFra = LocalDateTime.now().minusDays(15),
-				status = DeltakerStatus.Type.HAR_SLUTTET.name,
-				aktiv = true,
-			)
-		)
-
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
-			headers = createAnsatt1AuthHeader()
-		)
-
-		val expectedJson = "[]"
-		response.code shouldBe 200
-		response.body?.string() shouldBe expectedJson
-	}
-
-	@Test
-	internal fun `hentDeltakere - returnerer deltakere med status avsluttet for 14 dager`() {
-		testDataRepository.deleteAllDeltaker()
-
-		val deltaker = DELTAKER_1.copy(id = UUID.randomUUID())
-		testDataRepository.insertDeltaker(deltaker)
-
-		testDataRepository.insertDeltakerStatus(
-			DeltakerStatusInput(
-				id = UUID.randomUUID(),
-				deltakerId = deltaker.id,
-				gyldigFra = LocalDateTime.now().minusDays(13),
-				status = DeltakerStatus.Type.HAR_SLUTTET.name,
-				aktiv = true,
-			)
-		)
-
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/tiltaksarrangor/deltaker?gjennomforingId=${GJENNOMFORING_1.id}",
-			headers = createAnsatt1AuthHeader()
-		)
-
-		response.code shouldBe 200
-		JsonPath.parse(response.body?.string()).read<Int>("$.length()") shouldBe 1
 	}
 
 	@Test

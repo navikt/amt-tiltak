@@ -1,20 +1,20 @@
 package no.nav.amt.tiltak.common.auth
 
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.AuditLoggerService
+import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.common.audit_log.cef.CefMessage
 import no.nav.common.audit_log.cef.CefMessageEvent
 import no.nav.common.audit_log.cef.CefMessageSeverity
 import no.nav.common.audit_log.log.AuditLogger
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.UUID
 
 @Service
 class AuditLoggerServiceImpl(
 	private val auditLogger: AuditLogger,
-	@Lazy private val arrangorAnsattService: ArrangorAnsattService,
 	@Lazy private val navAnsattService: NavAnsattService,
-	@Lazy private val gjennomforingService: GjennomforingService,
 	@Lazy private val deltakerService: DeltakerService
 ) : AuditLoggerService {
 
@@ -37,9 +37,6 @@ class AuditLoggerServiceImpl(
 
 		const val NAV_ANSATT_ENDRINGSMELDING_AUDIT_LOG_REASON =
 			"NAV-ansatt har lest melding fra tiltaksarrangoer om oppstartsdato paa tiltak for aa registrere dette."
-
-		const val TILTAKSARRANGOR_ANSATT_DELTAKER_OPPSLAG_AUDIT_LOG_REASON =
-			"Tiltaksarrangor ansatt har gjort oppslag paa deltaker."
 	}
 
 	override fun navAnsattBehandletEndringsmeldingAuditLog(navAnsattId: UUID, deltakerId: UUID) {
@@ -52,22 +49,6 @@ class AuditLoggerServiceImpl(
 			eventType = AuditEventType.ACCESS,
 			eventSeverity = AuditEventSeverity.INFO,
 			reason = NAV_ANSATT_ENDRINGSMELDING_AUDIT_LOG_REASON
-		)
-	}
-
-	override fun tiltaksarrangorAnsattDeltakerOppslagAuditLog(arrangorAnsattId: UUID, deltakerId: UUID) {
-		val deltaker = 	deltakerService.hentDeltaker(deltakerId)
-			?: throw NoSuchElementException("Fant ikke deltaker med id: $deltakerId")
-
-		val gjennomforing = gjennomforingService.getGjennomforing(deltaker.gjennomforingId)
-
-		sendAuditLog(
-			sourceUserIdProvider = { arrangorAnsattService.getAnsatt(arrangorAnsattId).personligIdent },
-			destinationUserIdProvider = { deltaker.personIdent },
-			eventType = AuditEventType.ACCESS,
-			eventSeverity = AuditEventSeverity.INFO,
-			reason = TILTAKSARRANGOR_ANSATT_DELTAKER_OPPSLAG_AUDIT_LOG_REASON,
-			extensions = mapOf("cn1" to gjennomforing.arrangor.organisasjonsnummer)
 		)
 	}
 

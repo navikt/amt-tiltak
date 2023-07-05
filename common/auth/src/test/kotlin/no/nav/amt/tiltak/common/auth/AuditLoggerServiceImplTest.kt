@@ -4,16 +4,10 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
-import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
-import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
-import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
-import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.DeltakerService
-import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.common.audit_log.cef.CefMessage
 import no.nav.common.audit_log.log.AuditLogger
@@ -26,11 +20,7 @@ class AuditLoggerServiceImplTest {
 
 	val navAnsattService: NavAnsattService = mockk()
 
-	val arrangorAnsattService: ArrangorAnsattService = mockk()
-
 	val deltakerService: DeltakerService = mockk()
-
-	val gjennomforingService: GjennomforingService = mockk()
 
 	val auditLogger: AuditLogger = mockk()
 
@@ -40,9 +30,7 @@ class AuditLoggerServiceImplTest {
 	fun setup() {
 		auditLoggerService = AuditLoggerServiceImpl(
 			auditLogger,
-			arrangorAnsattService,
 			navAnsattService,
-			gjennomforingService,
 			deltakerService
 		)
 	}
@@ -102,75 +90,4 @@ class AuditLoggerServiceImplTest {
 		msg.extension["suid"] shouldBe "Z1234"
 		msg.extension["duid"] shouldBe "12345678900"
 	}
-
-	@Test
-	fun `tiltaksarrangorAnsattDeltakerOppslagAuditLog - skal lage logmelding med riktig data`() {
-		val arrangorAnsattId = UUID.randomUUID()
-		val deltakerId = UUID.randomUUID()
-		val gjennomforingId = UUID.randomUUID()
-
-		every {
-			arrangorAnsattService.getAnsatt(arrangorAnsattId)
-		} returns Ansatt(arrangorAnsattId, "47645453534", "", null, "", emptyList())
-
-		every {
-			deltakerService.hentDeltaker(deltakerId)
-		} returns Deltaker(
-			id = deltakerId,
-			gjennomforingId = gjennomforingId,
-			fornavn = "",
-			mellomnavn = null,
-			etternavn = "",
-			personIdent = "12345678900",
-			navEnhet = null,
-			navVeilederId = null,
-			epost = null,
-			telefonnummer = null,
-			startDato = null,
-			sluttDato = null,
-			status = DeltakerStatus(UUID.randomUUID(), DeltakerStatus.Type.DELTAR, null, LocalDateTime.now(), LocalDateTime.now(), true),
-			registrertDato = LocalDateTime.now(),
-			erSkjermet = false,
-			endretDato = LocalDateTime.now()
-		)
-
-		every {
-			gjennomforingService.getGjennomforing(gjennomforingId)
-		} returns Gjennomforing(
-			id = gjennomforingId,
-			tiltak = Tiltak(UUID.randomUUID(), "", ""),
-			arrangor = Arrangor(UUID.randomUUID(), "", "123435643", "", ""),
-			navn = "",
-			status = Gjennomforing.Status.GJENNOMFORES,
-			startDato = null,
-			sluttDato = null,
-			navEnhetId = null,
-			opprettetAar = 1,
-			lopenr = 1,
-			erKurs = false
-		)
-
-		val messageSlot = slot<CefMessage>()
-
-		every {
-			auditLogger.log(capture(messageSlot))
-		} returns Unit
-
-		auditLoggerService.tiltaksarrangorAnsattDeltakerOppslagAuditLog(arrangorAnsattId, deltakerId)
-
-		val msg = messageSlot.captured
-
-		msg.version shouldBe 0
-		msg.deviceProduct shouldBe "AuditLogger"
-		msg.deviceVendor shouldBe "amt-tiltak"
-		msg.deviceVersion shouldBe "1.0"
-		msg.name shouldBe "Sporingslogg"
-		msg.severity shouldBe "INFO"
-		msg.signatureId shouldBe "audit:access"
-		msg.extension["msg"] shouldBe "Tiltaksarrangor ansatt har gjort oppslag paa deltaker."
-		msg.extension["suid"] shouldBe "47645453534"
-		msg.extension["duid"] shouldBe "12345678900"
-		msg.extension["cn1"] shouldBe "123435643"
-	}
-
 }

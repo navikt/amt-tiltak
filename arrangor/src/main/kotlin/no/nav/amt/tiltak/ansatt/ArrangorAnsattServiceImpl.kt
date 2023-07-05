@@ -3,7 +3,6 @@ package no.nav.amt.tiltak.ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorAnsatt
 import no.nav.amt.tiltak.core.domain.arrangor.TilknyttetArrangor
-import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
@@ -56,26 +55,12 @@ class ArrangorAnsattServiceImpl(
 		}
 	}
 
-	override fun getAnsatte(ansattIder: List<UUID>): List<Ansatt> {
-		return arrangorAnsattRepository.getAnsatte(ansattIder).map { it.toAnsatt(emptyList()) }
-	}
-
 	override fun getAnsattByPersonligIdent(personIdent: String): Ansatt? {
 		arrangorAnsattTilgangService.synkroniserRettigheterMedAltinn(personIdent)
 		val ansattDbo = arrangorAnsattRepository.getByPersonligIdent(personIdent) ?: return null
 		val arrangorer = hentTilknyttedeArrangorer(ansattDbo.id)
 
 		return ansattDbo.toAnsatt(arrangorer)
-	}
-
-	override fun getAnsattIdByPersonligIdent(personIdent: String) : UUID {
-		return arrangorAnsattRepository.getByPersonligIdent(personIdent)?.id
-			?: throw UnauthorizedException("Fant ikke ansatt")
-	}
-
-	override fun getVeiledereForArrangor(arrangorId: UUID): List<Ansatt> {
-		return arrangorAnsattRepository.getAnsatteMedRolleForArrangor(arrangorId, ArrangorAnsattRolle.VEILEDER)
-			.map { it.toAnsatt(emptyList()) }
 	}
 
 	override fun setTilgangerSistSynkronisert(ansattId: UUID, sistOppdatert: LocalDateTime) {
