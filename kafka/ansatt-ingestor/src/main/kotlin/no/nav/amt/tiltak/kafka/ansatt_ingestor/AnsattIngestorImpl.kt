@@ -5,7 +5,6 @@ import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorAnsatt
 import no.nav.amt.tiltak.core.kafka.AnsattIngestor
-import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.kafka.ansatt_ingestor.model.AnsattDto
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component
 @Component
 class AnsattIngestorImpl(
 	private val arrangorService: ArrangorService,
-	private val arrangorAnsattService: ArrangorAnsattService,
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
 	private val amtArrangorClient: AmtArrangorClient
 ) : AnsattIngestor {

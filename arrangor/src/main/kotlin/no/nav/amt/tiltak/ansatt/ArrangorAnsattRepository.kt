@@ -157,13 +157,4 @@ open class ArrangorAnsattRepository(
 			rowMapper
 		)
 	}
-
-	fun setVelykketInnlogging(ansattId: UUID) {
-		val sql = """
-			UPDATE arrangor_ansatt SET sist_velykkede_innlogging = CURRENT_TIMESTAMP WHERE id = :ansattId
-		""".trimIndent()
-
-		template.update(sql, sqlParameters("ansattId" to ansattId))
-	}
-
 }
