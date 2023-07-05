@@ -73,11 +73,6 @@ class ArrangorAnsattServiceImpl(
 			?: throw UnauthorizedException("Fant ikke ansatt")
 	}
 
-	override fun getKoordinatorerForGjennomforing(gjennomforingId: UUID): List<Ansatt> {
-		return arrangorAnsattRepository.getAnsatteForGjennomforing(gjennomforingId, ArrangorAnsattRolle.KOORDINATOR)
-			.map { it.toAnsatt(emptyList()) }
-	}
-
 	override fun getVeiledereForArrangor(arrangorId: UUID): List<Ansatt> {
 		return arrangorAnsattRepository.getAnsatteMedRolleForArrangor(arrangorId, ArrangorAnsattRolle.VEILEDER)
 			.map { it.toAnsatt(emptyList()) }

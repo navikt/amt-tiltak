@@ -11,9 +11,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_3
-import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
-import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattGjennomforingTilgangInput
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattRolleInput
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -24,9 +22,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.UUID
 
 class ArrangorAnsattRepositoryTest {
 
@@ -72,39 +69,6 @@ class ArrangorAnsattRepositoryTest {
 
 		ansatte.any { it.id == ARRANGOR_ANSATT_1.id } shouldBe true
 		ansatte.any { it.id == ARRANGOR_ANSATT_2.id } shouldBe true
-	}
-
-	@Test
-	internal fun `getAnsatteForGjennomforing - skal filtrere pa rolle, gjennomforing og filtere ut duplikater`() {
-		testRepository.insertArrangorAnsattRolle(
-			ArrangorAnsattRolleInput(
-				id = UUID.randomUUID(),
-				ARRANGOR_1.id,
-				ARRANGOR_ANSATT_1.id,
-				ArrangorAnsattRolle.KOORDINATOR.name,
-			)
-		)
-
-		testRepository.insertMineDeltakerlister(
-			ArrangorAnsattGjennomforingTilgangInput(
-				id = UUID.randomUUID(),
-				ansattId = ARRANGOR_ANSATT_2.id,
-				gjennomforingId = GJENNOMFORING_1.id,
-				gyldigFra = ZonedDateTime.now().minusHours(1),
-				gyldigTil = ZonedDateTime.now().plusYears(1)
-			)
-		)
-
-		val koordinatorer = repository.getAnsatteForGjennomforing(GJENNOMFORING_1.id, ArrangorAnsattRolle.KOORDINATOR)
-
-		koordinatorer.first().id shouldBe ARRANGOR_ANSATT_1.id
-
-		koordinatorer shouldHaveSize 1
-
-		val veiledere = repository.getAnsatteForGjennomforing(GJENNOMFORING_1.id, ArrangorAnsattRolle.VEILEDER)
-
-		veiledere.any { it.id == ARRANGOR_ANSATT_1.id } shouldBe true
-		veiledere.any { it.id == ARRANGOR_ANSATT_2.id } shouldBe true
 	}
 
 	@Test

@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.core.port
 
-import java.util.*
+import java.util.UUID
 
 interface MineDeltakerlisterService {
 
@@ -8,5 +8,4 @@ interface MineDeltakerlisterService {
 	fun fjern(arrangorAnsattId: UUID, gjennomforingId: UUID)
 	fun fjernAlleHosArrangor(arrangorAnsattId: UUID, arrangorId: UUID)
 	fun hent(ansattId: UUID): List<UUID>
-	fun erLagtTil(ansattId: UUID, gjennomforingId: UUID): Boolean
 }

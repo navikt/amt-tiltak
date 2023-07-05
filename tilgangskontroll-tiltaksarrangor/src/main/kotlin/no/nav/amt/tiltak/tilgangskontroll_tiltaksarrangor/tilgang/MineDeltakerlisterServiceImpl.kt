@@ -56,10 +56,4 @@ open class MineDeltakerlisterServiceImpl(
 		return mineDeltakerlisterRepository.hent(ansattId)
 			.map { it.gjennomforingId }
 	}
-
-	override fun erLagtTil(ansattId: UUID, gjennomforingId: UUID): Boolean {
-		val gjennomforinger = hent(ansattId)
-		return gjennomforinger.contains(gjennomforingId)
-	}
-
 }
