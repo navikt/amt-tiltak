@@ -2,17 +2,13 @@ package no.nav.amt.tiltak.ansatt
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
-import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_3
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
-import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattRolleInput
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
@@ -23,7 +19,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
-import java.util.UUID
 
 class ArrangorAnsattRepositoryTest {
 
@@ -59,41 +54,6 @@ class ArrangorAnsattRepositoryTest {
 		assertEquals("Ansatt 1 fornavn", ansatt.fornavn)
 		assertEquals("Ansatt 1 mellomnavn", ansatt.mellomnavn)
 		assertEquals("Ansatt 1 etternavn", ansatt.etternavn)
-	}
-
-	@Test
-	internal fun `getAnsatte - flere ansatte - returnere liste med alle ansatte`() {
-		val ansatte = repository.getAnsatte(listOf(ARRANGOR_ANSATT_1.id, ARRANGOR_ANSATT_2.id))
-
-		ansatte shouldHaveSize 2
-
-		ansatte.any { it.id == ARRANGOR_ANSATT_1.id } shouldBe true
-		ansatte.any { it.id == ARRANGOR_ANSATT_2.id } shouldBe true
-	}
-
-	@Test
-	internal fun `getAnsatteMedRolleForArrangor - flere ansatte - skal filtrere pa rolle`() {
-		testRepository.insertArrangorAnsattRolle(
-			ArrangorAnsattRolleInput(
-				id = UUID.randomUUID(),
-				ARRANGOR_1.id,
-				ARRANGOR_ANSATT_1.id,
-				ArrangorAnsattRolle.VEILEDER.name,
-			)
-		)
-
-		val koordinatorer = repository.getAnsatteMedRolleForArrangor(ARRANGOR_1.id, ArrangorAnsattRolle.KOORDINATOR)
-
-		koordinatorer.first().id shouldBe ARRANGOR_ANSATT_1.id
-
-		koordinatorer shouldHaveSize 1
-
-		val veiledere = repository.getAnsatteMedRolleForArrangor(ARRANGOR_1.id, ArrangorAnsattRolle.VEILEDER)
-
-		veiledere shouldHaveSize 2
-
-		veiledere.any { it.id == ARRANGOR_ANSATT_1.id } shouldBe true
-		veiledere.any { it.id == ARRANGOR_ANSATT_2.id } shouldBe true
 	}
 
 	@Test

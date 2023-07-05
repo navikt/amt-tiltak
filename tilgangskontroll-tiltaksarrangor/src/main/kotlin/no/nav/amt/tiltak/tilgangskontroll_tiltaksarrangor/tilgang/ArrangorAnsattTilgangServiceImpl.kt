@@ -103,24 +103,10 @@ open class ArrangorAnsattTilgangServiceImpl(
 		}
 	}
 
-	override fun verifiserHarRolleAnywhere(ansattId: UUID, rolle: ArrangorAnsattRolle) {
-		val hasRolle = hentRoller(ansattId).contains(rolle)
-
-		if (!hasRolle) {
-			secureLog.error("Ansatt ident: $ansattId har ikke $rolle rolle hos noen arrangører")
-			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ansatt har ikke $rolle rolle. Se secure logs for deltaljer")
-		}
-	}
-
 	override fun harRolleHosArrangor(ansattId: UUID, arrangorId: UUID, rolle: ArrangorAnsattRolle): Boolean {
 		val ansatt = arrangorAnsattService.getAnsatt(ansattId)
 		val tilgangerHosArrangor = ansatt.arrangorer.first {it.id == arrangorId}
 		return tilgangerHosArrangor.roller.contains(rolle)
-	}
-
-	private fun hentRoller(ansattId: UUID): List<ArrangorAnsattRolle> {
-		return hentAnsattTilganger(ansattId)
-			.flatMap { it.roller }
 	}
 
 	private fun harLagtTilGjennomforing(ansattId: UUID, gjennomforingId: UUID): Boolean {

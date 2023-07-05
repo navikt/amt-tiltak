@@ -45,8 +45,6 @@ interface DeltakerService {
 
 	fun erSkjultForTiltaksarrangor(deltakerId: UUID): Boolean
 
-	fun erSkjultForTiltaksarrangor(deltakerIder: List<UUID>): Map<UUID, Boolean>
-
 	fun republiserAlleDeltakerePaKafka(batchSize: Int = 500)
 
 	fun slettDeltakerePaaGjennomforing(gjennomforingId: UUID)

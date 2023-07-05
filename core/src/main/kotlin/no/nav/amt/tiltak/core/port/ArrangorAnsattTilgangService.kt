@@ -22,6 +22,4 @@ interface ArrangorAnsattTilgangService {
 	fun verifiserRolleHosArrangor(ansattId: UUID, arrangorId: UUID, rolle: ArrangorAnsattRolle)
 
 	fun harRolleHosArrangor(ansattId: UUID, arrangorId: UUID, rolle: ArrangorAnsattRolle): Boolean
-
-	fun verifiserHarRolleAnywhere(ansattId: UUID, rolle: ArrangorAnsattRolle)
 }

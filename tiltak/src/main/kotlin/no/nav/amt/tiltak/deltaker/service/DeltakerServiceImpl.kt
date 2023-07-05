@@ -274,10 +274,6 @@ open class DeltakerServiceImpl(
 		return skjultDeltakerRepository.erSkjultForTiltaksarrangor(listOf(deltakerId)).getOrDefault(deltakerId, false)
 	}
 
-	override fun erSkjultForTiltaksarrangor(deltakerIder: List<UUID>): Map<UUID, Boolean> {
-		return skjultDeltakerRepository.erSkjultForTiltaksarrangor(deltakerIder)
-	}
-
 	override fun republiserAlleDeltakerePaKafka(batchSize: Int) {
 		var offset = 0
 
