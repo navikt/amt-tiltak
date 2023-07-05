@@ -102,7 +102,7 @@ open class ArrangorVeilederRepository(
 		val sql = """
 			UPDATE arrangor_veileder
 			SET gyldig_til = current_timestamp, modified_at = current_timestamp
-			WHERE ansatt_id = :ansattId AND deltaker_id = :deltakerId AND er_medveileder is :erMedveileder AND gyldig_til > current_timestamp
+			WHERE ansatt_id = :ansattId AND deltaker_id = :deltakerId AND er_medveileder = :erMedveileder AND gyldig_til > current_timestamp
 		""".trimIndent()
 
 		val parameters = sqlParameters(
