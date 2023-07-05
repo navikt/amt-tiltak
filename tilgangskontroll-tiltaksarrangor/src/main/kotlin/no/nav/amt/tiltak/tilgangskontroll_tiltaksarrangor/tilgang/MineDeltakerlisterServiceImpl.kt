@@ -27,6 +27,11 @@ open class MineDeltakerlisterServiceImpl(
 			return
 		}
 
+		if (gjennomforingService.getGjennomforingOrNull(gjennomforingId) == null) {
+			log.warn("Kan ikke opprette tilgang på gjennomføring $id for ansatt $arrangorAnsattId fordi gjennomføringen ikke finnes")
+			return
+		}
+
 		mineDeltakerlisterRepository.leggTil(
 			id = id,
 			arrangorAnsattId = arrangorAnsattId,
