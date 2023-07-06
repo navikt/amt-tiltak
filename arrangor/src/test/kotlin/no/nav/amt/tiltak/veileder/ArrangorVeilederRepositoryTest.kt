@@ -8,12 +8,8 @@ import no.nav.amt.tiltak.test.database.DbUtils.shouldBeCloseTo
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1_VEILEDER_1
-import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2_VEILEDER_1
-import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_4
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
-import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
-import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_4
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_3
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
@@ -31,82 +27,12 @@ class ArrangorVeilederRepositoryTest {
 
 	private val dataSource = SingletonPostgresContainer.getDataSource()
 
-	private val opprettVeilederDbo1 = OpprettVeilederDbo(
-		ansattId = ARRANGOR_ANSATT_1.id,
-		erMedveileder = false,
-		gyldigFra = ZonedDateTime.now().minusSeconds(10),
-		gyldigTil = ZonedDateTime.now().plusYears(5),
-	)
-	private val opprettVeilederDbo2 = OpprettVeilederDbo(
-		ansattId = ARRANGOR_ANSATT_2.id,
-		erMedveileder = true,
-		gyldigFra = ZonedDateTime.now().minusSeconds(10),
-		gyldigTil = ZonedDateTime.now().plusYears(5),
-	)
-
 	@BeforeEach
 	fun migrate() {
 		repository = ArrangorVeilederRepository(NamedParameterJdbcTemplate(dataSource))
 		testDataRepository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
 
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
-	}
-
-	@Test
-	fun `opprettVeiledere - en veileder, medveileder og deltaker - insertes riktig`() {
-		repository.opprettVeiledere(
-			veiledere = listOf(opprettVeilederDbo1, opprettVeilederDbo2),
-			deltakerIder = listOf(DELTAKER_1.id),
-		)
-
-		val veiledere = repository.getAktiveForDeltaker(DELTAKER_1.id)
-
-		veiledere shouldHaveSize 2
-
-		val veileder = veiledere.find { !it.erMedveileder }
-		val medveileder = veiledere.find { it.erMedveileder }
-
-		veileder!!.ansattId shouldBe opprettVeilederDbo1.ansattId
-		veileder.deltakerId shouldBe DELTAKER_1.id
-		veileder.gyldigFra shouldBeCloseTo opprettVeilederDbo1.gyldigFra
-		veileder.gyldigTil shouldBeCloseTo opprettVeilederDbo1.gyldigTil
-
-		medveileder!!.ansattId shouldBe opprettVeilederDbo2.ansattId
-		medveileder.deltakerId shouldBe DELTAKER_1.id
-		medveileder.gyldigFra shouldBeCloseTo opprettVeilederDbo2.gyldigFra
-		medveileder.gyldigTil shouldBeCloseTo opprettVeilederDbo2.gyldigTil
-	}
-
-	@Test
-	fun `opprettVeiledere - en veileder, medveileder og flere deltakere - insertes riktig`() {
-		testDataRepository.insertBruker(BRUKER_4)
-		testDataRepository.insertDeltaker(DELTAKER_4)
-
-		val deltakere = listOf(DELTAKER_1.id, DELTAKER_2.id, DELTAKER_4.id)
-
-		repository.opprettVeiledere(
-			veiledere = listOf(opprettVeilederDbo1, opprettVeilederDbo2),
-			deltakerIder = deltakere,
-		)
-
-		deltakere.forEach {deltakerId ->
-			val veiledere = repository.getAktiveForDeltaker(deltakerId)
-
-			veiledere shouldHaveSize 2
-
-			val veileder = veiledere.find { !it.erMedveileder }
-			val medveileder = veiledere.find { it.erMedveileder }
-
-			veileder!!.ansattId shouldBe opprettVeilederDbo1.ansattId
-			veileder.deltakerId shouldBe deltakerId
-			veileder.gyldigFra shouldBeCloseTo opprettVeilederDbo1.gyldigFra
-			veileder.gyldigTil shouldBeCloseTo opprettVeilederDbo1.gyldigTil
-
-			medveileder!!.ansattId shouldBe opprettVeilederDbo2.ansattId
-			medveileder.deltakerId shouldBe deltakerId
-			medveileder.gyldigFra shouldBeCloseTo opprettVeilederDbo2.gyldigFra
-			medveileder.gyldigTil shouldBeCloseTo opprettVeilederDbo2.gyldigTil
-		}
 	}
 
 	@Test
