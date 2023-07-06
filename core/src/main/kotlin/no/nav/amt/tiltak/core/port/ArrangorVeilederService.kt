@@ -1,7 +1,6 @@
 package no.nav.amt.tiltak.core.port
 
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeileder
-import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeilederInput
 import java.util.UUID
 
 interface ArrangorVeilederService {
@@ -11,8 +10,6 @@ interface ArrangorVeilederService {
 	fun hentDeltakereForVeileder(ansattId: UUID): List<ArrangorVeileder>
 
 	fun erVeilederFor(ansattId: UUID, deltakerId: UUID): Boolean
-
-	fun opprettVeiledereForDeltaker(veiledere: List<ArrangorVeilederInput>, deltakerId: UUID)
 
 	fun fjernAlleDeltakereForVeilederHosArrangor(ansattId: UUID, arrangorId: UUID)
 

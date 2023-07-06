@@ -26,41 +26,6 @@ open class ArrangorVeilederRepository(
 		)
 	}
 
-	internal fun opprettVeiledere(veiledere: List<OpprettVeilederDbo>, deltakerIder: List<UUID>) {
-		if (veiledere.isEmpty() || deltakerIder.isEmpty()) return
-
-		val sql = """
-			INSERT INTO arrangor_veileder(
-				id,
-				ansatt_id,
-				deltaker_id,
-				gyldig_fra,
-				gyldig_til,
-				er_medveileder
-			)
-			VALUES(:id, :ansattId, :deltakerId, :gyldigFra, :gyldigTil, :erMedveileder)
-		""".trimIndent()
-
-		val parameters = deltakerIder.map { deltakerId ->
-				veiledere.map { veileder ->
-					sqlParameters(
-						"id" to UUID.randomUUID(),
-						"ansattId" to veileder.ansattId,
-						"deltakerId" to deltakerId,
-						"gyldigFra" to veileder.gyldigFra.toOffsetDateTime(),
-						"gyldigTil" to veileder.gyldigTil.toOffsetDateTime(),
-						"erMedveileder" to veileder.erMedveileder,
-					)
-				}
-			}.flatten().toTypedArray()
-
-		template.batchUpdate(sql, parameters)
-	}
-
-	internal fun opprettVeiledere(veiledere: List<OpprettVeilederDbo>, deltakerId: UUID) {
-		opprettVeiledere(veiledere, listOf(deltakerId))
-	}
-
 	internal fun inaktiverVeileder(ansattId: UUID, deltakerId: UUID, erMedveileder: Boolean) {
 		val sql = """
 			UPDATE arrangor_veileder
