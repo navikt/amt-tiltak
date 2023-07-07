@@ -55,7 +55,7 @@
         <okhttp.version>4.11.0</okhttp.version>
         <token-support.version>3.1.0</token-support.version>
         <mock-oauth2-server.version>0.5.9</mock-oauth2-server.version>
-        <common.version>3.2023.05.08_11.05-d13adbef1e85</common.version>
+        <common.version>3.2023.07.07_09.10-85326e9557f0</common.version>
         <logstash.version>7.4</logstash.version>
     </properties>
 
