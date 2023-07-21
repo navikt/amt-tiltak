@@ -145,6 +145,8 @@ internal class GjennomforingRepositoryTest : FunSpec({
 			status = "GJENNOMFORES",
 			startDato = LocalDate.of(2022, 2, 1),
 			sluttDato = LocalDate.of(2050, 12, 30),
+			createdAt = LocalDateTime.now(),
+			modifiedAt = LocalDateTime.now(),
 			navEnhetId = null,
 			lopenr = 123,
 			opprettetAar = 2020,

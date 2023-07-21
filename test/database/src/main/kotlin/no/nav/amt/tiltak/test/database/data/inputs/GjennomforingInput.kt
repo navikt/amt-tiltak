@@ -4,6 +4,7 @@ import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 data class GjennomforingInput(
@@ -14,6 +15,8 @@ data class GjennomforingInput(
 	val status: String,
 	val startDato: LocalDate,
 	val sluttDato: LocalDate,
+	val createdAt: LocalDateTime,
+	val modifiedAt: LocalDateTime,
 	val navEnhetId: UUID?,
 	val opprettetAar: Int,
 	val lopenr: Int,
