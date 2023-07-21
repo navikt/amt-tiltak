@@ -225,8 +225,8 @@ class TestDataRepository(
 
 	fun insertGjennomforing(cmd: GjennomforingInput) {
 		val sql = """
-			INSERT INTO gjennomforing (id, tiltak_id, arrangor_id, navn, status, start_dato, slutt_dato, nav_enhet_id, opprettet_aar, lopenr, er_kurs)
-			VALUES (:id, :tiltak_id, :arrangor_id, :navn, :status, :start_dato, :slutt_dato, :nav_enhet_id, :opprettet_aar, :lopenr, :er_kurs)
+			INSERT INTO gjennomforing (id, tiltak_id, arrangor_id, navn, status, start_dato, slutt_dato, created_at, modified_at, nav_enhet_id, opprettet_aar, lopenr, er_kurs)
+			VALUES (:id, :tiltak_id, :arrangor_id, :navn, :status, :start_dato, :slutt_dato, :created_at, :modified_at, :nav_enhet_id, :opprettet_aar, :lopenr, :er_kurs)
 		""".trimIndent()
 
 		template.update(
@@ -238,6 +238,8 @@ class TestDataRepository(
 				"status" to cmd.status,
 				"start_dato" to cmd.startDato,
 				"slutt_dato" to cmd.sluttDato,
+				"created_at" to cmd.createdAt,
+				"modified_at" to cmd.modifiedAt,
 				"nav_enhet_id" to cmd.navEnhetId,
 				"opprettet_aar" to cmd.opprettetAar,
 				"lopenr" to cmd.lopenr,

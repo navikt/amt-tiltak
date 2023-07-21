@@ -17,6 +17,7 @@ import no.nav.amt.tiltak.test.database.data.inputs.GjennomforingInput
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 class DeltakerStatistikkRepositoryTest : FunSpec({
@@ -100,6 +101,8 @@ private val AKTIV_GJENNOMFORING_UTEN_BRUKERE = GjennomforingInput(
 	status = "GJENNOMFORES",
 	startDato = LocalDate.of(2022, 2, 1),
 	sluttDato = LocalDate.of(2050, 12, 30),
+	createdAt = LocalDateTime.now(),
+	modifiedAt = LocalDateTime.now(),
 	navEnhetId = TestData.NAV_ENHET_1.id,
 	opprettetAar = 2020,
 	lopenr = 123,

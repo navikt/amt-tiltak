@@ -23,21 +23,6 @@ import java.util.UUID
 
 object TestData {
 
-	fun createGjennomforingInput(tiltak: TiltakInput, arrangor: ArrangorInput, enhet: NavEnhetInput) =
-		GjennomforingInput(
-			id = UUID.randomUUID(),
-			tiltakId = tiltak.id,
-			arrangorId = arrangor.id,
-			navn = "Tiltaksgjennomforing1",
-			status = "GJENNOMFORES",
-			startDato = LocalDate.now().minusWeeks(3),
-			sluttDato = LocalDate.now().plusYears(3),
-			navEnhetId = enhet.id,
-			opprettetAar = 2020,
-			lopenr = 123,
-			erKurs = false
-		)
-
 	fun createDeltakerInput(bruker: BrukerInput, gjennomforing: GjennomforingInput) =
 		DeltakerInput(
 			id = UUID.randomUUID(),
@@ -180,6 +165,8 @@ object TestData {
 		status = "GJENNOMFORES",
 		startDato = LocalDate.of(2022, 2, 1),
 		sluttDato = LocalDate.of(2050, 12, 30),
+		createdAt = LocalDateTime.now(),
+		modifiedAt = LocalDateTime.now(),
 		navEnhetId = NAV_ENHET_1.id,
 		opprettetAar = 2020,
 		lopenr = 123,
@@ -194,6 +181,8 @@ object TestData {
 		status = "GJENNOMFORES",
 		startDato = LocalDate.of(2022, 2, 1),
 		sluttDato = LocalDate.of(2050, 12, 30),
+		createdAt = LocalDateTime.now(),
+		modifiedAt = LocalDateTime.now(),
 		navEnhetId = NAV_ENHET_1.id,
 		opprettetAar = 2020,
 		lopenr = 123,
@@ -208,6 +197,8 @@ object TestData {
 		status = "AVSLUTTET",
 		startDato = LocalDate.of(2022, 2, 1),
 		sluttDato = LocalDate.of(2022, 2, 13),
+		createdAt = LocalDateTime.now(),
+		modifiedAt = LocalDateTime.now(),
 		navEnhetId = NAV_ENHET_2.id,
 		opprettetAar = 2020,
 		lopenr = 124,
@@ -222,6 +213,8 @@ object TestData {
 		status = "GJENNOMFORES",
 		startDato = LocalDate.of(2022, 3, 5),
 		sluttDato = LocalDate.of(2022, 7, 12),
+		createdAt = LocalDateTime.now(),
+		modifiedAt = LocalDateTime.now(),
 		navEnhetId = NAV_ENHET_2.id,
 		opprettetAar = 2022,
 		lopenr = 439823,

@@ -13,6 +13,8 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Service
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
@@ -33,20 +35,29 @@ class DataPublisherService(
 		}
 	}
 
-	fun publish(type: DataPublishType, batchSize: Int = 100, forcePublish: Boolean = true) {
+	fun publish(type: DataPublishType) {
+		when (type) {
+			DataPublishType.DELTAKER -> publish(type, fromDate = LocalDateTime.MIN)
+			DataPublishType.DELTAKERLISTE -> publish(type, fromDate = LocalDateTime.MIN)
+			DataPublishType.ENDRINGSMELDING -> publish(type, fromDate = LocalDateTime.MIN)
+		}
+
+	}
+
+	fun publish(type: DataPublishType, batchSize: Int = 100, forcePublish: Boolean = true, fromDate: LocalDateTime) {
 		val idQueries = IdQueries(template)
 
 		when (type) {
 			DataPublishType.DELTAKER -> {
 				publishBatch(
-					idProvider = { offset -> idQueries.hentDeltakerIds(offset, batchSize) },
+					idProvider = { offset -> idQueries.hentDeltakerIds(offset, batchSize, fromDate) },
 					publisher = { id -> publishDeltaker(id, forcePublish) }
 				)
 			}
 
 			DataPublishType.DELTAKERLISTE -> {
 				publishBatch(
-					idProvider = { offset -> idQueries.hentDeltakerlisteIds(offset, batchSize) },
+					idProvider = { offset -> idQueries.hentDeltakerlisteIds(offset, batchSize, fromDate) },
 					publisher = { id -> publishDeltakerliste(id, forcePublish) }
 				)
 
@@ -54,19 +65,20 @@ class DataPublisherService(
 
 			DataPublishType.ENDRINGSMELDING -> {
 				publishBatch(
-					idProvider = { offset -> idQueries.hentEndringsmeldingIds(offset, batchSize) },
+					idProvider = { offset -> idQueries.hentEndringsmeldingIds(offset, batchSize, fromDate) },
 					publisher = { id -> publishEndringsmelding(id, forcePublish) }
 				)
 			}
 		}
 	}
 
-	fun publishAll(batchSize: Int = 100, forcePublish: Boolean = true) {
+	fun publishAll(batchSize: Int = 100, forcePublish: Boolean = true, fromDate: LocalDateTime = LocalDateTime.now().minusDays(7)) {
 		DataPublishType.values().forEach {
 			publish(
 				type = it,
 				batchSize = batchSize,
-				forcePublish = forcePublish
+				forcePublish = forcePublish,
+				fromDate = fromDate
 			)
 		}
 	}

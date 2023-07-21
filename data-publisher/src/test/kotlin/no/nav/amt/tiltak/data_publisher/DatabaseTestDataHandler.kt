@@ -17,6 +17,7 @@ import no.nav.amt.tiltak.test.database.data.inputs.TiltakInput
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.Random
 import java.util.UUID
@@ -30,9 +31,14 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 
 	fun createDeltakerliste(
 		arrangorId: UUID = createArrangor().id,
-		tiltakId: UUID = createTiltak().id
+		tiltakId: UUID = createTiltak().id,
+		createdAt: LocalDateTime = LocalDateTime.now(),
+		modifiedAt: LocalDateTime = LocalDateTime.now()
 	): GjennomforingInput =
-		gjennomforingInput(tiltakId = tiltakId, arrangorId = arrangorId)
+		gjennomforingInput(
+			tiltakId = tiltakId, arrangorId = arrangorId,
+			createdAt = createdAt, modifiedAt = modifiedAt
+		)
 			.also { testDataRepository.insertGjennomforing(it) }
 
 
@@ -41,27 +47,35 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 
 	fun createDeltaker(
 		brukerId: UUID = createBruker().id,
-		gjennomforingId: UUID = createDeltakerliste().id
-	): DeltakerInput = deltakerInput(brukerId, gjennomforingId)
+		gjennomforingId: UUID = createDeltakerliste().id,
+		registrertDato: LocalDateTime = LocalDateTime.now(),
+		endretDato: LocalDateTime = LocalDateTime.now()
+	): DeltakerInput = deltakerInput(brukerId, gjennomforingId, registrertDato, endretDato)
 		.also { testDataRepository.insertDeltaker(it) }
 		.also { testDataRepository.insertDeltakerStatus(createDeltakerStatus(it.id)) }
 
 	fun createEndringsmelding(
 		deltakerId: UUID = createDeltaker().id,
-		opprettetAv: UUID = createArrangorAnsatt().id
-	): EndringsmeldingInput = endringsmeldingInput(deltakerId, opprettetAv)
+		opprettetAv: UUID = createArrangorAnsatt().id,
+		createdAt: LocalDateTime = LocalDateTime.now(),
+		modifiedAt: LocalDateTime = LocalDateTime.now(),
+	): EndringsmeldingInput = endringsmeldingInput(deltakerId, opprettetAv, createdAt, modifiedAt)
 		.also { testDataRepository.insertEndringsmelding(it) }
 
 	fun endringsmeldingInput(
 		deltakerId: UUID,
-		opprettetAv: UUID
+		opprettetAv: UUID,
+		createdAt: LocalDateTime,
+		modifiedAt: LocalDateTime
 	) = EndringsmeldingInput(
 		id = UUID.randomUUID(),
 		deltakerId = deltakerId,
 		opprettetAvArrangorAnsattId = opprettetAv,
 		type = Endringsmelding.Type.ENDRE_SLUTTDATO.name,
 		innhold = JsonUtils.toJsonString(Endringsmelding.Innhold.EndreSluttdatoInnhold(LocalDate.now())),
-		status = Endringsmelding.Status.AKTIV
+		status = Endringsmelding.Status.AKTIV,
+		createdAt = createdAt.atZone(ZoneId.systemDefault()),
+		modifiedAt = modifiedAt.atZone(ZoneId.systemDefault())
 	)
 
 	fun createArrangorAnsatt() = arrangorAnsattInput()
@@ -123,11 +137,25 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		navn: String = UUID.randomUUID().toString(),
 		startDato: LocalDate = LocalDate.now().minusDays(1),
 		sluttDato: LocalDate = LocalDate.now().plusDays(1),
+		createdAt: LocalDateTime = LocalDateTime.now(),
+		modifiedAt: LocalDateTime = LocalDateTime.now(),
 		navEnhetId: UUID? = null,
 		opprettetAar: Int = LocalDate.now().year,
 		lopenr: Int = Random().nextInt()
 	): GjennomforingInput = GjennomforingInput(
-		id, tiltakId, arrangorId, navn, status, startDato, sluttDato, navEnhetId, opprettetAar, lopenr, false
+		id,
+		tiltakId,
+		arrangorId,
+		navn,
+		status,
+		startDato,
+		sluttDato,
+		createdAt,
+		modifiedAt,
+		navEnhetId,
+		opprettetAar,
+		lopenr,
+		false
 	)
 
 	private fun navEnhetInput(): NavEnhetInput = NavEnhetInput(
@@ -154,7 +182,9 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 
 	private fun deltakerInput(
 		brukerId: UUID,
-		gjennomforingId: UUID
+		gjennomforingId: UUID,
+		registrertDato: LocalDateTime,
+		endretDato: LocalDateTime
 	): DeltakerInput = DeltakerInput(
 		id = UUID.randomUUID(),
 		brukerId = brukerId,
@@ -163,7 +193,8 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		sluttDato = LocalDate.now().plusDays(1),
 		dagerPerUke = 5,
 		prosentStilling = 100.0F,
-		registrertDato = LocalDateTime.now(),
+		registrertDato = registrertDato,
+		endretDato = endretDato,
 		innsokBegrunnelse = UUID.randomUUID().toString()
 	)
 
