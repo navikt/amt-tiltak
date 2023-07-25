@@ -33,6 +33,15 @@ open class NavEnhetServiceImpl(
 
 	override fun getNavEnhet(id: UUID) = navEnhetRepository.get(id).toNavEnhet()
 
+	override fun upsert(enhet: NavEnhet) {
+		val eksisterendeEnhet = navEnhetRepository.hentEnhet(enhet.enhetId)?.toNavEnhet()
+
+		if (eksisterendeEnhet != enhet) {
+			navEnhetRepository.upsert(enhet)
+		}
+
+	}
+
 	private fun opprettEnhet(enhetId: String): NavEnhet? {
 		val navEnhet = amtPersonClient.hentNavEnhet(enhetId)
 			.recover {
@@ -40,13 +49,7 @@ open class NavEnhetServiceImpl(
 				else throw it
 			}.getOrThrow()
 
-		val insertInput = NavEnhetInsertInput(
-			id = navEnhet.id,
-			enhetId = navEnhet.enhetId,
-			navn = navEnhet.navn
-		)
-
-		navEnhetRepository.insert(insertInput)
+		navEnhetRepository.upsert(navEnhet)
 
 		return navEnhet
 	}

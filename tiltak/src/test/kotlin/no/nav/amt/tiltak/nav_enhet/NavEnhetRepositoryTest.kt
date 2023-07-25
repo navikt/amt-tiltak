@@ -5,12 +5,13 @@ import ch.qos.logback.classic.Logger
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.util.*
+import java.util.UUID
 
 class NavEnhetRepositoryTest : FunSpec({
 	val dataSource = SingletonPostgresContainer.getDataSource()
@@ -52,14 +53,12 @@ class NavEnhetRepositoryTest : FunSpec({
 		exception.message shouldBe "Enhet med id $id eksisterer ikke."
 	}
 
-	test("insert() - skal inserte ny nav enhet") {
+	test("upsert() - skal inserte ny nav enhet") {
 		val id = UUID.randomUUID()
 		val enhetId = "ENHET_001"
 		val navn = "ENHET_001_NAVN"
 
-		repository.insert(NavEnhetInsertInput(
-			id, enhetId, navn
-		))
+		repository.upsert(NavEnhet(id, enhetId, navn))
 
 		val hentetEnhet = repository.get(id)
 

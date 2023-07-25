@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.core.port
 
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
-import java.util.*
+import java.util.UUID
 
 interface NavEnhetService {
 
@@ -10,6 +10,8 @@ interface NavEnhetService {
 	fun getNavEnhet(enhetId: String): NavEnhet?
 
 	fun getNavEnhetForBruker(personIdent: String): NavEnhet?
+
+	fun upsert(enhet: NavEnhet)
 
 }
 
