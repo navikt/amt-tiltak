@@ -53,7 +53,7 @@ data class EndringsmeldingDto(
 
 		data class EndreDeltakelseProsentInnhold(
 			val deltakelseProsent: Int,
-			val dagerPerUke: Int?,
+			val dagerPerUke: Float?,
 			val gyldigFraDato: LocalDate?
 		) : Innhold()
 

@@ -23,7 +23,7 @@ interface EndringsmeldingService {
 
 	fun opprettForlengDeltakelseEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate): UUID
 
-	fun opprettEndreDeltakelseProsentEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, deltakerProsent: Int, dagerPerUke: Int?, gyldigFraDato: LocalDate?):UUID
+	fun opprettEndreDeltakelseProsentEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, deltakerProsent: Int, dagerPerUke: Float?, gyldigFraDato: LocalDate?):UUID
 
 	fun opprettAvsluttDeltakelseEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate, statusAarsak: EndringsmeldingStatusAarsak): UUID
 

@@ -11,7 +11,7 @@ data class DeltakerUpsertDbo(
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val registrertDato: LocalDateTime,
-	val dagerPerUke: Int? = null,
+	val dagerPerUke: Float? = null,
 	val prosentStilling: Float? = null,
 	val innsokBegrunnelse: String? = null
 )

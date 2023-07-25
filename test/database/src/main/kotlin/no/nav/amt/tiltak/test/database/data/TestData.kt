@@ -30,7 +30,7 @@ object TestData {
 			gjennomforingId = gjennomforing.id,
 			startDato = LocalDate.now().plusDays(5),
 			sluttDato = LocalDate.now().plusDays(30),
-			dagerPerUke = 5,
+			dagerPerUke = 5.0f,
 			prosentStilling = 100f,
 			registrertDato = LocalDateTime.now(),
 			innsokBegrunnelse = null
@@ -278,7 +278,7 @@ object TestData {
 		gjennomforingId = GJENNOMFORING_1.id,
 		startDato = LocalDate.of(2022, 2, 13),
 		sluttDato = LocalDate.of(2030, 2, 14),
-		dagerPerUke = 5,
+		dagerPerUke = 2.5f,
 		prosentStilling = 100f,
 		registrertDato = LocalDateTime.of(2022, 2, 13, 12, 12),
 		innsokBegrunnelse = "begrunnelse deltaker 1",
@@ -323,7 +323,7 @@ object TestData {
 		gjennomforingId = GJENNOMFORING_1.id,
 		startDato = LocalDate.of(2022, 2, 10),
 		sluttDato = LocalDate.of(2022, 2, 12),
-		dagerPerUke = 5,
+		dagerPerUke = 2.5f,
 		prosentStilling = 100f,
 		registrertDato = LocalDateTime.of(2022, 2, 10, 12, 12),
 		innsokBegrunnelse = "begrunnelse deltaker 2"
@@ -372,7 +372,7 @@ object TestData {
 		gjennomforingId = GJENNOMFORING_1.id,
 		startDato = LocalDate.of(2022, 2, 10),
 		sluttDato = LocalDate.of(2022, 2, 12),
-		dagerPerUke = 5,
+		dagerPerUke = 5.0f,
 		prosentStilling = 100f,
 		registrertDato = LocalDateTime.of(2022, 2, 10, 12, 12),
 		innsokBegrunnelse = "begrunnelse deltaker 4"

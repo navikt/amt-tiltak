@@ -60,7 +60,7 @@ sealed class Innhold {
 
 	data class EndreDeltakelseProsentInnhold(
 		val nyDeltakelseProsent: Int,
-		val dagerPerUke: Int?,
+		val dagerPerUke: Float?,
 		val gyldigFraDato: LocalDate?
 	) : Innhold()
 

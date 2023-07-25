@@ -14,7 +14,7 @@ data class DeltakerInput(
 	val gjennomforingId: UUID,
 	val startDato: LocalDate,
 	val sluttDato: LocalDate,
-	val dagerPerUke: Int,
+	val dagerPerUke: Float,
 	val prosentStilling: Float,
 	val registrertDato: LocalDateTime,
 	val innsokBegrunnelse: String?,

@@ -12,7 +12,7 @@ data class DeltakerV1Dto(
 	val sluttDato: LocalDate?,
 	val status: DeltakerStatusDto,
 	val registrertDato: LocalDateTime,
-	val dagerPerUke: Int?,
+	val dagerPerUke: Float?,
 	val prosentStilling: Float?,
 	val endretDato: LocalDateTime
 )

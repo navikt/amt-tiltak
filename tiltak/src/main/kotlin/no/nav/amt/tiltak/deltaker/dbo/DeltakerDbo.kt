@@ -21,7 +21,7 @@ data class DeltakerDbo(
 	val gjennomforingId: UUID,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
-	val dagerPerUke: Int?,
+	val dagerPerUke: Float?,
 	val prosentStilling: Float?,
 	val createdAt: LocalDateTime? = null,
 	val modifiedAt: LocalDateTime,

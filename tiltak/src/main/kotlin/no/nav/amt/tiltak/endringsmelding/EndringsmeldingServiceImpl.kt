@@ -123,7 +123,7 @@ open class EndringsmeldingServiceImpl(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
 		deltakerProsent: Int,
-		dagerPerUke: Int?,
+		dagerPerUke: Float?,
 		gyldigFraDato: LocalDate?
 	): UUID {
 		val innhold = EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold(

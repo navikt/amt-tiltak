@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.core.domain.tiltak
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.UUID
 
 data class DeltakerUpsert(
 	val id: UUID,
@@ -12,7 +12,7 @@ data class DeltakerUpsert(
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val registrertDato: LocalDateTime,
-	val dagerPerUke: Int? = null,
+	val dagerPerUke: Float? = null,
 	val prosentStilling: Float? = null,
 	val innsokBegrunnelse: String?
 ) {

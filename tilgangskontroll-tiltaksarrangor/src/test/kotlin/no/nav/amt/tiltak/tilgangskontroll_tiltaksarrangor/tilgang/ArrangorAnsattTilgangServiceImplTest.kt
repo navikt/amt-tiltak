@@ -110,7 +110,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 			aktiv = true
 		),
 		registrertDato = LocalDateTime.now(),
-		dagerPerUke = 5,
+		dagerPerUke = 3.5f,
 		prosentStilling = 100F,
 		gjennomforingId = gjennomforingId,
 		erSkjermet = true,

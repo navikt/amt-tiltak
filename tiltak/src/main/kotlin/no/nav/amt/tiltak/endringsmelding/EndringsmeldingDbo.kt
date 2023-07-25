@@ -54,7 +54,7 @@ data class EndringsmeldingDbo(
 
 		data class EndreDeltakelseProsentInnhold(
 			val nyDeltakelseProsent: Int,
-			val dagerPerUke: Int?,
+			val dagerPerUke: Float?,
 			val gyldigFraDato: LocalDate?
 		): Innhold()
 
