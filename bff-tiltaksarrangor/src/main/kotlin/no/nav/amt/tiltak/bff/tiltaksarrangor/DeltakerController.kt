@@ -192,7 +192,7 @@ class DeltakerController(
 
 	data class EndreDeltakelsesprosentRequestBody(
 		val deltakelseProsent: Int,
-		val dagerPerUke: Float?,
+		val dagerPerUke: Int?,
 		val gyldigFraDato: LocalDate?
 	)
 }
