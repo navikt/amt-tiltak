@@ -185,6 +185,10 @@ class BrukerServiceImpl(
 		log.info("Brukere oppdatert. Det var $brukereOppdatert oppdateringer.")
 	}
 
+	override fun upsert(bruker: Bruker) {
+		brukerRepository.upsert(bruker)
+	}
+
 	private fun createBruker(fodselsnummer: String): BrukerDbo {
 		val tildeltVeilederNavIdent = personService.hentTildeltVeilederNavIdent(fodselsnummer)
 

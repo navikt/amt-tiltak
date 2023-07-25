@@ -33,4 +33,6 @@ interface BrukerService {
 	fun hentBruker(id: UUID): Bruker
 
 	fun hentBruker(personIdent: String): Bruker?
+
+	fun upsert(bruker: Bruker)
 }
