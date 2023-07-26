@@ -1,11 +1,10 @@
 package no.nav.amt.tiltak.clients.amt_person.dto
 
-import java.util.*
+import java.util.UUID
 
 data class NavBrukerDto (
 	val id: UUID,
-	val personIdent: String,
-	val personIdentType: String?,
+	val personident: String,
 	val fornavn: String,
 	val mellomnavn: String?,
 	val etternavn: String,

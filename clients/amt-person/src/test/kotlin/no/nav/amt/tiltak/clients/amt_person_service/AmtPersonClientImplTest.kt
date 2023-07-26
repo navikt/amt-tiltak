@@ -3,8 +3,8 @@ package no.nav.amt.tiltak.clients.amt_person_service
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.clients.amt_person.AmtPersonClientImpl
 import no.nav.amt.tiltak.clients.amt_person.NavAnsattRequest
-import no.nav.amt.tiltak.clients.amt_person.NavBrukerRequest
 import no.nav.amt.tiltak.clients.amt_person.NavEnhetRequest
+import no.nav.amt.tiltak.clients.amt_person.PersonRequest
 import no.nav.amt.tiltak.clients.amt_person.dto.NavAnsattDto
 import no.nav.amt.tiltak.clients.amt_person.dto.NavBrukerDto
 import no.nav.amt.tiltak.clients.amt_person.dto.NavEnhetDto
@@ -13,7 +13,7 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.UUID
 
 class AmtPersonClientImplTest {
 	lateinit var server: MockWebServer
@@ -30,7 +30,7 @@ class AmtPersonClientImplTest {
 
 	@Test
 	fun `hentNavBruker - skal lage riktig request og parse respons`() {
-		val personIdent = "0011222244555"
+		val personident = "0011222244555"
 
 		val navEnhet = NavBrukerDto.NavEnhetDto(
 			id = UUID.randomUUID(),
@@ -40,8 +40,7 @@ class AmtPersonClientImplTest {
 
 		val bruker = NavBrukerDto(
 				id = UUID.randomUUID(),
-				personIdent = personIdent,
-				personIdentType = "FOLKEREGISTERIDENT",
+				personident = personident,
 				fornavn = "Fornavn",
 				mellomnavn = "Mellomnavn",
 				etternavn = "Etternavn",
@@ -58,12 +57,11 @@ class AmtPersonClientImplTest {
 			)
 		)
 
-		val faktiskBruker = client.hentNavBruker(personIdent).getOrThrow()
+		val faktiskBruker = client.hentNavBruker(personident).getOrThrow()
 
 		faktiskBruker.id shouldBe bruker.id
 		faktiskBruker.erSkjermet shouldBe bruker.erSkjermet
-		faktiskBruker.personIdent shouldBe bruker.personIdent
-		faktiskBruker.personIdentType!!.name shouldBe bruker.personIdentType
+		faktiskBruker.personident shouldBe bruker.personident
 		faktiskBruker.fornavn shouldBe bruker.fornavn
 		faktiskBruker.mellomnavn shouldBe bruker.mellomnavn
 		faktiskBruker.etternavn shouldBe bruker.etternavn
@@ -83,7 +81,7 @@ class AmtPersonClientImplTest {
 		request.path shouldBe "/api/nav-bruker"
 		request.method shouldBe "POST"
 		request.getHeader("Authorization") shouldBe "Bearer TOKEN"
-		request.body.readUtf8() shouldBe JsonUtils.toJsonString(NavBrukerRequest(personIdent))
+		request.body.readUtf8() shouldBe JsonUtils.toJsonString(PersonRequest(personident))
 
 	}
 
