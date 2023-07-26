@@ -88,7 +88,7 @@ class DeltakerServiceImplTest {
 		kafkaProducerService = mockk(relaxUnitFun = true)
 		publisherService = mockk()
 		amtPersonClient = mockk(relaxUnitFun = true)
-		brukerService = BrukerServiceImpl(brukerRepository, mockk(), mockk(), navEnhetService, amtPersonClient)
+		brukerService = BrukerServiceImpl(brukerRepository, mockk(), navEnhetService, amtPersonClient)
 		objectMapper = JsonUtils.objectMapper
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)

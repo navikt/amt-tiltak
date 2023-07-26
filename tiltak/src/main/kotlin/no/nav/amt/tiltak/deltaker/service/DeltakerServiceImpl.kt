@@ -46,7 +46,7 @@ open class DeltakerServiceImpl(
 
 	override fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert) {
 		val lagretDeltaker = hentDeltaker(deltaker.id)
-		val brukerId = brukerService.getOrCreate(personIdent)
+		val brukerId = brukerService.getIdOrCreate(personIdent)
 
 		if(lagretDeltaker == null || !deltaker.compareTo(lagretDeltaker)) {
 			val deltakerUpsertDbo = deltaker.toUpsertDbo(brukerId)

@@ -20,7 +20,7 @@ interface BrukerService {
 
 	fun settErSkjermet(personIdent: String, erSkjermet: Boolean)
 
-	fun getOrCreate(fodselsnummer: String): UUID
+	fun getIdOrCreate(fodselsnummer: String): UUID
 
 	fun finnesBruker(personIdent: String): Boolean
 
@@ -35,4 +35,7 @@ interface BrukerService {
 	fun hentBruker(personIdent: String): Bruker?
 
 	fun upsert(bruker: Bruker)
+
+	fun erAdressebeskyttet(personident: String): Boolean
+
 }

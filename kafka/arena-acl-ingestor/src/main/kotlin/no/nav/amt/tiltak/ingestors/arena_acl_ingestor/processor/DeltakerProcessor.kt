@@ -7,10 +7,10 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.port.ArrangorService
+import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavEnhetService
-import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
@@ -18,13 +18,13 @@ import no.nav.amt.tiltak.kafka.tiltaksgjennomforing_ingestor.GjennomforingStatus
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
-import java.util.*
+import java.util.UUID
 
 @Service
 class DeltakerProcessor(
 	private val gjennomforingService: GjennomforingService,
 	private val deltakerService: DeltakerService,
-	private val personService: PersonService,
+	private val brukerService: BrukerService,
 	private val arrangorService: ArrangorService,
 	private val tiltakService: TiltakService,
 	private val navEnhetService: NavEnhetService,
@@ -52,10 +52,8 @@ class DeltakerProcessor(
 			return
 		}
 
-		val person = personService.hentPerson(deltakerFnr)
-
-		if (person.diskresjonskode != null) {
-			log.info("Deltaker har diskresjonskode ${person.diskresjonskode} og skal filtreres ut")
+		if (brukerService.erAdressebeskyttet(deltakerFnr)) {
+			log.info("Deltaker har diskresjonskode og skal filtreres ut")
 			return
 		}
 

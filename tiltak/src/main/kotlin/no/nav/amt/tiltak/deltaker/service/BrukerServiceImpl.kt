@@ -1,16 +1,14 @@
 package no.nav.amt.tiltak.deltaker.service
 
 import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
-import no.nav.amt.tiltak.clients.amt_person.dto.OpprettNavBrukerDto
+import no.nav.amt.tiltak.clients.amt_person.model.erBeskyttet
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.IdentType
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.port.BrukerService
-import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
-import no.nav.amt.tiltak.deltaker.dbo.BrukerUpsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.log.SecureLog.secureLog
 import org.slf4j.LoggerFactory
@@ -21,7 +19,6 @@ import java.util.UUID
 class BrukerServiceImpl(
 	private val brukerRepository: BrukerRepository,
 	private val personService: PersonService,
-	private val navAnsattService: NavAnsattService,
 	private val navEnhetService: NavEnhetService,
 	private val amtPersonClient: AmtPersonClient,
 ) : BrukerService {
@@ -46,9 +43,8 @@ class BrukerServiceImpl(
 		brukerRepository.slettBruker(personIdent)
 	}
 
-	override fun getOrCreate(fodselsnummer: String): UUID {
-		val bruker = brukerRepository.get(fodselsnummer) ?: createBruker(fodselsnummer)
-		return bruker.id
+	override fun getIdOrCreate(fodselsnummer: String): UUID {
+		return brukerRepository.get(fodselsnummer)?.id ?: createBruker(fodselsnummer)
 	}
 
 	override fun hentBruker(id: UUID): Bruker {
@@ -189,57 +185,18 @@ class BrukerServiceImpl(
 		brukerRepository.upsert(bruker)
 	}
 
-	private fun createBruker(fodselsnummer: String): BrukerDbo {
-		val tildeltVeilederNavIdent = personService.hentTildeltVeilederNavIdent(fodselsnummer)
+	override fun erAdressebeskyttet(personident: String) = amtPersonClient.hentAdressebeskyttelse(personident)
+			.getOrThrow()
+			.erBeskyttet()
 
-		val veileder = tildeltVeilederNavIdent?.let { navAnsattService.getNavAnsatt(it) }
+	private fun createBruker(personident: String): UUID {
+		val navBruker = amtPersonClient.hentNavBruker(personident).getOrThrow()
 
-		val navEnhet = navEnhetService.getNavEnhetForBruker(fodselsnummer)
+		navBruker.navEnhet?.let { navEnhetService.upsert(it) }
+		brukerRepository.upsert(navBruker.toBruker())
 
-		val personKontaktinformasjon = personService.hentPersonKontaktinformasjon(fodselsnummer)
-
-		val person = personService.hentPerson(fodselsnummer)
-
-		val erSkjermet = personService.erSkjermet(fodselsnummer)
-
-		val bruker = BrukerUpsertDbo(
-			personIdent = fodselsnummer,
-			fornavn = person.fornavn,
-			mellomnavn = person.mellomnavn,
-			etternavn = person.etternavn,
-			telefonnummer = person.telefonnummer ?: personKontaktinformasjon.telefonnummer,
-			epost = personKontaktinformasjon.epost,
-			ansvarligVeilederId = veileder?.id,
-			navEnhetId = navEnhet?.id,
-			erSkjermet = erSkjermet
-		)
-
-		val brukerDbo = brukerRepository.upsert(bruker)
-
-		migrerBruker(brukerDbo)
-
-		return brukerDbo
+		return navBruker.id
 	}
-
-	private fun migrerBruker(bruker: BrukerDbo) {
-		amtPersonClient.migrerNavBruker(
-			OpprettNavBrukerDto(
-				id = bruker.id,
-				personIdent = bruker.personIdent,
-				personIdentType = bruker.personIdentType?.name,
-				historiskeIdenter = bruker.historiskeIdenter,
-				fornavn = bruker.fornavn,
-				mellomnavn = bruker.mellomnavn,
-				etternavn = bruker.etternavn,
-				navVeilederId = bruker.ansvarligVeilederId,
-				navEnhetId = bruker.navEnhetId,
-				telefon = bruker.telefonnummer,
-				epost = bruker.epost,
-				erSkjermet = bruker.erSkjermet,
-			)
-		)
-	}
-
 
 	private fun getAndUpdateBrukerData(bruker: BrukerDbo): Boolean {
 		val person = personService.hentPerson(bruker.personIdent)
