@@ -33,9 +33,7 @@ class DeltakerPublishQuery(
 
 		if (deltaker.status == null) return Result.DontPublish()
 
-		val skjulinger = getSkjuling(id)
-
-		val skjult = skjulinger
+		val skjult = getSkjuling(id)
 			.maxByOrNull { it.createdAt }
 			?.let {
 				if (it.skjultTil.isAfter(LocalDateTime.now())) {
