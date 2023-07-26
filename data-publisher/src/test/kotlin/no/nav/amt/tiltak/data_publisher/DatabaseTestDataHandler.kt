@@ -191,7 +191,7 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		gjennomforingId = gjennomforingId,
 		startDato = LocalDate.now(),
 		sluttDato = LocalDate.now().plusDays(1),
-		dagerPerUke = 5,
+		dagerPerUke = 2.5F,
 		prosentStilling = 100.0F,
 		registrertDato = registrertDato,
 		endretDato = endretDato,

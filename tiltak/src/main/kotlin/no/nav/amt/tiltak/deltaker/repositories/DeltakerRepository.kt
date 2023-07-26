@@ -2,7 +2,6 @@ package no.nav.amt.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getNullableFloat
-import no.nav.amt.tiltak.common.db_utils.getNullableInt
 import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getNullableUUID
 import no.nav.amt.tiltak.common.db_utils.getUUID
@@ -16,7 +15,7 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.UUID
 
 @Component
 open class DeltakerRepository(
@@ -44,7 +43,7 @@ open class DeltakerRepository(
 			startDato = rs.getDate("start_dato")?.toLocalDate(),
 			sluttDato = rs.getDate("slutt_dato")?.toLocalDate(),
 			gjennomforingId = UUID.fromString(rs.getString("gjennomforing_id")),
-			dagerPerUke = rs.getNullableInt("dager_per_uke"),
+			dagerPerUke = rs.getNullableFloat("dager_per_uke"),
 			prosentStilling = rs.getNullableFloat("prosent_stilling"),
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime(),
@@ -221,9 +220,12 @@ open class DeltakerRepository(
 				AND deltaker.slutt_dato < CURRENT_DATE
 		""".trimIndent()
 		val parameters = MapSqlParameterSource().addValues(
-			mapOf("gjennomforende_statuser" to listOf(
-				DeltakerStatus.Type.DELTAR.name,
-				DeltakerStatus.Type.VENTER_PA_OPPSTART.name))
+			mapOf(
+				"gjennomforende_statuser" to listOf(
+					DeltakerStatus.Type.DELTAR.name,
+					DeltakerStatus.Type.VENTER_PA_OPPSTART.name
+				)
+			)
 		)
 		return template.query(sql, parameters, rowMapper)
 	}
@@ -287,7 +289,8 @@ open class DeltakerRepository(
 			MapSqlParameterSource().addValues(
 				mapOf(
 					"deltakerId" to deltakerId
-				))
+				)
+			)
 		)
 		val sql = "DELETE FROM deltaker WHERE id = :deltakerId"
 

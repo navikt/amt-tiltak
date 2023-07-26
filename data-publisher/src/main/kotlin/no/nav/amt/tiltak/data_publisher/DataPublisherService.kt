@@ -13,7 +13,6 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -72,8 +71,12 @@ class DataPublisherService(
 		}
 	}
 
-	fun publishAll(batchSize: Int = 100, forcePublish: Boolean = true, fromDate: LocalDateTime = LocalDateTime.now().minusDays(7)) {
-		DataPublishType.values().forEach {
+	fun publishAll(
+		batchSize: Int = 100,
+		forcePublish: Boolean = true,
+		fromDate: LocalDateTime = LocalDateTime.now().minusDays(7)
+	) {
+		DataPublishType.entries.forEach {
 			publish(
 				type = it,
 				batchSize = batchSize,

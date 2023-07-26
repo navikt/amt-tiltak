@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.data_publisher.publish
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getLocalDate
 import no.nav.amt.tiltak.common.db_utils.getNullableDouble
-import no.nav.amt.tiltak.common.db_utils.getNullableInt
+import no.nav.amt.tiltak.common.db_utils.getNullableFloat
 import no.nav.amt.tiltak.common.db_utils.getNullableLocalDate
 import no.nav.amt.tiltak.common.db_utils.getNullableLocalDateTime
 import no.nav.amt.tiltak.common.db_utils.getNullableString
@@ -138,7 +138,7 @@ class DeltakerPublishQuery(
 		val skjermet: Boolean,
 		val telefonnummer: String?,
 		val epost: String?,
-		val dagerPerUke: Int?,
+		val dagerPerUke: Float?,
 		val prosentStilling: Double?,
 		val startDato: LocalDate?,
 		val sluttDato: LocalDate?,
@@ -169,7 +169,7 @@ class DeltakerPublishQuery(
 					skjermet = rs.getBoolean("er_skjermet"),
 					telefonnummer = rs.getNullableString("telefonnummer"),
 					epost = rs.getNullableString("epost"),
-					dagerPerUke = rs.getNullableInt("dager_per_uke"),
+					dagerPerUke = rs.getNullableFloat("dager_per_uke"),
 					prosentStilling = rs.getNullableDouble("prosent_stilling"),
 					startDato = rs.getNullableLocalDate("start_dato"),
 					sluttDato = rs.getNullableLocalDate("slutt_dato"),

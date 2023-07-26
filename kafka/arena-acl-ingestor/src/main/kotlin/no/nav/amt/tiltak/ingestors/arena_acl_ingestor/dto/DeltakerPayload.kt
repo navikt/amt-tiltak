@@ -12,7 +12,7 @@ data class DeltakerPayload(
 	val sluttDato: LocalDate?,
 	val status: Status,
 	val statusAarsak: StatusAarsak?,
-	val dagerPerUke: Int?,
+	val dagerPerUke: Float?,
 	val prosentDeltid: Float?,
 	val registrertDato: LocalDateTime,
 	val statusEndretDato: LocalDateTime?,

@@ -54,7 +54,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val startDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
 		val sluttDato = null
-		val dagerPerUke = 2
+		val dagerPerUke = 2.5f
 		val prosentStilling = 20.0f
 		val begrunnelse = "begrunnelse"
 
@@ -117,7 +117,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			GJENNOMFORING_1.id,
 			startDato =LocalDate.now().plusDays(7),
 			sluttDato = null,
-			dagerPerUke = 2,
+			dagerPerUke = 2.5f,
 			prosentStilling = 20.0f,
 			registrertDato = now
 		)
@@ -144,7 +144,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			GJENNOMFORING_1.id,
 			startDato = LocalDate.now().plusDays(7),
 			sluttDato = null,
-			dagerPerUke = 2,
+			dagerPerUke = 2f,
 			prosentStilling = 20.0f,
 			registrertDato = now
 		)
@@ -168,7 +168,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val startDato = LocalDate.now().plusDays(7)
 		val registrertDato = LocalDateTime.now().minusDays(3)
 		val sluttDato = null
-		val dagerPerUke = 2
+		val dagerPerUke = 5f
 		val prosentStilling = 20.0f
 		val gjennomforing = GJENNOMFORING_1
 		val bruker = BRUKER_3
@@ -211,7 +211,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			GJENNOMFORING_1.id,
 			startDato = LocalDate.now().minusDays(7),
 			sluttDato = LocalDate.now().minusDays(2),
-			dagerPerUke = 2,
+			dagerPerUke = 2.5f,
 			prosentStilling = 20.0f,
 			registrertDato = now.minusDays(10)
 		)
@@ -239,7 +239,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			GJENNOMFORING_1.id,
 			startDato = LocalDate.now().minusDays(7),
 			sluttDato = LocalDate.now().plusDays(2),
-			dagerPerUke = 2,
+			dagerPerUke = 2.5f,
 			prosentStilling = 20.0f,
 			registrertDato = LocalDateTime.now().minusDays(10)
 		)
@@ -267,7 +267,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			GJENNOMFORING_2.id,
 			startDato = LocalDate.now().minusDays(7),
 			sluttDato = LocalDate.now().plusDays(2),
-			dagerPerUke = 2,
+			dagerPerUke = 2.5f,
 			prosentStilling = 20.0f,
 			registrertDato = LocalDateTime.now().minusDays(10)
 		)
@@ -297,7 +297,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			GJENNOMFORING_1.id,
 			startDato = LocalDate.now().minusDays(7),
 			sluttDato = LocalDate.now().plusDays(2),
-			dagerPerUke = 2,
+			dagerPerUke = 2.5f,
 			prosentStilling = 20.0f,
 			registrertDato = now.minusDays(10)
 		)
@@ -332,7 +332,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			GJENNOMFORING_1.id,
 			startDato = LocalDate.now().plusDays(2),
 			sluttDato = LocalDate.now().plusDays(10),
-			dagerPerUke = 2,
+			dagerPerUke = 2.5f,
 			prosentStilling = 20.0f,
 			registrertDato = LocalDateTime.now().minusDays(10)
 		)
@@ -359,7 +359,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			GJENNOMFORING_1.id,
 			startDato = LocalDate.now().minusDays(7),
 			sluttDato = LocalDate.now().plusDays(2),
-			dagerPerUke = 2,
+			dagerPerUke = 2.5f,
 			prosentStilling = 20.0f,
 			registrertDato = LocalDateTime.now().minusDays(10)
 		)

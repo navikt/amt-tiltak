@@ -262,7 +262,7 @@ class DeltakerServiceImplTest {
 
 	@Test
 	fun `upsertDeltaker - oppdaterer forrige deltaker`() {
-		val dagerPerUke = 5
+		val dagerPerUke = 2.5f
 		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
 		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker.copy(dagerPerUke = dagerPerUke))
 

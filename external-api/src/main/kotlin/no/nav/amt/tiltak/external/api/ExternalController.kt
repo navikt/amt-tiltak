@@ -58,7 +58,7 @@ fun Deltaker.toDto(gjennomforing: Gjennomforing) = DeltakerDto(
 	startDato = startDato,
 	sluttDato = sluttDato,
 	status = status.toDto(),
-	dagerPerUke = dagerPerUke?.toFloat(),
+	dagerPerUke = dagerPerUke,
 	prosentStilling = prosentStilling,
 	registrertDato = registrertDato,
 )
