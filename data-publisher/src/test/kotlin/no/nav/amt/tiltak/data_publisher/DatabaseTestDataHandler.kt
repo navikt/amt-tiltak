@@ -13,10 +13,12 @@ import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
 import no.nav.amt.tiltak.test.database.data.inputs.GjennomforingInput
 import no.nav.amt.tiltak.test.database.data.inputs.NavAnsattInput
 import no.nav.amt.tiltak.test.database.data.inputs.NavEnhetInput
+import no.nav.amt.tiltak.test.database.data.inputs.SkjultDeltakerInput
 import no.nav.amt.tiltak.test.database.data.inputs.TiltakInput
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Month
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.Random
@@ -53,6 +55,13 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 	): DeltakerInput = deltakerInput(brukerId, gjennomforingId, registrertDato, endretDato)
 		.also { testDataRepository.insertDeltaker(it) }
 		.also { testDataRepository.insertDeltakerStatus(createDeltakerStatus(it.id)) }
+
+	fun skjulDeltaker(
+		deltakerId: UUID,
+		skjultAvArrangorAnsattId: UUID,
+		skjultTil: LocalDateTime = LocalDateTime.of(2999, Month.DECEMBER, 31, 0, 0)
+	) : SkjultDeltakerInput = skjultDeltakerInput(deltakerId, skjultAvArrangorAnsattId, skjultTil)
+		.also { testDataRepository.insertSkjultDeltaker(it) }
 
 	fun createEndringsmelding(
 		deltakerId: UUID = createDeltaker().id,
@@ -205,4 +214,16 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		telefonnummer = UUID.randomUUID().toString(),
 		epost = UUID.randomUUID().toString()
 	)
+
+	private fun skjultDeltakerInput(
+		deltakerId: UUID,
+		skjultAvArrangorAnsattId: UUID,
+		skjultTil: LocalDateTime
+	) = SkjultDeltakerInput(
+		id = UUID.randomUUID(),
+		deltakerId = deltakerId,
+		skjultAvArrangorAnsattId = skjultAvArrangorAnsattId,
+		skjultTil = skjultTil.atZone(ZoneId.systemDefault())
+	)
+
 }

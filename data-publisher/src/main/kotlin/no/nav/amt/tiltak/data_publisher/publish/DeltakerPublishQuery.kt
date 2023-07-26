@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.data_publisher.publish
 
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getLocalDate
+import no.nav.amt.tiltak.common.db_utils.getLocalDateTime
 import no.nav.amt.tiltak.common.db_utils.getNullableDouble
 import no.nav.amt.tiltak.common.db_utils.getNullableFloat
 import no.nav.amt.tiltak.common.db_utils.getNullableLocalDate
@@ -31,6 +32,20 @@ class DeltakerPublishQuery(
 		val deltaker = getDeltaker(id) ?: return Result.PublishTombstone()
 
 		if (deltaker.status == null) return Result.DontPublish()
+
+		val skjulinger = getSkjuling(id)
+
+		val skjult = skjulinger
+			.maxByOrNull { it.createdAt }
+			?.let {
+				if (it.skjultTil.isAfter(LocalDateTime.now())) {
+					DeltakerSkjultDto(
+						skjultAvAnsattId = it.skjultAvAnsattId,
+						dato = it.createdAt
+					)
+
+				} else null
+			}
 
 		return DeltakerPublishDto(
 			deltaker.id,
@@ -69,55 +84,47 @@ class DeltakerPublishQuery(
 				gyldigFra = deltaker.statusGyldigFra!!,
 				opprettetDato = deltaker.statusCreatedAt!!
 			),
-			skjult = deltaker.skjultAvAnsattId?.let {
-				DeltakerSkjultDto(
-					skjultAvAnsattId = deltaker.skjultAvAnsattId,
-					dato = deltaker.skjultCreatedAt!!
-				)
-			},
+			skjult = skjult,
 			deltarPaKurs = deltaker.deltarPaKurs
 		).let { Result.OK(it) }
 	}
 
 	private fun getDeltaker(deltakerId: UUID): DeltakerDbo? {
 		val sql = """
-		select deltaker.id                                  as deltakerId,
-			   deltaker.gjennomforing_id                    as deltakerlisteId,
-			   bruker.person_ident,
-			   bruker.fornavn,
-			   bruker.mellomnavn,
-			   bruker.er_skjermet                           as er_skjermet,
-			   bruker.etternavn,
-			   bruker.telefonnummer,
-			   bruker.epost,
-			   deltaker.dager_per_uke,
-			   deltaker.prosent_stilling,
-			   deltaker.start_dato,
-			   deltaker.slutt_dato,
-			   deltaker.registrert_dato,
-			   deltaker.innsok_begrunnelse,
-			   nav_enhet.navn                               as nav_enhet_navn,
-			   nav_ansatt.id                                as nav_ansatt_id,
-			   nav_ansatt.navn                              as nav_ansatt_navn,
-			   nav_ansatt.epost                             as nav_ansatt_epost,
-			   nav_ansatt.telefonnummer                     as nav_ansatt_telefonnummer,
-			   status.status                                as status,
-			   status.aarsak                                as status_aarsak,
-			   status.gyldig_fra                            as status_gyldig_fra,
-			   status.created_at                            as status_opprettet_dato,
-			   skjult_deltaker.skjult_av_arrangor_ansatt_id as skjult_av_arrangor_id,
-			   skjult_deltaker.created_at                   as skjult_pa_dato,
-			   gjennomforing.er_kurs
-		from deltaker
-				 left join gjennomforing on deltaker.gjennomforing_id = gjennomforing.id
-				 left join bruker on deltaker.bruker_id = bruker.id
-				 left join nav_enhet on bruker.nav_enhet_id = nav_enhet.id
-				 left join nav_ansatt on bruker.ansvarlig_veileder_id = nav_ansatt.id
-				 left join (select deltaker_id, status, aarsak, gyldig_fra, created_at
-							from deltaker_status
-							where aktiv is true) status on status.deltaker_id = deltaker.id
-				 left join skjult_deltaker on skjult_deltaker.deltaker_id = deltaker.id
-		where deltaker.id = :deltakerId
+			select deltaker.id                                  as deltakerId,
+				   deltaker.gjennomforing_id                    as deltakerlisteId,
+				   bruker.person_ident,
+				   bruker.fornavn,
+				   bruker.mellomnavn,
+				   bruker.er_skjermet                           as er_skjermet,
+				   bruker.etternavn,
+				   bruker.telefonnummer,
+				   bruker.epost,
+				   deltaker.dager_per_uke,
+				   deltaker.prosent_stilling,
+				   deltaker.start_dato,
+				   deltaker.slutt_dato,
+				   deltaker.registrert_dato,
+				   deltaker.innsok_begrunnelse,
+				   nav_enhet.navn                               as nav_enhet_navn,
+				   nav_ansatt.id                                as nav_ansatt_id,
+				   nav_ansatt.navn                              as nav_ansatt_navn,
+				   nav_ansatt.epost                             as nav_ansatt_epost,
+				   nav_ansatt.telefonnummer                     as nav_ansatt_telefonnummer,
+				   status.status                                as status,
+				   status.aarsak                                as status_aarsak,
+				   status.gyldig_fra                            as status_gyldig_fra,
+				   status.created_at                            as status_opprettet_dato,
+				   gjennomforing.er_kurs
+			from deltaker
+					 left join gjennomforing on deltaker.gjennomforing_id = gjennomforing.id
+					 left join bruker on deltaker.bruker_id = bruker.id
+					 left join nav_enhet on bruker.nav_enhet_id = nav_enhet.id
+					 left join nav_ansatt on bruker.ansvarlig_veileder_id = nav_ansatt.id
+					 left join (select deltaker_id, status, aarsak, gyldig_fra, created_at
+								from deltaker_status
+								where aktiv is true) status on status.deltaker_id = deltaker.id
+			where deltaker.id = :deltakerId
 		""".trimIndent()
 
 		return template.query(
@@ -127,6 +134,31 @@ class DeltakerPublishQuery(
 		).firstOrNull()
 	}
 
+	private fun getSkjuling(deltakerId: UUID): List<SkjultDeltakerDbo> = template.query(
+		"SELECT * FROM skjult_deltaker WHERE deltaker_id = :deltaker_id",
+		sqlParameters("deltaker_id" to deltakerId),
+		SkjultDeltakerDbo.rowMapper
+	)
+
+	private data class SkjultDeltakerDbo(
+		val id: UUID,
+		val deltakerId: UUID,
+		val skjultAvAnsattId: UUID,
+		val skjultTil: LocalDateTime,
+		val createdAt: LocalDateTime
+	) {
+		companion object {
+			val rowMapper = RowMapper { rs, _ ->
+				SkjultDeltakerDbo(
+					rs.getUUID("id"),
+					rs.getUUID("deltaker_id"),
+					rs.getUUID("skjult_av_arrangor_ansatt_id"),
+					rs.getLocalDateTime("skjult_til"),
+					rs.getLocalDateTime("created_at")
+				)
+			}
+		}
+	}
 
 	private data class DeltakerDbo(
 		val id: UUID,
@@ -153,8 +185,6 @@ class DeltakerPublishQuery(
 		val statusAarsak: String?,
 		val statusGyldigFra: LocalDateTime?,
 		val statusCreatedAt: LocalDateTime?,
-		val skjultAvAnsattId: UUID?,
-		val skjultCreatedAt: LocalDateTime?,
 		val deltarPaKurs: Boolean
 	) {
 		companion object {
@@ -184,8 +214,6 @@ class DeltakerPublishQuery(
 					statusAarsak = rs.getNullableString("status_aarsak"),
 					statusGyldigFra = rs.getNullableLocalDateTime("status_gyldig_fra"),
 					statusCreatedAt = rs.getNullableLocalDateTime("status_opprettet_dato"),
-					skjultAvAnsattId = rs.getNullableUUID("skjult_av_arrangor_id"),
-					skjultCreatedAt = rs.getNullableLocalDateTime("skjult_pa_dato"),
 					deltarPaKurs = rs.getBoolean("er_kurs")
 				)
 			}
