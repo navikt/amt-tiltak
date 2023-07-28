@@ -1,5 +1,7 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 
+import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
+import no.nav.amt.tiltak.clients.amt_person.model.erBeskyttet
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.Gjennomforing
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.MulighetsrommetApiClient
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
@@ -7,7 +9,6 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavEnhetService
@@ -24,11 +25,11 @@ import java.util.UUID
 class DeltakerProcessor(
 	private val gjennomforingService: GjennomforingService,
 	private val deltakerService: DeltakerService,
-	private val brukerService: BrukerService,
 	private val arrangorService: ArrangorService,
 	private val tiltakService: TiltakService,
 	private val navEnhetService: NavEnhetService,
 	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
+	private val amtPersonClient: AmtPersonClient,
 	private val transactionTemplate: TransactionTemplate
 ) : GenericProcessor<DeltakerPayload>() {
 
@@ -52,7 +53,11 @@ class DeltakerProcessor(
 			return
 		}
 
-		if (brukerService.erAdressebeskyttet(deltakerFnr)) {
+		val erAdressebeskyttet = amtPersonClient.hentAdressebeskyttelse(deltakerFnr)
+			.getOrThrow()
+			.erBeskyttet()
+
+		if (erAdressebeskyttet) {
 			log.info("Deltaker har diskresjonskode og skal filtreres ut")
 			return
 		}

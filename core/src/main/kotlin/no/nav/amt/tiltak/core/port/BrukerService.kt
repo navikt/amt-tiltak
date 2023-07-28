@@ -36,6 +36,4 @@ interface BrukerService {
 
 	fun upsert(bruker: Bruker)
 
-	fun erAdressebeskyttet(personident: String): Boolean
-
 }

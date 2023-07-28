@@ -1,7 +1,6 @@
 package no.nav.amt.tiltak.deltaker.service
 
 import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
-import no.nav.amt.tiltak.clients.amt_person.model.erBeskyttet
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.IdentType
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
@@ -184,10 +183,6 @@ class BrukerServiceImpl(
 	override fun upsert(bruker: Bruker) {
 		brukerRepository.upsert(bruker)
 	}
-
-	override fun erAdressebeskyttet(personident: String) = amtPersonClient.hentAdressebeskyttelse(personident)
-			.getOrThrow()
-			.erBeskyttet()
 
 	private fun createBruker(personident: String): UUID {
 		val navBruker = amtPersonClient.hentNavBruker(personident).getOrThrow()
