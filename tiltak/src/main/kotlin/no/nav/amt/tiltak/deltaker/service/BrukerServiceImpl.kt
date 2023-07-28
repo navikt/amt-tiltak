@@ -195,7 +195,7 @@ class BrukerServiceImpl(
 		navBruker.navEnhet?.let { navEnhetService.upsert(it) }
 		brukerRepository.upsert(navBruker.toBruker())
 
-		return navBruker.id
+		return navBruker.personId
 	}
 
 	private fun getAndUpdateBrukerData(bruker: BrukerDbo): Boolean {

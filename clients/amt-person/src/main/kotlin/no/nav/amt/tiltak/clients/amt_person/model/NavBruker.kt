@@ -5,7 +5,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import java.util.UUID
 
 data class NavBruker(
-	val id: UUID,
+	val personId: UUID,
 	val personident: String,
 	val fornavn: String,
 	val mellomnavn: String?,
@@ -17,7 +17,7 @@ data class NavBruker(
 	val erSkjermet: Boolean,
 ) {
 	fun toBruker() = Bruker(
-		id = id,
+		id = personId,
 		personIdent = personident,
 		personIdentType = null,
 		historiskeIdenter = emptyList(),

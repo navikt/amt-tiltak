@@ -39,17 +39,17 @@ class AmtPersonClientImplTest {
 		)
 
 		val bruker = NavBrukerDto(
-				id = UUID.randomUUID(),
-				personident = personident,
-				fornavn = "Fornavn",
-				mellomnavn = "Mellomnavn",
-				etternavn = "Etternavn",
-				navVeilederId = UUID.randomUUID(),
-				navEnhet = navEnhet,
-				telefon = "77742777",
-				epost = "bruker@nav.no",
-				erSkjermet = false,
-			)
+			personId = UUID.randomUUID(),
+			personident = personident,
+			fornavn = "Fornavn",
+			mellomnavn = "Mellomnavn",
+			etternavn = "Etternavn",
+			navVeilederId = UUID.randomUUID(),
+			navEnhet = navEnhet,
+			telefon = "77742777",
+			epost = "bruker@nav.no",
+			erSkjermet = false,
+		)
 
 		server.enqueue(
 			MockResponse().setBody(
@@ -59,7 +59,7 @@ class AmtPersonClientImplTest {
 
 		val faktiskBruker = client.hentNavBruker(personident).getOrThrow()
 
-		faktiskBruker.id shouldBe bruker.id
+		faktiskBruker.personId shouldBe bruker.personId
 		faktiskBruker.erSkjermet shouldBe bruker.erSkjermet
 		faktiskBruker.personident shouldBe bruker.personident
 		faktiskBruker.fornavn shouldBe bruker.fornavn

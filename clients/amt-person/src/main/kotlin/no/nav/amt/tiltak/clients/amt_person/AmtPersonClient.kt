@@ -8,7 +8,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 
 interface AmtPersonClient {
 
-	fun hentNavBruker(personIdent: String): Result<NavBruker>
+	fun hentNavBruker(personident: String): Result<NavBruker>
 	fun hentNavAnsatt(navIdent: String): Result<NavAnsatt>
 	fun hentNavEnhet(enhetId: String): Result<NavEnhet>
 	fun hentAdressebeskyttelse(personident: String): Result<AdressebeskyttelseGradering?>

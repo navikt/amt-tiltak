@@ -91,7 +91,7 @@ class MockAmtPersonHttpServer : MockHttpServer("MockAmtPersonHttpServer") {
 }
 
 fun mockNavBruker(bruker: BrukerInput, navEnhet: NavEnhetInput) = NavBruker(
-	id = bruker.id,
+	personId = bruker.id,
 	personident = bruker.personIdent,
 	fornavn = bruker.fornavn,
 	mellomnavn = bruker.mellomnavn,

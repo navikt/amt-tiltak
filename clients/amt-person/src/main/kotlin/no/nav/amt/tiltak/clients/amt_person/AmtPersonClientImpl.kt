@@ -34,7 +34,7 @@ class AmtPersonClientImpl(
 			val navBruker = fromJsonString<NavBrukerDto>(body)
 
 			NavBruker(
-				id = navBruker.id,
+				personId = navBruker.personId,
 				personident = navBruker.personident,
 				fornavn = navBruker.fornavn,
 				mellomnavn = navBruker.mellomnavn,
