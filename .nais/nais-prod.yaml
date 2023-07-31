@@ -132,8 +132,6 @@ spec:
       value: amt.arrangor-ansatt-v1
     - name: ENDRINGSMELDIG_TOPIC
       value: amt.endringsmelding-v1
-    - name: AKTOR_V2_TOPIC
-      value: pdl.aktor-v2
 
   gcp:
     sqlInstances:

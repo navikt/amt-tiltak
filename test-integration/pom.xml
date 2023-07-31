@@ -68,10 +68,5 @@
             <artifactId>mock-oauth2-server</artifactId>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.github.avro-kotlin.avro4k</groupId>
-            <artifactId>avro4k-core</artifactId>
-            <scope>runtime</scope>
-        </dependency>
     </dependencies>
 </project>

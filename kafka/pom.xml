@@ -17,7 +17,6 @@
         <module>kafka-config</module>
         <module>kafka-producer</module>
         <module>gjennomforing-ingestor</module>
-        <module>pdl-aktor-v2-ingestor</module>
         <module>arrangor-ingestor</module>
         <module>ansatt-ingestor</module>
     </modules>

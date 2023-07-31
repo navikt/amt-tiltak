@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.test.integration
 
-import io.confluent.kafka.schemaregistry.client.MockSchemaRegistryClient
 import no.nav.amt.tiltak.kafka.config.KafkaProperties
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.integration.utils.SingletonKafkaProvider
@@ -30,11 +29,6 @@ open class IntegrationTestConfiguration {
 	@Bean
 	open fun testDataRepository(template: NamedParameterJdbcTemplate): TestDataRepository {
 		return TestDataRepository(template)
-	}
-
-	@Bean
-	open fun schemaRegistryClient() : MockSchemaRegistryClient {
-		return MockSchemaRegistryClient()
 	}
 
 }

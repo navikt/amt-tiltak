@@ -92,10 +92,6 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>pdl-aktor-v2-ingestor</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>arrangor-ingestor</artifactId>
         </dependency>
         <dependency>

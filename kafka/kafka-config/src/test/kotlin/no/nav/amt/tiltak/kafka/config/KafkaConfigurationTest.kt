@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.kafka.config
 
-import no.nav.amt.tiltak.core.kafka.AktorV2Ingestor
 import no.nav.amt.tiltak.core.kafka.AmtArrangorIngestor
 import no.nav.amt.tiltak.core.kafka.AnsattIngestor
 import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
@@ -28,7 +27,6 @@ class KafkaConfigurationTest {
 	private val amtTiltakTopic = "test.amt-tiltak"
 	private val sisteTiltaksgjennomforingerTopic: String = "test.siste-tiltaksgjennomforinger"
 	private val deltakerTopic: String = "test.deltaker-v1"
-	private val aktorV2Topic: String = "test.aktor-v2"
 	private val amtArrangorTopic: String = "test.arrangor-v1"
 	private val amtArrangorAnsattTopic: String = "test.ansatt-v1"
 
@@ -44,7 +42,6 @@ class KafkaConfigurationTest {
 			amtTiltakTopic = amtTiltakTopic,
 			sisteTiltaksgjennomforingerTopic = sisteTiltaksgjennomforingerTopic,
 			deltakerTopic = deltakerTopic,
-			aktorV2Topic = aktorV2Topic,
 			amtArrangorAnsattTopic = amtArrangorAnsattTopic,
 			amtArrangorTopic = amtArrangorTopic,
 			amtDeltakerTopic = "",
@@ -86,12 +83,6 @@ class KafkaConfigurationTest {
 			}
 		}
 
-		val aktorV2Ingestor = object : AktorV2Ingestor {
-			override fun ingestKafkaRecord(key: String, value: ByteArray?) {
-				counter.incrementAndGet()
-			}
-		}
-
 		val arrangorIngestor = object : AmtArrangorIngestor {
 			override fun ingestArrangor(recordValue: String?) {
 				counter.incrementAndGet()
@@ -111,7 +102,6 @@ class KafkaConfigurationTest {
 			JdbcTemplate(dataSource),
 			arenaAclIngestor,
 			gjennomforingIngestor,
-			aktorV2Ingestor,
 			arrangorIngestor,
 			ansattIngestor
 		)

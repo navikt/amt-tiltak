@@ -10,7 +10,6 @@ import no.nav.common.kafka.consumer.util.deserializer.Deserializers.stringDeseri
 import no.nav.common.kafka.spring.PostgresJdbcTemplateConsumerRepository
 import okhttp3.internal.toImmutableList
 import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.slf4j.LoggerFactory
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration
@@ -28,7 +27,6 @@ open class KafkaConfiguration(
 	jdbcTemplate: JdbcTemplate,
 	arenaAclIngestor: ArenaAclIngestor,
 	gjennomforingIngestor: GjennomforingIngestor,
-	aktorV2Ingestor: AktorV2Ingestor,
 	arrangorIngestor: AmtArrangorIngestor,
 	ansattIngestor: AnsattIngestor
 ) {
@@ -61,18 +59,6 @@ open class KafkaConfiguration(
 					stringDeserializer(),
 					stringDeserializer(),
 					Consumer<ConsumerRecord<String, String>> { gjennomforingIngestor.ingestKafkaRecord(it.key(), it.value()) }
-				)
-		)
-
-		topicConfigs.add(
-			KafkaConsumerClientBuilder.TopicConfig<String, ByteArray>()
-				.withLogging()
-				.withStoreOnFailure(consumerRepository)
-				.withConsumerConfig(
-					kafkaTopicProperties.aktorV2Topic,
-					stringDeserializer(),
-					ByteArrayDeserializer(),
-					Consumer<ConsumerRecord<String, ByteArray>> { aktorV2Ingestor.ingestKafkaRecord(it.key(), it.value()) }
 				)
 		)
 

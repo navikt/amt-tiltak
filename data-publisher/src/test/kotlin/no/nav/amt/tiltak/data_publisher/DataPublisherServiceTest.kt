@@ -78,7 +78,6 @@ private fun createTopicProperties(): KafkaTopicProperties = KafkaTopicProperties
 	amtTiltakTopic = "",
 	sisteTiltaksgjennomforingerTopic = "",
 	deltakerTopic = "",
-	aktorV2Topic = "",
 	amtArrangorTopic = "",
 	amtEndringsmeldingTopic = "",
 	amtDeltakerlisteTopic = "",
