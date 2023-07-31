@@ -133,7 +133,7 @@ spec:
     - name: ENDRINGSMELDIG_TOPIC
       value: amt.endringsmelding-v1
     - name: NAV_BRUKER_PERSONALIA_TOPIC
-      value: nav-bruker-personalia-v1
+      value: amt.nav-bruker-personalia-v1
 
   gcp:
     sqlInstances:
