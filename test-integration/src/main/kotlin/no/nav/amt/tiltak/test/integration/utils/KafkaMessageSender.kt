@@ -14,8 +14,6 @@ class KafkaMessageSender(
 	private val amtTiltakTopic: String,
 	@Value("\${app.env.sisteTiltaksgjennomforingerTopic}")
 	private val sisteTiltaksgjennomforingerTopic: String,
-	@Value("\${app.env.sisteTilordnetVeilederTopic}")
-	private val sisteTilordnetVeilederTopic: String,
 	@Value("\${app.env.arenaTiltakDeltakerTopic}")
 	private val arenaTiltakDeltakerTopic: String,
 	@Value("\${app.env.leesahTopic}")

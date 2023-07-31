@@ -116,8 +116,6 @@ spec:
     - name: UNLEASH_URL
       value: https://unleash.nais.io/api/
     # Kafka topics
-    - name: SISTE_TILORDNET_VEILEDER_TOPIC
-      value: pto.siste-tilordnet-veileder-v1
     - name: SISTE_TILTAKSGJENNOMFORINGER_TOPIC
       value: team-mulighetsrommet.siste-tiltaksgjennomforinger-v1
     - name: AMT_TILTAK_TOPIC

@@ -5,7 +5,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(prefix = "app.env")
 data class KafkaTopicProperties(
 	val amtTiltakTopic: String,
-	val sisteTilordnetVeilederTopic: String,
 	val sisteTiltaksgjennomforingerTopic: String,
 	val leesahTopic: String,
 	val deltakerTopic: String,

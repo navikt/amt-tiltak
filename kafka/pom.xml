@@ -16,7 +16,6 @@
         <module>arena-acl-ingestor</module>
         <module>kafka-config</module>
         <module>kafka-producer</module>
-        <module>tildelt-veileder-ingestor</module>
         <module>gjennomforing-ingestor</module>
         <module>pdl-leesah-ingestor</module>
         <module>pdl-aktor-v2-ingestor</module>

@@ -76,7 +76,6 @@ class DataPublisherServiceTest : FunSpec({
 
 private fun createTopicProperties(): KafkaTopicProperties = KafkaTopicProperties(
 	amtTiltakTopic = "",
-	sisteTilordnetVeilederTopic = "",
 	sisteTiltaksgjennomforingerTopic = "",
 	leesahTopic = "",
 	deltakerTopic = "",

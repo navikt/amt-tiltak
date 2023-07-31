@@ -92,10 +92,6 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>tildelt-veileder-ingestor</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>pdl-leesah-ingestor</artifactId>
         </dependency>
         <dependency>
