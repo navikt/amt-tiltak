@@ -18,8 +18,6 @@ class KafkaMessageSender(
 	private val sisteTilordnetVeilederTopic: String,
 	@Value("\${app.env.arenaTiltakDeltakerTopic}")
 	private val arenaTiltakDeltakerTopic: String,
-	@Value("\${app.env.endringPaaBrukerTopic}")
-	private val endringPaaBrukerTopic: String,
 	@Value("\${app.env.skjermedePersonerTopic}")
 	private val skjermedePersonerTopic: String,
 	@Value("\${app.env.leesahTopic}")
