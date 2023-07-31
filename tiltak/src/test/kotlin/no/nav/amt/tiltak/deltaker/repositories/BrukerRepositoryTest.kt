@@ -82,6 +82,26 @@ class BrukerRepositoryTest : FunSpec({
 		nyBruker.modifiedAt shouldBeAfter originalBruker!!.modifiedAt
 	}
 
+	test("upsert(Bruker) - bruker finnes - oppdaterer eksisterende bruker") {
+		val originalBruker = repository.get(BRUKER_2.personIdent)
+
+		val oppdatertBruker = BRUKER_2.copy(
+			fornavn = "nytt",
+			mellomnavn = null,
+			etternavn = "navn",
+			personIdent = "nytt fnr"
+		)
+
+		repository.upsert(oppdatertBruker.toModel())
+
+		val nyBruker = repository.get(originalBruker!!.id)!!
+		nyBruker.fornavn shouldBe oppdatertBruker.fornavn
+		nyBruker.mellomnavn shouldBe oppdatertBruker.mellomnavn
+		nyBruker.etternavn shouldBe oppdatertBruker.etternavn
+		nyBruker.personIdent shouldBe oppdatertBruker.personIdent
+		nyBruker.modifiedAt shouldBeAfter originalBruker!!.modifiedAt
+	}
+
 	test("Get user that does not exist should be null") {
 		repository.get("234789") shouldBe null
 	}

@@ -1,11 +1,12 @@
 package no.nav.amt.tiltak.clients.amt_person.model
 
-import java.util.*
+import no.nav.amt.tiltak.core.domain.tiltak.Bruker
+import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
+import java.util.UUID
 
 data class NavBruker(
-	val id: UUID,
-	val personIdent: String,
-	val personIdentType: IdentType?,
+	val personId: UUID,
+	val personident: String,
 	val fornavn: String,
 	val mellomnavn: String?,
 	val etternavn: String,
@@ -15,12 +16,20 @@ data class NavBruker(
 	val epost: String?,
 	val erSkjermet: Boolean,
 ) {
-	enum class IdentType{
-		FOLKEREGISTERIDENT, NPID
-	}
-	data class NavEnhet(
-		val id: UUID,
-		val enhetId: String,
-		val navn: String,
+	fun toBruker() = Bruker(
+		id = personId,
+		personIdent = personident,
+		personIdentType = null,
+		historiskeIdenter = emptyList(),
+		fornavn = fornavn,
+		mellomnavn = mellomnavn,
+		etternavn = etternavn,
+		telefonnummer = telefon,
+		epost = epost,
+		ansvarligVeilederId = navVeilederId,
+		navEnhetId = navEnhet?.id,
+		erSkjermet = erSkjermet,
 	)
+
+
 }

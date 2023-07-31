@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.test.database.data.inputs
 
+import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import java.util.UUID
 
 data class BrukerInput(
@@ -13,5 +14,20 @@ data class BrukerInput(
     val ansvarligVeilederId: UUID?,
     val navEnhet: NavEnhetInput?,
 	val erSkjermet: Boolean
-)
+) {
+	fun toModel() = Bruker(
+		id = id,
+		personIdent = personIdent,
+		personIdentType = null,
+		historiskeIdenter = emptyList(),
+		fornavn = fornavn,
+		mellomnavn = mellomnavn,
+		etternavn = etternavn,
+		telefonnummer = telefonnummer,
+		epost = epost,
+		ansvarligVeilederId = ansvarligVeilederId,
+		navEnhetId = navEnhet?.id,
+		erSkjermet = erSkjermet
+	)
+}
 

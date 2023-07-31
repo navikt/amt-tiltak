@@ -1,5 +1,7 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 
+import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
+import no.nav.amt.tiltak.clients.amt_person.model.erBeskyttet
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.Gjennomforing
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.MulighetsrommetApiClient
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
@@ -10,7 +12,6 @@ import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavEnhetService
-import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
@@ -18,17 +19,17 @@ import no.nav.amt.tiltak.kafka.tiltaksgjennomforing_ingestor.GjennomforingStatus
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
-import java.util.*
+import java.util.UUID
 
 @Service
 class DeltakerProcessor(
 	private val gjennomforingService: GjennomforingService,
 	private val deltakerService: DeltakerService,
-	private val personService: PersonService,
 	private val arrangorService: ArrangorService,
 	private val tiltakService: TiltakService,
 	private val navEnhetService: NavEnhetService,
 	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
+	private val amtPersonClient: AmtPersonClient,
 	private val transactionTemplate: TransactionTemplate
 ) : GenericProcessor<DeltakerPayload>() {
 
@@ -52,10 +53,12 @@ class DeltakerProcessor(
 			return
 		}
 
-		val person = personService.hentPerson(deltakerFnr)
+		val erAdressebeskyttet = amtPersonClient.hentAdressebeskyttelse(deltakerFnr)
+			.getOrThrow()
+			.erBeskyttet()
 
-		if (person.diskresjonskode != null) {
-			log.info("Deltaker har diskresjonskode ${person.diskresjonskode} og skal filtreres ut")
+		if (erAdressebeskyttet) {
+			log.info("Deltaker har diskresjonskode og skal filtreres ut")
 			return
 		}
 

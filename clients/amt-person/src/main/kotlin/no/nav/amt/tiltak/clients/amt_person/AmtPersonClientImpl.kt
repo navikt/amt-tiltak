@@ -1,9 +1,11 @@
 package no.nav.amt.tiltak.clients.amt_person
 
+import no.nav.amt.tiltak.clients.amt_person.dto.AdressebeskyttelseDto
 import no.nav.amt.tiltak.clients.amt_person.dto.NavAnsattDto
 import no.nav.amt.tiltak.clients.amt_person.dto.NavBrukerDto
 import no.nav.amt.tiltak.clients.amt_person.dto.NavEnhetDto
 import no.nav.amt.tiltak.clients.amt_person.dto.OpprettNavBrukerDto
+import no.nav.amt.tiltak.clients.amt_person.model.AdressebeskyttelseGradering
 import no.nav.amt.tiltak.clients.amt_person.model.NavBruker
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.common.json.JsonUtils.toJsonString
@@ -27,19 +29,18 @@ class AmtPersonClientImpl(
 
 	private val mediaTypeJson = "application/json".toMediaType()
 	private val log = LoggerFactory.getLogger(javaClass)
-	override fun hentNavBruker(personIdent: String): Result<NavBruker> {
-		return hentEllerOpprett("nav-bruker", NavBrukerRequest(personIdent)) { body ->
+	override fun hentNavBruker(personident: String): Result<NavBruker> {
+		return hentEllerOpprett("nav-bruker", PersonRequest(personident)) { body ->
 			val navBruker = fromJsonString<NavBrukerDto>(body)
 
 			NavBruker(
-				id = navBruker.id,
-				personIdent = navBruker.personIdent,
-				personIdentType = navBruker.personIdentType?.let { NavBruker.IdentType.valueOf(it) },
+				personId = navBruker.personId,
+				personident = navBruker.personident,
 				fornavn = navBruker.fornavn,
 				mellomnavn = navBruker.mellomnavn,
 				etternavn = navBruker.etternavn,
 				navVeilederId = navBruker.navVeilederId,
-				navEnhet = navBruker.navEnhet?.let { NavBruker.NavEnhet(it.id, it.enhetId, it.navn) },
+				navEnhet = navBruker.navEnhet?.let { NavEnhet(it.id, it.enhetId, it.navn) },
 				telefon = navBruker.telefon,
 				epost = navBruker.epost,
 				erSkjermet = navBruker.erSkjermet,
@@ -70,6 +71,23 @@ class AmtPersonClientImpl(
 				enhetId = navEnhetDto.enhetId,
 				navn = navEnhetDto.navn
 			)
+		}
+	}
+
+	override fun hentAdressebeskyttelse(personident: String): Result<AdressebeskyttelseGradering?> {
+		val endepunkt = "person/adressebeskyttelse"
+		val request = buildRequest(endepunkt, PersonRequest(personident))
+
+		httpClient.newCall(request).execute().use { response ->
+			if (!response.isSuccessful) {
+				return when (response.code) {
+					404 -> Result.failure(NoSuchElementException("Klarte ikke å hente $endepunkt fra amt-person-service. status=${response.code}"))
+					else -> Result.failure(RuntimeException("Klarte ikke å hente $endepunkt fra amt-person-service. status=${response.code}"))
+				}
+			}
+			val body = response.body?.string() ?: return Result.failure(RuntimeException("Body is missing"))
+
+			return Result.success(fromJsonString<AdressebeskyttelseDto>(body).gradering)
 		}
 	}
 
