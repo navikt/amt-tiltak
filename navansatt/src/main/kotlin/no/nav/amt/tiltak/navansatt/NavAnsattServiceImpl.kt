@@ -49,23 +49,6 @@ internal class NavAnsattServiceImpl(
 		navAnsattRepository.upsert(input)
 	}
 
-	override fun migrerAlle() {
-		var offset = 0
-		var ansatte: List<NavAnsattDbo>
-
-		log.info("Migrerer nav ansatte fra amt-tiltak til amt-person-service")
-		do {
-			ansatte = navAnsattRepository.getAnsatte(offset)
-
-			ansatte.forEach { ansatt -> amtPersonClient.migrerNavAnsatt(ansatt.toNavAnsatt()) }
-
-			log.info("Migrerte nav ansatte fra offset: $offset til: ${offset + ansatte.size}")
-			offset += ansatte.size
-		} while (ansatte.isNotEmpty())
-
-		log.info("Migrering fullført. $offset nav ansatte ble migrert.")
-	}
-
 	private fun NavAnsattDbo.toNavAnsatt() = NavAnsatt(
 		id = id,
 		navIdent = navIdent,

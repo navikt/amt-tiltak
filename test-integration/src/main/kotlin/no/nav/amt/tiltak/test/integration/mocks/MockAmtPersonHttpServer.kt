@@ -18,10 +18,6 @@ import okhttp3.mockwebserver.RecordedRequest
 import java.util.UUID
 
 class MockAmtPersonHttpServer : MockHttpServer("MockAmtPersonHttpServer") {
-	init {
-		addResponseHandler("/api/migrer/nav-bruker", MockResponse().setResponseCode(200))
-		addResponseHandler("/api/migrer/nav-enhet", MockResponse().setResponseCode(200))
-	}
 
 	fun addNavBrukerResponse(navBruker: NavBruker) {
 		val request = toJsonString(PersonRequest(navBruker.personident))
