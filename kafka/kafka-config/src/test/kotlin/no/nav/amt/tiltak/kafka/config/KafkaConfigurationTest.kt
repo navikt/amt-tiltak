@@ -5,7 +5,6 @@ import no.nav.amt.tiltak.core.kafka.AmtArrangorIngestor
 import no.nav.amt.tiltak.core.kafka.AnsattIngestor
 import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
 import no.nav.amt.tiltak.core.kafka.GjennomforingIngestor
-import no.nav.amt.tiltak.core.kafka.LeesahIngestor
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.common.kafka.producer.KafkaProducerClientImpl
 import no.nav.common.kafka.producer.util.ProducerUtils.toJsonProducerRecord
@@ -28,7 +27,6 @@ class KafkaConfigurationTest {
 
 	private val amtTiltakTopic = "test.amt-tiltak"
 	private val sisteTiltaksgjennomforingerTopic: String = "test.siste-tiltaksgjennomforinger"
-	private val leesahTopic: String = "test.leesah-v1"
 	private val deltakerTopic: String = "test.deltaker-v1"
 	private val aktorV2Topic: String = "test.aktor-v2"
 	private val amtArrangorTopic: String = "test.arrangor-v1"
@@ -45,7 +43,6 @@ class KafkaConfigurationTest {
 		val kafkaTopicProperties = KafkaTopicProperties(
 			amtTiltakTopic = amtTiltakTopic,
 			sisteTiltaksgjennomforingerTopic = sisteTiltaksgjennomforingerTopic,
-			leesahTopic = leesahTopic,
 			deltakerTopic = deltakerTopic,
 			aktorV2Topic = aktorV2Topic,
 			amtArrangorAnsattTopic = amtArrangorAnsattTopic,
@@ -89,12 +86,6 @@ class KafkaConfigurationTest {
 			}
 		}
 
-		val leesahIngestor = object : LeesahIngestor {
-			override fun ingestKafkaRecord(aktorId: String, recordValue: ByteArray) {
-				counter.incrementAndGet()
-			}
-		}
-
 		val aktorV2Ingestor = object : AktorV2Ingestor {
 			override fun ingestKafkaRecord(key: String, value: ByteArray?) {
 				counter.incrementAndGet()
@@ -120,7 +111,6 @@ class KafkaConfigurationTest {
 			JdbcTemplate(dataSource),
 			arenaAclIngestor,
 			gjennomforingIngestor,
-			leesahIngestor,
 			aktorV2Ingestor,
 			arrangorIngestor,
 			ansattIngestor

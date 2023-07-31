@@ -6,7 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class KafkaTopicProperties(
 	val amtTiltakTopic: String,
 	val sisteTiltaksgjennomforingerTopic: String,
-	val leesahTopic: String,
 	val deltakerTopic: String,
 	val aktorV2Topic: String,
 

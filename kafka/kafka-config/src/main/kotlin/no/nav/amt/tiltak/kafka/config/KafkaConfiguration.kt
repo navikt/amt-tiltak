@@ -28,7 +28,6 @@ open class KafkaConfiguration(
 	jdbcTemplate: JdbcTemplate,
 	arenaAclIngestor: ArenaAclIngestor,
 	gjennomforingIngestor: GjennomforingIngestor,
-	leesahIngestor: LeesahIngestor,
 	aktorV2Ingestor: AktorV2Ingestor,
 	arrangorIngestor: AmtArrangorIngestor,
 	ansattIngestor: AnsattIngestor
@@ -62,18 +61,6 @@ open class KafkaConfiguration(
 					stringDeserializer(),
 					stringDeserializer(),
 					Consumer<ConsumerRecord<String, String>> { gjennomforingIngestor.ingestKafkaRecord(it.key(), it.value()) }
-				)
-		)
-
-		topicConfigs.add(
-			KafkaConsumerClientBuilder.TopicConfig<String, ByteArray>()
-				.withLogging()
-				.withStoreOnFailure(consumerRepository)
-				.withConsumerConfig(
-					kafkaTopicProperties.leesahTopic,
-					stringDeserializer(),
-					ByteArrayDeserializer(),
-					Consumer<ConsumerRecord<String, ByteArray>> { leesahIngestor.ingestKafkaRecord(it.key(), it.value()) }
 				)
 		)
 

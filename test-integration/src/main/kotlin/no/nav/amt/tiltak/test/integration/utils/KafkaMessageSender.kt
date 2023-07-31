@@ -16,8 +16,6 @@ class KafkaMessageSender(
 	private val sisteTiltaksgjennomforingerTopic: String,
 	@Value("\${app.env.arenaTiltakDeltakerTopic}")
 	private val arenaTiltakDeltakerTopic: String,
-	@Value("\${app.env.leesahTopic}")
-	private val leesahTopic: String,
 	@Value("\${app.env.aktorV2Topic}")
 	private val aktorV2Topic: String,
 	@Value("\${app.env.amtArrangorTopic}")
@@ -37,10 +35,6 @@ class KafkaMessageSender(
 
 	fun sendDeleteTilSisteTiltaksgjennomforingTopic(gjennomforingId: String) {
 		kafkaProducer.send(ProducerRecord(sisteTiltaksgjennomforingerTopic, gjennomforingId.toByteArray(), null))
-	}
-
-	fun sendTilLeesahTopic(aktorId: String, payload: ByteArray) {
-		kafkaProducer.send(ProducerRecord(leesahTopic, aktorId.toByteArray(), payload))
 	}
 
 	fun sendTilAktorV2Topic(key: String, payload: ByteArray) {

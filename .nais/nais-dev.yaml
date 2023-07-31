@@ -120,8 +120,6 @@ spec:
       value: team-mulighetsrommet.siste-tiltaksgjennomforinger-v1
     - name: AMT_TILTAK_TOPIC
       value: amt.amt-tiltak-v1
-    - name: LEESAH_TOPIC
-      value: pdl.leesah-v1
     - name: DELTAKER_TOPIC
       value: amt.deltaker-v1
     - name: DELTAKER_TOPIC_V2

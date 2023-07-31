@@ -196,11 +196,6 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>pdl-leesah-ingestor</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>pdl-aktor-v2-ingestor</artifactId>
                 <version>${project.version}</version>
             </dependency>
