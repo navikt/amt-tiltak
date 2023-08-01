@@ -63,7 +63,7 @@ class MulighetsrommetApiClientImpl(
 			val opprettetAar: Int,
 			val lopenr: Int,
 			val virksomhetsnummer: String?,
-			val ansvarligNavEnhetId: String,
+			val ansvarligNavEnhetId: String?,
 			val status: String
 		)
 	}
