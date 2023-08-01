@@ -49,6 +49,22 @@ internal class NavAnsattServiceImpl(
 		navAnsattRepository.upsert(input)
 	}
 
+	override fun opprettNavAnsattHvisIkkeFinnes(navAnsattId: UUID) {
+		if (navAnsattRepository.finnesAnsatt(navAnsattId)) return
+
+		val nyNavAnsatt = amtPersonClient.hentNavAnsatt(navAnsattId).getOrThrow()
+
+		upsertNavAnsatt(
+			UpsertNavAnsattInput(
+				id = nyNavAnsatt.id,
+				navIdent = nyNavAnsatt.navIdent,
+				navn = nyNavAnsatt.navn,
+				epost = nyNavAnsatt.epost,
+				telefonnummer = nyNavAnsatt.telefonnummer,
+			)
+		)
+	}
+
 	private fun NavAnsattDbo.toNavAnsatt() = NavAnsatt(
 		id = id,
 		navIdent = navIdent,

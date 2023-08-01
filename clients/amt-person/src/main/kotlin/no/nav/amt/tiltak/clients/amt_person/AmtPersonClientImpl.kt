@@ -14,7 +14,9 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+
 import java.time.Duration
+import java.util.UUID
 import java.util.function.Supplier
 
 class AmtPersonClientImpl(
@@ -41,6 +43,26 @@ class AmtPersonClientImpl(
 				epost = navBruker.epost,
 				erSkjermet = navBruker.erSkjermet,
 			)
+		}
+	}
+
+	override fun hentNavAnsatt(id: UUID): Result<NavAnsatt> {
+		val request = Request.Builder()
+			.url("$baseUrl/api/nav-ansatt/$id")
+			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
+			.get()
+			.build()
+
+		httpClient.newCall(request).execute().use { response ->
+			if (!response.isSuccessful) {
+				return when (response.code) {
+					404 -> Result.failure(NoSuchElementException("Nav-ansatt eksisterer ikke i amt-person-service. status=${response.code}"))
+					else -> Result.failure(RuntimeException("Klarte ikke å hente nav-ansatt fra amt-person-service. status=${response.code}"))
+				}
+			}
+			val body = response.body?.string() ?: return Result.failure(RuntimeException("Body is missing"))
+
+			return Result.success(fromJsonString(body))
 		}
 	}
 
@@ -72,7 +94,7 @@ class AmtPersonClientImpl(
 
 	override fun hentAdressebeskyttelse(personident: String): Result<AdressebeskyttelseGradering?> {
 		val endepunkt = "person/adressebeskyttelse"
-		val request = buildRequest(endepunkt, PersonRequest(personident))
+		val request = buildPostRequest(endepunkt, PersonRequest(personident))
 
 		httpClient.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
@@ -88,7 +110,7 @@ class AmtPersonClientImpl(
 	}
 
 	private fun <T> hentEllerOpprett(endepunkt: String, requestBody: Any, fn: (body: String) -> T): Result<T> {
-		val request = buildRequest(endepunkt, requestBody)
+		val request = buildPostRequest(endepunkt, requestBody)
 
 		httpClient.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
@@ -102,7 +124,7 @@ class AmtPersonClientImpl(
 		}
 	}
 
-	private fun buildRequest(endepunkt: String, requestBody: Any) = Request.Builder()
+	private fun buildPostRequest(endepunkt: String, requestBody: Any) = Request.Builder()
 		.url("$baseUrl/api/$endepunkt")
 		.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
 		.post(toJsonString(requestBody).toRequestBody(mediaTypeJson))

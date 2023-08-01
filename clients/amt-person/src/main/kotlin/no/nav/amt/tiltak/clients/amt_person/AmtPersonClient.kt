@@ -4,11 +4,13 @@ import no.nav.amt.tiltak.clients.amt_person.model.AdressebeskyttelseGradering
 import no.nav.amt.tiltak.clients.amt_person.model.NavBruker
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
+import java.util.UUID
 
 interface AmtPersonClient {
 
 	fun hentNavBruker(personident: String): Result<NavBruker>
 	fun hentNavAnsatt(navIdent: String): Result<NavAnsatt>
+	fun hentNavAnsatt(id: UUID): Result<NavAnsatt>
 	fun hentNavEnhet(enhetId: String): Result<NavEnhet>
 	fun hentAdressebeskyttelse(personident: String): Result<AdressebeskyttelseGradering?>
 

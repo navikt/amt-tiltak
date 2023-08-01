@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.IdentType
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.port.BrukerService
+import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.PersonService
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
@@ -19,6 +20,7 @@ class BrukerServiceImpl(
 	private val brukerRepository: BrukerRepository,
 	private val personService: PersonService,
 	private val navEnhetService: NavEnhetService,
+	private val navAnsattService: NavAnsattService,
 	private val amtPersonClient: AmtPersonClient,
 ) : BrukerService {
 
@@ -192,6 +194,8 @@ class BrukerServiceImpl(
 		val navBruker = amtPersonClient.hentNavBruker(personident).getOrThrow()
 
 		navBruker.navEnhet?.let { navEnhetService.upsert(it) }
+		navBruker.navVeilederId?.let { navAnsattService.opprettNavAnsattHvisIkkeFinnes(it) }
+
 		brukerRepository.upsert(navBruker.toBruker())
 
 		return navBruker.personId
