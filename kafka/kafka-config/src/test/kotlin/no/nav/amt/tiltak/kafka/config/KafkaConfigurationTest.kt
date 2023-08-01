@@ -1,14 +1,9 @@
 package no.nav.amt.tiltak.kafka.config
 
-import no.nav.amt.tiltak.core.kafka.AktorV2Ingestor
 import no.nav.amt.tiltak.core.kafka.AmtArrangorIngestor
 import no.nav.amt.tiltak.core.kafka.AnsattIngestor
 import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
-import no.nav.amt.tiltak.core.kafka.EndringPaaBrukerIngestor
 import no.nav.amt.tiltak.core.kafka.GjennomforingIngestor
-import no.nav.amt.tiltak.core.kafka.LeesahIngestor
-import no.nav.amt.tiltak.core.kafka.SkjermetPersonIngestor
-import no.nav.amt.tiltak.core.kafka.TildeltVeilederIngestor
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.common.kafka.producer.KafkaProducerClientImpl
 import no.nav.common.kafka.producer.util.ProducerUtils.toJsonProducerRecord
@@ -30,13 +25,8 @@ import java.util.concurrent.atomic.AtomicInteger
 class KafkaConfigurationTest {
 
 	private val amtTiltakTopic = "test.amt-tiltak"
-	private val sisteTilordnetVeilederTopic = "test.siste-tilordnet-veileder"
-	private val endringPaaBrukerTopic = "test.pto.endring-paa-oppfolgingsbruker"
-	private val skjermetPersonTopic = "nom.skjermede-personer-status-v1"
 	private val sisteTiltaksgjennomforingerTopic: String = "test.siste-tiltaksgjennomforinger"
-	private val leesahTopic: String = "test.leesah-v1"
 	private val deltakerTopic: String = "test.deltaker-v1"
-	private val aktorV2Topic: String = "test.aktor-v2"
 	private val amtArrangorTopic: String = "test.arrangor-v1"
 	private val amtArrangorAnsattTopic: String = "test.ansatt-v1"
 
@@ -50,13 +40,8 @@ class KafkaConfigurationTest {
 	fun `should ingest arena records after configuring kafka`() {
 		val kafkaTopicProperties = KafkaTopicProperties(
 			amtTiltakTopic = amtTiltakTopic,
-			sisteTilordnetVeilederTopic = sisteTilordnetVeilederTopic,
-			endringPaaBrukerTopic = endringPaaBrukerTopic,
-			skjermedePersonerTopic = skjermetPersonTopic,
 			sisteTiltaksgjennomforingerTopic = sisteTiltaksgjennomforingerTopic,
-			leesahTopic = leesahTopic,
 			deltakerTopic = deltakerTopic,
-			aktorV2Topic = aktorV2Topic,
 			amtArrangorAnsattTopic = amtArrangorAnsattTopic,
 			amtArrangorTopic = amtArrangorTopic,
 			amtDeltakerTopic = "",
@@ -92,37 +77,8 @@ class KafkaConfigurationTest {
 			}
 		}
 
-		val tildeltVeilederIngestor = object : TildeltVeilederIngestor {
-			override fun ingestKafkaRecord(recordValue: String) {
-				counter.incrementAndGet()
-			}
-		}
-
-		val endringPaaBrukerIngestor = object : EndringPaaBrukerIngestor {
-			override fun ingestKafkaRecord(recordValue: String) {
-				counter.incrementAndGet()
-			}
-		}
-		val skjermetPersonIngestor = object : SkjermetPersonIngestor {
-			override fun ingest(recordKey: String, recordValue: String) {
-				counter.incrementAndGet()
-			}
-		}
-
 		val gjennomforingIngestor = object : GjennomforingIngestor {
 			override fun ingestKafkaRecord(gjennomforingId: String, recordValue: String?) {
-				counter.incrementAndGet()
-			}
-		}
-
-		val leesahIngestor = object : LeesahIngestor {
-			override fun ingestKafkaRecord(aktorId: String, recordValue: ByteArray) {
-				counter.incrementAndGet()
-			}
-		}
-
-		val aktorV2Ingestor = object : AktorV2Ingestor {
-			override fun ingestKafkaRecord(key: String, value: ByteArray?) {
 				counter.incrementAndGet()
 			}
 		}
@@ -145,12 +101,7 @@ class KafkaConfigurationTest {
 			kafkaProperties,
 			JdbcTemplate(dataSource),
 			arenaAclIngestor,
-			tildeltVeilederIngestor,
-			endringPaaBrukerIngestor,
-			skjermetPersonIngestor,
 			gjennomforingIngestor,
-			leesahIngestor,
-			aktorV2Ingestor,
 			arrangorIngestor,
 			ansattIngestor
 		)
@@ -161,9 +112,6 @@ class KafkaConfigurationTest {
 		val value = "some value"
 
 		kafkaProducer.sendSync(toJsonProducerRecord(amtTiltakTopic, "1", value))
-		kafkaProducer.sendSync(toJsonProducerRecord(sisteTilordnetVeilederTopic, "1", value))
-		kafkaProducer.sendSync(toJsonProducerRecord(endringPaaBrukerTopic, "1", value))
-		kafkaProducer.sendSync(toJsonProducerRecord(skjermetPersonTopic, "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord(sisteTiltaksgjennomforingerTopic, "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord(amtArrangorTopic, "1", value))
 		kafkaProducer.sendSync(toJsonProducerRecord(amtArrangorAnsattTopic, "1", value))
@@ -174,7 +122,7 @@ class KafkaConfigurationTest {
 
 		Thread.sleep(3000)
 
-		assertEquals(7, counter.get())
+		assertEquals(4, counter.get())
 	}
 
 }

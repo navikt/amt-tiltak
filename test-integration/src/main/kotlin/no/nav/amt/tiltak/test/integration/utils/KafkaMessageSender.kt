@@ -14,18 +14,8 @@ class KafkaMessageSender(
 	private val amtTiltakTopic: String,
 	@Value("\${app.env.sisteTiltaksgjennomforingerTopic}")
 	private val sisteTiltaksgjennomforingerTopic: String,
-	@Value("\${app.env.sisteTilordnetVeilederTopic}")
-	private val sisteTilordnetVeilederTopic: String,
 	@Value("\${app.env.arenaTiltakDeltakerTopic}")
 	private val arenaTiltakDeltakerTopic: String,
-	@Value("\${app.env.endringPaaBrukerTopic}")
-	private val endringPaaBrukerTopic: String,
-	@Value("\${app.env.skjermedePersonerTopic}")
-	private val skjermedePersonerTopic: String,
-	@Value("\${app.env.leesahTopic}")
-	private val leesahTopic: String,
-	@Value("\${app.env.aktorV2Topic}")
-	private val aktorV2Topic: String,
 	@Value("\${app.env.amtArrangorTopic}")
 	private val amtArrangorTopic: String,
 	@Value("\${app.env.amtArrangorAnsattTopic}")
@@ -43,18 +33,6 @@ class KafkaMessageSender(
 
 	fun sendDeleteTilSisteTiltaksgjennomforingTopic(gjennomforingId: String) {
 		kafkaProducer.send(ProducerRecord(sisteTiltaksgjennomforingerTopic, gjennomforingId.toByteArray(), null))
-	}
-
-	fun sendTilSkjermetPersonTopic(fnr: String, erSkjermet: Boolean) {
-		kafkaProducer.send(ProducerRecord(skjermedePersonerTopic, fnr.toByteArray(), erSkjermet.toString().toByteArray()))
-	}
-
-	fun sendTilLeesahTopic(aktorId: String, payload: ByteArray) {
-		kafkaProducer.send(ProducerRecord(leesahTopic, aktorId.toByteArray(), payload))
-	}
-
-	fun sendTilAktorV2Topic(key: String, payload: ByteArray) {
-		kafkaProducer.send(ProducerRecord(aktorV2Topic, key.toByteArray(), payload))
 	}
 
 	fun sendTilAmtArrangorTopic(jsonString: String) {

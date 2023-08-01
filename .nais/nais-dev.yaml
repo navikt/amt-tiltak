@@ -116,18 +116,10 @@ spec:
     - name: UNLEASH_URL
       value: https://unleash.nais.io/api/
     # Kafka topics
-    - name: SISTE_TILORDNET_VEILEDER_TOPIC
-      value: pto.siste-tilordnet-veileder-v1
     - name: SISTE_TILTAKSGJENNOMFORINGER_TOPIC
       value: team-mulighetsrommet.siste-tiltaksgjennomforinger-v1
     - name: AMT_TILTAK_TOPIC
       value: amt.amt-tiltak-v1
-    - name: ENDRING_PAA_OPPF_BRUKER_TOPIC
-      value: pto.endring-paa-oppfolgingsbruker-v2
-    - name: SKJERMEDE_PERSONER_STATUS_TOPIC
-      value: nom.skjermede-personer-status-v1
-    - name: LEESAH_TOPIC
-      value: pdl.leesah-v1
     - name: DELTAKER_TOPIC
       value: amt.deltaker-v1
     - name: DELTAKER_TOPIC_V2
@@ -140,8 +132,6 @@ spec:
       value: amt.arrangor-ansatt-v1
     - name: ENDRINGSMELDIG_TOPIC
       value: amt.endringsmelding-v1
-    - name: AKTOR_V2_TOPIC
-      value: pdl.aktor-v2
 
   gcp:
     sqlInstances:
