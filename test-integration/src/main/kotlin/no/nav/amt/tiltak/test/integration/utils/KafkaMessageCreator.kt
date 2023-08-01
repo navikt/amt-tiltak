@@ -87,3 +87,21 @@ data class DeltakerMessage (
 	val statusEndretDato: LocalDateTime? = LocalDateTime.now().plusDays(1),
 	val innsokBegrunnelse: String? = "Begrunnelse",
 )
+data class NavBrukerMsg(
+	val personId: UUID,
+	val personident: String,
+	val fornavn: String,
+	val mellomnavn: String?,
+	val etternavn: String,
+	val navVeilederId: UUID?,
+	val navEnhet: NavEnhetMsg?,
+	val telefon: String?,
+	val epost: String?,
+	val erSkjermet: Boolean,
+)  {
+	data class NavEnhetMsg(
+		val id: UUID,
+		val enhetId: String,
+		val navn: String,
+	)
+}

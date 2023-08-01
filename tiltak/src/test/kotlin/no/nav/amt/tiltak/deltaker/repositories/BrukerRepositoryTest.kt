@@ -15,8 +15,10 @@ import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_2
+import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import java.util.UUID
 
 
 class BrukerRepositoryTest : FunSpec({
@@ -25,10 +27,13 @@ class BrukerRepositoryTest : FunSpec({
 
 	lateinit var repository: BrukerRepository
 
+	lateinit var testDataRespository: TestDataRepository
+
 	beforeEach {
 		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 		rootLogger.level = Level.WARN
 
+		testDataRespository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
 		repository = BrukerRepository(NamedParameterJdbcTemplate(dataSource))
 
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
@@ -150,7 +155,16 @@ class BrukerRepositoryTest : FunSpec({
 		bruker!!.personIdent shouldBe nyIdent
 		bruker.historiskeIdenter shouldBe identer
 		bruker.personIdentType shouldBe identType
-
 	}
+
+	test("slettBruker(id) - bruker finnes - sletter") {
+		val bruker = BRUKER_1.copy(id = UUID.randomUUID(), personIdent = "678767")
+		testDataRespository.insertBruker(bruker)
+
+		repository.slettBruker(bruker.id)
+
+		repository.get(bruker.id) shouldBe null
+	}
+
 
 })

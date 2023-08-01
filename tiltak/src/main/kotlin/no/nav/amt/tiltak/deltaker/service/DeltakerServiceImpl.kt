@@ -97,6 +97,11 @@ open class DeltakerServiceImpl(
 		return mapDeltakereOgAktiveStatuser(deltakere)
 	}
 
+	override fun hentDeltakereMedPersonId(brukerId: UUID): List<Deltaker> {
+		val deltakere = deltakerRepository.getDeltakereMedBrukerId(brukerId)
+		return mapDeltakereOgAktiveStatuser(deltakere)
+	}
+
 	override fun progressStatuser() {
 
 		val deltakere = deltakerRepository.erPaaAvsluttetGjennomforing()

@@ -22,7 +22,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.UUID
 
 internal class DeltakerRepositoryTest : FunSpec({
 
@@ -383,6 +383,17 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		deltakere2 shouldHaveSize 2
 		deltakere2.any { it.id == deltaker1Id } shouldBe false
+	}
+
+	test("hentDeltakereMedBrukerId - skal hente deltakere") {
+		val deltakerId = UUID.randomUUID()
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(deltakerId))
+
+		val deltakere = repository.getDeltakereMedBrukerId(DELTAKER_1.brukerId)
+
+		deltakere shouldHaveSize 2
+		deltakere.any { it.id == deltakerId } shouldBe true
+		deltakere.any { it.id == DELTAKER_1.id } shouldBe true
 	}
 
 })

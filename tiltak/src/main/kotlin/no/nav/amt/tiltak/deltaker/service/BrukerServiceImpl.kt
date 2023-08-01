@@ -38,6 +38,10 @@ class BrukerServiceImpl(
 		}
 	}
 
+	override fun slettBruker(id: UUID) {
+		brukerRepository.slettBruker(id)
+	}
+
 	override fun slettBruker(personIdent: String) {
 		brukerRepository.slettBruker(personIdent)
 	}

@@ -25,6 +25,8 @@ interface DeltakerService {
 
 	fun hentDeltakereMedPersonIdent(personIdent: String): List<Deltaker>
 
+	fun hentDeltakereMedPersonId(brukerId: UUID): List<Deltaker>
+
 	fun oppdaterNavEnhet(personIdent: String, navEnhet: NavEnhet?)
 
 	fun finnesBruker(personIdent: String): Boolean
