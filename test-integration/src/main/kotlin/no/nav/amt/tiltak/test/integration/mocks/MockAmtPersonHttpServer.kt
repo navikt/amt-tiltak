@@ -35,7 +35,15 @@ class MockAmtPersonHttpServer : MockHttpServer("MockAmtPersonHttpServer") {
 		addResponseHandler(requestPredicate, response)
 	}
 
-	fun addAnsattResponse(navAnsatt: NavAnsatt) {
+	fun addAnsattResponse(navAnsatt: NavAnsatt, method: String = "POST") {
+		when (method) {
+			"POST" -> postNavAnsatt(navAnsatt)
+			"GET" -> getNavAnsatt(navAnsatt)
+			else -> throw NotImplementedError(method)
+		}
+	}
+
+	private fun postNavAnsatt(navAnsatt: NavAnsatt) {
 		val request = toJsonString(NavAnsattRequest(navAnsatt.navIdent))
 
 		val requestPredicate = { req: RecordedRequest ->
@@ -50,6 +58,20 @@ class MockAmtPersonHttpServer : MockHttpServer("MockAmtPersonHttpServer") {
 
 		addResponseHandler(requestPredicate, response)
 	}
+
+	private fun getNavAnsatt(navAnsatt: NavAnsatt) {
+		val requestPredicate = { req: RecordedRequest ->
+			req.path == "/api/nav-ansatt/${navAnsatt.id}"
+				&& req.method == "GET"
+		}
+
+		val response = MockResponse()
+			.setBody(toJsonString(navAnsatt))
+			.setResponseCode(200)
+
+		addResponseHandler(requestPredicate, response)
+	}
+
 
 	fun addNavEnhetResponse(navEnhetId: String, navn: String) {
 		val request = toJsonString(NavEnhetRequest(navEnhetId))

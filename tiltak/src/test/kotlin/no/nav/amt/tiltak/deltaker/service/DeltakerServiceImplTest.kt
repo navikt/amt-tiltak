@@ -17,6 +17,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
@@ -55,7 +56,7 @@ import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.UUID
 
 class DeltakerServiceImplTest {
 	lateinit var deltakerRepository: DeltakerRepository
@@ -73,6 +74,7 @@ class DeltakerServiceImplTest {
 	lateinit var objectMapper: ObjectMapper
 	lateinit var publisherService: DataPublisherService
 	lateinit var amtPersonClient: AmtPersonClient
+	lateinit var navAnsattService: NavAnsattService
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 	val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
@@ -88,7 +90,8 @@ class DeltakerServiceImplTest {
 		kafkaProducerService = mockk(relaxUnitFun = true)
 		publisherService = mockk()
 		amtPersonClient = mockk(relaxUnitFun = true)
-		brukerService = BrukerServiceImpl(brukerRepository, mockk(), navEnhetService, amtPersonClient)
+		navAnsattService = mockk(relaxUnitFun = true)
+		brukerService = BrukerServiceImpl(brukerRepository, mockk(), navEnhetService, navAnsattService, amtPersonClient)
 		objectMapper = JsonUtils.objectMapper
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)

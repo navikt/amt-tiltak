@@ -12,4 +12,6 @@ interface NavAnsattService {
 
 	fun upsertNavAnsatt(input: UpsertNavAnsattInput)
 
+	fun opprettNavAnsattHvisIkkeFinnes(navAnsattId: UUID)
+
 }

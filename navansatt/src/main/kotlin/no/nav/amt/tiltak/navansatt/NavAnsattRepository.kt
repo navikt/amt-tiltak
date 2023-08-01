@@ -6,7 +6,7 @@ import no.nav.amt.tiltak.core.domain.nav_ansatt.UpsertNavAnsattInput
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.UUID
 
 @Component
 internal class NavAnsattRepository(
@@ -91,6 +91,16 @@ internal class NavAnsattRepository(
 
 		return template.query(sql, parameters, rowMapper)
 
+	}
+
+	fun finnesAnsatt(id: UUID): Boolean {
+		val sql = """
+			SELECT * FROM nav_ansatt WHERE id = :id
+		""".trimIndent()
+
+		val parameters = sqlParameters("id" to id)
+
+		return template.query(sql, parameters, rowMapper).isNotEmpty()
 	}
 
 }
