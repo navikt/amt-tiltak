@@ -56,7 +56,7 @@ class AmtPersonClientImpl(
 		httpClient.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
 				return when (response.code) {
-					404 -> Result.failure(NoSuchElementException("Klarte ikke å hente nav-ansatt fra amt-person-service. status=${response.code}"))
+					404 -> Result.failure(NoSuchElementException("Nav-ansatt eksisterer ikke i amt-person-service. status=${response.code}"))
 					else -> Result.failure(RuntimeException("Klarte ikke å hente nav-ansatt fra amt-person-service. status=${response.code}"))
 				}
 			}
