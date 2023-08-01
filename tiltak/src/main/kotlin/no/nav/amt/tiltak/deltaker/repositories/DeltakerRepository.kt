@@ -187,6 +187,24 @@ open class DeltakerRepository(
 		return template.query(sql, parameters, rowMapper)
 	}
 
+	fun getDeltakereMedBrukerId(brukerId: UUID): List<DeltakerDbo> {
+		val sql = """
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
+			FROM deltaker
+					 inner join bruker on bruker.id = deltaker.bruker_id
+					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
+			WHERE bruker.id = :brukerId
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"brukerId" to brukerId,
+			)
+		)
+
+		return template.query(sql, parameters, rowMapper)
+	}
+
 	fun get(personIdent: String, gjennomforingId: UUID): DeltakerDbo? {
 		val sql = """
 			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id

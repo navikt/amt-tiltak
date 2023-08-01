@@ -265,6 +265,19 @@ open class BrukerRepository(
 		template.update(sql, parameters)
 	}
 
+	fun slettBruker(id: UUID) {
+		val sql = "DELETE FROM bruker WHERE id = :id"
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf(
+				"id" to id
+			)
+		)
+
+		template.update(sql, parameters)
+	}
+
+
 	fun slettBruker(personIdent: String) {
 		val sql = "DELETE FROM bruker WHERE person_ident = :personIdent"
 

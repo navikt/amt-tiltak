@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.clients.veilarbarena.VeilarbarenaClient
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.log.SecureLog.secureLog
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -14,6 +15,8 @@ open class NavEnhetServiceImpl(
 	private val veilarbarenaClient: VeilarbarenaClient,
 	private val amtPersonClient: AmtPersonClient,
 ) : NavEnhetService {
+
+	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun getNavEnhetForBruker(personIdent: String): NavEnhet? {
 		val oppfolgingsenhetId = veilarbarenaClient.hentBrukerOppfolgingsenhetId(personIdent)
@@ -38,6 +41,7 @@ open class NavEnhetServiceImpl(
 
 		if (eksisterendeEnhet != enhet) {
 			navEnhetRepository.upsert(enhet)
+			log.info("Upsertet nav-enhet ${enhet.id}")
 		}
 
 	}

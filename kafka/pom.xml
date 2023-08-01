@@ -19,5 +19,6 @@
         <module>gjennomforing-ingestor</module>
         <module>arrangor-ingestor</module>
         <module>ansatt-ingestor</module>
+        <module>nav-bruker-ingestor</module>
     </modules>
 </project>
