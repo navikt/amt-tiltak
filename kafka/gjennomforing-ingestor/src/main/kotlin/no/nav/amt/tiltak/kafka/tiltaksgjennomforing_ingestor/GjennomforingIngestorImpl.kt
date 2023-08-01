@@ -4,10 +4,14 @@ import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.MulighetsrommetApiCl
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.kafka.GjennomforingIngestor
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.ArrangorService
+import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.NavEnhetService
+import no.nav.amt.tiltak.core.port.TiltakService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.UUID
 
 @Service
 class GjennomforingIngestorImpl(
@@ -63,7 +67,7 @@ class GjennomforingIngestorImpl(
 			gjennomforing.tiltakstype.arenaKode
 		)
 
-		val navEnhet = arenaData.ansvarligNavEnhetId.let { navEnhetService.getNavEnhet(it) }
+		val navEnhet = arenaData.ansvarligNavEnhetId?.let { navEnhetService.getNavEnhet(it) }
 
 		gjennomforingService.upsert(
 			GjennomforingUpsert(

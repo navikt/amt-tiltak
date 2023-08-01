@@ -79,7 +79,7 @@ class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 		mockMulighetsrommetApiServer.gjennomforingArenaData(gjennomforingMessage.id, gjennomforingArenaData)
 		mockArrangorServer.addArrangorResponse(arrangorMedOverordnetArrangor)
 		mockArrangorServer.addArrangorResponse(overordnetArrangor)
-		mockAmtPersonHttpServer.addNavEnhetResponse(gjennomforingArenaData.ansvarligNavEnhetId, navEnhetNavn)
+		mockAmtPersonHttpServer.addNavEnhetResponse(gjennomforingArenaData.ansvarligNavEnhetId!!, navEnhetNavn)
 
 		kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(jsonObjekt)
 
