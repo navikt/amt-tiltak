@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.clients.mulighetsrommet_api_client
 
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 interface MulighetsrommetApiClient {
 
@@ -14,7 +14,7 @@ data class GjennomforingArenaData(
 	val opprettetAar: Int,
 	val lopenr: Int,
 	val virksomhetsnummer: String?,
-	val ansvarligNavEnhetId: String,
+	val ansvarligNavEnhetId: String?,
 	val status: String,
 )
 

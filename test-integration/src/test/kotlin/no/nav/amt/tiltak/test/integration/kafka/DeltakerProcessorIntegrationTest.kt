@@ -286,7 +286,7 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 		mockArrangorServer.addArrangorResponse(arrangor)
 		mockArrangorServer.addArrangorResponse(overordnetArrangor)
 
-		mockAmtPersonHttpServer.addNavEnhetResponse(gjennomforingArenaData.ansvarligNavEnhetId, "navEnhetNavn")
+		mockAmtPersonHttpServer.addNavEnhetResponse(gjennomforingArenaData.ansvarligNavEnhetId!!, "navEnhetNavn")
 
 		kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(jsonObjekt)
 

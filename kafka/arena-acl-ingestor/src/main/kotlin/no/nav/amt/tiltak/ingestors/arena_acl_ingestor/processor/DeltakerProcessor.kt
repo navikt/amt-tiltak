@@ -119,7 +119,7 @@ class DeltakerProcessor(
 			gjennomforing.tiltakstype.arenaKode
 		)
 
-		val navEnhet = gjennomforingArenaData.ansvarligNavEnhetId.let { navEnhetService.getNavEnhet(it) }
+		val navEnhet = gjennomforingArenaData.ansvarligNavEnhetId?.let { navEnhetService.getNavEnhet(it) }
 
 		gjennomforingService.upsert(
 			GjennomforingUpsert(
