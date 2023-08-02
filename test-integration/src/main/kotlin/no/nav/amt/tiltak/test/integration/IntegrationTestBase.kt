@@ -53,7 +53,6 @@ abstract class IntegrationTestBase {
 		val mockPdlHttpServer = MockPdlHttpServer()
 		val mockMachineToMachineHttpServer = MockMachineToMachineHttpServer()
 		val mockMulighetsrommetApiServer = MockMulighetsrommetApiServer()
-		val mockVeilarboppfolgingHttpServer = MockVeilarboppfolgingHttpServer()
 		val mockDkifHttpServer = MockDkifHttpServer()
 		val mockAmtPersonHttpServer = MockAmtPersonHttpServer()
 
@@ -74,10 +73,6 @@ abstract class IntegrationTestBase {
 			mockDkifHttpServer.start()
 			registry.add("digdir-krr-proxy.url") { mockDkifHttpServer.serverUrl() }
 			registry.add("digdir-krr-proxy.scope") { "test.digdir-krr-proxy" }
-
-			mockVeilarboppfolgingHttpServer.start()
-			registry.add("veilarboppfolging.url") { mockVeilarboppfolgingHttpServer.serverUrl() }
-			registry.add("veilarboppfolging.scope") { "test.veilarboppfolging" }
 
 			mockMulighetsrommetApiServer.start()
 			registry.add("mulighetsrommet-api.url") { mockMulighetsrommetApiServer.serverUrl() }
@@ -117,7 +112,6 @@ abstract class IntegrationTestBase {
 		mockArrangorServer.reset()
 		mockPdlHttpServer.reset()
 		mockMulighetsrommetApiServer.reset()
-		mockVeilarboppfolgingHttpServer.resetHttpServer()
 		mockDkifHttpServer.resetHttpServer()
 	}
 

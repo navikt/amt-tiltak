@@ -6,8 +6,6 @@ interface PersonService {
 
 	fun hentPerson(fnr: String): Person
 
-	fun hentTildeltVeilederNavIdent(fnr: String): String?
-
 	fun hentGjeldendePersonligIdent(ident: String): String
 
 	fun erSkjermet(norskIdent: String): Boolean

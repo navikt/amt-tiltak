@@ -67,7 +67,6 @@ spec:
           cluster: dev-gcp
       external:
         - host: pdl-api.dev-fss-pub.nais.io
-        - host: veilarboppfolging.dev-fss-pub.nais.io
         - host: digdir-krr-proxy.intern.dev.nav.no
   kafka:
     pool: nav-dev
@@ -92,10 +91,6 @@ spec:
       value: http://amt-person-service.amt.svc.cluster.local
     - name: AMT_PERSON_SCOPE
       value: api://dev-gcp.amt.amt-person-service/.default
-    - name: VEILARBOPPFOLGING_URL
-      value: https://veilarboppfolging.dev-fss-pub.nais.io
-    - name: VEILARBOPPFOLGING_SCOPE
-      value: api://dev-fss.pto.veilarboppfolging/.default
     - name: DIGDIR_KRR_PROXY_SCOPE
       value: api://dev-gcp.team-rocket.digdir-krr-proxy/.default
     - name: DIGDIR_KRR_PROXY_URL

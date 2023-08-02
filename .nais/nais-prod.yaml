@@ -67,7 +67,6 @@ spec:
           cluster: prod-gcp
       external:
         - host: pdl-api.prod-fss-pub.nais.io
-        - host: veilarboppfolging.prod-fss-pub.nais.io
         - host: digdir-krr-proxy.intern.nav.no
   kafka:
     pool: nav-prod
@@ -92,10 +91,6 @@ spec:
       value: http://amt-person-service.amt.svc.cluster.local
     - name: AMT_PERSON_SCOPE
       value: api://prod-gcp.amt.amt-person-service/.default
-    - name: VEILARBOPPFOLGING_SCOPE
-      value: api://prod-fss.pto.veilarboppfolging/.default
-    - name: VEILARBOPPFOLGING_URL
-      value: https://veilarboppfolging.prod-fss-pub.nais.io
     - name: DIGDIR_KRR_PROXY_SCOPE
       value: api://prod-gcp.team-rocket.digdir-krr-proxy/.default
     - name: DIGDIR_KRR_PROXY_URL
