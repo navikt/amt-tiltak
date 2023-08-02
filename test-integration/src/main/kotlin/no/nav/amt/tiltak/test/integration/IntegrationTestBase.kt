@@ -54,7 +54,6 @@ abstract class IntegrationTestBase {
 		val mockMachineToMachineHttpServer = MockMachineToMachineHttpServer()
 		val mockMulighetsrommetApiServer = MockMulighetsrommetApiServer()
 		val mockVeilarboppfolgingHttpServer = MockVeilarboppfolgingHttpServer()
-		val mockVeilarbarenaHttpServer = MockVeilarbarenaHttpServer()
 		val mockDkifHttpServer = MockDkifHttpServer()
 		val mockAmtPersonHttpServer = MockAmtPersonHttpServer()
 
@@ -79,10 +78,6 @@ abstract class IntegrationTestBase {
 			mockVeilarboppfolgingHttpServer.start()
 			registry.add("veilarboppfolging.url") { mockVeilarboppfolgingHttpServer.serverUrl() }
 			registry.add("veilarboppfolging.scope") { "test.veilarboppfolging" }
-
-			mockVeilarbarenaHttpServer.start()
-			registry.add("veilarbarena.url") { mockVeilarbarenaHttpServer.serverUrl() }
-			registry.add("veilarbarena.scope") { "test.veilarbarena" }
 
 			mockMulighetsrommetApiServer.start()
 			registry.add("mulighetsrommet-api.url") { mockMulighetsrommetApiServer.serverUrl() }
@@ -123,7 +118,6 @@ abstract class IntegrationTestBase {
 		mockPdlHttpServer.reset()
 		mockMulighetsrommetApiServer.reset()
 		mockVeilarboppfolgingHttpServer.resetHttpServer()
-		mockVeilarbarenaHttpServer.resetHttpServer()
 		mockDkifHttpServer.resetHttpServer()
 	}
 
