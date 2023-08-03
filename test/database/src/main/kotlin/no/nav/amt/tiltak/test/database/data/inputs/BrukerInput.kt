@@ -18,8 +18,6 @@ data class BrukerInput(
 	fun toModel() = Bruker(
 		id = id,
 		personIdent = personIdent,
-		personIdentType = null,
-		historiskeIdenter = emptyList(),
 		fornavn = fornavn,
 		mellomnavn = mellomnavn,
 		etternavn = etternavn,

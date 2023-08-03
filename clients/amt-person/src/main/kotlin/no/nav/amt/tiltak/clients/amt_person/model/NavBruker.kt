@@ -19,8 +19,6 @@ data class NavBruker(
 	fun toBruker() = Bruker(
 		id = personId,
 		personIdent = personident,
-		personIdentType = null,
-		historiskeIdenter = emptyList(),
 		fornavn = fornavn,
 		mellomnavn = mellomnavn,
 		etternavn = etternavn,

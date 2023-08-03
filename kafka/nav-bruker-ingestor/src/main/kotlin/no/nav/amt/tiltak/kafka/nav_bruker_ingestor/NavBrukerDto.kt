@@ -27,9 +27,6 @@ data class NavBrukerDto(
 		telefonnummer = telefon,
 		epost = epost,
 		erSkjermet = erSkjermet,
-		// Følgende kommer ikke på topic og bør fjernes fra domenet på sikt
-		personIdentType = null,
-		historiskeIdenter = emptyList(),
 	)
 }
 
