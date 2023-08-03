@@ -9,8 +9,6 @@ interface NavEnhetService {
 
 	fun getNavEnhet(enhetId: String): NavEnhet?
 
-	fun getNavEnhetForBruker(personIdent: String): NavEnhet?
-
 	fun upsert(enhet: NavEnhet)
 
 }
