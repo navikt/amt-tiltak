@@ -66,7 +66,6 @@ spec:
           namespace: team-mulighetsrommet
           cluster: prod-gcp
       external:
-        - host: pdl-api.prod-fss-pub.nais.io
         - host: digdir-krr-proxy.intern.nav.no
   kafka:
     pool: nav-prod
@@ -79,10 +78,6 @@ spec:
       value: {{ad_gruppe_tiltak_ansvarlig}}
     - name: AD_GRUPPE_ID_ENDRINGSMELDING
       value: {{ad_gruppe_endringsmelding}}
-    - name: PDL_SCOPE
-      value: api://prod-fss.pdl.pdl-api/.default
-    - name: PDL_URL
-      value: https://pdl-api.prod-fss-pub.nais.io
     - name: AMT_ARRANGOR_SCOPE
       value: api://prod-gcp.amt.amt-arrangor/.default
     - name: AMT_ARRANGOR_URL

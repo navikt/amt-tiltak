@@ -50,7 +50,6 @@ abstract class IntegrationTestBase {
 		val mockOAuthServer = MockOAuthServer()
 		val mockArrangorServer = MockAmtArrangorServer()
 		val mockPoaoTilgangHttpServer = MockPoaoTilgangHttpServer()
-		val mockPdlHttpServer = MockPdlHttpServer()
 		val mockMachineToMachineHttpServer = MockMachineToMachineHttpServer()
 		val mockMulighetsrommetApiServer = MockMulighetsrommetApiServer()
 		val mockDkifHttpServer = MockDkifHttpServer()
@@ -86,10 +85,6 @@ abstract class IntegrationTestBase {
 			registry.add("poao-tilgang.url") { mockPoaoTilgangHttpServer.serverUrl() }
 			registry.add("poao-tilgang.scope") { "test.poao-tilgang" }
 
-			mockPdlHttpServer.start()
-			registry.add("pdl.url") { mockPdlHttpServer.serverUrl() }
-			registry.add("pdl.scope") { "test.pdl" }
-
 			mockMachineToMachineHttpServer.start()
 			registry.add("nais.env.azureOpenIdConfigTokenEndpoint") {
 				mockMachineToMachineHttpServer.serverUrl() + MockMachineToMachineHttpServer.tokenPath
@@ -110,7 +105,6 @@ abstract class IntegrationTestBase {
 	fun resetMockServers() {
 		mockPoaoTilgangHttpServer.reset()
 		mockArrangorServer.reset()
-		mockPdlHttpServer.reset()
 		mockMulighetsrommetApiServer.reset()
 		mockDkifHttpServer.resetHttpServer()
 	}
