@@ -16,8 +16,6 @@
         <module>amt-arrangor-client</module>
         <module>dkif</module>
         <module>pdl</module>
-        <module>veilarbarena</module>
-        <module>veilarboppfolging</module>
         <module>mulighetsrommet-api-client</module>
         <module>amt-person</module>
     </modules>

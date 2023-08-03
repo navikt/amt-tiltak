@@ -5,7 +5,6 @@ import io.micrometer.core.instrument.MeterRegistry
 import no.nav.amt.tiltak.clients.dkif.DkifClient
 import no.nav.amt.tiltak.clients.pdl.AdressebeskyttelseGradering
 import no.nav.amt.tiltak.clients.pdl.PdlClient
-import no.nav.amt.tiltak.clients.veilarboppfolging.VeilarboppfolgingClient
 import no.nav.amt.tiltak.core.port.Diskresjonskode
 import no.nav.amt.tiltak.core.port.Kontaktinformasjon
 import no.nav.amt.tiltak.core.port.Person
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service
 class PersonServiceImpl(
 	private val pdlClient: PdlClient,
 	private val dkifClient: DkifClient,
-	private val veilarboppfolgingClient: VeilarboppfolgingClient,
 	private val meterRegistry: MeterRegistry,
 	private val poaoTilgangClient: PoaoTilgangClient
 ) : PersonService {
@@ -48,10 +46,6 @@ class PersonServiceImpl(
 				else -> null
 			}
 		).also { person -> person.diskresjonskode?.let { incrementCounter(it) } }
-	}
-
-	override fun hentTildeltVeilederNavIdent(fnr: String): String? {
-		return veilarboppfolgingClient.hentVeilederIdent(fnr)
 	}
 
 	override fun hentGjeldendePersonligIdent(ident: String) : String = pdlClient.hentGjeldendePersonligIdent(ident)
