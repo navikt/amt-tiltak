@@ -91,7 +91,7 @@ class DeltakerServiceImplTest {
 		publisherService = mockk()
 		amtPersonClient = mockk(relaxUnitFun = true)
 		navAnsattService = mockk(relaxUnitFun = true)
-		brukerService = BrukerServiceImpl(brukerRepository, mockk(), navEnhetService, navAnsattService, amtPersonClient)
+		brukerService = BrukerServiceImpl(brukerRepository, navEnhetService, navAnsattService, amtPersonClient)
 		objectMapper = JsonUtils.objectMapper
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)

@@ -2,7 +2,6 @@ package no.nav.amt.tiltak.bff.tiltaksarrangor
 
 import no.nav.amt.tiltak.bff.tiltaksarrangor.request.*
 import no.nav.amt.tiltak.bff.tiltaksarrangor.response.OpprettEndringsmeldingResponse
-import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.exceptions.SkjultDeltakerException
 import no.nav.amt.tiltak.core.exceptions.ValidationException
@@ -19,7 +18,6 @@ class DeltakerController(
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
 	private val deltakerService: DeltakerService,
 	private val endringsmeldingService: EndringsmeldingService,
-	private val authService: AuthService
 ) {
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@PostMapping("/{deltakerId}/oppstartsdato")
@@ -155,36 +153,6 @@ class DeltakerController(
 		deltakerService.skjulDeltakerForTiltaksarrangor(deltakerId, ansatt.id)
 	}
 
-	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
-	@GetMapping("/{deltakerId}/bruker-info")
-	fun hentBrukerInfo(@PathVariable("deltakerId") deltakerId: UUID): BrukerInfo {
-		authService.validerErM2MToken()
-
-		val bruker = deltakerService.hentBruker(deltakerId)
-		return BrukerInfo(
-			bruker.id,
-			bruker.personIdentType?.name,
-			bruker.historiskeIdenter,
-			bruker.navEnhetId,
-		)
-	}
-
-	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
-	@PostMapping("/bruker-info")
-	fun hentBrukerInfoForPersonident(@RequestBody request: HentBrukerInfoRequest): BrukerInfo {
-		authService.validerErM2MToken()
-
-		val bruker = deltakerService.hentBruker(request.personident)
-		return bruker?.let {
-			BrukerInfo(
-				brukerId = it.id,
-				personIdentType = it.personIdentType?.name,
-				historiskeIdenter = it.historiskeIdenter,
-				navEnhetId = it.navEnhetId
-			)
-		} ?: throw NoSuchElementException("Fant ikke forespurt bruker")
-	}
-
 	private fun verifiserErIkkeSkjult(deltakerId: UUID) {
 		if (deltakerService.erSkjultForTiltaksarrangor(deltakerId))
 			throw SkjultDeltakerException("Deltaker med id $deltakerId er skjult for tiltaksarrangør")
@@ -196,11 +164,3 @@ class DeltakerController(
 		val gyldigFraDato: LocalDate?
 	)
 }
-
-
-data class BrukerInfo(
-	val brukerId: UUID,
-	val personIdentType: String?,
-	val historiskeIdenter: List<String>,
-	val navEnhetId: UUID?,
-)

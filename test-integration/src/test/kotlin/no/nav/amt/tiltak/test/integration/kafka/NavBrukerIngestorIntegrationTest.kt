@@ -2,10 +2,10 @@ package no.nav.amt.tiltak.test.integration.kafka
 
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.common.json.JsonUtils
-import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.NavEnhetService
+import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
@@ -15,7 +15,6 @@ import no.nav.amt.tiltak.test.integration.utils.NavBrukerMsg
 import no.nav.amt.tiltak.test.utils.AsyncUtils
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.UUID
 
@@ -26,7 +25,7 @@ class NavBrukerIngestorIntegrationTest : IntegrationTestBase() {
 	lateinit var navEnhetService: NavEnhetService
 
 	@Autowired
-	lateinit var brukerService: BrukerService
+	lateinit var brukerRepository: BrukerRepository
 
 	@Autowired
 	lateinit var deltakerService: DeltakerService
@@ -58,7 +57,7 @@ class NavBrukerIngestorIntegrationTest : IntegrationTestBase() {
 		kafkaMessageSender.sendTilNavBrukerTopic(msg.personId, JsonUtils.toJsonString(msg))
 
 		AsyncUtils.eventually {
-			val bruker = brukerService.hentBruker(BRUKER_1.id)
+			val bruker = brukerRepository.get(BRUKER_1.id)!!
 
 			bruker.personIdent shouldBe msg.personident
 			bruker.fornavn shouldBe msg.fornavn
@@ -120,7 +119,7 @@ class NavBrukerIngestorIntegrationTest : IntegrationTestBase() {
 			val ansatt = navAnsattService.getNavAnsatt(nyNavVeileder.id)
 			ansatt.navIdent shouldBe nyNavVeileder.navIdent
 
-			val bruker = brukerService.hentBruker(BRUKER_1.id)
+			val bruker = brukerRepository.get(BRUKER_1.id)!!
 			bruker.ansvarligVeilederId shouldBe nyNavVeileder.id
 		}
 	}
@@ -130,9 +129,7 @@ class NavBrukerIngestorIntegrationTest : IntegrationTestBase() {
 		kafkaMessageSender.sendTilNavBrukerTopic(BRUKER_1.id, null)
 
 		AsyncUtils.eventually {
-			assertThrows<NoSuchElementException> {
-				brukerService.hentBruker(BRUKER_1.id)
-			}
+			brukerRepository.get(BRUKER_1.id) shouldBe null
 
 			deltakerService.hentDeltakereMedPersonId(BRUKER_1.id) shouldBe emptyList()
 		}

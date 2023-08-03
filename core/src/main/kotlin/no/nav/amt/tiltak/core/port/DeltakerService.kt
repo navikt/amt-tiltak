@@ -1,10 +1,8 @@
 package no.nav.amt.tiltak.core.port
 
-import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
-import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import java.util.UUID
 
 interface DeltakerService {
@@ -27,15 +25,7 @@ interface DeltakerService {
 
 	fun hentDeltakereMedPersonId(brukerId: UUID): List<Deltaker>
 
-	fun oppdaterNavEnhet(personIdent: String, navEnhet: NavEnhet?)
-
-	fun finnesBruker(personIdent: String): Boolean
-
-	fun oppdaterAnsvarligVeileder(personIdent: String, navAnsattId: UUID)
-
 	fun erSkjermet(deltakerId: UUID): Boolean
-
-	fun settSkjermet(personIdent: String, erSkjermet: Boolean)
 
 	fun hentDeltakerMap(deltakerIder: List<UUID>): Map<UUID, Deltaker>
 
@@ -50,9 +40,5 @@ interface DeltakerService {
 	fun republiserAlleDeltakerePaKafka(batchSize: Int = 500)
 
 	fun slettDeltakerePaaGjennomforing(gjennomforingId: UUID)
-
-	fun hentBruker(deltakerId: UUID): Bruker
-
-	fun hentBruker(personIdent: String): Bruker?
 
 }
