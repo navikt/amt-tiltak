@@ -14,7 +14,6 @@
 
     <modules>
         <module>amt-arrangor-client</module>
-        <module>dkif</module>
         <module>mulighetsrommet-api-client</module>
         <module>amt-person</module>
     </modules>

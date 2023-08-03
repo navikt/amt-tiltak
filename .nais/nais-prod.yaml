@@ -65,8 +65,6 @@ spec:
         - application: mulighetsrommet-api
           namespace: team-mulighetsrommet
           cluster: prod-gcp
-      external:
-        - host: digdir-krr-proxy.intern.nav.no
   kafka:
     pool: nav-prod
   secureLogs:
@@ -86,10 +84,6 @@ spec:
       value: http://amt-person-service.amt.svc.cluster.local
     - name: AMT_PERSON_SCOPE
       value: api://prod-gcp.amt.amt-person-service/.default
-    - name: DIGDIR_KRR_PROXY_SCOPE
-      value: api://prod-gcp.team-rocket.digdir-krr-proxy/.default
-    - name: DIGDIR_KRR_PROXY_URL
-      value: https://digdir-krr-proxy.intern.nav.no
     - name: POAO_TILGANG_URL
       value: http://poao-tilgang.poao.svc.cluster.local
     - name: POAO_TILGANG_SCOPE

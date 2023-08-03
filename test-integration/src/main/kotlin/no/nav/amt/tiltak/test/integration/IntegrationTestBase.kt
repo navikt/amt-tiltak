@@ -52,7 +52,6 @@ abstract class IntegrationTestBase {
 		val mockPoaoTilgangHttpServer = MockPoaoTilgangHttpServer()
 		val mockMachineToMachineHttpServer = MockMachineToMachineHttpServer()
 		val mockMulighetsrommetApiServer = MockMulighetsrommetApiServer()
-		val mockDkifHttpServer = MockDkifHttpServer()
 		val mockAmtPersonHttpServer = MockAmtPersonHttpServer()
 
 		@JvmStatic
@@ -68,10 +67,6 @@ abstract class IntegrationTestBase {
 			mockArrangorServer.start()
 			registry.add("amt-arrangor.url") { mockArrangorServer.serverUrl() }
 			registry.add("amt-arrangor.scope") { "test.arrangor" }
-
-			mockDkifHttpServer.start()
-			registry.add("digdir-krr-proxy.url") { mockDkifHttpServer.serverUrl() }
-			registry.add("digdir-krr-proxy.scope") { "test.digdir-krr-proxy" }
 
 			mockMulighetsrommetApiServer.start()
 			registry.add("mulighetsrommet-api.url") { mockMulighetsrommetApiServer.serverUrl() }
@@ -106,7 +101,6 @@ abstract class IntegrationTestBase {
 		mockPoaoTilgangHttpServer.reset()
 		mockArrangorServer.reset()
 		mockMulighetsrommetApiServer.reset()
-		mockDkifHttpServer.resetHttpServer()
 	}
 
 	fun resetMockServersAndAddDefaultData() {
