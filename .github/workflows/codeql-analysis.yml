@@ -43,7 +43,7 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
       - name: Build maven artifacts
-        run: mvn -B package
+        run: mvn -B package -DskipTests
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
         with:
