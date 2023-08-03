@@ -1,12 +1,10 @@
 package no.nav.amt.tiltak.deltaker.service
 
-import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import no.nav.amt.tiltak.core.domain.tiltak.STATUSER_SOM_KAN_SKJULES
 import no.nav.amt.tiltak.core.domain.tiltak.harIkkeStartet
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
@@ -136,28 +134,9 @@ open class DeltakerServiceImpl(
 		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
 	}
 
-	override fun oppdaterNavEnhet(personIdent: String, navEnhet: NavEnhet?) {
-		brukerService.oppdaterNavEnhet(personIdent, navEnhet)
-
-	}
-
 	override fun erSkjermet(deltakerId: UUID) : Boolean {
 		val deltaker = hentDeltaker(deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 		return deltaker.erSkjermet
-	}
-
-	override fun settSkjermet(personIdent: String, erSkjermet: Boolean) {
-		brukerService.settErSkjermet(personIdent, erSkjermet)
-	}
-
-	override fun hentBruker(deltakerId: UUID): Bruker {
-		val brukerId = deltakerRepository.hentBrukerId(deltakerId)
-
-		return brukerService.hentBruker(brukerId)
-	}
-
-	override fun hentBruker(personIdent: String): Bruker? {
-		return brukerService.hentBruker(personIdent)
 	}
 
 	private fun oppdaterStatus(status: DeltakerStatusInsert) {
@@ -242,14 +221,6 @@ open class DeltakerServiceImpl(
 				gyldigFra = LocalDateTime.now()
 			))
 		}
-
-	override fun finnesBruker(personIdent: String): Boolean {
-		return brukerService.finnesBruker(personIdent)
-	}
-
-	override fun oppdaterAnsvarligVeileder(personIdent: String, navAnsattId: UUID) {
-		brukerService.oppdaterAnsvarligVeileder(personIdent, navAnsattId)
-	}
 
 	override fun hentDeltakerMap(deltakerIder: List<UUID>): Map<UUID, Deltaker> {
 		val deltakere = deltakerRepository.getDeltakere(deltakerIder)

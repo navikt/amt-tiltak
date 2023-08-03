@@ -11,7 +11,6 @@ import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
-import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
@@ -534,41 +533,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 
 		response.code shouldBe 403
-	}
-
-	@Test
-	fun `hentBrukerInfo - ikke m2m token - skal returnere 401`() {
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/bruker-info",
-			headers =  mapOf("Authorization" to "Bearer ${mockOAuthServer.issueAzureAdToken(ident = "", oid = UUID.randomUUID())}")
-		)
-
-		response.code shouldBe 401
-	}
-	@Test
-	fun `hentBrukerInfo - deltaker finnes - skal ha status 200 og returnere info`() {
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/bruker-info",
-			headers =  mapOf("Authorization" to "Bearer ${mockOAuthServer.issueAzureAdM2MToken()}")
-		)
-
-		response.code shouldBe 200
-		response.body!!.string() shouldBe """{"brukerId":"23b04c3a-a36c-451f-b9cf-30b6a6b586b8","personIdentType":null,"historiskeIdenter":[],"navEnhetId":"09405517-99c0-49e5-9eb3-31c61b9579cf"}""".trimMargin()
-	}
-
-	@Test
-	fun `hentBrukerInfoForPersonident - deltaker finnes - skal ha status 200 og returnere info`() {
-		val response = sendRequest(
-			method = "POST",
-			url = "/api/tiltaksarrangor/deltaker/bruker-info",
-			headers =  mapOf("Authorization" to "Bearer ${mockOAuthServer.issueAzureAdM2MToken()}"),
-			body = """{"personident": "${BRUKER_1.personIdent}"}""".toJsonRequestBody()
-		)
-
-		response.code shouldBe 200
-		response.body!!.string() shouldBe """{"brukerId":"23b04c3a-a36c-451f-b9cf-30b6a6b586b8","personIdentType":null,"historiskeIdenter":[],"navEnhetId":"09405517-99c0-49e5-9eb3-31c61b9579cf"}""".trimMargin()
 	}
 
 	private fun opprettSkjultDeltaker(): UUID {
