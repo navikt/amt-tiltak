@@ -5,8 +5,6 @@ import java.util.UUID
 data class Bruker(
 	val id: UUID,
 	val personIdent: String,
-	val personIdentType: IdentType?,
-	val historiskeIdenter: List<String>,
 	val fornavn: String,
 	val mellomnavn: String?,
 	val etternavn: String,
