@@ -1,143 +1,106 @@
 package no.nav.amt.tiltak.navansatt
 
-import ch.qos.logback.classic.Level
-import ch.qos.logback.classic.Logger
-import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
-import no.nav.amt.tiltak.core.domain.nav_ansatt.Bucket
-import no.nav.amt.tiltak.core.domain.nav_ansatt.UpsertNavAnsattInput
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
-import org.slf4j.LoggerFactory
+import no.nav.amt.tiltak.test.database.data.TestDataRepository
+import no.nav.amt.tiltak.test.database.data.inputs.NavAnsattInput
+import org.junit.AfterClass
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.util.*
+import java.util.UUID
 
+class NavAnsattRepositoryTest {
+	companion object {
+		private val dataSource = SingletonPostgresContainer.getDataSource()
+		private val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
+		private val testRepository = TestDataRepository(jdbcTemplate)
+		private val repository = NavAnsattRepository(jdbcTemplate)
 
-class NavAnsattRepositoryTest : FunSpec({
+		@JvmStatic
+		@AfterClass
+		fun tearDown() {
+			DbTestDataUtils.cleanDatabase(dataSource)
+		}
+	}
 
-	val dataSource = SingletonPostgresContainer.getDataSource()
+	@Test
+	fun `get(uuid) - ansatt finnes - returnerer ansatt`() {
+		val forventetAnsatt = mockAnsatt()
+		testRepository.insertNavAnsatt(forventetAnsatt)
+		val ansatt = repository.get(forventetAnsatt.id)
 
-	lateinit var repository: NavAnsattRepository
+		sammenlign(ansatt, forventetAnsatt)
+	}
+	@Test
+	fun `get(uuid) - ansatt finnes ikke - kaster NoSuchElementException`() {
+		assertThrows<NoSuchElementException> {
+			repository.get(UUID.randomUUID())
+		}
+	}
 
-	val upsertCmd = UpsertNavAnsattInput(
+	@Test
+	fun `get(string) - ansatt finnes - returnerer ansatt`() {
+		val forventetAnsatt = mockAnsatt()
+		testRepository.insertNavAnsatt(forventetAnsatt)
+		val ansatt = repository.get(forventetAnsatt.navIdent)!!
+
+		sammenlign(ansatt, forventetAnsatt)
+	}
+	@Test
+	fun `get(string) - ansatt finnes ikke - returnerer null`() {
+		repository.get("Ansatt som ikke finnes") shouldBe null
+	}
+
+	@Test
+	fun `upsert - ny ansatt - inserter ansatt`() {
+		val forventetAnsatt = mockAnsatt()
+		repository.upsert(forventetAnsatt.toModel())
+		val ansatt = repository.get(forventetAnsatt.id)
+
+		sammenlign(ansatt, forventetAnsatt)
+	}
+
+	@Test
+	fun `upsert - ansatt finnes - oppdaterer ansatt`() {
+		val originalAnsatt = mockAnsatt()
+		testRepository.insertNavAnsatt(originalAnsatt)
+
+		val forventetAnsatt = originalAnsatt.copy(navn = "nytt navn", epost = "ny@epost", telefonnummer = "ny telefon")
+		repository.upsert(forventetAnsatt.toModel())
+
+		val ansatt = repository.get(forventetAnsatt.id)
+
+		sammenlign(ansatt, forventetAnsatt)
+	}
+
+	@Test
+	fun `finnesAnsatt - ansatt finnes - returnerer true`() {
+		val forventetAnsatt = mockAnsatt()
+		testRepository.insertNavAnsatt(forventetAnsatt)
+		repository.finnesAnsatt(forventetAnsatt.id) shouldBe true
+	}
+	@Test
+	fun `finnesAnsatt - ansatt finnes ikke - returnere false`() {
+		repository.finnesAnsatt(UUID.randomUUID()) shouldBe false
+	}
+
+	private fun mockAnsatt() = NavAnsattInput(
 		id = UUID.randomUUID(),
-		navIdent = "test123",
-		navn = "Fornavn Etternavn",
-		telefonnummer = "7464635",
-		epost = "fornavn.etternavn@nav.no",
+		navIdent = (1000 .. 9000).random().toString(),
+		navn = "Veileder Veiledersen",
+		epost = "veil@nav.no",
+		telefonnummer = "2500052",
 	)
 
-	beforeEach {
-		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
-		rootLogger.level = Level.WARN
-
-		repository = NavAnsattRepository(NamedParameterJdbcTemplate(dataSource))
-
-		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
-	}
-
-	test("Hent nav-ansatt som ikke eksisterer returnerer null") {
-		repository.getNavAnsattWithIdent("DOES_NOT_EXIST") shouldBe null
-	}
-
-	test("Insert nav-ansatt så hent bør returnere nav-ansatt") {
-		repository.upsert(upsertCmd)
-
-		val storedDbo = repository.getNavAnsattWithIdent(upsertCmd.navIdent)
-
-		storedDbo shouldNotBe null
-		storedDbo!!.id shouldNotBe -1
-		storedDbo.navIdent shouldBe upsertCmd.navIdent
-		storedDbo.navn shouldBe upsertCmd.navn
-		storedDbo.telefonnummer shouldBe upsertCmd.telefonnummer
-		storedDbo.epost shouldBe upsertCmd.epost
-	}
-
-	test("Update nav-ansatt så hent bør returnere oppdatert nav-ansatt") {
-		repository.upsert(
-			UpsertNavAnsattInput(
-				id = UUID.randomUUID(),
-				navIdent = NAV_ANSATT_1.navIdent,
-				navn = "Nytt navn",
-				epost = "Ny epost",
-				telefonnummer = "Nytt telefonnummer",
-			)
-		)
-
-		val updatedDbo = repository.getNavAnsattWithIdent(NAV_ANSATT_1.navIdent)
-
-		updatedDbo!!.navn shouldBe "Nytt navn"
-		updatedDbo.epost shouldBe "Ny epost"
-		updatedDbo.telefonnummer shouldBe "Nytt telefonnummer"
-	}
-
-	test("getNavAnsattInBatch - 2 bucket - skal samme antall ansatte som i bucket") {
-		val bucket0Identer = listOf("W998919")
-		val bucket50Identer = listOf("W100172", "W101063")
-
-		repository.upsert(
-			UpsertNavAnsattInput(
-				id = UUID.randomUUID(),
-				navIdent = bucket0Identer[0],
-				navn = "Nytt navn 1",
-				epost = "Ny epost 1",
-				telefonnummer = "Nytt telefonnummer 1",
-			)
-		)
-		repository.upsert(
-			UpsertNavAnsattInput(
-				id = UUID.randomUUID(),
-				navIdent = bucket50Identer[0],
-				navn = "Nytt navn 2",
-				epost = "Ny epost 2",
-				telefonnummer = "Nytt telefonnummer 2",
-			)
-		)
-		repository.upsert(
-			UpsertNavAnsattInput(
-				id = UUID.randomUUID(),
-				navIdent = bucket50Identer[1],
-				navn = "Nytt navn 3",
-				epost = "Ny epost 3",
-				telefonnummer = "Nytt telefonnummer 3",
-			)
-		)
-
-		repository.getNavAnsattInBucket(Bucket(50)) shouldHaveSize 2
-		repository.getNavAnsattInBucket(Bucket(0)) shouldHaveSize 1
-	}
-
-	test("getNavAnsattInBatch - opprinnelig bucket 0 - bucket beregnes på nytt ved upsert") {
-		val bucket50Identer = listOf("W100172")
-
-		repository.upsert(
-			UpsertNavAnsattInput(
-				id = UUID.randomUUID(),
-				navIdent = bucket50Identer[0],
-				navn = "Nytt navn A",
-				epost = "Ny epost A",
-				telefonnummer = "Nytt telefonnummer A",
-				bucket = Bucket(0)
-			)
-		)
-		repository.getNavAnsattInBucket(Bucket(0)) shouldHaveSize 1
-		repository.getNavAnsattInBucket(Bucket(50)) shouldHaveSize 0
-
-		repository.upsert(
-			UpsertNavAnsattInput(
-				id = UUID.randomUUID(),
-				navIdent = bucket50Identer[0],
-				navn = "Nytt navn B",
-				epost = "Ny epost B",
-				telefonnummer = "Nytt telefonnummer B",
-			)
-		)
-		repository.getNavAnsattInBucket(Bucket(0)) shouldHaveSize 0
-		repository.getNavAnsattInBucket(Bucket(50)) shouldHaveSize 1
+	private fun sammenlign(faktisk: NavAnsattDbo, forventet: NavAnsattInput) {
+		faktisk.id shouldBe forventet.id
+		faktisk.navIdent shouldBe forventet.navIdent
+		faktisk.navn shouldBe forventet.navn
+		faktisk.telefonnummer shouldBe forventet.telefonnummer
+		faktisk.epost shouldBe forventet.epost
 	}
 
 
-})
+}
