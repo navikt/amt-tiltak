@@ -8,6 +8,7 @@ data class KafkaTopicProperties(
 	val sisteTiltaksgjennomforingerTopic: String,
 	val deltakerTopic: String,
 	val amtNavBrukerPersonaliaTopic: String,
+	val amtNavAnsattPersonaliaTopic: String,
 
 	//Internal publish topics
 	val amtArrangorTopic: String,

@@ -105,3 +105,12 @@ data class NavBrukerMsg(
 		val navn: String,
 	)
 }
+
+
+data class NavAnsattMsg(
+	val id: UUID,
+	val navident: String,
+	val navn: String,
+	val telefon: String?,
+	val epost: String?,
+)

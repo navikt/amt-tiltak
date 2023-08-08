@@ -21,7 +21,9 @@ class KafkaMessageSender(
 	@Value("\${app.env.amtArrangorAnsattTopic}")
 	private val amtArrangorAnsattTopic: String,
 	@Value("\${app.env.amtNavBrukerPersonaliaTopic}")
-	private val navBrukerTopic: String
+	private val navBrukerTopic: String,
+	@Value("\${app.env.amtNavAnsattPersonaliaTopic}")
+	private val navAnsattTopic: String,
 ) {
 	private val kafkaProducer = KafkaProducerClientImpl<ByteArray, ByteArray>(properties.producer())
 
@@ -47,5 +49,9 @@ class KafkaMessageSender(
 
 	fun sendTilNavBrukerTopic(key: UUID, jsonString: String?) {
 		kafkaProducer.send(ProducerRecord(navBrukerTopic, key.toString().toByteArray(), jsonString?.toByteArray()))
+	}
+
+	fun sendTilNavAnsattTopic(key: UUID, jsonString: String?) {
+		kafkaProducer.send(ProducerRecord(navAnsattTopic, key.toString().toByteArray(), jsonString?.toByteArray()))
 	}
 }

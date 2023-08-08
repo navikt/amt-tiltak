@@ -20,5 +20,6 @@
         <module>arrangor-ingestor</module>
         <module>ansatt-ingestor</module>
         <module>nav-bruker-ingestor</module>
+        <module>nav-ansatt-ingestor</module>
     </modules>
 </project>
