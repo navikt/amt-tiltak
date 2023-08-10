@@ -100,6 +100,10 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>nav-ansatt-ingestor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>mulighetsrommet-api-client</artifactId>
         </dependency>
         <dependency>

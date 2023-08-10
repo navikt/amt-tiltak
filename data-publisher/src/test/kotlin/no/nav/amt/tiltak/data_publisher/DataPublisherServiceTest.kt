@@ -84,4 +84,5 @@ private fun createTopicProperties(): KafkaTopicProperties = KafkaTopicProperties
 	amtDeltakerTopic = "",
 	amtArrangorAnsattTopic = "",
 	amtNavBrukerPersonaliaTopic = "",
+	amtNavAnsattPersonaliaTopic = "",
 )

@@ -2,7 +2,6 @@ package no.nav.amt.tiltak.navansatt
 
 import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
-import no.nav.amt.tiltak.core.domain.nav_ansatt.UpsertNavAnsattInput
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -21,7 +20,7 @@ internal class NavAnsattServiceImpl(
 	}
 
 	override fun getNavAnsatt(navIdent: String): NavAnsatt {
-		val navAnsatt = navAnsattRepository.getNavAnsattWithIdent(navIdent)
+		val navAnsatt = navAnsattRepository.get(navIdent)
 
 		if (navAnsatt != null)
 			return navAnsatt.toNavAnsatt()
@@ -32,21 +31,15 @@ internal class NavAnsattServiceImpl(
 		}
 
 		log.info("Oppretter ny nav ansatt for nav ident $navIdent")
-		navAnsattRepository.upsert(UpsertNavAnsattInput(
-			id = nyNavAnsatt.id,
-			navIdent = nyNavAnsatt.navIdent,
-			navn = nyNavAnsatt.navn,
-			epost = nyNavAnsatt.epost,
-			telefonnummer = nyNavAnsatt.telefonnummer,
-		))
+		upsert(nyNavAnsatt)
 
 		val ansatt = navAnsattRepository.get(nyNavAnsatt.id).toNavAnsatt()
 
 		return ansatt
 	}
 
-	override fun upsertNavAnsatt(input: UpsertNavAnsattInput) {
-		navAnsattRepository.upsert(input)
+	override fun upsert(ansatt: NavAnsatt) {
+		navAnsattRepository.upsert(ansatt)
 	}
 
 	override fun opprettNavAnsattHvisIkkeFinnes(navAnsattId: UUID) {
@@ -54,15 +47,7 @@ internal class NavAnsattServiceImpl(
 
 		val nyNavAnsatt = amtPersonClient.hentNavAnsatt(navAnsattId).getOrThrow()
 
-		upsertNavAnsatt(
-			UpsertNavAnsattInput(
-				id = nyNavAnsatt.id,
-				navIdent = nyNavAnsatt.navIdent,
-				navn = nyNavAnsatt.navn,
-				epost = nyNavAnsatt.epost,
-				telefonnummer = nyNavAnsatt.telefonnummer,
-			)
-		)
+		upsert(nyNavAnsatt)
 	}
 
 	private fun NavAnsattDbo.toNavAnsatt() = NavAnsatt(

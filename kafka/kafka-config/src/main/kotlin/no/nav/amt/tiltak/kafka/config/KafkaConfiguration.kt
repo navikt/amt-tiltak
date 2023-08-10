@@ -30,6 +30,7 @@ open class KafkaConfiguration(
 	arrangorIngestor: AmtArrangorIngestor,
 	ansattIngestor: AnsattIngestor,
 	navBrukerIngestor: NavBrukerIngestor,
+	navAnsattIngestor: NavAnsattIngestor,
 ) {
 	private val log = LoggerFactory.getLogger(javaClass)
     private var client: KafkaConsumerClient
@@ -95,6 +96,17 @@ open class KafkaConfiguration(
 					stringDeserializer(),
 					stringDeserializer(),
 					Consumer<ConsumerRecord<String, String>> { navBrukerIngestor.ingest(it.key(), it.value()) }
+				)
+		)
+		topicConfigs.add(
+			KafkaConsumerClientBuilder.TopicConfig<String, String>()
+				.withLogging()
+				.withStoreOnFailure(consumerRepository)
+				.withConsumerConfig(
+					kafkaTopicProperties.amtNavAnsattPersonaliaTopic,
+					stringDeserializer(),
+					stringDeserializer(),
+					Consumer<ConsumerRecord<String, String>> { navAnsattIngestor.ingest(it.value()) }
 				)
 		)
 
