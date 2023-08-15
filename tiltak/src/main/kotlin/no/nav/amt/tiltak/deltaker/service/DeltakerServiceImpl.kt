@@ -46,7 +46,7 @@ open class DeltakerServiceImpl(
 		val lagretDeltaker = hentDeltaker(deltaker.id)
 		val brukerId = brukerService.getIdOrCreate(personIdent)
 
-		if(lagretDeltaker == null || !deltaker.compareTo(lagretDeltaker)) {
+		if (lagretDeltaker == null || !deltaker.compareTo(lagretDeltaker)) {
 			val deltakerUpsertDbo = deltaker.toUpsertDbo(brukerId)
 			deltakerRepository.upsert(deltakerUpsertDbo)
 			oppdaterStatus(deltaker.statusInsert)
@@ -90,8 +90,8 @@ open class DeltakerServiceImpl(
 		return mapDeltakereOgAktiveStatuser(deltakere)
 	}
 
-	override fun hentDeltakereMedPersonIdent(personIdent: String): List<Deltaker>{
-		val deltakere =  deltakerRepository.getDeltakereMedPersonIdent(personIdent)
+	override fun hentDeltakereMedPersonIdent(personIdent: String): List<Deltaker> {
+		val deltakere = deltakerRepository.getDeltakereMedPersonIdent(personIdent)
 		return mapDeltakereOgAktiveStatuser(deltakere)
 	}
 
@@ -103,7 +103,7 @@ open class DeltakerServiceImpl(
 	override fun progressStatuser() {
 
 		val deltakere = deltakerRepository.erPaaAvsluttetGjennomforing()
-			.plus (deltakerRepository.sluttDatoPassert())
+			.plus(deltakerRepository.sluttDatoPassert())
 			.let { mapDeltakereOgAktiveStatuser(it) }
 
 		progressStatuser(deltakere)
@@ -134,8 +134,8 @@ open class DeltakerServiceImpl(
 		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
 	}
 
-	override fun erSkjermet(deltakerId: UUID) : Boolean {
-		val deltaker = hentDeltaker(deltakerId)?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
+	override fun erSkjermet(deltakerId: UUID): Boolean {
+		val deltaker = hentDeltaker(deltakerId) ?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 		return deltaker.erSkjermet
 	}
 
@@ -148,7 +148,7 @@ open class DeltakerServiceImpl(
 			deltakerId = status.deltakerId,
 			type = status.type,
 			aarsak = status.aarsak,
-			gyldigFra = status.gyldigFra?: LocalDateTime.now()
+			gyldigFra = status.gyldigFra ?: LocalDateTime.now()
 		)
 
 		transactionTemplate.executeWithoutResult {
@@ -180,7 +180,8 @@ open class DeltakerServiceImpl(
 	}
 
 	private fun sluttetForTidlig(gjennomforinger: List<Gjennomforing>, deltaker: Deltaker): Boolean {
-		val gjennomforing = gjennomforinger.find { it.id == deltaker.gjennomforingId } ?: throw RuntimeException("Fant ikke gjennomføring med id ${deltaker.gjennomforingId}")
+		val gjennomforing = gjennomforinger.find { it.id == deltaker.gjennomforingId }
+			?: throw RuntimeException("Fant ikke gjennomføring med id ${deltaker.gjennomforingId}")
 		if (!gjennomforing.erKurs) {
 			return false
 		}
@@ -190,11 +191,11 @@ open class DeltakerServiceImpl(
 		return false
 	}
 
-	private fun hentStatusOrThrow(deltakerId: UUID) : DeltakerStatus {
+	private fun hentStatusOrThrow(deltakerId: UUID): DeltakerStatus {
 		return hentStatus(deltakerId) ?: throw NoSuchElementException("Fant ikke status på deltaker med id $deltakerId")
 	}
 
-	private fun hentStatus(deltakerId: UUID) : DeltakerStatus? {
+	private fun hentStatus(deltakerId: UUID): DeltakerStatus? {
 		return deltakerStatusRepository.getStatusForDeltaker(deltakerId)?.toModel() ?: return null
 	}
 
@@ -213,13 +214,15 @@ open class DeltakerServiceImpl(
 	private fun oppdaterStatuser(deltakere: List<UUID>, nyStatus: DeltakerStatus.Type) = deltakere
 		.also { log.info("Oppdaterer status på ${it.size} deltakere") }
 		.forEach {
-			insertStatus(DeltakerStatusInsert(
-				id = UUID.randomUUID(),
-				deltakerId = it,
-				type = nyStatus,
-				aarsak = null,
-				gyldigFra = LocalDateTime.now()
-			))
+			insertStatus(
+				DeltakerStatusInsert(
+					id = UUID.randomUUID(),
+					deltakerId = it,
+					type = nyStatus,
+					aarsak = null,
+					gyldigFra = LocalDateTime.now()
+				)
+			)
 		}
 
 	override fun hentDeltakerMap(deltakerIder: List<UUID>): Map<UUID, Deltaker> {
@@ -281,6 +284,21 @@ open class DeltakerServiceImpl(
 		} while (deltakere.isNotEmpty())
 
 		log.info("Ferdig med republisering av deltakere på kafka")
+	}
+
+	override fun republiserDeltakerPaKafka(deltakerId: UUID) {
+		val dbo = deltakerRepository.get(deltakerId)
+			?: error("Fant ikke deltaker med id $deltakerId")
+
+		val status = deltakerStatusRepository.getStatusForDeltaker(deltakerId)
+			?: error("Fant ikke status for deltaker med id $deltakerId")
+
+		val deltaker = dbo.toDeltaker(status.toModel())
+
+		kafkaProducerService.publiserDeltaker(deltaker)
+		publisherService.publish(deltaker.id, DataPublishType.DELTAKER)
+
+		log.info("Publisert deltaker med id $deltakerId på kafka")
 	}
 
 	fun DeltakerUpsert.toUpsertDbo(brukerId: UUID) = DeltakerUpsertDbo(
