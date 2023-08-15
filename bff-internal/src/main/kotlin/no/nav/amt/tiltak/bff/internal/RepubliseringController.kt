@@ -7,9 +7,13 @@ import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.common.job.JobRunner
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
-import java.util.*
+import java.util.UUID
 
 @Unprotected
 @RestController
@@ -23,6 +27,18 @@ class RepubliseringController(
 	fun republiserDeltakere(request: HttpServletRequest) {
 		if (isInternal(request)) {
 			JobRunner.runAsync("republiser_deltakere_kafka", deltakerService::republiserAlleDeltakerePaKafka)
+		} else {
+			throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
+		}
+	}
+
+	@GetMapping("/deltakere/{id}")
+	fun republiserDeltaker(
+		@PathVariable("id") id: UUID,
+		request: HttpServletRequest,
+	) {
+		if (isInternal(request)) {
+			JobRunner.runAsync("republiser_deltaker_kafka") { deltakerService.republiserDeltakerPaKafka(id) }
 		} else {
 			throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
 		}
