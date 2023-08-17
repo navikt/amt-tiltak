@@ -119,4 +119,5 @@ fun mockNavBruker(bruker: BrukerInput, navEnhet: NavEnhetInput) = NavBruker(
 	telefon = bruker.telefonnummer,
 	epost = bruker.epost,
 	erSkjermet = bruker.erSkjermet,
+	adresse = bruker.adresse
 )

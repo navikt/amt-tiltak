@@ -13,4 +13,5 @@ data class Bruker(
 	val ansvarligVeilederId: UUID?,
 	val navEnhetId: UUID?,
 	val erSkjermet: Boolean,
+	val adresse: Adresse?
 )

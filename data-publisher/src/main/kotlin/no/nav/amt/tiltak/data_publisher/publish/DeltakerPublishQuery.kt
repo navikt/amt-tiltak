@@ -10,6 +10,8 @@ import no.nav.amt.tiltak.common.db_utils.getNullableLocalDateTime
 import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getNullableUUID
 import no.nav.amt.tiltak.common.db_utils.getUUID
+import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.core.domain.tiltak.Adresse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.data_publisher.model.DeltakerKontaktinformasjonDto
 import no.nav.amt.tiltak.data_publisher.model.DeltakerNavVeilederDto
@@ -59,7 +61,8 @@ class DeltakerPublishQuery(
 					telefonnummer = deltaker.telefonnummer,
 					epost = deltaker.epost
 				),
-				skjermet = deltaker.skjermet
+				skjermet = deltaker.skjermet,
+				adresse = deltaker.adresse
 			),
 			dagerPerUke = deltaker.dagerPerUke,
 			prosentStilling = deltaker.prosentStilling,
@@ -98,6 +101,7 @@ class DeltakerPublishQuery(
 				   bruker.etternavn,
 				   bruker.telefonnummer,
 				   bruker.epost,
+				   bruker.adresse,
 				   deltaker.dager_per_uke,
 				   deltaker.prosent_stilling,
 				   deltaker.start_dato,
@@ -166,6 +170,7 @@ class DeltakerPublishQuery(
 		val mellomnavn: String?,
 		val etternavn: String,
 		val skjermet: Boolean,
+		val adresse: Adresse?,
 		val telefonnummer: String?,
 		val epost: String?,
 		val dagerPerUke: Float?,
@@ -195,6 +200,7 @@ class DeltakerPublishQuery(
 					mellomnavn = rs.getNullableString("mellomnavn"),
 					etternavn = rs.getString("etternavn"),
 					skjermet = rs.getBoolean("er_skjermet"),
+					adresse = rs.getString("adresse")?.let { JsonUtils.fromJsonString<Adresse>(it) },
 					telefonnummer = rs.getNullableString("telefonnummer"),
 					epost = rs.getNullableString("epost"),
 					dagerPerUke = rs.getNullableFloat("dager_per_uke"),

@@ -2,11 +2,14 @@ package no.nav.amt.tiltak.test.integration.kafka
 
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.core.domain.tiltak.Oppholdsadresse
+import no.nav.amt.tiltak.core.domain.tiltak.Vegadresse
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
@@ -52,6 +55,18 @@ class NavBrukerIngestorIntegrationTest : IntegrationTestBase() {
 			telefon = "42",
 			epost = "ny@epost",
 			erSkjermet = true,
+			adresse = TestData.lagAdresse().copy(oppholdsadresse = Oppholdsadresse(
+				coAdressenavn = null,
+				matrikkeladresse = null,
+				vegadresse = Vegadresse(
+					husnummer = "1",
+					husbokstav = null,
+					adressenavn = "Gateveien",
+					tilleggsnavn = null,
+					postnummer = "1234",
+					poststed = "ANDEBY"
+				),
+			))
 		)
 
 		kafkaMessageSender.sendTilNavBrukerTopic(msg.personId, JsonUtils.toJsonString(msg))
@@ -68,6 +83,7 @@ class NavBrukerIngestorIntegrationTest : IntegrationTestBase() {
 			bruker.telefonnummer shouldBe msg.telefon
 			bruker.epost shouldBe msg.epost
 			bruker.erSkjermet shouldBe msg.erSkjermet
+			bruker.adresse?.oppholdsadresse?.vegadresse?.poststed shouldBe "ANDEBY"
 		}
 	 }
 
@@ -85,6 +101,7 @@ class NavBrukerIngestorIntegrationTest : IntegrationTestBase() {
 			telefon = BRUKER_1.telefonnummer,
 			epost = BRUKER_1.epost,
 			erSkjermet = BRUKER_1.erSkjermet,
+			adresse = BRUKER_1.adresse
 		)
 
 		kafkaMessageSender.sendTilNavBrukerTopic(msg.personId, JsonUtils.toJsonString(msg))
@@ -111,6 +128,7 @@ class NavBrukerIngestorIntegrationTest : IntegrationTestBase() {
 			telefon = BRUKER_1.telefonnummer,
 			epost = BRUKER_1.epost,
 			erSkjermet = BRUKER_1.erSkjermet,
+			adresse = BRUKER_1.adresse
 		)
 
 		kafkaMessageSender.sendTilNavBrukerTopic(msg.personId, JsonUtils.toJsonString(msg))

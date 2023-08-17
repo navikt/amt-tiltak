@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.data_publisher
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorInput
@@ -186,7 +187,8 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		epost = UUID.randomUUID().toString(),
 		ansvarligVeilederId = ansvarligVeilederId,
 		navEnhet = navEnhet,
-		erSkjermet = false
+		erSkjermet = false,
+		adresse = TestData.lagAdresse()
 	)
 
 	private fun deltakerInput(

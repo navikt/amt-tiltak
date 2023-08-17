@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.test.integration.utils
 
+import no.nav.amt.tiltak.core.domain.tiltak.Adresse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import java.time.LocalDate
@@ -98,6 +99,7 @@ data class NavBrukerMsg(
 	val telefon: String?,
 	val epost: String?,
 	val erSkjermet: Boolean,
+	val adresse: Adresse?
 )  {
 	data class NavEnhetMsg(
 		val id: UUID,

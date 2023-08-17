@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.clients.amt_person.model
 
+import no.nav.amt.tiltak.core.domain.tiltak.Adresse
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import java.util.UUID
@@ -15,6 +16,7 @@ data class NavBruker(
 	val telefon: String?,
 	val epost: String?,
 	val erSkjermet: Boolean,
+	val adresse: Adresse?
 ) {
 	fun toBruker() = Bruker(
 		id = personId,
@@ -27,7 +29,6 @@ data class NavBruker(
 		ansvarligVeilederId = navVeilederId,
 		navEnhetId = navEnhet?.id,
 		erSkjermet = erSkjermet,
+		adresse = adresse
 	)
-
-
 }
