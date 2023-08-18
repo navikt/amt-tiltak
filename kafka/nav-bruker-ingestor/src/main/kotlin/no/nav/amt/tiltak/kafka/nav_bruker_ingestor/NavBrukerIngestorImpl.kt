@@ -21,13 +21,18 @@ class NavBrukerIngestorImpl(
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun ingest(key: String, value: String?) {
+		val personId = UUID.fromString(key)
 		val brukerDto = value?.let { fromJsonString<NavBrukerDto>(it) }
-			?: return handleTombstone(UUID.fromString(key))
+			?: return handleTombstone(personId)
 
 		brukerDto.navEnhet?.toModel()?.let { navEnhetService.upsert(it) }
 		brukerDto.navVeilederId?.let { navAnsattService.opprettNavAnsattHvisIkkeFinnes(it) }
 
 		brukerService.upsert(brukerDto.toModel())
+
+		val deltakere = deltakerService.hentDeltakereMedPersonId(personId)
+		deltakere.forEach { deltakerService.publiserDeltakerPaKafka(it.id) }
+
 		log.info("Håndterte melding for nav-bruker $key")
 	}
 

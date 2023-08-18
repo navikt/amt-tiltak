@@ -41,6 +41,8 @@ interface DeltakerService {
 
 	fun republiserDeltakerPaKafka(deltakerId: UUID)
 
+	fun publiserDeltakerPaKafka(deltakerId: UUID)
+
 	fun slettDeltakerePaaGjennomforing(gjennomforingId: UUID)
 
 }

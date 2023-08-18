@@ -301,6 +301,11 @@ open class DeltakerServiceImpl(
 		log.info("Publisert deltaker med id $deltakerId på kafka")
 	}
 
+	override fun publiserDeltakerPaKafka(deltakerId: UUID) {
+		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
+		log.info("Publisert oppdatert deltaker med id $deltakerId på kafka")
+	}
+
 	fun DeltakerUpsert.toUpsertDbo(brukerId: UUID) = DeltakerUpsertDbo(
 		id = this.id,
 		brukerId = brukerId,
