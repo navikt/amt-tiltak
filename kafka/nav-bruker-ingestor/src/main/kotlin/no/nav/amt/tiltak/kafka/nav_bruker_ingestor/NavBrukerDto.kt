@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.kafka.nav_bruker_ingestor
 
+import no.nav.amt.tiltak.core.domain.tiltak.Adresse
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
 import java.util.UUID
@@ -15,6 +16,7 @@ data class NavBrukerDto(
 	val telefon: String?,
 	val epost: String?,
 	val erSkjermet: Boolean,
+	val adresse: Adresse?
 ) {
 	fun toModel() = Bruker(
 		id = personId,
@@ -27,6 +29,7 @@ data class NavBrukerDto(
 		telefonnummer = telefon,
 		epost = epost,
 		erSkjermet = erSkjermet,
+		adresse = adresse
 	)
 }
 

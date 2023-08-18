@@ -1,7 +1,12 @@
 package no.nav.amt.tiltak.test.database.data
 
+import no.nav.amt.tiltak.core.domain.tiltak.Adresse
+import no.nav.amt.tiltak.core.domain.tiltak.Bostedsadresse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.core.domain.tiltak.Kontaktadresse
+import no.nav.amt.tiltak.core.domain.tiltak.Matrikkeladresse
+import no.nav.amt.tiltak.core.domain.tiltak.Vegadresse
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattGjennomforingTilgangInput
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattRolleInput
@@ -46,7 +51,8 @@ object TestData {
 			epost = "bruker@example.com",
 			ansvarligVeilederId = null,
 			navEnhet = navEnhet,
-			erSkjermet = false
+			erSkjermet = false,
+			adresse = lagAdresse()
 		)
 
 	fun createStatusInput(deltaker: DeltakerInput) = DeltakerStatusInput(
@@ -257,7 +263,8 @@ object TestData {
 		epost = "bruker1@example.com",
 		ansvarligVeilederId = NAV_ANSATT_1.id,
 		navEnhet = NAV_ENHET_1,
-		erSkjermet = false
+		erSkjermet = false,
+		adresse = lagAdresse()
 	)
 
 	val BRUKER_SKJERMET = BrukerInput(
@@ -269,7 +276,8 @@ object TestData {
 		epost = "skjermet@example.com",
 		ansvarligVeilederId = NAV_ANSATT_1.id,
 		navEnhet = NAV_ENHET_1,
-		erSkjermet = true
+		erSkjermet = true,
+		adresse = null
 	)
 
 	val DELTAKER_1 = DeltakerInput(
@@ -314,7 +322,8 @@ object TestData {
 		epost = "bruker2@example.com",
 		ansvarligVeilederId = null,
 		navEnhet = NAV_ENHET_1,
-		erSkjermet = false
+		erSkjermet = false,
+		adresse = lagAdresse()
 	)
 
 	val DELTAKER_2 = DeltakerInput(
@@ -348,7 +357,8 @@ object TestData {
 		epost = "bruker3@example.com",
 		ansvarligVeilederId = null,
 		navEnhet = NAV_ENHET_1,
-		erSkjermet = false
+		erSkjermet = false,
+		adresse = lagAdresse()
 	)
 
 	// Bruker 4
@@ -362,7 +372,8 @@ object TestData {
 		epost = "bruker4@example.com",
 		ansvarligVeilederId = null,
 		navEnhet = NAV_ENHET_1,
-		erSkjermet = false
+		erSkjermet = false,
+		adresse = null
 	)
 
 
@@ -452,5 +463,31 @@ object TestData {
 		gyldigFra = ZonedDateTime.parse("2022-11-08T15:00:00.00000+00:00"),
 		gyldigTil = ZonedDateTime.parse("3000-01-01T00:00:00.00000+00:00"),
 	)
+
+	fun lagAdresse(): Adresse =
+		Adresse(
+			bostedsadresse = Bostedsadresse(
+				coAdressenavn = "C/O Gutterommet",
+				vegadresse = null,
+				matrikkeladresse = Matrikkeladresse(
+					tilleggsnavn = "Gården",
+					postnummer = "0484",
+					poststed = "OSLO"
+				)
+			),
+			oppholdsadresse = null,
+			kontaktadresse = Kontaktadresse(
+				coAdressenavn = null,
+				vegadresse = Vegadresse(
+					husnummer = "1",
+					husbokstav = null,
+					adressenavn = "Gate",
+					tilleggsnavn = null,
+					postnummer = "1234",
+					poststed = "MOSS"
+				),
+				postboksadresse = null
+			)
+		)
 
 }

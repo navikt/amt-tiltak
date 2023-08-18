@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.clients.amt_person.dto
 
+import no.nav.amt.tiltak.core.domain.tiltak.Adresse
 import java.util.UUID
 
 data class NavBrukerDto (
@@ -13,6 +14,7 @@ data class NavBrukerDto (
 	val telefon: String?,
 	val epost: String?,
 	val erSkjermet: Boolean,
+	val adresse: Adresse?
 ) {
 	data class NavEnhetDto(
 		val id: UUID,

@@ -9,6 +9,11 @@ import no.nav.amt.tiltak.clients.amt_person.dto.NavAnsattDto
 import no.nav.amt.tiltak.clients.amt_person.dto.NavBrukerDto
 import no.nav.amt.tiltak.clients.amt_person.dto.NavEnhetDto
 import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.core.domain.tiltak.Adresse
+import no.nav.amt.tiltak.core.domain.tiltak.Bostedsadresse
+import no.nav.amt.tiltak.core.domain.tiltak.Kontaktadresse
+import no.nav.amt.tiltak.core.domain.tiltak.Matrikkeladresse
+import no.nav.amt.tiltak.core.domain.tiltak.Vegadresse
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.BeforeEach
@@ -37,6 +42,30 @@ class AmtPersonClientImplTest {
 			enhetId = "887766",
 			navn = "Nav Oslo",
 		)
+		val adresse = Adresse(
+			bostedsadresse = Bostedsadresse(
+				coAdressenavn = "C/O Gutterommet",
+				vegadresse = null,
+				matrikkeladresse = Matrikkeladresse(
+					tilleggsnavn = "Gården",
+					postnummer = "0484",
+					poststed = "OSLO"
+				)
+			),
+			oppholdsadresse = null,
+			kontaktadresse = Kontaktadresse(
+				coAdressenavn = null,
+				vegadresse = Vegadresse(
+					husnummer = "1",
+					husbokstav = null,
+					adressenavn = "Gate",
+					tilleggsnavn = null,
+					postnummer = "1234",
+					poststed = "MOSS"
+				),
+				postboksadresse = null
+			)
+		)
 
 		val bruker = NavBrukerDto(
 			personId = UUID.randomUUID(),
@@ -49,6 +78,7 @@ class AmtPersonClientImplTest {
 			telefon = "77742777",
 			epost = "bruker@nav.no",
 			erSkjermet = false,
+			adresse = adresse
 		)
 
 		server.enqueue(
@@ -68,6 +98,7 @@ class AmtPersonClientImplTest {
 		faktiskBruker.telefon shouldBe bruker.telefon
 		faktiskBruker.epost shouldBe bruker.epost
 		faktiskBruker.navVeilederId shouldBe bruker.navVeilederId
+		faktiskBruker.adresse shouldBe adresse
 
 		val faktiskNavEnhet = faktiskBruker.navEnhet!!
 		faktiskNavEnhet.id shouldBe navEnhet.id

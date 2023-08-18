@@ -1,10 +1,14 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
+import no.nav.amt.tiltak.common.json.JsonUtils.objectMapper
+import no.nav.amt.tiltak.core.domain.tiltak.Adresse
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.utils.getNullableUUID
 import no.nav.amt.tiltak.utils.getUUID
+import org.postgresql.util.PGobject
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -28,6 +32,7 @@ open class BrukerRepository(
 			ansvarligVeilederId = rs.getNullableUUID("ansvarlig_veileder_id"),
 			navEnhetId = rs.getNullableUUID("nav_enhet_id"),
 			erSkjermet = rs.getBoolean("er_skjermet"),
+			adresse = rs.getString("adresse")?.let { fromJsonString<Adresse>(it) },
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
 		)
@@ -35,7 +40,7 @@ open class BrukerRepository(
 
 	fun upsert(bruker: Bruker) {
 		val sql = """
-			INSERT INTO bruker(id, person_ident, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_enhet_id, er_skjermet)
+			INSERT INTO bruker(id, person_ident, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_enhet_id, er_skjermet, adresse)
 			VALUES (:id,
 					:personIdent,
 					:fornavn,
@@ -45,7 +50,8 @@ open class BrukerRepository(
 					:epost,
 					:veileder_id,
 					:nav_enhet_id,
-					:er_skjermet)
+					:er_skjermet,
+					:adresse)
 			ON CONFLICT(id) DO UPDATE SET
 			    person_ident = :personIdent,
 			 	fornavn = :fornavn,
@@ -56,7 +62,8 @@ open class BrukerRepository(
 				ansvarlig_veileder_id = :veileder_id,
 				nav_enhet_id = :nav_enhet_id,
 				modified_at = CURRENT_TIMESTAMP,
-				er_skjermet = :er_skjermet
+				er_skjermet = :er_skjermet,
+				adresse = :adresse
 		""".trimIndent()
 
 		val parameters = sqlParameters(
@@ -69,7 +76,8 @@ open class BrukerRepository(
 			"epost" to bruker.epost,
 			"veileder_id" to bruker.ansvarligVeilederId,
 			"nav_enhet_id" to bruker.navEnhetId,
-			"er_skjermet" to bruker.erSkjermet
+			"er_skjermet" to bruker.erSkjermet,
+			"adresse" to bruker.adresse?.toPGObject()
 		)
 
 		template.update(sql, parameters)
@@ -134,4 +142,8 @@ open class BrukerRepository(
 		template.update(sql, parameters)
 	}
 
+	private fun Adresse.toPGObject() = PGobject().also {
+		it.type = "json"
+		it.value = objectMapper.writeValueAsString(this)
+	}
 }

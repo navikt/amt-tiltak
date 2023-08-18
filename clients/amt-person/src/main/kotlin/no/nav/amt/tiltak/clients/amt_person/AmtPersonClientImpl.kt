@@ -42,6 +42,7 @@ class AmtPersonClientImpl(
 				telefon = navBruker.telefon,
 				epost = navBruker.epost,
 				erSkjermet = navBruker.erSkjermet,
+				adresse = navBruker.adresse
 			)
 		}
 	}

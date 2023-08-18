@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.data_publisher.model
 
+import no.nav.amt.tiltak.core.domain.tiltak.Adresse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.common.json.JsonUtils
 import org.springframework.util.DigestUtils
@@ -30,7 +31,8 @@ data class DeltakerPersonaliaDto(
 	val personident: String,
 	val navn: Navn,
 	val kontaktinformasjon: DeltakerKontaktinformasjonDto,
-	val skjermet: Boolean
+	val skjermet: Boolean,
+	val adresse: Adresse?
 )
 
 data class Navn(
