@@ -286,7 +286,7 @@ open class DeltakerServiceImpl(
 		log.info("Ferdig med republisering av deltakere på kafka")
 	}
 
-	override fun republiserDeltakerPaKafka(deltakerId: UUID) {
+	override fun publiserDeltakerPaKafka(deltakerId: UUID) {
 		val dbo = deltakerRepository.get(deltakerId)
 			?: error("Fant ikke deltaker med id $deltakerId")
 
