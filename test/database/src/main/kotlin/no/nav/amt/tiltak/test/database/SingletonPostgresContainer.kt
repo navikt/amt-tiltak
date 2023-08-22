@@ -47,6 +47,12 @@ object SingletonPostgresContainer {
 
 	private fun applyMigrations(dataSource: DataSource) {
 		val flyway: Flyway = Flyway.configure()
+			.configuration(
+				mapOf(
+					// Disable transactional locks in order to support concurrent indexes
+					"flyway.postgresql.transactional.lock" to "false"
+				)
+			)
 			.dataSource(dataSource)
 			.connectRetries(10)
 			.cleanDisabled(false)
