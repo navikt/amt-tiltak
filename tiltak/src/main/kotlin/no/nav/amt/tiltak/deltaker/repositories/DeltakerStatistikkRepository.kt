@@ -59,19 +59,6 @@ class DeltakerStatistikkRepository(
 		Int::class.java
 	)
 
-
-	fun eksponerteBrukere(): Int {
-		val query = """
-			select count(distinct bruker_id)
-			from deltaker
-			where deltaker.gjennomforing_id in (
-				select gjennomforing_id
-				from arrangor_ansatt_gjennomforing_tilgang tilgang
-				where deltaker.gjennomforing_id = tilgang.gjennomforing_id);
-		""".trimIndent()
-		return template.queryForObject(query, MapSqlParameterSource(), Int::class.java)!!
-	}
-
 	fun eksponerteBrukerePrStatus(): List<StatusStatistikk> {
 		val query = """
 			select ds.status as status, count(distinct deltaker.id) as antall

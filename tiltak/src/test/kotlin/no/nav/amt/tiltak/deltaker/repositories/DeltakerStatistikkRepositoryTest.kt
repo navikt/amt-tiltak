@@ -72,10 +72,6 @@ class DeltakerStatistikkRepositoryTest : FunSpec({
 		repository.antallAktiveArrangorerMedBrukere() shouldBe 1
 	}
 
-	test("eksponerteBrukere - returnerer 3") {
-		repository.eksponerteBrukere() shouldBe 3
-	}
-
 	test("eksponerteBrukerePerStatus - returnerer 3") {
 		repository.eksponerteBrukerePrStatus() shouldHaveSize 2
 		repository.eksponerteBrukerePrStatus() shouldContain StatusStatistikk("DELTAR", 2)
