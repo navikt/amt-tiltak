@@ -6,7 +6,10 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.STATUSER_SOM_KAN_SKJULES
+import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
+import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import no.nav.amt.tiltak.core.domain.tiltak.harIkkeStartet
+import no.nav.amt.tiltak.core.exceptions.ValidationException
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
@@ -21,6 +24,7 @@ import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.repositories.SkjultDeltakerRepository
+import no.nav.amt.tiltak.deltaker.repositories.VurderingRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
@@ -38,6 +42,7 @@ open class DeltakerServiceImpl(
 	private val transactionTemplate: TransactionTemplate,
 	private val kafkaProducerService: KafkaProducerService,
 	private val publisherService: DataPublisherService,
+	private val vurderingRepository: VurderingRepository
 ) : DeltakerService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -137,6 +142,41 @@ open class DeltakerServiceImpl(
 	override fun erSkjermet(deltakerId: UUID): Boolean {
 		val deltaker = hentDeltaker(deltakerId) ?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 		return deltaker.erSkjermet
+	}
+
+	override fun lagreVurdering(
+		deltakerId: UUID,
+		arrangorAnsattId: UUID,
+		vurderingstype: Vurderingstype,
+		begrunnelse: String?
+	): List<Vurdering> {
+		val status = deltakerStatusRepository.getStatusForDeltaker(deltakerId)
+		if (status?.type != DeltakerStatus.Type.VURDERES) {
+			log.error("Kan ikke opprette vurdering for deltaker med id $deltakerId som ikke har status VURDERES")
+			throw ValidationException("Kan ikke opprette vurdering for deltaker som ikke har status VURDERES")
+		}
+
+		val opprinneligeVurderinger = vurderingRepository.getVurderingerForDeltaker(deltakerId)
+		val forrigeVurdering = opprinneligeVurderinger.firstOrNull { it.gyldigTil == null }
+		if (forrigeVurdering?.vurderingstype == vurderingstype && forrigeVurdering.begrunnelse == begrunnelse) return opprinneligeVurderinger
+
+		val nyVurdering = Vurdering(
+			id = UUID.randomUUID(),
+			deltakerId = deltakerId,
+			vurderingstype = vurderingstype,
+			begrunnelse = begrunnelse,
+			opprettetAvArrangorAnsattId = arrangorAnsattId,
+			gyldigFra = LocalDateTime.now(),
+			gyldigTil = null
+		)
+
+		transactionTemplate.executeWithoutResult {
+			forrigeVurdering?.let { vurderingRepository.deaktiver(it.id) }
+			vurderingRepository.insert(nyVurdering)
+		}
+
+		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
+		return vurderingRepository.getVurderingerForDeltaker(deltakerId)
 	}
 
 	private fun oppdaterStatus(status: DeltakerStatusInsert) {

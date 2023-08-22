@@ -3,6 +3,8 @@ package no.nav.amt.tiltak.core.port
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
+import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
+import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import java.util.UUID
 
 interface DeltakerService {
@@ -42,5 +44,7 @@ interface DeltakerService {
 	fun publiserDeltakerPaKafka(deltakerId: UUID)
 
 	fun slettDeltakerePaaGjennomforing(gjennomforingId: UUID)
+
+	fun lagreVurdering(deltakerId: UUID, arrangorAnsattId: UUID, vurderingstype: Vurderingstype, begrunnelse: String?): List<Vurdering>
 
 }

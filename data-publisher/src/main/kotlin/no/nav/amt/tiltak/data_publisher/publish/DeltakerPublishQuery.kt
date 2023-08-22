@@ -13,6 +13,8 @@ import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.tiltak.Adresse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
+import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import no.nav.amt.tiltak.data_publisher.model.DeltakerKontaktinformasjonDto
 import no.nav.amt.tiltak.data_publisher.model.DeltakerNavVeilederDto
 import no.nav.amt.tiltak.data_publisher.model.DeltakerPersonaliaDto
@@ -21,6 +23,7 @@ import no.nav.amt.tiltak.data_publisher.model.DeltakerSkjultDto
 import no.nav.amt.tiltak.data_publisher.model.DeltakerStatusDto
 import no.nav.amt.tiltak.data_publisher.model.Navn
 import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -46,6 +49,7 @@ class DeltakerPublishQuery(
 
 				} else null
 			}
+		val vurderinger = getVurderinger(id)
 
 		return DeltakerPublishDto(
 			deltaker.id,
@@ -86,7 +90,8 @@ class DeltakerPublishQuery(
 				opprettetDato = deltaker.statusCreatedAt!!
 			),
 			skjult = skjult,
-			deltarPaKurs = deltaker.deltarPaKurs
+			deltarPaKurs = deltaker.deltarPaKurs,
+			vurderingerFraArrangor = vurderinger
 		).let { Result.OK(it) }
 	}
 
@@ -160,6 +165,32 @@ class DeltakerPublishQuery(
 				)
 			}
 		}
+	}
+
+	private fun getVurderinger(deltakerId: UUID): List<Vurdering> {
+		val sql = """
+			SELECT *
+			FROM vurdering
+			WHERE deltaker_id = :deltakerId;
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf("deltakerId" to deltakerId)
+		)
+
+		return template.query(sql, parameters, vurderingRowMapper)
+	}
+
+	private val vurderingRowMapper = RowMapper { rs, _ ->
+		Vurdering(
+			id = rs.getUUID("id"),
+			deltakerId = rs.getUUID("deltaker_id"),
+			vurderingstype = Vurderingstype.valueOf(rs.getString("vurderingstype")),
+			begrunnelse = rs.getString("begrunnelse"),
+			opprettetAvArrangorAnsattId = rs.getUUID("opprettet_av_arrangor_ansatt_id"),
+			gyldigFra = rs.getLocalDateTime("gyldig_fra"),
+			gyldigTil = rs.getNullableLocalDateTime("gyldig_til")
+		)
 	}
 
 	private data class DeltakerDbo(

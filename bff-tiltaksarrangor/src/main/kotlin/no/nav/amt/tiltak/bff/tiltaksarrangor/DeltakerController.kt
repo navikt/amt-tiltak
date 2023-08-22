@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.bff.tiltaksarrangor
 import no.nav.amt.tiltak.bff.tiltaksarrangor.request.*
 import no.nav.amt.tiltak.bff.tiltaksarrangor.response.OpprettEndringsmeldingResponse
 import no.nav.amt.tiltak.common.auth.Issuer
+import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.amt.tiltak.core.exceptions.SkjultDeltakerException
 import no.nav.amt.tiltak.core.exceptions.ValidationException
 import no.nav.amt.tiltak.core.port.*
@@ -151,6 +152,25 @@ class DeltakerController(
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 
 		deltakerService.skjulDeltakerForTiltaksarrangor(deltakerId, ansatt.id)
+	}
+
+	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
+	@PostMapping("/{deltakerId}/vurdering")
+	fun registrerVurdering(
+		@PathVariable("deltakerId") deltakerId: UUID,
+		@RequestBody request: RegistrerVurderingRequest
+	): List<Vurdering> {
+		val ansatt = controllerService.hentInnloggetAnsatt()
+
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		verifiserErIkkeSkjult(deltakerId)
+
+		return deltakerService.lagreVurdering(
+			deltakerId = deltakerId,
+			arrangorAnsattId = ansatt.id,
+			vurderingstype = request.vurderingstype,
+			begrunnelse = request.begrunnelse
+		)
 	}
 
 	private fun verifiserErIkkeSkjult(deltakerId: UUID) {
