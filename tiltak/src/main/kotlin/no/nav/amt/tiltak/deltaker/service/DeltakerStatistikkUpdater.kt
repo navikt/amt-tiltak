@@ -14,7 +14,6 @@ private const val arrangorer = "amt_tiltak_antall_arrangorer"
 private const val arrangorerMedBrukere = "amt_tiltak_antall_arrangorer_med_brukere"
 private const val aktiveArrangorer = "amt_tiltak_antall_aktive_arrangorer"
 private const val aktiveArrangorerMedBrukere = "amt_tiltak_antall_aktive_arrangorer_med_brukere"
-private const val eksponerteBrukere = "amt_tiltak_antall_brukere_eksponerte" // erstattes av eksponerteBrukerePrStatus
 private const val eksponerteBrukerePrStatus = "amt_tiltak_antall_brukere_eksponerte_pr_status"
 
 @Component
@@ -25,7 +24,6 @@ class DeltakerStatistikkUpdater(
 
 	private val simpleGauges: Map<String, AtomicInteger> = mapOf(
 		Pair(deltakere, registry.gauge(deltakere, AtomicInteger(0))!!),
-		Pair(eksponerteBrukere, registry.gauge(eksponerteBrukere, AtomicInteger(0))!!),
 		Pair(arrangorer, registry.gauge(arrangorer, AtomicInteger(0))!!),
 		Pair(arrangorerMedBrukere, registry.gauge(arrangorerMedBrukere, AtomicInteger(0))!!),
 		Pair(aktiveArrangorer, registry.gauge(aktiveArrangorer, AtomicInteger(0))!!),
@@ -55,7 +53,6 @@ class DeltakerStatistikkUpdater(
 		simpleGauges.getValue(arrangorerMedBrukere).set(deltakerStatistikkRepository.antallArrangorerMedBrukere()!!)
 		simpleGauges.getValue(aktiveArrangorer).set(deltakerStatistikkRepository.antallAktiveArrangorer()!!)
 		simpleGauges.getValue(aktiveArrangorerMedBrukere).set(deltakerStatistikkRepository.antallAktiveArrangorerMedBrukere()!!)
-		simpleGauges.getValue(eksponerteBrukere).set(deltakerStatistikkRepository.eksponerteBrukere())
 		oppdaterEksponterteBrukerePerStatus()
 	}
 
