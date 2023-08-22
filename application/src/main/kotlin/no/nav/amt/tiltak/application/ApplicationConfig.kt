@@ -12,7 +12,9 @@ import no.nav.poao_tilgang.client.PoaoTilgangCachedClient
 import no.nav.poao_tilgang.client.PoaoTilgangClient
 import no.nav.poao_tilgang.client.PoaoTilgangHttpClient
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
+import org.flywaydb.core.api.configuration.FluentConfiguration
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -73,4 +75,14 @@ open class ApplicationConfig {
 		@Value("\${app.env.unleashUrl}") unleashUrl: String) : UnleashClient {
 		return UnleashClientImpl(unleashUrl, "amt-tiltak")
 	}
+
+	@Bean
+	open fun flywayCustomizer(): FlywayConfigurationCustomizer? {
+		return FlywayConfigurationCustomizer { configuration: FluentConfiguration ->
+			configuration.configuration(
+				mapOf("flyway.postgresql.transactional.lock" to "false")
+			)
+		}
+	}
+
 }
