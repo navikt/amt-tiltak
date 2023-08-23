@@ -624,8 +624,8 @@ class DeltakerServiceImplTest {
 		val forrigeVurderingFraDb = vurderinger.find { it.id == forrigeVurdering.id }
 		forrigeVurderingFraDb?.vurderingstype shouldBe Vurderingstype.OPPFYLLER_IKKE_KRAVENE
 		forrigeVurderingFraDb?.begrunnelse shouldBe forrigeVurdering.begrunnelse
-		forrigeVurderingFraDb?.gyldigFra shouldBe forrigeVurdering.gyldigFra
-		forrigeVurderingFraDb?.gyldigTil shouldNotBe null
+		forrigeVurderingFraDb!!.gyldigFra shouldBeEqualTo forrigeVurdering.gyldigFra
+		forrigeVurderingFraDb.gyldigTil shouldNotBe null
 
 		val nyVurderingFraDb = vurderinger.find { it.id != forrigeVurdering.id }
 		nyVurderingFraDb?.vurderingstype shouldBe Vurderingstype.OPPFYLLER_KRAVENE
