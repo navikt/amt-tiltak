@@ -7,14 +7,9 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
-import no.nav.amt.tiltak.core.kafka.KafkaProducerService
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.ArrangorService
+import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
-import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
-import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
-import no.nav.amt.tiltak.deltaker.repositories.SkjultDeltakerRepository
-import no.nav.amt.tiltak.deltaker.service.DeltakerServiceImpl
-import no.nav.amt.tiltak.endringsmelding.EndringsmeldingServiceImpl
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
@@ -25,9 +20,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.jdbc.datasource.DataSourceTransactionManager
-import org.springframework.transaction.support.TransactionTemplate
-import java.util.*
+import java.util.UUID
 
 class GjennomforingServiceImplTest : FunSpec({
 
@@ -37,74 +30,28 @@ class GjennomforingServiceImplTest : FunSpec({
 
 	lateinit var testDataRepository: TestDataRepository
 
-	lateinit var deltakerService: DeltakerService
-
-	lateinit var gjennomforingService: GjennomforingService
-
 	lateinit var arrangorService: ArrangorService
 
 	lateinit var tiltakService: TiltakService
 
-	lateinit var brukerService: BrukerService
-
-	lateinit var navEnhetService: NavEnhetService
-
-	lateinit var kafkaProducerService: KafkaProducerService
-
-	lateinit var endringsmeldingService: EndringsmeldingServiceImpl
-
 	lateinit var service: GjennomforingServiceImpl
-
-	lateinit var skjulDeltakerRepository: SkjultDeltakerRepository
 
 	lateinit var publisherService: DataPublisherService
 
 
 	beforeEach {
 		val parameterTemplate = NamedParameterJdbcTemplate(dataSource)
-		val transactionTemplate = TransactionTemplate(DataSourceTransactionManager(dataSource))
 
 		gjennomforingRepository = GjennomforingRepository(parameterTemplate)
 
 		testDataRepository = TestDataRepository(parameterTemplate)
 
-		deltakerService = mockk()
-
 		arrangorService = mockk()
 
 		tiltakService = mockk()
 
-		brukerService = mockk()
-
-		navEnhetService = mockk()
-
-		kafkaProducerService = mockk(relaxUnitFun = true)
-
-		endringsmeldingService = mockk()
-
-		skjulDeltakerRepository = mockk()
-
 		publisherService = mockk()
 
-
-		gjennomforingService = GjennomforingServiceImpl(
-			gjennomforingRepository,
-			tiltakService,
-			arrangorService,
-			publisherService
-		)
-
-		deltakerService = DeltakerServiceImpl(
-			DeltakerRepository(parameterTemplate),
-			DeltakerStatusRepository(parameterTemplate),
-			brukerService,
-			endringsmeldingService,
-			skjulDeltakerRepository,
-			gjennomforingService,
-			transactionTemplate,
-			kafkaProducerService,
-			publisherService
-		)
 
 		service = GjennomforingServiceImpl(
 			gjennomforingRepository = gjennomforingRepository,

@@ -4,10 +4,14 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.beInstanceOf
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.domain.tiltak.EndringsmeldingStatusAarsak
+import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
+import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
+import no.nav.amt.tiltak.deltaker.repositories.VurderingRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
@@ -33,6 +37,9 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 	@Autowired
 	lateinit var deltakerService: DeltakerService
+
+	@Autowired
+	lateinit var vurderingRepository: VurderingRepository
 
 	val dato = "2022-11-01"
 	val deltakerIkkeTilgang = DELTAKER_1.copy(id = UUID.randomUUID(), gjennomforingId = GJENNOMFORING_2.id)
@@ -533,6 +540,58 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 
 		response.code shouldBe 403
+	}
+
+	@Test
+	fun `registrerVurdering() skal returnere 403 hvis ikke tilgang`() {
+		val response = sendRequest(
+			method = "POST",
+			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/vurdering",
+			headers = createAnsatt1AuthHeader(),
+			body = """{"vurderingstype": "OPPFYLLER_IKKE_KRAVENE", "begrunnelse": "Mangler førerkort"}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 403
+	}
+
+	@Test
+	fun `registrerVurdering() skal returnere 200 og opprette vurdering`() {
+		val deltakerId = UUID.randomUUID()
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId))
+		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerId, status = "VURDERES"))
+
+		val response = sendRequest(
+			method = "POST",
+			url = "/api/tiltaksarrangor/deltaker/$deltakerId/vurdering",
+			headers = createAnsatt1AuthHeader(),
+			body = """{"vurderingstype": "OPPFYLLER_IKKE_KRAVENE", "begrunnelse": "Mangler førerkort"}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 200
+
+		val vurderinger = vurderingRepository.getVurderingerForDeltaker(deltakerId)
+		vurderinger shouldHaveSize 1
+
+		val vurdering = vurderinger.first()
+		vurdering.vurderingstype shouldBe Vurderingstype.OPPFYLLER_IKKE_KRAVENE
+		vurdering.begrunnelse shouldBe "Mangler førerkort"
+		vurdering.gyldigTil shouldBe null
+		val vurderingerFraResponse = response.body?.string()?.let { fromJsonString<List<Vurdering>>(it) }?.firstOrNull()
+		vurderingerFraResponse?.vurderingstype shouldBe Vurderingstype.OPPFYLLER_IKKE_KRAVENE
+		vurderingerFraResponse?.begrunnelse shouldBe "Mangler førerkort"
+		vurderingerFraResponse?.gyldigTil shouldBe null
+	}
+
+	@Test
+	fun `registrerVurdering skal returnere 400 hvis deltaker ikke har status VURDERES`() {
+		val response = sendRequest(
+			method = "POST",
+			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/vurdering",
+			headers = createAnsatt1AuthHeader(),
+			body = """{"vurderingstype": "OPPFYLLER_IKKE_KRAVENE", "begrunnelse": "Mangler førerkort"}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 400
 	}
 
 	private fun opprettSkjultDeltaker(): UUID {

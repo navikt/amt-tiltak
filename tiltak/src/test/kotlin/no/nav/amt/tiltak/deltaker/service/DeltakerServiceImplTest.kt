@@ -14,6 +14,9 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
+import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
+import no.nav.amt.tiltak.core.exceptions.ValidationException
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
@@ -25,9 +28,11 @@ import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
 import no.nav.amt.tiltak.deltaker.repositories.SkjultDeltakerRepository
+import no.nav.amt.tiltak.deltaker.repositories.VurderingRepository
 import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
 import no.nav.amt.tiltak.endringsmelding.EndringsmeldingServiceImpl
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.DbUtils.shouldBeEqualTo
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2
@@ -75,6 +80,7 @@ class DeltakerServiceImplTest {
 	lateinit var publisherService: DataPublisherService
 	lateinit var amtPersonClient: AmtPersonClient
 	lateinit var navAnsattService: NavAnsattService
+	lateinit var vurderingRepository: VurderingRepository
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 	val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
@@ -99,6 +105,7 @@ class DeltakerServiceImplTest {
 		gjennomforingService = mockk()
 		endringsmeldingRepository = EndringsmeldingRepository(jdbcTemplate, objectMapper)
 		endringsmeldingService = EndringsmeldingServiceImpl(endringsmeldingRepository, mockk(), transactionTemplate, publisherService)
+		vurderingRepository = VurderingRepository(jdbcTemplate)
 
 		deltakerServiceImpl = DeltakerServiceImpl(
 			deltakerRepository = deltakerRepository,
@@ -109,7 +116,8 @@ class DeltakerServiceImplTest {
 			gjennomforingService = gjennomforingService,
 			transactionTemplate = transactionTemplate,
 			kafkaProducerService = kafkaProducerService,
-			publisherService = publisherService
+			publisherService = publisherService,
+			vurderingRepository = vurderingRepository
 		)
 		testDataRepository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
 
@@ -527,6 +535,104 @@ class DeltakerServiceImplTest {
 		deltakerServiceImpl.republiserAlleDeltakerePaKafka(1)
 
 		verify(exactly = 2) { kafkaProducerService.publiserDeltaker(any()) }
+	}
+
+	@Test
+	fun `lagreVurdering - deltaker har status IKKE_AKTUELL - kaster IllegalStateException`() {
+		val deltakerId = UUID.randomUUID()
+
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId))
+		testDataRepository.insertDeltakerStatus(
+			DELTAKER_1_STATUS_1.copy(
+				id = UUID.randomUUID(),
+				deltakerId = deltakerId,
+				status = "IKKE_AKTUELL"
+			)
+		)
+
+		shouldThrowExactly<ValidationException> {
+			deltakerServiceImpl.lagreVurdering(
+				deltakerId = deltakerId,
+				arrangorAnsattId = ARRANGOR_ANSATT_1.id,
+				vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
+				begrunnelse = null
+			)
+		}
+	}
+
+	@Test
+	fun `lagreVurdering - deltaker har status VURDERES og ingen vurderinger fra for - lagrer vurdering`() {
+		val deltakerId = UUID.randomUUID()
+
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId))
+		testDataRepository.insertDeltakerStatus(
+			DELTAKER_1_STATUS_1.copy(
+				id = UUID.randomUUID(),
+				deltakerId = deltakerId,
+				status = "VURDERES"
+			)
+		)
+
+		val vurderinger = deltakerServiceImpl.lagreVurdering(
+			deltakerId = deltakerId,
+			arrangorAnsattId = ARRANGOR_ANSATT_1.id,
+			vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
+			begrunnelse = null
+		)
+
+		vurderinger.size shouldBe 1
+		val lagretVurdering = vurderinger.first()
+		lagretVurdering.deltakerId shouldBe deltakerId
+		lagretVurdering.vurderingstype shouldBe Vurderingstype.OPPFYLLER_KRAVENE
+		lagretVurdering.begrunnelse shouldBe null
+		lagretVurdering.opprettetAvArrangorAnsattId shouldBe ARRANGOR_ANSATT_1.id
+		lagretVurdering.gyldigFra shouldBeEqualTo LocalDateTime.now()
+		lagretVurdering.gyldigTil shouldBe null
+	}
+
+	@Test
+	fun `lagreVurdering - deltaker har status VURDERES og en vurdering fra for - lagrer vurdering og setter gyldigTil for forrige vurdering`() {
+		val deltakerId = UUID.randomUUID()
+
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId))
+		testDataRepository.insertDeltakerStatus(
+			DELTAKER_1_STATUS_1.copy(
+				id = UUID.randomUUID(),
+				deltakerId = deltakerId,
+				status = "VURDERES"
+			)
+		)
+		val forrigeVurdering = Vurdering(
+			id = UUID.randomUUID(),
+			deltakerId = deltakerId,
+			begrunnelse = "Mangler førerkort",
+			vurderingstype = Vurderingstype.OPPFYLLER_IKKE_KRAVENE,
+			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+			gyldigFra = LocalDateTime.now().minusDays(2),
+			gyldigTil = null
+		)
+		vurderingRepository.insert(forrigeVurdering)
+
+		val vurderinger = deltakerServiceImpl.lagreVurdering(
+			deltakerId = deltakerId,
+			arrangorAnsattId = ARRANGOR_ANSATT_1.id,
+			vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
+			begrunnelse = null
+		)
+
+		vurderinger.size shouldBe 2
+		val forrigeVurderingFraDb = vurderinger.find { it.id == forrigeVurdering.id }
+		forrigeVurderingFraDb?.vurderingstype shouldBe Vurderingstype.OPPFYLLER_IKKE_KRAVENE
+		forrigeVurderingFraDb?.begrunnelse shouldBe forrigeVurdering.begrunnelse
+		forrigeVurderingFraDb!!.gyldigFra shouldBeEqualTo forrigeVurdering.gyldigFra
+		forrigeVurderingFraDb.gyldigTil shouldNotBe null
+
+		val nyVurderingFraDb = vurderinger.find { it.id != forrigeVurdering.id }
+		nyVurderingFraDb?.vurderingstype shouldBe Vurderingstype.OPPFYLLER_KRAVENE
+		nyVurderingFraDb?.begrunnelse shouldBe null
+		nyVurderingFraDb?.opprettetAvArrangorAnsattId shouldBe ARRANGOR_ANSATT_1.id
+		nyVurderingFraDb?.gyldigFra shouldNotBe null
+		nyVurderingFraDb?.gyldigTil shouldBe null
 	}
 
 	val statusInsert = DeltakerStatusInsert(

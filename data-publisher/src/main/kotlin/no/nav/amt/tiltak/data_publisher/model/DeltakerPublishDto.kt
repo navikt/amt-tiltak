@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.data_publisher.model
 
 import no.nav.amt.tiltak.core.domain.tiltak.Adresse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.common.json.JsonUtils
 import org.springframework.util.DigestUtils
 import java.time.LocalDate
@@ -22,7 +23,8 @@ data class DeltakerPublishDto(
 	val navKontor: String?,
 	val navVeileder: DeltakerNavVeilederDto?,
 	val skjult: DeltakerSkjultDto?,
-	val deltarPaKurs: Boolean
+	val deltarPaKurs: Boolean,
+	val vurderingerFraArrangor: List<Vurdering>?
 ) {
 	fun digest() = DigestUtils.md5DigestAsHex(JsonUtils.toJson(this).toByteArray())
 }
