@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.bff.nav_ansatt
 
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.EndringsmeldingDto
+import no.nav.amt.tiltak.bff.nav_ansatt.response.MeldingerFraArrangorResponse
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController("EndringsmeldingControllerNavAnsatt")
-@RequestMapping("/api/nav-ansatt/endringsmelding")
+@RequestMapping("/api/nav-ansatt")
 class EndringsmeldingController(
 	private val endringsmeldingService: EndringsmeldingService,
 	private val navAnsattService: NavAnsattService,
@@ -24,7 +25,7 @@ class EndringsmeldingController(
 	private val authService: AuthService,
 ) {
 
-	@GetMapping
+	@GetMapping("/endringsmelding")
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	fun hentEndringsmeldinger(@RequestParam("gjennomforingId") gjennomforingId: UUID): List<EndringsmeldingDto> {
 		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()
@@ -37,7 +38,20 @@ class EndringsmeldingController(
 		return controllerService.hentEndringsmeldinger(gjennomforingId, tilgangTilSkjermede)
 	}
 
-	@PatchMapping("/{endringsmeldingId}/ferdig")
+	@GetMapping("/meldinger")
+	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
+	fun hentMeldingerFraArrangor(@RequestParam("gjennomforingId") gjennomforingId: UUID): MeldingerFraArrangorResponse {
+		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()
+		val navIdent = authService.hentNavIdentTilInnloggetBruker()
+		val tilgangTilSkjermede = authService.harTilgangTilSkjermedePersoner()
+
+		tiltaksansvarligAuthService.verifiserTilgangTilEndringsmelding(navAnsattAzureId)
+		tiltaksansvarligAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId)
+
+		return controllerService.hentMeldinger(gjennomforingId, tilgangTilSkjermede)
+	}
+
+	@PatchMapping("/endringsmelding/{endringsmeldingId}/ferdig")
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	fun markerFerdig(@PathVariable("endringsmeldingId") endringsmeldingId: UUID) {
 		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()

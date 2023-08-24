@@ -1,7 +1,11 @@
 package no.nav.amt.tiltak.test.integration.nav_ansatt
 
 import io.kotest.matchers.shouldBe
+import no.nav.amt.tiltak.common.json.JsonUtils.objectMapper
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
+import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
+import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
+import no.nav.amt.tiltak.deltaker.repositories.VurderingRepository
 import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData
@@ -18,12 +22,16 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.util.*
+import java.time.LocalDateTime
+import java.util.UUID
 
 class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
 	@Autowired
 	lateinit var endringsmeldingRepository: EndringsmeldingRepository
+
+	@Autowired
+	lateinit var vurderingRepository: VurderingRepository
 
 	@BeforeEach
 	internal fun setUp() {
@@ -34,6 +42,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 	internal fun `skal teste token autentisering`() {
 		val requestBuilders = listOf(
 			Request.Builder().get().url("${serverUrl()}/api/nav-ansatt/endringsmelding"),
+			Request.Builder().get().url("${serverUrl()}/api/nav-ansatt/meldinger"),
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/nav-ansatt/endringsmelding/${UUID.randomUUID()}/ferdig"),
 		)
 		testNavAnsattAutentisering(requestBuilders, client, mockOAuthServer)
@@ -116,6 +125,90 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		response.code shouldBe 200
 		response.body?.string() shouldBe expectedJson
 	}
+
+	@Test
+	fun `hentMeldingerFraArrangor() - skal returnere 403 hvis ikke tilgang til gjennomforing`() {
+
+		testDataRepository.deleteAllTiltaksansvarligGjennomforingTilgang()
+
+		val oid = UUID.randomUUID()
+
+		val token = mockOAuthServer.issueAzureAdToken(
+			ident = NAV_ANSATT_1.navIdent,
+			oid = oid,
+		)
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/nav-ansatt/meldinger?gjennomforingId=${GJENNOMFORING_1.id}",
+			headers = mapOf("Authorization" to "Bearer $token")
+		)
+
+		Assertions.assertEquals(403, response.code)
+	}
+
+	@Test
+	fun `hentMeldingerFraArrangor() - skal returnere 200 med riktig, maskert response`() {
+		val oid = UUID.randomUUID()
+		testDataRepository.deleteAllEndringsmeldinger()
+		testDataRepository.deleteAllVurderinger()
+		val endringsmeldingInput = insertSkjermetPersonMedEndringsmeldinger()
+		val vurdering = insertVurdering(endringsmeldingInput.deltakerId)
+
+		val token = mockOAuthServer.issueAzureAdToken(
+			ident = NAV_ANSATT_1.navIdent,
+			oid = oid
+		)
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/nav-ansatt/meldinger?gjennomforingId=${GJENNOMFORING_1.id}",
+			headers = mapOf("Authorization" to "Bearer $token")
+		)
+
+		val expectedJson = """
+			{"endringsmeldinger":[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":null,"mellomnavn":null,"etternavn":null,"fodselsnummer":null,"erSkjermet":true},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","type":"LEGG_TIL_OPPSTARTSDATO"}],"vurderinger":[{"id":"866a387f-87d1-4623-8010-32fcdea5464e","deltaker":{"fornavn":null,"mellomnavn":null,"etternavn":null,"fodselsnummer":null,"erSkjermet":true},"vurderingstype":"OPPFYLLER_KRAVENE","begrunnelse":null,"opprettetDato":${objectMapper.writeValueAsString(vurdering.gyldigFra)}}]}
+			""".trimIndent()
+
+		response.code shouldBe 200
+		response.body?.string() shouldBe expectedJson
+	}
+
+
+	@Test
+	fun `hentMeldingerFraArrangor() - med tilgang til skjermede personer - skal returnere 200 med riktig response`() {
+		val oid = UUID.randomUUID()
+		testDataRepository.deleteAllEndringsmeldinger()
+		testDataRepository.deleteAllVurderinger()
+
+		val endringsmeldingInput = insertSkjermetPersonMedEndringsmeldinger()
+		val vurdering = insertVurdering(endringsmeldingInput.deltakerId)
+
+		val token = mockOAuthServer.issueAzureAdToken(
+			ident = NAV_ANSATT_1.navIdent,
+			oid = oid,
+			adGroupIds = arrayOf(
+				mockOAuthServer.endringsmeldingGroupId,
+				mockOAuthServer.tiltakAnsvarligGroupId,
+				mockOAuthServer.tilgangTilNavAnsattGroupId,
+			)
+
+		)
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/nav-ansatt/meldinger?gjennomforingId=${GJENNOMFORING_1.id}",
+			headers = mapOf("Authorization" to "Bearer $token")
+		)
+
+		val expectedJson = """
+				{"endringsmeldinger":[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":"Skjermet bruker fornavn","mellomnavn":null,"etternavn":"Skjermet bruker etternavn","fodselsnummer":"10101010101","erSkjermet":true},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","type":"LEGG_TIL_OPPSTARTSDATO"}],"vurderinger":[{"id":"866a387f-87d1-4623-8010-32fcdea5464e","deltaker":{"fornavn":"Skjermet bruker fornavn","mellomnavn":null,"etternavn":"Skjermet bruker etternavn","fodselsnummer":"10101010101","erSkjermet":true},"vurderingstype":"OPPFYLLER_KRAVENE","begrunnelse":null,"opprettetDato":${objectMapper.writeValueAsString(vurdering.gyldigFra)}}]}
+			""".trimIndent()
+
+		response.code shouldBe 200
+		response.body?.string() shouldBe expectedJson
+	}
+
 	@Test
 	fun `markerFerdig() - skal returnere 200 og markere som ferdig`() {
 		val oid = UUID.randomUUID()
@@ -173,7 +266,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
 	}
 
-	private fun insertSkjermetPersonMedEndringsmeldinger () : EndringsmeldingInput {
+	private fun insertSkjermetPersonMedEndringsmeldinger() : EndringsmeldingInput {
 		val skjermetDeltaker = TestData.createDeltakerInput(BRUKER_SKJERMET, GJENNOMFORING_1)
 		val endringsmelding = TestData.createEndringsmelding(skjermetDeltaker, ARRANGOR_ANSATT_1)
 		val status = TestData.createStatusInput(skjermetDeltaker)
@@ -183,5 +276,19 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		testDataRepository.insertDeltakerStatus(status)
 		testDataRepository.insertEndringsmelding(endringsmelding)
 		return endringsmelding
+	}
+
+	private fun insertVurdering(deltakerId: UUID): Vurdering {
+		val vurdering = Vurdering(
+			id = UUID.fromString("866a387f-87d1-4623-8010-32fcdea5464e"),
+			deltakerId = deltakerId,
+			vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
+			begrunnelse = null,
+			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+			gyldigFra = LocalDateTime.now(),
+			gyldigTil = null
+		)
+		vurderingRepository.insert(vurdering)
+		return vurdering
 	}
 }

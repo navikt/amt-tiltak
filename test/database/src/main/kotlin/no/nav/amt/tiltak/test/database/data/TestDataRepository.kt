@@ -372,6 +372,14 @@ class TestDataRepository(
 		template.jdbcTemplate.update(sql)
 	}
 
+	fun deleteAllVurderinger() {
+		val sql = """
+			TRUNCATE vurdering CASCADE
+		""".trimIndent()
+
+		template.jdbcTemplate.update(sql)
+	}
+
 	fun insertTiltaksansvarligGjennomforingTilgang(cmd: TiltaksansvarligGjennomforingTilgangInput) {
 		val sql = """
 			INSERT INTO tiltaksansvarlig_gjennomforing_tilgang(id, nav_ansatt_id, gjennomforing_id, gyldig_til, created_at)
