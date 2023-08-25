@@ -43,11 +43,24 @@ open class VurderingRepository(
 		return template.query(sql, parameters, rowMapper)
 	}
 
+	fun getAktiveByGjennomforing(gjennomforingId: UUID): List<Vurdering> {
+		val sql = """
+			SELECT *
+			FROM vurdering
+			JOIN deltaker on vurdering.deltaker_id = deltaker.id
+			WHERE deltaker.gjennomforing_id = :gjennomforing_id AND gyldig_til is null
+		""".trimIndent()
+
+		val param = DbUtils.sqlParameters("gjennomforing_id" to gjennomforingId)
+
+		return template.query(sql, param, rowMapper)
+	}
+
 	fun insert(vurdering: Vurdering) {
 		val sql = """
 			INSERT INTO vurdering (id, deltaker_id, opprettet_av_arrangor_ansatt_id, vurderingstype, begrunnelse, gyldig_fra, gyldig_til)
 			VALUES (
-				:id, :deltaker_id, :opprettet_av_arrangor_ansatt_id, :vurderingstype, :begrunnelse, :gyldig_fra, null
+				:id, :deltaker_id, :opprettet_av_arrangor_ansatt_id, :vurderingstype, :begrunnelse, :gyldig_fra, :gyldig_til
 			)
 		""".trimIndent()
 		val params = DbUtils.sqlParameters(
@@ -56,7 +69,8 @@ open class VurderingRepository(
 			"opprettet_av_arrangor_ansatt_id" to vurdering.opprettetAvArrangorAnsattId,
 			"vurderingstype" to vurdering.vurderingstype.name,
 			"begrunnelse" to vurdering.begrunnelse,
-			"gyldig_fra" to vurdering.gyldigFra
+			"gyldig_fra" to vurdering.gyldigFra,
+			"gyldig_til" to vurdering.gyldigTil
 		)
 
 		template.update(sql, params)
