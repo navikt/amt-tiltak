@@ -57,6 +57,7 @@
         <mock-oauth2-server.version>1.0.0</mock-oauth2-server.version>
         <common.version>3.2023.07.07_09.10-85326e9557f0</common.version>
         <logstash.version>7.4</logstash.version>
+        <unleash.version>8.3.0</unleash.version>
     </properties>
 
     <repositories>
@@ -332,9 +333,9 @@
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
-                <artifactId>feature-toggle</artifactId>
-                <version>${common.version}</version>
+                <groupId>io.getunleash</groupId>
+                <artifactId>unleash-client-java</artifactId>
+                <version>${unleash.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.navikt.poao-tilgang</groupId>
