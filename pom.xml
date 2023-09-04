@@ -57,7 +57,7 @@
         <mock-oauth2-server.version>1.0.0</mock-oauth2-server.version>
         <common.version>3.2023.07.07_09.10-85326e9557f0</common.version>
         <logstash.version>7.4</logstash.version>
-        <unleash.version>8.3.0</unleash.version>
+        <unleash.version>8.3.1</unleash.version>
     </properties>
 
     <repositories>
