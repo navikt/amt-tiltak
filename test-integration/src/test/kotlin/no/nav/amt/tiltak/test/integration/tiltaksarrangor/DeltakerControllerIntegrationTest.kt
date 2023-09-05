@@ -95,6 +95,28 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
+	fun `endreOppstartsdato() - dato er null - skal returnere 200 og opprette endringsmelding`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/oppstartsdato",
+			headers = createAnsatt1AuthHeader(),
+			body = """{"oppstartsdato": null}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 200
+
+		val endringsmeldinger = endringsmeldingService.hentAktiveEndringsmeldingerForDeltaker(DELTAKER_1.id)
+		endringsmeldinger shouldHaveSize 1
+
+		val endringsmelding = endringsmeldinger.first()
+		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.EndreOppstartsdatoInnhold>()
+		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
+		(endringsmelding.innhold as Endringsmelding.Innhold.EndreOppstartsdatoInnhold).oppstartsdato shouldBe null
+
+		response.body?.string() shouldBe """{"id":"${endringsmelding.id}"}"""
+	}
+
+	@Test
 	fun `endreOppstartsdato() skal returnere 400 hvis deltaker er skjult`() {
 		val response = sendRequest(
 			method = "PATCH",

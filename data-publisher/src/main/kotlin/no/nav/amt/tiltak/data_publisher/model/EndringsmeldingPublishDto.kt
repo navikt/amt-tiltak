@@ -42,7 +42,7 @@ sealed class Innhold {
 	) : Innhold()
 
 	data class EndreOppstartsdatoInnhold(
-		val oppstartsdato: LocalDate
+		val oppstartsdato: LocalDate?
 	) : Innhold()
 
 	data class ForlengDeltakelseInnhold(
