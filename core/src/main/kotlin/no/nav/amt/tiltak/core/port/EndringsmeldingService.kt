@@ -19,7 +19,7 @@ interface EndringsmeldingService {
 
 	fun opprettLeggTilOppstartsdatoEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, oppstartsdato: LocalDate): UUID
 
-	fun opprettEndreOppstartsdatoEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, oppstartsdato: LocalDate): UUID
+	fun opprettEndreOppstartsdatoEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, oppstartsdato: LocalDate?): UUID
 
 	fun opprettForlengDeltakelseEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate): UUID
 

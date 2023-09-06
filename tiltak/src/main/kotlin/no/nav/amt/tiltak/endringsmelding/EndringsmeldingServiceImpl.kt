@@ -94,7 +94,7 @@ open class EndringsmeldingServiceImpl(
 	override fun opprettEndreOppstartsdatoEndringsmelding(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
-		oppstartsdato: LocalDate
+		oppstartsdato: LocalDate?
 	): UUID {
 		val innhold = EndringsmeldingDbo.Innhold.EndreOppstartsdatoInnhold(oppstartsdato)
 		return opprettOgMarkerAktiveSomUtdatert(
