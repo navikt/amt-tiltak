@@ -66,10 +66,15 @@ open class ArrangorAnsattTilgangServiceImpl(
 	override fun synkroniserRettigheterMedAltinn(ansattPersonligIdent: String) {
 		try {
 			val ansatt = amtArrangorService.getAnsatt(ansattPersonligIdent)
-			if (ansatt == null || ansatt.arrangorer.isEmpty()) {
-				log.warn("En ikke-ansatt har logget inn, men hadde ikke tilganger i Altinn.")
+			if (ansatt == null) {
+				log.warn("Fant ikke ansatt i amt-arrangor. Kan ikke oppdatere rettigheter.")
 				return
 			}
+			if (ansatt.arrangorer.isEmpty()) {
+				log.info("Ansatt ${ansatt.id} har ingen gyldige roller i amt-arrangor. Oppdaterer ikke rettigheter.")
+				return
+			}
+
 			oppdaterRollerOgTilganger(ansatt)
 		} catch (t: Throwable) {
 			log.error("Feil under synkronisering av altinn rettigheter", t)
