@@ -380,7 +380,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 			overordnetEnhetNavn = null,
 		)
 
-		arrangorAnsattTilgangServiceImpl.synkroniserRettigheterMedAltinn(ansattPersonligIdent)
+		arrangorAnsattTilgangServiceImpl.synkroniserRettigheter(ansattPersonligIdent)
 
 		verify(exactly = 1) { ansattRolleService.opprettRolle(any(), ansattId, arrangorId, KOORDINATOR) }
 	}
@@ -429,7 +429,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 			overordnetEnhetNavn = null,
 		)
 
-		arrangorAnsattTilgangServiceImpl.synkroniserRettigheterMedAltinn(ansattPersonligIdent)
+		arrangorAnsattTilgangServiceImpl.synkroniserRettigheter(ansattPersonligIdent)
 
 		verify(exactly = 0) { ansattRolleService.opprettRolle(any(), any(), any(), any()) }
 	}
@@ -487,7 +487,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 			overordnetEnhetNavn = null,
 		)
 
-		arrangorAnsattTilgangServiceImpl.synkroniserRettigheterMedAltinn(ansattPersonligIdent)
+		arrangorAnsattTilgangServiceImpl.synkroniserRettigheter(ansattPersonligIdent)
 
 		verify(exactly = 1) { ansattRolleService.deaktiverRolleHosArrangor(ansattId, arrangorId, KOORDINATOR) }
 		verify(exactly = 1) { ansattRolleService.deaktiverRolleHosArrangor(ansattId, arrangorId, VEILEDER) }
@@ -501,7 +501,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 
 		every { amtArrangorService.getAnsatt(ansattPersonligIdent) } returns null
 
-		arrangorAnsattTilgangServiceImpl.synkroniserRettigheterMedAltinn(ansattPersonligIdent)
+		arrangorAnsattTilgangServiceImpl.synkroniserRettigheter(ansattPersonligIdent)
 
 		verify(exactly = 0) { ansattRolleService.opprettRolle(any(), any(), any(), any()) }
 		verify(exactly = 0) { ansattRolleService.deaktiverRolleHosArrangor(any(), any(), any()) }
@@ -523,7 +523,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 			arrangorer = emptyList()
 		)
 
-		arrangorAnsattTilgangServiceImpl.synkroniserRettigheterMedAltinn(ansattPersonligIdent)
+		arrangorAnsattTilgangServiceImpl.synkroniserRettigheter(ansattPersonligIdent)
 
 		verify(exactly = 0) { ansattRolleService.opprettRolle(any(), any(), any(), any()) }
 		verify(exactly = 0) { ansattRolleService.deaktiverRolleHosArrangor(any(), any(), any()) }

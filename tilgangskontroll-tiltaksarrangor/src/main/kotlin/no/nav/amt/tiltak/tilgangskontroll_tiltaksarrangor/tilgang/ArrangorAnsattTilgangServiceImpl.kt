@@ -63,7 +63,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 		return ansattRolleService.hentAktiveRoller(ansattId)
 	}
 
-	override fun synkroniserRettigheterMedAltinn(ansattPersonligIdent: String) {
+	override fun synkroniserRettigheter(ansattPersonligIdent: String) {
 		try {
 			val ansatt = amtArrangorService.getAnsatt(ansattPersonligIdent)
 			if (ansatt == null) {
@@ -77,12 +77,12 @@ open class ArrangorAnsattTilgangServiceImpl(
 
 			oppdaterRollerOgTilganger(ansatt)
 		} catch (t: Throwable) {
-			log.error("Feil under synkronisering av altinn rettigheter", t)
-			secureLog.error("Feil under synkronisering av altinn rettigheter for fnr=$ansattPersonligIdent", t)
+			log.error("Feil under synkronisering av rettigheter", t)
+			secureLog.error("Feil under synkronisering av rettigheter for fnr=$ansattPersonligIdent", t)
 		}
 	}
 
-	override fun synkroniserRettigheterMedAltinn(ansattId: UUID) {
+	override fun synkroniserRettigheter(ansattId: UUID) {
 		try {
 			val ansatt = amtArrangorService.getAnsatt(ansattId)
 			if (ansatt == null || ansatt.arrangorer.isEmpty()) {
@@ -91,7 +91,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 			}
 			oppdaterRollerOgTilganger(ansatt)
 		} catch (t: Throwable) {
-			log.error("Feil under synkronisering av altinn rettigheter for ansatt med id $ansattId", t)
+			log.error("Feil under synkronisering av rettigheter for ansatt med id $ansattId", t)
 		}
 	}
 

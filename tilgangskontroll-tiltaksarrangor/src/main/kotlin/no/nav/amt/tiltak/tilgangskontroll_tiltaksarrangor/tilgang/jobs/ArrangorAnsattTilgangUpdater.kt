@@ -23,7 +23,7 @@ open class ArrangorAnsattTilgangUpdater(
 			val aWeekAgo = LocalDateTime.now().minusWeeks(1)
 
 			arrangorAnsattService.getAnsatteSistSynkronisertEldreEnn(aWeekAgo, numberToCheck)
-				.forEach { arrangorAnsattTilgangService.synkroniserRettigheterMedAltinn(it.personligIdent) }
+				.forEach { arrangorAnsattTilgangService.synkroniserRettigheter(it.personligIdent) }
 		}
 	}
 }
