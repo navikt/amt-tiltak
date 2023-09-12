@@ -63,21 +63,26 @@ open class ArrangorAnsattTilgangServiceImpl(
 		return ansattRolleService.hentAktiveRoller(ansattId)
 	}
 
-	override fun synkroniserRettigheterMedAltinn(ansattPersonligIdent: String) {
+	override fun synkroniserRettigheter(ansattPersonligIdent: String) {
 		try {
 			val ansatt = amtArrangorService.getAnsatt(ansattPersonligIdent)
-			if (ansatt == null || ansatt.arrangorer.isEmpty()) {
-				log.warn("En ikke-ansatt har logget inn, men hadde ikke tilganger i Altinn.")
+			if (ansatt == null) {
+				log.warn("Fant ikke ansatt i amt-arrangor. Kan ikke oppdatere rettigheter.")
 				return
 			}
+			if (ansatt.arrangorer.isEmpty()) {
+				log.info("Ansatt ${ansatt.id} har ingen gyldige roller i amt-arrangor. Oppdaterer ikke rettigheter.")
+				return
+			}
+
 			oppdaterRollerOgTilganger(ansatt)
 		} catch (t: Throwable) {
-			log.error("Feil under synkronisering av altinn rettigheter", t)
-			secureLog.error("Feil under synkronisering av altinn rettigheter for fnr=$ansattPersonligIdent", t)
+			log.error("Feil under synkronisering av rettigheter", t)
+			secureLog.error("Feil under synkronisering av rettigheter for fnr=$ansattPersonligIdent", t)
 		}
 	}
 
-	override fun synkroniserRettigheterMedAltinn(ansattId: UUID) {
+	override fun synkroniserRettigheter(ansattId: UUID) {
 		try {
 			val ansatt = amtArrangorService.getAnsatt(ansattId)
 			if (ansatt == null || ansatt.arrangorer.isEmpty()) {
@@ -86,7 +91,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 			}
 			oppdaterRollerOgTilganger(ansatt)
 		} catch (t: Throwable) {
-			log.error("Feil under synkronisering av altinn rettigheter for ansatt med id $ansattId", t)
+			log.error("Feil under synkronisering av rettigheter for ansatt med id $ansattId", t)
 		}
 	}
 
@@ -117,35 +122,54 @@ open class ArrangorAnsattTilgangServiceImpl(
 	private fun oppdaterRollerOgTilganger(ansatt: ArrangorAnsatt) {
 		arrangorAnsattService.upsertAnsatt(ansatt)
 
+		oppdaterRoller(ansatt)
+
+		oppdaterDeltakerlisteTilganger(ansatt)
+
+		oppdaterVeilederTilganger(ansatt)
+
+		arrangorAnsattService.setTilgangerSistSynkronisert(ansatt.id, LocalDateTime.now())
+	}
+
+	private fun oppdaterRoller(ansatt: ArrangorAnsatt) {
 		val lagredeAnsattTilganger = ansattRolleService.hentAktiveRoller(ansatt.id)
 			.flatMap { it.roller.map { r -> AnsattTilgang(it.arrangorId, r) } }
 
-		val altinnRoller = ansatt.tilArrangorAnsattRoller()
-		val altinnTilganger = altinnRoller
+		val ansattTilganger = ansatt
+			.tilArrangorAnsattRoller()
 			.flatMap {
 				val arrangor = arrangorService.getOrCreateArrangor(it.arrangor)
 
 				return@flatMap it.roller.map { rolle -> AnsattTilgang(arrangor.id, rolle) }
 			}
 
-		val tilgangerSomSkalLeggesTil = finnTilgangerSomSkalLeggesTil(altinnTilganger, lagredeAnsattTilganger)
-		val tilgangerSomSkalFjernes = finnTilgangerSomSkalFjernes(altinnTilganger, lagredeAnsattTilganger)
+		val tilgangerSomSkalLeggesTil = finnTilgangerSomSkalLeggesTil(ansattTilganger, lagredeAnsattTilganger)
+		val tilgangerSomSkalFjernes = finnTilgangerSomSkalFjernes(ansattTilganger, lagredeAnsattTilganger)
 
 		tilgangerSomSkalLeggesTil.forEach {
 			ansattRolleService.opprettRolle(UUID.randomUUID(), ansatt.id, it.arrangorId, it.arrangorAnsattRolle)
-			log.info("La til ny tilgang under synk med Altinn. ansattId=${ansatt.id} arrangorId=${it.arrangorId} rolle=${it.arrangorAnsattRolle}")
+			log.info("La til ny tilgang. ansattId=${ansatt.id} arrangorId=${it.arrangorId} rolle=${it.arrangorAnsattRolle}")
 		}
 		tilgangerSomSkalFjernes.forEach { tilgang ->
 			transactionTemplate.executeWithoutResult {
 				ansattRolleService.deaktiverRolleHosArrangor(ansatt.id, tilgang.arrangorId, tilgang.arrangorAnsattRolle)
-				when (tilgang.arrangorAnsattRolle)	{
-					ArrangorAnsattRolle.KOORDINATOR -> mineDeltakerlisterService.fjernAlleHosArrangor(ansatt.id, tilgang.arrangorId)
-					ArrangorAnsattRolle.VEILEDER -> arrangorVeilederService.fjernAlleDeltakereForVeilederHosArrangor(ansatt.id, tilgang.arrangorId)
+				when (tilgang.arrangorAnsattRolle) {
+					ArrangorAnsattRolle.KOORDINATOR -> mineDeltakerlisterService.fjernAlleHosArrangor(
+						ansatt.id,
+						tilgang.arrangorId
+					)
+
+					ArrangorAnsattRolle.VEILEDER -> arrangorVeilederService.fjernAlleDeltakereForVeilederHosArrangor(
+						ansatt.id,
+						tilgang.arrangorId
+					)
 				}
 			}
-			log.info("Fjernet tilgang under synk med Altinn. ansattId=${ansatt.id} arrangorId=${tilgang.arrangorId} rolle=${tilgang.arrangorAnsattRolle}")
+			log.info("Fjernet tilgang. ansattId=${ansatt.id} arrangorId=${tilgang.arrangorId} rolle=${tilgang.arrangorAnsattRolle}")
 		}
+	}
 
+	private fun oppdaterDeltakerlisteTilganger(ansatt: ArrangorAnsatt) {
 		val lagredeDeltakerlister = mineDeltakerlisterService.hent(ansatt.id)
 		val deltakerlisterSomSkalLeggesTil = finnDeltakerlisterSomSkalLeggesTil(
 			amtArrangorDeltakerlister = ansatt.arrangorer.flatMap { it.koordinator },
@@ -156,13 +180,19 @@ open class ArrangorAnsattTilgangServiceImpl(
 			lagredeDeltakerlister = lagredeDeltakerlister
 		)
 		deltakerlisterSomSkalLeggesTil.forEach {
-			mineDeltakerlisterService.leggTil(id = UUID.randomUUID(), arrangorAnsattId = ansatt.id, gjennomforingId = it)
+			mineDeltakerlisterService.leggTil(
+				id = UUID.randomUUID(),
+				arrangorAnsattId = ansatt.id,
+				gjennomforingId = it
+			)
 		}
 		deltakerlisterSomSkalFjernes.forEach {
 			mineDeltakerlisterService.fjern(arrangorAnsattId = ansatt.id, gjennomforingId = it)
 		}
 		log.info("Lagt til ${deltakerlisterSomSkalLeggesTil.size} deltakerlister og fjernet ${deltakerlisterSomSkalFjernes.size} for ansatt ${ansatt.id}")
+	}
 
+	private fun oppdaterVeilederTilganger(ansatt: ArrangorAnsatt) {
 		val lagretVeilederFor = arrangorVeilederService.hentDeltakereForVeileder(ansatt.id)
 		val veilederKoblingerSomSkalLeggesTil = finnVeilederkoblingerSomSkalLeggesTil(
 			lagredeVeilederkoblinger = lagretVeilederFor,
@@ -173,14 +203,20 @@ open class ArrangorAnsattTilgangServiceImpl(
 			amtArrangorVeiledere = ansatt.arrangorer.flatMap { it.veileder }
 		)
 		veilederKoblingerSomSkalFjernes.forEach {
-			arrangorVeilederService.fjernAnsattSomVeileder(ansattId = ansatt.id, deltakerId = it.deltakerId, erMedveileder = it.type == ArrangorAnsatt.VeilederType.MEDVEILEDER)
+			arrangorVeilederService.fjernAnsattSomVeileder(
+				ansattId = ansatt.id,
+				deltakerId = it.deltakerId,
+				erMedveileder = it.type == ArrangorAnsatt.VeilederType.MEDVEILEDER
+			)
 		}
 		veilederKoblingerSomSkalLeggesTil.forEach {
-			arrangorVeilederService.leggTilAnsattSomVeileder(ansattId = ansatt.id, deltakerId = it.deltakerId, erMedveileder = it.type == ArrangorAnsatt.VeilederType.MEDVEILEDER)
+			arrangorVeilederService.leggTilAnsattSomVeileder(
+				ansattId = ansatt.id,
+				deltakerId = it.deltakerId,
+				erMedveileder = it.type == ArrangorAnsatt.VeilederType.MEDVEILEDER
+			)
 		}
 		log.info("Lagt til ${veilederKoblingerSomSkalLeggesTil.size} og fjernet ${veilederKoblingerSomSkalFjernes.size} veileder-relasjoner for ansatt ${ansatt.id}")
-
-		arrangorAnsattService.setTilgangerSistSynkronisert(ansatt.id, LocalDateTime.now())
 	}
 
 	private fun finnTilgangerSomSkalLeggesTil(

@@ -13,9 +13,9 @@ interface ArrangorAnsattTilgangService {
 
 	fun hentAnsattTilganger(ansattId: UUID): List<ArrangorAnsattRoller>
 
-	fun synkroniserRettigheterMedAltinn(ansattPersonligIdent: String)
+	fun synkroniserRettigheter(ansattPersonligIdent: String)
 
-	fun synkroniserRettigheterMedAltinn(ansattId: UUID)
+	fun synkroniserRettigheter(ansattId: UUID)
 
 	fun oppdaterRollerOgTilgangerForAnsatt(ansatt: ArrangorAnsatt)
 

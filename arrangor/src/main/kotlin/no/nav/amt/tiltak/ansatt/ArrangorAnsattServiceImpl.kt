@@ -3,7 +3,6 @@ package no.nav.amt.tiltak.ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.Ansatt
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorAnsatt
 import no.nav.amt.tiltak.core.domain.arrangor.TilknyttetArrangor
-import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
 import no.nav.amt.tiltak.core.port.ArrangorService
@@ -50,13 +49,13 @@ class ArrangorAnsattServiceImpl(
 		if (maybeAnsattDbo != null) {
 			return maybeAnsattDbo
 		} else {
-			arrangorAnsattTilgangService.synkroniserRettigheterMedAltinn(ansattId)
+			arrangorAnsattTilgangService.synkroniserRettigheter(ansattId)
 			return arrangorAnsattRepository.get(ansattId)
 		}
 	}
 
 	override fun getAnsattByPersonligIdent(personIdent: String): Ansatt? {
-		arrangorAnsattTilgangService.synkroniserRettigheterMedAltinn(personIdent)
+		arrangorAnsattTilgangService.synkroniserRettigheter(personIdent)
 		val ansattDbo = arrangorAnsattRepository.getByPersonligIdent(personIdent) ?: return null
 		val arrangorer = hentTilknyttedeArrangorer(ansattDbo.id)
 
