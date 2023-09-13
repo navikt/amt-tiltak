@@ -31,7 +31,7 @@ class MulighetsrommetApiClientImpl(
 			val body = response.body?.string()
 
 			if (body.isNullOrEmpty()) {
-				log.info("Gjennomføring med id $id er opprettet utenfor Arena, kan ikke hante Arena-data")
+				log.info("Gjennomføring med id $id er opprettet utenfor Arena, kan ikke hente Arena-data")
 				return null
 			}
 
