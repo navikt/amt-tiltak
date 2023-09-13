@@ -107,6 +107,8 @@ class DeltakerProcessor(
 	private fun ingestGjennomforing(gjennomforingId: UUID): Gjennomforing {
 		val gjennomforing = mulighetsrommetApiClient.hentGjennomforing(gjennomforingId)
 		val gjennomforingArenaData = mulighetsrommetApiClient.hentGjennomforingArenaData(gjennomforingId)
+			?: throw IllegalStateException("Lagrer ikke gjennomføring med id ${gjennomforing.id} som er opprettet utenfor Arena")
+
 		if (gjennomforingArenaData.virksomhetsnummer == null) {
 			throw IllegalStateException("Lagrer ikke gjennomføring med id ${gjennomforing.id} og tiltakstype ${gjennomforing.tiltakstype.arenaKode} fordi virksomhetsnummer mangler.")
 		}

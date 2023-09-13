@@ -4,7 +4,8 @@ import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.common.rest.client.RestClient.baseClient
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.util.*
+import org.slf4j.LoggerFactory
+import java.util.UUID
 import java.util.function.Supplier
 
 class MulighetsrommetApiClientImpl(
@@ -13,7 +14,9 @@ class MulighetsrommetApiClientImpl(
     private val httpClient: OkHttpClient = baseClient(),
 ) : MulighetsrommetApiClient {
 
-	override fun hentGjennomforingArenaData(id: UUID): GjennomforingArenaData {
+	private val log = LoggerFactory.getLogger(javaClass)
+
+	override fun hentGjennomforingArenaData(id: UUID): GjennomforingArenaData? {
 		val request = Request.Builder()
 			.url("$baseUrl/api/v1/tiltaksgjennomforinger/arenadata/$id")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
@@ -25,7 +28,12 @@ class MulighetsrommetApiClientImpl(
 				throw RuntimeException("Klarte ikke å hente gjennomføring arenadata fra Mulighetsrommet. status=${response.code}")
 			}
 
-			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
+			val body = response.body?.string()
+
+			if (body.isNullOrEmpty()) {
+				log.info("Gjennomføring med id $id er opprettet utenfor Arena, kan ikke hante Arena-data")
+				return null
+			}
 
 			val responseBody = fromJsonString<HentGjennomforingArenaData.Response>(body)
 

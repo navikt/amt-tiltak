@@ -1,21 +1,27 @@
 package no.nav.amt.tiltak.clients.mulighetsrommet_api_client
 
-import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import java.util.*
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Test
+import java.util.UUID
 
-class MulighetsrommetApiClientImplTest : FunSpec({
+class MulighetsrommetApiClientImplTest {
+	companion object {
+		private val server = MockWebServer()
+		private val serverUrl = server.url("").toString().removeSuffix("/")
 
-	val server = MockWebServer()
-	val serverUrl = server.url("").toString().removeSuffix("/")
-
-	afterSpec {
-		server.shutdown()
+		@JvmStatic
+		@AfterAll
+		fun teardown() {
+			server.shutdown()
+		}
 	}
 
-	test("hentGjennomforingArenaData - skal lage riktig request og parse respons") {
+	@Test
+	fun `hentGjennomforingArenaData - respons inneholder data - skal lage riktig request og parse respons`() {
 		val client = MulighetsrommetApiClientImpl(
 			baseUrl = serverUrl,
 			tokenProvider = { "TOKEN" },
@@ -40,15 +46,38 @@ class MulighetsrommetApiClientImplTest : FunSpec({
 
 		val request = server.takeRequest()
 
-		gjennomforingArenaData.opprettetAar shouldBe 2022
-		gjennomforingArenaData.lopenr shouldBe 123
-		gjennomforingArenaData.virksomhetsnummer shouldBe "999222333"
-		gjennomforingArenaData.ansvarligNavEnhetId shouldBe "1234"
-		gjennomforingArenaData.status shouldBe "GJENNOMFORES"
+		gjennomforingArenaData shouldNotBe null
+		gjennomforingArenaData?.opprettetAar shouldBe 2022
+		gjennomforingArenaData?.lopenr shouldBe 123
+		gjennomforingArenaData?.virksomhetsnummer shouldBe "999222333"
+		gjennomforingArenaData?.ansvarligNavEnhetId shouldBe "1234"
+		gjennomforingArenaData?.status shouldBe "GJENNOMFORES"
 
 		request.path shouldBe "/api/v1/tiltaksgjennomforinger/arenadata/$id"
 		request.method shouldBe "GET"
 		request.getHeader("Authorization") shouldBe "Bearer TOKEN"
 	}
-})
 
+	@Test
+	fun `hentGjennomforingArenaData - respons har tom body - skal lage riktig request og parse respons`() {
+		val client = MulighetsrommetApiClientImpl(
+			baseUrl = serverUrl,
+			tokenProvider = { "TOKEN" }
+		)
+
+		server.enqueue(
+			MockResponse().setBody("")
+		)
+
+		val id = UUID.randomUUID()
+		val gjennomforingArenaData = client.hentGjennomforingArenaData(id)
+
+		val request = server.takeRequest()
+
+		gjennomforingArenaData shouldBe null
+
+		request.path shouldBe "/api/v1/tiltaksgjennomforinger/arenadata/$id"
+		request.method shouldBe "GET"
+		request.getHeader("Authorization") shouldBe "Bearer TOKEN"
+	}
+}
