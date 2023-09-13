@@ -107,7 +107,7 @@
             <artifactId>mulighetsrommet-api-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
+            <groupId>no.nav.common</groupId>
             <artifactId>token-client</artifactId>
         </dependency>
         <dependency>
@@ -115,11 +115,11 @@
             <artifactId>client</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
+            <groupId>no.nav.common</groupId>
             <artifactId>log</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
+            <groupId>no.nav.common</groupId>
             <artifactId>job</artifactId>
         </dependency>
         <dependency>

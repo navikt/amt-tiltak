@@ -59,6 +59,10 @@ class GjennomforingIngestorImpl(
 		}
 
 		val arenaData = mulighetsrommetApiClient.hentGjennomforingArenaData(gjennomforing.id)
+		if (arenaData == null) {
+			log.info("Lagrer ikke gjennomføring med id ${gjennomforing.id} fordi gjennomføringen er opprettet utenfor Arena")
+			return
+		}
 		val arrangor = arrangorService.upsertArrangor(gjennomforing.virksomhetsnummer)
 
 		val tiltak = tiltakService.upsertTiltak(

@@ -63,7 +63,7 @@ class DeltakerProcessor(
 		}
 
 		val gjennomforingId = gjennomforingService.getGjennomforingOrNull(deltakerDto.gjennomforingId)?.id
-			?: ingestGjennomforing(deltakerDto.gjennomforingId).id
+			?: upsertGjennomforing(deltakerDto.gjennomforingId).id
 
 		val status = DeltakerStatusInsert(
 			id = UUID.randomUUID(),
@@ -104,9 +104,11 @@ class DeltakerProcessor(
 		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=${gjennomforingId}")
 	}
 
-	private fun ingestGjennomforing(gjennomforingId: UUID): Gjennomforing {
+	private fun upsertGjennomforing(gjennomforingId: UUID): Gjennomforing {
 		val gjennomforing = mulighetsrommetApiClient.hentGjennomforing(gjennomforingId)
 		val gjennomforingArenaData = mulighetsrommetApiClient.hentGjennomforingArenaData(gjennomforingId)
+			?: throw IllegalStateException("Lagrer ikke gjennomføring med id ${gjennomforing.id} som er opprettet utenfor Arena")
+
 		if (gjennomforingArenaData.virksomhetsnummer == null) {
 			throw IllegalStateException("Lagrer ikke gjennomføring med id ${gjennomforing.id} og tiltakstype ${gjennomforing.tiltakstype.arenaKode} fordi virksomhetsnummer mangler.")
 		}

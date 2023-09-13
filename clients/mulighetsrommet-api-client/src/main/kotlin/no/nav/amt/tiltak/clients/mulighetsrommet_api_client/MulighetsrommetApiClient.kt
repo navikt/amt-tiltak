@@ -5,7 +5,7 @@ import java.util.UUID
 
 interface MulighetsrommetApiClient {
 
-	fun hentGjennomforingArenaData(id: UUID): GjennomforingArenaData
+	fun hentGjennomforingArenaData(id: UUID): GjennomforingArenaData?
 
 	fun hentGjennomforing(id: UUID): Gjennomforing
 }

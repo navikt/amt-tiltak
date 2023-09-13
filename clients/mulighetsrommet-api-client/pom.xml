@@ -22,7 +22,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
+            <groupId>no.nav.common</groupId>
             <artifactId>token-client</artifactId>
         </dependency>
         <dependency>
@@ -30,7 +30,7 @@
             <artifactId>json</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
+            <groupId>no.nav.common</groupId>
             <artifactId>rest</artifactId>
         </dependency>
 

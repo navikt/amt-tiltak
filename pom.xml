@@ -55,7 +55,7 @@
         <okhttp.version>4.11.0</okhttp.version>
         <token-support.version>3.1.5</token-support.version>
         <mock-oauth2-server.version>1.0.0</mock-oauth2-server.version>
-        <common.version>3.2023.07.07_09.10-85326e9557f0</common.version>
+        <common.version>3.2023.09.13_04.55-a8ff452fbd94</common.version>
         <logstash.version>7.4</logstash.version>
         <unleash.version>8.3.1</unleash.version>
     </properties>
@@ -69,6 +69,11 @@
         <repository>
             <id>confluent</id>
             <url>https://packages.confluent.io/maven/</url>
+        </repository>
+
+        <repository>
+            <id>github</id>
+            <url>https://github-package-registry-mirror.gc.nav.no/cached/maven-release</url>
         </repository>
 
         <repository>
@@ -298,37 +303,37 @@
             </dependency>
 
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>audit-log</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>kafka</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>rest</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>log</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>job</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>types</artifactId>
                 <version>${common.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.navikt.common-java-modules</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>token-client</artifactId>
                 <version>${common.version}</version>
             </dependency>
