@@ -12,7 +12,7 @@ import no.nav.amt.tiltak.data_publisher.model.Innhold
 import no.nav.amt.tiltak.data_publisher.model.Type
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.util.*
+import java.util.UUID
 
 class EndringsmeldingPublishQuery(
 	private val template: NamedParameterJdbcTemplate
@@ -36,12 +36,12 @@ class EndringsmeldingPublishQuery(
 		)
 	}
 
-	fun get(id: UUID): EndringsmeldingPublishDto {
+	fun get(id: UUID): EndringsmeldingPublishDto? {
 		return template.query(
 			"SELECT * FROM endringsmelding WHERE id = :id",
 			sqlParameters("id" to id),
 			rowMapper
-		).first()
+		).firstOrNull()
 	}
 
 	private fun parseInnholdJson(innholdJson: String, type: Type): Innhold? {

@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 class EndringsmeldingRepositoryTest : FunSpec({
 
@@ -278,5 +278,53 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		repository.deleteByDeltaker(DELTAKER_1.id)
 
 		repository.getByDeltaker(DELTAKER_1.id) shouldHaveSize 0
+	}
+
+	test("deleteErAktuell - skal slette alle er aktuell-endringsmeldinger") {
+		val erAktuellMelding = ENDRINGSMELDING_1_DELTAKER_1.copy(
+			id = UUID.randomUUID(),
+			status = Endringsmelding.Status.UTFORT,
+			utfortTidspunkt = ZonedDateTime.now().minusWeeks(1),
+			utfortAvNavAnsattId = NAV_ANSATT_1.id,
+			type = "DELTAKER_ER_AKTUELL"
+		)
+
+		testRepository.insertEndringsmelding(erAktuellMelding)
+		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
+
+		repository.deleteErAktuell()
+
+		val endringsmeldinger = repository.getByDeltaker(DELTAKER_1.id)
+		endringsmeldinger.size shouldBe 1
+		endringsmeldinger.first().type.name shouldBe ENDRINGSMELDING_1_DELTAKER_1.type
+	}
+
+	test("deleteErIkkeAktuellOppfyllerIkkeKravene - skal slette alle er ikke aktuell, oppfyller ikke kravene-endringsmeldinger") {
+		val erIkkeAktuellAnnetMelding = ENDRINGSMELDING_1_DELTAKER_1.copy(
+			id = UUID.randomUUID(),
+			status = Endringsmelding.Status.UTFORT,
+			utfortTidspunkt = ZonedDateTime.now().minusWeeks(1),
+			utfortAvNavAnsattId = NAV_ANSATT_1.id,
+			type = "DELTAKER_IKKE_AKTUELL",
+			innhold = """{ "aarsak": { "type": "ANNET", "beskrivelse": "Flyttet til utland" } }""",
+		)
+		val erIkkeAktuellOppfyllerIkkeKraveneMelding = ENDRINGSMELDING_1_DELTAKER_1.copy(
+			id = UUID.randomUUID(),
+			status = Endringsmelding.Status.AKTIV,
+			utfortTidspunkt = null,
+			utfortAvNavAnsattId = null,
+			type = "DELTAKER_IKKE_AKTUELL",
+			innhold = """{ "aarsak": { "type": "OPPFYLLER_IKKE_KRAVENE", "beskrivelse": "Mangler førerkort" } }""",
+		)
+
+		testRepository.insertEndringsmelding(erIkkeAktuellAnnetMelding)
+		testRepository.insertEndringsmelding(erIkkeAktuellOppfyllerIkkeKraveneMelding)
+
+		repository.deleteErIkkeAktuellOppfyllerIkkeKravene()
+
+		val endringsmeldinger = repository.getByDeltaker(DELTAKER_1.id)
+		endringsmeldinger.size shouldBe 1
+		endringsmeldinger.first().type.name shouldBe "DELTAKER_IKKE_AKTUELL"
+		endringsmeldinger.first().innhold?.let { JsonUtils.toJsonString(it) } shouldBe """{"aarsak":{"type":"ANNET","beskrivelse":"Flyttet til utland"}}"""
 	}
 })
