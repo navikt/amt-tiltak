@@ -26,7 +26,7 @@ class EndringsmeldingQueryTest: FunSpec({
 		val input = db.createEndringsmelding()
 		val data = query.get(input.id)
 
-		data.id shouldBe input.id
+		data?.id shouldBe input.id
 	}
 
 })

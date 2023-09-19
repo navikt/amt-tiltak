@@ -198,7 +198,27 @@ open class EndringsmeldingServiceImpl(
 	}
 
 	override fun slett(deltakerId: UUID) {
+		val endringsmeldinger = endringsmeldingRepository.getByDeltaker(deltakerId)
 		endringsmeldingRepository.deleteByDeltaker(deltakerId)
+		endringsmeldinger.forEach {
+			publisherService.publish(it.id, DataPublishType.ENDRINGSMELDING)
+		}
+	}
+
+	override fun slettErAktuell() {
+		val slettedeEndringsmeldinger = endringsmeldingRepository.deleteErAktuell()
+		slettedeEndringsmeldinger.forEach {
+			publisherService.publish(it.id, DataPublishType.ENDRINGSMELDING)
+		}
+		log.info("Slettet ${slettedeEndringsmeldinger.size} er aktuell-meldinger")
+	}
+
+	override fun slettErIkkeAktuellOppfyllerIkkeKravene() {
+		val slettedeEndringsmeldinger = endringsmeldingRepository.deleteErIkkeAktuellOppfyllerIkkeKravene()
+		slettedeEndringsmeldinger.forEach {
+			publisherService.publish(it.id, DataPublishType.ENDRINGSMELDING)
+		}
+		log.info("Slettet ${slettedeEndringsmeldinger.size} er ikke aktuell-meldinger med årsaktype OPPFYLLER_IKKE_KRAVENE")
 	}
 
 

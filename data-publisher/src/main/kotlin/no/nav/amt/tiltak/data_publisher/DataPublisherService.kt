@@ -136,8 +136,14 @@ class DataPublisherService(
 	}
 
 	private fun publishEndringsmelding(id: UUID, forcePublish: Boolean = false) {
-
 		val currentData = EndringsmeldingPublishQuery(template).get(id)
+
+		if (currentData == null) {
+			val record = ProducerRecord<String, String?>(kafkaTopicProperties.amtEndringsmeldingTopic, id.toString(), null)
+			stringKafkaProducer.sendSync(record)
+			logger.info("Legger inn tombstone på ENDRINGSMELDING med id $id")
+			return
+		}
 
 		if (forcePublish || !publishRepository.hasHash(id, DataPublishType.ENDRINGSMELDING, currentData.digest())) {
 			val key = id.toString()

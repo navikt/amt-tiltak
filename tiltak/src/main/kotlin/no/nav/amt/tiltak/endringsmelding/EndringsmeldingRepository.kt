@@ -12,7 +12,7 @@ import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.UUID
 
 @Component
 open class EndringsmeldingRepository(
@@ -159,6 +159,63 @@ open class EndringsmeldingRepository(
 			"deltakerId" to deltakerId,
 		)
 		template.update(sql, params)
+	}
+
+	fun deleteErAktuell(): List<EndringsmeldingDbo> {
+		val sql = """
+			SELECT * from endringsmelding WHERE type = :type
+		""".trimIndent()
+
+		val params = sqlParameters(
+			"type" to "DELTAKER_ER_AKTUELL",
+		)
+
+		val endringsmeldinger = template.query(sql, params, rowMapper)
+
+		val deleteSql = """
+			DELETE from endringsmelding WHERE type = :type
+		""".trimIndent()
+
+		template.update(deleteSql, params)
+
+		return endringsmeldinger
+	}
+
+	fun deleteErIkkeAktuellOppfyllerIkkeKravene(): List<EndringsmeldingDbo> {
+		val sql = """
+			SELECT *
+			FROM endringsmelding,
+				 JSONB_EXTRACT_PATH(innhold, 'aarsak') ea,
+				 JSONB_EXTRACT_PATH_TEXT(ea, 'type') aarsakt
+			WHERE type = :type
+			  AND aarsakt = :aarsaktype
+		""".trimIndent()
+
+		val params = sqlParameters(
+			"type" to "DELTAKER_IKKE_AKTUELL",
+			"aarsaktype" to "OPPFYLLER_IKKE_KRAVENE"
+		)
+
+		val endringsmeldinger = template.query(sql, params, rowMapper)
+		val endringsmeldingIder = endringsmeldinger.map { it.id }
+		if (endringsmeldingIder.isEmpty()) {
+			return emptyList()
+		}
+
+		val deleteSql = """
+			DELETE FROM endringsmelding
+			WHERE type = :type
+			  AND id in (:endringsmeldingIder)
+		""".trimIndent()
+
+		val deleteParams = sqlParameters(
+			"type" to "DELTAKER_IKKE_AKTUELL",
+			"endringsmeldingIder" to endringsmeldingIder
+		)
+
+		template.update(deleteSql, deleteParams)
+
+		return endringsmeldinger
 	}
 
 	private fun parseInnholdJson(innholdJson: String, type: EndringsmeldingDbo.Type): EndringsmeldingDbo.Innhold? {
