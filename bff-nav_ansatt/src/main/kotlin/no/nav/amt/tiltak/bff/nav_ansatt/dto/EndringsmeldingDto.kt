@@ -4,7 +4,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.domain.tiltak.EndringsmeldingStatusAarsak
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 data class EndringsmeldingDto(
 	val id: UUID,
@@ -25,7 +25,6 @@ data class EndringsmeldingDto(
 		AVSLUTT_DELTAKELSE,
 		DELTAKER_IKKE_AKTUELL,
 		ENDRE_DELTAKELSE_PROSENT,
-		DELTAKER_ER_AKTUELL,
 		ENDRE_SLUTTDATO
 	}
 
@@ -93,7 +92,6 @@ fun EndringsmeldingStatusAarsak.toDto(): EndringsmeldingStatusAarsakDto {
 		EndringsmeldingStatusAarsak.Type.IKKE_MOTT -> EndringsmeldingStatusAarsakDto(EndringsmeldingStatusAarsakDto.Type.IKKE_MOTT)
 		EndringsmeldingStatusAarsak.Type.ANNET -> EndringsmeldingStatusAarsakDto(EndringsmeldingStatusAarsakDto.Type.ANNET, this.beskrivelse)
 		EndringsmeldingStatusAarsak.Type.UTDANNING -> EndringsmeldingStatusAarsakDto(EndringsmeldingStatusAarsakDto.Type.UTDANNING)
-		EndringsmeldingStatusAarsak.Type.OPPFYLLER_IKKE_KRAVENE -> EndringsmeldingStatusAarsakDto(EndringsmeldingStatusAarsakDto.Type.OPPFYLLER_IKKE_KRAVENE, this.beskrivelse)
 
 	}
 }

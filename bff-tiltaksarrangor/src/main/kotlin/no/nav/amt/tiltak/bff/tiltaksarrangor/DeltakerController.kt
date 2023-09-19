@@ -118,19 +118,6 @@ class DeltakerController(
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
-	@PatchMapping("/{deltakerId}/er-aktuell")
-	fun deltakerErAktuell(
-		@PathVariable("deltakerId") deltakerId: UUID,
-	): OpprettEndringsmeldingResponse {
-		val ansatt = controllerService.hentInnloggetAnsatt()
-
-		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		verifiserErIkkeSkjult(deltakerId)
-
-		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettErAktuellEndringsmelding(deltakerId, ansatt.id))
-	}
-
-	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@PatchMapping("/{deltakerId}/endre-sluttdato")
 	fun endreSluttdato(
 		@PathVariable("deltakerId") deltakerId: UUID,

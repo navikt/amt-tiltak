@@ -64,7 +64,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/avslutt-deltakelse"),
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/forleng-deltakelse"),
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/ikke-aktuell"),
-			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/er-aktuell"),
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/endre-sluttdato"),
 
 
@@ -452,27 +451,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		response.code shouldBe 403
-	}
-
-	@Test
-	fun `deltakerErAktuell() skal returnere 200 og opprette endringsmelding`() {
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/er-aktuell",
-			headers = createAnsatt1AuthHeader()
-		)
-
-		response.code shouldBe 200
-
-		val endringsmeldinger = endringsmeldingService.hentAktiveEndringsmeldingerForDeltaker(DELTAKER_1.id)
-		endringsmeldinger shouldHaveSize 1
-
-		val endringsmelding = endringsmeldinger.first()
-		endringsmelding.innhold shouldBe null
-		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
-		endringsmelding.type shouldBe Endringsmelding.Type.DELTAKER_ER_AKTUELL
-
-		response.body?.string() shouldBe """{"id":"${endringsmelding.id}"}"""
 	}
 
 	@Test

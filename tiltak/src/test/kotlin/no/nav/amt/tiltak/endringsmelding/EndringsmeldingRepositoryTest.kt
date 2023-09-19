@@ -160,25 +160,6 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 	}
 
-	test("insert - skal inserte Er aktuell endringsmelding") {
-		val id = UUID.randomUUID()
-
-		repository.insert(
-			id = id,
-			deltakerId = DELTAKER_1.id,
-			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
-			innhold = null,
-			type = EndringsmeldingDbo.Type.DELTAKER_ER_AKTUELL
-
-		)
-
-		val endringsmelding = repository.get(id)
-
-		endringsmelding.type shouldBe EndringsmeldingDbo.Type.DELTAKER_ER_AKTUELL
-		endringsmelding.innhold shouldBe null
-		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
-	}
-
 	test("insert - skal inserte aktiv endreOppstartsdatoEndringsmelding") {
 		val id = UUID.randomUUID()
 		val innhold = EndringsmeldingDbo.Innhold.EndreOppstartsdatoInnhold(LocalDate.now())
@@ -278,53 +259,5 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		repository.deleteByDeltaker(DELTAKER_1.id)
 
 		repository.getByDeltaker(DELTAKER_1.id) shouldHaveSize 0
-	}
-
-	test("deleteErAktuell - skal slette alle er aktuell-endringsmeldinger") {
-		val erAktuellMelding = ENDRINGSMELDING_1_DELTAKER_1.copy(
-			id = UUID.randomUUID(),
-			status = Endringsmelding.Status.UTFORT,
-			utfortTidspunkt = ZonedDateTime.now().minusWeeks(1),
-			utfortAvNavAnsattId = NAV_ANSATT_1.id,
-			type = "DELTAKER_ER_AKTUELL"
-		)
-
-		testRepository.insertEndringsmelding(erAktuellMelding)
-		testRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
-
-		repository.deleteErAktuell()
-
-		val endringsmeldinger = repository.getByDeltaker(DELTAKER_1.id)
-		endringsmeldinger.size shouldBe 1
-		endringsmeldinger.first().type.name shouldBe ENDRINGSMELDING_1_DELTAKER_1.type
-	}
-
-	test("deleteErIkkeAktuellOppfyllerIkkeKravene - skal slette alle er ikke aktuell, oppfyller ikke kravene-endringsmeldinger") {
-		val erIkkeAktuellAnnetMelding = ENDRINGSMELDING_1_DELTAKER_1.copy(
-			id = UUID.randomUUID(),
-			status = Endringsmelding.Status.UTFORT,
-			utfortTidspunkt = ZonedDateTime.now().minusWeeks(1),
-			utfortAvNavAnsattId = NAV_ANSATT_1.id,
-			type = "DELTAKER_IKKE_AKTUELL",
-			innhold = """{ "aarsak": { "type": "ANNET", "beskrivelse": "Flyttet til utland" } }""",
-		)
-		val erIkkeAktuellOppfyllerIkkeKraveneMelding = ENDRINGSMELDING_1_DELTAKER_1.copy(
-			id = UUID.randomUUID(),
-			status = Endringsmelding.Status.AKTIV,
-			utfortTidspunkt = null,
-			utfortAvNavAnsattId = null,
-			type = "DELTAKER_IKKE_AKTUELL",
-			innhold = """{ "aarsak": { "type": "OPPFYLLER_IKKE_KRAVENE", "beskrivelse": "Mangler førerkort" } }""",
-		)
-
-		testRepository.insertEndringsmelding(erIkkeAktuellAnnetMelding)
-		testRepository.insertEndringsmelding(erIkkeAktuellOppfyllerIkkeKraveneMelding)
-
-		repository.deleteErIkkeAktuellOppfyllerIkkeKravene()
-
-		val endringsmeldinger = repository.getByDeltaker(DELTAKER_1.id)
-		endringsmeldinger.size shouldBe 1
-		endringsmeldinger.first().type.name shouldBe "DELTAKER_IKKE_AKTUELL"
-		endringsmeldinger.first().innhold?.let { JsonUtils.toJsonString(it) } shouldBe """{"aarsak":{"type":"ANNET","beskrivelse":"Flyttet til utland"}}"""
 	}
 })

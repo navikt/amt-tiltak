@@ -63,11 +63,8 @@ class EndringsmeldingPublishQuery(
 
 			Type.ENDRE_DELTAKELSE_PROSENT ->
 				objectMapper.readValue<Innhold.EndreDeltakelseProsentInnhold>(innholdJson)
+
 			Type.ENDRE_SLUTTDATO ->	objectMapper.readValue<Innhold.EndreSluttdatoInnhold>(innholdJson)
-			Type.DELTAKER_ER_AKTUELL -> null
-
-
-
 		}
 
 	}
