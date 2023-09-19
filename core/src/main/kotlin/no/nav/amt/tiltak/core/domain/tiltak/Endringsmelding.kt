@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.core.domain.tiltak
 
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 data class Endringsmelding(
 	val id: UUID,
@@ -26,7 +26,6 @@ data class Endringsmelding(
 		AVSLUTT_DELTAKELSE,
 		DELTAKER_IKKE_AKTUELL,
 		ENDRE_DELTAKELSE_PROSENT,
-		DELTAKER_ER_AKTUELL,
 		ENDRE_SLUTTDATO
 	}
 	sealed class Innhold {

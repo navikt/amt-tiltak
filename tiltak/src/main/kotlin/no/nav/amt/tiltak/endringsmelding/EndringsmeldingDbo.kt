@@ -4,7 +4,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.domain.tiltak.EndringsmeldingStatusAarsak
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 data class EndringsmeldingDbo(
 	val id: UUID,
@@ -26,7 +26,6 @@ data class EndringsmeldingDbo(
 		FORLENG_DELTAKELSE,
 		AVSLUTT_DELTAKELSE,
 		DELTAKER_IKKE_AKTUELL,
-		DELTAKER_ER_AKTUELL,
 		ENDRE_SLUTTDATO
 	}
 

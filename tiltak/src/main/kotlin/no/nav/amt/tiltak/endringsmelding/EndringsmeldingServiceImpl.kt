@@ -171,18 +171,6 @@ open class EndringsmeldingServiceImpl(
 		)
 	}
 
-	override fun opprettErAktuellEndringsmelding(
-		deltakerId: UUID,
-		arrangorAnsattId: UUID,
-	): UUID {
-		return opprettOgMarkerAktiveSomUtdatert(
-			deltakerId,
-			arrangorAnsattId,
-			null,
-			EndringsmeldingDbo.Type.DELTAKER_ER_AKTUELL
-		)
-	}
-
 	override fun opprettEndresluttdatoEndringsmelding(
 		deltakerId: UUID,
 		arrangorAnsattId: UUID,
@@ -204,23 +192,6 @@ open class EndringsmeldingServiceImpl(
 			publisherService.publish(it.id, DataPublishType.ENDRINGSMELDING)
 		}
 	}
-
-	override fun slettErAktuell() {
-		val slettedeEndringsmeldinger = endringsmeldingRepository.deleteErAktuell()
-		slettedeEndringsmeldinger.forEach {
-			publisherService.publish(it.id, DataPublishType.ENDRINGSMELDING)
-		}
-		log.info("Slettet ${slettedeEndringsmeldinger.size} er aktuell-meldinger")
-	}
-
-	override fun slettErIkkeAktuellOppfyllerIkkeKravene() {
-		val slettedeEndringsmeldinger = endringsmeldingRepository.deleteErIkkeAktuellOppfyllerIkkeKravene()
-		slettedeEndringsmeldinger.forEach {
-			publisherService.publish(it.id, DataPublishType.ENDRINGSMELDING)
-		}
-		log.info("Slettet ${slettedeEndringsmeldinger.size} er ikke aktuell-meldinger med årsaktype OPPFYLLER_IKKE_KRAVENE")
-	}
-
 
 	private fun EndringsmeldingDbo.toModel(): Endringsmelding {
 		return Endringsmelding(
@@ -244,7 +215,6 @@ open class EndringsmeldingServiceImpl(
 			EndringsmeldingDbo.Type.AVSLUTT_DELTAKELSE -> Endringsmelding.Type.AVSLUTT_DELTAKELSE
 			EndringsmeldingDbo.Type.DELTAKER_IKKE_AKTUELL -> Endringsmelding.Type.DELTAKER_IKKE_AKTUELL
 			EndringsmeldingDbo.Type.ENDRE_DELTAKELSE_PROSENT -> Endringsmelding.Type.ENDRE_DELTAKELSE_PROSENT
-			EndringsmeldingDbo.Type.DELTAKER_ER_AKTUELL -> Endringsmelding.Type.DELTAKER_ER_AKTUELL
 			EndringsmeldingDbo.Type.ENDRE_SLUTTDATO -> Endringsmelding.Type.ENDRE_SLUTTDATO
 		}
 	}

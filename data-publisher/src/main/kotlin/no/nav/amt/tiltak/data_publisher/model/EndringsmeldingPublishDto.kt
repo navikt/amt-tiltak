@@ -4,7 +4,7 @@ import no.nav.common.json.JsonUtils
 import org.springframework.util.DigestUtils
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class EndringsmeldingPublishDto(
 	val id: UUID,
@@ -27,7 +27,6 @@ enum class Type {
 	FORLENG_DELTAKELSE,
 	AVSLUTT_DELTAKELSE,
 	DELTAKER_IKKE_AKTUELL,
-	DELTAKER_ER_AKTUELL,
 	ENDRE_SLUTTDATO
 }
 

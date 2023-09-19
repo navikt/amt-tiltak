@@ -34,10 +34,6 @@ interface EndringsmeldingService {
 	fun hentAktiveEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding>
 
 	fun slett(deltakerId: UUID)
-	fun opprettErAktuellEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID): UUID
+
 	fun opprettEndresluttdatoEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate): UUID
-
-	fun slettErAktuell()
-
-	fun slettErIkkeAktuellOppfyllerIkkeKravene()
 }
