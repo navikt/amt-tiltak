@@ -7,9 +7,7 @@ import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController("GjennomforingControllerNavAnsatt")
@@ -46,10 +44,6 @@ class GjennomforingController(
 
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
 
-		if(gjennomforing.tiltak.kode == "GRUFAGYRKE") {
-			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Kan ikke aksessere GRUFAGYRKE $gjennomforingId")
-		}
-
 		val arrangor = gjennomforing.arrangor
 
 		return HentGjennomforingDto(
@@ -82,7 +76,6 @@ class GjennomforingController(
 		tiltaksansvarligAutoriseringService.verifiserTilgangTilFlate(navAnsattAzureId)
 
 		return gjennomforingService.getByLopenr(lopenr)
-			.filter { it.tiltak.kode != "GRUFAGYRKE"}
 			.map {
 				HentGjennomforingMedLopenrDto(
 					id = it.id,
