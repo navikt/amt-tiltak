@@ -279,7 +279,7 @@ open class DeltakerRepository(
 			WHERE deltaker_status.aktiv = TRUE
 				AND deltaker_status.status = '${DeltakerStatus.Type.VENTER_PA_OPPSTART.name}'
 				AND deltaker.start_dato <= CURRENT_DATE
-				AND deltaker.slutt_dato >= CURRENT_DATE
+				AND (deltaker.slutt_dato IS NULL OR deltaker.slutt_dato >= CURRENT_DATE)
 		""".trimIndent()
 		val parameters = MapSqlParameterSource()
 		return template.query(sql, parameters, rowMapper)
