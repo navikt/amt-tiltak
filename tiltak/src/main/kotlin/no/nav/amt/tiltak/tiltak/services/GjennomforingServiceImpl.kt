@@ -1,10 +1,12 @@
 package no.nav.amt.tiltak.tiltak.services
 
+import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.port.ArrangorService
+import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
@@ -13,6 +15,7 @@ import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.utils.UpdateStatus
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -21,7 +24,9 @@ class GjennomforingServiceImpl(
 	private val gjennomforingRepository: GjennomforingRepository,
 	private val tiltakService: TiltakService,
 	private val arrangorService: ArrangorService,
-	private val publisherService: DataPublisherService
+	@Lazy private val deltakerService: DeltakerService,
+	private val publisherService: DataPublisherService,
+	private val amtArrangorClient: AmtArrangorClient,
 ) : GjennomforingService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -52,6 +57,15 @@ class GjennomforingServiceImpl(
 			log.info("Oppdaterer ikke arrangørId for svartelistet gjennomføring med id ${storedGjennomforing.id}")
 			storedGjennomforing.arrangorId
 		} else {
+			if (updatedGjennomforing.arrangorId != storedGjennomforing.arrangorId) {
+				val deltakere = deltakerService.hentDeltakerePaaGjennomforing(updatedGjennomforing.id)
+
+				amtArrangorClient.fjernTilganger(
+					arrangorId = storedGjennomforing.arrangorId,
+					gjennomforingId = updatedGjennomforing.id,
+					deltakerIder = deltakere.map { it.id },
+				)
+			}
 			updatedGjennomforing.arrangorId
 		}
 		val update = storedGjennomforing.update(

@@ -99,6 +99,23 @@ class AmtArrangorClient(
 		}
 	}
 
+	fun fjernTilganger(arrangorId: UUID, gjennomforingId: UUID, deltakerIder: List<UUID>) {
+		val requestBody = FjernTilgangerHosArrangorRequest(arrangorId, gjennomforingId, deltakerIder)
+
+		val request = Request.Builder()
+			.url("$baseUrl/api/service/ansatt/tilganger")
+			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
+			.delete(JsonUtils.toJsonString(requestBody).toRequestBody(mediaTypeJson))
+			.build()
+
+		httpClient.newCall(request).execute().use { response ->
+			if (!response.isSuccessful) {
+				throw RuntimeException("Kunne fjerne tilganger hos arrangør $arrangorId for" +
+					" gjennomføring $gjennomforingId fra amt-arrangør. Status=${response.code}")
+			}
+		}
+	}
+
 	data class AnsattDto(
 		val id: UUID,
 		val personalia: PersonaliaDto,
@@ -156,5 +173,12 @@ class AmtArrangorClient(
 		val navn: String,
 		val organisasjonsnummer: String,
 		val overordnetArrangor: Arrangor?
+	)
+
+
+	data class FjernTilgangerHosArrangorRequest(
+		val arrangorId: UUID,
+		val deltakerlisteId: UUID,
+		val deltakerIder: List<UUID>
 	)
 }
