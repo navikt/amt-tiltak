@@ -50,7 +50,7 @@
         <mockito-kotlin.version>5.1.0</mockito-kotlin.version>
         <schedlock.version>5.8.0</schedlock.version>
         <nimbus.version>11.0</nimbus.version>
-        <mockk.version>1.13.7</mockk.version>
+        <mockk.version>1.13.8</mockk.version>
         <kotest.version>5.6.1</kotest.version>
         <okhttp.version>4.11.0</okhttp.version>
         <token-support.version>3.1.5</token-support.version>
