@@ -5,9 +5,12 @@ import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
+import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.port.ArrangorService
+import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -38,6 +41,10 @@ class GjennomforingServiceImplTest : FunSpec({
 
 	lateinit var publisherService: DataPublisherService
 
+	lateinit var deltakerService: DeltakerService
+
+	lateinit var amtArrangorClient: AmtArrangorClient
+
 
 	beforeEach {
 		val parameterTemplate = NamedParameterJdbcTemplate(dataSource)
@@ -52,12 +59,18 @@ class GjennomforingServiceImplTest : FunSpec({
 
 		publisherService = mockk()
 
+		deltakerService = mockk()
+
+		amtArrangorClient = mockk(relaxUnitFun = true)
+
 
 		service = GjennomforingServiceImpl(
 			gjennomforingRepository = gjennomforingRepository,
 			tiltakService = tiltakService,
 			arrangorService = arrangorService,
-			publisherService = publisherService
+			publisherService = publisherService,
+			deltakerService = deltakerService,
+			amtArrangorClient = amtArrangorClient,
 		)
 
 		every { publisherService.publish(id = any(), type = any()) } returns Unit
@@ -102,7 +115,42 @@ class GjennomforingServiceImplTest : FunSpec({
 		service.getByLopenr(lopenr).map { it.id } shouldContainAll  expectedIds
 	}
 
-	test("upsert - arrangørId er endret - arrangørId oppdateres for gjennomføringen") {
+
+	test("upsert - navn er endret - navn oppdateres for gjennomføringen") {
+		testDataRepository.insertNavEnhet(NAV_ENHET_1)
+		testDataRepository.insertTiltak(TILTAK_1)
+		testDataRepository.insertArrangor(ARRANGOR_1)
+		testDataRepository.insertGjennomforing(GJENNOMFORING_1)
+		val tiltakInserted = TILTAK_1.toTiltak()
+
+		val nyttNavn = "Oppfølging v2"
+
+		every { arrangorService.getArrangorById(ARRANGOR_1.id) } returns ARRANGOR_1.toArrangor()
+		every { tiltakService.getTiltakById(TILTAK_1.id) } returns tiltakInserted
+
+		service.upsert(
+			GjennomforingUpsert(
+				id = GJENNOMFORING_1.id,
+				tiltakId = TILTAK_1.id,
+				arrangorId = ARRANGOR_1.id,
+				navn = nyttNavn,
+				status = Gjennomforing.Status.GJENNOMFORES,
+				startDato = GJENNOMFORING_1.startDato,
+				sluttDato = GJENNOMFORING_1.sluttDato,
+				navEnhetId = NAV_ENHET_1.id,
+				lopenr = GJENNOMFORING_1.lopenr,
+				opprettetAar = GJENNOMFORING_1.opprettetAar,
+				erKurs = false
+			)
+		)
+
+		verify(exactly = 0) { amtArrangorClient.fjernTilganger(ARRANGOR_1.id, GJENNOMFORING_1.id, emptyList()) }
+
+		val oppdatertGjennomforing = service.getGjennomforing(GJENNOMFORING_1.id)
+		oppdatertGjennomforing.navn shouldBe nyttNavn
+	}
+
+	test("upsert - arrangørId er endret - arrangørId oppdateres for gjennomføringen og tilganger hos gammel arrangør stenges") {
 		testDataRepository.insertNavEnhet(NAV_ENHET_1)
 		testDataRepository.insertTiltak(TILTAK_1)
 		testDataRepository.insertArrangor(ARRANGOR_1)
@@ -113,6 +161,7 @@ class GjennomforingServiceImplTest : FunSpec({
 
 		every { arrangorService.getArrangorById(ARRANGOR_2.id) } returns oppdatertArrangor
 		every { tiltakService.getTiltakById(TILTAK_1.id) } returns tiltakInserted
+		every { deltakerService.hentDeltakerePaaGjennomforing(GJENNOMFORING_1.id) } returns emptyList()
 
 		service.upsert(
 			GjennomforingUpsert(
@@ -129,6 +178,8 @@ class GjennomforingServiceImplTest : FunSpec({
 				erKurs = false
 			)
 		)
+
+		verify(exactly = 1) { amtArrangorClient.fjernTilganger(ARRANGOR_1.id, GJENNOMFORING_1.id, emptyList()) }
 
 		val oppdatertGjennomforing = service.getGjennomforing(GJENNOMFORING_1.id)
 		oppdatertGjennomforing.arrangor.id shouldBe ARRANGOR_2.id
