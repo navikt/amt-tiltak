@@ -164,19 +164,31 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	fun `ingest deltaker - status feilregistrert - skal slette deltaker`() {
-		deltakerService.hentDeltaker(DELTAKER_1.id) shouldNotBe null
+	fun `ingest deltaker - status feilregistrert - skal oppdatere deltaker`() {
+		val mockNavBruker = mockNavBruker(
+			BRUKER_1.copy(
+				id = UUID.randomUUID(),
+				personIdent = (1..Long.MAX_VALUE).random().toString()
+			),
+			NAV_ENHET_1,
+		)
 
+		mockAmtPersonHttpServer.addNavBrukerResponse(mockNavBruker)
+		mockAmtPersonHttpServer.addAdressebeskyttelseResponse(mockNavBruker.personident, null)
+
+		val gjennomforing = ingestGjennomforing()
 		val message = DeltakerMessage(
-			id = DELTAKER_1.id,
-			gjennomforingId = DELTAKER_1.gjennomforingId,
+			gjennomforingId = gjennomforing.id,
+			personIdent = mockNavBruker.personident,
 			status = DeltakerStatus.Type.FEILREGISTRERT
 		)
 
 		kafkaMessageSender.sendTilAmtTiltakTopic(KafkaMessageCreator.opprettAmtTiltakDeltakerMessage(message))
 
 		AsyncUtils.eventually {
-			deltakerService.hentDeltaker(DELTAKER_1.id) shouldBe null
+			val deltaker = deltakerService.hentDeltaker(message.id)
+			deltaker shouldNotBe null
+			deltaker?.status?.type shouldBe DeltakerStatus.Type.FEILREGISTRERT
 		}
 
 	}

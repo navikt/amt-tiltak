@@ -47,12 +47,6 @@ class DeltakerProcessor(
 		val deltakerDto = message.payload
 		val deltakerFnr = message.payload.personIdent
 
-		if (deltakerDto.status == DeltakerPayload.Status.FEILREGISTRERT) {
-			log.info("Sletter deltaker med id=${deltakerDto.id} som er feilregistrert")
-			deltakerService.slettDeltaker(deltakerDto.id)
-			return
-		}
-
 		val erAdressebeskyttet = amtPersonClient.hentAdressebeskyttelse(deltakerFnr)
 			.getOrThrow()
 			.erBeskyttet()
