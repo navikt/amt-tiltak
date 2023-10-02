@@ -161,7 +161,7 @@ open class EndringsmeldingRepository(
 		template.update(sql, params)
 	}
 
-	private fun parseInnholdJson(innholdJson: String, type: EndringsmeldingDbo.Type): EndringsmeldingDbo.Innhold? {
+	private fun parseInnholdJson(innholdJson: String, type: EndringsmeldingDbo.Type): EndringsmeldingDbo.Innhold {
 		return when(type) {
 			EndringsmeldingDbo.Type.LEGG_TIL_OPPSTARTSDATO ->
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.LeggTilOppstartsdatoInnhold>(innholdJson)
@@ -177,6 +177,8 @@ open class EndringsmeldingRepository(
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold>(innholdJson)
 			EndringsmeldingDbo.Type.ENDRE_SLUTTDATO ->
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.EndreSluttdatoInnhold>(innholdJson)
+			EndringsmeldingDbo.Type.ENDRE_SLUTTAARSAK ->
+				objectMapper.readValue<EndringsmeldingDbo.Innhold.EndreSluttaarsakInnhold>(innholdJson)
 		}
 
 	}

@@ -27,7 +27,8 @@ enum class Type {
 	FORLENG_DELTAKELSE,
 	AVSLUTT_DELTAKELSE,
 	DELTAKER_IKKE_AKTUELL,
-	ENDRE_SLUTTDATO
+	ENDRE_SLUTTDATO,
+	ENDRE_SLUTTAARSAK,
 }
 
 data class EndringsmeldingStatusAarsakDto(
@@ -67,4 +68,7 @@ sealed class Innhold {
 		val sluttdato: LocalDate
 	) : Innhold()
 
+	data class EndreSluttaarsakInnhold(
+		val aarsak: EndringsmeldingStatusAarsakDto,
+	) : Innhold()
 }
