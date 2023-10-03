@@ -185,6 +185,20 @@ open class EndringsmeldingServiceImpl(
 		)
 	}
 
+	override fun opprettEndreSluttaarsakEndringsmelding(
+		deltakerId: UUID,
+		arrangorAnsattId: UUID,
+		statusAarsak: EndringsmeldingStatusAarsak
+	): UUID {
+		val innhold = EndringsmeldingDbo.Innhold.EndreSluttaarsakInnhold(statusAarsak)
+		return  opprettOgMarkerAktiveSomUtdatert(
+			deltakerId = deltakerId,
+			opprettetAvArrangorAnsattId = arrangorAnsattId,
+			innhold = innhold,
+			type = EndringsmeldingDbo.Type.ENDRE_SLUTTAARSAK
+		)
+	}
+
 	override fun slett(deltakerId: UUID) {
 		val endringsmeldinger = endringsmeldingRepository.getByDeltaker(deltakerId)
 		endringsmeldingRepository.deleteByDeltaker(deltakerId)
@@ -216,6 +230,7 @@ open class EndringsmeldingServiceImpl(
 			EndringsmeldingDbo.Type.DELTAKER_IKKE_AKTUELL -> Endringsmelding.Type.DELTAKER_IKKE_AKTUELL
 			EndringsmeldingDbo.Type.ENDRE_DELTAKELSE_PROSENT -> Endringsmelding.Type.ENDRE_DELTAKELSE_PROSENT
 			EndringsmeldingDbo.Type.ENDRE_SLUTTDATO -> Endringsmelding.Type.ENDRE_SLUTTDATO
+			EndringsmeldingDbo.Type.ENDRE_SLUTTAARSAK -> Endringsmelding.Type.ENDRE_SLUTTAARSAK
 		}
 	}
 
@@ -244,6 +259,9 @@ open class EndringsmeldingServiceImpl(
 				)
 			is EndringsmeldingDbo.Innhold.EndreSluttdatoInnhold ->
 				Endringsmelding.Innhold.EndreSluttdatoInnhold(this.sluttdato)
+
+			is EndringsmeldingDbo.Innhold.EndreSluttaarsakInnhold ->
+				Endringsmelding.Innhold.EndreSluttaarsakInnhold(this.aarsak)
 		}
 	}
 

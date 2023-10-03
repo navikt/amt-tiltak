@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.bff.tiltaksarrangor
 import no.nav.amt.tiltak.bff.tiltaksarrangor.request.*
 import no.nav.amt.tiltak.bff.tiltaksarrangor.response.OpprettEndringsmeldingResponse
 import no.nav.amt.tiltak.common.auth.Issuer
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.amt.tiltak.core.exceptions.SkjultDeltakerException
 import no.nav.amt.tiltak.core.exceptions.ValidationException
@@ -129,6 +130,25 @@ class DeltakerController(
 		verifiserErIkkeSkjult(deltakerId)
 
 		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettEndresluttdatoEndringsmelding(deltakerId, ansatt.id, request.sluttdato))
+	}
+
+	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
+	@PatchMapping("/{deltakerId}/sluttaarsak")
+	fun endreSluttaarsak(
+		@PathVariable("deltakerId") deltakerId: UUID,
+		@RequestBody request: EndreSluttaarsakRequest,
+	): OpprettEndringsmeldingResponse {
+		val ansatt = controllerService.hentInnloggetAnsatt()
+
+		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
+		verifiserErIkkeSkjult(deltakerId)
+
+		val deltaker = deltakerService.hentDeltaker(deltakerId)
+		if (deltaker?.status?.type != DeltakerStatus.Type.HAR_SLUTTET) {
+			throw ValidationException("Kan ikke opprette endreSluttaarsakEndringsmelding for deltaker med status ${deltaker?.status?.type}")
+		}
+
+		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettEndreSluttaarsakEndringsmelding(deltakerId, ansatt.id, request.aarsak.toModel()))
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)

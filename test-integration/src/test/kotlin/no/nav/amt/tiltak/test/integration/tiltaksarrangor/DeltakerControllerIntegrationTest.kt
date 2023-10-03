@@ -65,9 +65,8 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/forleng-deltakelse"),
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/ikke-aktuell"),
 			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/endre-sluttdato"),
-
-
-			)
+			Request.Builder().patch(emptyRequest()).url("${serverUrl()}/api/tiltaksarrangor/deltaker/${UUID.randomUUID()}/sluttaarsak"),
+		)
 		testTiltaksarrangorAutentisering(requestBuilders, client, mockOAuthServer)
 	}
 
@@ -593,6 +592,75 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 		response.code shouldBe 400
 	}
+
+	@Test
+	fun `endreSluttaarsak() skal returnere 200 og opprette endringsmelding`() {
+		val deltaker = DELTAKER_1.copy(id = UUID.randomUUID())
+
+		testDataRepository.insertDeltaker(deltaker)
+		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1.copy(
+			id = UUID.randomUUID(),
+			deltakerId = deltaker.id,
+			status = "HAR_SLUTTET"
+		))
+
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${deltaker.id}/sluttaarsak",
+			headers = createAnsatt1AuthHeader(),
+			body = """{"aarsak": {"type": "FATT_JOBB"} }""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 200
+
+		val endringsmeldinger = endringsmeldingService.hentAktiveEndringsmeldingerForDeltaker(deltaker.id)
+		endringsmeldinger shouldHaveSize 1
+
+		val endringsmelding = endringsmeldinger.first()
+		endringsmelding.innhold should beInstanceOf<Endringsmelding.Innhold.EndreSluttaarsakInnhold>()
+		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
+		(endringsmelding.innhold as Endringsmelding.Innhold.EndreSluttaarsakInnhold).aarsak.type shouldBe EndringsmeldingStatusAarsak.Type.FATT_JOBB
+
+		response.body?.string() shouldBe """{"id":"${endringsmelding.id}"}"""
+	}
+
+	@Test
+	fun `endreSluttaarsak() skal returnere 400 hvis deltaker ikke har riktig status`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/sluttaarsak",
+			headers = createAnsatt1AuthHeader(),
+			body = """{"aarsak": {"type": "FATT_JOBB"} }""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 400
+	}
+
+
+	@Test
+	fun `endreSluttaarsak() skal returnere 400 hvis deltaker er skjult`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${opprettSkjultDeltaker()}/sluttaarsak",
+			headers = createAnsatt1AuthHeader(),
+			body = """{"aarsak": {"type": "FATT_JOBB"} }""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 400
+	}
+
+	@Test
+	fun `endreSluttaarsak() skal returnere 403 hvis ikke tilgang`() {
+		val response = sendRequest(
+			method = "PATCH",
+			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/sluttaarsak",
+			headers = createAnsatt1AuthHeader(),
+			body = """{"aarsak": {"type": "FATT_JOBB"}}""".toJsonRequestBody()
+		)
+
+		response.code shouldBe 403
+	}
+
 
 	private fun opprettSkjultDeltaker(): UUID {
 		val deltakerId = UUID.randomUUID()

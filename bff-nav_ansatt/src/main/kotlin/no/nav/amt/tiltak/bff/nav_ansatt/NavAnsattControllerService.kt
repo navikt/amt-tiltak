@@ -120,6 +120,7 @@ class NavAnsattControllerService(
 			Endringsmelding.Type.DELTAKER_IKKE_AKTUELL -> EndringsmeldingDto.Type.DELTAKER_IKKE_AKTUELL
 			Endringsmelding.Type.ENDRE_DELTAKELSE_PROSENT -> EndringsmeldingDto.Type.ENDRE_DELTAKELSE_PROSENT
 			Endringsmelding.Type.ENDRE_SLUTTDATO -> EndringsmeldingDto.Type.ENDRE_SLUTTDATO
+			Endringsmelding.Type.ENDRE_SLUTTAARSAK -> EndringsmeldingDto.Type.ENDRE_SLUTTAARSAK
 		}
 	}
 

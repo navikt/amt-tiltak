@@ -44,7 +44,7 @@ class EndringsmeldingPublishQuery(
 		).firstOrNull()
 	}
 
-	private fun parseInnholdJson(innholdJson: String, type: Type): Innhold? {
+	private fun parseInnholdJson(innholdJson: String, type: Type): Innhold {
 		return when (type) {
 			Type.LEGG_TIL_OPPSTARTSDATO ->
 				objectMapper.readValue<Innhold.LeggTilOppstartsdatoInnhold>(innholdJson)
@@ -65,6 +65,8 @@ class EndringsmeldingPublishQuery(
 				objectMapper.readValue<Innhold.EndreDeltakelseProsentInnhold>(innholdJson)
 
 			Type.ENDRE_SLUTTDATO ->	objectMapper.readValue<Innhold.EndreSluttdatoInnhold>(innholdJson)
+
+			Type.ENDRE_SLUTTAARSAK -> objectMapper.readValue<Innhold.EndreSluttaarsakInnhold>(innholdJson)
 		}
 
 	}

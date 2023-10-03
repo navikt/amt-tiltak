@@ -245,6 +245,29 @@ class EndringsmeldingRepositoryTest : FunSpec({
 		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
 	}
 
+
+	test("insert - skal inserte aktiv endreSluttaarsakEndringsmelding") {
+		val id = UUID.randomUUID()
+		val innhold = EndringsmeldingDbo.Innhold.EndreSluttaarsakInnhold(
+			EndringsmeldingStatusAarsak(EndringsmeldingStatusAarsak.Type.UTDANNING)
+		)
+
+		repository.insert(
+			id = id,
+			deltakerId = DELTAKER_1.id,
+			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+			innhold = innhold,
+			type = EndringsmeldingDbo.Type.ENDRE_SLUTTAARSAK
+
+		)
+
+		val endringsmelding = repository.get(id)
+
+		endringsmelding.type shouldBe EndringsmeldingDbo.Type.ENDRE_SLUTTAARSAK
+		endringsmelding.innhold shouldBe innhold
+		endringsmelding.status shouldBe Endringsmelding.Status.AKTIV
+	}
+
 	test("deleteByDeltaker - skal slette alle endringsmeldinger på deltakeren") {
 		val utfortMelding = ENDRINGSMELDING_1_DELTAKER_1.copy(
 				id = UUID.randomUUID(),

@@ -26,7 +26,8 @@ data class EndringsmeldingDbo(
 		FORLENG_DELTAKELSE,
 		AVSLUTT_DELTAKELSE,
 		DELTAKER_IKKE_AKTUELL,
-		ENDRE_SLUTTDATO
+		ENDRE_SLUTTDATO,
+		ENDRE_SLUTTAARSAK,
 	}
 
 	sealed class Innhold {
@@ -59,6 +60,10 @@ data class EndringsmeldingDbo(
 
 		data class EndreSluttdatoInnhold(
 			val sluttdato: LocalDate
+		) : Innhold()
+
+		data class EndreSluttaarsakInnhold(
+			val aarsak: EndringsmeldingStatusAarsak,
 		) : Innhold()
 	}
 }
