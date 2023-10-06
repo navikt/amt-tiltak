@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.kafka.tiltaksgjennomforing_ingestor
 
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 data class GjennomforingMessage(
 	val id: UUID,
@@ -10,8 +10,13 @@ data class GjennomforingMessage(
 	val startDato: LocalDate,
 	val sluttDato: LocalDate? = null,
 	val status: Status,
-	val virksomhetsnummer: String
+	val virksomhetsnummer: String,
+	val oppstart: Oppstartstype?
 ) {
+	enum class Oppstartstype {
+		LOPENDE,
+		FELLES
+	}
 
 	data class Tiltakstype(
 		val id: UUID,
@@ -26,4 +31,18 @@ data class GjennomforingMessage(
 		AVSLUTTET,
 		APENT_FOR_INNSOK;
 	}
+
+	fun erKurs(): Boolean {
+		if (oppstart != null) {
+			return oppstart == Oppstartstype.FELLES
+		} else {
+			return kursTiltak.contains(tiltakstype.arenaKode)
+		}
+	}
+
+	private val kursTiltak = setOf(
+		"JOBBK",
+		"GRUPPEAMO",
+		"GRUFAGYRKE"
+	)
 }

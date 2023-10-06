@@ -7,7 +7,7 @@ import no.nav.amt.tiltak.utils.UpdateCheck
 import no.nav.amt.tiltak.utils.UpdateStatus
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class GjennomforingDbo(
 	val id: UUID,
@@ -52,6 +52,7 @@ data class GjennomforingDbo(
 				navEnhetId = other.navEnhetId,
 				lopenr = other.lopenr,
 				opprettetAar = other.opprettetAar,
+				erKurs = other.erKurs,
 				modifiedAt = LocalDateTime.now()
 			)
 

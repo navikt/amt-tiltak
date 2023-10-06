@@ -35,13 +35,8 @@ class GjennomforingIngestorImpl(
 		"GRUFAGYRKE"
 	)
 
-	private val kursTiltak = setOf(
-		"JOBBK",
-		"GRUPPEAMO",
-		"GRUFAGYRKE"
-	)
-
 	private val log = LoggerFactory.getLogger(javaClass)
+
 	override fun ingestKafkaRecord(gjennomforingId: String, recordValue: String?) {
 		if (recordValue == null) {
 			val id = UUID.fromString(gjennomforingId)
@@ -51,7 +46,6 @@ class GjennomforingIngestorImpl(
 			return
 		}
 		val gjennomforing = fromJsonString<GjennomforingMessage>(recordValue)
-		val erKurs = kursTiltak.contains(gjennomforing.tiltakstype.arenaKode)
 
 		if (!stottedeTiltak.contains(gjennomforing.tiltakstype.arenaKode)) {
 			log.info("Lagrer ikke gjennomføring med id ${gjennomforing.id} og tiltakstype ${gjennomforing.tiltakstype.arenaKode} fordi tiltaket ikke er støttet.")
@@ -85,7 +79,7 @@ class GjennomforingIngestorImpl(
 				navEnhetId = navEnhet?.id,
 				lopenr = arenaData.lopenr,
 				opprettetAar = arenaData.opprettetAar,
-				erKurs = erKurs
+				erKurs = gjennomforing.erKurs()
 			)
 		)
 
