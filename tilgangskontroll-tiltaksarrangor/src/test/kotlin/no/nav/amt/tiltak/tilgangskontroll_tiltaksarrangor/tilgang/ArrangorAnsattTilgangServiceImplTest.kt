@@ -12,6 +12,7 @@ import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorAnsatt
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.KOORDINATOR
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle.VEILEDER
+import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
@@ -114,8 +115,10 @@ class ArrangorAnsattTilgangServiceImplTest {
 		prosentStilling = 100F,
 		gjennomforingId = gjennomforingId,
 		erSkjermet = true,
-		endretDato = LocalDateTime.now()
+		endretDato = LocalDateTime.now(),
+		adressebeskyttelse = null
 	)
+
 	@BeforeEach
 	fun beforeEach() {
 		arrangorAnsattService = mockk()
@@ -329,6 +332,30 @@ class ArrangorAnsattTilgangServiceImplTest {
 				roller = listOf(KOORDINATOR)
 			)
 		)
+
+		shouldThrowExactly<ResponseStatusException> {
+			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)
+		}
+	}
+
+	@Test
+	fun `verifiserTilgangTilDeltaker - deltaker har adressebeskyttelse - skal kaste exception`() {
+		every {
+			arrangorVeilederService.erVeilederFor(ansattId, deltakerId)
+		} returns true
+
+		every {
+			ansattRolleService.hentAktiveRoller(any())
+		} returns listOf(
+			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
+				arrangorId = arrangorId,
+				roller = listOf(VEILEDER)
+			)
+		)
+
+		every {
+			deltakerService.hentDeltaker(deltakerId)
+		} returns deltaker.copy(adressebeskyttelse = Adressebeskyttelse.STRENGT_FORTROLIG)
 
 		shouldThrowExactly<ResponseStatusException> {
 			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)

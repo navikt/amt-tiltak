@@ -52,8 +52,8 @@ open class ArrangorAnsattTilgangServiceImpl(
 
 		val arrangorId = gjennomforingService.getArrangorId(deltaker.gjennomforingId)
 
-		if(!harKoordinatorTilgang(ansattId, deltaker.gjennomforingId, arrangorId)
-			&& !harVeilederTilgang(ansattId, deltakerId, arrangorId)) {
+		if(deltaker.harAdressebeskyttelse() || (!harKoordinatorTilgang(ansattId, deltaker.gjennomforingId, arrangorId)
+			&& !harVeilederTilgang(ansattId, deltakerId, arrangorId))) {
 			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Arrangør ansatt med id:$ansattId har ikke tilgang til deltaker med id $deltakerId")
 		}
 

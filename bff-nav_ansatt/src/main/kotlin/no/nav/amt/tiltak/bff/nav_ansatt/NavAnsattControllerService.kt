@@ -26,9 +26,9 @@ class NavAnsattControllerService(
 	private val vurderingService: VurderingService
 ) {
 
-	fun hentEndringsmeldinger (gjennomforingId: UUID, tilgangTilSkjermede: Boolean): List<EndringsmeldingDto> {
+	fun hentEndringsmeldinger(gjennomforingId: UUID, tilgangTilSkjermede: Boolean): List<EndringsmeldingDto> {
 		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId)
-		val deltakerMap = deltakerService.hentDeltakerMap(endringsmeldinger.map { it.deltakerId })
+		val deltakerMap = deltakerService.hentDeltakerMap(endringsmeldinger.map { it.deltakerId }).filterValues { !it.harAdressebeskyttelse() }
 
 		return endringsmeldinger.map { endringsmelding ->
 			val deltaker = deltakerMap[endringsmelding.deltakerId]
@@ -50,7 +50,7 @@ class NavAnsattControllerService(
 		deltakerIder.addAll(alleEndringsmeldinger.map { it.deltakerId })
 		deltakerIder.addAll(alleVurderinger.map { it.deltakerId })
 
-		val deltakerMap = deltakerService.hentDeltakerMap(deltakerIder.distinct())
+		val deltakerMap = deltakerService.hentDeltakerMap(deltakerIder.distinct()).filterValues { !it.harAdressebeskyttelse() }
 
 		val endringsmeldinger = alleEndringsmeldinger.map { endringsmelding ->
 			val deltaker = deltakerMap[endringsmelding.deltakerId]

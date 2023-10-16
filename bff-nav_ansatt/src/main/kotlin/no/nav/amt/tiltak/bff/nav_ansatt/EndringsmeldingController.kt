@@ -71,6 +71,11 @@ class EndringsmeldingController(
 			throw UnauthorizedException("Har ikke tilgang til operasjon på skjermet person. Sjekk secure logs")
 		}
 
+		if (deltaker.harAdressebeskyttelse()) {
+			secureLog.error("nav ansatt: <${navAnsatt}> kan ikke arkivere endringsmelding på adressebeskyttet person")
+			throw UnauthorizedException("Har ikke tilgang til operasjon på adressebeskyttet person. Sjekk secure logs")
+		}
+
 		endringsmeldingService.markerSomUtfort(endringsmeldingId, navAnsatt.id)
 	}
 }
