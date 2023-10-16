@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.deltaker.dbo
 
 import no.nav.amt.tiltak.core.domain.tiltak.Adresse
+import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -16,6 +17,7 @@ data class BrukerDbo(
 	val navEnhetId: UUID?,
 	val erSkjermet: Boolean,
 	val adresse: Adresse?,
+	val adressebeskyttelse: Adressebeskyttelse?,
 	val createdAt: LocalDateTime,
 	val modifiedAt: LocalDateTime
 )

@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.test.integration.kafka
 
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.Oppholdsadresse
 import no.nav.amt.tiltak.core.domain.tiltak.Vegadresse
 import no.nav.amt.tiltak.core.port.DeltakerService
@@ -66,7 +67,8 @@ class NavBrukerIngestorIntegrationTest : IntegrationTestBase() {
 					postnummer = "1234",
 					poststed = "ANDEBY"
 				),
-			))
+			)),
+			adressebeskyttelse = null
 		)
 
 		kafkaMessageSender.sendTilNavBrukerTopic(msg.personId, JsonUtils.toJsonString(msg))
@@ -84,8 +86,45 @@ class NavBrukerIngestorIntegrationTest : IntegrationTestBase() {
 			bruker.epost shouldBe msg.epost
 			bruker.erSkjermet shouldBe msg.erSkjermet
 			bruker.adresse?.oppholdsadresse?.vegadresse?.poststed shouldBe "ANDEBY"
+			bruker.adressebeskyttelse shouldBe msg.adressebeskyttelse
 		}
 	 }
+
+	@Test
+	internal fun `ingest - bruker finnes, blir adressebeskyttet - skal oppdatere bruker`() {
+		val msg = NavBrukerMsg(
+			personId = BRUKER_1.id,
+			personident = "ny ident",
+			fornavn = "nytt",
+			mellomnavn = null,
+			etternavn = "navn",
+			navVeilederId = BRUKER_1.ansvarligVeilederId,
+			navEnhet = NavBrukerMsg.NavEnhetMsg(NAV_ENHET_1.id, NAV_ENHET_1.enhetId, NAV_ENHET_1.navn),
+			telefon = "42",
+			epost = "ny@epost",
+			erSkjermet = true,
+			adresse = null,
+			adressebeskyttelse = Adressebeskyttelse.FORTROLIG
+		)
+
+		kafkaMessageSender.sendTilNavBrukerTopic(msg.personId, JsonUtils.toJsonString(msg))
+
+		AsyncUtils.eventually {
+			val bruker = brukerRepository.get(BRUKER_1.id)!!
+
+			bruker.personIdent shouldBe msg.personident
+			bruker.fornavn shouldBe msg.fornavn
+			bruker.mellomnavn shouldBe msg.mellomnavn
+			bruker.etternavn shouldBe msg.etternavn
+			bruker.ansvarligVeilederId shouldBe msg.navVeilederId
+			bruker.navEnhetId shouldBe msg.navEnhet?.id
+			bruker.telefonnummer shouldBe msg.telefon
+			bruker.epost shouldBe msg.epost
+			bruker.erSkjermet shouldBe msg.erSkjermet
+			bruker.adresse shouldBe null
+			bruker.adressebeskyttelse shouldBe msg.adressebeskyttelse
+		}
+	}
 
 	@Test
 	internal fun `ingest - nav enhet endret - skal oppdatere nav enhet`() {
@@ -101,7 +140,8 @@ class NavBrukerIngestorIntegrationTest : IntegrationTestBase() {
 			telefon = BRUKER_1.telefonnummer,
 			epost = BRUKER_1.epost,
 			erSkjermet = BRUKER_1.erSkjermet,
-			adresse = BRUKER_1.adresse
+			adresse = BRUKER_1.adresse,
+			adressebeskyttelse = BRUKER_1.adressebeskyttelse
 		)
 
 		kafkaMessageSender.sendTilNavBrukerTopic(msg.personId, JsonUtils.toJsonString(msg))
@@ -128,7 +168,8 @@ class NavBrukerIngestorIntegrationTest : IntegrationTestBase() {
 			telefon = BRUKER_1.telefonnummer,
 			epost = BRUKER_1.epost,
 			erSkjermet = BRUKER_1.erSkjermet,
-			adresse = BRUKER_1.adresse
+			adresse = BRUKER_1.adresse,
+			adressebeskyttelse = BRUKER_1.adressebeskyttelse
 		)
 
 		kafkaMessageSender.sendTilNavBrukerTopic(msg.personId, JsonUtils.toJsonString(msg))

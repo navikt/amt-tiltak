@@ -3,7 +3,6 @@ package no.nav.amt.tiltak.test.integration.kafka
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
-import no.nav.amt.tiltak.clients.amt_person.model.AdressebeskyttelseGradering
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.GjennomforingArenaData
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.port.DeltakerService
@@ -20,7 +19,6 @@ import no.nav.amt.tiltak.test.integration.mocks.mockNavBruker
 import no.nav.amt.tiltak.test.integration.utils.DeltakerMessage
 import no.nav.amt.tiltak.test.integration.utils.GjennomforingMessage
 import no.nav.amt.tiltak.test.integration.utils.KafkaMessageCreator
-import no.nav.amt.tiltak.test.integration.utils.LogUtils
 import no.nav.amt.tiltak.test.utils.AsyncUtils
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import org.junit.jupiter.api.BeforeEach
@@ -53,7 +51,6 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 		)
 
 		mockAmtPersonHttpServer.addNavBrukerResponse(mockNavBruker)
-		mockAmtPersonHttpServer.addAdressebeskyttelseResponse(mockNavBruker.personident, null)
 
 		val gjennomforing = ingestGjennomforing()
 		val message = DeltakerMessage(gjennomforingId = gjennomforing.id, personIdent = mockNavBruker.personident)
@@ -95,7 +92,6 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 		)
 
 		mockAmtPersonHttpServer.addNavBrukerResponse(mockNavBruker)
-		mockAmtPersonHttpServer.addAdressebeskyttelseResponse(mockNavBruker.personident, null)
 
 		val gjennomforing = ingestGjennomforing(tiltakKode = "GRUPPEAMO")
 		val message = DeltakerMessage(
@@ -141,7 +137,6 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 		)
 
 		mockAmtPersonHttpServer.addNavBrukerResponse(mockNavBruker)
-		mockAmtPersonHttpServer.addAdressebeskyttelseResponse(mockNavBruker.personident, null)
 
 
 		val message = DeltakerMessage(gjennomforingId = GJENNOMFORING_1.id, personIdent = mockNavBruker.personident)
@@ -174,7 +169,6 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 		)
 
 		mockAmtPersonHttpServer.addNavBrukerResponse(mockNavBruker)
-		mockAmtPersonHttpServer.addAdressebeskyttelseResponse(mockNavBruker.personident, null)
 
 		val gjennomforing = ingestGjennomforing()
 		val message = DeltakerMessage(
@@ -191,25 +185,6 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 			deltaker?.status?.type shouldBe DeltakerStatus.Type.FEILREGISTRERT
 		}
 
-	}
-
-	@Test
-	fun `ingest deltaker - deltaker har diskresjonskode - skal ikke insertes`() {
-		val message = DeltakerMessage(gjennomforingId = GJENNOMFORING_1.id)
-		mockAmtPersonHttpServer.addAdressebeskyttelseResponse(
-			message.personIdent,
-			AdressebeskyttelseGradering.STRENGT_FORTROLIG
-		)
-
-
-		LogUtils.withLogs { getLogs ->
-			kafkaMessageSender.sendTilAmtTiltakTopic(KafkaMessageCreator.opprettAmtTiltakDeltakerMessage(message))
-			AsyncUtils.eventually {
-				getLogs().any { it.message == "Deltaker har diskresjonskode og skal filtreres ut" } shouldBe true
-
-				deltakerService.hentDeltaker(message.id) shouldBe null
-			}
-		}
 	}
 
 	@Test
@@ -242,7 +217,6 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 		val mockNavBruker = mockNavBruker(BRUKER_1, NAV_ENHET_1)
 
 		mockAmtPersonHttpServer.addNavBrukerResponse(mockNavBruker)
-		mockAmtPersonHttpServer.addAdressebeskyttelseResponse(mockNavBruker.personident, null)
 
 		deltakerService.skjulDeltakerForTiltaksarrangor(skjultDeltaker.id, ARRANGOR_ANSATT_1.id)
 

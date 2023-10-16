@@ -1,7 +1,5 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 
-import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
-import no.nav.amt.tiltak.clients.amt_person.model.erBeskyttet
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.Gjennomforing
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.MulighetsrommetApiClient
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
@@ -29,7 +27,6 @@ class DeltakerProcessor(
 	private val tiltakService: TiltakService,
 	private val navEnhetService: NavEnhetService,
 	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
-	private val amtPersonClient: AmtPersonClient,
 	private val transactionTemplate: TransactionTemplate
 ) : GenericProcessor<DeltakerPayload>() {
 
@@ -45,16 +42,6 @@ class DeltakerProcessor(
 
 	private fun upsert(message: MessageWrapper<DeltakerPayload>) {
 		val deltakerDto = message.payload
-		val deltakerFnr = message.payload.personIdent
-
-		val erAdressebeskyttet = amtPersonClient.hentAdressebeskyttelse(deltakerFnr)
-			.getOrThrow()
-			.erBeskyttet()
-
-		if (erAdressebeskyttet) {
-			log.info("Deltaker har diskresjonskode og skal filtreres ut")
-			return
-		}
 
 		val gjennomforingId = gjennomforingService.getGjennomforingOrNull(deltakerDto.gjennomforingId)?.id
 			?: upsertGjennomforing(deltakerDto.gjennomforingId).id

@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.clients.amt_person.dto
 
 import no.nav.amt.tiltak.core.domain.tiltak.Adresse
+import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import java.util.UUID
 
 data class NavBrukerDto (
@@ -14,7 +15,8 @@ data class NavBrukerDto (
 	val telefon: String?,
 	val epost: String?,
 	val erSkjermet: Boolean,
-	val adresse: Adresse?
+	val adresse: Adresse?,
+	val adressebeskyttelse: Adressebeskyttelse? = null
 ) {
 	data class NavEnhetDto(
 		val id: UUID,
