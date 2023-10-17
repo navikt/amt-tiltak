@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.test.database.data
 
 import no.nav.amt.tiltak.core.domain.tiltak.Adresse
+import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.Bostedsadresse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
@@ -266,6 +267,20 @@ object TestData {
 		erSkjermet = true,
 		adresse = null,
 		adressebeskyttelse = null
+	)
+
+	val BRUKER_ADRESSEBESKYTTET = BrukerInput(
+		id = UUID.fromString("d624938b-e5dc-4b21-867e-74ca1c198ca1"),
+		personIdent = "6543219870",
+		fornavn = "Beskyttet bruker fornavn",
+		etternavn = "Beskyttet bruker etternavn",
+		telefonnummer = "98989898",
+		epost = "adressebeskyttet@example.com",
+		ansvarligVeilederId = NAV_ANSATT_1.id,
+		navEnhet = NAV_ENHET_1,
+		erSkjermet = true,
+		adresse = null,
+		adressebeskyttelse = Adressebeskyttelse.STRENGT_FORTROLIG
 	)
 
 	val DELTAKER_1 = DeltakerInput(

@@ -15,6 +15,7 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.VurderingService
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -25,20 +26,20 @@ class NavAnsattControllerService(
 	private val gjennomforingService: GjennomforingService,
 	private val vurderingService: VurderingService
 ) {
+	private val log = LoggerFactory.getLogger(javaClass)
 
 	fun hentEndringsmeldinger(gjennomforingId: UUID, tilgangTilSkjermede: Boolean): List<EndringsmeldingDto> {
 		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId)
 		val deltakerMap = deltakerService.hentDeltakerMap(endringsmeldinger.map { it.deltakerId }).filterValues { !it.harAdressebeskyttelse() }
 
-		return endringsmeldinger.map { endringsmelding ->
-			val deltaker = deltakerMap[endringsmelding.deltakerId]
-				?: throw NoSuchElementException("Fant ikke deltaker med id ${endringsmelding.deltakerId}")
+		return endringsmeldinger.mapNotNull { endringsmelding ->
+			val deltaker = getDeltaker(endringsmelding.deltakerId, deltakerMap) ?: return@mapNotNull null
 
 			if(deltaker.erSkjermet && !tilgangTilSkjermede) {
-				return@map endringsmelding.toDto(DeltakerDto(erSkjermet = true))
+				return@mapNotNull endringsmelding.toDto(DeltakerDto(erSkjermet = true))
 			}
 
-			return@map endringsmelding.toDto(deltaker.toDto())
+			return@mapNotNull endringsmelding.toDto(deltaker.toDto())
 		}
 	}
 
@@ -52,26 +53,24 @@ class NavAnsattControllerService(
 
 		val deltakerMap = deltakerService.hentDeltakerMap(deltakerIder.distinct()).filterValues { !it.harAdressebeskyttelse() }
 
-		val endringsmeldinger = alleEndringsmeldinger.map { endringsmelding ->
-			val deltaker = deltakerMap[endringsmelding.deltakerId]
-				?: throw java.util.NoSuchElementException("Fant ikke deltaker med id ${endringsmelding.deltakerId}")
+		val endringsmeldinger = alleEndringsmeldinger.mapNotNull { endringsmelding ->
+			val deltaker = getDeltaker(endringsmelding.deltakerId, deltakerMap) ?: return@mapNotNull null
 
 			if(deltaker.erSkjermet && !tilgangTilSkjermede) {
-				return@map endringsmelding.toDto(DeltakerDto(erSkjermet = true))
+				return@mapNotNull endringsmelding.toDto(DeltakerDto(erSkjermet = true))
 			}
 
-			return@map endringsmelding.toDto(deltaker.toDto())
+			return@mapNotNull endringsmelding.toDto(deltaker.toDto())
 		}
 
-		val vurderinger = alleVurderinger.map { vurdering ->
-			val deltaker = deltakerMap[vurdering.deltakerId]
-				?: throw java.util.NoSuchElementException("Fant ikke deltaker med id ${vurdering.deltakerId}")
+		val vurderinger = alleVurderinger.mapNotNull { vurdering ->
+			val deltaker = getDeltaker(vurdering.deltakerId, deltakerMap) ?: return@mapNotNull null
 
 			if(deltaker.erSkjermet && !tilgangTilSkjermede) {
-				return@map vurdering.toDto(DeltakerDto(erSkjermet = true))
+				return@mapNotNull vurdering.toDto(DeltakerDto(erSkjermet = true))
 			}
 
-			return@map vurdering.toDto(deltaker.toDto())
+			return@mapNotNull vurdering.toDto(deltaker.toDto())
 		}
 		return MeldingerFraArrangorResponse(endringsmeldinger, vurderinger)
 	}
@@ -83,6 +82,12 @@ class NavAnsattControllerService(
 
 			return@map gjennomforing.toDto(aktiveEndringsmeldinger.size, harSkjermede)
 		}
+	}
+
+	private fun getDeltaker(deltakerId: UUID, deltakerMap: Map<UUID, Deltaker>): Deltaker? {
+		deltakerMap[deltakerId]?.let { return it }
+		log.warn("Fant ikke deltaker med id $deltakerId")
+		return null
 	}
 
 	private fun Gjennomforing.toDto (antallAktiveEndringsmeldinger: Int, harSkjermede: Boolean) = HentGjennomforingerDto(
