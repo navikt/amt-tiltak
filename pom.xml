@@ -58,6 +58,8 @@
         <common.version>3.2023.09.13_04.55-a8ff452fbd94</common.version>
         <logstash.version>7.4</logstash.version>
         <unleash.version>8.4.0</unleash.version>
+        <!-- overstyrer sårbar dependency-->
+        <snakeyaml.version>2.2</snakeyaml.version>
     </properties>
 
     <repositories>
@@ -306,6 +308,25 @@
                 <groupId>no.nav.common</groupId>
                 <artifactId>kafka</artifactId>
                 <version>${common.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.xerial.snappy</groupId>
+                        <artifactId>snappy-java</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.avro</groupId>
+                        <artifactId>avro</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>io.confluent</groupId>
+                        <artifactId>kafka-avro-serializer</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>20231013</version>
             </dependency>
             <dependency>
                 <groupId>no.nav.common</groupId>
