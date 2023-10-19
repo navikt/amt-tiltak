@@ -24,12 +24,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-      - name: Set up cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
+          cache: 'maven'
       - name: Build maven artifacts
         run: mvn -B package
       - name: Dependency submission (for dependabot)

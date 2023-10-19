@@ -31,7 +31,7 @@ class AuditLoggerServiceImpl(
 	}
 
 	companion object {
-		const val APPLICATION_NAME = "amt-tiltak"
+		const val APPLICATION_NAME = "Tiltaksadministrasjon"
 		const val AUDIT_LOG_NAME = "Sporingslogg"
 		const val MESSAGE_EXTENSION = "msg"
 
