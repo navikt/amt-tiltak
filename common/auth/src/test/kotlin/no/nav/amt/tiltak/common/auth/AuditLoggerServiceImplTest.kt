@@ -80,7 +80,7 @@ class AuditLoggerServiceImplTest {
 		val msg = messageSlot.captured
 
 		msg.version shouldBe 0
-		msg.deviceProduct shouldBe "AuditLogger"
+		msg.deviceProduct shouldBe "amt-tiltak"
 		msg.deviceVendor shouldBe "Tiltaksadministrasjon"
 		msg.deviceVersion shouldBe "1.0"
 		msg.name shouldBe "Sporingslogg"
