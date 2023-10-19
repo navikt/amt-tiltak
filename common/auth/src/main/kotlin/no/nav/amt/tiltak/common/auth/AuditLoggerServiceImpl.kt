@@ -31,7 +31,8 @@ class AuditLoggerServiceImpl(
 	}
 
 	companion object {
-		const val APPLICATION_NAME = "Tiltaksadministrasjon"
+		const val DEVICE_VENDOR = "Tiltaksadministrasjon"
+		const val APPLICATION_NAME = "amt-tiltak"
 		const val AUDIT_LOG_NAME = "Sporingslogg"
 		const val MESSAGE_EXTENSION = "msg"
 
@@ -61,7 +62,8 @@ class AuditLoggerServiceImpl(
 		extensions: Map<String, String> = emptyMap()
 	) {
 		val builder = CefMessage.builder()
-			.applicationName(APPLICATION_NAME)
+			.applicationName(DEVICE_VENDOR)
+			.loggerName(APPLICATION_NAME)
 			.event(toCefMessageEvent(eventType))
 			.name(AUDIT_LOG_NAME)
 			.severity(toCefMessageSeverity(eventSeverity))
