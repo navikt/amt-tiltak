@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.clients.amt_person
 
-import no.nav.amt.tiltak.clients.amt_person.model.AdressebeskyttelseGradering
 import no.nav.amt.tiltak.clients.amt_person.model.NavBruker
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.domain.tiltak.NavEnhet
@@ -12,8 +11,6 @@ interface AmtPersonClient {
 	fun hentNavAnsatt(navIdent: String): Result<NavAnsatt>
 	fun hentNavAnsatt(id: UUID): Result<NavAnsatt>
 	fun hentNavEnhet(enhetId: String): Result<NavEnhet>
-	fun hentAdressebeskyttelse(personident: String): Result<AdressebeskyttelseGradering?>
-
 }
 
 data class PersonRequest(

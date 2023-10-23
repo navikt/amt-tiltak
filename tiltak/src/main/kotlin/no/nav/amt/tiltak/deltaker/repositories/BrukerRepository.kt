@@ -4,6 +4,7 @@ import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.common.json.JsonUtils.objectMapper
 import no.nav.amt.tiltak.core.domain.tiltak.Adresse
+import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.utils.getNullableUUID
@@ -33,6 +34,7 @@ open class BrukerRepository(
 			navEnhetId = rs.getNullableUUID("nav_enhet_id"),
 			erSkjermet = rs.getBoolean("er_skjermet"),
 			adresse = rs.getString("adresse")?.let { fromJsonString<Adresse>(it) },
+			adressebeskyttelse = rs.getString("adressebeskyttelse")?.let { Adressebeskyttelse.valueOf(it) },
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime()
 		)
@@ -40,7 +42,7 @@ open class BrukerRepository(
 
 	fun upsert(bruker: Bruker) {
 		val sql = """
-			INSERT INTO bruker(id, person_ident, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_enhet_id, er_skjermet, adresse)
+			INSERT INTO bruker(id, person_ident, fornavn, mellomnavn, etternavn, telefonnummer, epost, ansvarlig_veileder_id, nav_enhet_id, er_skjermet, adresse, adressebeskyttelse)
 			VALUES (:id,
 					:personIdent,
 					:fornavn,
@@ -51,7 +53,8 @@ open class BrukerRepository(
 					:veileder_id,
 					:nav_enhet_id,
 					:er_skjermet,
-					:adresse)
+					:adresse,
+					:adressebeskyttelse)
 			ON CONFLICT(id) DO UPDATE SET
 			    person_ident = :personIdent,
 			 	fornavn = :fornavn,
@@ -63,7 +66,8 @@ open class BrukerRepository(
 				nav_enhet_id = :nav_enhet_id,
 				modified_at = CURRENT_TIMESTAMP,
 				er_skjermet = :er_skjermet,
-				adresse = :adresse
+				adresse = :adresse,
+				adressebeskyttelse = :adressebeskyttelse
 		""".trimIndent()
 
 		val parameters = sqlParameters(
@@ -77,7 +81,8 @@ open class BrukerRepository(
 			"veileder_id" to bruker.ansvarligVeilederId,
 			"nav_enhet_id" to bruker.navEnhetId,
 			"er_skjermet" to bruker.erSkjermet,
-			"adresse" to bruker.adresse?.toPGObject()
+			"adresse" to bruker.adresse?.toPGObject(),
+			"adressebeskyttelse" to bruker.adressebeskyttelse?.name
 		)
 
 		template.update(sql, parameters)

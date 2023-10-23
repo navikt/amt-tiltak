@@ -4,8 +4,8 @@ import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getNullableFloat
 import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getNullableUUID
-import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.core.domain.tiltak.AVSLUTTENDE_STATUSER
+import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
@@ -48,7 +48,8 @@ open class DeltakerRepository(
 			createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime(),
 			registrertDato = rs.getTimestamp("registrert_dato").toLocalDateTime(),
-			innsokBegrunnelse = rs.getNullableString("innsok_begrunnelse")
+			innsokBegrunnelse = rs.getNullableString("innsok_begrunnelse"),
+			adressebeskyttelse = rs.getString("adressebeskyttelse")?.let { Adressebeskyttelse.valueOf(it) }
 		)
 	}
 
@@ -319,16 +320,5 @@ open class DeltakerRepository(
 		)
 
 		template.update(sql, parameters)
-	}
-
-	fun hentBrukerId(deltakerId: UUID): UUID {
-		val sql = """
-			select bruker_id from deltaker where id = :deltakerId
-		""".trimIndent()
-
-		val parameters = sqlParameters("deltakerId" to deltakerId)
-
-		return template.query(sql, parameters) { rs, _ -> rs.getUUID("bruker_id") }.first()
-
 	}
 }

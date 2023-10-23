@@ -1,9 +1,7 @@
 package no.nav.amt.tiltak.clients.amt_person
 
-import no.nav.amt.tiltak.clients.amt_person.dto.AdressebeskyttelseDto
 import no.nav.amt.tiltak.clients.amt_person.dto.NavAnsattDto
 import no.nav.amt.tiltak.clients.amt_person.dto.NavBrukerDto
-import no.nav.amt.tiltak.clients.amt_person.model.AdressebeskyttelseGradering
 import no.nav.amt.tiltak.clients.amt_person.model.NavBruker
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.common.json.JsonUtils.toJsonString
@@ -14,7 +12,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-
 import java.time.Duration
 import java.util.UUID
 import java.util.function.Supplier
@@ -42,7 +39,8 @@ class AmtPersonClientImpl(
 				telefon = navBruker.telefon,
 				epost = navBruker.epost,
 				erSkjermet = navBruker.erSkjermet,
-				adresse = navBruker.adresse
+				adresse = navBruker.adresse,
+				adressebeskyttelse = navBruker.adressebeskyttelse
 			)
 		}
 	}
@@ -90,23 +88,6 @@ class AmtPersonClientImpl(
 				enhetId = navEnhetDto.enhetId,
 				navn = navEnhetDto.navn
 			)
-		}
-	}
-
-	override fun hentAdressebeskyttelse(personident: String): Result<AdressebeskyttelseGradering?> {
-		val endepunkt = "person/adressebeskyttelse"
-		val request = buildPostRequest(endepunkt, PersonRequest(personident))
-
-		httpClient.newCall(request).execute().use { response ->
-			if (!response.isSuccessful) {
-				return when (response.code) {
-					404 -> Result.failure(NoSuchElementException("Klarte ikke å hente $endepunkt fra amt-person-service. status=${response.code}"))
-					else -> Result.failure(RuntimeException("Klarte ikke å hente $endepunkt fra amt-person-service. status=${response.code}"))
-				}
-			}
-			val body = response.body?.string() ?: return Result.failure(RuntimeException("Body is missing"))
-
-			return Result.success(fromJsonString<AdressebeskyttelseDto>(body).gradering)
 		}
 	}
 

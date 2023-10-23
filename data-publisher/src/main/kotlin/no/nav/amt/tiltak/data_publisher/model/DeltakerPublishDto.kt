@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.data_publisher.model
 
 import no.nav.amt.tiltak.core.domain.tiltak.Adresse
+import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.common.json.JsonUtils
@@ -34,7 +35,8 @@ data class DeltakerPersonaliaDto(
 	val navn: Navn,
 	val kontaktinformasjon: DeltakerKontaktinformasjonDto,
 	val skjermet: Boolean,
-	val adresse: Adresse?
+	val adresse: Adresse?,
+	val adressebeskyttelse: Adressebeskyttelse?
 )
 
 data class Navn(

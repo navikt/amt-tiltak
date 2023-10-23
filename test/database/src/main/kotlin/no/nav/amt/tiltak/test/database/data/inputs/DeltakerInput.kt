@@ -47,6 +47,7 @@ data class DeltakerInput(
 		dagerPerUke = dagerPerUke,
 		prosentStilling = prosentStilling,
 		innsokBegrunnelse = innsokBegrunnelse,
-		endretDato = endretDato
+		endretDato = endretDato,
+		adressebeskyttelse = brukerInput.adressebeskyttelse
 	)
 }

@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.test.database.data
 
 import no.nav.amt.tiltak.core.domain.tiltak.Adresse
+import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.Bostedsadresse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
@@ -39,20 +40,6 @@ object TestData {
 			prosentStilling = 100f,
 			registrertDato = LocalDateTime.now(),
 			innsokBegrunnelse = null
-		)
-
-	fun createBrukerInput(navEnhet: NavEnhetInput) =
-		BrukerInput(
-			id = UUID.randomUUID(),
-			personIdent = (1000..9999).random().toString(),
-			fornavn = "Fornavn",
-			etternavn = "Etternavn",
-			telefonnummer = (1000..9999).random().toString(),
-			epost = "bruker@example.com",
-			ansvarligVeilederId = null,
-			navEnhet = navEnhet,
-			erSkjermet = false,
-			adresse = lagAdresse()
 		)
 
 	fun createStatusInput(deltaker: DeltakerInput) = DeltakerStatusInput(
@@ -264,7 +251,8 @@ object TestData {
 		ansvarligVeilederId = NAV_ANSATT_1.id,
 		navEnhet = NAV_ENHET_1,
 		erSkjermet = false,
-		adresse = lagAdresse()
+		adresse = lagAdresse(),
+		adressebeskyttelse = null
 	)
 
 	val BRUKER_SKJERMET = BrukerInput(
@@ -277,7 +265,22 @@ object TestData {
 		ansvarligVeilederId = NAV_ANSATT_1.id,
 		navEnhet = NAV_ENHET_1,
 		erSkjermet = true,
-		adresse = null
+		adresse = null,
+		adressebeskyttelse = null
+	)
+
+	val BRUKER_ADRESSEBESKYTTET = BrukerInput(
+		id = UUID.fromString("d624938b-e5dc-4b21-867e-74ca1c198ca1"),
+		personIdent = "6543219870",
+		fornavn = "Beskyttet bruker fornavn",
+		etternavn = "Beskyttet bruker etternavn",
+		telefonnummer = "98989898",
+		epost = "adressebeskyttet@example.com",
+		ansvarligVeilederId = NAV_ANSATT_1.id,
+		navEnhet = NAV_ENHET_1,
+		erSkjermet = true,
+		adresse = null,
+		adressebeskyttelse = Adressebeskyttelse.STRENGT_FORTROLIG
 	)
 
 	val DELTAKER_1 = DeltakerInput(
@@ -323,7 +326,8 @@ object TestData {
 		ansvarligVeilederId = null,
 		navEnhet = NAV_ENHET_1,
 		erSkjermet = false,
-		adresse = lagAdresse()
+		adresse = lagAdresse(),
+		adressebeskyttelse = null
 	)
 
 	val DELTAKER_2 = DeltakerInput(
@@ -358,7 +362,8 @@ object TestData {
 		ansvarligVeilederId = null,
 		navEnhet = NAV_ENHET_1,
 		erSkjermet = false,
-		adresse = lagAdresse()
+		adresse = lagAdresse(),
+		adressebeskyttelse = null
 	)
 
 	// Bruker 4
@@ -373,7 +378,8 @@ object TestData {
 		ansvarligVeilederId = null,
 		navEnhet = NAV_ENHET_1,
 		erSkjermet = false,
-		adresse = null
+		adresse = null,
+		adressebeskyttelse = null
 	)
 
 

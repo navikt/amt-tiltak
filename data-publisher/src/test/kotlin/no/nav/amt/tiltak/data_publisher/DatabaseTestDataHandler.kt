@@ -188,7 +188,8 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		ansvarligVeilederId = ansvarligVeilederId,
 		navEnhet = navEnhet,
 		erSkjermet = false,
-		adresse = TestData.lagAdresse()
+		adresse = TestData.lagAdresse(),
+		adressebeskyttelse = null
 	)
 
 	private fun deltakerInput(

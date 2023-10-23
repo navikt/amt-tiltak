@@ -3,8 +3,6 @@ package no.nav.amt.tiltak.test.integration.mocks
 import no.nav.amt.tiltak.clients.amt_person.NavAnsattRequest
 import no.nav.amt.tiltak.clients.amt_person.NavEnhetRequest
 import no.nav.amt.tiltak.clients.amt_person.PersonRequest
-import no.nav.amt.tiltak.clients.amt_person.dto.AdressebeskyttelseDto
-import no.nav.amt.tiltak.clients.amt_person.model.AdressebeskyttelseGradering
 import no.nav.amt.tiltak.clients.amt_person.model.NavBruker
 import no.nav.amt.tiltak.common.json.JsonUtils.toJsonString
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
@@ -89,23 +87,6 @@ class MockAmtPersonHttpServer : MockHttpServer("MockAmtPersonHttpServer") {
 
 		addResponseHandler(requestPredicate, response)
 	}
-
-	fun addAdressebeskyttelseResponse(personident: String, gradering: AdressebeskyttelseGradering?) {
-		val request = toJsonString(PersonRequest(personident))
-
-		val requestPredicate = { req: RecordedRequest ->
-			req.path == "/api/person/adressebeskyttelse"
-				&& req.method == "POST"
-				&& req.getBodyAsString() == request
-		}
-
-		val response = MockResponse()
-			.setBody(toJsonString(AdressebeskyttelseDto(gradering)))
-			.setResponseCode(200)
-
-		addResponseHandler(requestPredicate, response)
-
-	}
 }
 
 fun mockNavBruker(bruker: BrukerInput, navEnhet: NavEnhetInput) = NavBruker(
@@ -119,5 +100,6 @@ fun mockNavBruker(bruker: BrukerInput, navEnhet: NavEnhetInput) = NavBruker(
 	telefon = bruker.telefonnummer,
 	epost = bruker.epost,
 	erSkjermet = bruker.erSkjermet,
-	adresse = bruker.adresse
+	adresse = bruker.adresse,
+	adressebeskyttelse = bruker.adressebeskyttelse
 )

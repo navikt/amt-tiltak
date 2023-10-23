@@ -14,6 +14,7 @@ import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.core.port.VurderingService
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_ADRESSEBESKYTTET
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_SKJERMET
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
@@ -137,6 +138,33 @@ class NavAnsattControllerServiceTest {
 			fodselsnummer = BRUKER_SKJERMET.personIdent,
 			erSkjermet = BRUKER_SKJERMET.erSkjermet
 		)
+	}
+
+	@Test
+	fun `hentEndringsmeldinger - adressebeskyttet deltaker - returnerer ikke endringsmelding`() {
+		val gjennomforingId = GJENNOMFORING_1.id
+		val deltakerInput = createDeltakerInput(BRUKER_ADRESSEBESKYTTET, GJENNOMFORING_1)
+		val deltaker = deltakerInput.toDeltaker(BRUKER_ADRESSEBESKYTTET, createStatusInput(deltakerInput))
+
+		val endringsmelding = Endringsmelding(
+			id = UUID.randomUUID(),
+			deltakerId = deltakerInput.id,
+			utfortAvNavAnsattId = UUID.randomUUID(),
+			utfortTidspunkt = ZonedDateTime.now(),
+			opprettetAvArrangorAnsattId = UUID.randomUUID(),
+			opprettet = ZonedDateTime.now(),
+			status = Endringsmelding.Status.AKTIV,
+			innhold = Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(LocalDate.now()),
+			type = Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO
+		)
+
+		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
+		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
+		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
+
+		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, false)
+
+		endringsmeldingerResult.size shouldBe 0
 	}
 
 	@Test
@@ -278,5 +306,40 @@ class NavAnsattControllerServiceTest {
 		meldingerFraArrangorResponse.vurderinger.size shouldBe 1
 		meldingerFraArrangorResponse.vurderinger[0].deltaker shouldBe forventetDeltaker
 		meldingerFraArrangorResponse.vurderinger[0].vurderingstype shouldBe Vurderingstype.OPPFYLLER_KRAVENE
+	}
+
+	@Test
+	fun `hentMeldinger - adressebeskyttet deltaker - returnerer ikke meldinger`() {
+		val gjennomforingId = GJENNOMFORING_1.id
+		val deltakerInput = createDeltakerInput(BRUKER_ADRESSEBESKYTTET, GJENNOMFORING_1)
+		val deltaker = deltakerInput.toDeltaker(BRUKER_ADRESSEBESKYTTET, createStatusInput(deltakerInput))
+		val endringsmelding = Endringsmelding(
+			id = UUID.randomUUID(),
+			deltakerId = deltaker.id,
+			utfortAvNavAnsattId = UUID.randomUUID(),
+			utfortTidspunkt = ZonedDateTime.now(),
+			opprettetAvArrangorAnsattId = UUID.randomUUID(),
+			opprettet = ZonedDateTime.now(),
+			status = Endringsmelding.Status.AKTIV,
+			innhold = Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(LocalDate.now()),
+			type = Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO
+		)
+		val vurdering = Vurdering(
+			id = UUID.randomUUID(),
+			deltakerId = deltaker.id,
+			vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
+			begrunnelse = null,
+			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+			gyldigFra = LocalDateTime.now(),
+			gyldigTil = null
+		)
+
+		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
+		every { vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId) } returns listOf(vurdering)
+		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
+
+		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, false)
+
+		meldingerFraArrangorResponse.endringsmeldinger.size shouldBe 0
 	}
 }

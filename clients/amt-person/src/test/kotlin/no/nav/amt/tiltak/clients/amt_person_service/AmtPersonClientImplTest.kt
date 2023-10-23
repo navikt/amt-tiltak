@@ -10,6 +10,7 @@ import no.nav.amt.tiltak.clients.amt_person.dto.NavBrukerDto
 import no.nav.amt.tiltak.clients.amt_person.dto.NavEnhetDto
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.tiltak.Adresse
+import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.Bostedsadresse
 import no.nav.amt.tiltak.core.domain.tiltak.Kontaktadresse
 import no.nav.amt.tiltak.core.domain.tiltak.Matrikkeladresse
@@ -78,7 +79,8 @@ class AmtPersonClientImplTest {
 			telefon = "77742777",
 			epost = "bruker@nav.no",
 			erSkjermet = false,
-			adresse = adresse
+			adresse = adresse,
+			adressebeskyttelse = null
 		)
 
 		server.enqueue(
@@ -99,6 +101,67 @@ class AmtPersonClientImplTest {
 		faktiskBruker.epost shouldBe bruker.epost
 		faktiskBruker.navVeilederId shouldBe bruker.navVeilederId
 		faktiskBruker.adresse shouldBe adresse
+		faktiskBruker.adressebeskyttelse shouldBe null
+
+		val faktiskNavEnhet = faktiskBruker.navEnhet!!
+		faktiskNavEnhet.id shouldBe navEnhet.id
+		faktiskNavEnhet.enhetId shouldBe navEnhet.enhetId
+		faktiskNavEnhet.navn shouldBe navEnhet.navn
+
+
+		val request = server.takeRequest()
+
+
+		request.path shouldBe "/api/nav-bruker"
+		request.method shouldBe "POST"
+		request.getHeader("Authorization") shouldBe "Bearer TOKEN"
+		request.body.readUtf8() shouldBe JsonUtils.toJsonString(PersonRequest(personident))
+
+	}
+
+	@Test
+	fun `hentNavBruker - har adressebeskyttelse - skal lage riktig request og parse respons`() {
+		val personident = "0011222244555"
+
+		val navEnhet = NavBrukerDto.NavEnhetDto(
+			id = UUID.randomUUID(),
+			enhetId = "887766",
+			navn = "Nav Oslo",
+		)
+
+		val bruker = NavBrukerDto(
+			personId = UUID.randomUUID(),
+			personident = personident,
+			fornavn = "Fornavn",
+			mellomnavn = "Mellomnavn",
+			etternavn = "Etternavn",
+			navVeilederId = UUID.randomUUID(),
+			navEnhet = navEnhet,
+			telefon = "77742777",
+			epost = "bruker@nav.no",
+			erSkjermet = false,
+			adresse = null,
+			adressebeskyttelse = Adressebeskyttelse.FORTROLIG
+		)
+
+		server.enqueue(
+			MockResponse().setBody(
+				JsonUtils.toJsonString(bruker)
+			)
+		)
+
+		val faktiskBruker = client.hentNavBruker(personident).getOrThrow()
+
+		faktiskBruker.personId shouldBe bruker.personId
+		faktiskBruker.erSkjermet shouldBe bruker.erSkjermet
+		faktiskBruker.personident shouldBe bruker.personident
+		faktiskBruker.fornavn shouldBe bruker.fornavn
+		faktiskBruker.mellomnavn shouldBe bruker.mellomnavn
+		faktiskBruker.etternavn shouldBe bruker.etternavn
+		faktiskBruker.telefon shouldBe bruker.telefon
+		faktiskBruker.epost shouldBe bruker.epost
+		faktiskBruker.navVeilederId shouldBe bruker.navVeilederId
+		faktiskBruker.adressebeskyttelse shouldBe Adressebeskyttelse.FORTROLIG
 
 		val faktiskNavEnhet = faktiskBruker.navEnhet!!
 		faktiskNavEnhet.id shouldBe navEnhet.id
