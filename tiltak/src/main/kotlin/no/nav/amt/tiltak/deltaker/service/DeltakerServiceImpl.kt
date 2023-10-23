@@ -212,16 +212,25 @@ open class DeltakerServiceImpl(
 
 		val skalBliHarSluttet = deltakere
 			.filter { it.status.type == DeltakerStatus.Type.DELTAR }
-			.filter { !sluttetForTidlig(gjennomforinger, it) }
+			.filter { !deltarPaKurs(gjennomforinger, it) }
+
+		val skalBliFullfort = deltakere
+			.filter { it.status.type == DeltakerStatus.Type.DELTAR }
+			.filter { deltarPaKurs(gjennomforinger, it) && !sluttetForTidlig(gjennomforinger, it) }
 
 		oppdaterStatuser(skalBliIkkeAktuell.map { it.id }, nyStatus = DeltakerStatus.Type.IKKE_AKTUELL)
 		oppdaterStatuser(skalBliAvbrutt.map { it.id }, nyStatus = DeltakerStatus.Type.AVBRUTT)
 		oppdaterStatuser(skalBliHarSluttet.map { it.id }, nyStatus = DeltakerStatus.Type.HAR_SLUTTET)
+		oppdaterStatuser(skalBliFullfort.map { it.id }, nyStatus = DeltakerStatus.Type.FULLFORT)
+	}
+
+	private fun deltarPaKurs(gjennomforinger: List<Gjennomforing>, deltaker: Deltaker): Boolean {
+		val gjennomforing = getGjennomforing(gjennomforinger, deltaker)
+		return gjennomforing.erKurs
 	}
 
 	private fun sluttetForTidlig(gjennomforinger: List<Gjennomforing>, deltaker: Deltaker): Boolean {
-		val gjennomforing = gjennomforinger.find { it.id == deltaker.gjennomforingId }
-			?: throw RuntimeException("Fant ikke gjennomføring med id ${deltaker.gjennomforingId}")
+		val gjennomforing = getGjennomforing(gjennomforinger, deltaker)
 		if (!gjennomforing.erKurs) {
 			return false
 		}
@@ -229,6 +238,11 @@ open class DeltakerServiceImpl(
 			return deltaker.sluttDato?.isBefore(it) == true
 		}
 		return false
+	}
+
+	private fun getGjennomforing(gjennomforinger: List<Gjennomforing>, deltaker: Deltaker): Gjennomforing {
+		return gjennomforinger.find { it.id == deltaker.gjennomforingId }
+			?: throw RuntimeException("Fant ikke gjennomføring med id ${deltaker.gjennomforingId}")
 	}
 
 	private fun hentStatusOrThrow(deltakerId: UUID): DeltakerStatus {
