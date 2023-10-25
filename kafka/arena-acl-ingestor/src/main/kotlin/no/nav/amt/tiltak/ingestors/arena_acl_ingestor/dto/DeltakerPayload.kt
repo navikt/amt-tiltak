@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto
 
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class DeltakerPayload(
 	val id: UUID,
@@ -20,7 +20,7 @@ data class DeltakerPayload(
 ) {
 	enum class Status {
 		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, FEILREGISTRERT, PABEGYNT, PABEGYNT_REGISTRERING,
-		SOKT_INN, VURDERES, VENTELISTE, AVBRUTT // kurs statuser
+		SOKT_INN, VURDERES, VENTELISTE, AVBRUTT, FULLFORT // kurs statuser
 		//PABEGYNT er erstattet av PABEGYNT_REGISTRERING, men må beholdes så lenge statusen er på topicen
 
 	}

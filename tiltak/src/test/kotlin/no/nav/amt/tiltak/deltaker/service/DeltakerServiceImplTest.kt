@@ -153,7 +153,7 @@ class DeltakerServiceImplTest {
 	}
 
 	@Test
-	fun `oppdaterStatuser - Sluttdato har passert, kurs - Setter status til har slutta`() {
+	fun `oppdaterStatuser - Sluttdato har passert, kurs - Setter status til fullfort`() {
 		val gjennomforingInput = GJENNOMFORING_KURS.copy(sluttDato = LocalDate.now().minusDays(1))
 		testDataRepository.insertGjennomforing(gjennomforingInput)
 		testDataRepository.insertBruker(BRUKER_2)
@@ -171,7 +171,7 @@ class DeltakerServiceImplTest {
 		deltakerServiceImpl.progressStatuser()
 
 		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
-		status!!.type shouldBe DeltakerStatus.Type.HAR_SLUTTET
+		status!!.type shouldBe DeltakerStatus.Type.FULLFORT
 
 	}
 

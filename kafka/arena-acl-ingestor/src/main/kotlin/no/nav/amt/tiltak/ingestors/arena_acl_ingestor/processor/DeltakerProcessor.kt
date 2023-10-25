@@ -135,7 +135,7 @@ class DeltakerProcessor(
 			DeltakerPayload.Status.VURDERES -> DeltakerStatus.Type.VURDERES
 			DeltakerPayload.Status.VENTELISTE -> DeltakerStatus.Type.VENTELISTE
 			DeltakerPayload.Status.AVBRUTT -> DeltakerStatus.Type.AVBRUTT
-
+			DeltakerPayload.Status.FULLFORT -> DeltakerStatus.Type.FULLFORT
 		}
 	}
 
