@@ -5,7 +5,10 @@ import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.security.token.support.core.api.Unprotected
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -21,6 +24,7 @@ class InternalController(
 	val gjennomforingService: GjennomforingService,
 	val deltakerService: DeltakerService,
 ) {
+	private val log = LoggerFactory.getLogger(javaClass)
 
 	@PostMapping("/fjern-tilganger")
 	fun fjernTilgangerHosArrangor(
@@ -40,6 +44,34 @@ class InternalController(
 
 		amtArrangorClient.fjernTilganger(body.arrangorId, body.deltakerlisteId, deltakerIder)
 
+	}
+
+	@DeleteMapping("/deltaker/{id}")
+	fun slettDeltaker(
+		request: HttpServletRequest,
+		@PathVariable("id") id: UUID
+	) {
+		if (!isInternal(request)) {
+			throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
+		}
+		deltakerService.slettDeltaker(id)
+		log.info("Slettet deltaker med id $id")
+	}
+
+	@DeleteMapping("/deltakerliste/{id}")
+	fun slettDeltakerliste(
+		request: HttpServletRequest,
+		@PathVariable("id") id: UUID
+	) {
+		if (!isInternal(request)) {
+			throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
+		}
+		val deltakere = deltakerService.hentDeltakerePaaGjennomforing(id)
+		if (deltakere.isNotEmpty()) {
+			throw IllegalStateException("Kan ikke slette gjennomføring som har deltakere")
+		}
+		gjennomforingService.slettGjennomforing(id)
+		log.info("Slettet deltakerliste med id $id")
 	}
 
 
