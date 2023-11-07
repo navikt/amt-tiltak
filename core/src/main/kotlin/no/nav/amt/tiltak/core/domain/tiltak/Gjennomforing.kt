@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.core.domain.tiltak
 
 import no.nav.amt.tiltak.core.domain.arrangor.Arrangor
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 data class Gjennomforing(
 	val id: UUID,
@@ -18,6 +18,6 @@ data class Gjennomforing(
 	val erKurs: Boolean
 ) {
 	enum class Status {
-		APENT_FOR_INNSOK, GJENNOMFORES, AVSLUTTET
+		PLANLAGT, APENT_FOR_INNSOK, GJENNOMFORES, AVSLUTTET
 	}
 }

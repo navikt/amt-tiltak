@@ -19,13 +19,15 @@ import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.inputs.GjennomforingInput
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 internal class GjennomforingRepositoryTest : FunSpec({
 
@@ -45,7 +47,7 @@ internal class GjennomforingRepositoryTest : FunSpec({
 	test("insert() should insert gjennomforing and return object") {
 		val id = UUID.randomUUID()
 		val navn = "TEST Tiltaksgjennomforing"
-		val status = Gjennomforing.Status.APENT_FOR_INNSOK
+		val status = Gjennomforing.Status.PLANLAGT
 		val startDato = LocalDate.now().plusDays(2)
 		val sluttDato = LocalDate.now().plusDays(10)
 
@@ -88,7 +90,7 @@ internal class GjennomforingRepositoryTest : FunSpec({
 					arrangorId = UUID.randomUUID(),
 					tiltakId = UUID.randomUUID(),
 					navn = "idosfja",
-					status = Gjennomforing.Status.APENT_FOR_INNSOK,
+					status = Gjennomforing.Status.PLANLAGT,
 					startDato = null,
 					sluttDato = null,
 					navEnhetId = null,

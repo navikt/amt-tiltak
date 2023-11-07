@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.data_publisher.model
 import no.nav.common.json.JsonUtils
 import org.springframework.util.DigestUtils
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 data class DeltakerlistePublishDto(
 	val id: UUID,
@@ -30,5 +30,5 @@ data class TiltakDto(
 )
 
 enum class DeltakerlisteStatus {
-	APENT_FOR_INNSOK, GJENNOMFORES, AVSLUTTET
+	PLANLAGT, GJENNOMFORES, AVSLUTTET
 }

@@ -23,7 +23,7 @@ class DeltakerlistePublishQuery(
 		return DeltakerlistePublishDto(
 			id = deltakerliste.id,
 			navn = deltakerliste.navn,
-			status = DeltakerlisteStatus.valueOf(deltakerliste.status),
+			status = toDeltakerlisteStatus(deltakerliste.status),
 			tiltak = TiltakDto(
 				navn = deltakerliste.tiltakNavn,
 				type = deltakerliste.tiltakType
@@ -63,6 +63,15 @@ class DeltakerlistePublishQuery(
 			sqlParameters("gjennomforingId" to gjennomforingId),
 			Deltakerliste.rowMapper
 		).firstOrNull()
+	}
+
+	private fun toDeltakerlisteStatus(status: String): DeltakerlisteStatus {
+		return when (status) {
+			"PLANLAGT", "APENT_FOR_INNSOK" -> DeltakerlisteStatus.PLANLAGT
+			"GJENNOMFORES" -> DeltakerlisteStatus.GJENNOMFORES
+			"AVSLUTTET" -> DeltakerlisteStatus.AVSLUTTET
+			else -> throw IllegalStateException("Ukjent status: $status")
+		}
 	}
 
 	private data class Deltakerliste(

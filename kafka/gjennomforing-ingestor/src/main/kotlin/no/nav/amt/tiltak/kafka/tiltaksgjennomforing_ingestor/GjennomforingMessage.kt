@@ -25,6 +25,7 @@ data class GjennomforingMessage(
 	)
 
 	enum class Status {
+	  	PLANLAGT,
 		GJENNOMFORES,
 		AVBRUTT,
 		AVLYST,
