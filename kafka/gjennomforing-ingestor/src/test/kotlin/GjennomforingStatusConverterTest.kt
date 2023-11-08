@@ -12,8 +12,13 @@ class GjennomforingStatusConverterTest {
 	}
 
 	@Test
-	fun `convert() - konverterer planlagt til APENT_FOR_INNSOK`() {
-		GjennomforingStatusConverter.convert(GjennomforingMessage.Status.APENT_FOR_INNSOK.name) shouldBe Gjennomforing.Status.APENT_FOR_INNSOK
+	fun `convert() - konverterer planlagt til PLANLAGT`() {
+		GjennomforingStatusConverter.convert(GjennomforingMessage.Status.PLANLAGT.name) shouldBe Gjennomforing.Status.PLANLAGT
+	}
+
+	@Test
+	fun `convert() - konverterer APENT_FOR_INNSOK til PLANLAGT`() {
+		GjennomforingStatusConverter.convert(GjennomforingMessage.Status.APENT_FOR_INNSOK.name) shouldBe Gjennomforing.Status.PLANLAGT
 	}
 
 	@Test
