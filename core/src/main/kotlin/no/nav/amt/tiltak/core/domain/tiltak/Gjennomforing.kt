@@ -18,6 +18,6 @@ data class Gjennomforing(
 	val erKurs: Boolean
 ) {
 	enum class Status {
-		PLANLAGT, APENT_FOR_INNSOK, GJENNOMFORES, AVSLUTTET
+		PLANLAGT, GJENNOMFORES, AVSLUTTET
 	}
 }

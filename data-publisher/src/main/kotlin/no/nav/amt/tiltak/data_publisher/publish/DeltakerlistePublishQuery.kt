@@ -67,7 +67,7 @@ class DeltakerlistePublishQuery(
 
 	private fun toDeltakerlisteStatus(status: String): DeltakerlisteStatus {
 		return when (status) {
-			"PLANLAGT", "APENT_FOR_INNSOK" -> DeltakerlisteStatus.PLANLAGT
+			"PLANLAGT" -> DeltakerlisteStatus.PLANLAGT
 			"GJENNOMFORES" -> DeltakerlisteStatus.GJENNOMFORES
 			"AVSLUTTET" -> DeltakerlisteStatus.AVSLUTTET
 			else -> throw IllegalStateException("Ukjent status: $status")
