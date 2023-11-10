@@ -57,7 +57,7 @@
         <mock-oauth2-server.version>2.0.0</mock-oauth2-server.version>
         <common.version>3.2023.10.18_13.28-58db82ecb1a5</common.version>
         <logstash.version>7.4</logstash.version>
-        <unleash.version>9.0.0</unleash.version>
+        <unleash.version>9.1.0</unleash.version>
         <!-- overstyrer sårbar dependency-->
         <snakeyaml.version>2.2</snakeyaml.version>
     </properties>
