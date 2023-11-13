@@ -81,7 +81,7 @@ Kilden til dataene om deltakerene er i hovedsak Arena per dags dato. I fremtiden
 |**aarsak**|`string\|null`|En årsak kan finnes på enkelte typer statuser (`HAR_SLUTTET`, `IKKE_AKTUELL` og `AVBRUTT`) og er en av følgende verdier: `SYK`, `FATT_JOBB`, `TRENGER_ANNEN_STOTTE`, `FIKK_IKKE_PLASS`, `IKKE_MOTT`, `ANNET`, `AVLYST_KONTRAKT`|
 |**opprettetDato**|`datetime`|Tidsstempel for når statusen ble opprettet|
 
-For mer utypende informasjon om når og hvordan deltakerstatuser settes og endres se mer utdypende dokumentasjon på [Confluence](https://confluence.adeo.no/pages/viewpage.action?pageId=573710206).
+For mer informasjon om når og hvordan deltakerstatuser settes og endres se mer utdypende dokumentasjon på [Confluence](https://confluence.adeo.no/pages/viewpage.action?pageId=573710206).
 
 ### Skjema
 
