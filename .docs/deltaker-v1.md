@@ -9,7 +9,7 @@
     1. [Skjema](#skjema)
 
 ## Beskrivelse
-På topicen `amt-deltaker-v1` publiseres det siste øyeblikksblidet av deltakere på følgende tiltakstyper:
+På topicen `amt.deltaker-v1` publiseres det siste øyeblikksblidet av deltakere på følgende tiltakstyper:
 
 - INDOPPFAG
 - ARBFORB
@@ -21,14 +21,13 @@ På topicen `amt-deltaker-v1` publiseres det siste øyeblikksblidet av deltakere
 - GRUPPEAMO
 - GRUFAGYRKE
 
-Topicen inneholder deltakere som kan ha **adressebeskyttelse** (kode 6/7).
+Topicen inneholder deltakere som kan ha **adressebeskyttelse** (kode 6/7), og skjermede personer (egen ansatt).
 
 Deltakere kan bli slettet, da vil det bli produsert en tombstone for den deltakeren.
 
-Topicen er satt opp med evig retention og compaction, så den skal inneholde alle deltakere som har vært registrert på de nevnte tilakene. Det er noen unntak: F.eks. så blir deltakere som er historisert i Arena pga gjentatte deltakelser på samme tiltaksgjennomføring slettet hos oss.
+Topicen er satt opp med evig retention og compaction, så den skal inneholde alle deltakere som har vært registrert på de nevnte tilakene. Det er noen unntak: F.eks. så blir deltakere som er historisert i Arena pga gjentatte deltakelser på samme tiltaksgjennomføring slettet hos oss (kun den siste deltakelsen vil bli beholdt).
 
-
-Kilden til dataene om deltakerene er i hovedsak Arena per dags dato. I fremtiden vil vi Team Komet overta som kilde, når vi har utviklet nye løsninger for å kunne melde på og endre deltakere utenfor Arena.
+Kilden til dataene om deltakerene er i hovedsak Arena per dags dato. I fremtiden vil vi i Team Komet overta som kilde når vi har utviklet nye løsninger for å kunne melde på og endre deltakere utenfor Arena.
 
 
 ## Meldinger
@@ -71,7 +70,7 @@ Kilden til dataene om deltakerene er i hovedsak Arena per dags dato. I fremtiden
 |**status** |`object`|Nåværende status på deltakeren, forteller f.eks om deltakeren deltar på tiltaket akkurat nå eller venter på oppstart osv. Se [Status](#status)|
 |**registrertDato** |`datetime`|Datoen deltakeren er registrert i Arena. Det er litt ukjent hva som definerer en registrertDato i fremtiden når vi i Komet overtar opprettelsen av deltakere.|
 |**dagerPerUke** |`float\|null`|Antall dager deltakeren deltar på tiltaket per uke. I Arena er det mulig å angi dette feltet som et desimaltall f.eks `2.5`, i ny løsning er det bare mulig å bruke heltall.<br /><br /> I ny løsning kan dette bare settes på tiltakstypene: <br/> - Arbeidsforberedende trening (AFT) <br/> - Varig tilrettelagt arbeid (VTA)|
-|**prosentStilling** |`float\|null`|Prosentandelen deltakeren deltar på tiltaket per uke. Hva er 100%? Vi vet ikke, det vil variere fra tiltak til tiltak hvor mye tid det er forventet at en deltaker skal bruke.<br /><br />I Arena er det mulig å angi dette feltet som et desimaltall f.eks `42.1`, i ny løsning er det bare mulig å bruke heltall.<br /><br /> I ny løsning kan dette bare settes på tiltakstypene: <br /> - Arbeidsforberedende trening (AFT) <br /> - Varig tilrettelagt arbeid (VTA)|
+|**prosentStilling** |`float\|null`|Prosentandelen deltakeren opptar av en tiltaksplass. Hva 100% innebærer av faktisk deltakelse vil variere fra tiltak til tiltak. <br /><br />I Arena er det mulig å angi dette feltet som et desimaltall f.eks `42.1`, i ny løsning er det bare mulig å bruke heltall.<br /><br /> I ny løsning kan dette bare settes på tiltakstypene: <br /> - Arbeidsforberedende trening (AFT) <br /> - Varig tilrettelagt arbeid (VTA)|
 |**endretDato** |`datetime`|Tidsstempel for siste endring på deltakeren|
 
 #### Status
