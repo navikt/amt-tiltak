@@ -85,7 +85,7 @@ For mer informasjon om når og hvordan deltakerstatuser settes og endres se mer 
 
 ### Skjema
 
-For oppdatert informasjon er det beste å se siste versjon direkte:
+For oppdatert informasjon er det best å se siste versjon direkte:
 - [DeltakerV1Dto](https://github.com/navikt/amt-tiltak/blob/main/kafka/kafka-producer/src/main/kotlin/no/nav/amt/tiltak/kafka/producer/dto/DeltakerV1Dto.kt)
 - [DeltakerStatusDto](https://github.com/navikt/amt-tiltak/blob/main/kafka/kafka-producer/src/main/kotlin/no/nav/amt/tiltak/kafka/producer/dto/DeltakerStatusDto.kt)
 - [DeltakerStatus.Type og DeltakerStatus.Aarsak](https://github.com/navikt/amt-tiltak/blob/main/core/src/main/kotlin/no/nav/amt/tiltak/core/domain/tiltak/DeltakerStatus.kt)
