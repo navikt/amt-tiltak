@@ -77,7 +77,7 @@ Kilden til dataene om deltakerene er i hovedsak Arena per dags dato. I fremtiden
 
 |Felt|Format|Beskrivelse|
 |-|-|-|
-|**type**|`string`|En av følgende verdier: `VENTER_PA_OPPSTART`, `DELTAR`, `HAR_SLUTTET`, `IKKE_AKTUELL`, `FEILREGISTRERT`, `SOKT_INN`, `VURDERES`, `VENTELISTE`, `AVBRUTT`, `PABEGYNT_REGISTRERING` <br /><br /> Det er litt ulike typer statuser som kan settes på deltakere, basert på hvilke tiltak de deltar på. Hovedregelen er at `SOKT_INN`, `VURDERES`, `VENTELISTE` og `AVBRUTT` kan kun settes på deltakere som går på tiltak hvor det er en felles oppstart, typisk kurs som `JOBBK`, `GRUPPEAMO`, `GRUFAGYRKE`.|
+|**type**|`string`|En av følgende verdier: `VENTER_PA_OPPSTART`, `DELTAR`, `HAR_SLUTTET`, `IKKE_AKTUELL`, `FEILREGISTRERT`, `SOKT_INN`, `VURDERES`, `VENTELISTE`, `AVBRUTT`, `FULLFORT`, `PABEGYNT_REGISTRERING` <br /><br /> Det er litt ulike typer statuser som kan settes på deltakere, basert på hvilke tiltak de deltar på. Hovedregelen er at `FULLFORT` og `AVBRUTT` kan kun settes på deltakere som går på tiltak hvor det er en felles oppstart, typisk kurs som `JOBBK`, `GRUPPEAMO`, `GRUFAGYRKE`, mens `HAR_SLUTTET` brukes kun på de andre tiltakene som har et "løpende" inntak og oppstart av deltakere.|
 |**aarsak**|`string\|null`|En årsak kan finnes på enkelte typer statuser (`HAR_SLUTTET`, `IKKE_AKTUELL` og `AVBRUTT`) og er en av følgende verdier: `SYK`, `FATT_JOBB`, `TRENGER_ANNEN_STOTTE`, `FIKK_IKKE_PLASS`, `IKKE_MOTT`, `ANNET`, `AVLYST_KONTRAKT`|
 |**opprettetDato**|`datetime`|Tidsstempel for når statusen ble opprettet|
 
@@ -85,7 +85,7 @@ For mer informasjon om når og hvordan deltakerstatuser settes og endres se mer 
 
 ### Skjema
 
-For oppdatert informasjon er det beste å se siste versjon direkte:
+For oppdatert informasjon er det best å se siste versjon direkte:
 - [DeltakerV1Dto](https://github.com/navikt/amt-tiltak/blob/main/kafka/kafka-producer/src/main/kotlin/no/nav/amt/tiltak/kafka/producer/dto/DeltakerV1Dto.kt)
 - [DeltakerStatusDto](https://github.com/navikt/amt-tiltak/blob/main/kafka/kafka-producer/src/main/kotlin/no/nav/amt/tiltak/kafka/producer/dto/DeltakerStatusDto.kt)
 - [DeltakerStatus.Type og DeltakerStatus.Aarsak](https://github.com/navikt/amt-tiltak/blob/main/core/src/main/kotlin/no/nav/amt/tiltak/core/domain/tiltak/DeltakerStatus.kt)
@@ -117,7 +117,7 @@ data class DeltakerStatusDto(
 
     enum class Type {
         VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, FEILREGISTRERT,
-        SOKT_INN, VURDERES, VENTELISTE, AVBRUTT, 
+        SOKT_INN, VURDERES, VENTELISTE, AVBRUTT, FULLFORT, 
         PABEGYNT_REGISTRERING, 
     }
 
