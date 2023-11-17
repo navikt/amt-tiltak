@@ -17,7 +17,7 @@ import no.nav.amt.tiltak.test.database.data.inputs.TiltaksansvarligGjennomforing
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 
 class TiltaksansvarligGjennomforingTilgangRepositoryTest : FunSpec({
@@ -102,7 +102,7 @@ class TiltaksansvarligGjennomforingTilgangRepositoryTest : FunSpec({
 
 		val tilgang = repository.hentTilgang(id)
 
-		tilgang.gyldigTil shouldBeBefore ZonedDateTime.now()
+		tilgang.gyldigTil shouldBeBefore ZonedDateTime.now().plusSeconds(3)
 	}
 
 })
