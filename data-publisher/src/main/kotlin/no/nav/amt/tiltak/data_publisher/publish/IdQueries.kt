@@ -28,26 +28,6 @@ class IdQueries(
 		) { rs, _ -> rs.getUUID("id") }
 	}
 
-	fun hentDeltakerlisteIds(offset: Int, limit: Int, modifiedAfter: LocalDateTime): List<UUID> {
-		val sql = """
-			SELECT id
-			FROM gjennomforing
-			WHERE modified_at >= :modified_after
-			ORDER BY id
-			OFFSET :offset
-			LIMIT :limit
-		""".trimIndent()
-
-		return template.query(
-			sql,
-			sqlParameters(
-				"modified_after" to modifiedAfter,
-				"offset" to offset,
-				"limit" to limit
-			)
-		) { rs, _ -> rs.getUUID("id") }
-	}
-
 	fun hentEndringsmeldingIds(offset: Int, limit: Int, modifiedAfter: LocalDateTime): List<UUID> {
 		val sql = """
 			SELECT id

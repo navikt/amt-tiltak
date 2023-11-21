@@ -61,7 +61,6 @@ open class DeltakerServiceImpl(
 
 			kafkaProducerService.publiserDeltaker(oppdatertDeltaker)
 			publisherService.publish(oppdatertDeltaker.id, DataPublishType.DELTAKER)
-			publisherService.publish(oppdatertDeltaker.gjennomforingId, DataPublishType.DELTAKERLISTE)
 		}
 	}
 
@@ -74,7 +73,6 @@ open class DeltakerServiceImpl(
 
 			kafkaProducerService.publiserDeltaker(oppdatertDeltaker)
 			publisherService.publish(oppdatertDeltaker.id, DataPublishType.DELTAKER)
-			publisherService.publish(oppdatertDeltaker.gjennomforingId, DataPublishType.DELTAKERLISTE)
 		}
 	}
 
@@ -116,7 +114,6 @@ open class DeltakerServiceImpl(
 
 		deltakere.forEach { deltaker ->
 			publisherService.publish(deltaker.id, DataPublishType.DELTAKER)
-			publisherService.publish(deltaker.gjennomforingId, DataPublishType.DELTAKERLISTE)
 		}
 	}
 
@@ -329,7 +326,6 @@ open class DeltakerServiceImpl(
 
 				kafkaProducerService.publiserDeltaker(deltaker)
 				publisherService.publish(deltaker.id, DataPublishType.DELTAKER)
-				publisherService.publish(deltaker.gjennomforingId, DataPublishType.DELTAKERLISTE)
 			}
 
 			offset += deltakere.size

@@ -152,7 +152,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		testDataRepository.deleteAllEndringsmeldinger()
 		testDataRepository.deleteAllVurderinger()
 		val endringsmeldingInput = insertSkjermetPersonMedEndringsmeldinger()
-		val vurdering = insertVurdering(endringsmeldingInput.deltakerId)
+		insertVurdering(endringsmeldingInput.deltakerId)
 
 		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
@@ -181,7 +181,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		testDataRepository.deleteAllVurderinger()
 
 		val endringsmeldingInput = insertSkjermetPersonMedEndringsmeldinger()
-		val vurdering = insertVurdering(endringsmeldingInput.deltakerId)
+		insertVurdering(endringsmeldingInput.deltakerId)
 
 		val token = mockOAuthServer.issueAzureAdToken(
 			ident = NAV_ANSATT_1.navIdent,
