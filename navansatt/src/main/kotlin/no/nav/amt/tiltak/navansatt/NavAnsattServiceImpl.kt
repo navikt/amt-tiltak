@@ -3,6 +3,8 @@ package no.nav.amt.tiltak.navansatt
 import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.port.NavAnsattService
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
+import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.util.UUID
@@ -11,6 +13,7 @@ import java.util.UUID
 internal class NavAnsattServiceImpl(
 	private val navAnsattRepository: NavAnsattRepository,
 	private val amtPersonClient: AmtPersonClient,
+	private val publisherService: DataPublisherService,
 ) : NavAnsattService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -33,17 +36,21 @@ internal class NavAnsattServiceImpl(
 		log.info("Oppretter ny nav ansatt for nav ident $navIdent")
 		upsert(nyNavAnsatt)
 
-		val ansatt = navAnsattRepository.get(nyNavAnsatt.id).toNavAnsatt()
-
-		return ansatt
+		return navAnsattRepository.get(nyNavAnsatt.id).toNavAnsatt()
 	}
 
 	override fun upsert(ansatt: NavAnsatt) {
-		navAnsattRepository.upsert(ansatt)
+		val lagretNavAnsatt = navAnsattRepository.getMaybeNavAnsatt(ansatt.id)?.toNavAnsatt()
+		if (lagretNavAnsatt != ansatt) {
+			navAnsattRepository.upsert(ansatt)
+			navAnsattRepository.getDeltakerIderForNavAnsatt(ansatt.id).forEach {
+				publisherService.publish(it, DataPublishType.DELTAKER)
+			}
+		}
 	}
 
 	override fun opprettNavAnsattHvisIkkeFinnes(navAnsattId: UUID) {
-		if (navAnsattRepository.finnesAnsatt(navAnsattId)) return
+		if (navAnsattRepository.getMaybeNavAnsatt(navAnsattId) != null) return
 
 		val nyNavAnsatt = amtPersonClient.hentNavAnsatt(navAnsattId).getOrThrow()
 

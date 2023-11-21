@@ -1,8 +1,10 @@
 package no.nav.amt.tiltak.navansatt
 
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.inputs.NavAnsattInput
 import org.junit.AfterClass
@@ -76,14 +78,23 @@ class NavAnsattRepositoryTest {
 	}
 
 	@Test
-	fun `finnesAnsatt - ansatt finnes - returnerer true`() {
+	fun `getMaybeNavAnsatt - ansatt finnes - returnerer ansatt`() {
 		val forventetAnsatt = mockAnsatt()
 		testRepository.insertNavAnsatt(forventetAnsatt)
-		repository.finnesAnsatt(forventetAnsatt.id) shouldBe true
+		repository.getMaybeNavAnsatt(forventetAnsatt.id) shouldNotBe null
 	}
 	@Test
-	fun `finnesAnsatt - ansatt finnes ikke - returnere false`() {
-		repository.finnesAnsatt(UUID.randomUUID()) shouldBe false
+	fun `getMaybeNavAnsatt - ansatt finnes ikke - returnere null`() {
+		repository.getMaybeNavAnsatt(UUID.randomUUID()) shouldBe null
+	}
+
+	@Test
+	fun `getDeltakerIderForNavAnsatt - ansatt er veileder for deltaker - returnerer deltakerId`() {
+		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
+
+		val deltakerIder = repository.getDeltakerIderForNavAnsatt(TestData.NAV_ANSATT_1.id)
+
+		deltakerIder shouldBe listOf(TestData.DELTAKER_1.id)
 	}
 
 	private fun mockAnsatt() = NavAnsattInput(

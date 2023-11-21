@@ -66,13 +66,15 @@ open class DeltakerServiceImpl(
 
 	override fun insertStatus(status: DeltakerStatusInsert) {
 		transactionTemplate.executeWithoutResult {
-			oppdaterStatus(status)
+			val statusBleOppdatert = oppdaterStatus(status)
 
-			val oppdatertDeltaker = hentDeltaker(status.deltakerId)
-				?: throw IllegalStateException("Fant ikke deltaker med id ${status.deltakerId}")
+			if (statusBleOppdatert) {
+				val oppdatertDeltaker = hentDeltaker(status.deltakerId)
+					?: throw IllegalStateException("Fant ikke deltaker med id ${status.deltakerId}")
 
-			kafkaProducerService.publiserDeltaker(oppdatertDeltaker)
-			publisherService.publish(oppdatertDeltaker.id, DataPublishType.DELTAKER)
+				kafkaProducerService.publiserDeltaker(oppdatertDeltaker)
+				publisherService.publish(oppdatertDeltaker.id, DataPublishType.DELTAKER)
+			}
 		}
 	}
 
@@ -104,17 +106,12 @@ open class DeltakerServiceImpl(
 	}
 
 	override fun progressStatuser() {
-
 		val deltakere = deltakerRepository.erPaaAvsluttetGjennomforing()
 			.plus(deltakerRepository.sluttDatoPassert())
 			.let { mapDeltakereOgAktiveStatuser(it) }
 
 		progressStatuser(deltakere)
 		oppdaterStatuser(deltakerRepository.skalHaStatusDeltar().map { it.id }, nyStatus = DeltakerStatus.Type.DELTAR)
-
-		deltakere.forEach { deltaker ->
-			publisherService.publish(deltaker.id, DataPublishType.DELTAKER)
-		}
 	}
 
 	override fun slettDeltakerePaaGjennomforing(gjennomforingId: UUID) {
@@ -176,9 +173,9 @@ open class DeltakerServiceImpl(
 		return vurderingRepository.getVurderingerForDeltaker(deltakerId)
 	}
 
-	private fun oppdaterStatus(status: DeltakerStatusInsert) {
+	private fun oppdaterStatus(status: DeltakerStatusInsert): Boolean {
 		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(status.deltakerId)
-		if (forrigeStatus?.type == status.type && forrigeStatus.aarsak == status.aarsak) return
+		if (forrigeStatus?.type == status.type && forrigeStatus.aarsak == status.aarsak) return false
 
 		val nyStatus = DeltakerStatusInsertDbo(
 			id = status.id,
@@ -192,8 +189,7 @@ open class DeltakerServiceImpl(
 			forrigeStatus?.let { deltakerStatusRepository.deaktiver(it.id) }
 			deltakerStatusRepository.insert(nyStatus)
 		}
-
-		publisherService.publish(status.deltakerId, DataPublishType.DELTAKER)
+		return true
 	}
 
 	private fun progressStatuser(deltakere: List<Deltaker>) {
@@ -351,7 +347,12 @@ open class DeltakerServiceImpl(
 		log.info("Publisert deltaker med id $deltakerId på kafka")
 	}
 
-	fun DeltakerUpsert.toUpsertDbo(brukerId: UUID) = DeltakerUpsertDbo(
+	override fun publiserDeltakerPaDeltakerV2Kafka(deltakerId: UUID) {
+		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
+		log.info("Publisert deltaker med id $deltakerId på kafkatopic deltaker-v2")
+	}
+
+	private fun DeltakerUpsert.toUpsertDbo(brukerId: UUID) = DeltakerUpsertDbo(
 		id = this.id,
 		brukerId = brukerId,
 		gjennomforingId = this.gjennomforingId,
@@ -362,7 +363,6 @@ open class DeltakerServiceImpl(
 		prosentStilling = this.prosentStilling,
 		innsokBegrunnelse = this.innsokBegrunnelse
 	)
-
 }
 
 

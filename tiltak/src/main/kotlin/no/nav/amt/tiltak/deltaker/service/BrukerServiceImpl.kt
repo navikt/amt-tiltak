@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Bruker
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.NavEnhetService
+import no.nav.amt.tiltak.deltaker.dbo.BrukerDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -29,6 +30,10 @@ class BrukerServiceImpl(
 		return brukerRepository.get(fodselsnummer)?.id ?: createBruker(fodselsnummer)
 	}
 
+	override fun get(id: UUID): Bruker? {
+		return brukerRepository.get(id)?.toBruker()
+	}
+
 	override fun upsert(bruker: Bruker) {
 		brukerRepository.upsert(bruker)
 	}
@@ -44,4 +49,20 @@ class BrukerServiceImpl(
 		return navBruker.personId
 	}
 
+	private fun BrukerDbo.toBruker(): Bruker {
+		return Bruker(
+			id = id,
+			personIdent = personIdent,
+			fornavn = fornavn,
+			mellomnavn = mellomnavn,
+			etternavn = etternavn,
+			telefonnummer = telefonnummer,
+			epost = epost,
+			ansvarligVeilederId = ansvarligVeilederId,
+			navEnhetId = navEnhetId,
+			erSkjermet = erSkjermet,
+			adresse = adresse,
+			adressebeskyttelse = adressebeskyttelse
+		)
+	}
 }

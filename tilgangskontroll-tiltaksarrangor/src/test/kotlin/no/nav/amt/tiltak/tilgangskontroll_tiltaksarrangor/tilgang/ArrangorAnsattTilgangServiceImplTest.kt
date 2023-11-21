@@ -22,7 +22,6 @@ import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.ArrangorVeilederService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.arrangor.AmtArrangorService
 import org.junit.jupiter.api.BeforeEach
@@ -52,8 +51,6 @@ class ArrangorAnsattTilgangServiceImplTest {
 	lateinit var gjennomforingService: GjennomforingService
 
 	lateinit var arrangorVeilederService: ArrangorVeilederService
-
-	lateinit var publisherService: DataPublisherService
 
 	val personligIdent = "fnr"
 
@@ -138,8 +135,6 @@ class ArrangorAnsattTilgangServiceImplTest {
 		arrangorVeilederService = mockk()
 
 		gjennomforingService = mockk()
-
-		publisherService = mockk()
 
 		arrangorAnsattTilgangServiceImpl = ArrangorAnsattTilgangServiceImpl(
 			arrangorAnsattService, ansattRolleService,

@@ -8,4 +8,5 @@ interface BrukerService {
 	fun slettBruker(personIdent: String)
 	fun slettBruker(id: UUID)
 	fun upsert(bruker: Bruker)
+	fun get(id: UUID): Bruker?
 }
