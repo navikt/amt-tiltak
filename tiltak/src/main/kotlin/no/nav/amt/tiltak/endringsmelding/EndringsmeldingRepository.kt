@@ -85,6 +85,20 @@ open class EndringsmeldingRepository(
 			?: throw NoSuchElementException("Fant ingen endringsmelding med id=$id")
 	}
 
+	fun getAktive(deltakerId: UUID, type: EndringsmeldingDbo.Type): List<EndringsmeldingDbo> {
+		val sql = """
+			SELECT * FROM endringsmelding
+			WHERE deltaker_id = :deltakerId AND type = :type AND status = 'AKTIV'
+		""".trimIndent()
+
+		val parameters = sqlParameters(
+			"deltakerId" to deltakerId,
+			"type" to type.name
+		)
+
+		return template.query(sql, parameters, rowMapper)
+	}
+
 	fun markerSomTilbakekalt(id: UUID) {
 		val sql = """
 			UPDATE endringsmelding

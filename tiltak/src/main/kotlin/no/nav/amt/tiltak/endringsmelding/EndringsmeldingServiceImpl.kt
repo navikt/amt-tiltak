@@ -269,12 +269,14 @@ open class EndringsmeldingServiceImpl(
 		deltakerId: UUID, opprettetAvArrangorAnsattId: UUID, innhold: EndringsmeldingDbo.Innhold?, type: EndringsmeldingDbo.Type
 	): UUID {
 		val id = UUID.randomUUID()
+		val aktiveEndringsmeldinger = endringsmeldingRepository.getAktive(deltakerId, type)
 		transactionTemplate.executeWithoutResult {
 			endringsmeldingRepository.markerAktiveSomUtdatert(deltakerId, type)
 			endringsmeldingRepository.insert(id, deltakerId, opprettetAvArrangorAnsattId, type, innhold)
 		}
 
 		log.info("Endringsmelding av type ${type.name} opprettet med id $id for deltaker $deltakerId")
+		aktiveEndringsmeldinger.forEach { publisherService.publish(it.id, DataPublishType.ENDRINGSMELDING) }
 		publisherService.publish(id, DataPublishType.ENDRINGSMELDING)
 		return id
 	}

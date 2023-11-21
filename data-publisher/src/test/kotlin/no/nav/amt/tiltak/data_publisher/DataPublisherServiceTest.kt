@@ -8,6 +8,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType.DELTAKER
+import no.nav.amt.tiltak.data_publisher.model.DataPublishType.ENDRINGSMELDING
 import no.nav.amt.tiltak.data_publisher.publish.PublishRepository
 import no.nav.amt.tiltak.kafka.config.KafkaTopicProperties
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -72,6 +73,16 @@ class DataPublisherServiceTest : FunSpec({
 		publishAndVerify(input.id, DELTAKER, 1)
 	}
 
+	test("Ny endringsmelding - sendes") {
+		val input = dbHandler.createEndringsmelding()
+		publishAndVerify(input.id, ENDRINGSMELDING, 1)
+	}
+
+	test("Endringsmelding to ganger uten endring - sendes en gang") {
+		val input = dbHandler.createEndringsmelding()
+		publishAndVerify(input.id, ENDRINGSMELDING, 1)
+		publishAndVerify(input.id, ENDRINGSMELDING, 1)
+	}
 })
 
 private fun createTopicProperties(): KafkaTopicProperties = KafkaTopicProperties(
