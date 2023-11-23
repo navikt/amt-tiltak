@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.exceptions.EndringsmeldingIkkeAktivException
 import no.nav.amt.tiltak.core.port.AuditLoggerService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
+import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
@@ -18,7 +19,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 class EndringsmeldingServiceImplTest {
 	lateinit var endringsmeldingService: EndringsmeldingServiceImpl
@@ -36,7 +37,7 @@ class EndringsmeldingServiceImplTest {
 	fun beforeEach() {
 		repository = mockk(relaxUnitFun = true)
 		auditLoggerService = mockk(relaxUnitFun = true)
-		transactionTemplate = mockk()
+		transactionTemplate = mockk(relaxUnitFun = true)
 		publisherService = mockk()
 		endringsmeldingService = EndringsmeldingServiceImpl(repository, auditLoggerService, transactionTemplate, publisherService)
 
@@ -64,7 +65,7 @@ class EndringsmeldingServiceImplTest {
 		verify(exactly = 1) {
 			repository.markerSomTilbakekalt(endringsmeldingDbo.id)
 		}
-
+		verify(exactly = 1) { publisherService.publish(endringsmeldingDbo.id, DataPublishType.ENDRINGSMELDING) }
 	}
 
 	@Test
@@ -82,6 +83,7 @@ class EndringsmeldingServiceImplTest {
 		verify(exactly = 1) {
 			repository.markerSomUtfort(endringsmeldingDbo.id, NAV_ANSATT_1.id)
 		}
+		verify(exactly = 1) { publisherService.publish(endringsmeldingDbo.id, DataPublishType.ENDRINGSMELDING) }
 	}
 
 	@Test
@@ -97,7 +99,20 @@ class EndringsmeldingServiceImplTest {
 
 	}
 
-	val endringsmeldingDbo = EndringsmeldingDbo(
+	@Test
+	fun `opprettLeggTilOppstartsdatoEndringsmelding - finnes allerede - publiserer utdatert og ny endringsmelding`() {
+		every {
+			repository.getAktive(endringsmeldingDbo.deltakerId, EndringsmeldingDbo.Type.LEGG_TIL_OPPSTARTSDATO)
+		} returns listOf(endringsmeldingDbo)
+
+		val nyOppstartsdato = LocalDate.now().plusWeeks(1)
+
+		endringsmeldingService.opprettLeggTilOppstartsdatoEndringsmelding(endringsmeldingDbo.deltakerId, endringsmeldingDbo.opprettetAvArrangorAnsattId, nyOppstartsdato)
+
+		verify(exactly = 2) { publisherService.publish(any(), DataPublishType.ENDRINGSMELDING) }
+	}
+
+	private val endringsmeldingDbo = EndringsmeldingDbo(
 			id = UUID.randomUUID(),
 			deltakerId = DELTAKER_1.id,
 			utfortAvNavAnsattId = null,

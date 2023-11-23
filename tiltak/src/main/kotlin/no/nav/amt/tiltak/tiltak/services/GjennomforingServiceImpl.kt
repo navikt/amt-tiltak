@@ -9,15 +9,13 @@ import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltakService
-import no.nav.amt.tiltak.data_publisher.DataPublisherService
-import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import no.nav.amt.tiltak.utils.UpdateStatus
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.UUID
 
 @Service
 class GjennomforingServiceImpl(
@@ -25,7 +23,6 @@ class GjennomforingServiceImpl(
 	private val tiltakService: TiltakService,
 	private val arrangorService: ArrangorService,
 	@Lazy private val deltakerService: DeltakerService,
-	private val publisherService: DataPublisherService,
 	private val amtArrangorClient: AmtArrangorClient,
 ) : GjennomforingService {
 
@@ -42,10 +39,8 @@ class GjennomforingServiceImpl(
 
 		if (storedGjennomforing != null) {
 			updateGjennomforing(storedGjennomforing, gjennomforing)
-			publisherService.publish(storedGjennomforing.id, DataPublishType.DELTAKERLISTE)
 		} else {
 			gjennomforingRepository.insert(gjennomforing)
-			publisherService.publish(gjennomforing.id, DataPublishType.DELTAKERLISTE)
 		}
 	}
 
@@ -90,7 +85,6 @@ class GjennomforingServiceImpl(
 	override fun slettGjennomforing(gjennomforingId: UUID) {
 		gjennomforingRepository.delete(gjennomforingId)
 		log.info("Gjennomføring med id=$gjennomforingId er slettet")
-		publisherService.publish(gjennomforingId, DataPublishType.DELTAKERLISTE)
 	}
 
 	override fun getGjennomforing(id: UUID): Gjennomforing {

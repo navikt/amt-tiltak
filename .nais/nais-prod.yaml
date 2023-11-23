@@ -105,8 +105,6 @@ spec:
       value: amt.deltaker-v1
     - name: DELTAKER_TOPIC_V2
       value: amt.deltaker-v2
-    - name: DELTAKERLISTE_TOPIC
-      value: amt.deltakerliste-v1
     - name: ARRANGOR_TOPIC
       value: amt.arrangor-v1
     - name: ARRANGOR_ANSATT_TOPIC

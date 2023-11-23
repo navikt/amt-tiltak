@@ -44,27 +44,6 @@ class IdQueriesTest : FunSpec({
 		ids shouldContain newDeltaker2.id
 	}
 
-	test("hentDeltakerlisteIds - henter alle som har modifiedAfter dato") {
-		val oldDeltakerliste = db.createDeltakerliste(
-			createdAt = LocalDateTime.now().minusDays(30),
-			modifiedAt = LocalDateTime.now().minusDays(30)
-		)
-
-		val newDeltakerliste1 = db.createDeltakerliste(
-			createdAt = LocalDateTime.now().minusDays(30),
-			modifiedAt = LocalDateTime.now().minusDays(1)
-		)
-
-		val newDeltakerliste2 = db.createDeltakerliste()
-
-		val ids = idQueries.hentDeltakerlisteIds(0, 10, LocalDateTime.now().minusDays(2))
-
-		ids shouldNotContain oldDeltakerliste.id
-		ids shouldContain newDeltakerliste1.id
-		ids shouldContain newDeltakerliste2.id
-
-	}
-
 	test("hentEndringsmeldingIds - henter alle som har modifiedAfter dato") {
 		val oldEndringsmelding = db.createEndringsmelding(
 			createdAt = LocalDateTime.now().minusDays(30),
@@ -84,6 +63,4 @@ class IdQueriesTest : FunSpec({
 		ids shouldContain newEndringsmelding1.id
 		ids shouldContain newEndringsmelding2.id
 	}
-
-
 })

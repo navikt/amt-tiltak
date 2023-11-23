@@ -23,6 +23,10 @@ internal class NavAnsattRepository(
 	}
 
 	internal fun get(id: UUID): NavAnsattDbo {
+		return getMaybeNavAnsatt(id) ?: throw NoSuchElementException("Fant ikke NAV Ansatt med id=$id")
+	}
+
+	internal fun getMaybeNavAnsatt(id: UUID): NavAnsattDbo? {
 		val sql = """
 			SELECT * FROM nav_ansatt WHERE id = :id
 		""".trimIndent()
@@ -30,7 +34,6 @@ internal class NavAnsattRepository(
 		val parameters = sqlParameters("id" to id)
 
 		return template.query(sql, parameters, rowMapper).firstOrNull()
-			?: throw NoSuchElementException("Fant ikke NAV Ansatt med id=$id")
 	}
 
 	internal fun get(navIdent: String): NavAnsattDbo? {
@@ -39,16 +42,6 @@ internal class NavAnsattRepository(
 			sqlParameters("navIdent" to navIdent),
 			rowMapper
 		).firstOrNull()
-	}
-
-	fun finnesAnsatt(id: UUID): Boolean {
-		val sql = """
-			SELECT * FROM nav_ansatt WHERE id = :id
-		""".trimIndent()
-
-		val parameters = sqlParameters("id" to id)
-
-		return template.query(sql, parameters, rowMapper).isNotEmpty()
 	}
 
 	fun upsert(ansatt: NavAnsatt) {
@@ -78,4 +71,19 @@ internal class NavAnsattRepository(
 		template.update(sql, parameterSource)
 	}
 
+	fun getDeltakerIderForNavAnsatt(navAnsattId: UUID): List<UUID> {
+		val sql = """
+			SELECT deltaker.id AS deltakerid
+			FROM deltaker
+					 LEFT JOIN bruker ON deltaker.bruker_id = bruker.id
+					 LEFT JOIN nav_ansatt ON bruker.ansvarlig_veileder_id = nav_ansatt.id
+			WHERE nav_ansatt.id = :navAnsattId
+		""".trimIndent()
+
+		return template.query(
+			sql,
+			sqlParameters("navAnsattId" to navAnsattId),
+			RowMapper { rs, _ -> UUID.fromString(rs.getString("deltakerid")) }
+		)
+	}
 }

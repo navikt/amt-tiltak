@@ -12,7 +12,6 @@ import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.TiltakService
-import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
@@ -39,8 +38,6 @@ class GjennomforingServiceImplTest : FunSpec({
 
 	lateinit var service: GjennomforingServiceImpl
 
-	lateinit var publisherService: DataPublisherService
-
 	lateinit var deltakerService: DeltakerService
 
 	lateinit var amtArrangorClient: AmtArrangorClient
@@ -57,8 +54,6 @@ class GjennomforingServiceImplTest : FunSpec({
 
 		tiltakService = mockk()
 
-		publisherService = mockk()
-
 		deltakerService = mockk()
 
 		amtArrangorClient = mockk(relaxUnitFun = true)
@@ -68,12 +63,10 @@ class GjennomforingServiceImplTest : FunSpec({
 			gjennomforingRepository = gjennomforingRepository,
 			tiltakService = tiltakService,
 			arrangorService = arrangorService,
-			publisherService = publisherService,
 			deltakerService = deltakerService,
 			amtArrangorClient = amtArrangorClient,
 		)
 
-		every { publisherService.publish(id = any(), type = any()) } returns Unit
 		DbTestDataUtils.cleanDatabase(dataSource)
 	}
 

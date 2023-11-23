@@ -43,8 +43,9 @@ interface DeltakerService {
 
 	fun publiserDeltakerPaKafka(deltakerId: UUID)
 
+	fun publiserDeltakerPaDeltakerV2Kafka(deltakerId: UUID)
+
 	fun slettDeltakerePaaGjennomforing(gjennomforingId: UUID)
 
 	fun lagreVurdering(deltakerId: UUID, arrangorAnsattId: UUID, vurderingstype: Vurderingstype, begrunnelse: String?): List<Vurdering>
-
 }
