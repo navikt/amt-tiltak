@@ -42,14 +42,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.code.style>official</kotlin.code.style>
         <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
-        <kotlin.version>1.9.20</kotlin.version>
+        <kotlin.version>1.9.21</kotlin.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
 
         <testcontainers.version>1.19.3</testcontainers.version>
         <mockito-kotlin.version>5.1.0</mockito-kotlin.version>
         <schedlock.version>5.10.0</schedlock.version>
-        <nimbus.version>11.6</nimbus.version>
+        <nimbus.version>11.7</nimbus.version>
         <mockk.version>1.13.8</mockk.version>
         <kotest.version>5.6.1</kotest.version>
         <okhttp.version>4.12.0</okhttp.version>
