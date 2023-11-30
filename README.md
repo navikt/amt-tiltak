@@ -42,3 +42,4 @@ Kopier verdien i feltet "access_token" fra "Token Response" og legg til headeren
 
 ## SonarCloud
 https://sonarcloud.io/dashboard?id=navikt_amt-tiltak
+endring
