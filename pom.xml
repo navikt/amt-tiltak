@@ -110,9 +110,6 @@
                     <compilerPlugins>
                         <plugin>kotlinx-serialization</plugin>
                     </compilerPlugins>
-                    <args>
-                        <arg>-java-parameters</arg>
-                    </args>
                 </configuration>
                 <dependencies>
                     <dependency>
