@@ -48,7 +48,7 @@
 
         <testcontainers.version>1.19.3</testcontainers.version>
         <mockito-kotlin.version>5.2.1</mockito-kotlin.version>
-        <schedlock.version>5.10.0</schedlock.version>
+        <schedlock.version>5.10.1</schedlock.version>
         <nimbus.version>11.7</nimbus.version>
         <mockk.version>1.13.8</mockk.version>
         <kotest.version>5.6.1</kotest.version>
@@ -58,8 +58,6 @@
         <common.version>3.2023.11.16_08.57-4fe62b8f9658</common.version>
         <logstash.version>7.4</logstash.version>
         <unleash.version>9.1.1</unleash.version>
-        <!-- overstyrer sårbar dependency-->
-        <snakeyaml.version>2.2</snakeyaml.version>
     </properties>
 
     <repositories>
@@ -83,13 +81,6 @@
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <parameters>true</parameters>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
