@@ -35,7 +35,7 @@
     <parent>
         <artifactId>spring-boot-starter-parent</artifactId>
         <groupId>org.springframework.boot</groupId>
-        <version>3.1.5</version>
+        <version>3.2.0</version>
     </parent>
 
     <properties>
@@ -53,13 +53,11 @@
         <mockk.version>1.13.8</mockk.version>
         <kotest.version>5.6.1</kotest.version>
         <okhttp.version>4.12.0</okhttp.version>
-        <token-support.version>3.1.9</token-support.version>
+        <token-support.version>3.2.0</token-support.version>
         <mock-oauth2-server.version>2.0.1</mock-oauth2-server.version>
-        <common.version>3.2023.10.18_13.28-58db82ecb1a5</common.version>
+        <common.version>3.2023.11.16_08.57-4fe62b8f9658</common.version>
         <logstash.version>7.4</logstash.version>
         <unleash.version>9.2.0</unleash.version>
-        <!-- overstyrer sårbar dependency-->
-        <snakeyaml.version>2.2</snakeyaml.version>
     </properties>
 
     <repositories>
@@ -356,7 +354,7 @@
             <dependency>
                 <groupId>no.nav.poao-tilgang</groupId>
                 <artifactId>client</artifactId>
-                <version>2023.11.08_09.13-468338e2e7f8</version>
+                <version>2023.11.29_08.41-860e116fe2a2</version>
             </dependency>
 
             <dependency>

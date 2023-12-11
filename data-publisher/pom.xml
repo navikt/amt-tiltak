@@ -42,8 +42,8 @@
             <version>1.2.1</version>
         </dependency>
         <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>core</artifactId>
+            <groupId>no.nav.common</groupId>
+            <artifactId>kafka</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
