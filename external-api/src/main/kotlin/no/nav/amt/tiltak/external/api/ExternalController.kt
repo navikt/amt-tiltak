@@ -67,6 +67,7 @@ fun Gjennomforing.toDto() = GjennomforingDto(
 	id = id,
 	navn = navn,
 	type = tiltak.kode,
+	tiltakstypeNavn = tiltak.navn,
 	arrangor = ArrangorDto(
 		navn = arrangor.navn,
 		virksomhetsnummer = arrangor.organisasjonsnummer
