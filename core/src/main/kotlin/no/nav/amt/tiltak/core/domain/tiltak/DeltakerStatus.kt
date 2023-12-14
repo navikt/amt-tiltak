@@ -16,6 +16,7 @@ data class DeltakerStatus(
 	}
 
 	enum class Type {
+		UTKAST_TIL_PAMELDING, AVBRUTT_UTKAST, // nye statuser for påmelding utenfor Arena
 		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, FEILREGISTRERT,
 		SOKT_INN, VURDERES, VENTELISTE, AVBRUTT, FULLFORT, // kurs statuser
 		PABEGYNT_REGISTRERING, PABEGYNT, //PABEGYNT er erstattet av PABEGYNT_REGISTRERING, men må beholdes så lenge statusen er på topicen
@@ -28,14 +29,16 @@ val AVSLUTTENDE_STATUSER = listOf(
 	DeltakerStatus.Type.IKKE_AKTUELL,
 	DeltakerStatus.Type.FEILREGISTRERT,
 	DeltakerStatus.Type.AVBRUTT,
-	DeltakerStatus.Type.FULLFORT
+	DeltakerStatus.Type.FULLFORT,
+	DeltakerStatus.Type.AVBRUTT_UTKAST
 )
 
 val VENTER_PAA_PLASS_STATUSER = listOf(
 	DeltakerStatus.Type.SOKT_INN,
 	DeltakerStatus.Type.VURDERES,
 	DeltakerStatus.Type.VENTELISTE,
-	DeltakerStatus.Type.PABEGYNT_REGISTRERING
+	DeltakerStatus.Type.PABEGYNT_REGISTRERING,
+	DeltakerStatus.Type.UTKAST_TIL_PAMELDING
 )
 
 val STATUSER_SOM_KAN_SKJULES = listOf(
