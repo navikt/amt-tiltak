@@ -17,6 +17,7 @@ import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testNavAnsattAutentisering
 import okhttp3.Request
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -35,6 +36,8 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 	@BeforeEach
 	internal fun setUp() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		testDataRepository.deleteAllEndringsmeldinger()
+		testDataRepository.deleteAllVurderinger()
 	}
 
 	@Test
@@ -85,7 +88,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-			[{"id":"9830e130-b18a-46b8-8e3e-6c06734d797e","deltaker":{"fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","erSkjermet":false},"innhold":{"oppstartsdato":"2022-11-11"},"status":"AKTIV","opprettetDato":"2022-11-08T14:00:00+01:00","type":"LEGG_TIL_OPPSTARTSDATO"},{"id":"07099997-e02e-45e3-be6f-3c1eaf694557","deltaker":{"fornavn":"Bruker 1 fornavn","mellomnavn":null,"etternavn":"Bruker 1 etternavn","fodselsnummer":"12345678910","erSkjermet":false},"innhold":{"sluttdato":"2022-11-10","aarsak":{"type":"ANNET","beskrivelse":"Flyttet til utland"}},"status":"AKTIV","opprettetDato":"2022-11-08T15:00:00+01:00","type":"AVSLUTT_DELTAKELSE"},{"id":"3fc16362-ba8b-4c0f-af93-b2ed56f12cd5","deltaker":{"fornavn":"Bruker 2 fornavn","mellomnavn":null,"etternavn":"Bruker 2 etternavn","fodselsnummer":"7908432423","erSkjermet":false},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","type":"LEGG_TIL_OPPSTARTSDATO"},{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":null,"mellomnavn":null,"etternavn":null,"fodselsnummer":null,"erSkjermet":true},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","type":"LEGG_TIL_OPPSTARTSDATO"}]
+				[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":null,"mellomnavn":null,"etternavn":null,"fodselsnummer":null,"erSkjermet":true},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","utfortTidspunkt":null,"type":"LEGG_TIL_OPPSTARTSDATO"}]
 			""".trimIndent()
 
 		response.code shouldBe 200
@@ -96,7 +99,6 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 	@Test
 	fun `hentEndringsmeldinger() - med tilgang til skjermede personer - skal returnere 200 med riktig response`() {
 		val oid = UUID.randomUUID()
-		testDataRepository.deleteAllEndringsmeldinger()
 
 		val endringsmeldingInput = insertSkjermetPersonMedEndringsmeldinger()
 
@@ -118,7 +120,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-				[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":"Skjermet bruker fornavn","mellomnavn":null,"etternavn":"Skjermet bruker etternavn","fodselsnummer":"10101010101","erSkjermet":true},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","type":"LEGG_TIL_OPPSTARTSDATO"}]
+				[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":"Skjermet bruker fornavn","mellomnavn":null,"etternavn":"Skjermet bruker etternavn","fodselsnummer":"10101010101","erSkjermet":true},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","utfortTidspunkt":null,"type":"LEGG_TIL_OPPSTARTSDATO"}]
 			""".trimIndent()
 
 		response.code shouldBe 200
@@ -149,8 +151,6 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 	@Test
 	fun `hentMeldingerFraArrangor() - skal returnere 200 med riktig, maskert response`() {
 		val oid = UUID.randomUUID()
-		testDataRepository.deleteAllEndringsmeldinger()
-		testDataRepository.deleteAllVurderinger()
 		val endringsmeldingInput = insertSkjermetPersonMedEndringsmeldinger()
 		insertVurdering(endringsmeldingInput.deltakerId)
 
@@ -166,7 +166,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-			{"endringsmeldinger":[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":null,"mellomnavn":null,"etternavn":null,"fodselsnummer":null,"erSkjermet":true},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","type":"LEGG_TIL_OPPSTARTSDATO"}],"vurderinger":[{"id":"866a387f-87d1-4623-8010-32fcdea5464e","deltaker":{"fornavn":null,"mellomnavn":null,"etternavn":null,"fodselsnummer":null,"erSkjermet":true},"vurderingstype":"OPPFYLLER_KRAVENE","begrunnelse":null,"opprettetDato":"2022-11-08T15:00:00"}]}
+				{"endringsmeldinger":[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":null,"mellomnavn":null,"etternavn":null,"fodselsnummer":null,"erSkjermet":true},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","utfortTidspunkt":null,"type":"LEGG_TIL_OPPSTARTSDATO"}],"vurderinger":[{"id":"866a387f-87d1-4623-8010-32fcdea5464e","deltaker":{"fornavn":null,"mellomnavn":null,"etternavn":null,"fodselsnummer":null,"erSkjermet":true},"vurderingstype":"OPPFYLLER_KRAVENE","begrunnelse":null,"opprettetDato":"2022-11-08T15:00:00"}]}
 			""".trimIndent()
 
 		response.code shouldBe 200
@@ -177,8 +177,6 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 	@Test
 	fun `hentMeldingerFraArrangor() - med tilgang til skjermede personer - skal returnere 200 med riktig response`() {
 		val oid = UUID.randomUUID()
-		testDataRepository.deleteAllEndringsmeldinger()
-		testDataRepository.deleteAllVurderinger()
 
 		val endringsmeldingInput = insertSkjermetPersonMedEndringsmeldinger()
 		insertVurdering(endringsmeldingInput.deltakerId)
@@ -201,7 +199,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-				{"endringsmeldinger":[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":"Skjermet bruker fornavn","mellomnavn":null,"etternavn":"Skjermet bruker etternavn","fodselsnummer":"10101010101","erSkjermet":true},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","type":"LEGG_TIL_OPPSTARTSDATO"}],"vurderinger":[{"id":"866a387f-87d1-4623-8010-32fcdea5464e","deltaker":{"fornavn":"Skjermet bruker fornavn","mellomnavn":null,"etternavn":"Skjermet bruker etternavn","fodselsnummer":"10101010101","erSkjermet":true},"vurderingstype":"OPPFYLLER_KRAVENE","begrunnelse":null,"opprettetDato":"2022-11-08T15:00:00"}]}
+				{"endringsmeldinger":[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":"Skjermet bruker fornavn","mellomnavn":null,"etternavn":"Skjermet bruker etternavn","fodselsnummer":"10101010101","erSkjermet":true},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","utfortTidspunkt":null,"type":"LEGG_TIL_OPPSTARTSDATO"}],"vurderinger":[{"id":"866a387f-87d1-4623-8010-32fcdea5464e","deltaker":{"fornavn":"Skjermet bruker fornavn","mellomnavn":null,"etternavn":"Skjermet bruker etternavn","fodselsnummer":"10101010101","erSkjermet":true},"vurderingstype":"OPPFYLLER_KRAVENE","begrunnelse":null,"opprettetDato":"2022-11-08T15:00:00"}]}
 			""".trimIndent()
 
 		response.code shouldBe 200
@@ -216,6 +214,8 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 			ident = NAV_ANSATT_1.navIdent,
 			oid = oid
 		)
+
+		testDataRepository.insertEndringsmelding(ENDRINGSMELDING_1_DELTAKER_1)
 
 		val endringsmeldingBefore = endringsmeldingRepository.get(ENDRINGSMELDING_1_DELTAKER_1.id)
 

@@ -12,6 +12,7 @@ data class EndringsmeldingDto(
 	val innhold: Innhold?,
 	val status: Status,
 	val opprettetDato: ZonedDateTime,
+	val utfortTidspunkt: ZonedDateTime?,
 	val type: Type
 ) {
 	enum class Status {
