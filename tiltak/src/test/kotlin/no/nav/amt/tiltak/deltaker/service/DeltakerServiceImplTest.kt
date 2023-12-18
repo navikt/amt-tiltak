@@ -436,11 +436,11 @@ class DeltakerServiceImplTest {
 	}
 
 	@Test
-	fun `slettDeltaker - skal slette deltaker, status og endringsmeldinger`() {
+	fun `slettDeltaker - skal slette deltaker, status, endringsmeldinger, og vurdering`() {
 		val statusInsertDbo = DeltakerStatusInsert(
 			id = UUID.randomUUID(),
 			deltakerId = deltaker.id,
-			type = DeltakerStatus.Type.DELTAR,
+			type = DeltakerStatus.Type.VURDERES,
 			aarsak = null,
 			gyldigFra = LocalDateTime.now().minusDays(2)
 		)
@@ -452,6 +452,12 @@ class DeltakerServiceImplTest {
 			ARRANGOR_ANSATT_1.id,
 			LocalDate.now().plusWeeks(4),
 		)
+		deltakerServiceImpl.lagreVurdering(
+			deltakerId = deltaker.id,
+			arrangorAnsattId = ARRANGOR_ANSATT_1.id,
+			vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
+			begrunnelse = null
+		)
 
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldNotBe null
 
@@ -462,6 +468,8 @@ class DeltakerServiceImplTest {
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldBe null
 
 		endringsmeldingService.hentAktiveEndringsmeldingerForDeltaker(deltakerId) shouldHaveSize 0
+
+		vurderingRepository.getVurderingerForDeltaker(deltaker.id) shouldBe emptyList()
 	}
 
 	@Test
