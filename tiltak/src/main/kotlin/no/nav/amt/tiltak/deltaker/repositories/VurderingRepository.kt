@@ -86,4 +86,14 @@ open class VurderingRepository(
 		)
 		template.update(sql, params)
 	}
+
+	fun slett(deltakerId: UUID) {
+		val sql = """
+			DELETE from vurdering WHERE deltaker_id = :deltakerId
+		""".trimIndent()
+		val params = DbUtils.sqlParameters(
+			"deltakerId" to deltakerId,
+		)
+		template.update(sql, params)
+	}
 }
