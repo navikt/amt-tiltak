@@ -113,6 +113,7 @@ class NavAnsattControllerService(
 		status = status.toDto(),
 		innhold = innhold?.toDto(),
 		opprettetDato = opprettet,
+		utfortTidspunkt = utfortTidspunkt,
 		type = type.toDto()
 	)
 
