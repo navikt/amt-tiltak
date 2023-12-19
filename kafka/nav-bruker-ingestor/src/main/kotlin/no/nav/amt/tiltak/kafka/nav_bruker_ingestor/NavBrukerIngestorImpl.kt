@@ -34,8 +34,11 @@ class NavBrukerIngestorImpl(
 		brukerService.upsert(brukerDto.toModel())
 
 		val deltakere = deltakerService.hentDeltakereMedPersonId(personId)
-		// det er kun endring i personident som skal trigge oppdatering på både deltaker-v1 og deltaker-v2
-		if (lagretBruker?.personIdent != brukerDto.personident) {
+
+		// Hvis vi ikke har lagret bruker, bør vi ikke ha deltakere, men pga samtidighetsproblemer ved opprettelse
+		// av deltaker og bruker så kan det skje, og da hender det at denne skriver utdatert deltakerdata til topic.
+		// Det er kun endring i personident som skal trigge oppdatering på både deltaker-v1 og deltaker-v2
+		if (lagretBruker != null && lagretBruker.personIdent != brukerDto.personident) {
 			deltakere.forEach { deltakerService.publiserDeltakerPaKafka(it.id) }
 		} else if (harEndredePersonopplysninger(lagretBruker, brukerDto)) {
 			deltakere.forEach { deltakerService.publiserDeltakerPaDeltakerV2Kafka(it.id) }
@@ -55,7 +58,7 @@ class NavBrukerIngestorImpl(
 
 	private fun harEndredePersonopplysninger(bruker: Bruker?, brukerDto: NavBrukerDto): Boolean {
 		if (bruker == null) {
-			return true
+			return false
 		} else {
 			return brukerDto.toModel() != bruker
 		}
