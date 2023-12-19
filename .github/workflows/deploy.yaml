@@ -46,13 +46,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: "write"
+      id-token: "write"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Deploy application
-        uses: nais/deploy/actions/deploy@master
+        uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: .nais/nais-dev.yaml
           VARS: .nais/vars-dev.yaml
@@ -70,14 +70,14 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: "write"
+      id-token: "write"
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Deploy application
-        uses: nais/deploy/actions/deploy@master
+        uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
           RESOURCE: .nais/nais-prod.yaml
           VARS: .nais/vars-prod.yaml
