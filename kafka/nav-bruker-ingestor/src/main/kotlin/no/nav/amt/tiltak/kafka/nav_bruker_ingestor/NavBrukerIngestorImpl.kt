@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
@@ -17,7 +18,7 @@ class NavBrukerIngestorImpl(
 	val navEnhetService: NavEnhetService,
 	val deltakerService: DeltakerService,
 	val navAnsattService: NavAnsattService,
-): NavBrukerIngestor {
+) : NavBrukerIngestor {
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
@@ -39,7 +40,12 @@ class NavBrukerIngestorImpl(
 		// av deltaker og bruker så kan det skje, og da hender det at denne skriver utdatert deltakerdata til topic.
 		// Det er kun endring i personident som skal trigge oppdatering på både deltaker-v1 og deltaker-v2
 		if (lagretBruker != null && lagretBruker.personIdent != brukerDto.personident) {
-			deltakere.forEach { deltakerService.publiserDeltakerPaKafka(it.id) }
+			deltakere.forEach {
+				deltakerService.publiserDeltakerPaKafka(
+					deltakerId = it.id,
+					endretDato = LocalDateTime.now(),
+				)
+			}
 		} else if (harEndredePersonopplysninger(lagretBruker, brukerDto)) {
 			deltakere.forEach { deltakerService.publiserDeltakerPaDeltakerV2Kafka(it.id) }
 		}
