@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
+import java.time.LocalDateTime
 import java.util.UUID
 
 interface DeltakerService {
@@ -41,7 +42,9 @@ interface DeltakerService {
 
 	fun republiserAlleDeltakerePaKafka(batchSize: Int = 500)
 
-	fun publiserDeltakerPaKafka(deltakerId: UUID)
+	fun republiserDeltakerPaKafka(deltakerId: UUID)
+
+	fun publiserDeltakerPaKafka(deltakerId: UUID, endretDato: LocalDateTime)
 
 	fun publiserDeltakerPaDeltakerV2Kafka(deltakerId: UUID)
 

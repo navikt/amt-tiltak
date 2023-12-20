@@ -38,7 +38,7 @@ class RepubliseringController(
 		request: HttpServletRequest,
 	) {
 		if (isInternal(request)) {
-			JobRunner.runAsync("republiser_deltaker_kafka") { deltakerService.publiserDeltakerPaKafka(id) }
+			JobRunner.runAsync("republiser_deltaker_kafka") { deltakerService.republiserDeltakerPaKafka(id) }
 		} else {
 			throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
 		}

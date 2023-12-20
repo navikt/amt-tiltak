@@ -59,8 +59,7 @@ open class DeltakerServiceImpl(
 			val oppdatertDeltaker = hentDeltaker(deltaker.id)
 				?: throw IllegalStateException("Fant ikke deltaker med id ${deltaker.id}")
 
-			kafkaProducerService.publiserDeltaker(oppdatertDeltaker)
-			publisherService.publish(oppdatertDeltaker.id, DataPublishType.DELTAKER)
+			publiser(oppdatertDeltaker, LocalDateTime.now())
 		}
 	}
 
@@ -72,8 +71,7 @@ open class DeltakerServiceImpl(
 				val oppdatertDeltaker = hentDeltaker(status.deltakerId)
 					?: throw IllegalStateException("Fant ikke deltaker med id ${status.deltakerId}")
 
-				kafkaProducerService.publiserDeltaker(oppdatertDeltaker)
-				publisherService.publish(oppdatertDeltaker.id, DataPublishType.DELTAKER)
+				publiser(oppdatertDeltaker, LocalDateTime.now())
 			}
 		}
 	}
@@ -321,7 +319,7 @@ open class DeltakerServiceImpl(
 
 				val deltaker = it.toDeltaker(status)
 
-				kafkaProducerService.publiserDeltaker(deltaker)
+				kafkaProducerService.publiserDeltaker(deltaker, deltaker.endretDato)
 				publisherService.publish(deltaker.id, DataPublishType.DELTAKER)
 			}
 
@@ -333,20 +331,25 @@ open class DeltakerServiceImpl(
 		log.info("Ferdig med republisering av deltakere på kafka")
 	}
 
-	override fun publiserDeltakerPaKafka(deltakerId: UUID) {
-		val dbo = deltakerRepository.get(deltakerId)
-			?: error("Fant ikke deltaker med id $deltakerId")
+	override fun republiserDeltakerPaKafka(deltakerId: UUID) {
+		val deltaker = hentDeltaker(deltakerId) ?: error("Fant ikke deltaker med id $deltakerId")
 
-		val status = deltakerStatusRepository.getStatusForDeltaker(deltakerId)
-			?: error("Fant ikke status for deltaker med id $deltakerId")
+		publiser(deltaker, deltaker.endretDato)
+	}
 
-		val deltaker = dbo.toDeltaker(status.toModel())
+	override fun publiserDeltakerPaKafka(deltakerId: UUID, endretDato: LocalDateTime) {
+		val deltaker = hentDeltaker(deltakerId) ?: error("Fant ikke deltaker med id $deltakerId")
 
-		kafkaProducerService.publiserDeltaker(deltaker)
+		publiser(deltaker, endretDato)
+	}
+
+	private fun publiser(deltaker: Deltaker, endretDato: LocalDateTime) {
+		kafkaProducerService.publiserDeltaker(deltaker, endretDato)
 		publisherService.publish(deltaker.id, DataPublishType.DELTAKER)
 
-		log.info("Publisert deltaker med id $deltakerId på kafka")
+		log.info("Publisert deltaker med id ${deltaker.id} på kafka")
 	}
+
 
 	override fun publiserDeltakerPaDeltakerV2Kafka(deltakerId: UUID) {
 		publisherService.publish(deltakerId, DataPublishType.DELTAKER)

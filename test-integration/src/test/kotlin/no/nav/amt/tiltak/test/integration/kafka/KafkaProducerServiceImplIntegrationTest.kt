@@ -30,7 +30,8 @@ class KafkaProducerServiceImplIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	fun `skal publisere deltaker med riktig key og value`() {
-		kafkaProducerService.publiserDeltaker(deltakerService.hentDeltaker(DELTAKER_1.id)!!)
+		val deltaker = deltakerService.hentDeltaker(DELTAKER_1.id)!!
+		kafkaProducerService.publiserDeltaker(deltaker, deltaker.endretDato)
 
 		val expectedJson = """
 			{"id":"dc600c70-124f-4fe7-a687-b58439beb214","gjennomforingId":"b3420940-5479-48c8-b2fa-3751c7a33aa2","personIdent":"12345678910","startDato":"2022-02-13","sluttDato":"2030-02-14","status":{"type":"DELTAR","aarsak":null,"opprettetDato":"2022-02-13T00:00:00"},"registrertDato":"2022-02-13T12:12:00","dagerPerUke":2.5,"prosentStilling":100.0,"endretDato":"2022-02-13T12:12:00"}

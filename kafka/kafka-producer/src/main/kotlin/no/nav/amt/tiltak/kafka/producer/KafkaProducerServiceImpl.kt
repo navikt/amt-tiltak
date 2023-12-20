@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.kafka.producer.dto.toDto
 import no.nav.common.kafka.producer.KafkaProducerClient
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -17,7 +18,7 @@ open class KafkaProducerServiceImpl(
 	private val kafkaProducerClient: KafkaProducerClient<ByteArray, ByteArray>
 ) : KafkaProducerService {
 
-	override fun publiserDeltaker(deltaker: Deltaker) {
+	override fun publiserDeltaker(deltaker: Deltaker, endretDato: LocalDateTime) {
 		val deltakerDto = DeltakerV1Dto(
 			id = deltaker.id,
 			gjennomforingId = deltaker.gjennomforingId,
@@ -28,7 +29,7 @@ open class KafkaProducerServiceImpl(
 			registrertDato = deltaker.registrertDato,
 			dagerPerUke = deltaker.dagerPerUke,
 			prosentStilling = deltaker.prosentStilling,
-			endretDato = deltaker.endretDato
+			endretDato = endretDato,
 		)
 
 		val key = deltaker.id.toString().toByteArray()
