@@ -58,6 +58,8 @@
         <common.version>3.2023.12.12_13.53-510909d4aa1a</common.version>
         <logstash.version>7.4</logstash.version>
         <unleash.version>9.2.0</unleash.version>
+
+        <logback.version>1.4.14</logback.version>
     </properties>
 
     <repositories>
