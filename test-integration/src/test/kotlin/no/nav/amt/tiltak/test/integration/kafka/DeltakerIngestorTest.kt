@@ -11,6 +11,7 @@ import no.nav.amt.tiltak.kafka.deltaker_ingestor.DeltakerDto
 import no.nav.amt.tiltak.kafka.deltaker_ingestor.DeltakerStatusDto
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.DbUtils.shouldBeCloseTo
+import no.nav.amt.tiltak.test.database.DbUtils.shouldBeEqualTo
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.utils.AsyncUtils
@@ -108,7 +109,7 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 		faktisk.prosentStilling shouldBe forventet.deltakelsesprosent
 		faktisk.innsokBegrunnelse shouldBe forventet.bakgrunnsinformasjon
 		faktisk.endretDato shouldBeCloseTo LocalDateTime.now()
-		faktisk.registrertDato shouldBe forventet.opprettet
+		faktisk.registrertDato shouldBeEqualTo forventet.opprettet
 		faktisk.mal shouldBe forventet.mal
 		sammenlignStatus(faktisk.status, forventet.status)
 	}
@@ -117,7 +118,7 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 		faktisk.id shouldBe forventet.id
 		faktisk.type shouldBe forventet.type
 		faktisk.aarsak shouldBe forventet.aarsak
-		faktisk.gyldigFra shouldBe forventet.gyldigFra
+		faktisk.gyldigFra shouldBeEqualTo forventet.gyldigFra
 		faktisk.opprettetDato shouldBeCloseTo LocalDateTime.now()
 		faktisk.aktiv shouldBe true
 	}
