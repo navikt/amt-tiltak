@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.deltaker.dbo
 import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.Mal
 import no.nav.amt.tiltak.nav_enhet.NavEnhetDbo
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -28,7 +29,8 @@ data class DeltakerDbo(
 	val modifiedAt: LocalDateTime,
 	val registrertDato: LocalDateTime,
 	val innsokBegrunnelse: String?,
-	val adressebeskyttelse: Adressebeskyttelse?
+	val adressebeskyttelse: Adressebeskyttelse?,
+	val mal: List<Mal>?
 ) {
 
 	fun toDeltaker(status: DeltakerStatus): Deltaker {
@@ -52,7 +54,8 @@ data class DeltakerDbo(
 			status = status,
 			innsokBegrunnelse = innsokBegrunnelse,
 			endretDato = modifiedAt,
-			adressebeskyttelse = adressebeskyttelse
+			adressebeskyttelse = adressebeskyttelse,
+			mal = mal
 		)
 	}
 

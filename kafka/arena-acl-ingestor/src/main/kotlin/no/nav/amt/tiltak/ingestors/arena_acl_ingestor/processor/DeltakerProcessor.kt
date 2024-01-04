@@ -63,7 +63,8 @@ class DeltakerProcessor(
 			prosentStilling = deltakerDto.prosentDeltid,
 			registrertDato = deltakerDto.registrertDato,
 			gjennomforingId = gjennomforingId,
-			innsokBegrunnelse = deltakerDto.innsokBegrunnelse
+			innsokBegrunnelse = deltakerDto.innsokBegrunnelse,
+			mal = null
 		)
 
 		transactionTemplate.executeWithoutResult {

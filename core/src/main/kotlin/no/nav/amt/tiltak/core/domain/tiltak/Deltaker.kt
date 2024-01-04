@@ -24,7 +24,8 @@ data class Deltaker(
 	val prosentStilling: Float? = null,
 	val innsokBegrunnelse: String? = null,
 	val endretDato: LocalDateTime,
-	val adressebeskyttelse: Adressebeskyttelse?
+	val adressebeskyttelse: Adressebeskyttelse?,
+	val mal: List<Mal>?
 ) {
 	fun harAdressebeskyttelse(): Boolean {
 		return adressebeskyttelse != null

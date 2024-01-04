@@ -674,7 +674,8 @@ class DeltakerServiceImplTest {
 		dagerPerUke = null,
 		prosentStilling = null,
 		gjennomforingId = GJENNOMFORING_1.id,
-		innsokBegrunnelse = null
+		innsokBegrunnelse = null,
+		mal = null
 	)
 
 }

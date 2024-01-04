@@ -109,6 +109,7 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 		faktisk.innsokBegrunnelse shouldBe forventet.bakgrunnsinformasjon
 		faktisk.endretDato shouldBeCloseTo LocalDateTime.now()
 		faktisk.registrertDato shouldBe forventet.opprettet
+		faktisk.mal shouldBe forventet.mal
 		sammenlignStatus(faktisk.status, forventet.status)
 	}
 

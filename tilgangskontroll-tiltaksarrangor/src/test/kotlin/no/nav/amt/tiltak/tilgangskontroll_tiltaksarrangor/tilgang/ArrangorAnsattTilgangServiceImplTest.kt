@@ -113,7 +113,8 @@ class ArrangorAnsattTilgangServiceImplTest {
 		gjennomforingId = gjennomforingId,
 		erSkjermet = true,
 		endretDato = LocalDateTime.now(),
-		adressebeskyttelse = null
+		adressebeskyttelse = null,
+		mal = null
 	)
 
 	@BeforeEach

@@ -66,7 +66,8 @@ class DeltakerIngestorImpl(
 			prosentStilling = deltakerDto.deltakelsesprosent,
 			registrertDato = deltakerDto.opprettet,
 			gjennomforingId = gjennomforingId,
-			innsokBegrunnelse = deltakerDto.bakgrunnsinformasjon
+			innsokBegrunnelse = deltakerDto.bakgrunnsinformasjon,
+			mal = deltakerDto.mal
 		)
 
 		transactionTemplate.executeWithoutResult {

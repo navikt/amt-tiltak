@@ -7,6 +7,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.Mal
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpsertDbo
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -57,6 +58,12 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val dagerPerUke = 2.5f
 		val prosentStilling = 20.0f
 		val begrunnelse = "begrunnelse"
+		val mal = listOf(Mal(
+			visningstekst = "Visningstekst",
+			type = "type",
+			valgt = true,
+			beskrivelse = null
+		))
 
 		repository.upsert(
 			DeltakerUpsertDbo(
@@ -68,7 +75,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 				dagerPerUke = dagerPerUke,
 				prosentStilling = prosentStilling,
 				registrertDato = registrertDato,
-				innsokBegrunnelse = begrunnelse
+				innsokBegrunnelse = begrunnelse,
+				mal = mal
 			)
 		)
 		val dbo = repository.get(id)
@@ -85,12 +93,19 @@ internal class DeltakerRepositoryTest : FunSpec({
 		dbo.modifiedAt shouldNotBe null
 		dbo.registrertDato.truncatedTo(ChronoUnit.MINUTES) shouldBe registrertDato.truncatedTo(ChronoUnit.MINUTES)
 		dbo.innsokBegrunnelse shouldBe begrunnelse
+		dbo.mal shouldBe mal
 	}
 
 	test("upsert - should update Deltaker and return the updated Deltaker") {
 		val nyStartdato = LocalDate.now().plusDays(1)
 		val nySluttdato = LocalDate.now().plusDays(14)
 		val nyBegrunnelse = "ny begrunnelse"
+		val mal = listOf(Mal(
+			visningstekst = "Visningstekst",
+			type = "type",
+			valgt = true,
+			beskrivelse = null
+		))
 
 		repository.upsert(DeltakerUpsertDbo(
 			id = DELTAKER_1.id,
@@ -99,7 +114,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 			startDato = nyStartdato,
 			sluttDato = nySluttdato,
 			registrertDato = LocalDateTime.now(),
-			innsokBegrunnelse = nyBegrunnelse
+			innsokBegrunnelse = nyBegrunnelse,
+			mal = mal
 		))
 		val updatedDeltaker = repository.get(DELTAKER_1.id)
 
@@ -108,6 +124,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		updatedDeltaker.startDato shouldBe nyStartdato
 		updatedDeltaker.sluttDato shouldBe nySluttdato
 		updatedDeltaker.innsokBegrunnelse shouldBe nyBegrunnelse
+		updatedDeltaker.mal shouldBe mal
 	}
 
 	test("get - deltaker finnes - returnerer deltaker") {
@@ -119,7 +136,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 			sluttDato = null,
 			dagerPerUke = 2.5f,
 			prosentStilling = 20.0f,
-			registrertDato = now
+			registrertDato = now,
+			mal = null
 		)
 
 		repository.upsert(insertDbo)
@@ -134,6 +152,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		gottenDbo.dagerPerUke shouldBe insertDbo.dagerPerUke
 		gottenDbo.prosentStilling shouldBe insertDbo.prosentStilling
 		gottenDbo.registrertDato.truncatedTo(ChronoUnit.MINUTES) shouldBe insertDbo.registrertDato.truncatedTo(ChronoUnit.MINUTES)
+		gottenDbo.mal shouldBe null
 	}
 
 	test("get(brukerId, gjennomforing) - returnerer deltaker") {
@@ -146,7 +165,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 			sluttDato = null,
 			dagerPerUke = 2f,
 			prosentStilling = 20.0f,
-			registrertDato = now
+			registrertDato = now,
+			mal = null
 		)
 
 		repository.upsert(insertDbo)
@@ -181,7 +201,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 			sluttDato = sluttDato,
 			dagerPerUke = dagerPerUke,
 			prosentStilling = prosentStilling,
-			registrertDato = registrertDato
+			registrertDato = registrertDato,
+			mal = null
 		)
 
 		repository.upsert(insertDbo)
@@ -213,7 +234,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 			sluttDato = LocalDate.now().minusDays(2),
 			dagerPerUke = 2.5f,
 			prosentStilling = 20.0f,
-			registrertDato = now.minusDays(10)
+			registrertDato = now.minusDays(10),
+			mal = null
 		)
 		repository.upsert(deltakerInsertDbo)
 		val deltaker = repository.get(deltakerInsertDbo.id)
@@ -241,7 +263,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 			sluttDato = LocalDate.now().plusDays(2),
 			dagerPerUke = 2.5f,
 			prosentStilling = 20.0f,
-			registrertDato = LocalDateTime.now().minusDays(10)
+			registrertDato = LocalDateTime.now().minusDays(10),
+			mal = null
 		)
 		val statusInsertDbo = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
@@ -269,7 +292,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 			sluttDato = LocalDate.now().plusDays(2),
 			dagerPerUke = 2.5f,
 			prosentStilling = 20.0f,
-			registrertDato = LocalDateTime.now().minusDays(10)
+			registrertDato = LocalDateTime.now().minusDays(10),
+			mal = null
 		)
 		repository.upsert(deltakerInsertDbo)
 		val deltaker = repository.get(deltakerInsertDbo.id)
@@ -299,7 +323,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 			sluttDato = LocalDate.now().plusDays(2),
 			dagerPerUke = 2.5f,
 			prosentStilling = 20.0f,
-			registrertDato = now.minusDays(10)
+			registrertDato = now.minusDays(10),
+			mal = null
 		)
 		val statusInsertDbo = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
@@ -334,7 +359,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 			sluttDato = LocalDate.now().plusDays(10),
 			dagerPerUke = 2.5f,
 			prosentStilling = 20.0f,
-			registrertDato = LocalDateTime.now().minusDays(10)
+			registrertDato = LocalDateTime.now().minusDays(10),
+			mal = null
 		)
 		val statusInsertDbo = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
@@ -361,7 +387,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 			sluttDato = LocalDate.now().plusDays(2),
 			dagerPerUke = 2.5f,
 			prosentStilling = 20.0f,
-			registrertDato = LocalDateTime.now().minusDays(10)
+			registrertDato = LocalDateTime.now().minusDays(10),
+			mal = null
 		)
 
 		repository.upsert(deltakerInsertDbo)
