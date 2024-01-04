@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.test.integration.mocks
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.GjennomforingArenaData
 import no.nav.amt.tiltak.test.integration.utils.MockHttpServer
 import okhttp3.mockwebserver.MockResponse
-import java.util.*
+import java.util.UUID
 
 class MockMulighetsrommetApiServer : MockHttpServer(name = "MockMulighetsrommetApiServer") {
 
@@ -11,9 +11,14 @@ class MockMulighetsrommetApiServer : MockHttpServer(name = "MockMulighetsrommetA
 		resetHttpServer()
 	}
 
-	fun gjennomforingArenaData(id: UUID, arenaDataResponse: GjennomforingArenaData) {
-		val virksomhetsnummer = if (arenaDataResponse.virksomhetsnummer == null) "null" else "\"${arenaDataResponse.virksomhetsnummer}\""
-		val body = """
+	fun gjennomforingArenaData(id: UUID, arenaDataResponse: GjennomforingArenaData?) {
+		if (arenaDataResponse == null) {
+			val response = MockResponse().setResponseCode(200)
+			addResponseHandler("/api/v1/tiltaksgjennomforinger/arenadata/${id}", response)
+		} else {
+			val virksomhetsnummer =
+				if (arenaDataResponse.virksomhetsnummer == null) "null" else "\"${arenaDataResponse.virksomhetsnummer}\""
+			val body = """
 			{
 				"opprettetAar": ${arenaDataResponse.opprettetAar},
 				"lopenr": ${arenaDataResponse.lopenr},
@@ -23,7 +28,8 @@ class MockMulighetsrommetApiServer : MockHttpServer(name = "MockMulighetsrommetA
 			}
 		""".trimIndent()
 
-		val response = MockResponse().setResponseCode(200).setBody(body)
-		addResponseHandler("/api/v1/tiltaksgjennomforinger/arenadata/${id}", response)
+			val response = MockResponse().setResponseCode(200).setBody(body)
+			addResponseHandler("/api/v1/tiltaksgjennomforinger/arenadata/${id}", response)
+		}
 	}
 }

@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.application
 
 import io.getunleash.DefaultUnleash
+import io.getunleash.Unleash
 import io.getunleash.util.UnleashConfig
 import no.nav.common.audit_log.log.AuditLogger
 import no.nav.common.audit_log.log.AuditLoggerImpl
@@ -74,7 +75,7 @@ open class ApplicationConfig {
 	open fun unleashClient(
 		@Value("\${app.env.unleashUrl}") unleashUrl: String,
 		@Value("\${app.env.unleashApiToken}") unleashApiToken: String
-	) : DefaultUnleash {
+	) : Unleash {
 		val appName = "amt-tiltak"
 		val config = UnleashConfig.builder()
 			.appName(appName)

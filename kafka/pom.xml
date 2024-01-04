@@ -21,5 +21,6 @@
         <module>ansatt-ingestor</module>
         <module>nav-bruker-ingestor</module>
         <module>nav-ansatt-ingestor</module>
+        <module>deltaker-ingestor</module>
     </modules>
 </project>

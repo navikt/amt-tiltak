@@ -104,6 +104,10 @@
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
+            <artifactId>deltaker-ingestor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>mulighetsrommet-api-client</artifactId>
         </dependency>
         <dependency>

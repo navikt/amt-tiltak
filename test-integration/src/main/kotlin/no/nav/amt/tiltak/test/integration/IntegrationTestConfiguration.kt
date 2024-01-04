@@ -1,5 +1,7 @@
 package no.nav.amt.tiltak.test.integration
 
+import io.getunleash.FakeUnleash
+import io.getunleash.Unleash
 import no.nav.amt.tiltak.kafka.config.KafkaProperties
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.integration.utils.SingletonKafkaProvider
@@ -25,10 +27,16 @@ open class IntegrationTestConfiguration {
 		return KafkaProducerClientImpl(properties)
 	}
 
-
 	@Bean
 	open fun testDataRepository(template: NamedParameterJdbcTemplate): TestDataRepository {
 		return TestDataRepository(template)
 	}
 
+	@Bean
+	open fun unleashClient(
+	): Unleash {
+		val fakeUnleash = FakeUnleash()
+		fakeUnleash.enableAll()
+		return fakeUnleash
+	}
 }
