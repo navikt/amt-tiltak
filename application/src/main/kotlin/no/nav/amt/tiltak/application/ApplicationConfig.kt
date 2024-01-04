@@ -19,6 +19,7 @@ import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomiz
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 
 @EnableJwtTokenValidation
 @Configuration
@@ -72,6 +73,7 @@ open class ApplicationConfig {
 	}
 
 	@Bean
+	@Profile("default")
 	open fun unleashClient(
 		@Value("\${app.env.unleashUrl}") unleashUrl: String,
 		@Value("\${app.env.unleashApiToken}") unleashApiToken: String
