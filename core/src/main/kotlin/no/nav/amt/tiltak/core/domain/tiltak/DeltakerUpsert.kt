@@ -23,7 +23,7 @@ data class DeltakerUpsert(
 		val deltakerEquals = id == deltaker.id && startDato == deltaker.startDato && sluttDato == deltaker.sluttDato
 			&& registrertDato.truncatedTo(ChronoUnit.MILLIS) == deltaker.registrertDato.truncatedTo(ChronoUnit.MILLIS)
 			&& dagerPerUke == deltaker.dagerPerUke && prosentStilling == deltaker.prosentStilling
-			&& innsokBegrunnelse == deltaker.innsokBegrunnelse
+			&& innsokBegrunnelse == deltaker.innsokBegrunnelse && mal == deltaker.mal
 
 		return statusEquals && deltakerEquals
 	}
