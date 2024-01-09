@@ -14,6 +14,7 @@ import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.kafka.tiltaksgjennomforing_ingestor.GjennomforingStatusConverter
+import no.nav.common.utils.EnvironmentUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
@@ -37,17 +38,26 @@ class DeltakerIngestorImpl(
 			val deltakerId = UUID.fromString(key)
 			if (value == null) {
 				deltakerService.slettDeltaker(deltakerId)
-				log.info("Slettet deltaker med id $deltakerId")
+				log.info("Slettet deltaker fra ny løsning med id $deltakerId")
 			} else {
 				upsert(fromJsonString<DeltakerDto>(value))
-				log.info("Håndterte deltaker med id $deltakerId")
+				log.info("Håndterte deltaker fra ny løsning med id $deltakerId")
 			}
 		}
 	}
 
 	private fun upsert(deltakerDto: DeltakerDto) {
 		val gjennomforingId = gjennomforingService.getGjennomforingOrNull(deltakerDto.deltakerlisteId)?.id
-			?: upsertGjennomforing(deltakerDto.deltakerlisteId).id
+			?: try {
+				upsertGjennomforing(deltakerDto.deltakerlisteId).id
+			} catch (e: IllegalStateException) {
+				if (EnvironmentUtils.isDevelopment().orElse(false)) {
+					log.warn("Ignorerer deltaker med id ${deltakerDto.id} på gjennomføring ${deltakerDto.deltakerlisteId} i dev: ${e.message}")
+					return
+				} else {
+					throw e
+				}
+			}
 
 		val status = DeltakerStatusInsert(
 			id = deltakerDto.status.id,
@@ -85,7 +95,7 @@ class DeltakerIngestorImpl(
 				deltakerService.opphevSkjulDeltakerForTiltaksarrangor(deltakerUpsert.id)
 			}
 		}
-		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} deltakerlisteId=${gjennomforingId}")
+		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} deltakerlisteId=${gjennomforingId} fra ny løsning")
 	}
 
 	private fun upsertGjennomforing(gjennomforingId: UUID): Gjennomforing {
