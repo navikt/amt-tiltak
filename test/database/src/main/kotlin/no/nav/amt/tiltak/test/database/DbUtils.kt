@@ -42,6 +42,11 @@ object DbUtils {
 		expected!!.shouldBeWithin(Duration.ofSeconds(1), this)
 	}
 
+	infix fun LocalDateTime.shouldBeCloseTo(expected: LocalDateTime?) {
+		expected shouldNotBe null
+		expected!!.shouldBeWithin(Duration.ofSeconds(10), this)
+	}
+
 	fun LocalDate.isEqualTo(other: LocalDate?): Boolean {
 		if (other == null) {
 			return false

@@ -113,6 +113,8 @@ spec:
       value: amt.nav-bruker-personalia-v1
     - name: NAV_ANSATT_PERSONALIA_TOPIC
       value: amt.nav-ansatt-personalia-v1
+    - name: DELTAKER_ENDRET_TOPIC
+      value: amt.deltaker-endring-v1
 
   gcp:
     sqlInstances:

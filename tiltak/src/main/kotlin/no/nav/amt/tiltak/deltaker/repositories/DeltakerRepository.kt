@@ -4,13 +4,17 @@ import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getNullableFloat
 import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getNullableUUID
+import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.core.domain.tiltak.AVSLUTTENDE_STATUSER
 import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.domain.tiltak.Mal
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpsertDbo
 import no.nav.amt.tiltak.nav_enhet.NavEnhetDbo
+import org.postgresql.util.PGobject
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -49,14 +53,15 @@ open class DeltakerRepository(
 			modifiedAt = rs.getTimestamp("modified_at").toLocalDateTime(),
 			registrertDato = rs.getTimestamp("registrert_dato").toLocalDateTime(),
 			innsokBegrunnelse = rs.getNullableString("innsok_begrunnelse"),
-			adressebeskyttelse = rs.getString("adressebeskyttelse")?.let { Adressebeskyttelse.valueOf(it) }
+			adressebeskyttelse = rs.getString("adressebeskyttelse")?.let { Adressebeskyttelse.valueOf(it) },
+			mal = rs.getString("mal")?.let { fromJsonString<List<Mal>>(it) }
 		)
 	}
 
 	fun upsert(deltaker: DeltakerUpsertDbo) {
 		val sql = """
 			INSERT INTO deltaker(id, bruker_id, gjennomforing_id, start_dato, slutt_dato,
-								 dager_per_uke, prosent_stilling, registrert_dato, innsok_begrunnelse)
+								 dager_per_uke, prosent_stilling, registrert_dato, innsok_begrunnelse, mal)
 			VALUES (:id,
 					:brukerId,
 					:gjennomforingId,
@@ -65,7 +70,8 @@ open class DeltakerRepository(
 					:dagerPerUke,
 					:prosentStilling,
 					:registrertDato,
-					:innsokBegrunnelse)
+					:innsokBegrunnelse,
+					:mal)
 			ON CONFLICT (id) DO
 			UPDATE SET
 				start_dato = :startdato,
@@ -73,6 +79,7 @@ open class DeltakerRepository(
 				dager_per_uke = :dagerPerUke,
 				prosent_stilling = :prosentStilling,
 				innsok_begrunnelse = :innsokBegrunnelse,
+				mal	= :mal,
 				modified_at = CURRENT_TIMESTAMP
 		""".trimIndent()
 
@@ -86,7 +93,8 @@ open class DeltakerRepository(
 				"dagerPerUke" to deltaker.dagerPerUke,
 				"prosentStilling" to deltaker.prosentStilling,
 				"registrertDato" to deltaker.registrertDato,
-				"innsokBegrunnelse" to deltaker.innsokBegrunnelse
+				"innsokBegrunnelse" to deltaker.innsokBegrunnelse,
+				"mal" to deltaker.mal?.toPGObject()
 			)
 		)
 
@@ -320,5 +328,10 @@ open class DeltakerRepository(
 		)
 
 		template.update(sql, parameters)
+	}
+
+	private fun List<Mal>.toPGObject() = PGobject().also {
+		it.type = "json"
+		it.value = JsonUtils.objectMapper.writeValueAsString(this)
 	}
 }

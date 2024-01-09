@@ -1,74 +1,87 @@
-package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
+package no.nav.amt.tiltak.kafka.deltaker_ingestor
 
+import io.getunleash.Unleash
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.Gjennomforing
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.MulighetsrommetApiClient
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
+import no.nav.amt.tiltak.core.kafka.DeltakerIngestor
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.TiltakService
-import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
-import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
 import no.nav.amt.tiltak.kafka.tiltaksgjennomforing_ingestor.GjennomforingStatusConverter
+import no.nav.common.utils.EnvironmentUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import java.util.UUID
 
 @Service
-class DeltakerProcessor(
-	private val gjennomforingService: GjennomforingService,
+class DeltakerIngestorImpl(
 	private val deltakerService: DeltakerService,
+	private val gjennomforingService: GjennomforingService,
 	private val arrangorService: ArrangorService,
 	private val tiltakService: TiltakService,
 	private val navEnhetService: NavEnhetService,
 	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
-	private val transactionTemplate: TransactionTemplate
-) : GenericProcessor<DeltakerPayload>() {
-
+	private val transactionTemplate: TransactionTemplate,
+	private val unleashClient: Unleash
+) : DeltakerIngestor {
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	override fun processInsertMessage(message: MessageWrapper<DeltakerPayload>) {
-		upsert(message)
+	override fun ingest(key: String, value: String?) {
+		if (unleashClient.isEnabled("amt.enable-komet-deltakere")) {
+			val deltakerId = UUID.fromString(key)
+			if (value == null) {
+				deltakerService.slettDeltaker(deltakerId)
+				log.info("Slettet deltaker fra ny løsning med id $deltakerId")
+			} else {
+				upsert(fromJsonString<DeltakerDto>(value))
+				log.info("Håndterte deltaker fra ny løsning med id $deltakerId")
+			}
+		}
 	}
 
-	override fun processModifyMessage(message: MessageWrapper<DeltakerPayload>) {
-		upsert(message)
-	}
-
-	private fun upsert(message: MessageWrapper<DeltakerPayload>) {
-		val deltakerDto = message.payload
-
-		val gjennomforingId = gjennomforingService.getGjennomforingOrNull(deltakerDto.gjennomforingId)?.id
-			?: upsertGjennomforing(deltakerDto.gjennomforingId).id
+	private fun upsert(deltakerDto: DeltakerDto) {
+		val gjennomforingId = gjennomforingService.getGjennomforingOrNull(deltakerDto.deltakerlisteId)?.id
+			?: try {
+				upsertGjennomforing(deltakerDto.deltakerlisteId).id
+			} catch (e: IllegalStateException) {
+				if (EnvironmentUtils.isDevelopment().orElse(false)) {
+					log.warn("Ignorerer deltaker med id ${deltakerDto.id} på gjennomføring ${deltakerDto.deltakerlisteId} i dev: ${e.message}")
+					return
+				} else {
+					throw e
+				}
+			}
 
 		val status = DeltakerStatusInsert(
-			id = UUID.randomUUID(),
+			id = deltakerDto.status.id,
 			deltakerId = deltakerDto.id,
-			type = tilDeltakerStatusType(deltakerDto.status),
-			aarsak = tilDeltakerAarsak(deltakerDto.statusAarsak),
-			gyldigFra = deltakerDto.statusEndretDato,
+			type = deltakerDto.status.type,
+			aarsak = deltakerDto.status.aarsak,
+			gyldigFra = deltakerDto.status.gyldigFra,
 		)
 
 		val deltakerUpsert = DeltakerUpsert(
 			id = deltakerDto.id,
 			statusInsert = status,
-			startDato = deltakerDto.startDato,
-			sluttDato = deltakerDto.sluttDato,
+			startDato = deltakerDto.startdato,
+			sluttDato = deltakerDto.sluttdato,
 			dagerPerUke = deltakerDto.dagerPerUke,
-			prosentStilling = deltakerDto.prosentDeltid,
-			registrertDato = deltakerDto.registrertDato,
+			prosentStilling = deltakerDto.deltakelsesprosent,
+			registrertDato = deltakerDto.opprettet,
 			gjennomforingId = gjennomforingId,
-			innsokBegrunnelse = deltakerDto.innsokBegrunnelse,
-			mal = null
+			innsokBegrunnelse = deltakerDto.bakgrunnsinformasjon,
+			mal = deltakerDto.mal
 		)
 
 		transactionTemplate.executeWithoutResult {
-			deltakerService.upsertDeltaker(deltakerDto.personIdent, deltakerUpsert)
+			deltakerService.upsertDeltaker(deltakerDto.personident, deltakerUpsert)
 
 			/*
 			 	Deltakere blir noen ganger gjenbrukt istedenfor at det opprettes en ny,
@@ -82,8 +95,7 @@ class DeltakerProcessor(
 				deltakerService.opphevSkjulDeltakerForTiltaksarrangor(deltakerUpsert.id)
 			}
 		}
-
-		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=${gjennomforingId}")
+		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} deltakerlisteId=${gjennomforingId} fra ny løsning")
 	}
 
 	private fun upsertGjennomforing(gjennomforingId: UUID): Gjennomforing {
@@ -121,44 +133,5 @@ class DeltakerProcessor(
 			)
 		)
 		return gjennomforing
-
 	}
-	private fun tilDeltakerStatusType(status: DeltakerPayload.Status): DeltakerStatus.Type {
-		return when(status){
-			DeltakerPayload.Status.VENTER_PA_OPPSTART -> DeltakerStatus.Type.VENTER_PA_OPPSTART
-			DeltakerPayload.Status.DELTAR -> DeltakerStatus.Type.DELTAR
-			DeltakerPayload.Status.HAR_SLUTTET -> DeltakerStatus.Type.HAR_SLUTTET
-			DeltakerPayload.Status.IKKE_AKTUELL -> DeltakerStatus.Type.IKKE_AKTUELL
-			DeltakerPayload.Status.FEILREGISTRERT -> DeltakerStatus.Type.FEILREGISTRERT
-			DeltakerPayload.Status.PABEGYNT -> DeltakerStatus.Type.PABEGYNT_REGISTRERING
-			DeltakerPayload.Status.PABEGYNT_REGISTRERING -> DeltakerStatus.Type.PABEGYNT_REGISTRERING
-			DeltakerPayload.Status.SOKT_INN -> DeltakerStatus.Type.SOKT_INN
-			DeltakerPayload.Status.VURDERES -> DeltakerStatus.Type.VURDERES
-			DeltakerPayload.Status.VENTELISTE -> DeltakerStatus.Type.VENTELISTE
-			DeltakerPayload.Status.AVBRUTT -> DeltakerStatus.Type.AVBRUTT
-			DeltakerPayload.Status.FULLFORT -> DeltakerStatus.Type.FULLFORT
-		}
-	}
-
-	private fun tilDeltakerAarsak(aarsak: DeltakerPayload.StatusAarsak?): DeltakerStatus.Aarsak? {
-		return when(aarsak){
-			DeltakerPayload.StatusAarsak.SYK -> DeltakerStatus.Aarsak.SYK
-			DeltakerPayload.StatusAarsak.FATT_JOBB -> DeltakerStatus.Aarsak.FATT_JOBB
-			DeltakerPayload.StatusAarsak.TRENGER_ANNEN_STOTTE -> DeltakerStatus.Aarsak.TRENGER_ANNEN_STOTTE
-			DeltakerPayload.StatusAarsak.FIKK_IKKE_PLASS -> DeltakerStatus.Aarsak.FIKK_IKKE_PLASS
-			DeltakerPayload.StatusAarsak.AVLYST_KONTRAKT -> DeltakerStatus.Aarsak.AVLYST_KONTRAKT
-			DeltakerPayload.StatusAarsak.IKKE_MOTT -> DeltakerStatus.Aarsak.IKKE_MOTT
-			DeltakerPayload.StatusAarsak.ANNET -> DeltakerStatus.Aarsak.ANNET
-			else -> null
-		}
-	}
-
-	override fun processDeleteMessage(message: MessageWrapper<DeltakerPayload>) {
-		val deltakerId = message.payload.id
-
-		log.info("Motatt delete-melding, sletter deltaker med id=$deltakerId")
-
-		deltakerService.slettDeltaker(deltakerId)
-	}
-
 }
