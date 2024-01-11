@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
-import java.util.*
+import java.util.UUID
 
 @Service
 open class AuthService(
@@ -22,23 +22,21 @@ open class AuthService(
 	lateinit var endringsmeldingGroupId: String
 
 	open fun hentPersonligIdentTilInnloggetBruker(): String {
-		val context = tokenValidationContextHolder.tokenValidationContext
+		val context = tokenValidationContextHolder.getTokenValidationContext()
 
-		val token = context.firstValidToken.orElseThrow {
+		val token = context.firstValidToken ?:
 			throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not authorized, valid token is missing")
-		}
 
-		return token.jwtTokenClaims["pid"]?.toString() ?: throw ResponseStatusException(
+		return token.jwtTokenClaims.getStringClaim("pid") ?: throw ResponseStatusException(
 			HttpStatus.UNAUTHORIZED,
 			"PID is missing or is not a string"
 		)
 	}
 
 	open fun hentNavIdentTilInnloggetBruker(): String = tokenValidationContextHolder
-		.tokenValidationContext
+		.getTokenValidationContext()
 		.getClaims(Issuer.AZURE_AD)
-		.get("NAVident")
-		?.toString()
+		.getStringClaim("NAVident")
 		?: throw NotAuthenticatedException("NAV ident is missing")
 
 	open fun harTilgangTilSkjermedePersoner() = harTilgangTilADGruppe(tilgangTilNavAnsattGroupId)
@@ -52,7 +50,7 @@ open class AuthService(
 	}
 
 	open fun hentAzureIdTilInnloggetBruker(): UUID = tokenValidationContextHolder
-		.tokenValidationContext
+		.getTokenValidationContext()
 		.getClaims(Issuer.AZURE_AD)
 		.getStringClaim("oid").let { UUID.fromString(it) }
 		?: throw ResponseStatusException(
@@ -61,7 +59,7 @@ open class AuthService(
 		)
 
 	fun hentAdGrupperTilInnloggetBruker(): List<AdGruppe> = tokenValidationContextHolder
-		.tokenValidationContext
+		.getTokenValidationContext()
 		.getClaims(Issuer.AZURE_AD)
 		.getAsList("groups")
 		.mapNotNull(this::mapIdTilAdGruppe)
@@ -69,13 +67,13 @@ open class AuthService(
 	private fun erM2MToken() = hentAzureIdTilInnloggetBruker().equals(hentSubjectClaim())
 
 	private fun hentSubjectClaim(): UUID = tokenValidationContextHolder
-		.tokenValidationContext
+		.getTokenValidationContext()
 		.getClaims(Issuer.AZURE_AD)
 		.getStringClaim("sub").let { UUID.fromString(it.toString()) }
 		?: throw NotAuthenticatedException("Sub is missing")
 
 	private fun harTilgangTilADGruppe(id: String): Boolean = tokenValidationContextHolder
-		.tokenValidationContext
+		.getTokenValidationContext()
 		.getClaims(Issuer.AZURE_AD)
 		.getAsList("groups")
 		.let { groups -> groups.any { it == id }}

@@ -41,19 +41,19 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.code.style>official</kotlin.code.style>
-        <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
+        <kotlin.compiler.jvmTarget>21</kotlin.compiler.jvmTarget>
         <kotlin.version>1.9.22</kotlin.version>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
 
         <testcontainers.version>1.19.3</testcontainers.version>
         <mockito-kotlin.version>5.2.1</mockito-kotlin.version>
         <schedlock.version>5.10.2</schedlock.version>
-        <nimbus.version>11.9</nimbus.version>
-        <mockk.version>1.13.8</mockk.version>
+        <nimbus.version>11.9.1</nimbus.version>
+        <mockk.version>1.13.9</mockk.version>
         <kotest.version>5.6.1</kotest.version>
         <okhttp.version>4.12.0</okhttp.version>
-        <token-support.version>3.2.0</token-support.version>
+        <token-support.version>4.0.3</token-support.version>
         <mock-oauth2-server.version>2.1.0</mock-oauth2-server.version>
         <common.version>3.2023.12.12_13.53-510909d4aa1a</common.version>
         <logstash.version>7.4</logstash.version>
@@ -86,7 +86,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.3</version>
+                <version>3.2.5</version>
             </plugin>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
