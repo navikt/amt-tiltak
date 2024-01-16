@@ -106,6 +106,7 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		deltakerId = deltakerId,
 		gyldigFra = LocalDateTime.now(),
 		status = DeltakerStatus.Type.DELTAR.name,
+		aarsak = null,
 		aktiv = true,
 		createdAt = ZonedDateTime.now()
 	)

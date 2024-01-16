@@ -55,6 +55,7 @@ object TestData {
 		gyldigFra = LocalDateTime.now(),
 		status = "DELTAR",
 		aktiv = true,
+		aarsak = null,
 		createdAt = deltaker.createdAt
 	)
 
@@ -310,6 +311,7 @@ object TestData {
 		deltakerId = DELTAKER_1.id,
 		gyldigFra = LocalDateTime.now(),
 		status = "DELTAR",
+		aarsak = null,
 		aktiv = true
 	)
 
@@ -318,6 +320,7 @@ object TestData {
 		deltakerId = DELTAKER_1.id,
 		gyldigFra = LocalDateTime.now(),
 		status = DeltakerStatus.Type.VENTER_PA_OPPSTART.name,
+		aarsak = null,
 		aktiv = true
 	)
 
@@ -361,6 +364,7 @@ object TestData {
 		deltakerId = DELTAKER_2.id,
 		gyldigFra = LocalDateTime.now(),
 		status = "DELTAR",
+		aarsak = null,
 		aktiv = true
 	)
 
@@ -415,6 +419,7 @@ object TestData {
 		deltakerId = DELTAKER_4.id,
 		gyldigFra = LocalDateTime.now(),
 		status = "VENTER_PA_OPPSTART",
+		aarsak = null,
 		aktiv = true
 	)
 
