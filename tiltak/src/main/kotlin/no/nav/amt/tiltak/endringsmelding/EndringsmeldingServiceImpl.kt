@@ -32,11 +32,6 @@ open class EndringsmeldingServiceImpl(
 			.map { it.toModel() }
 	}
 
-	override fun hentAktiveEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding> {
-		return hentEndringsmeldingerForGjennomforing(gjennomforingId)
-			.filter { it.status == Endringsmelding.Status.AKTIV }
-	}
-
 	override fun hentAktiveEndringsmeldingerForDeltaker(deltakerId: UUID): List<Endringsmelding> {
 		return hentAktiveEndringsmeldingerForDeltakere(listOf(deltakerId))
 			.getOrDefault(deltakerId, emptyList())

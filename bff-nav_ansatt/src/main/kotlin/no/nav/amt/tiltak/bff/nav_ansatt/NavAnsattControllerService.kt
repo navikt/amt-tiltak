@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.bff.nav_ansatt
 
+import io.getunleash.Unleash
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.DeltakerDto
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.HentGjennomforingerDto
@@ -24,12 +25,13 @@ class NavAnsattControllerService(
 	private val endringsmeldingService: EndringsmeldingService,
 	private val deltakerService: DeltakerService,
 	private val gjennomforingService: GjennomforingService,
-	private val vurderingService: VurderingService
+	private val vurderingService: VurderingService,
+	private val unleashClient: Unleash,
 ) {
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	fun hentEndringsmeldinger(gjennomforingId: UUID, tilgangTilSkjermede: Boolean): List<EndringsmeldingDto> {
-		val endringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId)
+		val endringsmeldinger = hentEndringsmeldingerForGjennomforing(gjennomforingId)
 		val deltakerMap = deltakerService.hentDeltakerMap(endringsmeldinger.map { it.deltakerId }).filterValues { !it.harAdressebeskyttelse() }
 
 		return endringsmeldinger.mapNotNull { endringsmelding ->
@@ -44,7 +46,7 @@ class NavAnsattControllerService(
 	}
 
 	fun hentMeldinger(gjennomforingId: UUID, tilgangTilSkjermede: Boolean): MeldingerFraArrangorResponse {
-		val alleEndringsmeldinger = endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId)
+		val alleEndringsmeldinger = hentEndringsmeldingerForGjennomforing(gjennomforingId)
 		val alleVurderinger = vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId)
 
 		val deltakerIder = mutableListOf<UUID>()
@@ -77,11 +79,23 @@ class NavAnsattControllerService(
 
 	fun hentGjennomforinger(gjennomforingIder: List<UUID>) : List<HentGjennomforingerDto> {
 		return gjennomforingService.getGjennomforinger(gjennomforingIder).map { gjennomforing ->
-			val aktiveEndringsmeldinger = endringsmeldingService.hentAktiveEndringsmeldingerForGjennomforing(gjennomforing.id)
+			val aktiveEndringsmeldinger = hentEndringsmeldingerForGjennomforing(gjennomforing.id)
+				.filter { it.status == Endringsmelding.Status.AKTIV }
 			val harSkjermede = aktiveEndringsmeldinger.any { deltakerService.erSkjermet(it.deltakerId) }
 
 			return@map gjennomforing.toDto(aktiveEndringsmeldinger.size, harSkjermede)
 		}
+	}
+
+
+	private fun hentEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding> {
+		if (unleashClient.isEnabled("amt.enable-komet-deltakere")) {
+			val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
+			if (gjennomforing.tiltak.kode in listOf("ARBFORB")) {
+				return emptyList()
+			}
+		}
+		return endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId)
 	}
 
 	private fun getDeltaker(deltakerId: UUID, deltakerMap: Map<UUID, Deltaker>): Deltaker? {

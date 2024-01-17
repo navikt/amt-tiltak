@@ -1,7 +1,6 @@
 package no.nav.amt.tiltak.endringsmelding
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -12,7 +11,6 @@ import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
-import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -84,19 +82,6 @@ class EndringsmeldingServiceImplTest {
 			repository.markerSomUtfort(endringsmeldingDbo.id, NAV_ANSATT_1.id)
 		}
 		verify(exactly = 1) { publisherService.publish(endringsmeldingDbo.id, DataPublishType.ENDRINGSMELDING) }
-	}
-
-	@Test
-	fun `hentAktiveEndringsmeldingerForGjennomforing - henter aktive endringsmeldinger pa gjennomforing`() {
-		every {
-			repository.getByGjennomforing(GJENNOMFORING_1.id)
-		} returns listOf(
-			endringsmeldingDbo,
-			endringsmeldingDbo.copy(status = Endringsmelding.Status.UTDATERT)
-		)
-
-		endringsmeldingService.hentAktiveEndringsmeldingerForGjennomforing(GJENNOMFORING_1.id).size shouldBe 1
-
 	}
 
 	@Test

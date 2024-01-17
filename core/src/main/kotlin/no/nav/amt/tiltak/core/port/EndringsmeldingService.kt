@@ -31,8 +31,6 @@ interface EndringsmeldingService {
 
     fun markerSomTilbakekalt(id: UUID)
 
-	fun hentAktiveEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding>
-
 	fun slett(deltakerId: UUID)
 
 	fun opprettEndresluttdatoEndringsmelding(deltakerId: UUID, arrangorAnsattId: UUID, sluttdato: LocalDate): UUID
