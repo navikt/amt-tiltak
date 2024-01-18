@@ -51,4 +51,6 @@ interface DeltakerService {
 	fun slettDeltakerePaaGjennomforing(gjennomforingId: UUID)
 
 	fun lagreVurdering(deltakerId: UUID, arrangorAnsattId: UUID, vurderingstype: Vurderingstype, begrunnelse: String?): List<Vurdering>
+
+	fun konverterStatuserForDeltakerePaaGjennomforing(gjennomforingId: UUID, oppdatertGjennomforingErKurs: Boolean)
 }

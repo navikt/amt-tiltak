@@ -28,6 +28,7 @@ import no.nav.amt.tiltak.deltaker.repositories.VurderingRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -170,6 +171,73 @@ open class DeltakerServiceImpl(
 
 		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
 		return vurderingRepository.getVurderingerForDeltaker(deltakerId)
+	}
+
+	override fun konverterStatuserForDeltakerePaaGjennomforing(
+		gjennomforingId: UUID,
+		oppdatertGjennomforingErKurs: Boolean
+	) {
+		val deltakere = hentDeltakerePaaGjennomforing(gjennomforingId)
+		if (deltakere.isNotEmpty()) {
+			if (oppdatertGjennomforingErKurs) {
+				konverterDeltakerstatuseFraLopendeInntakTilKurs(deltakere, gjennomforingId)
+			} else {
+				konverterDeltakerstatuseFraKursTilLopendeInntak(deltakere)
+			}
+		}
+	}
+
+	private fun konverterDeltakerstatuseFraKursTilLopendeInntak(deltakere: List<Deltaker>) {
+		val deltakereSomSkalOppdateres =
+			deltakere.filter { it.status.type == DeltakerStatus.Type.AVBRUTT || it.status.type == DeltakerStatus.Type.FULLFORT }
+
+		deltakereSomSkalOppdateres.forEach {
+			insertStatus(
+				DeltakerStatusInsert(
+					id = UUID.randomUUID(),
+					deltakerId = it.id,
+					type = DeltakerStatus.Type.HAR_SLUTTET,
+					aarsak = it.status.aarsak,
+					gyldigFra = LocalDateTime.now()
+				)
+			)
+		}
+		log.info("Oppdatert status for ${deltakereSomSkalOppdateres.size} deltakere på gjennomføring som gikk fra kurs til løpende inntak")
+	}
+
+	private fun konverterDeltakerstatuseFraLopendeInntakTilKurs(deltakere: List<Deltaker>, gjennomforingId: UUID) {
+		val deltakereSomSkalOppdateres =
+			deltakere.filter { it.status.type == DeltakerStatus.Type.HAR_SLUTTET }
+
+		if (deltakereSomSkalOppdateres.isNotEmpty()) {
+			val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
+
+			deltakereSomSkalOppdateres.forEach {
+				insertStatus(
+					DeltakerStatusInsert(
+						id = UUID.randomUUID(),
+						deltakerId = it.id,
+						type = getDeltakerStatusType(
+							deltakerSluttdato = it.sluttDato,
+							gjennomforingSluttdato = gjennomforing.sluttDato
+						),
+						aarsak = it.status.aarsak,
+						gyldigFra = LocalDateTime.now()
+					)
+				)
+			}
+		}
+		log.info("Oppdatert status for ${deltakereSomSkalOppdateres.size} deltakere på gjennomføring som gikk fra løpende inntak til kurs")
+	}
+
+	private fun getDeltakerStatusType(deltakerSluttdato: LocalDate?, gjennomforingSluttdato: LocalDate?): DeltakerStatus.Type {
+		return if (gjennomforingSluttdato == null || deltakerSluttdato == null) {
+			DeltakerStatus.Type.FULLFORT
+		} else if (deltakerSluttdato.isBefore(gjennomforingSluttdato)) {
+			DeltakerStatus.Type.AVBRUTT
+		} else {
+			DeltakerStatus.Type.FULLFORT
+		}
 	}
 
 	private fun oppdaterStatus(status: DeltakerStatusInsert): Boolean {

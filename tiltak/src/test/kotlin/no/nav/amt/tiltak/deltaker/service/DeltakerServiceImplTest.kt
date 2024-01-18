@@ -40,11 +40,14 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_2
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_4
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2_STATUS_1
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_4
+import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_4_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_KURS
@@ -654,6 +657,68 @@ class DeltakerServiceImplTest {
 		nyVurderingFraDb?.opprettetAvArrangorAnsattId shouldBe ARRANGOR_ANSATT_1.id
 		nyVurderingFraDb?.gyldigFra shouldNotBe null
 		nyVurderingFraDb?.gyldigTil shouldBe null
+	}
+
+	@Test
+	fun `konverterStatuserForDeltakerePaaGjennomforing - fra kurs til lopende - setter riktig status pa deltakere`() {
+		val gjennomforingInput = GJENNOMFORING_KURS.copy(sluttDato = LocalDate.now().plusYears(1))
+		testDataRepository.insertGjennomforing(gjennomforingInput)
+		testDataRepository.insertBruker(BRUKER_2)
+		testDataRepository.insertBruker(BRUKER_4)
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(gjennomforingId = GJENNOMFORING_KURS.id, sluttDato = gjennomforingInput.sluttDato))
+		testDataRepository.insertDeltaker(DELTAKER_2.copy(gjennomforingId = GJENNOMFORING_KURS.id, sluttDato = gjennomforingInput.sluttDato.minusDays(4)))
+		testDataRepository.insertDeltaker(DELTAKER_4.copy(gjennomforingId = GJENNOMFORING_KURS.id, sluttDato = gjennomforingInput.sluttDato))
+		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_2)
+		testDataRepository.insertDeltakerStatus(DELTAKER_2_STATUS_1.copy(status = DeltakerStatus.Type.AVBRUTT.name, aarsak = DeltakerStatus.Aarsak.FATT_JOBB.name))
+		testDataRepository.insertDeltakerStatus(DELTAKER_4_STATUS_1.copy(status = DeltakerStatus.Type.FULLFORT.name, aarsak = null))
+
+		deltakerServiceImpl.konverterStatuserForDeltakerePaaGjennomforing(GJENNOMFORING_KURS.id, false)
+
+		val status1 = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
+		status1!!.type shouldBe DeltakerStatus.Type.VENTER_PA_OPPSTART
+		verify(exactly = 0) { publisherService.publish(DELTAKER_1.id, DataPublishType.DELTAKER) }
+
+		val status2 = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
+		status2!!.type shouldBe DeltakerStatus.Type.HAR_SLUTTET
+		status2.aarsak shouldBe DeltakerStatus.Aarsak.FATT_JOBB
+		verify(exactly = 1) { publisherService.publish(DELTAKER_2.id, DataPublishType.DELTAKER) }
+
+		val status3 = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_4.id)
+		status3!!.type shouldBe DeltakerStatus.Type.HAR_SLUTTET
+		verify(exactly = 1) { publisherService.publish(DELTAKER_4.id, DataPublishType.DELTAKER) }
+	}
+
+	@Test
+	fun `konverterStatuserForDeltakerePaaGjennomforing - fra lopende til kurs - setter riktig status pa deltakere`() {
+		val gjennomforingInput = GJENNOMFORING_KURS.copy(sluttDato = LocalDate.now().plusYears(1))
+		testDataRepository.insertGjennomforing(gjennomforingInput)
+		testDataRepository.insertBruker(BRUKER_2)
+		testDataRepository.insertBruker(BRUKER_4)
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(gjennomforingId = GJENNOMFORING_KURS.id, sluttDato = gjennomforingInput.sluttDato))
+		testDataRepository.insertDeltaker(DELTAKER_2.copy(gjennomforingId = GJENNOMFORING_KURS.id, sluttDato = gjennomforingInput.sluttDato.minusDays(4)))
+		testDataRepository.insertDeltaker(DELTAKER_4.copy(gjennomforingId = GJENNOMFORING_KURS.id, sluttDato = gjennomforingInput.sluttDato))
+		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_2)
+		testDataRepository.insertDeltakerStatus(DELTAKER_2_STATUS_1.copy(status = DeltakerStatus.Type.HAR_SLUTTET.name, aarsak = DeltakerStatus.Aarsak.FATT_JOBB.name))
+		testDataRepository.insertDeltakerStatus(DELTAKER_4_STATUS_1.copy(status = DeltakerStatus.Type.HAR_SLUTTET.name, aarsak = null))
+
+		every {
+			gjennomforingService.getGjennomforing(any())
+		} returns gjennomforingInput.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor())
+
+		deltakerServiceImpl.konverterStatuserForDeltakerePaaGjennomforing(GJENNOMFORING_KURS.id, true)
+
+		val status1 = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
+		status1!!.type shouldBe DeltakerStatus.Type.VENTER_PA_OPPSTART
+		verify(exactly = 0) { publisherService.publish(DELTAKER_1.id, DataPublishType.DELTAKER) }
+
+		val status2 = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
+		status2!!.type shouldBe DeltakerStatus.Type.AVBRUTT
+		status2.aarsak shouldBe DeltakerStatus.Aarsak.FATT_JOBB
+		verify(exactly = 1) { publisherService.publish(DELTAKER_2.id, DataPublishType.DELTAKER) }
+
+		val status3 = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_4.id)
+		status3!!.type shouldBe DeltakerStatus.Type.FULLFORT
+		verify(exactly = 1) { publisherService.publish(DELTAKER_4.id, DataPublishType.DELTAKER) }
 	}
 
 	val statusInsert = DeltakerStatusInsert(

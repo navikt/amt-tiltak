@@ -54,7 +54,7 @@ class GjennomforingServiceImplTest : FunSpec({
 
 		tiltakService = mockk()
 
-		deltakerService = mockk()
+		deltakerService = mockk(relaxed = true)
 
 		amtArrangorClient = mockk(relaxUnitFun = true)
 
@@ -176,6 +176,39 @@ class GjennomforingServiceImplTest : FunSpec({
 
 		val oppdatertGjennomforing = service.getGjennomforing(GJENNOMFORING_1.id)
 		oppdatertGjennomforing.arrangor.id shouldBe ARRANGOR_2.id
+	}
+
+	test("upsert - inntaksform er endret - erKurs oppdateres for gjennomføringen") {
+		testDataRepository.insertNavEnhet(NAV_ENHET_1)
+		testDataRepository.insertTiltak(TILTAK_1)
+		testDataRepository.insertArrangor(ARRANGOR_1)
+		testDataRepository.insertGjennomforing(GJENNOMFORING_1)
+		val tiltakInserted = TILTAK_1.toTiltak()
+
+		every { arrangorService.getArrangorById(ARRANGOR_1.id) } returns ARRANGOR_1.toArrangor()
+		every { tiltakService.getTiltakById(TILTAK_1.id) } returns tiltakInserted
+
+		service.upsert(
+			GjennomforingUpsert(
+				id = GJENNOMFORING_1.id,
+				tiltakId = TILTAK_1.id,
+				arrangorId = ARRANGOR_1.id,
+				navn = GJENNOMFORING_1.navn,
+				status = Gjennomforing.Status.GJENNOMFORES,
+				startDato = GJENNOMFORING_1.startDato,
+				sluttDato = GJENNOMFORING_1.sluttDato,
+				navEnhetId = NAV_ENHET_1.id,
+				lopenr = GJENNOMFORING_1.lopenr,
+				opprettetAar = GJENNOMFORING_1.opprettetAar,
+				erKurs = true
+			)
+		)
+
+		verify(exactly = 0) { amtArrangorClient.fjernTilganger(ARRANGOR_1.id, GJENNOMFORING_1.id, emptyList()) }
+		verify(exactly = 1) { deltakerService.konverterStatuserForDeltakerePaaGjennomforing(GJENNOMFORING_1.id, true) }
+
+		val oppdatertGjennomforing = service.getGjennomforing(GJENNOMFORING_1.id)
+		oppdatertGjennomforing.erKurs shouldBe true
 	}
 
 })
