@@ -75,7 +75,7 @@ class DataPublisherService(
 		}
 	}
 
-	private fun publishDeltaker(id: UUID, forcePublish: Boolean = false) {
+	fun publishDeltaker(id: UUID, forcePublish: Boolean = false) {
 		when (val result = DeltakerPublishQuery(template).get(id)) {
 			is DeltakerPublishQuery.Result.DontPublish -> return
 			is DeltakerPublishQuery.Result.PublishTombstone -> {
