@@ -231,9 +231,7 @@ open class DeltakerServiceImpl(
 	}
 
 	private fun getDeltakerStatusType(deltakerSluttdato: LocalDate?, gjennomforingSluttdato: LocalDate?): DeltakerStatus.Type {
-		return if (gjennomforingSluttdato == null) {
-			DeltakerStatus.Type.AVBRUTT
-		} else if (deltakerSluttdato == null) {
+		return if (gjennomforingSluttdato == null || deltakerSluttdato == null) {
 			DeltakerStatus.Type.FULLFORT
 		} else if (deltakerSluttdato.isBefore(gjennomforingSluttdato)) {
 			DeltakerStatus.Type.AVBRUTT
