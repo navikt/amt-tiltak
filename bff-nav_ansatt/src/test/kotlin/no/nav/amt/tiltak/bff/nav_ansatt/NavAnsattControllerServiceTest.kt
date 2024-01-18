@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.bff.nav_ansatt
 
+import io.getunleash.Unleash
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -12,6 +13,7 @@ import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.core.port.VurderingService
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_ADRESSEBESKYTTET
@@ -19,6 +21,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_SKJERMET
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
+import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.test.database.data.TestData.createDeltakerInput
 import no.nav.amt.tiltak.test.database.data.TestData.createStatusInput
 import org.junit.jupiter.api.Test
@@ -33,11 +36,13 @@ class NavAnsattControllerServiceTest {
 	private val taAuthService = mockk<TiltaksansvarligAutoriseringService>()
 	private val gjennomforingService = mockk<GjennomforingService>()
 	private val vurderingService = mockk<VurderingService>()
+	private val unleashClient = mockk<Unleash>()
 	private val controller = NavAnsattControllerService(
 		endringsmeldingService,
 		deltakerService,
 		gjennomforingService,
-		vurderingService
+		vurderingService,
+		unleashClient
 	)
 	private val navIdent = "z1232"
 
@@ -59,6 +64,7 @@ class NavAnsattControllerServiceTest {
 		val deltaker = DELTAKER_1.toDeltaker(BRUKER_1, DELTAKER_1_STATUS_1)
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
+		every { unleashClient.isEnabled(any()) } returns false
 
 		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, false)
 
@@ -93,6 +99,7 @@ class NavAnsattControllerServiceTest {
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
+		every { unleashClient.isEnabled(any()) } returns false
 
 		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, false)
 
@@ -127,6 +134,7 @@ class NavAnsattControllerServiceTest {
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
+		every { unleashClient.isEnabled(any()) } returns false
 
 		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, true)
 
@@ -161,6 +169,7 @@ class NavAnsattControllerServiceTest {
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
+		every { unleashClient.isEnabled(any()) } returns false
 
 		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, false)
 
@@ -195,6 +204,7 @@ class NavAnsattControllerServiceTest {
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
 		every { vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId) } returns listOf(vurdering)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
+		every { unleashClient.isEnabled(any()) } returns false
 		val forventetDeltaker = DeltakerDto(
 			fornavn = BRUKER_1.fornavn,
 			mellomnavn = BRUKER_1.mellomnavn,
@@ -243,6 +253,7 @@ class NavAnsattControllerServiceTest {
 		every { vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId) } returns listOf(vurdering)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
+		every { unleashClient.isEnabled(any()) } returns false
 		val forventetDeltaker = DeltakerDto(
 			fornavn = null,
 			mellomnavn = null,
@@ -291,6 +302,7 @@ class NavAnsattControllerServiceTest {
 		every { vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId) } returns listOf(vurdering)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
+		every { unleashClient.isEnabled(any()) } returns false
 		val forventetDeltaker = DeltakerDto(
 			fornavn = BRUKER_SKJERMET.fornavn,
 			mellomnavn = BRUKER_SKJERMET.mellomnavn,
@@ -337,9 +349,41 @@ class NavAnsattControllerServiceTest {
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
 		every { vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId) } returns listOf(vurdering)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
+		every { unleashClient.isEnabled(any()) } returns false
 
 		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, false)
 
 		meldingerFraArrangorResponse.endringsmeldinger.size shouldBe 0
+	}
+
+	@Test
+	fun `hentEndringsmeldinger - meldinger for AFT håndteres i ny løsning - returnerer ikke endringsmelding`() {
+		val gjennomforingId = GJENNOMFORING_1.id
+
+		val endringsmelding = Endringsmelding(
+			id = UUID.randomUUID(),
+			deltakerId = DELTAKER_1.id,
+			utfortAvNavAnsattId = UUID.randomUUID(),
+			utfortTidspunkt = ZonedDateTime.now(),
+			opprettetAvArrangorAnsattId = UUID.randomUUID(),
+			opprettet = ZonedDateTime.now(),
+			status = Endringsmelding.Status.AKTIV,
+			innhold = Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(LocalDate.now()),
+			type = Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO
+		)
+
+		every { gjennomforingService.getGjennomforing(DELTAKER_1.gjennomforingId) } returns GJENNOMFORING_1
+			.toGjennomforing(
+				TILTAK_1.copy(type = "ARBFORB").toTiltak(),
+				ARRANGOR_1.toArrangor()
+			)
+		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
+		every { deltakerService.hentDeltakerMap(emptyList()) } returns emptyMap()
+		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
+		every { unleashClient.isEnabled(any()) } returns true
+
+		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, false)
+
+		endringsmeldingerResult.size shouldBe 0
 	}
 }
