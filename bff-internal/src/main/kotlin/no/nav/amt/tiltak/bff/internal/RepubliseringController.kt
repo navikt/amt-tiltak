@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.bff.internal
 
 import jakarta.servlet.http.HttpServletRequest
+import no.nav.amt.tiltak.core.kafka.KafkaProducerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
@@ -20,7 +21,8 @@ import java.util.UUID
 @RequestMapping("/internal/api/republisering")
 class RepubliseringController(
 	private val deltakerService: DeltakerService,
-	private val dataPublisher: DataPublisherService
+	private val dataPublisher: DataPublisherService,
+	private val kafkaProducerService: KafkaProducerService,
 ) {
 
 	@GetMapping("/deltakere")
@@ -38,7 +40,11 @@ class RepubliseringController(
 		request: HttpServletRequest,
 	) {
 		if (isInternal(request)) {
-			JobRunner.runAsync("republiser_deltaker_kafka") { deltakerService.republiserDeltakerPaKafka(id) }
+			JobRunner.runAsync("republiser_deltaker_kafka") {
+				val deltaker = deltakerService.hentDeltaker(id) ?: throw NoSuchElementException()
+				kafkaProducerService.publiserDeltaker(deltaker, deltaker.endretDato)
+				dataPublisher.publishDeltaker(deltaker.id, true)
+			}
 		} else {
 			throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
 		}
