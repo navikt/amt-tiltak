@@ -127,3 +127,8 @@ spec:
         databases:
           - name: amt-tiltak
             envVarPrefix: DB
+            users:
+              - name: datastream
+        flags:
+          - name: cloudsql.logical_decoding
+            value: "on"
