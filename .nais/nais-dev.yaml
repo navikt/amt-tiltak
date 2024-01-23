@@ -120,7 +120,13 @@ spec:
     sqlInstances:
       - name: amt-tiltak-v1
         type: POSTGRES_14
+        diskAutoresize: true
         tier: db-custom-1-3840
         databases:
           - name: amt-tiltak
             envVarPrefix: DB
+            users:
+              - name: datastream
+        flags:
+          - name: cloudsql.logical_decoding
+            value: "on"
