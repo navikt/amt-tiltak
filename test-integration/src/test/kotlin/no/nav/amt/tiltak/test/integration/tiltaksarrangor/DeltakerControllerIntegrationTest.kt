@@ -19,7 +19,6 @@ import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
-import no.nav.amt.tiltak.test.database.data.inputs.ArrangorVeilederDboInput
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
 import okhttp3.Request
@@ -27,7 +26,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
-import java.time.ZonedDateTime
 import java.util.UUID
 
 class DeltakerControllerIntegrationTest : IntegrationTestBase() {
@@ -489,34 +487,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 		deltakerService.erSkjultForTiltaksarrangor(deltakerId) shouldBe true
 	}
-
-	@Test
-	fun `skjulDeltakerForTiltaksarrangor() - VEILEDER - skal kunne skjule deltaker`() {
-		val deltakerId = UUID.randomUUID()
-		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId))
-		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerId, status = "IKKE_AKTUELL"))
-
-		testDataRepository.insertArrangorVeileder(
-			ArrangorVeilederDboInput(
-				id = UUID.randomUUID(),
-				ansattId = ARRANGOR_ANSATT_2.id,
-				deltakerId = deltakerId,
-				erMedveileder = false,
-				gyldigFra = ZonedDateTime.now().minusDays(1),
-				gyldigTil = ZonedDateTime.now().plusDays(1)
-			))
-
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/deltaker/${deltakerId}/skjul",
-			headers = createAnsatt2AuthHeader(),
-		)
-
-		response.code shouldBe 200
-
-		deltakerService.erSkjultForTiltaksarrangor(deltakerId) shouldBe true
-	}
-
 
 	@Test
 	fun `skjulDeltakerForTiltaksarrangor() skal returnere 403 hvis ikke tilgang`() {

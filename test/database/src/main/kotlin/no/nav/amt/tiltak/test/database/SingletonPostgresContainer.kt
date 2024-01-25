@@ -33,6 +33,9 @@ object SingletonPostgresContainer {
 
 			val container = createContainer()
 			postgresContainer = container
+			// Cloud SQL har wal_level = 'logical' på grunn av flagget cloudsql.logical_decoding i
+			// naiserator.yaml. Vi må sette det samme lokalt for at flywaymigrering skal fungere.
+			container.withCommand("postgres", "-c", "wal_level=logical")
 
 			container.start()
 
