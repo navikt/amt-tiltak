@@ -40,7 +40,7 @@ class DeltakerIngestorImpl(
 				deltakerService.slettDeltaker(deltakerId)
 				log.info("Slettet deltaker fra ny løsning med id $deltakerId")
 			} else {
-				upsert(fromJsonString<DeltakerDto>(value))
+				upsert(fromJsonString(value))
 				log.info("Håndterte deltaker fra ny løsning med id $deltakerId")
 			}
 		}
@@ -63,7 +63,7 @@ class DeltakerIngestorImpl(
 			id = deltakerDto.status.id,
 			deltakerId = deltakerDto.id,
 			type = deltakerDto.status.type,
-			aarsak = deltakerDto.status.aarsak,
+			aarsak = deltakerDto.status.aarsak?.type,
 			gyldigFra = deltakerDto.status.gyldigFra,
 		)
 

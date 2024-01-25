@@ -8,6 +8,7 @@ import java.util.UUID
 
 data class DeltakerDto(
 	val id: UUID,
+	val personId: UUID,
 	val personident: String,
 	val deltakerlisteId: UUID,
 	val startdato: LocalDate?,
@@ -24,8 +25,13 @@ data class DeltakerDto(
 data class DeltakerStatusDto(
 	val id: UUID,
 	val type: DeltakerStatus.Type,
-	val aarsak: DeltakerStatus.Aarsak?,
+	val aarsak: AarsakDto?,
 	val gyldigFra: LocalDateTime,
 	val gyldigTil: LocalDateTime?,
 	val opprettet: LocalDateTime,
-)
+) {
+	data class AarsakDto(
+		val type: DeltakerStatus.Aarsak,
+		val beskrivelse: String?,
+	)
+}

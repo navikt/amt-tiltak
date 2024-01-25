@@ -74,6 +74,7 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 	private fun mockDeltakerDto(deltakerlisteId: UUID): DeltakerDto =
 		DeltakerDto(
 			id = UUID.randomUUID(),
+			personId = UUID.randomUUID(),
 			personident = "12345678910",
 			deltakerlisteId = deltakerlisteId,
 			startdato = LocalDate.now().plusDays(1),
@@ -81,22 +82,24 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 			dagerPerUke = null,
 			deltakelsesprosent = 100F,
 			bakgrunnsinformasjon = "Dette tiltket vil være nyttig",
-			mal = listOf(Mal(
-				visningstekst = "Visningstekst",
-				type = "type",
-				valgt = true,
-				beskrivelse = null
-			)),
+			mal = listOf(
+				Mal(
+					visningstekst = "Visningstekst",
+					type = "type",
+					valgt = true,
+					beskrivelse = null,
+				),
+			),
 			status = DeltakerStatusDto(
 				id = UUID.randomUUID(),
 				type = DeltakerStatus.Type.VENTER_PA_OPPSTART,
 				aarsak = null,
 				gyldigFra = LocalDateTime.now(),
 				gyldigTil = null,
-				opprettet = LocalDateTime.now()
+				opprettet = LocalDateTime.now(),
 			),
 			sistEndret = LocalDateTime.now(),
-			opprettet = LocalDateTime.now()
+			opprettet = LocalDateTime.now(),
 		)
 
 	private fun sammenlign(faktisk: Deltaker, forventet: DeltakerDto) {
