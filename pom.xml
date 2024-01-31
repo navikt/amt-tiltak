@@ -361,7 +361,7 @@
             <dependency>
                 <groupId>no.nav.poao-tilgang</groupId>
                 <artifactId>client</artifactId>
-                <version>2024.01.23_14.55-e7426f53be9f</version>
+                <version>2024.01.31_14.27-e34438605052</version>
             </dependency>
 
             <dependency>
