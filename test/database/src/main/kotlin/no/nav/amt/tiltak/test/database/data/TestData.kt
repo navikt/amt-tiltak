@@ -6,7 +6,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Bostedsadresse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.domain.tiltak.Kontaktadresse
-import no.nav.amt.tiltak.core.domain.tiltak.Mal
+import no.nav.amt.tiltak.core.domain.tiltak.Innhold
 import no.nav.amt.tiltak.core.domain.tiltak.Matrikkeladresse
 import no.nav.amt.tiltak.core.domain.tiltak.Vegadresse
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattGjennomforingTilgangInput
@@ -41,7 +41,7 @@ object TestData {
 			prosentStilling = 100f,
 			registrertDato = LocalDateTime.now(),
 			innsokBegrunnelse = null,
-			mal = listOf(Mal(
+			innhold = listOf(Innhold(
 				visningstekst = "Visningstekst",
 				type = "type",
 				valgt = true,
@@ -302,7 +302,7 @@ object TestData {
 		registrertDato = LocalDateTime.of(2022, 2, 13, 12, 12),
 		innsokBegrunnelse = "begrunnelse deltaker 1",
 		endretDato = LocalDateTime.of(2022, 2, 13, 12, 12),
-		mal = null
+		innhold = null
 	)
 
 
@@ -351,7 +351,7 @@ object TestData {
 		prosentStilling = 100f,
 		registrertDato = LocalDateTime.of(2022, 2, 10, 12, 12),
 		innsokBegrunnelse = "begrunnelse deltaker 2",
-		mal = listOf(Mal(
+		innhold = listOf(Innhold(
 			visningstekst = "Visningstekst",
 			type = "type",
 			valgt = true,
@@ -411,7 +411,7 @@ object TestData {
 		prosentStilling = 100f,
 		registrertDato = LocalDateTime.of(2022, 2, 10, 12, 12),
 		innsokBegrunnelse = "begrunnelse deltaker 4",
-		mal = null
+		innhold = null
 	)
 
 	val DELTAKER_4_STATUS_1 = DeltakerStatusInput(

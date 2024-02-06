@@ -68,7 +68,7 @@ class AuditLoggerServiceImplTest {
 			erSkjermet = false,
 			endretDato = LocalDateTime.now(),
 			adressebeskyttelse = null,
-			mal = null
+			innhold = null
 		)
 
 		val messageSlot = slot<CefMessage>()

@@ -10,7 +10,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.AVSLUTTENDE_STATUSER
 import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.core.domain.tiltak.Mal
+import no.nav.amt.tiltak.core.domain.tiltak.Innhold
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpsertDbo
 import no.nav.amt.tiltak.nav_enhet.NavEnhetDbo
@@ -54,14 +54,14 @@ open class DeltakerRepository(
 			registrertDato = rs.getTimestamp("registrert_dato").toLocalDateTime(),
 			innsokBegrunnelse = rs.getNullableString("innsok_begrunnelse"),
 			adressebeskyttelse = rs.getString("adressebeskyttelse")?.let { Adressebeskyttelse.valueOf(it) },
-			mal = rs.getString("mal")?.let { fromJsonString<List<Mal>>(it) }
+			innhold = rs.getString("innhold")?.let { fromJsonString<List<Innhold>>(it) }
 		)
 	}
 
 	fun upsert(deltaker: DeltakerUpsertDbo) {
 		val sql = """
 			INSERT INTO deltaker(id, bruker_id, gjennomforing_id, start_dato, slutt_dato,
-								 dager_per_uke, prosent_stilling, registrert_dato, innsok_begrunnelse, mal)
+								 dager_per_uke, prosent_stilling, registrert_dato, innsok_begrunnelse, innhold)
 			VALUES (:id,
 					:brukerId,
 					:gjennomforingId,
@@ -71,7 +71,7 @@ open class DeltakerRepository(
 					:prosentStilling,
 					:registrertDato,
 					:innsokBegrunnelse,
-					:mal)
+					:innhold)
 			ON CONFLICT (id) DO
 			UPDATE SET
 				start_dato = :startdato,
@@ -79,7 +79,7 @@ open class DeltakerRepository(
 				dager_per_uke = :dagerPerUke,
 				prosent_stilling = :prosentStilling,
 				innsok_begrunnelse = :innsokBegrunnelse,
-				mal	= :mal,
+				innhold	= :innhold,
 				modified_at = CURRENT_TIMESTAMP
 		""".trimIndent()
 
@@ -94,7 +94,7 @@ open class DeltakerRepository(
 				"prosentStilling" to deltaker.prosentStilling,
 				"registrertDato" to deltaker.registrertDato,
 				"innsokBegrunnelse" to deltaker.innsokBegrunnelse,
-				"mal" to deltaker.mal?.toPGObject()
+				"innhold" to deltaker.innhold?.toPGObject()
 			)
 		)
 
@@ -330,7 +330,7 @@ open class DeltakerRepository(
 		template.update(sql, parameters)
 	}
 
-	private fun List<Mal>.toPGObject() = PGobject().also {
+	private fun List<Innhold>.toPGObject() = PGobject().also {
 		it.type = "json"
 		it.value = JsonUtils.objectMapper.writeValueAsString(this)
 	}
