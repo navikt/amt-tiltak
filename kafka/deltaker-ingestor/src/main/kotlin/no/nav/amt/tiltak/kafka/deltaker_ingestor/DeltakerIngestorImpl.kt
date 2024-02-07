@@ -77,7 +77,7 @@ class DeltakerIngestorImpl(
 			registrertDato = deltakerDto.opprettet,
 			gjennomforingId = gjennomforingId,
 			innsokBegrunnelse = deltakerDto.bakgrunnsinformasjon,
-			mal = deltakerDto.mal
+			innhold = deltakerDto.innhold
 		)
 
 		transactionTemplate.executeWithoutResult {

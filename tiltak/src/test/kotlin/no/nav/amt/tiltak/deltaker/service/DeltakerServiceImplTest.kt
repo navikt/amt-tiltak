@@ -740,7 +740,7 @@ class DeltakerServiceImplTest {
 		prosentStilling = null,
 		gjennomforingId = GJENNOMFORING_1.id,
 		innsokBegrunnelse = null,
-		mal = null
+		innhold = null
 	)
 
 }

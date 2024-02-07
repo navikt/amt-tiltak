@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.core.domain.tiltak
 
-data class Mal(
+data class Innhold(
 	val visningstekst: String,
 	val type: String,
 	val valgt: Boolean,

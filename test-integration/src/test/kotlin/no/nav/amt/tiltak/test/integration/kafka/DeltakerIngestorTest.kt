@@ -5,7 +5,7 @@ import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
-import no.nav.amt.tiltak.core.domain.tiltak.Mal
+import no.nav.amt.tiltak.core.domain.tiltak.Innhold
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.kafka.deltaker_ingestor.DeltakerDto
 import no.nav.amt.tiltak.kafka.deltaker_ingestor.DeltakerStatusDto
@@ -82,8 +82,8 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 			dagerPerUke = null,
 			deltakelsesprosent = 100F,
 			bakgrunnsinformasjon = "Dette tiltket vil være nyttig",
-			mal = listOf(
-				Mal(
+			innhold = listOf(
+				Innhold(
 					visningstekst = "Visningstekst",
 					type = "type",
 					valgt = true,
@@ -113,7 +113,7 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 		faktisk.innsokBegrunnelse shouldBe forventet.bakgrunnsinformasjon
 		faktisk.endretDato shouldBeCloseTo LocalDateTime.now()
 		faktisk.registrertDato shouldBeEqualTo forventet.opprettet
-		faktisk.mal shouldBe forventet.mal
+		faktisk.innhold shouldBe forventet.innhold
 		sammenlignStatus(faktisk.status, forventet.status)
 	}
 

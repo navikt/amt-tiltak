@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.data_publisher
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
-import no.nav.amt.tiltak.core.domain.tiltak.Mal
+import no.nav.amt.tiltak.core.domain.tiltak.Innhold
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
@@ -210,7 +210,7 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		registrertDato = registrertDato,
 		endretDato = endretDato,
 		innsokBegrunnelse = UUID.randomUUID().toString(),
-		mal = listOf(Mal(
+		innhold = listOf(Innhold(
 			visningstekst = "Visningstekst",
 			type = "type",
 			valgt = true,
