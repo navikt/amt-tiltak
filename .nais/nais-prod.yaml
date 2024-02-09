@@ -51,6 +51,8 @@ spec:
         - application: amt-tiltaksarrangor-bff
         - application: tiltakspenger-tiltak
           namespace: tpts
+        - application: tilleggsstonader-integrasjoner
+          namespace: tilleggsstonader
     outbound:
       rules:
         - application: amt-person-service
