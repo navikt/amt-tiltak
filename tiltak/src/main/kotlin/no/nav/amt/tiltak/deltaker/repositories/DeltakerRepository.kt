@@ -8,9 +8,9 @@ import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.core.domain.tiltak.AVSLUTTENDE_STATUSER
 import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.core.domain.tiltak.Innhold
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpsertDbo
 import no.nav.amt.tiltak.nav_enhet.NavEnhetDbo
@@ -54,7 +54,7 @@ open class DeltakerRepository(
 			registrertDato = rs.getTimestamp("registrert_dato").toLocalDateTime(),
 			innsokBegrunnelse = rs.getNullableString("innsok_begrunnelse"),
 			adressebeskyttelse = rs.getString("adressebeskyttelse")?.let { Adressebeskyttelse.valueOf(it) },
-			innhold = rs.getString("innhold")?.let { fromJsonString<List<Innhold>>(it) }
+			innhold = rs.getString("innhold")?.let { fromJsonString(it) }
 		)
 	}
 
@@ -330,7 +330,7 @@ open class DeltakerRepository(
 		template.update(sql, parameters)
 	}
 
-	private fun List<Innhold>.toPGObject() = PGobject().also {
+	private fun DeltakelsesInnhold.toPGObject() = PGobject().also {
 		it.type = "json"
 		it.value = JsonUtils.objectMapper.writeValueAsString(this)
 	}

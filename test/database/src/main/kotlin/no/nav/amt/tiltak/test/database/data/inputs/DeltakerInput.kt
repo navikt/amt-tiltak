@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.test.database.data.inputs
 
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Innhold
@@ -21,7 +22,7 @@ data class DeltakerInput(
 	val innsokBegrunnelse: String?,
 	val createdAt: ZonedDateTime = ZonedDateTime.of(2022, 2, 13, 0, 0, 0, 0, ZoneId.systemDefault()),
 	val endretDato: LocalDateTime = LocalDateTime.now(),
-	val innhold: List<Innhold>?
+	val innhold: DeltakelsesInnhold?
 ) {
 	fun toDeltaker(brukerInput: BrukerInput, statusInput: DeltakerStatusInput) = Deltaker(
 		id = id,

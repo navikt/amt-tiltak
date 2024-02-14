@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.test.integration.kafka
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Innhold
@@ -82,13 +83,13 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 			dagerPerUke = null,
 			deltakelsesprosent = 100F,
 			bakgrunnsinformasjon = "Dette tiltket vil være nyttig",
-			innhold = listOf(
-				Innhold(
+			innhold = DeltakelsesInnhold(
+				"Ledetekst",
+				listOf(Innhold(
 					visningstekst = "Visningstekst",
 					type = "type",
-					valgt = true,
-					beskrivelse = null,
-				),
+					beskrivelse = null
+				))
 			),
 			status = DeltakerStatusDto(
 				id = UUID.randomUUID(),
