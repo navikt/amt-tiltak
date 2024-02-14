@@ -28,9 +28,8 @@ object DbTestDataUtils {
 		val tables = getAllTables(jdbcTemplate, SCHEMA).filter { it != FLYWAY_SCHEMA_HISTORY_TABLE_NAME }
 		val sequences = getAllSequences(jdbcTemplate, SCHEMA)
 
-		tables.forEach {
-			jdbcTemplate.update("TRUNCATE TABLE $it CASCADE")
-		}
+		val stmt = tables.joinToString("\n", prefix = "BEGIN;\n", postfix = "COMMIT;\n") { "TRUNCATE TABLE $it CASCADE;" }
+		jdbcTemplate.update(stmt)
 
 		sequences.forEach {
 			jdbcTemplate.update("ALTER SEQUENCE $it RESTART WITH 1")
