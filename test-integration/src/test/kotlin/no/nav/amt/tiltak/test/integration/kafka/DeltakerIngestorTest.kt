@@ -87,7 +87,7 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 				"Ledetekst",
 				listOf(Innhold(
 					tekst = "Visningstekst",
-					type = "type",
+					innholdskode = "type",
 					beskrivelse = null
 				))
 			),

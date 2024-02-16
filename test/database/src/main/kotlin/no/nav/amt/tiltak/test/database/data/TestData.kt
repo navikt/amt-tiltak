@@ -46,7 +46,7 @@ object TestData {
 				"Ledetekst for tiltaket",
 				listOf(Innhold(
 					tekst = "Visningstekst",
-					type = "type",
+					innholdskode = "type",
 					beskrivelse = null
 				))
 			)
@@ -359,7 +359,7 @@ object TestData {
 			listOf(
 				Innhold(
 					tekst = "Visningstekst",
-					type = "type",
+					innholdskode = "type",
 					beskrivelse = null
 				)
 			),

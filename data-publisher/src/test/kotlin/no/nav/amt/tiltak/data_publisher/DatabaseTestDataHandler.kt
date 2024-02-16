@@ -216,7 +216,7 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 			listOf(
 				Innhold(
 					tekst = "Visningstekst",
-					type = "type",
+					innholdskode = "type",
 					beskrivelse = null
 				)
 			),

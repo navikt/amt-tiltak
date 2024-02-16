@@ -7,6 +7,6 @@ data class DeltakelsesInnhold(
 
 data class Innhold(
 	val tekst: String,
-	val type: String,
+	val innholdskode: String,
 	val beskrivelse: String?,
 )
