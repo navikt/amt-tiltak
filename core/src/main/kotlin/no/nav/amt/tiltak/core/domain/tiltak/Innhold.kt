@@ -6,7 +6,7 @@ data class DeltakelsesInnhold(
 )
 
 data class Innhold(
-	val visningstekst: String,
-	val type: String,
+	val tekst: String,
+	val innholdskode: String,
 	val beskrivelse: String?,
 )

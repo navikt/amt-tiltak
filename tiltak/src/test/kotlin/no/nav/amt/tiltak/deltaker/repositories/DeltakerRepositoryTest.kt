@@ -62,8 +62,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val innhold = DeltakelsesInnhold(
 			"Ledetekst",
 			listOf(Innhold(
-				visningstekst = "Visningstekst",
-				type = "type",
+				tekst = "Visningstekst",
+				innholdskode = "type",
 				beskrivelse = null
 			))
 		)
@@ -106,8 +106,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val innhold = DeltakelsesInnhold(
 			"Ledetekst",
 			listOf(Innhold(
-				visningstekst = "Visningstekst",
-				type = "type",
+				tekst = "Visningstekst",
+				innholdskode = "type",
 				beskrivelse = null
 			))
 		)

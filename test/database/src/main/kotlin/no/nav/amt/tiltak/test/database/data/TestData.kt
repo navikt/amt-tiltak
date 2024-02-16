@@ -45,8 +45,8 @@ object TestData {
 			innhold = DeltakelsesInnhold(
 				"Ledetekst for tiltaket",
 				listOf(Innhold(
-					visningstekst = "Visningstekst",
-					type = "type",
+					tekst = "Visningstekst",
+					innholdskode = "type",
 					beskrivelse = null
 				))
 			)
@@ -358,8 +358,8 @@ object TestData {
 			"Ledetekst",
 			listOf(
 				Innhold(
-					visningstekst = "Visningstekst",
-					type = "type",
+					tekst = "Visningstekst",
+					innholdskode = "type",
 					beskrivelse = null
 				)
 			),
