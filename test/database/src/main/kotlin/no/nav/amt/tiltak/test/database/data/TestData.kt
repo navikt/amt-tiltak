@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.test.database.data
 import no.nav.amt.tiltak.core.domain.tiltak.Adresse
 import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.Bostedsadresse
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.domain.tiltak.Kontaktadresse
@@ -41,12 +42,14 @@ object TestData {
 			prosentStilling = 100f,
 			registrertDato = LocalDateTime.now(),
 			innsokBegrunnelse = null,
-			innhold = listOf(Innhold(
-				visningstekst = "Visningstekst",
-				type = "type",
-				valgt = true,
-				beskrivelse = null
-			))
+			innhold = DeltakelsesInnhold(
+				"Ledetekst for tiltaket",
+				listOf(Innhold(
+					visningstekst = "Visningstekst",
+					type = "type",
+					beskrivelse = null
+				))
+			)
 		)
 
 	fun createStatusInput(deltaker: DeltakerInput) = DeltakerStatusInput(
@@ -351,12 +354,16 @@ object TestData {
 		prosentStilling = 100f,
 		registrertDato = LocalDateTime.of(2022, 2, 10, 12, 12),
 		innsokBegrunnelse = "begrunnelse deltaker 2",
-		innhold = listOf(Innhold(
-			visningstekst = "Visningstekst",
-			type = "type",
-			valgt = true,
-			beskrivelse = null
-		))
+		innhold = DeltakelsesInnhold(
+			"Ledetekst",
+			listOf(
+				Innhold(
+					visningstekst = "Visningstekst",
+					type = "type",
+					beskrivelse = null
+				)
+			),
+		),
 	)
 
 	val DELTAKER_2_STATUS_1 = DeltakerStatusInput(

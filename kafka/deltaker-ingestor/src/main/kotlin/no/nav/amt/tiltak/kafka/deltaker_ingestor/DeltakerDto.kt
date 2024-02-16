@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.kafka.deltaker_ingestor
 
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Innhold
 import java.time.LocalDate
@@ -16,7 +17,7 @@ data class DeltakerDto(
 	val dagerPerUke: Float?,
 	val deltakelsesprosent: Float?,
 	val bakgrunnsinformasjon: String?,
-	val innhold: List<Innhold>,
+	val innhold: DeltakelsesInnhold?,
 	val status: DeltakerStatusDto,
 	val sistEndret: LocalDateTime,
 	val opprettet: LocalDateTime,

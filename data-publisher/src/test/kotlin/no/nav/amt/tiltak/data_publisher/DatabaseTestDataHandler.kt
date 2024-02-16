@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.data_publisher
 
 import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.domain.tiltak.Innhold
@@ -210,12 +211,16 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		registrertDato = registrertDato,
 		endretDato = endretDato,
 		innsokBegrunnelse = UUID.randomUUID().toString(),
-		innhold = listOf(Innhold(
-			visningstekst = "Visningstekst",
-			type = "type",
-			valgt = true,
-			beskrivelse = null
-		))
+		innhold = DeltakelsesInnhold(
+			"Ledetekst",
+			listOf(
+				Innhold(
+					visningstekst = "Visningstekst",
+					type = "type",
+					beskrivelse = null
+				)
+			),
+		),
 	)
 
 	private fun navAnsattInput(): NavAnsattInput = NavAnsattInput(

@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Innhold
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
@@ -58,12 +59,14 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val dagerPerUke = 2.5f
 		val prosentStilling = 20.0f
 		val begrunnelse = "begrunnelse"
-		val innhold = listOf(Innhold(
-			visningstekst = "Visningstekst",
-			type = "type",
-			valgt = true,
-			beskrivelse = null
-		))
+		val innhold = DeltakelsesInnhold(
+			"Ledetekst",
+			listOf(Innhold(
+				visningstekst = "Visningstekst",
+				type = "type",
+				beskrivelse = null
+			))
+		)
 
 		repository.upsert(
 			DeltakerUpsertDbo(
@@ -100,12 +103,14 @@ internal class DeltakerRepositoryTest : FunSpec({
 		val nyStartdato = LocalDate.now().plusDays(1)
 		val nySluttdato = LocalDate.now().plusDays(14)
 		val nyBegrunnelse = "ny begrunnelse"
-		val innhold = listOf(Innhold(
-			visningstekst = "Visningstekst",
-			type = "type",
-			valgt = true,
-			beskrivelse = null
-		))
+		val innhold = DeltakelsesInnhold(
+			"Ledetekst",
+			listOf(Innhold(
+				visningstekst = "Visningstekst",
+				type = "type",
+				beskrivelse = null
+			))
+		)
 
 		repository.upsert(DeltakerUpsertDbo(
 			id = DELTAKER_1.id,

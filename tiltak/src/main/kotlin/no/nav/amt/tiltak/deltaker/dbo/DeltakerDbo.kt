@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.deltaker.dbo
 
 import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Innhold
@@ -30,7 +31,7 @@ data class DeltakerDbo(
 	val registrertDato: LocalDateTime,
 	val innsokBegrunnelse: String?,
 	val adressebeskyttelse: Adressebeskyttelse?,
-	val innhold: List<Innhold>?
+	val innhold: DeltakelsesInnhold?
 ) {
 
 	fun toDeltaker(status: DeltakerStatus): Deltaker {
