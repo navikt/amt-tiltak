@@ -17,7 +17,6 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
-import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
 import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
@@ -110,18 +109,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		(endringsmelding.innhold as Endringsmelding.Innhold.EndreOppstartsdatoInnhold).oppstartsdato shouldBe null
 
 		response.body?.string() shouldBe """{"id":"${endringsmelding.id}"}"""
-	}
-
-	@Test
-	fun `endreOppstartsdato() skal returnere 400 hvis deltaker er skjult`() {
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/deltaker/${opprettSkjultDeltaker()}/oppstartsdato",
-			headers = createAnsatt1AuthHeader(),
-			body = """{"oppstartsdato": "$dato"}""".toJsonRequestBody()
-		)
-
-		response.code shouldBe 400
 	}
 
 	@Test
@@ -229,18 +216,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	fun `endreDeltakelsesprosent skal returnere 400 hvis deltaker er skjult`() {
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/deltaker/${opprettSkjultDeltaker()}/deltakelse-prosent",
-			headers = createAnsatt1AuthHeader(),
-			body = """{"deltakelseProsent": 12}""".toJsonRequestBody()
-		)
-
-		response.code shouldBe 400
-	}
-
-	@Test
 	fun `avsluttDeltakelse() skal returnere 200 og opprette endringsmelding`() {
 		val response = sendRequest(
 			method = "PATCH",
@@ -261,18 +236,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		(endringsmelding.innhold as Endringsmelding.Innhold.AvsluttDeltakelseInnhold).aarsak.type shouldBe EndringsmeldingStatusAarsak.Type.FATT_JOBB
 
 		response.body?.string() shouldBe """{"id":"${endringsmelding.id}"}"""
-	}
-
-	@Test
-	fun `avsluttDeltakelse skal returnere 400 hvis deltaker er skjult`() {
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/deltaker/${opprettSkjultDeltaker()}/avslutt-deltakelse",
-			headers = createAnsatt1AuthHeader(),
-			body = """{"sluttdato": "$dato", "aarsak": {"type": "FATT_JOBB"} }""".toJsonRequestBody()
-		)
-
-		response.code shouldBe 400
 	}
 
 	@Test
@@ -306,18 +269,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		(endringsmelding.innhold as Endringsmelding.Innhold.ForlengDeltakelseInnhold).sluttdato shouldBe LocalDate.parse(dato)
 
 		response.body?.string() shouldBe """{"id":"${endringsmelding.id}"}"""
-	}
-
-	@Test
-	fun `forlengDeltakelse skal returnere 400 hvis deltaker er skjult`() {
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/deltaker/${opprettSkjultDeltaker()}/forleng-deltakelse",
-			headers = createAnsatt1AuthHeader(),
-			body = """{"sluttdato": "$dato"}""".toJsonRequestBody()
-		)
-
-		response.code shouldBe 400
 	}
 
 	@Test
@@ -381,18 +332,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	fun `deltakerIkkeAktuell skal returnere 400 hvis deltaker er skjult`() {
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/deltaker/${opprettSkjultDeltaker()}/ikke-aktuell",
-			headers = createAnsatt1AuthHeader(),
-			body = """{"aarsak": {"type": "FATT_JOBB"}}""".toJsonRequestBody()
-		)
-
-		response.code shouldBe 400
-	}
-
-	@Test
 	fun `deltakerIkkeAktuell() skal returnere 403 hvis ikke tilgang`() {
 		val response = sendRequest(
 			method = "PATCH",
@@ -427,18 +366,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	fun `leggTilOppstartsdato skal returnere 400 hvis deltaker er skjult`() {
-		val response = sendRequest(
-			method = "POST",
-			url = "/api/tiltaksarrangor/deltaker/${opprettSkjultDeltaker()}/oppstartsdato",
-			headers = createAnsatt1AuthHeader(),
-			body = """{"oppstartsdato": "$dato"}""".toJsonRequestBody()
-		)
-
-		response.code shouldBe 400
-	}
-
-	@Test
 	fun `leggTilOppstartsdato() skal returnere 403 hvis ikke tilgang`() {
 		val response = sendRequest(
 			method = "POST",
@@ -470,45 +397,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		(endringsmelding.innhold as Endringsmelding.Innhold.EndreSluttdatoInnhold).sluttdato shouldBe LocalDate.parse(dato)
 
 		response.body?.string() shouldBe """{"id":"${endringsmelding.id}"}"""
-	}
-	@Test
-	fun `skjulDeltakerForTiltaksarrangor() - skal skjule deltaker`() {
-		val deltakerId = UUID.randomUUID()
-		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId))
-		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerId, status = "IKKE_AKTUELL"))
-
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/deltaker/${deltakerId}/skjul",
-			headers = createAnsatt1AuthHeader(),
-		)
-
-		response.code shouldBe 200
-
-		deltakerService.erSkjultForTiltaksarrangor(deltakerId) shouldBe true
-	}
-
-	@Test
-	fun `skjulDeltakerForTiltaksarrangor() skal returnere 403 hvis ikke tilgang`() {
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/skjul",
-			headers = createAnsatt1AuthHeader(),
-		)
-
-		response.code shouldBe 403
-	}
-
-	@Test
-	fun `skjulDeltakerForTiltaksarrangor() skal returnere 403 om Ansatt kun er veileder`() {
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/skjul",
-			headers = createAnsatt2AuthHeader(),
-		)
-
-
-		response.code shouldBe 403
 	}
 
 	@Test
@@ -606,19 +494,6 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		response.code shouldBe 400
 	}
 
-
-	@Test
-	fun `endreSluttaarsak() skal returnere 400 hvis deltaker er skjult`() {
-		val response = sendRequest(
-			method = "PATCH",
-			url = "/api/tiltaksarrangor/deltaker/${opprettSkjultDeltaker()}/sluttaarsak",
-			headers = createAnsatt1AuthHeader(),
-			body = """{"aarsak": {"type": "FATT_JOBB"} }""".toJsonRequestBody()
-		)
-
-		response.code shouldBe 400
-	}
-
 	@Test
 	fun `endreSluttaarsak() skal returnere 403 hvis ikke tilgang`() {
 		val response = sendRequest(
@@ -630,17 +505,4 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 		response.code shouldBe 403
 	}
-
-
-	private fun opprettSkjultDeltaker(): UUID {
-		val deltakerId = UUID.randomUUID()
-
-		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId, gjennomforingId = GJENNOMFORING_1.id))
-		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerId, status = "IKKE_AKTUELL"))
-
-		deltakerService.skjulDeltakerForTiltaksarrangor(deltakerId, ARRANGOR_ANSATT_1.id)
-
-		return deltakerId
-	}
-
 }

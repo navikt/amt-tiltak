@@ -23,7 +23,6 @@ data class DeltakerPublishDto(
 	val bestillingTekst: String?,
 	val navKontor: String?,
 	val navVeileder: DeltakerNavVeilederDto?,
-	val skjult: DeltakerSkjultDto?,
 	val deltarPaKurs: Boolean,
 	val vurderingerFraArrangor: List<Vurdering>?
 ) {
@@ -43,11 +42,6 @@ data class Navn(
 	val fornavn: String,
 	val mellomnavn: String?,
 	val etternavn: String
-)
-
-data class DeltakerSkjultDto(
-	val skjultAvAnsattId: UUID,
-	val dato: LocalDateTime
 )
 
 data class DeltakerStatusDto(

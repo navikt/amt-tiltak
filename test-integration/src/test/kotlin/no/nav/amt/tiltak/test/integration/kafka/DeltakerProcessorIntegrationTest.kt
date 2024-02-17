@@ -8,8 +8,6 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.DbUtils.shouldBeEqualTo
-import no.nav.amt.tiltak.test.database.data.TestData
-import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
@@ -200,42 +198,6 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 			deltakerService.hentDeltaker(DELTAKER_1.id) shouldBe null
 		}
 	}
-
-	@Test
-	fun `ingest deltaker - deltaker er tidligere skjult - skal oppheves når deltakerstatus oppdateres`() {
-		val skjultDeltaker = DELTAKER_1.copy(id = UUID.randomUUID())
-
-		testDataRepository.insertDeltaker(skjultDeltaker)
-		testDataRepository.insertDeltakerStatus(
-			TestData.DELTAKER_1_STATUS_1.copy(
-				id = UUID.randomUUID(),
-				deltakerId = skjultDeltaker.id,
-				status = "IKKE_AKTUELL"
-			)
-		)
-
-		val mockNavBruker = mockNavBruker(BRUKER_1, NAV_ENHET_1)
-
-		mockAmtPersonHttpServer.addNavBrukerResponse(mockNavBruker)
-
-		deltakerService.skjulDeltakerForTiltaksarrangor(skjultDeltaker.id, ARRANGOR_ANSATT_1.id)
-
-		deltakerService.erSkjultForTiltaksarrangor(skjultDeltaker.id) shouldBe true
-
-		val message = DeltakerMessage(
-			id = skjultDeltaker.id,
-			gjennomforingId = skjultDeltaker.gjennomforingId,
-			status = DeltakerStatus.Type.DELTAR,
-			personIdent = BRUKER_1.personIdent
-		)
-
-		kafkaMessageSender.sendTilAmtTiltakTopic(KafkaMessageCreator.opprettAmtTiltakDeltakerMessage(message))
-
-		AsyncUtils.eventually {
-			deltakerService.erSkjultForTiltaksarrangor(skjultDeltaker.id) shouldBe false
-		}
-	}
-
 
 	private fun ingestGjennomforing(tiltakKode: String = "INDOPPFAG"): GjennomforingMessage {
 		val overordnetArrangor = AmtArrangorClient.ArrangorMedOverordnetArrangor(

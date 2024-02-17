@@ -20,7 +20,6 @@ import no.nav.amt.tiltak.data_publisher.model.DeltakerKontaktinformasjonDto
 import no.nav.amt.tiltak.data_publisher.model.DeltakerNavVeilederDto
 import no.nav.amt.tiltak.data_publisher.model.DeltakerPersonaliaDto
 import no.nav.amt.tiltak.data_publisher.model.DeltakerPublishDto
-import no.nav.amt.tiltak.data_publisher.model.DeltakerSkjultDto
 import no.nav.amt.tiltak.data_publisher.model.DeltakerStatusDto
 import no.nav.amt.tiltak.data_publisher.model.Navn
 import org.springframework.jdbc.core.RowMapper
@@ -39,17 +38,6 @@ class DeltakerPublishQuery(
 
 		if (deltaker.status == null) return Result.DontPublish()
 
-		val skjult = getSkjuling(id)
-			.maxByOrNull { it.createdAt }
-			?.let {
-				if (it.skjultTil.isAfter(LocalDateTime.now())) {
-					DeltakerSkjultDto(
-						skjultAvAnsattId = it.skjultAvAnsattId,
-						dato = it.createdAt
-					)
-
-				} else null
-			}
 		val vurderinger = getVurderinger(id)
 
 		return DeltakerPublishDto(
@@ -91,7 +79,6 @@ class DeltakerPublishQuery(
 				gyldigFra = deltaker.statusGyldigFra!!,
 				opprettetDato = deltaker.statusCreatedAt!!
 			),
-			skjult = skjult,
 			deltarPaKurs = deltaker.deltarPaKurs,
 			vurderingerFraArrangor = vurderinger
 		).let { Result.OK(it) }
@@ -142,32 +129,6 @@ class DeltakerPublishQuery(
 			sqlParameters("deltakerId" to deltakerId),
 			DeltakerDbo.rowMapper
 		).firstOrNull()
-	}
-
-	private fun getSkjuling(deltakerId: UUID): List<SkjultDeltakerDbo> = template.query(
-		"SELECT * FROM skjult_deltaker WHERE deltaker_id = :deltaker_id",
-		sqlParameters("deltaker_id" to deltakerId),
-		SkjultDeltakerDbo.rowMapper
-	)
-
-	private data class SkjultDeltakerDbo(
-		val id: UUID,
-		val deltakerId: UUID,
-		val skjultAvAnsattId: UUID,
-		val skjultTil: LocalDateTime,
-		val createdAt: LocalDateTime
-	) {
-		companion object {
-			val rowMapper = RowMapper { rs, _ ->
-				SkjultDeltakerDbo(
-					rs.getUUID("id"),
-					rs.getUUID("deltaker_id"),
-					rs.getUUID("skjult_av_arrangor_ansatt_id"),
-					rs.getLocalDateTime("skjult_til"),
-					rs.getLocalDateTime("created_at")
-				)
-			}
-		}
 	}
 
 	private fun getVurderinger(deltakerId: UUID): List<Vurdering> {

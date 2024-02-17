@@ -1,9 +1,6 @@
 package no.nav.amt.tiltak.test.database.data
 
 import no.nav.amt.tiltak.common.db_utils.DbUtils
-import no.nav.amt.tiltak.common.db_utils.getUUID
-import no.nav.amt.tiltak.common.db_utils.getZonedDateTime
-import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
 import no.nav.amt.tiltak.test.database.DbTestDataUtils.parameters
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattGjennomforingTilgangInput
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
@@ -17,13 +14,9 @@ import no.nav.amt.tiltak.test.database.data.inputs.EndringsmeldingInput
 import no.nav.amt.tiltak.test.database.data.inputs.GjennomforingInput
 import no.nav.amt.tiltak.test.database.data.inputs.NavAnsattInput
 import no.nav.amt.tiltak.test.database.data.inputs.NavEnhetInput
-import no.nav.amt.tiltak.test.database.data.inputs.SkjultDeltakerInput
 import no.nav.amt.tiltak.test.database.data.inputs.TiltakInput
 import no.nav.amt.tiltak.test.database.data.inputs.TiltaksansvarligGjennomforingTilgangInput
-import no.nav.amt.tiltak.test.database.data.outputs.ArrangorAnsattGjennomforingTilgangOutput
-import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.util.UUID
 
 class TestDataRepository(
 	private val template: NamedParameterJdbcTemplate
@@ -63,37 +56,6 @@ class TestDataRepository(
 		)
 	}
 
-	fun getArrangorAnsattGjennomforingTilganger(arrangorAnsattId: UUID): List<ArrangorAnsattGjennomforingTilgangOutput> {
-		val sql = """
-			SELECT * FROM arrangor_ansatt_gjennomforing_tilgang WHERE ansatt_id = :ansattId
-		""".trimIndent()
-
-		val rowMapper = RowMapper { rs, _ ->
-			ArrangorAnsattGjennomforingTilgangOutput(
-				id = rs.getUUID("id"),
-				ansattId = rs.getUUID("ansatt_id"),
-				gjennomforingId = rs.getUUID("gjennomforing_id"),
-				gyldigFra = rs.getZonedDateTime("gyldig_fra"),
-				gyldigTil = rs.getZonedDateTime("gyldig_til"),
-				createdAt = rs.getZonedDateTime("created_at"),
-			)
-		}
-
-		return template.query(
-			sql, parameters(
-				"ansattId" to arrangorAnsattId,
-			), rowMapper
-		)
-	}
-
-	fun deleteAllArrangorAnsattGjennomforingTilganger() {
-		val sql = """
-			TRUNCATE arrangor_ansatt_gjennomforing_tilgang CASCADE
-		""".trimIndent()
-
-		template.jdbcTemplate.update(sql)
-	}
-
 	fun insertArrangorAnsattRolle(cmd: ArrangorAnsattRolleInput) {
 		val sql = """
 			INSERT INTO arrangor_ansatt_rolle(id, arrangor_id, ansatt_id, rolle)
@@ -113,27 +75,6 @@ class TestDataRepository(
 		val sql = """
 			INSERT INTO arrangor(id, overordnet_enhet_organisasjonsnummer, overordnet_enhet_navn, organisasjonsnummer, navn)
 			VALUES (:id, :overordnet_enhet_organisasjonsnummer, :overordnet_enhet_navn, :organisasjonsnummer, :navn)
-		""".trimIndent()
-
-		template.update(
-			sql, parameters(
-				"id" to cmd.id,
-				"overordnet_enhet_organisasjonsnummer" to cmd.overordnetEnhetOrganisasjonsnummer,
-				"overordnet_enhet_navn" to cmd.overordnetEnhetNavn,
-				"organisasjonsnummer" to cmd.organisasjonsnummer,
-				"navn" to cmd.navn,
-			)
-		)
-	}
-
-	fun updateArrangor(cmd: ArrangorInput) {
-		val sql = """
-			UPDATE arrangor
-			SET overordnet_enhet_navn = :overordnet_enhet_navn,
-				overordnet_enhet_organisasjonsnummer = :overordnet_enhet_organisasjonsnummer,
-				organisasjonsnummer = :organisasjonsnummer,
-				navn = :navn
-			WHERE id = :id
 		""".trimIndent()
 
 		template.update(
@@ -195,14 +136,6 @@ class TestDataRepository(
 
 				)
 		)
-	}
-
-	fun deleteAllDeltaker() {
-		val sql = """
-			TRUNCATE deltaker CASCADE
-		""".trimIndent()
-
-		template.jdbcTemplate.update(sql)
 	}
 
 	fun insertDeltakerStatus(cmd: DeltakerStatusInput) {
@@ -305,22 +238,6 @@ class TestDataRepository(
 		)
 	}
 
-	fun updateTiltak(cmd: TiltakInput) {
-		val sql = """
-			UPDATE tiltak
-			SET navn = :navn, type = :type
-			WHERE id = :id
-		""".trimIndent()
-
-		template.update(
-			sql, parameters(
-				"id" to cmd.id,
-				"navn" to cmd.navn,
-				"type" to cmd.type
-			)
-		)
-	}
-
 	fun insertEndringsmelding(cmd: EndringsmeldingInput) {
 		val sql = """
 			INSERT INTO endringsmelding(
@@ -406,22 +323,6 @@ class TestDataRepository(
 		template.jdbcTemplate.update(sql)
 	}
 
-	fun insertSkjultDeltaker(input: SkjultDeltakerInput) {
-		val sql = """
-			INSERT INTO skjult_deltaker(id, deltaker_id, skjult_av_arrangor_ansatt_id, skjult_til)
-			VALUES (:id, :deltakerId, :skjultAvArrangorAnsattId, :skjultTil)
-		""".trimIndent()
-
-		val parameters = DbUtils.sqlParameters(
-			"id" to input.id,
-			"deltakerId" to input.deltakerId,
-			"skjultAvArrangorAnsattId" to input.skjultAvArrangorAnsattId,
-			"skjultTil" to input.skjultTil.toOffsetDateTime(),
-		)
-
-		template.update(sql, parameters)
-	}
-
 	fun insertArrangorVeileder(input: ArrangorVeilederDboInput) {
 		val sql = """
 			INSERT INTO arrangor_veileder(
@@ -450,23 +351,4 @@ class TestDataRepository(
 
 		template.update(sql, parameters)
 	}
-
-	fun deleteAllArrangorAnsattRoller(rolle: ArrangorAnsattRolle) {
-		val sql = """
-			DELETE FROM arrangor_ansatt_rolle WHERE rolle = :rolle::arrangor_rolle
-		""".trimIndent()
-
-		val parameters = DbUtils.sqlParameters("rolle" to rolle.name)
-
-		template.update(sql, parameters)
-	}
-
-	fun deleteAllArrangorAnsattRoller() {
-		val sql = """
-			DELETE FROM arrangor_ansatt_rolle
-		""".trimIndent()
-
-		template.jdbcTemplate.update(sql)
-	}
-
 }

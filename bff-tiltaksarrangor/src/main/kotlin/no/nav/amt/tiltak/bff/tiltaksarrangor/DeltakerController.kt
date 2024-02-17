@@ -1,17 +1,30 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor
 
-import no.nav.amt.tiltak.bff.tiltaksarrangor.request.*
+import no.nav.amt.tiltak.bff.tiltaksarrangor.request.AvsluttDeltakelseRequest
+import no.nav.amt.tiltak.bff.tiltaksarrangor.request.DeltakerIkkeAktuellRequest
+import no.nav.amt.tiltak.bff.tiltaksarrangor.request.EndreOppstartsdatoRequest
+import no.nav.amt.tiltak.bff.tiltaksarrangor.request.EndreSluttaarsakRequest
+import no.nav.amt.tiltak.bff.tiltaksarrangor.request.EndreSluttdatoRequest
+import no.nav.amt.tiltak.bff.tiltaksarrangor.request.ForlengDeltakelseRequest
+import no.nav.amt.tiltak.bff.tiltaksarrangor.request.LeggTilOppstartsdatoRequest
+import no.nav.amt.tiltak.bff.tiltaksarrangor.request.RegistrerVurderingRequest
 import no.nav.amt.tiltak.bff.tiltaksarrangor.response.OpprettEndringsmeldingResponse
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
-import no.nav.amt.tiltak.core.exceptions.SkjultDeltakerException
 import no.nav.amt.tiltak.core.exceptions.ValidationException
-import no.nav.amt.tiltak.core.port.*
+import no.nav.amt.tiltak.core.port.ArrangorAnsattTilgangService
+import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/tiltaksarrangor/deltaker")
@@ -30,7 +43,6 @@ class DeltakerController(
 		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		verifiserErIkkeSkjult(deltakerId)
 
 		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettLeggTilOppstartsdatoEndringsmelding(deltakerId, ansatt.id, request.oppstartsdato))
 	}
@@ -44,7 +56,6 @@ class DeltakerController(
 		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		verifiserErIkkeSkjult(deltakerId)
 
 		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettEndreOppstartsdatoEndringsmelding(deltakerId, ansatt.id, request.oppstartsdato))
 	}
@@ -58,7 +69,6 @@ class DeltakerController(
 		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		verifiserErIkkeSkjult(deltakerId)
 
 		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettAvsluttDeltakelseEndringsmelding(deltakerId, ansatt.id, request.sluttdato, request.aarsak.toModel()))
 	}
@@ -72,7 +82,6 @@ class DeltakerController(
 		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		verifiserErIkkeSkjult(deltakerId)
 
 		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettForlengDeltakelseEndringsmelding(deltakerId, ansatt.id, request.sluttdato))
 	}
@@ -93,7 +102,6 @@ class DeltakerController(
 		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		verifiserErIkkeSkjult(deltakerId)
 
 		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettEndreDeltakelseProsentEndringsmelding(
 			deltakerId = deltakerId,
@@ -113,7 +121,6 @@ class DeltakerController(
 		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		verifiserErIkkeSkjult(deltakerId)
 
 		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettDeltakerIkkeAktuellEndringsmelding(deltakerId, ansatt.id, request.aarsak.toModel()))
 	}
@@ -127,7 +134,6 @@ class DeltakerController(
 		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		verifiserErIkkeSkjult(deltakerId)
 
 		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettEndresluttdatoEndringsmelding(deltakerId, ansatt.id, request.sluttdato))
 	}
@@ -141,7 +147,6 @@ class DeltakerController(
 		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		verifiserErIkkeSkjult(deltakerId)
 
 		val deltaker = deltakerService.hentDeltaker(deltakerId)
 		if (deltaker?.status?.type != DeltakerStatus.Type.HAR_SLUTTET) {
@@ -149,16 +154,6 @@ class DeltakerController(
 		}
 
 		return OpprettEndringsmeldingResponse(endringsmeldingService.opprettEndreSluttaarsakEndringsmelding(deltakerId, ansatt.id, request.aarsak.toModel()))
-	}
-
-	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
-	@PatchMapping("/{deltakerId}/skjul")
-	fun skjulDeltakerForTiltaksarrangor(@PathVariable("deltakerId") deltakerId: UUID) {
-		val ansatt = controllerService.hentInnloggetAnsatt()
-
-		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-
-		deltakerService.skjulDeltakerForTiltaksarrangor(deltakerId, ansatt.id)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
@@ -170,7 +165,6 @@ class DeltakerController(
 		val ansatt = controllerService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
-		verifiserErIkkeSkjult(deltakerId)
 
 		return deltakerService.lagreVurdering(
 			deltakerId = deltakerId,
@@ -178,11 +172,6 @@ class DeltakerController(
 			vurderingstype = request.vurderingstype,
 			begrunnelse = request.begrunnelse
 		)
-	}
-
-	private fun verifiserErIkkeSkjult(deltakerId: UUID) {
-		if (deltakerService.erSkjultForTiltaksarrangor(deltakerId))
-			throw SkjultDeltakerException("Deltaker med id $deltakerId er skjult for tiltaksarrangør")
 	}
 
 	data class EndreDeltakelsesprosentRequestBody(
