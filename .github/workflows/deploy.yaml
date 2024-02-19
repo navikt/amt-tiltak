@@ -28,7 +28,7 @@ jobs:
       - name: Build maven artifacts
         run: mvn -B package
       - name: Dependency submission (for dependabot)
-        uses: advanced-security/maven-dependency-submission-action@v4.0.0
+        uses: advanced-security/maven-dependency-submission-action@v4.0.1
       - name: docker-build-push
         uses: nais/docker-build-push@v0
         id: docker-build-push
