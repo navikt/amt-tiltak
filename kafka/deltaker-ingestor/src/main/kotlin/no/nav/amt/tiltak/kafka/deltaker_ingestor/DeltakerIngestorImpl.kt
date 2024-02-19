@@ -82,18 +82,6 @@ class DeltakerIngestorImpl(
 
 		transactionTemplate.executeWithoutResult {
 			deltakerService.upsertDeltaker(deltakerDto.personident, deltakerUpsert)
-
-			/*
-			 	Deltakere blir noen ganger gjenbrukt istedenfor at det opprettes en ny,
-			 	eller NAV har bestemt at deltakeren skal på tiltaket selv om tiltaksarrangøren har skjult deltakeren.
-			 	I disse tilfellene så må vi oppheve at deltakeren skjules.
-			*/
-			if (
-				deltakerService.erSkjultForTiltaksarrangor(deltakerUpsert.id)
-				&& !deltakerService.kanDeltakerSkjulesForTiltaksarrangor(deltakerUpsert.id)
-			) {
-				deltakerService.opphevSkjulDeltakerForTiltaksarrangor(deltakerUpsert.id)
-			}
 		}
 		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} deltakerlisteId=${gjennomforingId} fra ny løsning")
 	}

@@ -512,44 +512,6 @@ class DeltakerServiceImplTest {
 	}
 
 	@Test
-	fun `skjulDeltakerForTiltaksarrangor - skal skjule deltaker`() {
-		val deltakerId = UUID.randomUUID()
-
-		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId))
-		testDataRepository.insertDeltakerStatus(
-			DELTAKER_1_STATUS_1.copy(
-				id = UUID.randomUUID(),
-				deltakerId = deltakerId,
-				status = "IKKE_AKTUELL"
-			)
-		)
-
-		deltakerServiceImpl.skjulDeltakerForTiltaksarrangor(deltakerId, ARRANGOR_ANSATT_1.id)
-
-		deltakerServiceImpl.erSkjultForTiltaksarrangor(deltakerId) shouldBe true
-		verify(exactly = 0) { kafkaProducerService.publiserDeltaker(any(), any()) }
-		verify(exactly = 1) { publisherService.publish(deltakerId, DataPublishType.DELTAKER) }
-	}
-
-	@Test
-	fun `skjulDeltakerForTiltaksarrangor - skal kaste exception hvis deltaker har ugyldig status`() {
-		val deltakerId = UUID.randomUUID()
-
-		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId))
-		testDataRepository.insertDeltakerStatus(
-			DELTAKER_1_STATUS_1.copy(
-				id = UUID.randomUUID(),
-				deltakerId = deltakerId,
-				status = "DELTAR"
-			)
-		)
-
-		shouldThrowExactly<IllegalStateException> {
-			deltakerServiceImpl.skjulDeltakerForTiltaksarrangor(deltakerId, ARRANGOR_ANSATT_1.id)
-		}
-	}
-
-	@Test
 	fun `republiserAlleDeltakerePaKafka - skal publisere deltakere på kafka`() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 

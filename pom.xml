@@ -404,12 +404,6 @@
 
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
-                <artifactId>mock-oauth-server</artifactId>
-                <version>${project.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.amt-tiltak</groupId>
                 <artifactId>test-utils</artifactId>
                 <version>${project.version}</version>
                 <scope>test</scope>

@@ -67,8 +67,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>mock-oauth-server</artifactId>
+            <groupId>no.nav.security</groupId>
+            <artifactId>token-validation-spring</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
