@@ -6,6 +6,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
+import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
@@ -64,7 +65,8 @@ class DeltakerProcessor(
 			registrertDato = deltakerDto.registrertDato,
 			gjennomforingId = gjennomforingId,
 			innsokBegrunnelse = deltakerDto.innsokBegrunnelse,
-			innhold = null
+			innhold = null,
+			kilde = Kilde.ARENA
 		)
 
 		transactionTemplate.executeWithoutResult {

@@ -14,6 +14,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import no.nav.amt.tiltak.core.exceptions.ValidationException
@@ -698,7 +699,8 @@ class DeltakerServiceImplTest {
 		prosentStilling = null,
 		gjennomforingId = GJENNOMFORING_1.id,
 		innsokBegrunnelse = null,
-		innhold = null
+		innhold = null,
+		kilde = Kilde.ARENA
 	)
 
 }

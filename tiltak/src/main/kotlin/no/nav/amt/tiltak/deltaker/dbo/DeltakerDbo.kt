@@ -4,7 +4,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
-import no.nav.amt.tiltak.core.domain.tiltak.Innhold
+import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.nav_enhet.NavEnhetDbo
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -31,7 +31,8 @@ data class DeltakerDbo(
 	val registrertDato: LocalDateTime,
 	val innsokBegrunnelse: String?,
 	val adressebeskyttelse: Adressebeskyttelse?,
-	val innhold: DeltakelsesInnhold?
+	val innhold: DeltakelsesInnhold?,
+	val kilde: Kilde?
 ) {
 
 	fun toDeltaker(status: DeltakerStatus): Deltaker {
@@ -56,7 +57,8 @@ data class DeltakerDbo(
 			innsokBegrunnelse = innsokBegrunnelse,
 			endretDato = modifiedAt,
 			adressebeskyttelse = adressebeskyttelse,
-			innhold = innhold
+			innhold = innhold,
+			kilde = kilde
 		)
 	}
 

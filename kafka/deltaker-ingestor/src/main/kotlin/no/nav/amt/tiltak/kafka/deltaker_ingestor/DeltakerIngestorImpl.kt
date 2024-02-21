@@ -7,6 +7,7 @@ import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
+import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.kafka.DeltakerIngestor
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
@@ -77,7 +78,8 @@ class DeltakerIngestorImpl(
 			registrertDato = deltakerDto.opprettet,
 			gjennomforingId = gjennomforingId,
 			innsokBegrunnelse = deltakerDto.bakgrunnsinformasjon,
-			innhold = deltakerDto.innhold
+			innhold = deltakerDto.innhold,
+			kilde = Kilde.KOMET
 		)
 
 		transactionTemplate.executeWithoutResult {

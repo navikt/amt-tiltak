@@ -114,7 +114,8 @@ class ArrangorAnsattTilgangServiceImplTest {
 		erSkjermet = true,
 		endretDato = LocalDateTime.now(),
 		adressebeskyttelse = null,
-		innhold = null
+		innhold = null,
+		kilde = null
 	)
 
 	@BeforeEach

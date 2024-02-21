@@ -407,7 +407,8 @@ open class DeltakerServiceImpl(
 		dagerPerUke = this.dagerPerUke,
 		prosentStilling = this.prosentStilling,
 		innsokBegrunnelse = this.innsokBegrunnelse,
-		innhold = this.innhold
+		innhold = this.innhold,
+		kilde = this.kilde
 	)
 }
 

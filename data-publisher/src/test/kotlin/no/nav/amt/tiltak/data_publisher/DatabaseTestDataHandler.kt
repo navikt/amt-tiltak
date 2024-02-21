@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.domain.tiltak.Innhold
+import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
@@ -212,6 +213,7 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 				)
 			),
 		),
+		kilde = Kilde.ARENA
 	)
 
 	private fun navAnsattInput(): NavAnsattInput = NavAnsattInput(
