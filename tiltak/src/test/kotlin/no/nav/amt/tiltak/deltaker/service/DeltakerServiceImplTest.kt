@@ -28,7 +28,6 @@ import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
-import no.nav.amt.tiltak.deltaker.repositories.SkjultDeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.VurderingRepository
 import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
 import no.nav.amt.tiltak.endringsmelding.EndringsmeldingServiceImpl
@@ -77,7 +76,6 @@ class DeltakerServiceImplTest {
 	lateinit var navEnhetService: NavEnhetService
 	lateinit var endringsmeldingService: EndringsmeldingServiceImpl
 	lateinit var endringsmeldingRepository: EndringsmeldingRepository
-	lateinit var skjultDeltakerRepository: SkjultDeltakerRepository
 	lateinit var gjennomforingService: GjennomforingService
 	lateinit var kafkaProducerService: KafkaProducerService
 	lateinit var objectMapper: ObjectMapper
@@ -105,7 +103,6 @@ class DeltakerServiceImplTest {
 		objectMapper = JsonUtils.objectMapper
 		deltakerRepository = DeltakerRepository(jdbcTemplate)
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
-		skjultDeltakerRepository = SkjultDeltakerRepository(jdbcTemplate)
 		gjennomforingService = mockk()
 		endringsmeldingRepository = EndringsmeldingRepository(jdbcTemplate, objectMapper)
 		endringsmeldingService = EndringsmeldingServiceImpl(endringsmeldingRepository, mockk(), transactionTemplate, publisherService)
@@ -116,7 +113,6 @@ class DeltakerServiceImplTest {
 			deltakerStatusRepository = deltakerStatusRepository,
 			brukerService = brukerService,
 			endringsmeldingService = endringsmeldingService,
-			skjultDeltakerRepository = skjultDeltakerRepository,
 			gjennomforingService = gjennomforingService,
 			transactionTemplate = transactionTemplate,
 			kafkaProducerService = kafkaProducerService,

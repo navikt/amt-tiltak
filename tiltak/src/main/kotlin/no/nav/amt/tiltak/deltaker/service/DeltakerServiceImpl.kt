@@ -22,7 +22,6 @@ import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpsertDbo
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.DeltakerStatusRepository
-import no.nav.amt.tiltak.deltaker.repositories.SkjultDeltakerRepository
 import no.nav.amt.tiltak.deltaker.repositories.VurderingRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -37,7 +36,6 @@ open class DeltakerServiceImpl(
 	private val deltakerStatusRepository: DeltakerStatusRepository,
 	private val brukerService: BrukerService,
 	private val endringsmeldingService: EndringsmeldingService,
-	private val skjultDeltakerRepository: SkjultDeltakerRepository,
 	private val gjennomforingService: GjennomforingService,
 	private val transactionTemplate: TransactionTemplate,
 	private val kafkaProducerService: KafkaProducerService,
@@ -122,7 +120,6 @@ open class DeltakerServiceImpl(
 		transactionTemplate.execute {
 			endringsmeldingService.slett(deltakerId)
 			deltakerStatusRepository.slett(deltakerId)
-			skjultDeltakerRepository.slett(deltakerId)
 			vurderingRepository.slett(deltakerId)
 			deltakerRepository.slettVeilederrelasjonOgDeltaker(deltakerId)
 			kafkaProducerService.publiserSlettDeltaker(deltakerId)
