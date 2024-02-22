@@ -51,7 +51,7 @@ object TestData {
 					beskrivelse = null
 				))
 			),
-			kilde = null
+			kilde = Kilde.ARENA
 		)
 
 	fun createStatusInput(deltaker: DeltakerInput) = DeltakerStatusInput(

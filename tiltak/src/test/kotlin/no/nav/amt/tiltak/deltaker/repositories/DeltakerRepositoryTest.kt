@@ -124,7 +124,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			registrertDato = LocalDateTime.now(),
 			innsokBegrunnelse = nyBegrunnelse,
 			innhold = innhold,
-			kilde = null
+			kilde = Kilde.ARENA
 		))
 		val updatedDeltaker = repository.get(DELTAKER_1.id)
 
@@ -134,7 +134,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		updatedDeltaker.sluttDato shouldBe nySluttdato
 		updatedDeltaker.innsokBegrunnelse shouldBe nyBegrunnelse
 		updatedDeltaker.innhold shouldBe innhold
-		updatedDeltaker.kilde shouldBe null
+		updatedDeltaker.kilde shouldBe Kilde.ARENA
 	}
 
 	test("get - deltaker finnes - returnerer deltaker") {
@@ -178,7 +178,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			prosentStilling = 20.0f,
 			registrertDato = now,
 			innhold = null,
-			kilde = null
+			kilde = Kilde.ARENA
 		)
 
 		repository.upsert(insertDbo)
@@ -215,7 +215,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			prosentStilling = prosentStilling,
 			registrertDato = registrertDato,
 			innhold = null,
-			kilde = null
+			kilde = Kilde.ARENA
 		)
 
 		repository.upsert(insertDbo)
@@ -249,7 +249,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			prosentStilling = 20.0f,
 			registrertDato = now.minusDays(10),
 			innhold = null,
-			kilde = null
+			kilde = Kilde.ARENA
 		)
 		repository.upsert(deltakerInsertDbo)
 		val deltaker = repository.get(deltakerInsertDbo.id)
@@ -279,7 +279,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			prosentStilling = 20.0f,
 			registrertDato = LocalDateTime.now().minusDays(10),
 			innhold = null,
-			kilde = null
+			kilde = Kilde.ARENA
 		)
 		val statusInsertDbo = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
@@ -309,7 +309,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			prosentStilling = 20.0f,
 			registrertDato = LocalDateTime.now().minusDays(10),
 			innhold = null,
-			kilde = null
+			kilde = Kilde.ARENA
 		)
 		repository.upsert(deltakerInsertDbo)
 		val deltaker = repository.get(deltakerInsertDbo.id)
@@ -341,7 +341,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			prosentStilling = 20.0f,
 			registrertDato = now.minusDays(10),
 			innhold = null,
-			kilde = null
+			kilde = Kilde.ARENA
 		)
 		val statusInsertDbo = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
@@ -378,7 +378,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			prosentStilling = 20.0f,
 			registrertDato = LocalDateTime.now().minusDays(10),
 			innhold = null,
-			kilde = null
+			kilde = Kilde.ARENA
 		)
 		val statusInsertDbo = DeltakerStatusInsertDbo(
 			id = UUID.randomUUID(),
@@ -407,7 +407,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			prosentStilling = 20.0f,
 			registrertDato = LocalDateTime.now().minusDays(10),
 			innhold = null,
-			kilde = null
+			kilde = Kilde.ARENA
 		)
 
 		repository.upsert(deltakerInsertDbo)

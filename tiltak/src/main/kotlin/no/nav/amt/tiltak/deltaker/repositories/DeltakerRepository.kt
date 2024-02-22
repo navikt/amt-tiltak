@@ -56,7 +56,7 @@ open class DeltakerRepository(
 			innsokBegrunnelse = rs.getNullableString("innsok_begrunnelse"),
 			adressebeskyttelse = rs.getString("adressebeskyttelse")?.let { Adressebeskyttelse.valueOf(it) },
 			innhold = rs.getString("innhold")?.let { fromJsonString(it) },
-			kilde = rs.getString("kilde")?.let { Kilde.valueOf(it) }
+			kilde = Kilde.valueOf(rs.getString("kilde"))
 		)
 	}
 
@@ -99,7 +99,7 @@ open class DeltakerRepository(
 				"registrertDato" to deltaker.registrertDato,
 				"innsokBegrunnelse" to deltaker.innsokBegrunnelse,
 				"innhold" to deltaker.innhold?.toPGObject(),
-				"kilde" to deltaker.kilde?.name
+				"kilde" to deltaker.kilde.name
 			)
 		)
 

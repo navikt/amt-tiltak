@@ -32,7 +32,7 @@ data class DeltakerDbo(
 	val innsokBegrunnelse: String?,
 	val adressebeskyttelse: Adressebeskyttelse?,
 	val innhold: DeltakelsesInnhold?,
-	val kilde: Kilde?
+	val kilde: Kilde
 ) {
 
 	fun toDeltaker(status: DeltakerStatus): Deltaker {

@@ -23,7 +23,7 @@ data class DeltakerInput(
 	val createdAt: ZonedDateTime = ZonedDateTime.of(2022, 2, 13, 0, 0, 0, 0, ZoneId.systemDefault()),
 	val endretDato: LocalDateTime = LocalDateTime.now(),
 	val innhold: DeltakelsesInnhold?,
-	val kilde: Kilde?
+	val kilde: Kilde
 ) {
 	fun toDeltaker(brukerInput: BrukerInput, statusInput: DeltakerStatusInput) = Deltaker(
 		id = id,

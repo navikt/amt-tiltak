@@ -17,5 +17,5 @@ data class DeltakerUpsertDbo(
 	val prosentStilling: Float? = null,
 	val innsokBegrunnelse: String? = null,
 	val innhold: DeltakelsesInnhold?,
-	val kilde: Kilde?
+	val kilde: Kilde
 )

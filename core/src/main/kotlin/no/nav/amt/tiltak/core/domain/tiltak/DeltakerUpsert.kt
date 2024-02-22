@@ -16,7 +16,7 @@ data class DeltakerUpsert(
 	val prosentStilling: Float? = null,
 	val innsokBegrunnelse: String?,
 	val innhold: DeltakelsesInnhold?,
-	val kilde: Kilde?
+	val kilde: Kilde
 ) {
 	fun compareTo(deltaker: Deltaker): Boolean {
 		// Her kan man ikke enkelt sammenlikne hele objektet fordi sammenlikning av localdatetime må rundes av pga ms presisjon
