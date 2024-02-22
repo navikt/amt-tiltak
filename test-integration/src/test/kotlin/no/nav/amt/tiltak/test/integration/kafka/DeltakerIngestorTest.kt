@@ -7,6 +7,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Innhold
+import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.kafka.deltaker_ingestor.DeltakerDto
 import no.nav.amt.tiltak.kafka.deltaker_ingestor.DeltakerStatusDto
@@ -115,6 +116,7 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 		faktisk.endretDato shouldBeCloseTo LocalDateTime.now()
 		faktisk.registrertDato shouldBeEqualTo forventet.opprettet
 		faktisk.innhold shouldBe forventet.innhold
+		faktisk.kilde shouldBe Kilde.KOMET
 		sammenlignStatus(faktisk.status, forventet.status)
 	}
 

@@ -16,6 +16,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.core.port.ArrangorAnsattService
 import no.nav.amt.tiltak.core.port.ArrangorService
@@ -114,7 +115,8 @@ class ArrangorAnsattTilgangServiceImplTest {
 		erSkjermet = true,
 		endretDato = LocalDateTime.now(),
 		adressebeskyttelse = null,
-		innhold = null
+		innhold = null,
+		kilde = Kilde.ARENA
 	)
 
 	@BeforeEach

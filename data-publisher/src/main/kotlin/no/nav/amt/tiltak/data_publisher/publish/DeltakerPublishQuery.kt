@@ -14,6 +14,7 @@ import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.tiltak.Adresse
 import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import no.nav.amt.tiltak.data_publisher.model.DeltakerKontaktinformasjonDto
@@ -80,7 +81,8 @@ class DeltakerPublishQuery(
 				opprettetDato = deltaker.statusCreatedAt!!
 			),
 			deltarPaKurs = deltaker.deltarPaKurs,
-			vurderingerFraArrangor = vurderinger
+			vurderingerFraArrangor = vurderinger,
+			kilde = deltaker.kilde
 		).let { Result.OK(it) }
 	}
 
@@ -103,6 +105,7 @@ class DeltakerPublishQuery(
 				   deltaker.slutt_dato,
 				   deltaker.registrert_dato,
 				   deltaker.innsok_begrunnelse,
+				   deltaker.kilde,
 				   nav_enhet.navn                               as nav_enhet_navn,
 				   nav_ansatt.id                                as nav_ansatt_id,
 				   nav_ansatt.navn                              as nav_ansatt_navn,
@@ -184,7 +187,8 @@ class DeltakerPublishQuery(
 		val statusAarsak: String?,
 		val statusGyldigFra: LocalDateTime?,
 		val statusCreatedAt: LocalDateTime?,
-		val deltarPaKurs: Boolean
+		val deltarPaKurs: Boolean,
+		val kilde: Kilde
 	) {
 		companion object {
 			val rowMapper = RowMapper { rs, _ ->
@@ -215,7 +219,8 @@ class DeltakerPublishQuery(
 					statusAarsak = rs.getNullableString("status_aarsak"),
 					statusGyldigFra = rs.getNullableLocalDateTime("status_gyldig_fra"),
 					statusCreatedAt = rs.getNullableLocalDateTime("status_opprettet_dato"),
-					deltarPaKurs = rs.getBoolean("er_kurs")
+					deltarPaKurs = rs.getBoolean("er_kurs"),
+					kilde = Kilde.valueOf(rs.getString("kilde"))
 				)
 			}
 		}

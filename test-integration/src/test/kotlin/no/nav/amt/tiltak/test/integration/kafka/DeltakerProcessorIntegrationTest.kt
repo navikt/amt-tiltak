@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.GjennomforingArenaData
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
+import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.DbUtils.shouldBeEqualTo
@@ -75,6 +76,7 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 			deltaker.erSkjermet shouldBe false
 			deltaker.fornavn shouldBe mockNavBruker.fornavn
 			deltaker.etternavn shouldBe mockNavBruker.etternavn
+			deltaker.kilde shouldBe Kilde.ARENA
 		}
 
 	}
@@ -119,6 +121,7 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 			deltaker.erSkjermet shouldBe false
 			deltaker.fornavn shouldBe mockNavBruker.fornavn
 			deltaker.etternavn shouldBe mockNavBruker.etternavn
+			deltaker.kilde shouldBe Kilde.ARENA
 		}
 
 	}

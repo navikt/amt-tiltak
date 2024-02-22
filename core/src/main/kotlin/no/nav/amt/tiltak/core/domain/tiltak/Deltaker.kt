@@ -25,7 +25,8 @@ data class Deltaker(
 	val innsokBegrunnelse: String? = null,
 	val endretDato: LocalDateTime,
 	val adressebeskyttelse: Adressebeskyttelse?,
-	val innhold: DeltakelsesInnhold?
+	val innhold: DeltakelsesInnhold?,
+	val kilde: Kilde
 ) {
 	fun harAdressebeskyttelse(): Boolean {
 		return adressebeskyttelse != null

@@ -11,6 +11,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
+import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpsertDbo
 import no.nav.amt.tiltak.nav_enhet.NavEnhetDbo
@@ -54,14 +55,15 @@ open class DeltakerRepository(
 			registrertDato = rs.getTimestamp("registrert_dato").toLocalDateTime(),
 			innsokBegrunnelse = rs.getNullableString("innsok_begrunnelse"),
 			adressebeskyttelse = rs.getString("adressebeskyttelse")?.let { Adressebeskyttelse.valueOf(it) },
-			innhold = rs.getString("innhold")?.let { fromJsonString(it) }
+			innhold = rs.getString("innhold")?.let { fromJsonString(it) },
+			kilde = Kilde.valueOf(rs.getString("kilde"))
 		)
 	}
 
 	fun upsert(deltaker: DeltakerUpsertDbo) {
 		val sql = """
 			INSERT INTO deltaker(id, bruker_id, gjennomforing_id, start_dato, slutt_dato,
-								 dager_per_uke, prosent_stilling, registrert_dato, innsok_begrunnelse, innhold)
+								 dager_per_uke, prosent_stilling, registrert_dato, innsok_begrunnelse, innhold, kilde)
 			VALUES (:id,
 					:brukerId,
 					:gjennomforingId,
@@ -71,7 +73,8 @@ open class DeltakerRepository(
 					:prosentStilling,
 					:registrertDato,
 					:innsokBegrunnelse,
-					:innhold)
+					:innhold,
+					:kilde)
 			ON CONFLICT (id) DO
 			UPDATE SET
 				start_dato = :startdato,
@@ -80,6 +83,7 @@ open class DeltakerRepository(
 				prosent_stilling = :prosentStilling,
 				innsok_begrunnelse = :innsokBegrunnelse,
 				innhold	= :innhold,
+				kilde = :kilde,
 				modified_at = CURRENT_TIMESTAMP
 		""".trimIndent()
 
@@ -94,7 +98,8 @@ open class DeltakerRepository(
 				"prosentStilling" to deltaker.prosentStilling,
 				"registrertDato" to deltaker.registrertDato,
 				"innsokBegrunnelse" to deltaker.innsokBegrunnelse,
-				"innhold" to deltaker.innhold?.toPGObject()
+				"innhold" to deltaker.innhold?.toPGObject(),
+				"kilde" to deltaker.kilde.name
 			)
 		)
 
