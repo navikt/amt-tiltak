@@ -46,7 +46,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
 
-        <testcontainers.version>1.19.5</testcontainers.version>
+        <testcontainers.version>1.19.6</testcontainers.version>
         <mockito-kotlin.version>5.2.1</mockito-kotlin.version>
         <schedlock.version>5.11.0</schedlock.version>
         <nimbus.version>11.10</nimbus.version>
