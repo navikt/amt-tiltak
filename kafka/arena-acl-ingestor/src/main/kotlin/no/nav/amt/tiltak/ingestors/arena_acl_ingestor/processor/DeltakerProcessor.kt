@@ -152,7 +152,7 @@ class DeltakerProcessor(
 
 		log.info("Motatt delete-melding, sletter deltaker med id=$deltakerId")
 
-		deltakerService.slettDeltaker(deltakerId)
+		deltakerService.slettDeltaker(deltakerId, Kilde.ARENA)
 	}
 
 }

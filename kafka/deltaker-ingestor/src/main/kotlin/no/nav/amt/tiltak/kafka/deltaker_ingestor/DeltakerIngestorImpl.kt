@@ -4,8 +4,6 @@ import io.getunleash.Unleash
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.Gjennomforing
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.MulighetsrommetApiClient
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerHistorikk
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
@@ -21,8 +19,6 @@ import no.nav.common.utils.EnvironmentUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
@@ -39,11 +35,21 @@ class DeltakerIngestorImpl(
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun ingest(key: String, value: String?) {
-		val deltakerDtoJsonHistorikk: DeltakerDtoJsonHistorikk? = value?.let { fromJsonString(it) }
-		if (unleashClient.isEnabled("amt.enable-komet-deltakere") && deltakerDtoJsonHistorikk?.kilde == Kilde.KOMET) {
+		if (unleashClient.isEnabled("amt.enable-komet-deltakere")) {
 			val deltakerId = UUID.fromString(key)
-			upsert(deltakerDtoJsonHistorikk.toDeltakerDto())
-			log.info("Håndterte deltaker fra ny løsning med id $deltakerId")
+			if (value == null) {
+				val deltaker = deltakerService.hentDeltaker(deltakerId)
+				if (deltaker?.kilde == Kilde.KOMET) {
+					deltakerService.slettDeltaker(deltakerId, Kilde.KOMET)
+					log.info("Slettet deltaker fra ny løsning med id $deltakerId")
+				}
+			} else {
+				val deltakerDto: DeltakerDto = fromJsonString(value)
+				if (deltakerDto.kilde == Kilde.KOMET) {
+					upsert(deltakerDto)
+					log.info("Håndterte deltaker fra ny løsning med id $deltakerId")
+				}
+			}
 		}
 	}
 
@@ -127,54 +133,5 @@ class DeltakerIngestorImpl(
 			)
 		)
 		return gjennomforing
-	}
-}
-
-data class DeltakerDtoJsonHistorikk(
-	val id: UUID,
-	val deltakerlisteId: UUID,
-	val personalia: DeltakerPersonaliaDto,
-	val status: DeltakerStatusDto,
-	val dagerPerUke: Float?,
-	val prosentStilling: Double?,
-	val oppstartsdato: LocalDate?,
-	val sluttdato: LocalDate?,
-	val innsoktDato: LocalDate,
-	val forsteVedtakFattet: LocalDate?,
-	val bestillingTekst: String?,
-	val navKontor: String?,
-	val navVeileder: DeltakerNavVeilederDto?,
-	val deltarPaKurs: Boolean,
-	val kilde: Kilde?,
-	val innhold: DeltakelsesInnhold?,
-	val historikk: String?,
-	val sistEndretAv: UUID?,
-	val sistEndretAvEnhet: UUID?,
-	val sistEndret: LocalDateTime?,
-) {
-	fun toDeltakerDto(): DeltakerDto {
-		val h = historikk?.let { fromJsonString<List<String>>(it) }
-		return DeltakerDto(
-			id = id,
-			deltakerlisteId = deltakerlisteId,
-			personalia = personalia,
-			status = status,
-			dagerPerUke = dagerPerUke,
-			prosentStilling = prosentStilling,
-			oppstartsdato = oppstartsdato,
-			sluttdato = sluttdato,
-			innsoktDato = innsoktDato,
-			forsteVedtakFattet = forsteVedtakFattet,
-			bestillingTekst = bestillingTekst,
-			navKontor = navKontor,
-			navVeileder = navVeileder,
-			deltarPaKurs = deltarPaKurs,
-			kilde = kilde,
-			innhold = innhold,
-			historikk = h?.map { fromJsonString<DeltakerHistorikk>(it) },
-			sistEndretAv = sistEndretAv,
-			sistEndretAvEnhet = sistEndretAvEnhet,
-			sistEndret = sistEndret
-		)
 	}
 }

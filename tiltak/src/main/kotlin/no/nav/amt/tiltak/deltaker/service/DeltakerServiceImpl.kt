@@ -113,11 +113,11 @@ open class DeltakerServiceImpl(
 
 	override fun slettDeltakerePaaGjennomforing(gjennomforingId: UUID) {
 		hentDeltakerePaaGjennomforing(gjennomforingId).forEach {
-			slettDeltaker(it.id)
+			slettDeltaker(it.id, it.kilde)
 		}
 	}
 
-	override fun slettDeltaker(deltakerId: UUID) {
+	override fun slettDeltaker(deltakerId: UUID, kilde: Kilde) {
 		transactionTemplate.execute {
 			endringsmeldingService.slett(deltakerId)
 			deltakerStatusRepository.slett(deltakerId)
@@ -127,7 +127,9 @@ open class DeltakerServiceImpl(
 		}
 
 		log.info("Deltaker med id=$deltakerId er slettet")
-		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
+		if (kilde != Kilde.KOMET) {
+			publisherService.publish(deltakerId, DataPublishType.DELTAKER)
+		}
 	}
 
 	override fun erSkjermet(deltakerId: UUID): Boolean {

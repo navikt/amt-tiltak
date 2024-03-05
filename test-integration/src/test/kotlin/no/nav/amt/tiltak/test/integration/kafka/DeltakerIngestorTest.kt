@@ -12,7 +12,6 @@ import no.nav.amt.tiltak.core.domain.tiltak.Innhold
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.kafka.deltaker_ingestor.DeltakerDto
-import no.nav.amt.tiltak.kafka.deltaker_ingestor.DeltakerDtoJsonHistorikk
 import no.nav.amt.tiltak.kafka.deltaker_ingestor.DeltakerPersonaliaDto
 import no.nav.amt.tiltak.kafka.deltaker_ingestor.DeltakerStatusDto
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -41,7 +40,7 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 	@Test
 	fun `ingest - ny deltaker - oppretter deltaker`() {
 		val deltakerDto = mockDeltakerDto(TestData.GJENNOMFORING_1.id)
-		val value = toJsonString(deltakerDto.toDeltakerDtoJsonHistorikk())
+		val value = toJsonString(deltakerDto)
 
 		kafkaMessageSender.sendTilDeltakerV2Topic(deltakerDto.id, value)
 
@@ -57,12 +56,25 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 		val deltakerlisteId = UUID.randomUUID()
 		mockMulighetsrommetApiServer.gjennomforingArenaData(deltakerlisteId, null)
 		val deltakerDto = mockDeltakerDto(deltakerlisteId)
-		val value = toJsonString(deltakerDto.toDeltakerDtoJsonHistorikk())
+		val value = toJsonString(deltakerDto)
 
 		kafkaMessageSender.sendTilDeltakerV2Topic(deltakerDto.id, value)
 
 		AsyncUtils.eventually {
 			val lagretDeltaker = deltakerService.hentDeltaker(deltakerDto.id)
+			lagretDeltaker shouldBe null
+		}
+	}
+
+	@Test
+	fun `ingest - tombstone - sletter deltaker`() {
+		val deltakerId = UUID.randomUUID()
+		testDataRepository.insertDeltaker(TestData.DELTAKER_2.copy(id = deltakerId, kilde = Kilde.KOMET))
+		testDataRepository.insertDeltakerStatus(TestData.DELTAKER_2_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerId))
+		kafkaMessageSender.sendTilDeltakerV2Topic(deltakerId, null)
+
+		AsyncUtils.eventually {
+			val lagretDeltaker = deltakerService.hentDeltaker(deltakerId)
 			lagretDeltaker shouldBe null
 		}
 	}
@@ -154,31 +166,5 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 		faktisk.gyldigFra shouldBeEqualTo forventet.gyldigFra
 		faktisk.opprettetDato shouldBeCloseTo LocalDateTime.now()
 		faktisk.aktiv shouldBe true
-	}
-
-	private fun DeltakerDto.toDeltakerDtoJsonHistorikk(): DeltakerDtoJsonHistorikk {
-		val h = historikk?.let { h -> toJsonString(h.map { toJsonString(it) }) }
-		return DeltakerDtoJsonHistorikk(
-			id = id,
-			deltakerlisteId = deltakerlisteId,
-			personalia = personalia,
-			status = status,
-			dagerPerUke = dagerPerUke,
-			prosentStilling = prosentStilling,
-			oppstartsdato = oppstartsdato,
-			sluttdato = sluttdato,
-			innsoktDato = innsoktDato,
-			forsteVedtakFattet = forsteVedtakFattet,
-			bestillingTekst = bestillingTekst,
-			navKontor = navKontor,
-			navVeileder = navVeileder,
-			deltarPaKurs = deltarPaKurs,
-			kilde = kilde,
-			innhold = innhold,
-			historikk = h,
-			sistEndretAv = sistEndretAv,
-			sistEndretAvEnhet = sistEndretAvEnhet,
-			sistEndret = sistEndret
-		)
 	}
 }
