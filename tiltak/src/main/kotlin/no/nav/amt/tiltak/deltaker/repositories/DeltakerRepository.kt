@@ -59,7 +59,7 @@ open class DeltakerRepository(
 			innhold = rs.getString("innhold")?.let { fromJsonString(it) },
 			kilde = Kilde.valueOf(rs.getString("kilde")),
 			forsteVedtakFattet = rs.getDate("forste_vedtak_fattet")?.toLocalDate(),
-			historikk = rs.getString("historikk")?.let { fromJsonString(it) },
+			historikk = rs.getString("historikk")?.let { h -> fromJsonString<List<String>>(h).map { fromJsonString(it) } },
 			sistEndretAv = rs.getNullableUUID("sist_endret_av"),
 			sistEndretAvEnhet = rs.getNullableUUID("sist_endret_av_enhet")
 		)
@@ -361,8 +361,10 @@ open class DeltakerRepository(
 		it.value = JsonUtils.objectMapper.writeValueAsString(this)
 	}
 
-	private fun List<DeltakerHistorikk>.toPGObject() = PGobject().also {
+	private fun List<DeltakerHistorikk>.toPGObject() = toPGObject(this.map { JsonUtils.toJsonString(it) })
+
+	private fun toPGObject(any: Any) = PGobject().also {
 		it.type = "json"
-		it.value = JsonUtils.objectMapper.writeValueAsString(this)
+		it.value = JsonUtils.objectMapper.writeValueAsString(any)
 	}
 }

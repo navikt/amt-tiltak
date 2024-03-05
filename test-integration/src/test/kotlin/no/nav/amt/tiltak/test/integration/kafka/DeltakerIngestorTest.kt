@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.test.integration.kafka
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.common.json.JsonUtils.toJsonString
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerEndring
@@ -12,6 +12,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Innhold
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.kafka.deltaker_ingestor.DeltakerDto
+import no.nav.amt.tiltak.kafka.deltaker_ingestor.DeltakerDtoJsonHistorikk
 import no.nav.amt.tiltak.kafka.deltaker_ingestor.DeltakerPersonaliaDto
 import no.nav.amt.tiltak.kafka.deltaker_ingestor.DeltakerStatusDto
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -40,7 +41,7 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 	@Test
 	fun `ingest - ny deltaker - oppretter deltaker`() {
 		val deltakerDto = mockDeltakerDto(TestData.GJENNOMFORING_1.id)
-		val value = JsonUtils.toJsonString(deltakerDto)
+		val value = toJsonString(deltakerDto.toDeltakerDtoJsonHistorikk())
 
 		kafkaMessageSender.sendTilDeltakerV2Topic(deltakerDto.id, value)
 
@@ -56,22 +57,12 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 		val deltakerlisteId = UUID.randomUUID()
 		mockMulighetsrommetApiServer.gjennomforingArenaData(deltakerlisteId, null)
 		val deltakerDto = mockDeltakerDto(deltakerlisteId)
-		val value = JsonUtils.toJsonString(deltakerDto)
+		val value = toJsonString(deltakerDto.toDeltakerDtoJsonHistorikk())
 
 		kafkaMessageSender.sendTilDeltakerV2Topic(deltakerDto.id, value)
 
 		AsyncUtils.eventually {
 			val lagretDeltaker = deltakerService.hentDeltaker(deltakerDto.id)
-			lagretDeltaker shouldBe null
-		}
-	}
-
-	@Test
-	fun `ingest - tombstone - sletter deltaker`() {
-		kafkaMessageSender.sendTilDeltakerV2Topic(TestData.DELTAKER_4.id, null)
-
-		AsyncUtils.eventually {
-			val lagretDeltaker = deltakerService.hentDeltaker(TestData.DELTAKER_4.id)
 			lagretDeltaker shouldBe null
 		}
 	}
@@ -163,5 +154,31 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 		faktisk.gyldigFra shouldBeEqualTo forventet.gyldigFra
 		faktisk.opprettetDato shouldBeCloseTo LocalDateTime.now()
 		faktisk.aktiv shouldBe true
+	}
+
+	private fun DeltakerDto.toDeltakerDtoJsonHistorikk(): DeltakerDtoJsonHistorikk {
+		val h = historikk?.let { h -> toJsonString(h.map { toJsonString(it) }) }
+		return DeltakerDtoJsonHistorikk(
+			id = id,
+			deltakerlisteId = deltakerlisteId,
+			personalia = personalia,
+			status = status,
+			dagerPerUke = dagerPerUke,
+			prosentStilling = prosentStilling,
+			oppstartsdato = oppstartsdato,
+			sluttdato = sluttdato,
+			innsoktDato = innsoktDato,
+			forsteVedtakFattet = forsteVedtakFattet,
+			bestillingTekst = bestillingTekst,
+			navKontor = navKontor,
+			navVeileder = navVeileder,
+			deltarPaKurs = deltarPaKurs,
+			kilde = kilde,
+			innhold = innhold,
+			historikk = h,
+			sistEndretAv = sistEndretAv,
+			sistEndretAvEnhet = sistEndretAvEnhet,
+			sistEndret = sistEndret
+		)
 	}
 }

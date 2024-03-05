@@ -129,7 +129,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		dbo.innhold shouldBe innhold
 		dbo.kilde shouldBe Kilde.ARENA
 		dbo.forsteVedtakFattet shouldBe registrertDato.toLocalDate()
-		dbo.historikk?.first() shouldBe vedtak
+		(dbo.historikk?.first() as DeltakerHistorikk.Vedtak).vedtak shouldBe vedtak
 		dbo.sistEndretAv shouldBe endretAv
 		dbo.sistEndretAvEnhet shouldBe endretAvEnhet
 	}
@@ -184,7 +184,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		updatedDeltaker.innhold shouldBe innhold
 		updatedDeltaker.kilde shouldBe Kilde.ARENA
 		updatedDeltaker.forsteVedtakFattet shouldBe DELTAKER_1.registrertDato.toLocalDate()
-		updatedDeltaker.historikk?.first() shouldBe endring
+		(updatedDeltaker.historikk?.first() as DeltakerHistorikk.Endring).endring shouldBe endring
 		updatedDeltaker.sistEndretAv shouldBe endretAv
 		updatedDeltaker.sistEndretAvEnhet shouldBe endretAvEnhet
 	}

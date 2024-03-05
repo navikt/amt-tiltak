@@ -240,7 +240,9 @@ class DeltakerPublishQuery(
 					deltarPaKurs = rs.getBoolean("er_kurs"),
 					kilde = Kilde.valueOf(rs.getString("kilde")),
 					forsteVedtakFattet = rs.getNullableLocalDate("forste_vedtak_fattet"),
-					historikk = rs.getString("historikk")?.let { JsonUtils.fromJsonString(it) },
+					historikk = rs.getString("historikk")?.let { h ->
+						JsonUtils.fromJsonString<List<String>>(h).map { JsonUtils.fromJsonString(it) }
+					},
 					sistEndretAv = rs.getNullableUUID("sist_endret_av"),
 					sistEndretAvEnhet = rs.getNullableUUID("sist_endret_av_enhet")
 				)
