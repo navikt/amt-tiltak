@@ -53,8 +53,9 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		brukerId: UUID = createBruker().id,
 		gjennomforingId: UUID = createDeltakerliste().id,
 		registrertDato: LocalDateTime = LocalDateTime.now(),
-		endretDato: LocalDateTime = LocalDateTime.now()
-	): DeltakerInput = deltakerInput(brukerId, gjennomforingId, registrertDato, endretDato)
+		endretDato: LocalDateTime = LocalDateTime.now(),
+		kilde: Kilde = Kilde.ARENA
+	): DeltakerInput = deltakerInput(brukerId, gjennomforingId, registrertDato, endretDato, kilde)
 		.also { testDataRepository.insertDeltaker(it) }
 		.also { testDataRepository.insertDeltakerStatus(createDeltakerStatus(it.id)) }
 
@@ -191,7 +192,8 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		brukerId: UUID,
 		gjennomforingId: UUID,
 		registrertDato: LocalDateTime,
-		endretDato: LocalDateTime
+		endretDato: LocalDateTime,
+		kilde: Kilde = Kilde.ARENA
 	): DeltakerInput = DeltakerInput(
 		id = UUID.randomUUID(),
 		brukerId = brukerId,
@@ -213,7 +215,7 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 				)
 			),
 		),
-		kilde = Kilde.ARENA,
+		kilde = kilde,
 		forsteVedtakFattet = null,
 		historikk = null,
 		sistEndretAv = null,

@@ -41,6 +41,8 @@ class DeltakerPublishQuery(
 
 		val vurderinger = getVurderinger(id)
 
+		if (deltaker.kilde == Kilde.KOMET && vurderinger.isEmpty()) return Result.DontPublish()
+
 		return DeltakerPublishDto(
 			deltaker.id,
 			deltakerlisteId = deltaker.deltakerlisteId,
@@ -131,7 +133,7 @@ class DeltakerPublishQuery(
 					 left join bruker on deltaker.bruker_id = bruker.id
 					 left join nav_enhet on bruker.nav_enhet_id = nav_enhet.id
 					 left join nav_ansatt on bruker.ansvarlig_veileder_id = nav_ansatt.id
-					 left join (select deltaker_id, status, aarsak, gyldig_fra, created_at
+					 left join (select id, deltaker_id, status, aarsak, gyldig_fra, created_at
 								from deltaker_status
 								where aktiv is true) status on status.deltaker_id = deltaker.id
 			where deltaker.id = :deltakerId
