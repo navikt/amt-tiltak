@@ -266,6 +266,7 @@ open class DeltakerRepository(
 					 inner join bruker on bruker.id = deltaker.bruker_id
 					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
 			WHERE deltaker_status.aktiv = TRUE
+				AND deltaker.kilde != 'KOMET'
 				AND deltaker_status.status IN (:gjennomforende_statuser)
 				AND deltaker.slutt_dato < CURRENT_DATE
 		""".trimIndent()
@@ -289,6 +290,7 @@ open class DeltakerRepository(
          		inner join gjennomforing on deltaker.gjennomforing_id = gjennomforing.id
 		 		LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
 			WHERE deltaker_status.aktiv = TRUE
+				AND deltaker.kilde != 'KOMET'
 				AND deltaker_status.status not in (:avsluttende_statuser)
 				AND gjennomforing.status = :gjennomforing_status
 		""".trimIndent()
@@ -309,6 +311,7 @@ open class DeltakerRepository(
 					 inner join bruker on bruker.id = deltaker.bruker_id
 					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
 			WHERE deltaker_status.aktiv = TRUE
+				AND deltaker.kilde != 'KOMET'
 				AND deltaker_status.status = '${DeltakerStatus.Type.VENTER_PA_OPPSTART.name}'
 				AND deltaker.start_dato <= CURRENT_DATE
 				AND (deltaker.slutt_dato IS NULL OR deltaker.slutt_dato >= CURRENT_DATE)
