@@ -5,7 +5,7 @@ import no.nav.common.kafka.producer.KafkaProducerClientImpl
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.UUID
 
 @Component
 class KafkaMessageSender(
@@ -24,8 +24,8 @@ class KafkaMessageSender(
 	private val navBrukerTopic: String,
 	@Value("\${app.env.amtNavAnsattPersonaliaTopic}")
 	private val navAnsattTopic: String,
-	@Value("\${app.env.amtDeltakerEndringTopic}")
-	private val amtDeltakerEndringTopic: String,
+	@Value("\${app.env.amtDeltakerTopic}")
+	private val amtDeltakerTopic: String,
 ) {
 	private val kafkaProducer = KafkaProducerClientImpl<ByteArray, ByteArray>(properties.producer())
 
@@ -57,7 +57,7 @@ class KafkaMessageSender(
 		kafkaProducer.send(ProducerRecord(navAnsattTopic, key.toString().toByteArray(), jsonString?.toByteArray()))
 	}
 
-	fun sendTilDeltakerEndringTopic(key: UUID, jsonString: String?) {
-		kafkaProducer.send(ProducerRecord(amtDeltakerEndringTopic, key.toString().toByteArray(), jsonString?.toByteArray()))
+	fun sendTilDeltakerV2Topic(key: UUID, jsonString: String?) {
+		kafkaProducer.send(ProducerRecord(amtDeltakerTopic, key.toString().toByteArray(), jsonString?.toByteArray()))
 	}
 }

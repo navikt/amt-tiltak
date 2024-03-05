@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.core.domain.tiltak.AVSLUTTENDE_STATUSER
 import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerHistorikk
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
@@ -56,14 +57,19 @@ open class DeltakerRepository(
 			innsokBegrunnelse = rs.getNullableString("innsok_begrunnelse"),
 			adressebeskyttelse = rs.getString("adressebeskyttelse")?.let { Adressebeskyttelse.valueOf(it) },
 			innhold = rs.getString("innhold")?.let { fromJsonString(it) },
-			kilde = Kilde.valueOf(rs.getString("kilde"))
+			kilde = Kilde.valueOf(rs.getString("kilde")),
+			forsteVedtakFattet = rs.getDate("forste_vedtak_fattet")?.toLocalDate(),
+			historikk = rs.getString("historikk")?.let { fromJsonString(it) },
+			sistEndretAv = rs.getNullableUUID("sist_endret_av"),
+			sistEndretAvEnhet = rs.getNullableUUID("sist_endret_av_enhet")
 		)
 	}
 
 	fun upsert(deltaker: DeltakerUpsertDbo) {
 		val sql = """
 			INSERT INTO deltaker(id, bruker_id, gjennomforing_id, start_dato, slutt_dato,
-								 dager_per_uke, prosent_stilling, registrert_dato, innsok_begrunnelse, innhold, kilde)
+								 dager_per_uke, prosent_stilling, registrert_dato, innsok_begrunnelse, innhold, kilde,
+								 forste_vedtak_fattet, historikk, sist_endret_av, sist_endret_av_enhet)
 			VALUES (:id,
 					:brukerId,
 					:gjennomforingId,
@@ -74,7 +80,11 @@ open class DeltakerRepository(
 					:registrertDato,
 					:innsokBegrunnelse,
 					:innhold,
-					:kilde)
+					:kilde,
+					:forste_vedtak_fattet,
+					:historikk,
+					:sist_endret_av,
+					:sist_endret_av_enhet)
 			ON CONFLICT (id) DO
 			UPDATE SET
 				start_dato = :startdato,
@@ -84,6 +94,10 @@ open class DeltakerRepository(
 				innsok_begrunnelse = :innsokBegrunnelse,
 				innhold	= :innhold,
 				kilde = :kilde,
+				forste_vedtak_fattet = :forste_vedtak_fattet,
+				historikk = :historikk,
+				sist_endret_av = :sist_endret_av,
+				sist_endret_av_enhet = :sist_endret_av_enhet,
 				modified_at = CURRENT_TIMESTAMP
 		""".trimIndent()
 
@@ -99,7 +113,11 @@ open class DeltakerRepository(
 				"registrertDato" to deltaker.registrertDato,
 				"innsokBegrunnelse" to deltaker.innsokBegrunnelse,
 				"innhold" to deltaker.innhold?.toPGObject(),
-				"kilde" to deltaker.kilde.name
+				"kilde" to deltaker.kilde.name,
+				"forste_vedtak_fattet" to deltaker.forsteVedtakFattet,
+				"historikk" to deltaker.historikk?.toPGObject(),
+				"sist_endret_av" to deltaker.sistEndretAv,
+				"sist_endret_av_enhet" to deltaker.sistEndretAvEnhet
 			)
 		)
 
@@ -336,6 +354,11 @@ open class DeltakerRepository(
 	}
 
 	private fun DeltakelsesInnhold.toPGObject() = PGobject().also {
+		it.type = "json"
+		it.value = JsonUtils.objectMapper.writeValueAsString(this)
+	}
+
+	private fun List<DeltakerHistorikk>.toPGObject() = PGobject().also {
 		it.type = "json"
 		it.value = JsonUtils.objectMapper.writeValueAsString(this)
 	}

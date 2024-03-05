@@ -700,7 +700,11 @@ class DeltakerServiceImplTest {
 		gjennomforingId = GJENNOMFORING_1.id,
 		innsokBegrunnelse = null,
 		innhold = null,
-		kilde = Kilde.ARENA
+		kilde = Kilde.ARENA,
+		forsteVedtakFattet = null,
+		historikk = null,
+		sistEndretAv = null,
+		sistEndretAvEnhet = null
 	)
 
 }

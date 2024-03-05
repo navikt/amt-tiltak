@@ -26,7 +26,11 @@ data class Deltaker(
 	val endretDato: LocalDateTime,
 	val adressebeskyttelse: Adressebeskyttelse?,
 	val innhold: DeltakelsesInnhold?,
-	val kilde: Kilde
+	val kilde: Kilde,
+	val forsteVedtakFattet: LocalDate?,
+	val historikk: List<DeltakerHistorikk>?,
+	val sistEndretAv: UUID?,
+	val sistEndretAvEnhet: UUID?,
 ) {
 	fun harAdressebeskyttelse(): Boolean {
 		return adressebeskyttelse != null

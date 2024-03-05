@@ -66,7 +66,11 @@ class DeltakerProcessor(
 			gjennomforingId = gjennomforingId,
 			innsokBegrunnelse = deltakerDto.innsokBegrunnelse,
 			innhold = null,
-			kilde = Kilde.ARENA
+			kilde = Kilde.ARENA,
+			forsteVedtakFattet = null,
+			historikk = null,
+			sistEndretAv = null,
+			sistEndretAvEnhet = null
 		)
 
 		transactionTemplate.executeWithoutResult {

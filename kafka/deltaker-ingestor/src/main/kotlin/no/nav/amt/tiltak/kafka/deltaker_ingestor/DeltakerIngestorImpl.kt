@@ -35,15 +35,11 @@ class DeltakerIngestorImpl(
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun ingest(key: String, value: String?) {
-		if (unleashClient.isEnabled("amt.enable-komet-deltakere")) {
+		val deltakerDto: DeltakerDto? = value?.let { fromJsonString(it) }
+		if (unleashClient.isEnabled("amt.enable-komet-deltakere") && deltakerDto?.kilde == Kilde.KOMET) {
 			val deltakerId = UUID.fromString(key)
-			if (value == null) {
-				deltakerService.slettDeltaker(deltakerId)
-				log.info("Slettet deltaker fra ny løsning med id $deltakerId")
-			} else {
-				upsert(fromJsonString(value))
-				log.info("Håndterte deltaker fra ny løsning med id $deltakerId")
-			}
+			upsert(fromJsonString(value))
+			log.info("Håndterte deltaker fra ny løsning med id $deltakerId")
 		}
 	}
 
@@ -61,29 +57,33 @@ class DeltakerIngestorImpl(
 			}
 
 		val status = DeltakerStatusInsert(
-			id = deltakerDto.status.id,
+			id = deltakerDto.status.id ?: UUID.randomUUID(),
 			deltakerId = deltakerDto.id,
 			type = deltakerDto.status.type,
-			aarsak = deltakerDto.status.aarsak?.type,
+			aarsak = deltakerDto.status.aarsak,
 			gyldigFra = deltakerDto.status.gyldigFra,
 		)
 
 		val deltakerUpsert = DeltakerUpsert(
 			id = deltakerDto.id,
 			statusInsert = status,
-			startDato = deltakerDto.startdato,
+			startDato = deltakerDto.oppstartsdato,
 			sluttDato = deltakerDto.sluttdato,
 			dagerPerUke = deltakerDto.dagerPerUke,
-			prosentStilling = deltakerDto.deltakelsesprosent,
-			registrertDato = deltakerDto.opprettet,
+			prosentStilling = deltakerDto.prosentStilling?.toFloat(),
+			registrertDato = deltakerDto.innsoktDato.atStartOfDay(),
 			gjennomforingId = gjennomforingId,
-			innsokBegrunnelse = deltakerDto.bakgrunnsinformasjon,
+			innsokBegrunnelse = deltakerDto.bestillingTekst,
 			innhold = deltakerDto.innhold,
-			kilde = Kilde.KOMET
+			kilde = Kilde.KOMET,
+			forsteVedtakFattet = deltakerDto.forsteVedtakFattet,
+			historikk = deltakerDto.historikk,
+			sistEndretAv = deltakerDto.sistEndretAv,
+			sistEndretAvEnhet = deltakerDto.sistEndretAvEnhet
 		)
 
 		transactionTemplate.executeWithoutResult {
-			deltakerService.upsertDeltaker(deltakerDto.personident, deltakerUpsert)
+			deltakerService.upsertDeltaker(deltakerDto.personalia.personident, deltakerUpsert)
 		}
 		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} deltakerlisteId=${gjennomforingId} fra ny løsning")
 	}

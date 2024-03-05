@@ -408,7 +408,11 @@ open class DeltakerServiceImpl(
 		prosentStilling = this.prosentStilling,
 		innsokBegrunnelse = this.innsokBegrunnelse,
 		innhold = this.innhold,
-		kilde = this.kilde
+		kilde = this.kilde,
+		forsteVedtakFattet = this.forsteVedtakFattet,
+		historikk = this.historikk,
+		sistEndretAv = this.sistEndretAv,
+		sistEndretAvEnhet = this.sistEndretAvEnhet
 	)
 }
 

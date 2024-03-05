@@ -213,7 +213,11 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 				)
 			),
 		),
-		kilde = Kilde.ARENA
+		kilde = Kilde.ARENA,
+		forsteVedtakFattet = null,
+		historikk = null,
+		sistEndretAv = null,
+		sistEndretAvEnhet = null
 	)
 
 	private fun navAnsattInput(): NavAnsattInput = NavAnsattInput(

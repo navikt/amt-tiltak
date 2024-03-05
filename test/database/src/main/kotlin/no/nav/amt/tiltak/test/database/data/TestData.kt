@@ -51,7 +51,11 @@ object TestData {
 					beskrivelse = null
 				))
 			),
-			kilde = Kilde.ARENA
+			kilde = Kilde.ARENA,
+			forsteVedtakFattet = null,
+			historikk = null,
+			sistEndretAv = null,
+			sistEndretAvEnhet = null
 		)
 
 	fun createStatusInput(deltaker: DeltakerInput) = DeltakerStatusInput(
@@ -308,7 +312,11 @@ object TestData {
 		innsokBegrunnelse = "begrunnelse deltaker 1",
 		endretDato = LocalDateTime.of(2022, 2, 13, 12, 12),
 		innhold = null,
-		kilde = Kilde.ARENA
+		kilde = Kilde.ARENA,
+		forsteVedtakFattet = null,
+		historikk = null,
+		sistEndretAv = null,
+		sistEndretAvEnhet = null
 	)
 
 
@@ -367,7 +375,11 @@ object TestData {
 				)
 			),
 		),
-		kilde = Kilde.ARENA
+		kilde = Kilde.ARENA,
+		forsteVedtakFattet = null,
+		historikk = null,
+		sistEndretAv = null,
+		sistEndretAvEnhet = null
 	)
 
 	val DELTAKER_2_STATUS_1 = DeltakerStatusInput(
@@ -423,7 +435,11 @@ object TestData {
 		registrertDato = LocalDateTime.of(2022, 2, 10, 12, 12),
 		innsokBegrunnelse = "begrunnelse deltaker 4",
 		innhold = null,
-		kilde = Kilde.ARENA
+		kilde = Kilde.ARENA,
+		forsteVedtakFattet = null,
+		historikk = null,
+		sistEndretAv = null,
+		sistEndretAvEnhet = null
 	)
 
 	val DELTAKER_4_STATUS_1 = DeltakerStatusInput(
