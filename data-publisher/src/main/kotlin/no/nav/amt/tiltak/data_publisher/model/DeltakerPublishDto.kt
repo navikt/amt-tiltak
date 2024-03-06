@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.data_publisher.model
 
 import no.nav.amt.tiltak.core.domain.tiltak.Adresse
 import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerHistorikk
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
@@ -26,7 +27,11 @@ data class DeltakerPublishDto(
 	val navVeileder: DeltakerNavVeilederDto?,
 	val deltarPaKurs: Boolean,
 	val vurderingerFraArrangor: List<Vurdering>?,
-	val kilde: Kilde?
+	val kilde: Kilde?,
+	val forsteVedtakFattet: LocalDate?,
+	val historikk: List<DeltakerHistorikk>?,
+	val sistEndretAv: UUID?,
+	val sistEndretAvEnhet: UUID?,
 ) {
 	fun digest() = DigestUtils.md5DigestAsHex(JsonUtils.toJson(this).toByteArray())
 }
@@ -47,6 +52,7 @@ data class Navn(
 )
 
 data class DeltakerStatusDto(
+	val id: UUID?,
     val type: DeltakerStatus.Type,
     val aarsak: DeltakerStatus.Aarsak?,
     val gyldigFra: LocalDateTime,

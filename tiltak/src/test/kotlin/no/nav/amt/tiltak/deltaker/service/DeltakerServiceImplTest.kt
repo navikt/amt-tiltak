@@ -409,10 +409,18 @@ class DeltakerServiceImplTest {
 
 	@Test
 	fun `slettDeltaker - skal publisere sletting på kafka`() {
-		deltakerServiceImpl.slettDeltaker(deltakerId)
+		deltakerServiceImpl.slettDeltaker(deltakerId, Kilde.ARENA)
 
 		verify(exactly = 1) { kafkaProducerService.publiserSlettDeltaker(deltakerId) }
 		verify(exactly = 1) { publisherService.publish(deltakerId, DataPublishType.DELTAKER) }
+	}
+
+	@Test
+	fun `slettDeltaker - skal ikke publisere sletting på v2-topic hvis kilde er KOMET`() {
+		deltakerServiceImpl.slettDeltaker(deltakerId, Kilde.KOMET)
+
+		verify(exactly = 1) { kafkaProducerService.publiserSlettDeltaker(deltakerId) }
+		verify(exactly = 0) { publisherService.publish(deltakerId, DataPublishType.DELTAKER) }
 	}
 
 
@@ -429,7 +437,7 @@ class DeltakerServiceImplTest {
 		deltakerServiceImpl.insertStatus(statusInsertDbo)
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldNotBe null
 
-		deltakerServiceImpl.slettDeltaker(deltakerId)
+		deltakerServiceImpl.slettDeltaker(deltakerId, Kilde.ARENA)
 
 		deltakerRepository.get(deltakerId) shouldBe null
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldBe null
@@ -461,7 +469,7 @@ class DeltakerServiceImplTest {
 
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldNotBe null
 
-		deltakerServiceImpl.slettDeltaker(deltakerId)
+		deltakerServiceImpl.slettDeltaker(deltakerId, Kilde.ARENA)
 
 		deltakerRepository.get(deltakerId) shouldBe null
 
@@ -700,7 +708,11 @@ class DeltakerServiceImplTest {
 		gjennomforingId = GJENNOMFORING_1.id,
 		innsokBegrunnelse = null,
 		innhold = null,
-		kilde = Kilde.ARENA
+		kilde = Kilde.ARENA,
+		forsteVedtakFattet = null,
+		historikk = null,
+		sistEndretAv = null,
+		sistEndretAvEnhet = null
 	)
 
 }

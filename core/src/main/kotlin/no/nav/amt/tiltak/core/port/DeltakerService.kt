@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.core.port
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
+import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import java.time.LocalDateTime
@@ -22,7 +23,7 @@ interface DeltakerService {
 
 	fun progressStatuser()
 
-	fun slettDeltaker(deltakerId: UUID)
+	fun slettDeltaker(deltakerId: UUID, kilde: Kilde)
 
 	fun hentDeltakereMedPersonIdent(personIdent: String): List<Deltaker>
 

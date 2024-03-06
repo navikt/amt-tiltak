@@ -66,7 +66,11 @@ class DeltakerProcessor(
 			gjennomforingId = gjennomforingId,
 			innsokBegrunnelse = deltakerDto.innsokBegrunnelse,
 			innhold = null,
-			kilde = Kilde.ARENA
+			kilde = Kilde.ARENA,
+			forsteVedtakFattet = null,
+			historikk = null,
+			sistEndretAv = null,
+			sistEndretAvEnhet = null
 		)
 
 		transactionTemplate.executeWithoutResult {
@@ -148,7 +152,7 @@ class DeltakerProcessor(
 
 		log.info("Motatt delete-melding, sletter deltaker med id=$deltakerId")
 
-		deltakerService.slettDeltaker(deltakerId)
+		deltakerService.slettDeltaker(deltakerId, Kilde.ARENA)
 	}
 
 }

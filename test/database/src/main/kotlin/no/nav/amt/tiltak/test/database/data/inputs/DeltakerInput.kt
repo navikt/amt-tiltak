@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.test.database.data.inputs
 
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerHistorikk
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import java.time.LocalDate
@@ -23,7 +24,11 @@ data class DeltakerInput(
 	val createdAt: ZonedDateTime = ZonedDateTime.of(2022, 2, 13, 0, 0, 0, 0, ZoneId.systemDefault()),
 	val endretDato: LocalDateTime = LocalDateTime.now(),
 	val innhold: DeltakelsesInnhold?,
-	val kilde: Kilde
+	val kilde: Kilde,
+	val forsteVedtakFattet: LocalDate?,
+	val historikk: List<DeltakerHistorikk>?,
+	val sistEndretAv: UUID?,
+	val sistEndretAvEnhet: UUID?
 ) {
 	fun toDeltaker(brukerInput: BrukerInput, statusInput: DeltakerStatusInput) = Deltaker(
 		id = id,
@@ -54,6 +59,10 @@ data class DeltakerInput(
 		endretDato = endretDato,
 		adressebeskyttelse = brukerInput.adressebeskyttelse,
 		innhold = innhold,
-		kilde = kilde
+		kilde = kilde,
+		forsteVedtakFattet = forsteVedtakFattet,
+		historikk = historikk,
+		sistEndretAv = sistEndretAv,
+		sistEndretAvEnhet = sistEndretAvEnhet
 	)
 }

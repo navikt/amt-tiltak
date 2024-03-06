@@ -13,6 +13,7 @@ import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.tiltak.Adresse
 import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerHistorikk
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
@@ -33,13 +34,14 @@ import java.util.UUID
 class DeltakerPublishQuery(
 	private val template: NamedParameterJdbcTemplate
 ) {
-
 	fun get(id: UUID): Result<DeltakerPublishDto> {
 		val deltaker = getDeltaker(id) ?: return Result.PublishTombstone()
 
 		if (deltaker.status == null) return Result.DontPublish()
 
 		val vurderinger = getVurderinger(id)
+
+		if (deltaker.kilde == Kilde.KOMET && vurderinger.isEmpty()) return Result.DontPublish()
 
 		return DeltakerPublishDto(
 			deltaker.id,
@@ -75,6 +77,7 @@ class DeltakerPublishQuery(
 				)
 			},
 			status = DeltakerStatusDto(
+				id = deltaker.statusId,
 				type = DeltakerStatus.Type.valueOf(deltaker.status),
 				aarsak = deltaker.statusAarsak?.let { DeltakerStatus.Aarsak.valueOf(it) },
 				gyldigFra = deltaker.statusGyldigFra!!,
@@ -82,7 +85,11 @@ class DeltakerPublishQuery(
 			),
 			deltarPaKurs = deltaker.deltarPaKurs,
 			vurderingerFraArrangor = vurderinger,
-			kilde = deltaker.kilde
+			kilde = deltaker.kilde,
+			forsteVedtakFattet = deltaker.forsteVedtakFattet,
+			historikk = deltaker.historikk,
+			sistEndretAv = deltaker.sistEndretAv,
+			sistEndretAvEnhet = deltaker.sistEndretAvEnhet
 		).let { Result.OK(it) }
 	}
 
@@ -106,11 +113,16 @@ class DeltakerPublishQuery(
 				   deltaker.registrert_dato,
 				   deltaker.innsok_begrunnelse,
 				   deltaker.kilde,
+				   deltaker.forste_vedtak_fattet,
+				   deltaker.historikk,
+				   deltaker.sist_endret_av,
+				   deltaker.sist_endret_av_enhet,
 				   nav_enhet.navn                               as nav_enhet_navn,
 				   nav_ansatt.id                                as nav_ansatt_id,
 				   nav_ansatt.navn                              as nav_ansatt_navn,
 				   nav_ansatt.epost                             as nav_ansatt_epost,
 				   nav_ansatt.telefonnummer                     as nav_ansatt_telefonnummer,
+				   status.id 									as status_id,
 				   status.status                                as status,
 				   status.aarsak                                as status_aarsak,
 				   status.gyldig_fra                            as status_gyldig_fra,
@@ -121,7 +133,7 @@ class DeltakerPublishQuery(
 					 left join bruker on deltaker.bruker_id = bruker.id
 					 left join nav_enhet on bruker.nav_enhet_id = nav_enhet.id
 					 left join nav_ansatt on bruker.ansvarlig_veileder_id = nav_ansatt.id
-					 left join (select deltaker_id, status, aarsak, gyldig_fra, created_at
+					 left join (select id, deltaker_id, status, aarsak, gyldig_fra, created_at
 								from deltaker_status
 								where aktiv is true) status on status.deltaker_id = deltaker.id
 			where deltaker.id = :deltakerId
@@ -183,12 +195,17 @@ class DeltakerPublishQuery(
 		val navAnsattNavn: String?,
 		val navAnsattEpost: String?,
 		val navAnsattTelefonnummer: String?,
+		val statusId: UUID?,
 		val status: String?,
 		val statusAarsak: String?,
 		val statusGyldigFra: LocalDateTime?,
 		val statusCreatedAt: LocalDateTime?,
 		val deltarPaKurs: Boolean,
-		val kilde: Kilde
+		val kilde: Kilde,
+		val forsteVedtakFattet: LocalDate?,
+		val historikk: List<DeltakerHistorikk>?,
+		val sistEndretAv: UUID?,
+		val sistEndretAvEnhet: UUID?,
 	) {
 		companion object {
 			val rowMapper = RowMapper { rs, _ ->
@@ -215,12 +232,19 @@ class DeltakerPublishQuery(
 					navAnsattNavn = rs.getNullableString("nav_ansatt_navn"),
 					navAnsattEpost = rs.getNullableString("nav_ansatt_epost"),
 					navAnsattTelefonnummer = rs.getNullableString("nav_ansatt_telefonnummer"),
+					statusId = rs.getNullableUUID("status_id"),
 					status = rs.getString("status"),
 					statusAarsak = rs.getNullableString("status_aarsak"),
 					statusGyldigFra = rs.getNullableLocalDateTime("status_gyldig_fra"),
 					statusCreatedAt = rs.getNullableLocalDateTime("status_opprettet_dato"),
 					deltarPaKurs = rs.getBoolean("er_kurs"),
-					kilde = Kilde.valueOf(rs.getString("kilde"))
+					kilde = Kilde.valueOf(rs.getString("kilde")),
+					forsteVedtakFattet = rs.getNullableLocalDate("forste_vedtak_fattet"),
+					historikk = rs.getString("historikk")?.let { h ->
+						JsonUtils.fromJsonString<List<String>>(h).map { JsonUtils.fromJsonString(it) }
+					},
+					sistEndretAv = rs.getNullableUUID("sist_endret_av"),
+					sistEndretAvEnhet = rs.getNullableUUID("sist_endret_av_enhet")
 				)
 			}
 		}

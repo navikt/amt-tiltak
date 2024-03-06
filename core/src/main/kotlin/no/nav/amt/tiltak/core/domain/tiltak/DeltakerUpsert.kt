@@ -16,7 +16,11 @@ data class DeltakerUpsert(
 	val prosentStilling: Float? = null,
 	val innsokBegrunnelse: String?,
 	val innhold: DeltakelsesInnhold?,
-	val kilde: Kilde
+	val kilde: Kilde,
+	val forsteVedtakFattet: LocalDate?,
+	val historikk: List<DeltakerHistorikk>?,
+	val sistEndretAv: UUID?,
+	val sistEndretAvEnhet: UUID?,
 ) {
 	fun compareTo(deltaker: Deltaker): Boolean {
 		// Her kan man ikke enkelt sammenlikne hele objektet fordi sammenlikning av localdatetime må rundes av pga ms presisjon
@@ -25,6 +29,8 @@ data class DeltakerUpsert(
 			&& registrertDato.truncatedTo(ChronoUnit.MILLIS) == deltaker.registrertDato.truncatedTo(ChronoUnit.MILLIS)
 			&& dagerPerUke == deltaker.dagerPerUke && prosentStilling == deltaker.prosentStilling
 			&& innsokBegrunnelse == deltaker.innsokBegrunnelse && innhold == deltaker.innhold && kilde == deltaker.kilde
+			&& forsteVedtakFattet == deltaker.forsteVedtakFattet && sistEndretAv == deltaker.sistEndretAv
+			&& sistEndretAvEnhet == deltaker.sistEndretAvEnhet
 
 		return statusEquals && deltakerEquals
 	}

@@ -1,7 +1,13 @@
 package no.nav.amt.tiltak.kafka.config
 
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider
-import no.nav.amt.tiltak.core.kafka.*
+import no.nav.amt.tiltak.core.kafka.AmtArrangorIngestor
+import no.nav.amt.tiltak.core.kafka.AnsattIngestor
+import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
+import no.nav.amt.tiltak.core.kafka.DeltakerIngestor
+import no.nav.amt.tiltak.core.kafka.GjennomforingIngestor
+import no.nav.amt.tiltak.core.kafka.NavAnsattIngestor
+import no.nav.amt.tiltak.core.kafka.NavBrukerIngestor
 import no.nav.common.kafka.consumer.KafkaConsumerClient
 import no.nav.common.kafka.consumer.feilhandtering.KafkaConsumerRecordProcessor
 import no.nav.common.kafka.consumer.feilhandtering.util.KafkaConsumerRecordProcessorBuilder
@@ -115,7 +121,7 @@ open class KafkaConfiguration(
 				.withLogging()
 				.withStoreOnFailure(consumerRepository)
 				.withConsumerConfig(
-					kafkaTopicProperties.amtDeltakerEndringTopic,
+					kafkaTopicProperties.amtDeltakerTopic,
 					stringDeserializer(),
 					stringDeserializer(),
 					Consumer<ConsumerRecord<String, String>> { deltakerIngestor.ingest(it.key(), it.value()) }

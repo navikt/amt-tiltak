@@ -113,11 +113,11 @@ class TestDataRepository(
 		val sql = """
 			INSERT INTO deltaker (
 				id, bruker_id, gjennomforing_id, start_dato,
-				slutt_dato, dager_per_uke, prosent_stilling, registrert_dato, innsok_begrunnelse, modified_at
+				slutt_dato, dager_per_uke, prosent_stilling, registrert_dato, innsok_begrunnelse, modified_at, kilde
 			 )
 			VALUES (
 				:id, :bruker_id, :gjennomforing_id, :start_dato,
-				:slutt_dato, :dager_per_uke, :prosent_stilling, :registrert_dato, :innsok_begrunnelse, :modified_at
+				:slutt_dato, :dager_per_uke, :prosent_stilling, :registrert_dato, :innsok_begrunnelse, :modified_at, :kilde
 			);
 		""".trimIndent()
 
@@ -133,8 +133,8 @@ class TestDataRepository(
 				"registrert_dato" to cmd.registrertDato,
 				"innsok_begrunnelse" to cmd.innsokBegrunnelse,
 				"modified_at" to cmd.endretDato,
-
-				)
+				"kilde" to cmd.kilde.name
+			)
 		)
 	}
 
