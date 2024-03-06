@@ -28,7 +28,7 @@ jobs:
       - name: Build maven artifacts
         run: mvn -B package
       - name: Dependency submission (for dependabot)
-        uses: advanced-security/maven-dependency-submission-action@v4.0.0
+        uses: advanced-security/maven-dependency-submission-action@v4
       - name: docker-build-push
         uses: nais/docker-build-push@v0
         id: docker-build-push
@@ -57,12 +57,6 @@ jobs:
           RESOURCE: .nais/nais-dev.yaml
           VARS: .nais/vars-dev.yaml
           VAR: image=${{ needs.test-build-and-push.outputs.image }}
-      - name: Create release
-        uses: softprops/action-gh-release@v1
-        with:
-          name: Release to dev
-          tag_name: release/dev@${{ github.sha }}
-          prerelease: true
 
   deploy-prod:
     name: Deploy application to prod
@@ -82,9 +76,3 @@ jobs:
           RESOURCE: .nais/nais-prod.yaml
           VARS: .nais/vars-prod.yaml
           VAR: image=${{ needs.test-build-and-push.outputs.image }}
-      - name: Create release
-        uses: softprops/action-gh-release@v1
-        with:
-          name: Release to prod
-          tag_name: release/prod@${{ github.sha }}
-          prerelease: false
