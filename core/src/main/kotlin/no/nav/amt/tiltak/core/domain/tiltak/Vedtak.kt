@@ -32,9 +32,14 @@ data class DeltakerVedVedtak(
 	data class DeltakerStatus(
 		val id: UUID,
 		val type: no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus.Type,
-		val aarsak: no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus.Aarsak?,
+		val aarsak: Aarsak?,
 		val gyldigFra: LocalDateTime,
 		val gyldigTil: LocalDateTime?,
 		val opprettet: LocalDateTime,
-	)
+	) {
+		data class Aarsak(
+			val type: no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus.Aarsak,
+			val beskrivelse: String?,
+		)
+	}
 }
