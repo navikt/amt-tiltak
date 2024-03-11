@@ -81,7 +81,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 			gyldigTil = null,
 			deltakerVedVedtak = DeltakerVedVedtak(
 				id, null, null, null, null, null, emptyList(),
-				DeltakerStatus(UUID.randomUUID(), DeltakerStatus.Type.VENTER_PA_OPPSTART, null, LocalDateTime.now(), LocalDateTime.now(), true)
+				DeltakerVedVedtak.DeltakerStatus(UUID.randomUUID(), DeltakerStatus.Type.VENTER_PA_OPPSTART, null, LocalDateTime.now(), LocalDateTime.now(), LocalDateTime.now())
 			),
 			fattetAvNav = false,
 			opprettet = LocalDateTime.now(),
