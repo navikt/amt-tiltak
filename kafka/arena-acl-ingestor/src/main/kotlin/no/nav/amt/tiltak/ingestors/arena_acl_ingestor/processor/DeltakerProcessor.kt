@@ -52,6 +52,7 @@ class DeltakerProcessor(
 			deltakerId = deltakerDto.id,
 			type = tilDeltakerStatusType(deltakerDto.status),
 			aarsak = tilDeltakerAarsak(deltakerDto.statusAarsak),
+			aarsaksbeskrivelse = null,
 			gyldigFra = deltakerDto.statusEndretDato,
 		)
 

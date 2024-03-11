@@ -197,6 +197,7 @@ open class DeltakerServiceImpl(
 					deltakerId = it.id,
 					type = DeltakerStatus.Type.HAR_SLUTTET,
 					aarsak = it.status.aarsak,
+					aarsaksbeskrivelse = it.status.aarsaksbeskrivelse,
 					gyldigFra = LocalDateTime.now()
 				)
 			)
@@ -221,6 +222,7 @@ open class DeltakerServiceImpl(
 							gjennomforingSluttdato = gjennomforing.sluttDato
 						),
 						aarsak = it.status.aarsak,
+						aarsaksbeskrivelse = it.status.aarsaksbeskrivelse,
 						gyldigFra = LocalDateTime.now()
 					)
 				)
@@ -248,6 +250,7 @@ open class DeltakerServiceImpl(
 			deltakerId = status.deltakerId,
 			type = status.type,
 			aarsak = status.aarsak,
+			aarsaksbeskrivelse = status.aarsaksbeskrivelse,
 			gyldigFra = status.gyldigFra ?: LocalDateTime.now()
 		)
 
@@ -333,6 +336,7 @@ open class DeltakerServiceImpl(
 					deltakerId = it,
 					type = nyStatus,
 					aarsak = null,
+					aarsaksbeskrivelse = null,
 					gyldigFra = LocalDateTime.now()
 				)
 			)

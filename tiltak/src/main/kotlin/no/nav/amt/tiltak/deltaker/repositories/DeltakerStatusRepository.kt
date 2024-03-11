@@ -11,7 +11,7 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.UUID
 
 @Component
 open class DeltakerStatusRepository(
@@ -24,6 +24,7 @@ open class DeltakerStatusRepository(
 			deltakerId = rs.getUUID("deltaker_id"),
 			type = DeltakerStatus.Type.valueOf(rs.getString("status")),
 			aarsak = rs.getNullableString("aarsak")?.let { DeltakerStatus.Aarsak.valueOf(it) },
+			aarsaksbeskrivelse = rs.getNullableString("aarsaksbeskrivelse"),
 			aktiv = rs.getBoolean("aktiv"),
 			gyldigFra = rs.getLocalDateTime("gyldig_fra"),
 			opprettetDato = rs.getTimestamp("created_at").toLocalDateTime(),
@@ -41,9 +42,9 @@ open class DeltakerStatusRepository(
 
 	fun insert(status: DeltakerStatusInsertDbo) {
 		val sql = """
-			INSERT INTO deltaker_status (id, deltaker_id, gyldig_fra, status, aarsak, aktiv)
+			INSERT INTO deltaker_status (id, deltaker_id, gyldig_fra, status, aarsak, aarsaksbeskrivelse, aktiv)
 			VALUES (
-				:id, :deltaker_id, :gyldig_fra, :status, :aarsak, true
+				:id, :deltaker_id, :gyldig_fra, :status, :aarsak, :aarsaksbeskrivelse, true
 			)
 		""".trimIndent()
 		val params = sqlParameters(
@@ -51,7 +52,8 @@ open class DeltakerStatusRepository(
 			"deltaker_id" to status.deltakerId,
 			"gyldig_fra" to status.gyldigFra,
 			"status" to status.type.name,
-			"aarsak" to status.aarsak?.name
+			"aarsak" to status.aarsak?.name,
+			"aarsaksbeskrivelse" to status.aarsaksbeskrivelse
 		)
 
 		template.update(sql, params)
@@ -59,7 +61,7 @@ open class DeltakerStatusRepository(
 
 	fun getStatuserForDeltaker(deltakerId: UUID): List<DeltakerStatusDbo> {
 		val sql = """
-			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aktiv, created_at
+			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aarsaksbeskrivelse, aktiv, created_at
 			FROM deltaker_status
 			WHERE deltaker_id = :deltakerId;
 		""".trimIndent()
@@ -73,7 +75,7 @@ open class DeltakerStatusRepository(
 
 	fun getStatusForDeltaker(deltakerId: UUID): DeltakerStatusDbo? {
 		val sql = """
-			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aktiv, created_at
+			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aarsaksbeskrivelse, aktiv, created_at
 			FROM deltaker_status
 			WHERE deltaker_id = :deltakerId
 			AND aktiv = true
@@ -100,7 +102,7 @@ open class DeltakerStatusRepository(
 		if (deltakerIder.isEmpty()) return emptyList()
 
 		val sql = """
-			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aktiv, created_at
+			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aarsaksbeskrivelse, aktiv, created_at
 			FROM deltaker_status
 			WHERE deltaker_id IN (:deltakerIder)
 			AND aktiv = true

@@ -71,6 +71,7 @@ class DeltakerIngestorImpl(
 			deltakerId = deltakerDto.id,
 			type = deltakerDto.status.type,
 			aarsak = deltakerDto.status.aarsak,
+			aarsaksbeskrivelse = deltakerDto.status.aarsaksbeskrivelse,
 			gyldigFra = deltakerDto.status.gyldigFra,
 		)
 

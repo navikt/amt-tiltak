@@ -20,7 +20,7 @@ import no.nav.amt.tiltak.test.database.data.TestDataSeeder
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 internal class DeltakerStatusRepositoryTest : FunSpec({
 
@@ -45,6 +45,7 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 			deltakerId = deltakerCmd.id,
 			type = VENTER_PA_OPPSTART,
 			aarsak = DeltakerStatus.Aarsak.AVLYST_KONTRAKT,
+			aarsaksbeskrivelse = null,
 			gyldigFra = lastweek
 		)
 		val status2 = DeltakerStatusInsertDbo(
@@ -52,6 +53,7 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 			deltakerId = deltakerCmd.id,
 			type = DELTAR,
 			aarsak= DeltakerStatus.Aarsak.ANNET,
+			aarsaksbeskrivelse = "Beskrivelse",
 			gyldigFra = yesterday
 		)
 		val now = LocalDateTime.now()
@@ -68,6 +70,7 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 			status1.deltakerId,
 			status1.type,
 			status1.aarsak,
+			status1.aarsaksbeskrivelse,
 			status1.gyldigFra!!, now, false )
 
 		persisted[1].copy(opprettetDato = now) shouldBe DeltakerStatusDbo(
@@ -75,6 +78,7 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 			status2.deltakerId,
 			status2.type,
 			status2.aarsak,
+			status2.aarsaksbeskrivelse,
 			status2.gyldigFra!!, now, true)
 	}
 

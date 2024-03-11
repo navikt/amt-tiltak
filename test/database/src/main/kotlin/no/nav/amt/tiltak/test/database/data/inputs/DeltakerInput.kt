@@ -48,6 +48,7 @@ data class DeltakerInput(
 			id = statusInput.id,
 			type = DeltakerStatus.Type.valueOf(statusInput.status),
 			aarsak = null,
+			aarsaksbeskrivelse = null,
 			gyldigFra = statusInput.gyldigFra,
 			opprettetDato = statusInput.createdAt.toLocalDateTime(),
 			aktiv = statusInput.aktiv
