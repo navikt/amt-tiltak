@@ -28,4 +28,13 @@ data class DeltakerVedVedtak(
     val bakgrunnsinformasjon: String?,
     val innhold: List<Innhold>,
     val status: DeltakerStatus,
-)
+) {
+	data class DeltakerStatus(
+		val id: UUID,
+		val type: no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus.Type,
+		val aarsak: no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus.Aarsak?,
+		val gyldigFra: LocalDateTime,
+		val gyldigTil: LocalDateTime?,
+		val opprettet: LocalDateTime,
+	)
+}
