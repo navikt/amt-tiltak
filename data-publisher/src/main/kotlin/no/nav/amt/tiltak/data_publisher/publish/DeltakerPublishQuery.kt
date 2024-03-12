@@ -80,6 +80,7 @@ class DeltakerPublishQuery(
 				id = deltaker.statusId,
 				type = DeltakerStatus.Type.valueOf(deltaker.status),
 				aarsak = deltaker.statusAarsak?.let { DeltakerStatus.Aarsak.valueOf(it) },
+				aarsaksbeskrivelse = deltaker.statusAarsakBeskrivelse,
 				gyldigFra = deltaker.statusGyldigFra!!,
 				opprettetDato = deltaker.statusCreatedAt!!
 			),
@@ -125,6 +126,7 @@ class DeltakerPublishQuery(
 				   status.id 									as status_id,
 				   status.status                                as status,
 				   status.aarsak                                as status_aarsak,
+				   status.aarsaksbeskrivelse                    as status_aarsaksbeskrivelse,
 				   status.gyldig_fra                            as status_gyldig_fra,
 				   status.created_at                            as status_opprettet_dato,
 				   gjennomforing.er_kurs
@@ -133,7 +135,7 @@ class DeltakerPublishQuery(
 					 left join bruker on deltaker.bruker_id = bruker.id
 					 left join nav_enhet on bruker.nav_enhet_id = nav_enhet.id
 					 left join nav_ansatt on bruker.ansvarlig_veileder_id = nav_ansatt.id
-					 left join (select id, deltaker_id, status, aarsak, gyldig_fra, created_at
+					 left join (select id, deltaker_id, status, aarsak, aarsaksbeskrivelse, gyldig_fra, created_at
 								from deltaker_status
 								where aktiv is true) status on status.deltaker_id = deltaker.id
 			where deltaker.id = :deltakerId
@@ -198,6 +200,7 @@ class DeltakerPublishQuery(
 		val statusId: UUID?,
 		val status: String?,
 		val statusAarsak: String?,
+		val statusAarsakBeskrivelse: String?,
 		val statusGyldigFra: LocalDateTime?,
 		val statusCreatedAt: LocalDateTime?,
 		val deltarPaKurs: Boolean,
@@ -235,6 +238,7 @@ class DeltakerPublishQuery(
 					statusId = rs.getNullableUUID("status_id"),
 					status = rs.getString("status"),
 					statusAarsak = rs.getNullableString("status_aarsak"),
+					statusAarsakBeskrivelse = rs.getNullableString("status_aarsaksbeskrivelse"),
 					statusGyldigFra = rs.getNullableLocalDateTime("status_gyldig_fra"),
 					statusCreatedAt = rs.getNullableLocalDateTime("status_opprettet_dato"),
 					deltarPaKurs = rs.getBoolean("er_kurs"),

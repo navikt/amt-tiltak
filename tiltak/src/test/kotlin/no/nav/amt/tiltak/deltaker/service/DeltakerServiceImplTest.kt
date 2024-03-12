@@ -301,6 +301,7 @@ class DeltakerServiceImplTest {
 				deltakerId = DELTAKER_1.id,
 				type = DeltakerStatus.Type.HAR_SLUTTET,
 				aarsak = null,
+				aarsaksbeskrivelse = null,
 				gyldigFra = LocalDateTime.now().minusHours(1)
 			)
 		)
@@ -322,6 +323,7 @@ class DeltakerServiceImplTest {
 			deltakerId = nyDeltaker!!.id,
 			type = DeltakerStatus.Type.IKKE_AKTUELL,
 			aarsak = null,
+			aarsaksbeskrivelse = null,
 			gyldigFra = now
 		)
 
@@ -336,6 +338,7 @@ class DeltakerServiceImplTest {
 			type = statusInsertDbo.type,
 			gyldigFra = statusInsertDbo.gyldigFra!!,
 			aarsak = statusInsertDbo.aarsak,
+			aarsaksbeskrivelse = statusInsertDbo.aarsaksbeskrivelse,
 			opprettetDato = now,
 			aktiv = true
 		)
@@ -355,6 +358,7 @@ class DeltakerServiceImplTest {
 			deltakerId = nyDeltaker!!.id,
 			type = DeltakerStatus.Type.IKKE_AKTUELL,
 			aarsak = null,
+			aarsaksbeskrivelse = null,
 			gyldigFra = LocalDateTime.now()
 		)
 
@@ -385,6 +389,7 @@ class DeltakerServiceImplTest {
 			deltakerId = nyDeltaker!!.id,
 			type = DeltakerStatus.Type.IKKE_AKTUELL,
 			aarsak = null,
+			aarsaksbeskrivelse = null,
 			gyldigFra = LocalDateTime.now()
 		)
 
@@ -431,6 +436,7 @@ class DeltakerServiceImplTest {
 			deltakerId = deltaker.id,
 			type = DeltakerStatus.Type.DELTAR,
 			aarsak = null,
+			aarsaksbeskrivelse = null,
 			gyldigFra = LocalDateTime.now().minusDays(2)
 		)
 		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
@@ -450,6 +456,7 @@ class DeltakerServiceImplTest {
 			deltakerId = deltaker.id,
 			type = DeltakerStatus.Type.VURDERES,
 			aarsak = null,
+			aarsaksbeskrivelse = null,
 			gyldigFra = LocalDateTime.now().minusDays(2)
 		)
 
@@ -693,6 +700,7 @@ class DeltakerServiceImplTest {
 		deltakerId = deltakerId,
 		type = DeltakerStatus.Type.DELTAR,
 		aarsak = null,
+		aarsaksbeskrivelse = null,
 		gyldigFra = LocalDateTime.now().minusDays(7),
 	)
 

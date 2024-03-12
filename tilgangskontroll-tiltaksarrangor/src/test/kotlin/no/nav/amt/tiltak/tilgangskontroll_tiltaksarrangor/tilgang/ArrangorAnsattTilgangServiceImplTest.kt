@@ -104,6 +104,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 			id = UUID.randomUUID(),
 			type =  DeltakerStatus.Type.VENTER_PA_OPPSTART,
 			aarsak = null,
+			aarsaksbeskrivelse = null,
 			gyldigFra =  LocalDateTime.now().minusHours(1),
 			opprettetDato = LocalDateTime.now(),
 			aktiv = true

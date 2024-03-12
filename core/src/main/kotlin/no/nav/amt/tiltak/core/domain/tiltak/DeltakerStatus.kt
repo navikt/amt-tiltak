@@ -7,6 +7,7 @@ data class DeltakerStatus(
 	val id: UUID,
 	val type: Type,
 	val aarsak: Aarsak?,
+	val aarsaksbeskrivelse: String?,
 	val gyldigFra: LocalDateTime,
 	val opprettetDato: LocalDateTime,
 	val aktiv: Boolean,

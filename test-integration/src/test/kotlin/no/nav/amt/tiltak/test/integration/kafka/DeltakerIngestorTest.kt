@@ -97,6 +97,7 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 				id = UUID.randomUUID(),
 				type = DeltakerStatus.Type.VENTER_PA_OPPSTART,
 				aarsak = null,
+				aarsaksbeskrivelse = null,
 				gyldigFra = LocalDateTime.now(),
 				opprettetDato = LocalDateTime.now()
 			),
