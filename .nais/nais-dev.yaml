@@ -130,3 +130,12 @@ spec:
         flags:
           - name: cloudsql.logical_decoding
             value: "on"
+
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
+    logging:
+      destinations:
+        - id: elastic
+        - id: loki
