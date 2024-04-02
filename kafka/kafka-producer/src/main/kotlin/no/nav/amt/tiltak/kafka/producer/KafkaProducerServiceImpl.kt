@@ -10,7 +10,7 @@ import no.nav.common.kafka.producer.KafkaProducerClient
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Service
 open class KafkaProducerServiceImpl(
@@ -30,6 +30,7 @@ open class KafkaProducerServiceImpl(
 			dagerPerUke = deltaker.dagerPerUke,
 			prosentStilling = deltaker.prosentStilling,
 			endretDato = endretDato,
+			kilde = deltaker.kilde
 		)
 
 		val key = deltaker.id.toString().toByteArray()

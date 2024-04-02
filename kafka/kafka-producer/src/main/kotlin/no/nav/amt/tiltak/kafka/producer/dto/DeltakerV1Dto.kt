@@ -1,8 +1,9 @@
 package no.nav.amt.tiltak.kafka.producer.dto
 
+import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class DeltakerV1Dto(
 	val id: UUID,
@@ -14,6 +15,7 @@ data class DeltakerV1Dto(
 	val registrertDato: LocalDateTime,
 	val dagerPerUke: Float?,
 	val prosentStilling: Float?,
-	val endretDato: LocalDateTime
+	val endretDato: LocalDateTime,
+	val kilde: Kilde?
 )
 
