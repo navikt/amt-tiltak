@@ -55,12 +55,10 @@
         <okhttp.version>4.12.0</okhttp.version>
         <token-support.version>4.1.4</token-support.version>
         <mock-oauth2-server.version>2.1.2</mock-oauth2-server.version>
-        <common.version>3.2023.12.12_13.53-510909d4aa1a</common.version>
+        <common.version>3.2024.02.21_11.18-8f9b43befae1</common.version>
         <logstash.version>7.4</logstash.version>
         <unleash.version>9.2.0</unleash.version>
         <postgresql.version>42.7.2</postgresql.version>
-
-        <logback.version>1.4.14</logback.version>
     </properties>
 
     <repositories>
