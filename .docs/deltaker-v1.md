@@ -9,7 +9,7 @@
     1. [Skjema](#skjema)
 
 ## Beskrivelse
-På topicen `amt.deltaker-v1` publiseres det siste øyeblikksblidet av deltakere på følgende tiltakstyper:
+På topicen `amt.deltaker-v1` publiseres det siste øyeblikksbildet av deltakere på følgende tiltakstyper:
 
 - INDOPPFAG
 - ARBFORB
@@ -49,7 +49,8 @@ Kilden til dataene om deltakerene er i hovedsak Arena per dags dato. I fremtiden
   "registrertDato": "2022-01-27T16:13:39",
   "dagerPerUke": 3,
   "prosentStilling": 50,
-  "endretDato": "2023-10-24T11:47:48.254204"
+  "endretDato": "2023-10-24T11:47:48.254204",
+  "kilde": "ARENA"
 }
 ```
 
@@ -60,18 +61,19 @@ Kilden til dataene om deltakerene er i hovedsak Arena per dags dato. I fremtiden
 
 ### Deltaker
 
-|Felt|Format|Beskrivelse|
-|-|-|-|
-|**id**| `uuid`|En unik id som identifiserer en enkelt deltaker / deltakelse på ett tiltak. Samme som `Key`|
-|**gjennomforingId** |`uuid`|En unik id som identifiserer en tiltaksgjennomføring fra [Team Valp](https://github.com/navikt/mulighetsrommet)|
-|**personIdent** |`string`|Gjeldende folkeregisterident for personen, hvis en folkeregisterident ikke finnes kan det være en av: npid eller aktør-id|
-|**startDato** |`date\|null`|Dagen deltakeren starter/startet på tiltaket| 
-|**sluttDato** |`date\|null`|Dagen deltakeren slutter/sluttet på tiltaket|
-|**status** |`object`|Nåværende status på deltakeren, forteller f.eks om deltakeren deltar på tiltaket akkurat nå eller venter på oppstart osv. Se [Status](#status)|
-|**registrertDato** |`datetime`|Datoen deltakeren er registrert i Arena. Det er litt ukjent hva som definerer en registrertDato i fremtiden når vi i Komet overtar opprettelsen av deltakere.|
-|**dagerPerUke** |`float\|null`|Antall dager deltakeren deltar på tiltaket per uke. I Arena er det mulig å angi dette feltet som et desimaltall f.eks `2.5`, i ny løsning er det bare mulig å bruke heltall.<br /><br /> I ny løsning kan dette bare settes på tiltakstypene: <br/> - Arbeidsforberedende trening (AFT) <br/> - Varig tilrettelagt arbeid (VTA)|
-|**prosentStilling** |`float\|null`|Prosentandelen deltakeren opptar av en tiltaksplass. Hva 100% innebærer av faktisk deltakelse vil variere fra tiltak til tiltak. <br /><br />I Arena er det mulig å angi dette feltet som et desimaltall f.eks `42.1`, i ny løsning er det bare mulig å bruke heltall.<br /><br /> I ny løsning kan dette bare settes på tiltakstypene: <br /> - Arbeidsforberedende trening (AFT) <br /> - Varig tilrettelagt arbeid (VTA)|
-|**endretDato** |`datetime`|Tidsstempel for siste endring på deltakeren|
+| Felt                | Format         | Beskrivelse                                                                                                                                                                                                                                                                                                                                                                                                                 |
+|---------------------|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **id**              | `uuid`         | En unik id som identifiserer en enkelt deltaker / deltakelse på ett tiltak. Samme som `Key`                                                                                                                                                                                                                                                                                                                                 |
+| **gjennomforingId** | `uuid`         | En unik id som identifiserer en tiltaksgjennomføring fra [Team Valp](https://github.com/navikt/mulighetsrommet)                                                                                                                                                                                                                                                                                                             |
+| **personIdent**     | `string`       | Gjeldende folkeregisterident for personen, hvis en folkeregisterident ikke finnes kan det være en av: npid eller aktør-id                                                                                                                                                                                                                                                                                                   |
+| **startDato**       | `date\|null`   | Dagen deltakeren starter/startet på tiltaket                                                                                                                                                                                                                                                                                                                                                                                | 
+| **sluttDato**       | `date\|null`   | Dagen deltakeren slutter/sluttet på tiltaket                                                                                                                                                                                                                                                                                                                                                                                |
+| **status**          | `object`       | Nåværende status på deltakeren, forteller f.eks om deltakeren deltar på tiltaket akkurat nå eller venter på oppstart osv. Se [Status](#status)                                                                                                                                                                                                                                                                              |
+| **registrertDato**  | `datetime`     | Datoen deltakeren er registrert i Arena. Det er litt ukjent hva som definerer en registrertDato i fremtiden når vi i Komet overtar opprettelsen av deltakere.                                                                                                                                                                                                                                                               |
+| **dagerPerUke**     | `float\|null`  | Antall dager deltakeren deltar på tiltaket per uke. I Arena er det mulig å angi dette feltet som et desimaltall f.eks `2.5`, i ny løsning er det bare mulig å bruke heltall.<br /><br /> I ny løsning kan dette bare settes på tiltakstypene: <br/> - Arbeidsforberedende trening (AFT) <br/> - Varig tilrettelagt arbeid (VTA)                                                                                             |
+| **prosentStilling** | `float\|null`  | Prosentandelen deltakeren opptar av en tiltaksplass. Hva 100% innebærer av faktisk deltakelse vil variere fra tiltak til tiltak. <br /><br />I Arena er det mulig å angi dette feltet som et desimaltall f.eks `42.1`, i ny løsning er det bare mulig å bruke heltall.<br /><br /> I ny løsning kan dette bare settes på tiltakstypene: <br /> - Arbeidsforberedende trening (AFT) <br /> - Varig tilrettelagt arbeid (VTA) |
+| **endretDato**      | `datetime`     | Tidsstempel for siste endring på deltakeren                                                                                                                                                                                                                                                                                                                                                                                 |
+| **kilde**           | `string\|null` | Kilde for endringen. Kan være `null`, `ARENA` eller `KOMET`. Hvis kilden er `KOMET` ble deltakeren opprettet eller sist endret i Komets nye løsning (ikke i prod ennå). Hvis kilde er `null` eller `ARENA` ble deltakeren opprettet eller sist endret i Arena.                                                                                                                                                              |
 
 #### Status
 
@@ -101,7 +103,8 @@ data class DeltakerV1Dto(
 	val registrertDato: LocalDateTime,
 	val dagerPerUke: Float?,
 	val prosentStilling: Float?,
-	val endretDato: LocalDateTime
+	val endretDato: LocalDateTime,
+	val kilde: Kilde?
 )
 
 
@@ -122,5 +125,10 @@ data class DeltakerStatusDto(
         PABEGYNT_REGISTRERING, 
     }
 
+}
+
+enum class Kilde {
+   KOMET,
+   ARENA
 }
 ```
