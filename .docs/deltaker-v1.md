@@ -50,7 +50,7 @@ Kilden til dataene om deltakerene er i hovedsak Arena per dags dato. I fremtiden
   "dagerPerUke": 3,
   "prosentStilling": 50,
   "endretDato": "2023-10-24T11:47:48.254204",
-  "kilde":"ARENA"
+  "kilde": "ARENA"
 }
 ```
 
@@ -104,7 +104,7 @@ data class DeltakerV1Dto(
 	val dagerPerUke: Float?,
 	val prosentStilling: Float?,
 	val endretDato: LocalDateTime,
-    val kilde: Kilde?
+	val kilde: Kilde?
 )
 
 
