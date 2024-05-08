@@ -145,7 +145,6 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		sluttDato: LocalDate = LocalDate.now().plusDays(1),
 		createdAt: LocalDateTime = LocalDateTime.now(),
 		modifiedAt: LocalDateTime = LocalDateTime.now(),
-		navEnhetId: UUID? = null,
 		opprettetAar: Int = LocalDate.now().year,
 		lopenr: Int = Random().nextInt()
 	): GjennomforingInput = GjennomforingInput(
@@ -158,7 +157,6 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		sluttDato,
 		createdAt,
 		modifiedAt,
-		navEnhetId,
 		opprettetAar,
 		lopenr,
 		false

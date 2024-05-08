@@ -12,7 +12,6 @@ data class Gjennomforing(
 	val status: Status,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
-	val navEnhetId: UUID?,
 	val opprettetAar: Int,
 	val lopenr: Int,
 	val erKurs: Boolean

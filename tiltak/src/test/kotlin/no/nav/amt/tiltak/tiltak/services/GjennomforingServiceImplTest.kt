@@ -17,7 +17,6 @@ import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
@@ -73,7 +72,6 @@ class GjennomforingServiceImplTest : FunSpec({
 
 	test("getGjennomforing - gjennomføring er kurs - returnerer gjennomføring") {
 		val gjennomforingId = UUID.randomUUID()
-		testDataRepository.insertNavEnhet(NAV_ENHET_1)
 		testDataRepository.insertTiltak(TILTAK_1)
 		testDataRepository.insertArrangor(ARRANGOR_1)
 		testDataRepository.insertGjennomforing(GJENNOMFORING_1.copy(id=gjennomforingId, erKurs = true))
@@ -88,7 +86,6 @@ class GjennomforingServiceImplTest : FunSpec({
 	}
 
 	test("getByLopenummer - returnerer alle gjennomføringer, uansett status") {
-		testDataRepository.insertNavEnhet(NAV_ENHET_1)
 		testDataRepository.insertTiltak(TILTAK_1)
 		testDataRepository.insertArrangor(ARRANGOR_1)
 		testDataRepository.insertGjennomforing(GJENNOMFORING_1)
@@ -110,7 +107,6 @@ class GjennomforingServiceImplTest : FunSpec({
 
 
 	test("upsert - navn er endret - navn oppdateres for gjennomføringen") {
-		testDataRepository.insertNavEnhet(NAV_ENHET_1)
 		testDataRepository.insertTiltak(TILTAK_1)
 		testDataRepository.insertArrangor(ARRANGOR_1)
 		testDataRepository.insertGjennomforing(GJENNOMFORING_1)
@@ -130,7 +126,6 @@ class GjennomforingServiceImplTest : FunSpec({
 				status = Gjennomforing.Status.GJENNOMFORES,
 				startDato = GJENNOMFORING_1.startDato,
 				sluttDato = GJENNOMFORING_1.sluttDato,
-				navEnhetId = NAV_ENHET_1.id,
 				lopenr = GJENNOMFORING_1.lopenr,
 				opprettetAar = GJENNOMFORING_1.opprettetAar,
 				erKurs = false
@@ -144,7 +139,6 @@ class GjennomforingServiceImplTest : FunSpec({
 	}
 
 	test("upsert - arrangørId er endret - arrangørId oppdateres for gjennomføringen og tilganger hos gammel arrangør stenges") {
-		testDataRepository.insertNavEnhet(NAV_ENHET_1)
 		testDataRepository.insertTiltak(TILTAK_1)
 		testDataRepository.insertArrangor(ARRANGOR_1)
 		testDataRepository.insertArrangor(ARRANGOR_2)
@@ -165,7 +159,6 @@ class GjennomforingServiceImplTest : FunSpec({
 				status = Gjennomforing.Status.GJENNOMFORES,
 				startDato = GJENNOMFORING_1.startDato,
 				sluttDato = GJENNOMFORING_1.sluttDato,
-				navEnhetId = NAV_ENHET_1.id,
 				lopenr = GJENNOMFORING_1.lopenr,
 				opprettetAar = GJENNOMFORING_1.opprettetAar,
 				erKurs = false
@@ -179,7 +172,6 @@ class GjennomforingServiceImplTest : FunSpec({
 	}
 
 	test("upsert - inntaksform er endret - erKurs oppdateres for gjennomføringen") {
-		testDataRepository.insertNavEnhet(NAV_ENHET_1)
 		testDataRepository.insertTiltak(TILTAK_1)
 		testDataRepository.insertArrangor(ARRANGOR_1)
 		testDataRepository.insertGjennomforing(GJENNOMFORING_1)
@@ -197,7 +189,6 @@ class GjennomforingServiceImplTest : FunSpec({
 				status = Gjennomforing.Status.GJENNOMFORES,
 				startDato = GJENNOMFORING_1.startDato,
 				sluttDato = GJENNOMFORING_1.sluttDato,
-				navEnhetId = NAV_ENHET_1.id,
 				lopenr = GJENNOMFORING_1.lopenr,
 				opprettetAar = GJENNOMFORING_1.opprettetAar,
 				erKurs = true

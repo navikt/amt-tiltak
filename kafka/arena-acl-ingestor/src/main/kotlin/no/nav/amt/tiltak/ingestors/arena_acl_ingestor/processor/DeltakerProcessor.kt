@@ -101,7 +101,6 @@ class DeltakerProcessor(
 				status = GjennomforingStatusConverter.convert(gjennomforing.status.name),
 				startDato = gjennomforing.startDato,
 				sluttDato = gjennomforing.sluttDato,
-				navEnhetId = null,// brukes ikke til noe lenger
 				lopenr = gjennomforingArenaData.lopenr,
 				opprettetAar = gjennomforingArenaData.opprettetAar,
 				erKurs = gjennomforing.erKurs()

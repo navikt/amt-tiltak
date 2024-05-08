@@ -17,7 +17,6 @@ data class GjennomforingDbo(
 	val status: Gjennomforing.Status,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
-	val navEnhetId: UUID?,
 	val opprettetAar: Int,
 	val lopenr: Int,
 	val erKurs: Boolean,
@@ -34,7 +33,6 @@ data class GjennomforingDbo(
 			status = status,
 			startDato = startDato,
 			sluttDato = sluttDato,
-			navEnhetId = navEnhetId,
 			lopenr = lopenr,
 			opprettetAar = opprettetAar,
 			erKurs = erKurs
@@ -49,7 +47,6 @@ data class GjennomforingDbo(
 				status = other.status,
 				startDato = other.startDato,
 				sluttDato = other.sluttDato,
-				navEnhetId = other.navEnhetId,
 				lopenr = other.lopenr,
 				opprettetAar = other.opprettetAar,
 				erKurs = other.erKurs,

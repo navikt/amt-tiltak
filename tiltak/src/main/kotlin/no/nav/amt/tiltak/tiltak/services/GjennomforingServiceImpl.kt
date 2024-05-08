@@ -70,7 +70,6 @@ class GjennomforingServiceImpl(
 				status = updatedGjennomforing.status,
 				startDato = updatedGjennomforing.startDato,
 				sluttDato = updatedGjennomforing.sluttDato,
-				navEnhetId = updatedGjennomforing.navEnhetId,
 				lopenr = updatedGjennomforing.lopenr,
 				opprettetAar = updatedGjennomforing.opprettetAar,
 				erKurs = updatedGjennomforing.erKurs

@@ -72,7 +72,6 @@ class GjennomforingIngestorImpl(
 				status = GjennomforingStatusConverter.convert(gjennomforing.status.name),
 				startDato = gjennomforing.startDato,
 				sluttDato = gjennomforing.sluttDato,
-				navEnhetId = null,// brukes ikke til noe lenger
 				lopenr = arenaData.lopenr,
 				opprettetAar = arenaData.opprettetAar,
 				erKurs = gjennomforing.erKurs()

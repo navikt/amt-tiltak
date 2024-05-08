@@ -177,7 +177,6 @@ object TestData {
 		sluttDato = LocalDate.of(2050, 12, 30),
 		createdAt = LocalDateTime.now(),
 		modifiedAt = LocalDateTime.now(),
-		navEnhetId = NAV_ENHET_1.id,
 		opprettetAar = 2020,
 		lopenr = 123,
 		erKurs = false
@@ -193,7 +192,6 @@ object TestData {
 		sluttDato = LocalDate.of(2050, 12, 30),
 		createdAt = LocalDateTime.now(),
 		modifiedAt = LocalDateTime.now(),
-		navEnhetId = NAV_ENHET_1.id,
 		opprettetAar = 2020,
 		lopenr = 123,
 		erKurs = true
@@ -209,7 +207,6 @@ object TestData {
 		sluttDato = LocalDate.of(2022, 2, 13),
 		createdAt = LocalDateTime.now(),
 		modifiedAt = LocalDateTime.now(),
-		navEnhetId = NAV_ENHET_2.id,
 		opprettetAar = 2020,
 		lopenr = 124,
 		erKurs = false
@@ -225,7 +222,6 @@ object TestData {
 		sluttDato = LocalDate.of(2022, 7, 12),
 		createdAt = LocalDateTime.now(),
 		modifiedAt = LocalDateTime.now(),
-		navEnhetId = NAV_ENHET_2.id,
 		opprettetAar = 2022,
 		lopenr = 439823,
 		erKurs = false
