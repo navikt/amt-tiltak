@@ -32,10 +32,7 @@ class MulighetsrommetApiClientImplTest {
 				"""
 					{
 						"opprettetAar": 2022,
-						"lopenr": 123,
-						"virksomhetsnummer": "999222333",
-						"ansvarligNavEnhetId": "1234",
-						"status": "GJENNOMFORES"
+						"lopenr": 123
 					}
 				""".trimIndent()
 			)
@@ -49,9 +46,6 @@ class MulighetsrommetApiClientImplTest {
 		gjennomforingArenaData shouldNotBe null
 		gjennomforingArenaData?.opprettetAar shouldBe 2022
 		gjennomforingArenaData?.lopenr shouldBe 123
-		gjennomforingArenaData?.virksomhetsnummer shouldBe "999222333"
-		gjennomforingArenaData?.ansvarligNavEnhetId shouldBe "1234"
-		gjennomforingArenaData?.status shouldBe "GJENNOMFORES"
 
 		request.path shouldBe "/api/v1/tiltaksgjennomforinger/arenadata/$id"
 		request.method shouldBe "GET"

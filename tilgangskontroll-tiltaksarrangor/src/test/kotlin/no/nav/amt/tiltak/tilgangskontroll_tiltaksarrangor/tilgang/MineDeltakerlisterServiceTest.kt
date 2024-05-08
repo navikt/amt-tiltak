@@ -17,7 +17,6 @@ import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_TILGANG_1
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import org.slf4j.LoggerFactory
@@ -60,7 +59,6 @@ class MineDeltakerlisterServiceTest : FunSpec({
 
 		DbTestDataUtils.cleanDatabase(dataSource)
 
-		testRepository.insertNavEnhet(NAV_ENHET_1)
 		testRepository.insertArrangor(ARRANGOR_1)
 		testRepository.insertArrangorAnsatt(ARRANGOR_ANSATT_1)
 		testRepository.insertTiltak(TILTAK_1)
@@ -68,7 +66,6 @@ class MineDeltakerlisterServiceTest : FunSpec({
 		testRepository.insertGjennomforing(
 			GJENNOMFORING_2.copy(
 				arrangorId = ARRANGOR_1.id,
-				navEnhetId = NAV_ENHET_1.id
 			)
 		)
 	}
@@ -138,7 +135,6 @@ class MineDeltakerlisterServiceTest : FunSpec({
 				status = Gjennomforing.Status.GJENNOMFORES,
 				startDato = null,
 				sluttDato = null,
-				navEnhetId = null,
 				opprettetAar = 0,
 				lopenr = 1,
 				erKurs = false
@@ -150,7 +146,6 @@ class MineDeltakerlisterServiceTest : FunSpec({
 				status = Gjennomforing.Status.GJENNOMFORES,
 				startDato = null,
 				sluttDato = null,
-				navEnhetId = null,
 				opprettetAar = 0,
 				lopenr = 2,
 				erKurs = false

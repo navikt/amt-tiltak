@@ -12,10 +12,7 @@ interface MulighetsrommetApiClient {
 
 data class GjennomforingArenaData(
 	val opprettetAar: Int,
-	val lopenr: Int,
-	val virksomhetsnummer: String?,
-	val ansvarligNavEnhetId: String?,
-	val status: String,
+	val lopenr: Int
 )
 
 

@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 class DeltakerStatistikkRepositoryTest : FunSpec({
 
@@ -99,7 +99,6 @@ private val AKTIV_GJENNOMFORING_UTEN_BRUKERE = GjennomforingInput(
 	sluttDato = LocalDate.of(2050, 12, 30),
 	createdAt = LocalDateTime.now(),
 	modifiedAt = LocalDateTime.now(),
-	navEnhetId = TestData.NAV_ENHET_1.id,
 	opprettetAar = 2020,
 	lopenr = 123,
 	erKurs = false

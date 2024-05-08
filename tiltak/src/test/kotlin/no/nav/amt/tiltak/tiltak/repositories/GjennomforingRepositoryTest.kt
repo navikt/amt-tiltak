@@ -14,7 +14,6 @@ import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
-import no.nav.amt.tiltak.test.database.data.TestData.NAV_ENHET_1
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.inputs.GjennomforingInput
@@ -60,7 +59,6 @@ internal class GjennomforingRepositoryTest : FunSpec({
 				status = status,
 				startDato = startDato,
 				sluttDato = sluttDato,
-				navEnhetId = NAV_ENHET_1.id,
 				opprettetAar = 2020,
 				lopenr = 123,
 				erKurs = false
@@ -93,7 +91,6 @@ internal class GjennomforingRepositoryTest : FunSpec({
 					status = Gjennomforing.Status.PLANLAGT,
 					startDato = null,
 					sluttDato = null,
-					navEnhetId = null,
 					createdAt = LocalDateTime.now(),
 					modifiedAt = LocalDateTime.now(),
 					lopenr = 123,
@@ -119,7 +116,6 @@ internal class GjennomforingRepositoryTest : FunSpec({
 				status = updatedStatus,
 				startDato = updatedStartDato,
 				sluttDato = updatedSluttDato,
-				navEnhetId = null,
 				createdAt = LocalDateTime.now(),
 				modifiedAt = LocalDateTime.now(),
 				lopenr = 90879,
@@ -149,7 +145,6 @@ internal class GjennomforingRepositoryTest : FunSpec({
 			sluttDato = LocalDate.of(2050, 12, 30),
 			createdAt = LocalDateTime.now(),
 			modifiedAt = LocalDateTime.now(),
-			navEnhetId = null,
 			lopenr = 123,
 			opprettetAar = 2020,
 			erKurs = false

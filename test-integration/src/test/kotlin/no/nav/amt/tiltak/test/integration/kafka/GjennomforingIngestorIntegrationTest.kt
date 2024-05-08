@@ -6,7 +6,6 @@ import no.nav.amt.tiltak.clients.amt_arrangor_client.AmtArrangorClient
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.GjennomforingArenaData
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
@@ -34,16 +33,11 @@ class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 	@Autowired
 	lateinit var arrangorService: ArrangorService
 
-	@Autowired
-	lateinit var navEnhetService: NavEnhetService
-
 	@BeforeEach
 	internal fun setUp() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
 		resetMockServersAndAddDefaultData()
 	}
-
-	val navEnhetNavn = "Nav Enhet"
 
 	val overordnetArrangor = AmtArrangorClient.ArrangorMedOverordnetArrangor(
 		id = UUID.randomUUID(),
@@ -64,10 +58,7 @@ class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 
 	val gjennomforingArenaData = GjennomforingArenaData(
 		opprettetAar = 2022,
-		lopenr = 123,
-		virksomhetsnummer = arrangorMedOverordnetArrangor.organisasjonsnummer,
-		ansvarligNavEnhetId = "621981",
-		status = "GJENNOMFOR",
+		lopenr = 123
 	)
 
 	val gjennomforingMessage = GjennomforingMessage().copy(virksomhetsnummer = arrangorMedOverordnetArrangor.organisasjonsnummer)
@@ -79,7 +70,6 @@ class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 		mockMulighetsrommetApiServer.gjennomforingArenaData(gjennomforingMessage.id, gjennomforingArenaData)
 		mockArrangorServer.addArrangorResponse(arrangorMedOverordnetArrangor)
 		mockArrangorServer.addArrangorResponse(overordnetArrangor)
-		mockAmtPersonHttpServer.addNavEnhetResponse(gjennomforingArenaData.ansvarligNavEnhetId!!, navEnhetNavn)
 
 		kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(jsonObjekt)
 
@@ -108,10 +98,6 @@ class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 				arrangor.navn shouldBe arrangorMedOverordnetArrangor.navn
 				arrangor.overordnetEnhetNavn shouldBe arrangorMedOverordnetArrangor.overordnetArrangor?.navn
 				arrangor.overordnetEnhetOrganisasjonsnummer shouldBe arrangorMedOverordnetArrangor.overordnetArrangor?.organisasjonsnummer
-
-				val navEnhet = navEnhetService.getNavEnhet(gjennomforing.navEnhetId!!)
-				navEnhet.enhetId shouldBe gjennomforingArenaData.ansvarligNavEnhetId
-				navEnhet.navn shouldBe navEnhetNavn
 			}
 		 }
 

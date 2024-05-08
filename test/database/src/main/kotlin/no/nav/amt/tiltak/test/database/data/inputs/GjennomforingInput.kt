@@ -5,7 +5,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class GjennomforingInput(
 	val id: UUID,
@@ -17,7 +17,6 @@ data class GjennomforingInput(
 	val sluttDato: LocalDate,
 	val createdAt: LocalDateTime,
 	val modifiedAt: LocalDateTime,
-	val navEnhetId: UUID?,
 	val opprettetAar: Int,
 	val lopenr: Int,
 	val erKurs: Boolean
@@ -31,7 +30,6 @@ data class GjennomforingInput(
 			status = Gjennomforing.Status.valueOf(this.status),
 			startDato = this.startDato,
 			sluttDato = this.sluttDato,
-			navEnhetId = this.navEnhetId,
 			opprettetAar = this.opprettetAar,
 			lopenr = this.lopenr,
 			erKurs = this.erKurs

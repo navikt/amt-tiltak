@@ -39,10 +39,7 @@ class MulighetsrommetApiClientImpl(
 
 			return GjennomforingArenaData(
 				opprettetAar = responseBody.opprettetAar,
-				lopenr = responseBody.lopenr,
-				virksomhetsnummer = responseBody.virksomhetsnummer,
-				ansvarligNavEnhetId = responseBody.ansvarligNavEnhetId,
-				status = responseBody.status,
+				lopenr = responseBody.lopenr
 			)
 		}
 	}
@@ -69,10 +66,7 @@ class MulighetsrommetApiClientImpl(
 	object HentGjennomforingArenaData {
 		data class Response(
 			val opprettetAar: Int,
-			val lopenr: Int,
-			val virksomhetsnummer: String?,
-			val ansvarligNavEnhetId: String?,
-			val status: String
+			val lopenr: Int
 		)
 	}
 

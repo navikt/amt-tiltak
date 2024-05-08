@@ -7,7 +7,6 @@ import no.nav.amt.tiltak.core.kafka.GjennomforingIngestor
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.TiltakService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -19,7 +18,6 @@ class GjennomforingIngestorImpl(
 	private val gjennomforingService: GjennomforingService,
 	private val deltakerService: DeltakerService,
 	private val tiltakService: TiltakService,
-	private val navEnhetService: NavEnhetService,
 	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
 ): GjennomforingIngestor {
 
@@ -65,8 +63,6 @@ class GjennomforingIngestorImpl(
 			gjennomforing.tiltakstype.arenaKode
 		)
 
-		val navEnhet = arenaData.ansvarligNavEnhetId?.let { navEnhetService.getNavEnhet(it) }
-
 		gjennomforingService.upsert(
 			GjennomforingUpsert(
 				id = gjennomforing.id,
@@ -76,7 +72,6 @@ class GjennomforingIngestorImpl(
 				status = GjennomforingStatusConverter.convert(gjennomforing.status.name),
 				startDato = gjennomforing.startDato,
 				sluttDato = gjennomforing.sluttDato,
-				navEnhetId = navEnhet?.id,
 				lopenr = arenaData.lopenr,
 				opprettetAar = arenaData.opprettetAar,
 				erKurs = gjennomforing.erKurs()

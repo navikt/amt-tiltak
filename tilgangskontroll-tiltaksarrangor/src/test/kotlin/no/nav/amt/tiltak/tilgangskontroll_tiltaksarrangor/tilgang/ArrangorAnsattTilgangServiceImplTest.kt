@@ -83,7 +83,6 @@ class ArrangorAnsattTilgangServiceImplTest {
 		status = Gjennomforing.Status.GJENNOMFORES,
 		startDato = null,
 		sluttDato = null,
-		navEnhetId = null,
 		opprettetAar = 2022,
 		lopenr = 3837,
 		erKurs = false

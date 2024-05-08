@@ -10,7 +10,6 @@ import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
@@ -26,7 +25,6 @@ class DeltakerProcessor(
 	private val deltakerService: DeltakerService,
 	private val arrangorService: ArrangorService,
 	private val tiltakService: TiltakService,
-	private val navEnhetService: NavEnhetService,
 	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
 	private val transactionTemplate: TransactionTemplate
 ) : GenericProcessor<DeltakerPayload>() {
@@ -86,19 +84,13 @@ class DeltakerProcessor(
 		val gjennomforingArenaData = mulighetsrommetApiClient.hentGjennomforingArenaData(gjennomforingId)
 			?: throw IllegalStateException("Lagrer ikke gjennomføring med id ${gjennomforing.id} som er opprettet utenfor Arena")
 
-		if (gjennomforingArenaData.virksomhetsnummer == null) {
-			throw IllegalStateException("Lagrer ikke gjennomføring med id ${gjennomforing.id} og tiltakstype ${gjennomforing.tiltakstype.arenaKode} fordi virksomhetsnummer mangler.")
-		}
-
-		val arrangor = arrangorService.upsertArrangor(gjennomforingArenaData.virksomhetsnummer!!)
+		val arrangor = arrangorService.upsertArrangor(gjennomforing.virksomhetsnummer)
 
 		val tiltak = tiltakService.upsertTiltak(
 			gjennomforing.tiltakstype.id,
 			gjennomforing.tiltakstype.navn,
 			gjennomforing.tiltakstype.arenaKode
 		)
-
-		val navEnhet = gjennomforingArenaData.ansvarligNavEnhetId?.let { navEnhetService.getNavEnhet(it) }
 
 		gjennomforingService.upsert(
 			GjennomforingUpsert(
@@ -109,7 +101,6 @@ class DeltakerProcessor(
 				status = GjennomforingStatusConverter.convert(gjennomforing.status.name),
 				startDato = gjennomforing.startDato,
 				sluttDato = gjennomforing.sluttDato,
-				navEnhetId = navEnhet?.id,
 				lopenr = gjennomforingArenaData.lopenr,
 				opprettetAar = gjennomforingArenaData.opprettetAar,
 				erKurs = gjennomforing.erKurs()

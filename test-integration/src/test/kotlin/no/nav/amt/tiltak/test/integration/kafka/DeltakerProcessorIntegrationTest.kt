@@ -222,10 +222,7 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 
 		val gjennomforingArenaData = GjennomforingArenaData(
 			opprettetAar = 2022,
-			lopenr = 123,
-			virksomhetsnummer = arrangor.organisasjonsnummer,
-			ansvarligNavEnhetId = "58749854",
-			status = "GJENNOMFOR",
+			lopenr = 123
 		)
 
 		val gjennomforingMessage =
@@ -236,8 +233,6 @@ class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
 
 		mockArrangorServer.addArrangorResponse(arrangor)
 		mockArrangorServer.addArrangorResponse(overordnetArrangor)
-
-		mockAmtPersonHttpServer.addNavEnhetResponse(gjennomforingArenaData.ansvarligNavEnhetId!!, "navEnhetNavn")
 
 		kafkaMessageSender.sendTilSisteTiltaksgjennomforingTopic(jsonObjekt)
 
