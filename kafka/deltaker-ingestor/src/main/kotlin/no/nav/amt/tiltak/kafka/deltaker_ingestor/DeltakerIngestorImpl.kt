@@ -12,7 +12,6 @@ import no.nav.amt.tiltak.core.kafka.DeltakerIngestor
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
-import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.kafka.tiltaksgjennomforing_ingestor.GjennomforingStatusConverter
 import no.nav.common.utils.EnvironmentUtils
@@ -27,7 +26,6 @@ class DeltakerIngestorImpl(
 	private val gjennomforingService: GjennomforingService,
 	private val arrangorService: ArrangorService,
 	private val tiltakService: TiltakService,
-	private val navEnhetService: NavEnhetService,
 	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
 	private val transactionTemplate: TransactionTemplate,
 	private val unleashClient: Unleash
@@ -104,19 +102,13 @@ class DeltakerIngestorImpl(
 		val gjennomforingArenaData = mulighetsrommetApiClient.hentGjennomforingArenaData(gjennomforingId)
 			?: throw IllegalStateException("Lagrer ikke gjennomføring med id ${gjennomforing.id} som er opprettet utenfor Arena")
 
-		if (gjennomforingArenaData.virksomhetsnummer == null) {
-			throw IllegalStateException("Lagrer ikke gjennomføring med id ${gjennomforing.id} og tiltakstype ${gjennomforing.tiltakstype.arenaKode} fordi virksomhetsnummer mangler.")
-		}
-
-		val arrangor = arrangorService.upsertArrangor(gjennomforingArenaData.virksomhetsnummer!!)
+		val arrangor = arrangorService.upsertArrangor(gjennomforing.virksomhetsnummer)
 
 		val tiltak = tiltakService.upsertTiltak(
 			gjennomforing.tiltakstype.id,
 			gjennomforing.tiltakstype.navn,
 			gjennomforing.tiltakstype.arenaKode
 		)
-
-		val navEnhet = gjennomforingArenaData.ansvarligNavEnhetId?.let { navEnhetService.getNavEnhet(it) }
 
 		gjennomforingService.upsert(
 			GjennomforingUpsert(
@@ -127,7 +119,7 @@ class DeltakerIngestorImpl(
 				status = GjennomforingStatusConverter.convert(gjennomforing.status.name),
 				startDato = gjennomforing.startDato,
 				sluttDato = gjennomforing.sluttDato,
-				navEnhetId = navEnhet?.id,
+				navEnhetId = null,// brukes ikke til noe lenger
 				lopenr = gjennomforingArenaData.lopenr,
 				opprettetAar = gjennomforingArenaData.opprettetAar,
 				erKurs = gjennomforing.erKurs()

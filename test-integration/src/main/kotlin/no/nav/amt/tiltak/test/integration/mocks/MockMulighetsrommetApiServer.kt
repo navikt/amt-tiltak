@@ -16,15 +16,10 @@ class MockMulighetsrommetApiServer : MockHttpServer(name = "MockMulighetsrommetA
 			val response = MockResponse().setResponseCode(200)
 			addResponseHandler("/api/v1/tiltaksgjennomforinger/arenadata/${id}", response)
 		} else {
-			val virksomhetsnummer =
-				if (arenaDataResponse.virksomhetsnummer == null) "null" else "\"${arenaDataResponse.virksomhetsnummer}\""
 			val body = """
 			{
 				"opprettetAar": ${arenaDataResponse.opprettetAar},
-				"lopenr": ${arenaDataResponse.lopenr},
-				"virksomhetsnummer": $virksomhetsnummer,
-				"ansvarligNavEnhetId": "${arenaDataResponse.ansvarligNavEnhetId}",
-				"status": "${arenaDataResponse.status}"
+				"lopenr": ${arenaDataResponse.lopenr}
 			}
 		""".trimIndent()
 
