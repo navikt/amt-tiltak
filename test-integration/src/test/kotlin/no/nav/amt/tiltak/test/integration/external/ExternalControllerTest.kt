@@ -1,10 +1,14 @@
 package no.nav.amt.tiltak.test.integration.external
 
 import io.kotest.matchers.shouldBe
+import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
+import no.nav.amt.tiltak.external.api.dto.HarAktiveDeltakelserResponse
+import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.UUID
 
 
 class ExternalControllerTest: IntegrationTestBase() {
@@ -12,6 +16,11 @@ class ExternalControllerTest: IntegrationTestBase() {
 	val getAzureAdM2MToken = { mapOf("Authorization" to "Bearer ${mockOAuthServer.issueAzureAdM2MToken()}") }
 	val getAzureAToken = { mapOf("Authorization" to "Bearer ${mockOAuthServer.issueAzureAdToken(ident = "", oid = UUID.randomUUID())}") }
 
+	@BeforeEach
+	fun setup() {
+		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		resetMockServersAndAddDefaultData()
+	}
 
 	@Test
 	fun `hentMineDeltakelser - mangler token - returnerer 401`() {
@@ -66,5 +75,29 @@ class ExternalControllerTest: IntegrationTestBase() {
 		)
 
 		response.code shouldBe 401
+	}
+
+	@Test
+	fun `harAktiveDeltakelser - mangler token - returnerer 401`() {
+		val response = sendRequest(
+			method = "POST",
+			body = """{"personIdent": "${TestData.BRUKER_1.personIdent}"}""".toJsonRequestBody(),
+			url = "/api/external/aktiv-deltaker",
+		)
+
+		response.code shouldBe 401
+	}
+
+	@Test
+	fun `harAktiveDeltakelser - gyldig m2m token - returnerer 200`() {
+		val response = sendRequest(
+			method = "POST",
+			body = """{"personIdent": "${TestData.BRUKER_1.personIdent}"}""".toJsonRequestBody(),
+			url = "/api/external/aktiv-deltaker",
+			headers =  getAzureAdM2MToken()
+		)
+
+		response.code shouldBe 200
+		fromJsonString<HarAktiveDeltakelserResponse>(response.body?.string()!!).harAktiveDeltakelser shouldBe true
 	}
 }
