@@ -53,6 +53,9 @@ spec:
           namespace: tpts
         - application: tilleggsstonader-integrasjoner
           namespace: tilleggsstonader
+        - application: veilarboppfolging
+          namespace: pto
+          cluster: dev-fss
     outbound:
       rules:
         - application: amt-person-service
