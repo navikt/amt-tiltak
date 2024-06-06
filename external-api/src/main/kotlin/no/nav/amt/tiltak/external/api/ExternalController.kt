@@ -9,6 +9,7 @@ import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.external.api.dto.ArrangorDto
 import no.nav.amt.tiltak.external.api.dto.DeltakerDto
 import no.nav.amt.tiltak.external.api.dto.GjennomforingDto
+import no.nav.amt.tiltak.external.api.dto.HarAktiveDeltakelserResponse
 import no.nav.amt.tiltak.external.api.dto.toDto
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.GetMapping
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.*
 
 @RestController
 @RequestMapping("/api/external")
@@ -40,11 +40,26 @@ class ExternalController(
 		return hentDeltakelser(body.personIdent)
 	}
 
+	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
+	@PostMapping("/aktiv-deltaker")
+	fun harAktiveDeltakelser(@RequestBody body: HentDeltakelserRequest): HarAktiveDeltakelserResponse {
+		authService.validerErM2MToken()
+		val harAktiveDeltakelser = harAktiveDeltakelser(hentDeltakelser(body.personIdent))
+		return HarAktiveDeltakelserResponse(harAktiveDeltakelser)
+	}
+
 	private fun hentDeltakelser(personIdent: String): List<DeltakerDto> {
 		return deltakerService.hentDeltakereMedPersonIdent(personIdent)
 			.map {
 					deltaker -> deltaker.toDto(gjennomforingService.getGjennomforing(deltaker.gjennomforingId))
 			}
+	}
+
+	private fun harAktiveDeltakelser(deltakelser: List<DeltakerDto>): Boolean {
+		if (deltakelser.isEmpty()) {
+			return false
+		}
+		return deltakelser.find { it.erAktiv() } != null
 	}
 }
 
