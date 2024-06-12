@@ -250,6 +250,32 @@ class DeltakerServiceImplTest {
 	}
 
 	@Test
+	fun `avsluttDeltakerePaaAvbruttGjennomforing - Avslutter aktive deltakere deltakere pa avbrutt gjennomforing med sluttarsak`() {
+		testDataRepository.insertArrangor(ARRANGOR_2)
+		testDataRepository.insertNavEnhet(NAV_ENHET_2)
+		testDataRepository.insertGjennomforing(GJENNOMFORING_2)
+		testDataRepository.insertDeltaker(DELTAKER_1.copy(gjennomforingId = GJENNOMFORING_2.id))
+		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1)
+
+		every {
+			gjennomforingService.getGjennomforinger(any())
+		} returns listOf(GJENNOMFORING_2.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor()))
+
+		// Valider testdata tilstand
+		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
+		GJENNOMFORING_2.status shouldBe Gjennomforing.Status.AVSLUTTET.name
+		forrigeStatus!!.type shouldBe DeltakerStatus.Type.DELTAR
+
+		deltakerServiceImpl.avsluttDeltakerePaaAvbruttGjennomforing(GJENNOMFORING_2.id)
+
+		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
+
+		status!!.type shouldBe DeltakerStatus.Type.HAR_SLUTTET
+		status.aarsak shouldBe DeltakerStatus.Aarsak.SAMARBEIDET_MED_ARRANGOREN_ER_AVBRUTT
+		verify(exactly = 1) { publisherService.publish(DELTAKER_1.id, DataPublishType.DELTAKER) }
+	}
+
+	@Test
 	fun `upsertDeltaker - inserter ny deltaker`() {
 		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
 

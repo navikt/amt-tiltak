@@ -77,7 +77,9 @@ class GjennomforingIngestorImpl(
 				erKurs = gjennomforing.erKurs()
 			)
 		)
-
+		if (gjennomforing.status == GjennomforingMessage.Status.AVLYST || gjennomforing.status == GjennomforingMessage.Status.AVBRUTT) {
+			deltakerService.avsluttDeltakerePaaAvbruttGjennomforing(gjennomforing.id)
+		}
 		log.info("Fullført upsert av gjennomføring id=${gjennomforing.id} arrangorId=${arrangor.id}")
 	}
 }
