@@ -8,6 +8,8 @@ import no.nav.amt.tiltak.bff.nav_ansatt.dto.TiltakDto
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.VurderingDto
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.toDto
 import no.nav.amt.tiltak.bff.nav_ansatt.response.MeldingerFraArrangorResponse
+import no.nav.amt.tiltak.common.auth.AdGruppe
+import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
@@ -30,22 +32,33 @@ class NavAnsattControllerService(
 ) {
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	fun hentEndringsmeldinger(gjennomforingId: UUID, tilgangTilSkjermede: Boolean): List<EndringsmeldingDto> {
-		val endringsmeldinger = hentEndringsmeldingerForGjennomforing(gjennomforingId)
-		val deltakerMap = deltakerService.hentDeltakerMap(endringsmeldinger.map { it.deltakerId }).filterValues { !it.harAdressebeskyttelse() }
-
-		return endringsmeldinger.mapNotNull { endringsmelding ->
-			val deltaker = getDeltaker(endringsmelding.deltakerId, deltakerMap) ?: return@mapNotNull null
-
-			if(deltaker.erSkjermet && !tilgangTilSkjermede) {
-				return@mapNotNull endringsmelding.toDto(DeltakerDto(erSkjermet = true))
+	companion object {
+		fun harTilgangTilDeltaker(deltaker: Deltaker, tilganger: List<AdGruppe>): Boolean {
+			val tilgangTilMuligAdressebeskyttetDeltaker = when (deltaker.adressebeskyttelse) {
+				Adressebeskyttelse.STRENGT_FORTROLIG_UTLAND,
+				Adressebeskyttelse.STRENGT_FORTROLIG -> tilganger.contains(AdGruppe.TILTAKSANSVARLIG_STRENGT_FORTROLIG_ADRESSE_GRUPPE)
+				Adressebeskyttelse.FORTROLIG -> tilganger.contains(AdGruppe.TILTAKSANSVARLIG_FORTROLIG_ADRESSE_GRUPPE)
+				null -> true
 			}
 
-			return@mapNotNull endringsmelding.toDto(deltaker.toDto())
+			val tilgangTilMuligSkjermetDeltaker = if (deltaker.erSkjermet) {
+				tilganger.contains(AdGruppe.TILTAKSANSVARLIG_EGNE_ANSATTE_GRUPPE)
+			} else {
+				true
+			}
+
+			return tilgangTilMuligAdressebeskyttetDeltaker && tilgangTilMuligSkjermetDeltaker
 		}
 	}
 
-	fun hentMeldinger(gjennomforingId: UUID, tilgangTilSkjermede: Boolean): MeldingerFraArrangorResponse {
+	fun hentEndringsmeldinger(gjennomforingId: UUID, tilganger: List<AdGruppe>): List<EndringsmeldingDto> {
+		val endringsmeldinger = hentEndringsmeldingerForGjennomforing(gjennomforingId)
+		val deltakerMap = deltakerService.hentDeltakerMap(endringsmeldinger.map { it.deltakerId }).filterValues { !it.harAdressebeskyttelse() }
+
+		return endringsmeldinger.mapNotNull { endringsmelding -> tilEndringsmeldingDto(endringsmelding, deltakerMap, tilganger) }
+	}
+
+	fun hentMeldinger(gjennomforingId: UUID, tilganger: List<AdGruppe>): MeldingerFraArrangorResponse {
 		val alleEndringsmeldinger = hentEndringsmeldingerForGjennomforing(gjennomforingId)
 		val alleVurderinger = vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId)
 
@@ -56,23 +69,11 @@ class NavAnsattControllerService(
 		val deltakerMap = deltakerService.hentDeltakerMap(deltakerIder.distinct()).filterValues { !it.harAdressebeskyttelse() }
 
 		val endringsmeldinger = alleEndringsmeldinger.mapNotNull { endringsmelding ->
-			val deltaker = getDeltaker(endringsmelding.deltakerId, deltakerMap) ?: return@mapNotNull null
-
-			if(deltaker.erSkjermet && !tilgangTilSkjermede) {
-				return@mapNotNull endringsmelding.toDto(DeltakerDto(erSkjermet = true))
-			}
-
-			return@mapNotNull endringsmelding.toDto(deltaker.toDto())
+			tilEndringsmeldingDto(endringsmelding, deltakerMap, tilganger)
 		}
 
 		val vurderinger = alleVurderinger.mapNotNull { vurdering ->
-			val deltaker = getDeltaker(vurdering.deltakerId, deltakerMap) ?: return@mapNotNull null
-
-			if(deltaker.erSkjermet && !tilgangTilSkjermede) {
-				return@mapNotNull vurdering.toDto(DeltakerDto(erSkjermet = true))
-			}
-
-			return@mapNotNull vurdering.toDto(deltaker.toDto())
+			tilVurderingDto(vurdering, deltakerMap, tilganger)
 		}
 		return MeldingerFraArrangorResponse(endringsmeldinger, vurderinger)
 	}
@@ -97,6 +98,36 @@ class NavAnsattControllerService(
 		}
 		return endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId)
 	}
+
+	private fun tilEndringsmeldingDto(
+		endringsmelding: Endringsmelding,
+		deltakerMap: Map<UUID, Deltaker>,
+		tilganger: List<AdGruppe>,
+	): EndringsmeldingDto? {
+		val deltaker = getDeltaker(endringsmelding.deltakerId, deltakerMap) ?: return null
+
+		return if (harTilgangTilDeltaker(deltaker, tilganger)) {
+			endringsmelding.toDto(deltaker.toDto())
+		} else {
+			endringsmelding.toDto(DeltakerDto(erSkjermet = deltaker.erSkjermet, adressebeskyttelse = deltaker.adressebeskyttelse))
+		}
+	}
+
+
+	private fun tilVurderingDto(
+		vurdering: Vurdering,
+		deltakerMap: Map<UUID, Deltaker>,
+		tilganger: List<AdGruppe>,
+	): VurderingDto? {
+		val deltaker = getDeltaker(vurdering.deltakerId, deltakerMap) ?: return null
+
+		return if (harTilgangTilDeltaker(deltaker, tilganger)) {
+			vurdering.toDto(deltaker.toDto())
+		} else {
+			vurdering.toDto(DeltakerDto(erSkjermet = deltaker.erSkjermet, adressebeskyttelse = deltaker.adressebeskyttelse))
+		}
+	}
+
 
 	private fun getDeltaker(deltakerId: UUID, deltakerMap: Map<UUID, Deltaker>): Deltaker? {
 		deltakerMap[deltakerId]?.let { return it }
@@ -158,5 +189,6 @@ class NavAnsattControllerService(
 		etternavn = etternavn,
 		fodselsnummer = personIdent,
 		erSkjermet = erSkjermet,
+		adressebeskyttelse = adressebeskyttelse,
 	)
 }

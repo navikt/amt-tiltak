@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.DeltakerDto
+import no.nav.amt.tiltak.common.auth.AdGruppe
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
@@ -46,6 +47,9 @@ class NavAnsattControllerServiceTest {
 	)
 	private val navIdent = "z1232"
 
+	private val ingenTilganger = emptyList<AdGruppe>()
+	private val tilgangTilSkjermede = listOf(AdGruppe.TILTAKSANSVARLIG_EGNE_ANSATTE_GRUPPE)
+
 	@Test
 	fun `hentEndringsmeldinger - deltaker er ikke skjermet, nav ansatt har ikke tilgang til skjermede - returnerer umaskert bruker`() {
 		val gjennomforingId = GJENNOMFORING_1.id
@@ -66,7 +70,7 @@ class NavAnsattControllerServiceTest {
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { unleashClient.isEnabled(any()) } returns false
 
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, false)
+		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, ingenTilganger)
 
 		endringsmeldingerResult.size shouldBe 1
 		endringsmeldingerResult[0].deltaker shouldBe DeltakerDto(
@@ -74,7 +78,8 @@ class NavAnsattControllerServiceTest {
 			mellomnavn = BRUKER_1.mellomnavn,
 			etternavn = BRUKER_1.etternavn,
 			fodselsnummer = BRUKER_1.personIdent,
-			erSkjermet = BRUKER_1.erSkjermet
+			erSkjermet = BRUKER_1.erSkjermet,
+			adressebeskyttelse = BRUKER_1.adressebeskyttelse,
 		)
 	}
 
@@ -101,15 +106,16 @@ class NavAnsattControllerServiceTest {
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
 		every { unleashClient.isEnabled(any()) } returns false
 
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, false)
+		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, ingenTilganger)
 
 		endringsmeldingerResult.size shouldBe 1
-		endringsmeldingerResult.get(0).deltaker shouldBe DeltakerDto(
+		endringsmeldingerResult[0].deltaker shouldBe DeltakerDto(
 			fornavn = null,
 			mellomnavn = null,
 			etternavn = null,
 			fodselsnummer = null,
-			erSkjermet = BRUKER_SKJERMET.erSkjermet
+			erSkjermet = BRUKER_SKJERMET.erSkjermet,
+			adressebeskyttelse = BRUKER_SKJERMET.adressebeskyttelse,
 		)
 	}
 
@@ -136,7 +142,7 @@ class NavAnsattControllerServiceTest {
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
 		every { unleashClient.isEnabled(any()) } returns false
 
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, true)
+		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilSkjermede)
 
 		endringsmeldingerResult.size shouldBe 1
 		endringsmeldingerResult.get(0).deltaker shouldBe DeltakerDto(
@@ -144,7 +150,9 @@ class NavAnsattControllerServiceTest {
 			mellomnavn = BRUKER_SKJERMET.mellomnavn,
 			etternavn = BRUKER_SKJERMET.etternavn,
 			fodselsnummer = BRUKER_SKJERMET.personIdent,
-			erSkjermet = BRUKER_SKJERMET.erSkjermet
+			erSkjermet = BRUKER_SKJERMET.erSkjermet,
+			adressebeskyttelse = BRUKER_SKJERMET.adressebeskyttelse,
+
 		)
 	}
 
@@ -171,7 +179,7 @@ class NavAnsattControllerServiceTest {
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
 		every { unleashClient.isEnabled(any()) } returns false
 
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, false)
+		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, ingenTilganger)
 
 		endringsmeldingerResult.size shouldBe 0
 	}
@@ -210,10 +218,11 @@ class NavAnsattControllerServiceTest {
 			mellomnavn = BRUKER_1.mellomnavn,
 			etternavn = BRUKER_1.etternavn,
 			fodselsnummer = BRUKER_1.personIdent,
-			erSkjermet = BRUKER_1.erSkjermet
+			erSkjermet = BRUKER_1.erSkjermet,
+			adressebeskyttelse = BRUKER_1.adressebeskyttelse
 		)
 
-		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, false)
+		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, ingenTilganger)
 
 		meldingerFraArrangorResponse.endringsmeldinger.size shouldBe 1
 		meldingerFraArrangorResponse.endringsmeldinger[0].deltaker shouldBe forventetDeltaker
@@ -259,10 +268,11 @@ class NavAnsattControllerServiceTest {
 			mellomnavn = null,
 			etternavn = null,
 			fodselsnummer = null,
-			erSkjermet = BRUKER_SKJERMET.erSkjermet
+			erSkjermet = BRUKER_SKJERMET.erSkjermet,
+			adressebeskyttelse = BRUKER_SKJERMET.adressebeskyttelse,
 		)
 
-		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, false)
+		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, ingenTilganger)
 
 		meldingerFraArrangorResponse.endringsmeldinger.size shouldBe 1
 		meldingerFraArrangorResponse.endringsmeldinger[0].deltaker shouldBe forventetDeltaker
@@ -308,10 +318,11 @@ class NavAnsattControllerServiceTest {
 			mellomnavn = BRUKER_SKJERMET.mellomnavn,
 			etternavn = BRUKER_SKJERMET.etternavn,
 			fodselsnummer = BRUKER_SKJERMET.personIdent,
-			erSkjermet = BRUKER_SKJERMET.erSkjermet
+			erSkjermet = BRUKER_SKJERMET.erSkjermet,
+			adressebeskyttelse = BRUKER_SKJERMET.adressebeskyttelse,
 		)
 
-		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, true)
+		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilSkjermede)
 
 		meldingerFraArrangorResponse.endringsmeldinger.size shouldBe 1
 		meldingerFraArrangorResponse.endringsmeldinger[0].deltaker shouldBe forventetDeltaker
@@ -351,7 +362,7 @@ class NavAnsattControllerServiceTest {
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { unleashClient.isEnabled(any()) } returns false
 
-		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, false)
+		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, ingenTilganger)
 
 		meldingerFraArrangorResponse.endringsmeldinger.size shouldBe 0
 	}
@@ -382,7 +393,7 @@ class NavAnsattControllerServiceTest {
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
 		every { unleashClient.isEnabled(any()) } returns true
 
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, false)
+		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, ingenTilganger)
 
 		endringsmeldingerResult.size shouldBe 0
 	}

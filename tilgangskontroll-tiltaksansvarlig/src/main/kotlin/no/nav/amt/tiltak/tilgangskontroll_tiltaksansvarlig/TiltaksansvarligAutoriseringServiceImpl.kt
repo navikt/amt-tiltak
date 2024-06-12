@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig
 
+import no.nav.amt.tiltak.common.auth.AdGruppe
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
@@ -23,7 +24,7 @@ class TiltaksansvarligAutoriseringServiceImpl(
 			secureLog.warn(
 				"""
 					$navAnsattAzureId har ikke tilgang til tiltaksansvarlig flate. Er ikke medlem av
-					${AuthService.AdGruppe.TILTAKSANSVARLIG_FLATE_GRUPPE.name}
+					${AdGruppe.TILTAKSANSVARLIG_FLATE_GRUPPE.name}
 				""".trimIndent()
 			)
 
@@ -38,7 +39,7 @@ class TiltaksansvarligAutoriseringServiceImpl(
 			secureLog.warn(
 				"""
 					$navAnsattAzureId har ikke tilgang til endringsmeldinger. Er ikke medlem av
-					${AuthService.AdGruppe.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE.name}
+					${AdGruppe.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE.name}
 				""".trimIndent()
 			)
 

@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.bff.nav_ansatt
 
+import no.nav.amt.tiltak.common.auth.AdGruppe
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.common.auth.Issuer
 import no.nav.amt.tiltak.core.port.NavAnsattService
@@ -26,17 +27,18 @@ open class AutentiseringController(
 			navIdent = veileder.navIdent,
 			navn = veileder.navn,
 			tilganger = adGrupper
-				.mapNotNull(this::mapAdGruppeTilTilgang)
+				.map(this::mapAdGruppeTilTilgang)
 				.toSet()
 		)
 	}
 
-	private fun mapAdGruppeTilTilgang(adGruppe: AuthService.AdGruppe): Tilgang? {
+	private fun mapAdGruppeTilTilgang(adGruppe: AdGruppe): Tilgang {
 		return when(adGruppe) {
-			AuthService.AdGruppe.TILTAKSANSVARLIG_FLATE_GRUPPE -> Tilgang.FLATE
-			AuthService.AdGruppe.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE -> Tilgang.ENDRINGSMELDING
-			AuthService.AdGruppe.TILTAKSANSVARLIG_EGNE_ANSATTE_GRUPPE -> Tilgang.EGNE_ANSATTE
-			else -> null
+			AdGruppe.TILTAKSANSVARLIG_FLATE_GRUPPE -> Tilgang.FLATE
+			AdGruppe.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE -> Tilgang.ENDRINGSMELDING
+			AdGruppe.TILTAKSANSVARLIG_EGNE_ANSATTE_GRUPPE -> Tilgang.EGNE_ANSATTE
+			AdGruppe.TILTAKSANSVARLIG_FORTROLIG_ADRESSE_GRUPPE -> Tilgang.FORTROLIG_ADRESSE
+			AdGruppe.TILTAKSANSVARLIG_STRENGT_FORTROLIG_ADRESSE_GRUPPE -> Tilgang.STRENGT_FORTROLIG_ADRESSE
 		}
 	}
 
@@ -50,6 +52,8 @@ open class AutentiseringController(
 		FLATE,
 		ENDRINGSMELDING,
 		EGNE_ANSATTE,
+		FORTROLIG_ADRESSE,
+		STRENGT_FORTROLIG_ADRESSE,
 	}
 
 }

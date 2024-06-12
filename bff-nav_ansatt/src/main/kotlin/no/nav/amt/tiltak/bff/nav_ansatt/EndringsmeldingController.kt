@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.bff.nav_ansatt
 
+import no.nav.amt.tiltak.bff.nav_ansatt.NavAnsattControllerService.Companion.harTilgangTilDeltaker
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.bff.nav_ansatt.response.MeldingerFraArrangorResponse
 import no.nav.amt.tiltak.common.auth.AuthService
@@ -30,12 +31,12 @@ class EndringsmeldingController(
 	fun hentEndringsmeldinger(@RequestParam("gjennomforingId") gjennomforingId: UUID): List<EndringsmeldingDto> {
 		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-		val tilgangTilSkjermede = authService.harTilgangTilSkjermedePersoner()
+		val tilganger = authService.hentAdGrupperTilInnloggetBruker()
 
 		tiltaksansvarligAuthService.verifiserTilgangTilEndringsmelding(navAnsattAzureId)
 		tiltaksansvarligAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId)
 
-		return controllerService.hentEndringsmeldinger(gjennomforingId, tilgangTilSkjermede)
+		return controllerService.hentEndringsmeldinger(gjennomforingId, tilganger)
 	}
 
 	@GetMapping("/meldinger")
@@ -43,12 +44,12 @@ class EndringsmeldingController(
 	fun hentMeldingerFraArrangor(@RequestParam("gjennomforingId") gjennomforingId: UUID): MeldingerFraArrangorResponse {
 		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-		val tilgangTilSkjermede = authService.harTilgangTilSkjermedePersoner()
+		val tilganger = authService.hentAdGrupperTilInnloggetBruker()
 
 		tiltaksansvarligAuthService.verifiserTilgangTilEndringsmelding(navAnsattAzureId)
 		tiltaksansvarligAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId)
 
-		return controllerService.hentMeldinger(gjennomforingId, tilgangTilSkjermede)
+		return controllerService.hentMeldinger(gjennomforingId, tilganger)
 	}
 
 	@PatchMapping("/endringsmelding/{endringsmeldingId}/ferdig")
@@ -56,7 +57,7 @@ class EndringsmeldingController(
 	fun markerFerdig(@PathVariable("endringsmeldingId") endringsmeldingId: UUID) {
 		val navAnsattAzureId = authService.hentAzureIdTilInnloggetBruker()
 		val navIdent = authService.hentNavIdentTilInnloggetBruker()
-		val tilgangTilSkjermede = authService.harTilgangTilSkjermedePersoner()
+		val tilganger = authService.hentAdGrupperTilInnloggetBruker()
 		val endringsmelding = endringsmeldingService.hentEndringsmelding(endringsmeldingId)
 
 		val deltaker = deltakerService.hentDeltaker(endringsmelding.deltakerId)
@@ -66,16 +67,14 @@ class EndringsmeldingController(
 		tiltaksansvarligAuthService.verifiserTilgangTilGjennomforing(navIdent, deltaker.gjennomforingId)
 		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 
-		if (!tilgangTilSkjermede && deltaker.erSkjermet) {
-			secureLog.error("nav ansatt: <${navAnsatt}> kan ikke arkivere endringsmelding på skjermet person")
-			throw UnauthorizedException("Har ikke tilgang til operasjon på skjermet person. Sjekk secure logs")
+		if (harTilgangTilDeltaker(deltaker, tilganger)) {
+			endringsmeldingService.markerSomUtfort(endringsmeldingId, navAnsatt.id)
+		} else {
+			secureLog.error(
+				"nav ansatt: <${navAnsatt}> kan ikke arkivere endringsmelding på person " +
+					"hvor skjermet = ${deltaker.erSkjermet} eller adressebeskyttelse = ${deltaker.harAdressebeskyttelse()}"
+			)
+			throw UnauthorizedException("Har ikke tilgang til operasjon på skjermet eller adressebeskyttet person. Sjekk secure logs")
 		}
-
-		if (deltaker.harAdressebeskyttelse()) {
-			secureLog.error("nav ansatt: <${navAnsatt}> kan ikke arkivere endringsmelding på adressebeskyttet person")
-			throw UnauthorizedException("Har ikke tilgang til operasjon på adressebeskyttet person. Sjekk secure logs")
-		}
-
-		endringsmeldingService.markerSomUtfort(endringsmeldingId, navAnsatt.id)
 	}
 }

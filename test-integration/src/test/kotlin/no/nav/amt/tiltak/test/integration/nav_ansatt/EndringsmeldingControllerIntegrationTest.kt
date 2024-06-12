@@ -87,7 +87,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-				[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":null,"mellomnavn":null,"etternavn":null,"fodselsnummer":null,"erSkjermet":true},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","utfortTidspunkt":null,"type":"LEGG_TIL_OPPSTARTSDATO"}]
+				[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":null,"mellomnavn":null,"etternavn":null,"fodselsnummer":null,"erSkjermet":true,"adressebeskyttelse":null},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","utfortTidspunkt":null,"type":"LEGG_TIL_OPPSTARTSDATO"}]
 			""".trimIndent()
 
 		response.code shouldBe 200
@@ -119,7 +119,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-				[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":"Skjermet bruker fornavn","mellomnavn":null,"etternavn":"Skjermet bruker etternavn","fodselsnummer":"10101010101","erSkjermet":true},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","utfortTidspunkt":null,"type":"LEGG_TIL_OPPSTARTSDATO"}]
+				[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":"Skjermet bruker fornavn","mellomnavn":null,"etternavn":"Skjermet bruker etternavn","fodselsnummer":"10101010101","erSkjermet":true,"adressebeskyttelse":null},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","utfortTidspunkt":null,"type":"LEGG_TIL_OPPSTARTSDATO"}]
 			""".trimIndent()
 
 		response.code shouldBe 200
@@ -165,7 +165,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-				{"endringsmeldinger":[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":null,"mellomnavn":null,"etternavn":null,"fodselsnummer":null,"erSkjermet":true},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","utfortTidspunkt":null,"type":"LEGG_TIL_OPPSTARTSDATO"}],"vurderinger":[{"id":"866a387f-87d1-4623-8010-32fcdea5464e","deltaker":{"fornavn":null,"mellomnavn":null,"etternavn":null,"fodselsnummer":null,"erSkjermet":true},"vurderingstype":"OPPFYLLER_KRAVENE","begrunnelse":null,"opprettetDato":"2022-11-08T15:00:00"}]}
+				{"endringsmeldinger":[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":null,"mellomnavn":null,"etternavn":null,"fodselsnummer":null,"erSkjermet":true,"adressebeskyttelse":null},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","utfortTidspunkt":null,"type":"LEGG_TIL_OPPSTARTSDATO"}],"vurderinger":[{"id":"866a387f-87d1-4623-8010-32fcdea5464e","deltaker":{"fornavn":null,"mellomnavn":null,"etternavn":null,"fodselsnummer":null,"erSkjermet":true,"adressebeskyttelse":null},"vurderingstype":"OPPFYLLER_KRAVENE","begrunnelse":null,"opprettetDato":"2022-11-08T15:00:00"}]}
 			""".trimIndent()
 
 		response.code shouldBe 200
@@ -198,7 +198,7 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-				{"endringsmeldinger":[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":"Skjermet bruker fornavn","mellomnavn":null,"etternavn":"Skjermet bruker etternavn","fodselsnummer":"10101010101","erSkjermet":true},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","utfortTidspunkt":null,"type":"LEGG_TIL_OPPSTARTSDATO"}],"vurderinger":[{"id":"866a387f-87d1-4623-8010-32fcdea5464e","deltaker":{"fornavn":"Skjermet bruker fornavn","mellomnavn":null,"etternavn":"Skjermet bruker etternavn","fodselsnummer":"10101010101","erSkjermet":true},"vurderingstype":"OPPFYLLER_KRAVENE","begrunnelse":null,"opprettetDato":"2022-11-08T15:00:00"}]}
+				{"endringsmeldinger":[{"id":"${endringsmeldingInput.id}","deltaker":{"fornavn":"Skjermet bruker fornavn","mellomnavn":null,"etternavn":"Skjermet bruker etternavn","fodselsnummer":"10101010101","erSkjermet":true,"adressebeskyttelse":null},"innhold":{"oppstartsdato":"2022-11-09"},"status":"AKTIV","opprettetDato":"2022-11-08T16:00:00+01:00","utfortTidspunkt":null,"type":"LEGG_TIL_OPPSTARTSDATO"}],"vurderinger":[{"id":"866a387f-87d1-4623-8010-32fcdea5464e","deltaker":{"fornavn":"Skjermet bruker fornavn","mellomnavn":null,"etternavn":"Skjermet bruker etternavn","fodselsnummer":"10101010101","erSkjermet":true,"adressebeskyttelse":null},"vurderingstype":"OPPFYLLER_KRAVENE","begrunnelse":null,"opprettetDato":"2022-11-08T15:00:00"}]}
 			""".trimIndent()
 
 		response.code shouldBe 200

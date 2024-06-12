@@ -42,6 +42,8 @@ spec:
           - id: {{ad_gruppe_egne_ansatte}}
           - id: {{ad_gruppe_tiltak_ansvarlig}}
           - id: {{ad_gruppe_endringsmelding}}
+          - id: {{ad_gruppe_fortrolig_adresse}}
+          - id: {{ad_gruppe_strengt_fortrolig_adresse}}
   tokenx:
     enabled: true
   accessPolicy:
@@ -83,6 +85,10 @@ spec:
       value: {{ad_gruppe_tiltak_ansvarlig}}
     - name: AD_GRUPPE_ID_ENDRINGSMELDING
       value: {{ad_gruppe_endringsmelding}}
+    - name: AD_GRUPPE_ID_FORTROLIG_ADRESSE
+      value: {{ad_gruppe_fortrolig_adresse}}
+    - name: AD_GRUPPE_ID_STRENGT_FORTROLIG_ADRESSE
+      value: {{ad_gruppe_strengt_fortrolig_adresse}}
     - name: AMT_ARRANGOR_SCOPE
       value: api://prod-gcp.amt.amt-arrangor/.default
     - name: AMT_ARRANGOR_URL

@@ -21,6 +21,12 @@ open class AuthService(
 	@Value("\${ad_gruppe_endringsmelding}")
 	lateinit var endringsmeldingGroupId: String
 
+	@Value("\${ad_gruppe_fortrolig_adresse}")
+	lateinit var fortroligAdresseGroupId: String
+
+	@Value("\${ad_gruppe_strengt_fortrolig_adresse}")
+	lateinit var strengtFortroligAdresseGroupId: String
+
 	open fun hentPersonligIdentTilInnloggetBruker(): String {
 		val context = tokenValidationContextHolder.getTokenValidationContext()
 
@@ -38,8 +44,6 @@ open class AuthService(
 		.getClaims(Issuer.AZURE_AD)
 		.getStringClaim("NAVident")
 		?: throw NotAuthenticatedException("NAV ident is missing")
-
-	open fun harTilgangTilSkjermedePersoner() = harTilgangTilADGruppe(tilgangTilNavAnsattGroupId)
 
 	open fun harTilgangTilTiltaksansvarligflate() = harTilgangTilADGruppe(tiltakAnsvarligGroupId)
 
@@ -83,14 +87,10 @@ open class AuthService(
 			tiltakAnsvarligGroupId -> AdGruppe.TILTAKSANSVARLIG_FLATE_GRUPPE
 			endringsmeldingGroupId -> AdGruppe.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
 			tilgangTilNavAnsattGroupId -> AdGruppe.TILTAKSANSVARLIG_EGNE_ANSATTE_GRUPPE
+			fortroligAdresseGroupId -> AdGruppe.TILTAKSANSVARLIG_FORTROLIG_ADRESSE_GRUPPE
+			strengtFortroligAdresseGroupId -> AdGruppe.TILTAKSANSVARLIG_STRENGT_FORTROLIG_ADRESSE_GRUPPE
 			else -> null
 		}
-	}
-
-	enum class AdGruppe {
-		TILTAKSANSVARLIG_FLATE_GRUPPE,
-		TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE,
-		TILTAKSANSVARLIG_EGNE_ANSATTE_GRUPPE,
 	}
 
 }
