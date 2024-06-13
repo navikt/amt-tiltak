@@ -12,8 +12,8 @@ open class MockOAuthServer {
 	val tilgangTilNavAnsattGroupId = "egen_ansatt_tilgang_id"
 	val tiltakAnsvarligGroupId = "tiltak_ansvarlig_tilgang_id"
 	val endringsmeldingGroupId = "endringsmelding_tilgang_id"
-
-
+	val adressebeskyttelseFortroligGroupId = "ad_gruppe_fortrolig_adresse_id"
+	val adressebeskyttelseStrengtFortroligGroupId = "ad_gruppe_strengt_fortrolig_adresse_id"
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
