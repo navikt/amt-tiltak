@@ -4,7 +4,10 @@ import io.getunleash.Unleash
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.amt.tiltak.bff.nav_ansatt.NavAnsattControllerService.Companion.harTilgangTilDeltaker
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.DeltakerDto
+import no.nav.amt.tiltak.common.auth.AdGruppe
+import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
@@ -24,6 +27,7 @@ import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.TILTAK_1
 import no.nav.amt.tiltak.test.database.data.TestData.createDeltakerInput
 import no.nav.amt.tiltak.test.database.data.TestData.createStatusInput
+import no.nav.amt.tiltak.test.database.data.inputs.BrukerInput
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -46,6 +50,21 @@ class NavAnsattControllerServiceTest {
 	)
 	private val navIdent = "z1232"
 
+	private val tilgangTilLosning = listOf(
+		AdGruppe.TILTAKSANSVARLIG_FLATE_GRUPPE,
+		AdGruppe.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE
+	)
+	private val tilgangTilSkjermede = tilgangTilLosning.plus(AdGruppe.TILTAKSANSVARLIG_EGNE_ANSATTE_GRUPPE)
+	private val tilgangTilStrengtFortrolig = tilgangTilLosning.plus(AdGruppe.TILTAKSANSVARLIG_STRENGT_FORTROLIG_ADRESSE_GRUPPE)
+	private val tilgangTilFortrolig = tilgangTilLosning.plus(AdGruppe.TILTAKSANSVARLIG_FORTROLIG_ADRESSE_GRUPPE)
+	private val tilgangTilAlt = AdGruppe.entries.toList()
+
+	private val brukereMedAdressebeskyttelse = listOf(
+		BRUKER_ADRESSEBESKYTTET,
+		BRUKER_ADRESSEBESKYTTET.copy(adressebeskyttelse = Adressebeskyttelse.STRENGT_FORTROLIG_UTLAND),
+		BRUKER_ADRESSEBESKYTTET.copy(adressebeskyttelse = Adressebeskyttelse.FORTROLIG)
+	)
+
 	@Test
 	fun `hentEndringsmeldinger - deltaker er ikke skjermet, nav ansatt har ikke tilgang til skjermede - returnerer umaskert bruker`() {
 		val gjennomforingId = GJENNOMFORING_1.id
@@ -66,16 +85,10 @@ class NavAnsattControllerServiceTest {
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { unleashClient.isEnabled(any()) } returns false
 
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, false)
+		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
 
 		endringsmeldingerResult.size shouldBe 1
-		endringsmeldingerResult[0].deltaker shouldBe DeltakerDto(
-			fornavn = BRUKER_1.fornavn,
-			mellomnavn = BRUKER_1.mellomnavn,
-			etternavn = BRUKER_1.etternavn,
-			fodselsnummer = BRUKER_1.personIdent,
-			erSkjermet = BRUKER_1.erSkjermet
-		)
+		endringsmeldingerResult[0].deltaker shouldBe umaskertDeltakerDto(BRUKER_1)
 	}
 
 	@Test
@@ -101,16 +114,10 @@ class NavAnsattControllerServiceTest {
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
 		every { unleashClient.isEnabled(any()) } returns false
 
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, false)
+		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
 
 		endringsmeldingerResult.size shouldBe 1
-		endringsmeldingerResult.get(0).deltaker shouldBe DeltakerDto(
-			fornavn = null,
-			mellomnavn = null,
-			etternavn = null,
-			fodselsnummer = null,
-			erSkjermet = BRUKER_SKJERMET.erSkjermet
-		)
+		endringsmeldingerResult[0].deltaker shouldBe maskertDeltakerDto(BRUKER_SKJERMET)
 	}
 
 	@Test
@@ -136,44 +143,10 @@ class NavAnsattControllerServiceTest {
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
 		every { unleashClient.isEnabled(any()) } returns false
 
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, true)
+		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilSkjermede)
 
 		endringsmeldingerResult.size shouldBe 1
-		endringsmeldingerResult.get(0).deltaker shouldBe DeltakerDto(
-			fornavn = BRUKER_SKJERMET.fornavn,
-			mellomnavn = BRUKER_SKJERMET.mellomnavn,
-			etternavn = BRUKER_SKJERMET.etternavn,
-			fodselsnummer = BRUKER_SKJERMET.personIdent,
-			erSkjermet = BRUKER_SKJERMET.erSkjermet
-		)
-	}
-
-	@Test
-	fun `hentEndringsmeldinger - adressebeskyttet deltaker - returnerer ikke endringsmelding`() {
-		val gjennomforingId = GJENNOMFORING_1.id
-		val deltakerInput = createDeltakerInput(BRUKER_ADRESSEBESKYTTET, GJENNOMFORING_1)
-		val deltaker = deltakerInput.toDeltaker(BRUKER_ADRESSEBESKYTTET, createStatusInput(deltakerInput))
-
-		val endringsmelding = Endringsmelding(
-			id = UUID.randomUUID(),
-			deltakerId = deltakerInput.id,
-			utfortAvNavAnsattId = UUID.randomUUID(),
-			utfortTidspunkt = ZonedDateTime.now(),
-			opprettetAvArrangorAnsattId = UUID.randomUUID(),
-			opprettet = ZonedDateTime.now(),
-			status = Endringsmelding.Status.AKTIV,
-			innhold = Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(LocalDate.now()),
-			type = Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO
-		)
-
-		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
-		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
-		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
-		every { unleashClient.isEnabled(any()) } returns false
-
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, false)
-
-		endringsmeldingerResult.size shouldBe 0
+		endringsmeldingerResult.get(0).deltaker shouldBe umaskertDeltakerDto(BRUKER_SKJERMET)
 	}
 
 	@Test
@@ -205,15 +178,9 @@ class NavAnsattControllerServiceTest {
 		every { vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId) } returns listOf(vurdering)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { unleashClient.isEnabled(any()) } returns false
-		val forventetDeltaker = DeltakerDto(
-			fornavn = BRUKER_1.fornavn,
-			mellomnavn = BRUKER_1.mellomnavn,
-			etternavn = BRUKER_1.etternavn,
-			fodselsnummer = BRUKER_1.personIdent,
-			erSkjermet = BRUKER_1.erSkjermet
-		)
+		val forventetDeltaker = umaskertDeltakerDto(BRUKER_1)
 
-		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, false)
+		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilLosning)
 
 		meldingerFraArrangorResponse.endringsmeldinger.size shouldBe 1
 		meldingerFraArrangorResponse.endringsmeldinger[0].deltaker shouldBe forventetDeltaker
@@ -254,15 +221,9 @@ class NavAnsattControllerServiceTest {
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
 		every { unleashClient.isEnabled(any()) } returns false
-		val forventetDeltaker = DeltakerDto(
-			fornavn = null,
-			mellomnavn = null,
-			etternavn = null,
-			fodselsnummer = null,
-			erSkjermet = BRUKER_SKJERMET.erSkjermet
-		)
+		val forventetDeltaker = maskertDeltakerDto(BRUKER_SKJERMET)
 
-		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, false)
+		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilLosning)
 
 		meldingerFraArrangorResponse.endringsmeldinger.size shouldBe 1
 		meldingerFraArrangorResponse.endringsmeldinger[0].deltaker shouldBe forventetDeltaker
@@ -303,15 +264,9 @@ class NavAnsattControllerServiceTest {
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
 		every { unleashClient.isEnabled(any()) } returns false
-		val forventetDeltaker = DeltakerDto(
-			fornavn = BRUKER_SKJERMET.fornavn,
-			mellomnavn = BRUKER_SKJERMET.mellomnavn,
-			etternavn = BRUKER_SKJERMET.etternavn,
-			fodselsnummer = BRUKER_SKJERMET.personIdent,
-			erSkjermet = BRUKER_SKJERMET.erSkjermet
-		)
+		val forventetDeltaker = umaskertDeltakerDto(BRUKER_SKJERMET)
 
-		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, true)
+		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilSkjermede)
 
 		meldingerFraArrangorResponse.endringsmeldinger.size shouldBe 1
 		meldingerFraArrangorResponse.endringsmeldinger[0].deltaker shouldBe forventetDeltaker
@@ -321,39 +276,69 @@ class NavAnsattControllerServiceTest {
 	}
 
 	@Test
-	fun `hentMeldinger - adressebeskyttet deltaker - returnerer ikke meldinger`() {
-		val gjennomforingId = GJENNOMFORING_1.id
-		val deltakerInput = createDeltakerInput(BRUKER_ADRESSEBESKYTTET, GJENNOMFORING_1)
-		val deltaker = deltakerInput.toDeltaker(BRUKER_ADRESSEBESKYTTET, createStatusInput(deltakerInput))
-		val endringsmelding = Endringsmelding(
-			id = UUID.randomUUID(),
-			deltakerId = deltaker.id,
-			utfortAvNavAnsattId = UUID.randomUUID(),
-			utfortTidspunkt = ZonedDateTime.now(),
-			opprettetAvArrangorAnsattId = UUID.randomUUID(),
-			opprettet = ZonedDateTime.now(),
-			status = Endringsmelding.Status.AKTIV,
-			innhold = Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(LocalDate.now()),
-			type = Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO
-		)
-		val vurdering = Vurdering(
-			id = UUID.randomUUID(),
-			deltakerId = deltaker.id,
-			vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
-			begrunnelse = null,
-			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
-			gyldigFra = LocalDateTime.now(),
-			gyldigTil = null
-		)
+	fun `hentMeldinger - adressebeskyttede deltakere, ikke tilgang - returnerer maskert bruker`() {
+		brukereMedAdressebeskyttelse.forEach {
+			testTilganger(it) { gjennomforingId ->
+				val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilLosning)
+				meldingerFraArrangorResponse.endringsmeldinger[0].deltaker shouldBe maskertDeltakerDto(it)
+				meldingerFraArrangorResponse.vurderinger[0].deltaker shouldBe maskertDeltakerDto(it)
+			}
+		}
+	}
 
-		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
-		every { vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId) } returns listOf(vurdering)
-		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
-		every { unleashClient.isEnabled(any()) } returns false
+	@Test
+	fun `hentEndringsmeldinger - adressebeskyttede deltakere, ikke tilgang - returnerer maskert bruker`() {
+		brukereMedAdressebeskyttelse.forEach {
+			testTilganger(it) { gjennomforingId ->
+				val meldingerFraArrangorResponse = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
+				meldingerFraArrangorResponse[0].deltaker shouldBe maskertDeltakerDto(it)
+			}
+		}
+	}
+	@Test
+	fun `hentMeldinger - strengt fortrolig og skjermet deltaker, mangler tilgang til skjermet - returnerer maskert bruker`() {
+		val bruker = BRUKER_ADRESSEBESKYTTET.copy(erSkjermet = true)
+		testTilganger(bruker) { gjennomforingId ->
+			val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilStrengtFortrolig)
+			meldingerFraArrangorResponse.endringsmeldinger[0].deltaker shouldBe maskertDeltakerDto(bruker)
+			meldingerFraArrangorResponse.vurderinger[0].deltaker shouldBe maskertDeltakerDto(bruker)
+		}
+	}
 
-		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, false)
+	@Test
+	fun `hentMeldinger - strengt fortrolig deltaker, har tilgang - returnerer umaskert bruker`() {
+		testTilganger(BRUKER_ADRESSEBESKYTTET) { gjennomforingId ->
+			val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilStrengtFortrolig)
+			meldingerFraArrangorResponse.endringsmeldinger[0].deltaker shouldBe umaskertDeltakerDto(BRUKER_ADRESSEBESKYTTET)
+			meldingerFraArrangorResponse.vurderinger[0].deltaker shouldBe umaskertDeltakerDto(BRUKER_ADRESSEBESKYTTET)
+		}
+	}
 
-		meldingerFraArrangorResponse.endringsmeldinger.size shouldBe 0
+	@Test
+	fun `harTilgangTilDeltaker - skal sjekke om ad-grupper gir tilgang til deltaker`() {
+		val deltakereMedAdressebeskyttelse = brukereMedAdressebeskyttelse.map {
+			val deltakerInput = createDeltakerInput(it, GJENNOMFORING_1)
+			deltakerInput.toDeltaker(it, createStatusInput(deltakerInput))
+		}
+
+		deltakereMedAdressebeskyttelse.forEach {
+			harTilgangTilDeltaker(it, tilgangTilLosning) shouldBe false
+			harTilgangTilDeltaker(it, tilgangTilSkjermede) shouldBe false
+			harTilgangTilDeltaker(it, tilgangTilAlt) shouldBe true
+
+			when (it.adressebeskyttelse) {
+				Adressebeskyttelse.STRENGT_FORTROLIG_UTLAND,
+				Adressebeskyttelse.STRENGT_FORTROLIG -> {
+					harTilgangTilDeltaker(it, tilgangTilStrengtFortrolig) shouldBe true
+					harTilgangTilDeltaker(it, tilgangTilFortrolig) shouldBe false
+				}
+				Adressebeskyttelse.FORTROLIG -> {
+					harTilgangTilDeltaker(it, tilgangTilStrengtFortrolig) shouldBe false
+					harTilgangTilDeltaker(it, tilgangTilFortrolig) shouldBe true
+				}
+				null -> { /* Skjer ikke */ }
+			}
+		}
 	}
 
 	@Test
@@ -382,8 +367,60 @@ class NavAnsattControllerServiceTest {
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
 		every { unleashClient.isEnabled(any()) } returns true
 
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, false)
+		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
 
 		endringsmeldingerResult.size shouldBe 0
 	}
+
+	private fun testTilganger(bruker: BrukerInput, assertions: (gjennomforingId: UUID) -> Unit) {
+		val gjennomforingId = GJENNOMFORING_1.id
+		val deltakerInput = createDeltakerInput(bruker, GJENNOMFORING_1)
+		val deltaker = deltakerInput.toDeltaker(bruker, createStatusInput(deltakerInput))
+
+		val endringsmelding = Endringsmelding(
+			id = UUID.randomUUID(),
+			deltakerId = deltaker.id,
+			utfortAvNavAnsattId = UUID.randomUUID(),
+			utfortTidspunkt = ZonedDateTime.now(),
+			opprettetAvArrangorAnsattId = UUID.randomUUID(),
+			opprettet = ZonedDateTime.now(),
+			status = Endringsmelding.Status.AKTIV,
+			innhold = Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(LocalDate.now()),
+			type = Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO
+		)
+		val vurdering = Vurdering(
+			id = UUID.randomUUID(),
+			deltakerId = deltaker.id,
+			vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
+			begrunnelse = null,
+			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+			gyldigFra = LocalDateTime.now(),
+			gyldigTil = null
+		)
+
+		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
+		every { vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId) } returns listOf(vurdering)
+		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
+		every { unleashClient.isEnabled(NavAnsattControllerService.KOMET_DELTAKERE_TOGGEL) } returns false
+
+		assertions(gjennomforingId)
+	}
+
+	private fun umaskertDeltakerDto(bruker: BrukerInput) = DeltakerDto(
+		fornavn = bruker.fornavn,
+		mellomnavn = bruker.mellomnavn,
+		etternavn = bruker.etternavn,
+		fodselsnummer = bruker.personIdent,
+		erSkjermet = bruker.erSkjermet,
+		adressebeskyttelse = bruker.adressebeskyttelse,
+	)
+
+	private fun maskertDeltakerDto(it: BrukerInput) = DeltakerDto(
+		fornavn = null,
+		mellomnavn = null,
+		etternavn = null,
+		fodselsnummer = null,
+		erSkjermet = it.erSkjermet,
+		adressebeskyttelse = it.adressebeskyttelse,
+	)
 }

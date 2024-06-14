@@ -2,9 +2,13 @@ package no.nav.amt.tiltak.test.integration.nav_ansatt
 
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.data.TestData
+import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_ADRESSEBESKYTTET
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.NAV_ANSATT_2
+import no.nav.amt.tiltak.test.database.data.inputs.BrukerInput
 import no.nav.amt.tiltak.test.database.data.inputs.GjennomforingInput
 import no.nav.amt.tiltak.test.database.data.inputs.NavAnsattInput
 import no.nav.amt.tiltak.test.database.data.inputs.TiltaksansvarligGjennomforingTilgangInput
@@ -45,7 +49,28 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 		)
 
 		val expectedJson = """
-			[{"id":"513219ca-481b-4aae-9d51-435dba9929cd","navn":"Tiltaksgjennomforing2","arrangorNavn":"Org Tiltaksarrangør 2","lopenr":124,"opprettetAar":2020,"antallAktiveEndringsmeldinger":0,"harSkjermedeDeltakere":false,"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"AVSLUTTET","startDato":"2022-02-01","sluttDato":"2022-02-13"},{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","arrangorNavn":"Org Tiltaksarrangør 1","lopenr":123,"opprettetAar":2020,"antallAktiveEndringsmeldinger":3,"harSkjermedeDeltakere":false,"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"GJENNOMFORES","startDato":"2022-02-01","sluttDato":"2050-12-30"}]""".trimIndent()
+				[{"id":"513219ca-481b-4aae-9d51-435dba9929cd","navn":"Tiltaksgjennomforing2","arrangorNavn":"Org Tiltaksarrangør 2","lopenr":124,"opprettetAar":2020,"antallAktiveEndringsmeldinger":0,"harSkjermedeDeltakere":false,"adressebeskyttelser":[],"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"AVSLUTTET","startDato":"2022-02-01","sluttDato":"2022-02-13"},{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","arrangorNavn":"Org Tiltaksarrangør 1","lopenr":123,"opprettetAar":2020,"antallAktiveEndringsmeldinger":3,"harSkjermedeDeltakere":false,"adressebeskyttelser":[],"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"GJENNOMFORES","startDato":"2022-02-01","sluttDato":"2050-12-30"}]
+			""".trimIndent()
+		response.code shouldBe 200
+		response.body?.string() shouldBe expectedJson
+	}
+
+	@Test
+	internal fun `hentGjennomforinger - skjermet og adressebeskyttet deltakere - skal ha status 200 med korrekt respons`() {
+		val token = lagTokenMedAdGruppe(NAV_ANSATT_1)
+		giTilgang(NAV_ANSATT_1, GJENNOMFORING_1)
+
+		insertPersonMedEndringsmeldinger(BRUKER_ADRESSEBESKYTTET.copy(erSkjermet = true))
+
+		val response = sendRequest(
+			method = "GET",
+			url = "/api/nav-ansatt/gjennomforing",
+			headers = mapOf("Authorization" to "Bearer $token")
+		)
+
+		val expectedJson = """
+				[{"id":"513219ca-481b-4aae-9d51-435dba9929cd","navn":"Tiltaksgjennomforing2","arrangorNavn":"Org Tiltaksarrangør 2","lopenr":124,"opprettetAar":2020,"antallAktiveEndringsmeldinger":0,"harSkjermedeDeltakere":false,"adressebeskyttelser":[],"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"AVSLUTTET","startDato":"2022-02-01","sluttDato":"2022-02-13"},{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","arrangorNavn":"Org Tiltaksarrangør 1","lopenr":123,"opprettetAar":2020,"antallAktiveEndringsmeldinger":4,"harSkjermedeDeltakere":true,"adressebeskyttelser":["STRENGT_FORTROLIG"],"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"GJENNOMFORES","startDato":"2022-02-01","sluttDato":"2050-12-30"}]
+			""".trimIndent()
 		response.code shouldBe 200
 		response.body?.string() shouldBe expectedJson
 	}
@@ -177,5 +202,18 @@ class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
 			oid = oid,
 		)
 	}
+
+
+	private fun insertPersonMedEndringsmeldinger(bruker: BrukerInput) {
+		val deltaker = TestData.createDeltakerInput(bruker, GJENNOMFORING_1)
+		val endringsmelding = TestData.createEndringsmelding(deltaker, ARRANGOR_ANSATT_1)
+		val status = TestData.createStatusInput(deltaker)
+
+		testDataRepository.insertBruker(bruker)
+		testDataRepository.insertDeltaker(deltaker)
+		testDataRepository.insertDeltakerStatus(status)
+		testDataRepository.insertEndringsmelding(endringsmelding)
+	}
+
 
 }

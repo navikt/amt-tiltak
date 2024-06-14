@@ -291,7 +291,7 @@ object TestData {
 		epost = "adressebeskyttet@example.com",
 		ansvarligVeilederId = NAV_ANSATT_1.id,
 		navEnhet = NAV_ENHET_1,
-		erSkjermet = true,
+		erSkjermet = false,
 		adresse = null,
 		adressebeskyttelse = Adressebeskyttelse.STRENGT_FORTROLIG
 	)
