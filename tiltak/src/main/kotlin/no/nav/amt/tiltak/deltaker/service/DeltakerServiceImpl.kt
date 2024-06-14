@@ -105,6 +105,7 @@ open class DeltakerServiceImpl(
 	override fun progressStatuser() {
 		val deltakere = deltakerRepository.erPaaAvsluttetGjennomforing()
 			.plus(deltakerRepository.sluttDatoPassert())
+			.filter { it.kilde != Kilde.KOMET }
 			.let { mapDeltakereOgAktiveStatuser(it) }
 
 		progressStatuser(deltakere)
@@ -115,6 +116,11 @@ open class DeltakerServiceImpl(
 		hentDeltakerePaaGjennomforing(gjennomforingId).forEach {
 			slettDeltaker(it.id, it.kilde)
 		}
+	}
+
+	override fun avsluttDeltakerePaaAvbruttGjennomforing(gjennomforingId: UUID) {
+		val deltakere = hentDeltakerePaaGjennomforing(gjennomforingId).filter { it.kilde != Kilde.KOMET }
+		progressStatuser(deltakere, DeltakerStatus.Aarsak.SAMARBEIDET_MED_ARRANGOREN_ER_AVBRUTT)
 	}
 
 	override fun slettDeltaker(deltakerId: UUID, kilde: Kilde) {
@@ -261,7 +267,7 @@ open class DeltakerServiceImpl(
 		return true
 	}
 
-	private fun progressStatuser(deltakere: List<Deltaker>) {
+	private fun progressStatuser(deltakere: List<Deltaker>, sluttarsak: DeltakerStatus.Aarsak? = null) {
 		val gjennomforinger = deltakere
 			.map { it.gjennomforingId }
 			.distinct()
@@ -280,10 +286,10 @@ open class DeltakerServiceImpl(
 			.filter { it.status.type == DeltakerStatus.Type.DELTAR }
 			.filter { deltarPaKurs(gjennomforinger, it) && !sluttetForTidlig(gjennomforinger, it) }
 
-		oppdaterStatuser(skalBliIkkeAktuell.map { it.id }, nyStatus = DeltakerStatus.Type.IKKE_AKTUELL)
-		oppdaterStatuser(skalBliAvbrutt.map { it.id }, nyStatus = DeltakerStatus.Type.AVBRUTT)
-		oppdaterStatuser(skalBliHarSluttet.map { it.id }, nyStatus = DeltakerStatus.Type.HAR_SLUTTET)
-		oppdaterStatuser(skalBliFullfort.map { it.id }, nyStatus = DeltakerStatus.Type.FULLFORT)
+		oppdaterStatuser(skalBliIkkeAktuell.map { it.id }, nyStatus = DeltakerStatus.Type.IKKE_AKTUELL, sluttarsak)
+		oppdaterStatuser(skalBliAvbrutt.map { it.id }, nyStatus = DeltakerStatus.Type.AVBRUTT, sluttarsak)
+		oppdaterStatuser(skalBliHarSluttet.map { it.id }, nyStatus = DeltakerStatus.Type.HAR_SLUTTET, sluttarsak)
+		oppdaterStatuser(skalBliFullfort.map { it.id }, nyStatus = DeltakerStatus.Type.FULLFORT, sluttarsak)
 	}
 
 	private fun deltarPaKurs(gjennomforinger: List<Gjennomforing>, deltaker: Deltaker): Boolean {
@@ -327,7 +333,11 @@ open class DeltakerServiceImpl(
 		}
 	}
 
-	private fun oppdaterStatuser(deltakere: List<UUID>, nyStatus: DeltakerStatus.Type) = deltakere
+	private fun oppdaterStatuser(
+		deltakere: List<UUID>,
+		nyStatus: DeltakerStatus.Type,
+		sluttarsak: DeltakerStatus.Aarsak? = null
+	) = deltakere
 		.also { log.info("Oppdaterer status på ${it.size} deltakere") }
 		.forEach {
 			insertStatus(
@@ -335,7 +345,7 @@ open class DeltakerServiceImpl(
 					id = UUID.randomUUID(),
 					deltakerId = it,
 					type = nyStatus,
-					aarsak = null,
+					aarsak = sluttarsak,
 					aarsaksbeskrivelse = null,
 					gyldigFra = LocalDateTime.now()
 				)
