@@ -150,34 +150,6 @@ class NavAnsattControllerServiceTest {
 	}
 
 	@Test
-	fun `hentEndringsmeldinger - strengt fortrolig deltaker - returnerer ikke endringsmelding`() {
-		val gjennomforingId = GJENNOMFORING_1.id
-		val deltakerInput = createDeltakerInput(BRUKER_ADRESSEBESKYTTET, GJENNOMFORING_1)
-		val deltaker = deltakerInput.toDeltaker(BRUKER_ADRESSEBESKYTTET, createStatusInput(deltakerInput))
-
-		val endringsmelding = Endringsmelding(
-			id = UUID.randomUUID(),
-			deltakerId = deltakerInput.id,
-			utfortAvNavAnsattId = UUID.randomUUID(),
-			utfortTidspunkt = ZonedDateTime.now(),
-			opprettetAvArrangorAnsattId = UUID.randomUUID(),
-			opprettet = ZonedDateTime.now(),
-			status = Endringsmelding.Status.AKTIV,
-			innhold = Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(LocalDate.now()),
-			type = Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO
-		)
-
-		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
-		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
-		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
-		every { unleashClient.isEnabled(any()) } returns false
-
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
-
-		endringsmeldingerResult.size shouldBe 0
-	}
-
-	@Test
 	fun `hentMeldinger - deltaker er ikke skjermet, nav ansatt har ikke tilgang til skjermede - returnerer umaskert bruker`() {
 		val gjennomforingId = GJENNOMFORING_1.id
 		val endringsmelding = Endringsmelding(
@@ -301,42 +273,6 @@ class NavAnsattControllerServiceTest {
 		meldingerFraArrangorResponse.vurderinger.size shouldBe 1
 		meldingerFraArrangorResponse.vurderinger[0].deltaker shouldBe forventetDeltaker
 		meldingerFraArrangorResponse.vurderinger[0].vurderingstype shouldBe Vurderingstype.OPPFYLLER_KRAVENE
-	}
-
-	@Test
-	fun `hentMeldinger - strengt fortrolig deltakere er togglet av - returnerer ikke meldinger`() {
-		val gjennomforingId = GJENNOMFORING_1.id
-		val deltakerInput = createDeltakerInput(BRUKER_ADRESSEBESKYTTET, GJENNOMFORING_1)
-		val deltaker = deltakerInput.toDeltaker(BRUKER_ADRESSEBESKYTTET, createStatusInput(deltakerInput))
-		val endringsmelding = Endringsmelding(
-			id = UUID.randomUUID(),
-			deltakerId = deltaker.id,
-			utfortAvNavAnsattId = UUID.randomUUID(),
-			utfortTidspunkt = ZonedDateTime.now(),
-			opprettetAvArrangorAnsattId = UUID.randomUUID(),
-			opprettet = ZonedDateTime.now(),
-			status = Endringsmelding.Status.AKTIV,
-			innhold = Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(LocalDate.now()),
-			type = Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO
-		)
-		val vurdering = Vurdering(
-			id = UUID.randomUUID(),
-			deltakerId = deltaker.id,
-			vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
-			begrunnelse = null,
-			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
-			gyldigFra = LocalDateTime.now(),
-			gyldigTil = null
-		)
-
-		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
-		every { vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId) } returns listOf(vurdering)
-		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
-		every { unleashClient.isEnabled(any()) } returns false
-
-		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilLosning)
-
-		meldingerFraArrangorResponse.endringsmeldinger.size shouldBe 0
 	}
 
 	@Test
@@ -466,7 +402,6 @@ class NavAnsattControllerServiceTest {
 		every { vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId) } returns listOf(vurdering)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { unleashClient.isEnabled(NavAnsattControllerService.KOMET_DELTAKERE_TOGGEL) } returns false
-		every { unleashClient.isEnabled(NavAnsattControllerService.ADRESSEBESKYTTELSE_TOGGEL) } returns true
 
 		assertions(gjennomforingId)
 	}

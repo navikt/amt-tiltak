@@ -34,8 +34,6 @@ class NavAnsattControllerService(
 
 	companion object {
 
-		const val ADRESSEBESKYTTELSE_TOGGEL = "amt.enable-adressebeskyttede-deltakere"
-
 		const val KOMET_DELTAKERE_TOGGEL = "amt.enable-komet-deltakere"
 
 		fun harTilgangTilDeltaker(deltaker: Deltaker, tilganger: List<AdGruppe>): Boolean {
@@ -58,12 +56,7 @@ class NavAnsattControllerService(
 
 	fun hentEndringsmeldinger(gjennomforingId: UUID, tilganger: List<AdGruppe>): List<EndringsmeldingDto> {
 		val endringsmeldinger = hentEndringsmeldingerForGjennomforing(gjennomforingId)
-		val deltakerMap = if (unleashClient.isEnabled(ADRESSEBESKYTTELSE_TOGGEL)) {
-			deltakerService.hentDeltakerMap(endringsmeldinger.map { it.deltakerId })
-		} else {
-			deltakerService.hentDeltakerMap(endringsmeldinger.map { it.deltakerId })
-				.filterValues { !it.harAdressebeskyttelse() }
-		}
+		val deltakerMap = deltakerService.hentDeltakerMap(endringsmeldinger.map { it.deltakerId })
 
 		return endringsmeldinger.mapNotNull { endringsmelding -> tilEndringsmeldingDto(endringsmelding, deltakerMap, tilganger) }
 	}
@@ -76,12 +69,7 @@ class NavAnsattControllerService(
 		deltakerIder.addAll(alleEndringsmeldinger.map { it.deltakerId })
 		deltakerIder.addAll(alleVurderinger.map { it.deltakerId })
 
-		val deltakerMap = if (unleashClient.isEnabled(ADRESSEBESKYTTELSE_TOGGEL)) {
-			deltakerService.hentDeltakerMap(deltakerIder.distinct())
-		} else {
-			deltakerService.hentDeltakerMap(deltakerIder.distinct())
-				.filterValues { !it.harAdressebeskyttelse() }
-		}
+		val deltakerMap = deltakerService.hentDeltakerMap(deltakerIder.distinct())
 
 		val endringsmeldinger = alleEndringsmeldinger.mapNotNull { endringsmelding ->
 			tilEndringsmeldingDto(endringsmelding, deltakerMap, tilganger)
