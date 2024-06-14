@@ -97,9 +97,16 @@ class NavAnsattControllerService(
 		return gjennomforingService.getGjennomforinger(gjennomforingIder).map { gjennomforing ->
 			val aktiveEndringsmeldinger = hentEndringsmeldingerForGjennomforing(gjennomforing.id)
 				.filter { it.status == Endringsmelding.Status.AKTIV }
-			val harSkjermede = aktiveEndringsmeldinger.any { deltakerService.erSkjermet(it.deltakerId) }
+			val alleVurderinger = vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforing.id)
 
-			return@map gjennomforing.toDto(aktiveEndringsmeldinger.size, harSkjermede)
+			val deltakere = deltakerService.hentDeltakere(
+				aktiveEndringsmeldinger.map { it.deltakerId }
+				.plus(alleVurderinger.map { it.deltakerId })
+			)
+			val harSkjermede = deltakere.any { it.erSkjermet }
+			val adressebeskyttelser = deltakere.mapNotNull { it.adressebeskyttelse }.distinct()
+
+			return@map gjennomforing.toDto(aktiveEndringsmeldinger.size, harSkjermede, adressebeskyttelser)
 		}
 	}
 
@@ -150,7 +157,11 @@ class NavAnsattControllerService(
 		return null
 	}
 
-	private fun Gjennomforing.toDto (antallAktiveEndringsmeldinger: Int, harSkjermede: Boolean) = HentGjennomforingerDto(
+	private fun Gjennomforing.toDto (
+		antallAktiveEndringsmeldinger: Int,
+		harSkjermede: Boolean,
+		adressebeskyttelser: List<Adressebeskyttelse>
+	) = HentGjennomforingerDto(
 		id = id,
 		navn = navn,
 		lopenr = lopenr,
@@ -158,6 +169,7 @@ class NavAnsattControllerService(
 		arrangorNavn = arrangor.overordnetEnhetNavn ?: arrangor.navn,
 		antallAktiveEndringsmeldinger = antallAktiveEndringsmeldinger,
 		harSkjermedeDeltakere = harSkjermede,
+		adressebeskyttelser = adressebeskyttelser,
 		tiltak = TiltakDto(
 			kode = tiltak.kode,
 			navn = tiltak.navn,
