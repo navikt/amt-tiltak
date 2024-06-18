@@ -60,6 +60,10 @@
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>utils</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.getunleash</groupId>
+            <artifactId>unleash-client-java</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
