@@ -58,6 +58,7 @@ data class DeltakerEndring(
 
         data class EndreStartdato(
             val startdato: LocalDate?,
+			val sluttdato: LocalDate?
         ) : Endring()
 
         data class EndreSluttdato(
@@ -66,6 +67,7 @@ data class DeltakerEndring(
 
         data class ForlengDeltakelse(
             val sluttdato: LocalDate,
+			val begrunnelse: String?,
         ) : Endring()
 
         data class IkkeAktuell(
