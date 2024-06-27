@@ -49,6 +49,10 @@
             <groupId>no.nav.amt-tiltak</groupId>
             <artifactId>amt-person</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.getunleash</groupId>
+            <artifactId>unleash-client-java</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.mockk</groupId>

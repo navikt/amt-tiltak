@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 
+import io.getunleash.Unleash
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.Gjennomforing
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.MulighetsrommetApiClient
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
@@ -26,7 +27,8 @@ class DeltakerProcessor(
 	private val arrangorService: ArrangorService,
 	private val tiltakService: TiltakService,
 	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
-	private val transactionTemplate: TransactionTemplate
+	private val transactionTemplate: TransactionTemplate,
+	private val unleashClient: Unleash
 ) : GenericProcessor<DeltakerPayload>() {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -42,8 +44,19 @@ class DeltakerProcessor(
 	private fun upsert(message: MessageWrapper<DeltakerPayload>) {
 		val deltakerDto = message.payload
 
-		val gjennomforingId = gjennomforingService.getGjennomforingOrNull(deltakerDto.gjennomforingId)?.id
-			?: upsertGjennomforing(deltakerDto.gjennomforingId).id
+		val gjennomforing = gjennomforingService.getGjennomforingOrNull(deltakerDto.gjennomforingId)
+		val gjennomforingFraMulighetsrommet = if (gjennomforing == null) {
+			upsertGjennomforing(deltakerDto.gjennomforingId)
+		} else {
+			null
+		}
+
+		val gjennomforingId = gjennomforing?.id ?: gjennomforingFraMulighetsrommet!!.id
+		val tiltakstype = gjennomforing?.tiltak?.kode ?: gjennomforingFraMulighetsrommet!!.tiltakstype.arenaKode
+
+		if (unleashClient.isEnabled("amt.enable-komet-deltakere") && tiltakstype == "ARBFORB") {
+			log.info("Ignorerer deltaker på tiltak som komet er master for, id ${deltakerDto.id}")
+		}
 
 		val status = DeltakerStatusInsert(
 			id = UUID.randomUUID(),
