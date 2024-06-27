@@ -56,6 +56,7 @@ class DeltakerProcessor(
 
 		if (unleashClient.isEnabled("amt.enable-komet-deltakere") && tiltakstype == "ARBFORB") {
 			log.info("Ignorerer deltaker på tiltak som komet er master for, id ${deltakerDto.id}")
+			return
 		}
 
 		val status = DeltakerStatusInsert(
