@@ -7,13 +7,9 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerEndring
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerHistorikk
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerVedVedtak
 import no.nav.amt.tiltak.core.domain.tiltak.Innhold
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
-import no.nav.amt.tiltak.core.domain.tiltak.Vedtak
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpsertDbo
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -74,25 +70,7 @@ internal class DeltakerRepositoryTest : FunSpec({
 		)
 		val endretAv = UUID.randomUUID()
 		val endretAvEnhet = UUID.randomUUID()
-		val vedtak = Vedtak(
-			id = UUID.randomUUID(),
-			deltakerId = id,
-			fattet = null,
-			gyldigTil = null,
-			deltakerVedVedtak = DeltakerVedVedtak(
-				id, null, null, null, null, null, emptyList(),
-				DeltakerVedVedtak.DeltakerStatus(UUID.randomUUID(), DeltakerStatus.Type.VENTER_PA_OPPSTART, null, LocalDateTime.now(), LocalDateTime.now(), LocalDateTime.now())
-			),
-			fattetAvNav = false,
-			opprettet = LocalDateTime.now(),
-			opprettetAv = UUID.randomUUID(),
-			opprettetAvEnhet = UUID.randomUUID(),
-			sistEndret = LocalDateTime.now(),
-			sistEndretAv = UUID.randomUUID(),
-			sistEndretAvEnhet = UUID.randomUUID()
-		)
 
-		val historikk = listOf(DeltakerHistorikk.Vedtak(vedtak))
 		repository.upsert(
 			DeltakerUpsertDbo(
 				id,
@@ -107,7 +85,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 				innhold = innhold,
 				kilde = Kilde.ARENA,
 				forsteVedtakFattet = registrertDato.toLocalDate(),
-				historikk = historikk,
 				sistEndretAv = endretAv,
 				sistEndretAvEnhet = endretAvEnhet
 			)
@@ -129,7 +106,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 		dbo.innhold shouldBe innhold
 		dbo.kilde shouldBe Kilde.ARENA
 		dbo.forsteVedtakFattet shouldBe registrertDato.toLocalDate()
-		(dbo.historikk?.first() as DeltakerHistorikk.Vedtak).vedtak shouldBe vedtak
 		dbo.sistEndretAv shouldBe endretAv
 		dbo.sistEndretAvEnhet shouldBe endretAvEnhet
 	}
@@ -149,15 +125,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 		val endretAv = UUID.randomUUID()
 		val endretAvEnhet = UUID.randomUUID()
-		val endring = DeltakerEndring(
-			id = UUID.randomUUID(),
-			deltakerId = DELTAKER_1.id,
-			endring = DeltakerEndring.Endring.EndreBakgrunnsinformasjon("Bakgrunn"),
-			endretAv = endretAv,
-			endretAvEnhet = endretAvEnhet,
-			endret = LocalDateTime.now().minusDays(1)
-		)
-		val historikk = listOf(DeltakerHistorikk.Endring(endring))
 
 		repository.upsert(DeltakerUpsertDbo(
 			id = DELTAKER_1.id,
@@ -170,7 +137,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			innhold = innhold,
 			kilde = Kilde.ARENA,
 			forsteVedtakFattet = DELTAKER_1.registrertDato.toLocalDate(),
-			historikk = historikk,
 			sistEndretAv = endretAv,
 			sistEndretAvEnhet = endretAvEnhet
 		))
@@ -184,7 +150,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 		updatedDeltaker.innhold shouldBe innhold
 		updatedDeltaker.kilde shouldBe Kilde.ARENA
 		updatedDeltaker.forsteVedtakFattet shouldBe DELTAKER_1.registrertDato.toLocalDate()
-		(updatedDeltaker.historikk?.first() as DeltakerHistorikk.Endring).endring shouldBe endring
 		updatedDeltaker.sistEndretAv shouldBe endretAv
 		updatedDeltaker.sistEndretAvEnhet shouldBe endretAvEnhet
 	}
@@ -202,7 +167,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			innhold = null,
 			kilde = Kilde.ARENA,
 			forsteVedtakFattet = null,
-			historikk = null,
 			sistEndretAv = null,
 			sistEndretAvEnhet = null
 		)
@@ -236,7 +200,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			innhold = null,
 			kilde = Kilde.ARENA,
 			forsteVedtakFattet = null,
-			historikk = null,
 			sistEndretAv = null,
 			sistEndretAvEnhet = null
 		)
@@ -277,7 +240,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			innhold = null,
 			kilde = Kilde.ARENA,
 			forsteVedtakFattet = null,
-			historikk = null,
 			sistEndretAv = null,
 			sistEndretAvEnhet = null
 		)
@@ -315,7 +277,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			innhold = null,
 			kilde = Kilde.ARENA,
 			forsteVedtakFattet = null,
-			historikk = null,
 			sistEndretAv = null,
 			sistEndretAvEnhet = null
 		)
@@ -350,7 +311,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			innhold = null,
 			kilde = Kilde.ARENA,
 			forsteVedtakFattet = null,
-			historikk = null,
 			sistEndretAv = null,
 			sistEndretAvEnhet = null
 		)
@@ -385,7 +345,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			innhold = null,
 			kilde = Kilde.ARENA,
 			forsteVedtakFattet = null,
-			historikk = null,
 			sistEndretAv = null,
 			sistEndretAvEnhet = null
 		)
@@ -422,7 +381,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			innhold = null,
 			kilde = Kilde.ARENA,
 			forsteVedtakFattet = null,
-			historikk = null,
 			sistEndretAv = null,
 			sistEndretAvEnhet = null
 		)
@@ -464,7 +422,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			innhold = null,
 			kilde = Kilde.ARENA,
 			forsteVedtakFattet = null,
-			historikk = null,
 			sistEndretAv = null,
 			sistEndretAvEnhet = null
 		)
@@ -498,7 +455,6 @@ internal class DeltakerRepositoryTest : FunSpec({
 			innhold = null,
 			kilde = Kilde.ARENA,
 			forsteVedtakFattet = null,
-			historikk = null,
 			sistEndretAv = null,
 			sistEndretAvEnhet = null
 		)

@@ -9,7 +9,6 @@ import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.core.domain.tiltak.AVSLUTTENDE_STATUSER
 import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerHistorikk
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
@@ -59,7 +58,6 @@ open class DeltakerRepository(
 			innhold = rs.getString("innhold")?.let { fromJsonString(it) },
 			kilde = Kilde.valueOf(rs.getString("kilde")),
 			forsteVedtakFattet = rs.getDate("forste_vedtak_fattet")?.toLocalDate(),
-			historikk = rs.getString("historikk")?.let { h -> fromJsonString<List<String>>(h).map { fromJsonString(it) } },
 			sistEndretAv = rs.getNullableUUID("sist_endret_av"),
 			sistEndretAvEnhet = rs.getNullableUUID("sist_endret_av_enhet")
 		)
@@ -69,7 +67,7 @@ open class DeltakerRepository(
 		val sql = """
 			INSERT INTO deltaker(id, bruker_id, gjennomforing_id, start_dato, slutt_dato,
 								 dager_per_uke, prosent_stilling, registrert_dato, innsok_begrunnelse, innhold, kilde,
-								 forste_vedtak_fattet, historikk, sist_endret_av, sist_endret_av_enhet)
+								 forste_vedtak_fattet, sist_endret_av, sist_endret_av_enhet)
 			VALUES (:id,
 					:brukerId,
 					:gjennomforingId,
@@ -82,7 +80,6 @@ open class DeltakerRepository(
 					:innhold,
 					:kilde,
 					:forste_vedtak_fattet,
-					:historikk,
 					:sist_endret_av,
 					:sist_endret_av_enhet)
 			ON CONFLICT (id) DO
@@ -95,7 +92,6 @@ open class DeltakerRepository(
 				innhold	= :innhold,
 				kilde = :kilde,
 				forste_vedtak_fattet = :forste_vedtak_fattet,
-				historikk = :historikk,
 				sist_endret_av = :sist_endret_av,
 				sist_endret_av_enhet = :sist_endret_av_enhet,
 				modified_at = CURRENT_TIMESTAMP
@@ -115,7 +111,6 @@ open class DeltakerRepository(
 				"innhold" to deltaker.innhold?.toPGObject(),
 				"kilde" to deltaker.kilde.name,
 				"forste_vedtak_fattet" to deltaker.forsteVedtakFattet,
-				"historikk" to deltaker.historikk?.toPGObject(),
 				"sist_endret_av" to deltaker.sistEndretAv,
 				"sist_endret_av_enhet" to deltaker.sistEndretAvEnhet
 			)
@@ -360,8 +355,6 @@ open class DeltakerRepository(
 		it.type = "json"
 		it.value = JsonUtils.objectMapper.writeValueAsString(this)
 	}
-
-	private fun List<DeltakerHistorikk>.toPGObject() = toPGObject(this.map { JsonUtils.toJsonString(it) })
 
 	private fun toPGObject(any: Any) = PGobject().also {
 		it.type = "json"

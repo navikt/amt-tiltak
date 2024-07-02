@@ -3,7 +3,6 @@ package no.nav.amt.tiltak.kafka.deltaker_ingestor
 import no.nav.amt.tiltak.core.domain.tiltak.Adresse
 import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerHistorikk
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import java.time.LocalDate
@@ -27,7 +26,6 @@ data class DeltakerDto(
 	val deltarPaKurs: Boolean,
 	val kilde: Kilde?,
 	val innhold: DeltakelsesInnhold?,
-	val historikk: List<DeltakerHistorikk>?,
 	val sistEndretAv: UUID?,
 	val sistEndretAvEnhet: UUID?,
 	val sistEndret: LocalDateTime?,

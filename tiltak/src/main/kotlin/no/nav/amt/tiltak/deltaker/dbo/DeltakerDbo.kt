@@ -3,7 +3,6 @@ package no.nav.amt.tiltak.deltaker.dbo
 import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerHistorikk
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.nav_enhet.NavEnhetDbo
@@ -35,7 +34,6 @@ data class DeltakerDbo(
 	val innhold: DeltakelsesInnhold?,
 	val kilde: Kilde,
 	val forsteVedtakFattet: LocalDate?,
-	val historikk: List<DeltakerHistorikk>?,
 	val sistEndretAv: UUID?,
 	val sistEndretAvEnhet: UUID?
 ) {
@@ -65,7 +63,6 @@ data class DeltakerDbo(
 			innhold = innhold,
 			kilde = kilde,
 			forsteVedtakFattet = forsteVedtakFattet,
-			historikk = historikk,
 			sistEndretAv = sistEndretAv,
 			sistEndretAvEnhet = sistEndretAvEnhet
 		)
