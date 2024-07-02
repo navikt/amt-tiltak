@@ -5,8 +5,6 @@ import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.common.json.JsonUtils.toJsonString
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerEndring
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerHistorikk
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Innhold
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
@@ -122,18 +120,6 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 					)
 				)
 			),
-			historikk = listOf(
-				DeltakerHistorikk.Endring(
-					DeltakerEndring(
-						id = UUID.randomUUID(),
-						deltakerId = deltakerId,
-						endring = DeltakerEndring.Endring.EndreBakgrunnsinformasjon("Bakgrunn"),
-						endretAv = UUID.randomUUID(),
-						endretAvEnhet = UUID.randomUUID(),
-						endret = LocalDateTime.now().minusDays(1)
-					)
-				)
-			),
 			sistEndretAv = UUID.randomUUID(),
 			sistEndretAvEnhet = UUID.randomUUID(),
 			sistEndret = LocalDateTime.now()
@@ -154,7 +140,6 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 		faktisk.forsteVedtakFattet shouldBe forventet.forsteVedtakFattet
 		faktisk.innhold shouldBe forventet.innhold
 		faktisk.kilde shouldBe Kilde.KOMET
-		(faktisk.historikk!!.first() as DeltakerHistorikk.Endring).endring.deltakerId shouldBe forventet.id
 		faktisk.sistEndretAv shouldBe forventet.sistEndretAv
 		faktisk.sistEndretAvEnhet shouldBe forventet.sistEndretAvEnhet
 		sammenlignStatus(faktisk.status, forventet.status)

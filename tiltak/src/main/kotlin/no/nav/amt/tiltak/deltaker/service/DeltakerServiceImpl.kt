@@ -427,7 +427,6 @@ open class DeltakerServiceImpl(
 		innhold = this.innhold,
 		kilde = this.kilde,
 		forsteVedtakFattet = this.forsteVedtakFattet,
-		historikk = this.historikk,
 		sistEndretAv = this.sistEndretAv,
 		sistEndretAvEnhet = this.sistEndretAvEnhet
 	)

@@ -28,7 +28,6 @@ data class Deltaker(
 	val innhold: DeltakelsesInnhold?,
 	val kilde: Kilde,
 	val forsteVedtakFattet: LocalDate?,
-	val historikk: List<DeltakerHistorikk>?,
 	val sistEndretAv: UUID?,
 	val sistEndretAvEnhet: UUID?,
 ) {

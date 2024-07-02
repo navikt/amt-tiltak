@@ -13,7 +13,6 @@ import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.tiltak.Adresse
 import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerHistorikk
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
@@ -41,7 +40,7 @@ class DeltakerPublishQuery(
 
 		val vurderinger = getVurderinger(id)
 
-		if (deltaker.kilde == Kilde.KOMET && vurderinger.isEmpty()) return Result.DontPublish()
+		if (deltaker.kilde == Kilde.KOMET) return Result.DontPublish()
 
 		return DeltakerPublishDto(
 			deltaker.id,
@@ -88,7 +87,6 @@ class DeltakerPublishQuery(
 			vurderingerFraArrangor = vurderinger,
 			kilde = deltaker.kilde,
 			forsteVedtakFattet = deltaker.forsteVedtakFattet,
-			historikk = deltaker.historikk,
 			sistEndretAv = deltaker.sistEndretAv,
 			sistEndretAvEnhet = deltaker.sistEndretAvEnhet
 		).let { Result.OK(it) }
@@ -115,7 +113,6 @@ class DeltakerPublishQuery(
 				   deltaker.innsok_begrunnelse,
 				   deltaker.kilde,
 				   deltaker.forste_vedtak_fattet,
-				   deltaker.historikk,
 				   deltaker.sist_endret_av,
 				   deltaker.sist_endret_av_enhet,
 				   nav_enhet.navn                               as nav_enhet_navn,
@@ -206,7 +203,6 @@ class DeltakerPublishQuery(
 		val deltarPaKurs: Boolean,
 		val kilde: Kilde,
 		val forsteVedtakFattet: LocalDate?,
-		val historikk: List<DeltakerHistorikk>?,
 		val sistEndretAv: UUID?,
 		val sistEndretAvEnhet: UUID?,
 	) {
@@ -244,9 +240,6 @@ class DeltakerPublishQuery(
 					deltarPaKurs = rs.getBoolean("er_kurs"),
 					kilde = Kilde.valueOf(rs.getString("kilde")),
 					forsteVedtakFattet = rs.getNullableLocalDate("forste_vedtak_fattet"),
-					historikk = rs.getString("historikk")?.let { h ->
-						JsonUtils.fromJsonString<List<String>>(h).map { JsonUtils.fromJsonString(it) }
-					},
 					sistEndretAv = rs.getNullableUUID("sist_endret_av"),
 					sistEndretAvEnhet = rs.getNullableUUID("sist_endret_av_enhet")
 				)

@@ -215,7 +215,6 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 		),
 		kilde = kilde,
 		forsteVedtakFattet = null,
-		historikk = null,
 		sistEndretAv = null,
 		sistEndretAvEnhet = null
 	)

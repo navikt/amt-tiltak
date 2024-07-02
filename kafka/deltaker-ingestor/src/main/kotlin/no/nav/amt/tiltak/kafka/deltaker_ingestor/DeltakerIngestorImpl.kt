@@ -86,7 +86,6 @@ class DeltakerIngestorImpl(
 			innhold = deltakerDto.innhold,
 			kilde = Kilde.KOMET,
 			forsteVedtakFattet = deltakerDto.forsteVedtakFattet,
-			historikk = deltakerDto.historikk,
 			sistEndretAv = deltakerDto.sistEndretAv,
 			sistEndretAvEnhet = deltakerDto.sistEndretAvEnhet
 		)
