@@ -67,7 +67,6 @@ class DeltakerProcessor(
 			innhold = null,
 			kilde = Kilde.ARENA,
 			forsteVedtakFattet = null,
-			historikk = null,
 			sistEndretAv = null,
 			sistEndretAvEnhet = null
 		)

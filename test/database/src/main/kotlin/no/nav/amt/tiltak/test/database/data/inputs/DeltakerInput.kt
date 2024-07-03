@@ -2,7 +2,6 @@ package no.nav.amt.tiltak.test.database.data.inputs
 
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerHistorikk
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import java.time.LocalDate
@@ -26,7 +25,6 @@ data class DeltakerInput(
 	val innhold: DeltakelsesInnhold?,
 	val kilde: Kilde,
 	val forsteVedtakFattet: LocalDate?,
-	val historikk: List<DeltakerHistorikk>?,
 	val sistEndretAv: UUID?,
 	val sistEndretAvEnhet: UUID?
 ) {
@@ -62,7 +60,6 @@ data class DeltakerInput(
 		innhold = innhold,
 		kilde = kilde,
 		forsteVedtakFattet = forsteVedtakFattet,
-		historikk = historikk,
 		sistEndretAv = sistEndretAv,
 		sistEndretAvEnhet = sistEndretAvEnhet
 	)
