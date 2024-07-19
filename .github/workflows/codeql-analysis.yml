@@ -1,16 +1,11 @@
 name: CodeQL
 on:
-  push:
-    branches:
-      - main
+  merge_group:
   pull_request:
     branches:
       - main
   schedule:
-    - cron: '0 0 * * 3'
-
-env:
-  TZ: Europe/Oslo
+    - cron: "0 0 * * 3"
 
 jobs:
   analyze:
@@ -23,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'kotlin' ]
+        language: ["kotlin"]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,10 +31,28 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-          cache: 'maven'
-      - name: Build maven artifacts
-        run: mvn -B package -DskipTests
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+      - name: Build artifacts
+        run: ./gradlew build --no-build-cache -x test
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{matrix.language}}"
+
+  check_codeql_status:
+    name: Check CodeQL Status
+    needs: Analyze
+    permissions:
+      contents: read
+      checks: read
+      pull-requests: read
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - name: Check CodeQL Status
+        uses: eldrick19/code-scanning-status-checker@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pr_number: ${{ github.event.pull_request.number }}
+          repo: ${{ github.repository }}
