@@ -49,10 +49,12 @@ class ExternalController(
 	}
 
 	private fun hentDeltakelser(personIdent: String): List<DeltakerDto> {
-		return deltakerService.hentDeltakereMedPersonIdent(personIdent)
-			.map {
-					deltaker -> deltaker.toDto(gjennomforingService.getGjennomforing(deltaker.gjennomforingId))
-			}
+		val deltakere = deltakerService.hentDeltakereMedPersonIdent(personIdent)
+		val gjennomforinger = deltakere.distinctBy { it.gjennomforingId }
+			.map { gjennomforingService.getGjennomforing(it.gjennomforingId) }
+			.associateBy { it.id }
+
+		return deltakere.map { it.toDto(gjennomforinger[it.gjennomforingId]!!) }
 	}
 
 	private fun harAktiveDeltakelser(deltakelser: List<DeltakerDto>): Boolean {
