@@ -57,7 +57,7 @@ class NavBrukerIngestorImpl(
 		log.info("Mottok tombstone for nav-bruker $personId - sletter bruker og deltakere")
 		val deltakere = deltakerService.hentDeltakereMedPersonId(personId)
 
-		deltakere.forEach { deltakerService.slettDeltaker(it.id, it.kilde) }
+		deltakere.forEach { deltakerService.slettDeltaker(it.id) }
 
 		brukerService.slettBruker(personId)
 	}

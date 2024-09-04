@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.data_publisher
 
 import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.data_publisher.publish.DeltakerPublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.EndringsmeldingPublishQuery
@@ -21,6 +22,7 @@ class DataPublisherService(
 	private val stringKafkaProducer: KafkaProducerClient<String, String>,
 	private val template: NamedParameterJdbcTemplate,
 	private val publishRepository: PublishRepository,
+	private val unleashService: UnleashService
 ) {
 
 	private val logger = LoggerFactory.getLogger(javaClass)
@@ -76,7 +78,7 @@ class DataPublisherService(
 	}
 
 	fun publishDeltaker(id: UUID, forcePublish: Boolean = false) {
-		when (val result = DeltakerPublishQuery(template).get(id)) {
+		when (val result = DeltakerPublishQuery(template, unleashService).get(id)) {
 			is DeltakerPublishQuery.Result.DontPublish -> return
 			is DeltakerPublishQuery.Result.PublishTombstone -> {
 				ProducerRecord<String, String?>(kafkaTopicProperties.amtDeltakerTopic, id.toString(), null)

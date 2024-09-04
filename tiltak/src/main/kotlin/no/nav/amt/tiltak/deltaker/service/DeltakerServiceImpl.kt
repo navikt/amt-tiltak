@@ -5,7 +5,6 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import no.nav.amt.tiltak.core.domain.tiltak.harIkkeStartet
@@ -15,6 +14,7 @@ import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
@@ -41,7 +41,8 @@ open class DeltakerServiceImpl(
 	private val transactionTemplate: TransactionTemplate,
 	private val kafkaProducerService: KafkaProducerService,
 	private val publisherService: DataPublisherService,
-	private val vurderingRepository: VurderingRepository
+	private val vurderingRepository: VurderingRepository,
+	private val unleashService: UnleashService
 ) : DeltakerService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -103,27 +104,49 @@ open class DeltakerServiceImpl(
 	}
 
 	override fun progressStatuser() {
-		val deltakere = deltakerRepository.erPaaAvsluttetGjennomforing()
+		val deltakereSomSkalAvsluttes = deltakerRepository.erPaaAvsluttetGjennomforing()
 			.plus(deltakerRepository.sluttDatoPassert())
-			.filter { it.kilde != Kilde.KOMET }
+		val deltakereSomDeltar = deltakerRepository.skalHaStatusDeltar()
+
+		val gjennomforingIder = deltakereSomSkalAvsluttes
+			.plus(deltakereSomDeltar)
+			.map { it.gjennomforingId }.distinct()
+		val erKometMasterForGjennomforingMap = gjennomforingIder
+			.associateWith { unleashService.erKometMasterForTiltakstype(gjennomforingService.getGjennomforing(it).tiltak.kode) }
+
+		val deltakere = deltakereSomSkalAvsluttes
+			.filterNot { erKometMasterForGjennomforingMap[it.gjennomforingId]!! }
 			.let { mapDeltakereOgAktiveStatuser(it) }
 
 		progressStatuser(deltakere)
-		oppdaterStatuser(deltakerRepository.skalHaStatusDeltar().map { it.id }, nyStatus = DeltakerStatus.Type.DELTAR)
+		oppdaterStatuser(
+			deltakereSomDeltar.filterNot { erKometMasterForGjennomforingMap[it.gjennomforingId]!! }.map { it.id },
+			nyStatus = DeltakerStatus.Type.DELTAR
+		)
 	}
 
 	override fun slettDeltakerePaaGjennomforing(gjennomforingId: UUID) {
-		hentDeltakerePaaGjennomforing(gjennomforingId).forEach {
-			slettDeltaker(it.id, it.kilde)
+		val tiltaktype = gjennomforingService.getGjennomforing(gjennomforingId).tiltak.kode
+		if (unleashService.erKometMasterForTiltakstype(tiltaktype)) {
+			return
+		} else {
+			hentDeltakerePaaGjennomforing(gjennomforingId).forEach {
+				slettDeltaker(it.id)
+			}
 		}
 	}
 
 	override fun avsluttDeltakerePaaAvbruttGjennomforing(gjennomforingId: UUID) {
-		val deltakere = hentDeltakerePaaGjennomforing(gjennomforingId).filter { it.kilde != Kilde.KOMET }
-		progressStatuser(deltakere, DeltakerStatus.Aarsak.SAMARBEIDET_MED_ARRANGOREN_ER_AVBRUTT)
+		val tiltaktype = gjennomforingService.getGjennomforing(gjennomforingId).tiltak.kode
+		if (unleashService.erKometMasterForTiltakstype(tiltaktype)) {
+			return
+		} else {
+			val deltakere = hentDeltakerePaaGjennomforing(gjennomforingId)
+			progressStatuser(deltakere, DeltakerStatus.Aarsak.SAMARBEIDET_MED_ARRANGOREN_ER_AVBRUTT)
+		}
 	}
 
-	override fun slettDeltaker(deltakerId: UUID, kilde: Kilde) {
+	override fun slettDeltaker(deltakerId: UUID) {
 		transactionTemplate.execute {
 			endringsmeldingService.slett(deltakerId)
 			deltakerStatusRepository.slett(deltakerId)
@@ -133,9 +156,7 @@ open class DeltakerServiceImpl(
 		}
 
 		log.info("Deltaker med id=$deltakerId er slettet")
-		if (kilde != Kilde.KOMET) {
-			publisherService.publish(deltakerId, DataPublishType.DELTAKER)
-		}
+		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
 	}
 
 	override fun erSkjermet(deltakerId: UUID): Boolean {
@@ -182,12 +203,17 @@ open class DeltakerServiceImpl(
 		gjennomforingId: UUID,
 		oppdatertGjennomforingErKurs: Boolean
 	) {
-		val deltakere = hentDeltakerePaaGjennomforing(gjennomforingId).filter { it.kilde != Kilde.KOMET }
-		if (deltakere.isNotEmpty()) {
-			if (oppdatertGjennomforingErKurs) {
-				konverterDeltakerstatuseFraLopendeInntakTilKurs(deltakere, gjennomforingId)
-			} else {
-				konverterDeltakerstatuseFraKursTilLopendeInntak(deltakere)
+		val tiltaktype = gjennomforingService.getGjennomforing(gjennomforingId).tiltak.kode
+		if (unleashService.erKometMasterForTiltakstype(tiltaktype)) {
+			return
+		} else {
+			val deltakere = hentDeltakerePaaGjennomforing(gjennomforingId)
+			if (deltakere.isNotEmpty()) {
+				if (oppdatertGjennomforingErKurs) {
+					konverterDeltakerstatuseFraLopendeInntakTilKurs(deltakere, gjennomforingId)
+				} else {
+					konverterDeltakerstatuseFraKursTilLopendeInntak(deltakere)
+				}
 			}
 		}
 	}

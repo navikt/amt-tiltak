@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.bff.nav_ansatt
 
-import io.getunleash.Unleash
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -15,6 +14,7 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
+import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.core.port.VurderingService
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
@@ -40,13 +40,13 @@ class NavAnsattControllerServiceTest {
 	private val taAuthService = mockk<TiltaksansvarligAutoriseringService>()
 	private val gjennomforingService = mockk<GjennomforingService>()
 	private val vurderingService = mockk<VurderingService>()
-	private val unleashClient = mockk<Unleash>()
+	private val unleashService = mockk<UnleashService>()
 	private val controller = NavAnsattControllerService(
 		endringsmeldingService,
 		deltakerService,
 		gjennomforingService,
 		vurderingService,
-		unleashClient
+		unleashService
 	)
 	private val navIdent = "z1232"
 
@@ -83,7 +83,7 @@ class NavAnsattControllerServiceTest {
 		val deltaker = DELTAKER_1.toDeltaker(BRUKER_1, DELTAKER_1_STATUS_1)
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
-		every { unleashClient.isEnabled(any()) } returns false
+		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
 
 		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
 
@@ -112,7 +112,7 @@ class NavAnsattControllerServiceTest {
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
-		every { unleashClient.isEnabled(any()) } returns false
+		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
 
 		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
 
@@ -141,7 +141,7 @@ class NavAnsattControllerServiceTest {
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
-		every { unleashClient.isEnabled(any()) } returns false
+		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
 
 		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilSkjermede)
 
@@ -177,7 +177,7 @@ class NavAnsattControllerServiceTest {
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
 		every { vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId) } returns listOf(vurdering)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
-		every { unleashClient.isEnabled(any()) } returns false
+		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
 		val forventetDeltaker = umaskertDeltakerDto(BRUKER_1)
 
 		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilLosning)
@@ -220,7 +220,7 @@ class NavAnsattControllerServiceTest {
 		every { vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId) } returns listOf(vurdering)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
-		every { unleashClient.isEnabled(any()) } returns false
+		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
 		val forventetDeltaker = maskertDeltakerDto(BRUKER_SKJERMET)
 
 		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilLosning)
@@ -263,7 +263,7 @@ class NavAnsattControllerServiceTest {
 		every { vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId) } returns listOf(vurdering)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
-		every { unleashClient.isEnabled(any()) } returns false
+		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
 		val forventetDeltaker = umaskertDeltakerDto(BRUKER_SKJERMET)
 
 		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilSkjermede)
@@ -365,7 +365,7 @@ class NavAnsattControllerServiceTest {
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
 		every { deltakerService.hentDeltakerMap(emptyList()) } returns emptyMap()
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
-		every { unleashClient.isEnabled(any()) } returns true
+		every { unleashService.erKometMasterForTiltakstype(any()) } returns true
 
 		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
 
@@ -401,7 +401,7 @@ class NavAnsattControllerServiceTest {
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
 		every { vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId) } returns listOf(vurdering)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
-		every { unleashClient.isEnabled(NavAnsattControllerService.KOMET_DELTAKERE_TOGGEL) } returns false
+		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
 
 		assertions(gjennomforingId)
 	}

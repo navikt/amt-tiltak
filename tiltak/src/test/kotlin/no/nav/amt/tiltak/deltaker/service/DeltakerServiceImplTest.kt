@@ -23,6 +23,7 @@ import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.NavEnhetService
+import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
@@ -84,6 +85,7 @@ class DeltakerServiceImplTest {
 	lateinit var amtPersonClient: AmtPersonClient
 	lateinit var navAnsattService: NavAnsattService
 	lateinit var vurderingRepository: VurderingRepository
+	lateinit var unleashService: UnleashService
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 	val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
@@ -108,6 +110,7 @@ class DeltakerServiceImplTest {
 		endringsmeldingRepository = EndringsmeldingRepository(jdbcTemplate, objectMapper)
 		endringsmeldingService = EndringsmeldingServiceImpl(endringsmeldingRepository, mockk(), transactionTemplate, publisherService)
 		vurderingRepository = VurderingRepository(jdbcTemplate)
+		unleashService = mockk()
 
 		deltakerServiceImpl = DeltakerServiceImpl(
 			deltakerRepository = deltakerRepository,
@@ -118,12 +121,14 @@ class DeltakerServiceImplTest {
 			transactionTemplate = transactionTemplate,
 			kafkaProducerService = kafkaProducerService,
 			publisherService = publisherService,
-			vurderingRepository = vurderingRepository
+			vurderingRepository = vurderingRepository,
+			unleashService = unleashService
 		)
 		testDataRepository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
 
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource, TestDataSeeder::insertMinimum)
 		every { publisherService.publish(id = any(), type = any()) } returns Unit
+		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
 	}
 
 	@AfterEach
@@ -440,20 +445,11 @@ class DeltakerServiceImplTest {
 
 	@Test
 	fun `slettDeltaker - skal publisere sletting på kafka`() {
-		deltakerServiceImpl.slettDeltaker(deltakerId, Kilde.ARENA)
+		deltakerServiceImpl.slettDeltaker(deltakerId)
 
 		verify(exactly = 1) { kafkaProducerService.publiserSlettDeltaker(deltakerId) }
 		verify(exactly = 1) { publisherService.publish(deltakerId, DataPublishType.DELTAKER) }
 	}
-
-	@Test
-	fun `slettDeltaker - skal ikke publisere sletting på v2-topic hvis kilde er KOMET`() {
-		deltakerServiceImpl.slettDeltaker(deltakerId, Kilde.KOMET)
-
-		verify(exactly = 1) { kafkaProducerService.publiserSlettDeltaker(deltakerId) }
-		verify(exactly = 0) { publisherService.publish(deltakerId, DataPublishType.DELTAKER) }
-	}
-
 
 	@Test
 	fun `slettDeltaker - skal slette deltaker og status`() {
@@ -469,7 +465,7 @@ class DeltakerServiceImplTest {
 		deltakerServiceImpl.insertStatus(statusInsertDbo)
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldNotBe null
 
-		deltakerServiceImpl.slettDeltaker(deltakerId, Kilde.ARENA)
+		deltakerServiceImpl.slettDeltaker(deltakerId)
 
 		deltakerRepository.get(deltakerId) shouldBe null
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldBe null
@@ -502,7 +498,7 @@ class DeltakerServiceImplTest {
 
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldNotBe null
 
-		deltakerServiceImpl.slettDeltaker(deltakerId, Kilde.ARENA)
+		deltakerServiceImpl.slettDeltaker(deltakerId)
 
 		deltakerRepository.get(deltakerId) shouldBe null
 
