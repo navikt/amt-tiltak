@@ -46,7 +46,7 @@ class DeltakerProcessor(
 
 		val (gjennomforingId, tiltakstype) = getGjennomforingIdAndTiltakstype(deltakerDto.gjennomforingId)
 
-		if (unleashService.erKometMasterForTiltakstype(tiltakstype)) {
+		if (!unleashService.erKometMasterForTiltakstype(tiltakstype)) {
 			val status = DeltakerStatusInsert(
 				id = UUID.randomUUID(),
 				deltakerId = deltakerDto.id,
