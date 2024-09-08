@@ -35,7 +35,16 @@ class DeltakerIngestorImpl(
 	override fun ingest(key: String, value: String?) {
 		val deltakerId = UUID.fromString(key)
 		if (value == null) {
-			deltakerService.slettDeltaker(deltakerId)
+			val deltaker = deltakerService.hentDeltaker(deltakerId)
+			if (deltaker == null) {
+				log.info("Mottatt tombstone på deltaker som ikke finnes $deltakerId")
+				return
+			}
+			val tiltakstype = gjennomforingService.getGjennomforing(deltaker.gjennomforingId).tiltak.kode
+			val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltakstype)
+			if (erKometDeltaker) {
+				deltakerService.slettDeltaker(deltakerId, erKometDeltaker)
+			}
 		} else {
 			val deltakerDto: DeltakerDto = fromJsonString(value)
 			upsert(deltakerDto)
@@ -55,7 +64,8 @@ class DeltakerIngestorImpl(
 				}
 			}
 
-		if (unleashService.erKometMasterForTiltakstype(tiltakstype)) {
+		val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltakstype)
+		if (erKometDeltaker) {
 			val status = DeltakerStatusInsert(
 				id = deltakerDto.status.id ?: UUID.randomUUID(),
 				deltakerId = deltakerDto.id,
@@ -83,7 +93,7 @@ class DeltakerIngestorImpl(
 			)
 
 			transactionTemplate.executeWithoutResult {
-				deltakerService.upsertDeltaker(deltakerDto.personalia.personident, deltakerUpsert)
+				deltakerService.upsertDeltaker(deltakerDto.personalia.personident, deltakerUpsert, erKometDeltaker)
 			}
 			log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} deltakerlisteId=${gjennomforingId} fra ny løsning")
 		}

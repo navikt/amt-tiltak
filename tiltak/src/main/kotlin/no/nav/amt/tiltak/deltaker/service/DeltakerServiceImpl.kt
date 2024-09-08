@@ -47,7 +47,7 @@ open class DeltakerServiceImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	override fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert) {
+	override fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert, erKometDeltaker: Boolean?) {
 		val lagretDeltaker = hentDeltaker(deltaker.id)
 		val brukerId = brukerService.getIdOrCreate(personIdent)
 
@@ -59,11 +59,11 @@ open class DeltakerServiceImpl(
 			val oppdatertDeltaker = hentDeltaker(deltaker.id)
 				?: throw IllegalStateException("Fant ikke deltaker med id ${deltaker.id}")
 
-			publiser(oppdatertDeltaker, LocalDateTime.now())
+			publiser(oppdatertDeltaker, LocalDateTime.now(), erKometDeltaker)
 		}
 	}
 
-	override fun insertStatus(status: DeltakerStatusInsert) {
+	override fun insertStatus(status: DeltakerStatusInsert, erKometDeltaker: Boolean?) {
 		transactionTemplate.executeWithoutResult {
 			val statusBleOppdatert = oppdaterStatus(status)
 
@@ -71,7 +71,7 @@ open class DeltakerServiceImpl(
 				val oppdatertDeltaker = hentDeltaker(status.deltakerId)
 					?: throw IllegalStateException("Fant ikke deltaker med id ${status.deltakerId}")
 
-				publiser(oppdatertDeltaker, LocalDateTime.now())
+				publiser(oppdatertDeltaker, LocalDateTime.now(), erKometDeltaker)
 			}
 		}
 	}
@@ -106,32 +106,41 @@ open class DeltakerServiceImpl(
 	override fun progressStatuser() {
 		val deltakereSomSkalAvsluttes = deltakerRepository.erPaaAvsluttetGjennomforing()
 			.plus(deltakerRepository.sluttDatoPassert())
-		val deltakereSomDeltar = deltakerRepository.skalHaStatusDeltar()
 
 		val gjennomforingIder = deltakereSomSkalAvsluttes
-			.plus(deltakereSomDeltar)
 			.map { it.gjennomforingId }.distinct()
 		val erKometMasterForGjennomforingMap = gjennomforingIder
 			.associateWith { unleashService.erKometMasterForTiltakstype(gjennomforingService.getGjennomforing(it).tiltak.kode) }
+			.toMutableMap()
 
 		val deltakere = deltakereSomSkalAvsluttes
 			.filterNot { erKometMasterForGjennomforingMap[it.gjennomforingId]!! }
 			.let { mapDeltakereOgAktiveStatuser(it) }
 
 		progressStatuser(deltakere)
+
+		val deltakereSomSkalDelta = deltakerRepository.skalHaStatusDeltar()
+
+		deltakereSomSkalDelta.forEach {
+			if (erKometMasterForGjennomforingMap[it.gjennomforingId] == null) {
+				erKometMasterForGjennomforingMap[it.gjennomforingId] = unleashService.erKometMasterForTiltakstype(gjennomforingService.getGjennomforing(it.gjennomforingId).tiltak.kode)
+			}
+		}
+
 		oppdaterStatuser(
-			deltakereSomDeltar.filterNot { erKometMasterForGjennomforingMap[it.gjennomforingId]!! }.map { it.id },
+			deltakereSomSkalDelta.filterNot { erKometMasterForGjennomforingMap[it.gjennomforingId]!! }.map { it.id },
 			nyStatus = DeltakerStatus.Type.DELTAR
 		)
 	}
 
 	override fun slettDeltakerePaaGjennomforing(gjennomforingId: UUID) {
 		val tiltaktype = gjennomforingService.getGjennomforing(gjennomforingId).tiltak.kode
-		if (unleashService.erKometMasterForTiltakstype(tiltaktype)) {
+		val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltaktype)
+		if (erKometDeltaker) {
 			return
 		} else {
 			hentDeltakerePaaGjennomforing(gjennomforingId).forEach {
-				slettDeltaker(it.id)
+				slettDeltaker(it.id, erKometDeltaker)
 			}
 		}
 	}
@@ -146,7 +155,7 @@ open class DeltakerServiceImpl(
 		}
 	}
 
-	override fun slettDeltaker(deltakerId: UUID) {
+	override fun slettDeltaker(deltakerId: UUID, erKometDeltaker: Boolean?) {
 		transactionTemplate.execute {
 			endringsmeldingService.slett(deltakerId)
 			deltakerStatusRepository.slett(deltakerId)
@@ -156,7 +165,7 @@ open class DeltakerServiceImpl(
 		}
 
 		log.info("Deltaker med id=$deltakerId er slettet")
-		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
+		publisherService.publish(deltakerId, DataPublishType.DELTAKER, erKometDeltaker)
 	}
 
 	override fun erSkjermet(deltakerId: UUID): Boolean {
@@ -195,7 +204,7 @@ open class DeltakerServiceImpl(
 			vurderingRepository.insert(nyVurdering)
 		}
 
-		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
+		publisherService.publish(deltakerId, DataPublishType.DELTAKER, null)
 		return vurderingRepository.getVurderingerForDeltaker(deltakerId)
 	}
 
@@ -231,7 +240,8 @@ open class DeltakerServiceImpl(
 					aarsak = it.status.aarsak,
 					aarsaksbeskrivelse = it.status.aarsaksbeskrivelse,
 					gyldigFra = LocalDateTime.now()
-				)
+				),
+				erKometDeltaker = false
 			)
 		}
 		log.info("Oppdatert status for ${deltakereSomSkalOppdateres.size} deltakere på gjennomføring som gikk fra kurs til løpende inntak")
@@ -256,7 +266,8 @@ open class DeltakerServiceImpl(
 						aarsak = it.status.aarsak,
 						aarsaksbeskrivelse = it.status.aarsaksbeskrivelse,
 						gyldigFra = LocalDateTime.now()
-					)
+					),
+					erKometDeltaker = false
 				)
 			}
 		}
@@ -374,7 +385,8 @@ open class DeltakerServiceImpl(
 					aarsak = sluttarsak,
 					aarsaksbeskrivelse = null,
 					gyldigFra = LocalDateTime.now()
-				)
+				),
+				erKometDeltaker = false
 			)
 		}
 
@@ -393,7 +405,13 @@ open class DeltakerServiceImpl(
 
 			val statuser = hentAktiveStatuserForDeltakere(deltakere.map { it.id })
 
-			deltakere.forEach {
+			val gjennomforingIder = deltakere
+				.map { it.gjennomforingId }.distinct()
+			val erKometMasterForGjennomforingMap = gjennomforingIder
+				.associateWith { unleashService.erKometMasterForTiltakstype(gjennomforingService.getGjennomforing(it).tiltak.kode) }
+				.toMutableMap()
+
+			deltakere.filterNot { erKometMasterForGjennomforingMap[it.gjennomforingId]!! }.forEach {
 				val status = statuser[it.id]?.toModel()
 
 				if (status == null) {
@@ -404,7 +422,7 @@ open class DeltakerServiceImpl(
 				val deltaker = it.toDeltaker(status)
 
 				kafkaProducerService.publiserDeltaker(deltaker, deltaker.endretDato)
-				publisherService.publish(deltaker.id, DataPublishType.DELTAKER)
+				publisherService.publish(deltaker.id, DataPublishType.DELTAKER, false)
 			}
 
 			offset += deltakere.size
@@ -415,28 +433,22 @@ open class DeltakerServiceImpl(
 		log.info("Ferdig med republisering av deltakere på kafka")
 	}
 
-	override fun republiserDeltakerPaKafka(deltakerId: UUID) {
-		val deltaker = hentDeltaker(deltakerId) ?: error("Fant ikke deltaker med id $deltakerId")
-
-		publiser(deltaker, deltaker.endretDato)
-	}
-
 	override fun publiserDeltakerPaKafka(deltakerId: UUID, endretDato: LocalDateTime) {
 		val deltaker = hentDeltaker(deltakerId) ?: error("Fant ikke deltaker med id $deltakerId")
 
-		publiser(deltaker, endretDato)
+		publiser(deltaker, endretDato, null)
 	}
 
-	private fun publiser(deltaker: Deltaker, endretDato: LocalDateTime) {
+	private fun publiser(deltaker: Deltaker, endretDato: LocalDateTime, erKometDeltaker: Boolean?) {
 		kafkaProducerService.publiserDeltaker(deltaker, endretDato)
-		publisherService.publish(deltaker.id, DataPublishType.DELTAKER)
+		publisherService.publish(deltaker.id, DataPublishType.DELTAKER, erKometDeltaker)
 
 		log.info("Publisert deltaker med id ${deltaker.id} på kafka")
 	}
 
 
 	override fun publiserDeltakerPaDeltakerV2Kafka(deltakerId: UUID) {
-		publisherService.publish(deltakerId, DataPublishType.DELTAKER)
+		publisherService.publish(deltakerId, DataPublishType.DELTAKER, null)
 		log.info("Publisert deltaker med id $deltakerId på kafkatopic deltaker-v2")
 	}
 

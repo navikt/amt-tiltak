@@ -46,7 +46,9 @@ class DeltakerProcessor(
 
 		val (gjennomforingId, tiltakstype) = getGjennomforingIdAndTiltakstype(deltakerDto.gjennomforingId)
 
-		if (!unleashService.erKometMasterForTiltakstype(tiltakstype)) {
+		val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltakstype)
+
+		if (!erKometDeltaker) {
 			val status = DeltakerStatusInsert(
 				id = UUID.randomUUID(),
 				deltakerId = deltakerDto.id,
@@ -74,7 +76,7 @@ class DeltakerProcessor(
 			)
 
 			transactionTemplate.executeWithoutResult {
-				deltakerService.upsertDeltaker(deltakerDto.personIdent, deltakerUpsert)
+				deltakerService.upsertDeltaker(deltakerDto.personIdent, deltakerUpsert, erKometDeltaker)
 			}
 			log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=${gjennomforingId}")
 		}
@@ -152,10 +154,17 @@ class DeltakerProcessor(
 
 	override fun processDeleteMessage(message: MessageWrapper<DeltakerPayload>) {
 		val deltakerId = message.payload.id
-
 		log.info("Motatt delete-melding, sletter deltaker med id=$deltakerId")
-
-		deltakerService.slettDeltaker(deltakerId)
+		val deltaker = deltakerService.hentDeltaker(deltakerId)
+		if (deltaker == null) {
+			log.info("Mottatt tombstone på arena-deltaker som ikke finnes $deltakerId")
+			return
+		}
+		val tiltakstype = gjennomforingService.getGjennomforing(deltaker.gjennomforingId).tiltak.kode
+		val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltakstype)
+		if (!erKometDeltaker) {
+			deltakerService.slettDeltaker(deltakerId, erKometDeltaker)
+		}
 	}
 
 	private data class GjennomforingIdOgTiltakstype(

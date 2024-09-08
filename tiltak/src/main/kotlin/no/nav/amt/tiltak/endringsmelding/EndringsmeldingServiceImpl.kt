@@ -55,7 +55,7 @@ open class EndringsmeldingServiceImpl(
 		endringsmeldingRepository.markerSomUtfort(endringsmeldingId, navAnsattId)
 
 		auditLoggerService.navAnsattBehandletEndringsmeldingAuditLog(navAnsattId, endringsmelding.deltakerId)
-		publisherService.publish(endringsmeldingId, DataPublishType.ENDRINGSMELDING)
+		publisherService.publish(endringsmeldingId, DataPublishType.ENDRINGSMELDING, null)
 	}
 
 	override fun markerSomTilbakekalt(id: UUID) {
@@ -68,7 +68,7 @@ open class EndringsmeldingServiceImpl(
 		}
 
 		endringsmeldingRepository.markerSomTilbakekalt(id)
-		publisherService.publish(id, DataPublishType.ENDRINGSMELDING)
+		publisherService.publish(id, DataPublishType.ENDRINGSMELDING, null)
 		log.info("Endringsmelding med id $id er tilbakekalt av arrangor ansatt")
 	}
 
@@ -198,7 +198,7 @@ open class EndringsmeldingServiceImpl(
 		val endringsmeldinger = endringsmeldingRepository.getByDeltaker(deltakerId)
 		endringsmeldingRepository.deleteByDeltaker(deltakerId)
 		endringsmeldinger.forEach {
-			publisherService.publish(it.id, DataPublishType.ENDRINGSMELDING)
+			publisherService.publish(it.id, DataPublishType.ENDRINGSMELDING, null)
 		}
 	}
 
@@ -271,8 +271,8 @@ open class EndringsmeldingServiceImpl(
 		}
 
 		log.info("Endringsmelding av type ${type.name} opprettet med id $id for deltaker $deltakerId")
-		aktiveEndringsmeldinger.forEach { publisherService.publish(it.id, DataPublishType.ENDRINGSMELDING) }
-		publisherService.publish(id, DataPublishType.ENDRINGSMELDING)
+		aktiveEndringsmeldinger.forEach { publisherService.publish(it.id, DataPublishType.ENDRINGSMELDING, null) }
+		publisherService.publish(id, DataPublishType.ENDRINGSMELDING, null)
 		return id
 	}
 

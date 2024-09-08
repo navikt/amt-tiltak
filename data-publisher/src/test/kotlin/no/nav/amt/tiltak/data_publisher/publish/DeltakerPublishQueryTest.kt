@@ -31,7 +31,7 @@ class DeltakerPublishQueryTest : FunSpec({
 		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
 		val input = db.createDeltaker()
 
-		when (val data = query.get(input.id)) {
+		when (val data = query.get(input.id, null)) {
 			is DeltakerPublishQuery.Result.OK -> data.result.id shouldBe input.id
 			else -> fail("Should be ok, was $data")
 		}
@@ -41,7 +41,7 @@ class DeltakerPublishQueryTest : FunSpec({
 		every { unleashService.erKometMasterForTiltakstype(any()) } returns true
 		val input = db.createDeltaker()
 
-		when (val data = query.get(input.id)) {
+		when (val data = query.get(input.id, null)) {
 			is DeltakerPublishQuery.Result.DontPublish -> {}
 			else -> fail("Should be ok, was $data")
 		}

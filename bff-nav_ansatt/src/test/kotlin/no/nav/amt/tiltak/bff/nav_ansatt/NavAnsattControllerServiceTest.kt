@@ -84,6 +84,11 @@ class NavAnsattControllerServiceTest {
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
+		every { gjennomforingService.getGjennomforing(DELTAKER_1.gjennomforingId) } returns GJENNOMFORING_1
+			.toGjennomforing(
+				TILTAK_1.copy(type = "ARBFORB").toTiltak(),
+				ARRANGOR_1.toArrangor()
+			)
 
 		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
 
@@ -113,6 +118,11 @@ class NavAnsattControllerServiceTest {
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
 		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
+		every { gjennomforingService.getGjennomforing(DELTAKER_1.gjennomforingId) } returns GJENNOMFORING_1
+			.toGjennomforing(
+				TILTAK_1.copy(type = "ARBFORB").toTiltak(),
+				ARRANGOR_1.toArrangor()
+			)
 
 		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
 
@@ -142,6 +152,11 @@ class NavAnsattControllerServiceTest {
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
 		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
+		every { gjennomforingService.getGjennomforing(DELTAKER_1.gjennomforingId) } returns GJENNOMFORING_1
+			.toGjennomforing(
+				TILTAK_1.copy(type = "ARBFORB").toTiltak(),
+				ARRANGOR_1.toArrangor()
+			)
 
 		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilSkjermede)
 
@@ -178,6 +193,11 @@ class NavAnsattControllerServiceTest {
 		every { vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId) } returns listOf(vurdering)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
+		every { gjennomforingService.getGjennomforing(DELTAKER_1.gjennomforingId) } returns GJENNOMFORING_1
+			.toGjennomforing(
+				TILTAK_1.copy(type = "ARBFORB").toTiltak(),
+				ARRANGOR_1.toArrangor()
+			)
 		val forventetDeltaker = umaskertDeltakerDto(BRUKER_1)
 
 		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilLosning)
@@ -221,6 +241,11 @@ class NavAnsattControllerServiceTest {
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
 		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
+		every { gjennomforingService.getGjennomforing(DELTAKER_1.gjennomforingId) } returns GJENNOMFORING_1
+			.toGjennomforing(
+				TILTAK_1.copy(type = "ARBFORB").toTiltak(),
+				ARRANGOR_1.toArrangor()
+			)
 		val forventetDeltaker = maskertDeltakerDto(BRUKER_SKJERMET)
 
 		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilLosning)
@@ -264,6 +289,11 @@ class NavAnsattControllerServiceTest {
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
 		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
+		every { gjennomforingService.getGjennomforing(DELTAKER_1.gjennomforingId) } returns GJENNOMFORING_1
+			.toGjennomforing(
+				TILTAK_1.copy(type = "ARBFORB").toTiltak(),
+				ARRANGOR_1.toArrangor()
+			)
 		val forventetDeltaker = umaskertDeltakerDto(BRUKER_SKJERMET)
 
 		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilSkjermede)
@@ -401,6 +431,11 @@ class NavAnsattControllerServiceTest {
 		every { endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId) } returns listOf(endringsmelding)
 		every { vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId) } returns listOf(vurdering)
 		every { deltakerService.hentDeltakerMap(listOf(deltaker.id)) } returns mapOf(endringsmelding.deltakerId to deltaker)
+		every { gjennomforingService.getGjennomforing(DELTAKER_1.gjennomforingId) } returns GJENNOMFORING_1
+			.toGjennomforing(
+				TILTAK_1.copy(type = "ARBFORB").toTiltak(),
+				ARRANGOR_1.toArrangor()
+			)
 		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
 
 		assertions(gjennomforingId)

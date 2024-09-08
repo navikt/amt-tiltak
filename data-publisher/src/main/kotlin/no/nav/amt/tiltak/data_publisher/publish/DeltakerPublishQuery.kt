@@ -35,14 +35,14 @@ class DeltakerPublishQuery(
 	private val template: NamedParameterJdbcTemplate,
 	private val unleashService: UnleashService
 ) {
-	fun get(id: UUID): Result<DeltakerPublishDto> {
+	fun get(id: UUID, erKometDeltaker: Boolean?): Result<DeltakerPublishDto> {
 		val deltaker = getDeltaker(id) ?: return Result.PublishTombstone()
 
 		if (deltaker.status == null) return Result.DontPublish()
 
-		val vurderinger = getVurderinger(id)
+		if (erKometDeltaker == true || unleashService.erKometMasterForTiltakstype(deltaker.tiltakstype)) return Result.DontPublish()
 
-		if (unleashService.erKometMasterForTiltakstype(deltaker.tiltakstype)) return Result.DontPublish()
+		val vurderinger = getVurderinger(id)
 
 		return DeltakerPublishDto(
 			deltaker.id,

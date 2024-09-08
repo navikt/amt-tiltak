@@ -43,7 +43,7 @@ class RepubliseringController(
 			JobRunner.runAsync("republiser_deltaker_kafka") {
 				val deltaker = deltakerService.hentDeltaker(id) ?: throw NoSuchElementException()
 				kafkaProducerService.publiserDeltaker(deltaker, deltaker.endretDato)
-				dataPublisher.publishDeltaker(deltaker.id, true)
+				dataPublisher.publishDeltaker(deltaker.id, forcePublish = true, erKometDeltaker = null)
 			}
 		} else {
 			throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
@@ -77,13 +77,11 @@ class RepubliseringController(
 		request: HttpServletRequest
 	) {
 		if (isInternal(request)) {
-			JobRunner.runAsync("republiser_${type}_${id}") { dataPublisher.publish(id, type) }
+			JobRunner.runAsync("republiser_${type}_${id}") { dataPublisher.publish(id, type, null) }
 		}
 	}
 
 	private fun isInternal(request: HttpServletRequest): Boolean {
 		return request.remoteAddr == "127.0.0.1"
 	}
-
-
 }

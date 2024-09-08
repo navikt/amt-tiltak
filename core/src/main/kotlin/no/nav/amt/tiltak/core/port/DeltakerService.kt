@@ -10,9 +10,9 @@ import java.util.UUID
 
 interface DeltakerService {
 
-	fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert)
+	fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert, erKometDeltaker: Boolean?)
 
-	fun insertStatus(status: DeltakerStatusInsert)
+	fun insertStatus(status: DeltakerStatusInsert, erKometDeltaker: Boolean?)
 
 	fun hentDeltakerePaaGjennomforing(gjennomforingId: UUID): List<Deltaker>
 
@@ -22,7 +22,7 @@ interface DeltakerService {
 
 	fun progressStatuser()
 
-	fun slettDeltaker(deltakerId: UUID)
+	fun slettDeltaker(deltakerId: UUID, erKometDeltaker: Boolean?)
 
 	fun hentDeltakereMedPersonIdent(personIdent: String): List<Deltaker>
 
@@ -33,8 +33,6 @@ interface DeltakerService {
 	fun hentDeltakerMap(deltakerIder: List<UUID>): Map<UUID, Deltaker>
 
 	fun republiserAlleDeltakerePaKafka(batchSize: Int = 500)
-
-	fun republiserDeltakerPaKafka(deltakerId: UUID)
 
 	fun publiserDeltakerPaKafka(deltakerId: UUID, endretDato: LocalDateTime)
 

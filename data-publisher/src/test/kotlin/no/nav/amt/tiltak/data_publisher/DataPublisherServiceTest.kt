@@ -34,7 +34,7 @@ class DataPublisherServiceTest : FunSpec({
 	lateinit var service: DataPublisherService
 
 	val publishAndVerify = fun(id: UUID, type: DataPublishType, expected: Int) {
-		service.publish(id, type)
+		service.publish(id, type, null)
 		verify(exactly = expected) { kafkaProducerClient.sendSync(any()) }
 	}
 
@@ -59,7 +59,7 @@ class DataPublisherServiceTest : FunSpec({
 		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
 
 		service = DataPublisherService(
-			kafkaTopicProperties, kafkaProducerClient, template, publishRepository, mockk()
+			kafkaTopicProperties, kafkaProducerClient, template, publishRepository,unleashService
 		)
 	}
 

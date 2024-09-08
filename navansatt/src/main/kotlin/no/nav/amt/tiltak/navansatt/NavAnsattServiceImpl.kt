@@ -44,7 +44,7 @@ internal class NavAnsattServiceImpl(
 		if (lagretNavAnsatt != ansatt) {
 			navAnsattRepository.upsert(ansatt)
 			navAnsattRepository.getDeltakerIderForNavAnsatt(ansatt.id).forEach {
-				publisherService.publish(it, DataPublishType.DELTAKER)
+				publisherService.publish(it, DataPublishType.DELTAKER, null)
 			}
 		}
 	}
