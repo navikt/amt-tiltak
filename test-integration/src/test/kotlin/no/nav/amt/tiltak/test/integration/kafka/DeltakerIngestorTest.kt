@@ -37,7 +37,11 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 
 	@Test
 	fun `ingest - ny deltaker - oppretter deltaker`() {
-		val deltakerDto = mockDeltakerDto(TestData.GJENNOMFORING_1.id)
+		val tiltakId = UUID.randomUUID()
+		val deltakerlisteId = UUID.randomUUID()
+		testDataRepository.insertTiltak(TestData.TILTAK_1.copy(id = tiltakId, type = "ARBFORB"))
+		testDataRepository.insertGjennomforing(TestData.GJENNOMFORING_1.copy(id = deltakerlisteId, tiltakId = tiltakId))
+		val deltakerDto = mockDeltakerDto(deltakerlisteId)
 		val value = toJsonString(deltakerDto)
 
 		kafkaMessageSender.sendTilDeltakerV2Topic(deltakerDto.id, value)
