@@ -23,6 +23,7 @@ import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.NavEnhetService
+import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
@@ -84,6 +85,7 @@ class DeltakerServiceImplTest {
 	lateinit var amtPersonClient: AmtPersonClient
 	lateinit var navAnsattService: NavAnsattService
 	lateinit var vurderingRepository: VurderingRepository
+	lateinit var unleashService: UnleashService
 
 	val dataSource = SingletonPostgresContainer.getDataSource()
 	val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
@@ -108,6 +110,7 @@ class DeltakerServiceImplTest {
 		endringsmeldingRepository = EndringsmeldingRepository(jdbcTemplate, objectMapper)
 		endringsmeldingService = EndringsmeldingServiceImpl(endringsmeldingRepository, mockk(), transactionTemplate, publisherService)
 		vurderingRepository = VurderingRepository(jdbcTemplate)
+		unleashService = mockk()
 
 		deltakerServiceImpl = DeltakerServiceImpl(
 			deltakerRepository = deltakerRepository,
@@ -118,12 +121,14 @@ class DeltakerServiceImplTest {
 			transactionTemplate = transactionTemplate,
 			kafkaProducerService = kafkaProducerService,
 			publisherService = publisherService,
-			vurderingRepository = vurderingRepository
+			vurderingRepository = vurderingRepository,
+			unleashService = unleashService
 		)
 		testDataRepository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
 
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource, TestDataSeeder::insertMinimum)
-		every { publisherService.publish(id = any(), type = any()) } returns Unit
+		every { publisherService.publish(id = any(), type = any(), erKometDeltaker = any()) } returns Unit
+		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
 	}
 
 	@AfterEach
@@ -144,13 +149,16 @@ class DeltakerServiceImplTest {
 		every {
 			gjennomforingService.getGjennomforinger(any())
 		} returns listOf(GJENNOMFORING_1.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor()))
+		every {
+			gjennomforingService.getGjennomforing(any())
+		} returns GJENNOMFORING_1.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor())
 
 		deltakerServiceImpl.progressStatuser()
 
 		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
 
 		status!!.type shouldBe DeltakerStatus.Type.HAR_SLUTTET
-		verify(exactly = 1) { publisherService.publish(DELTAKER_2.id, DataPublishType.DELTAKER) }
+		verify(exactly = 1) { publisherService.publish(DELTAKER_2.id, DataPublishType.DELTAKER, false) }
 	}
 
 	@Test
@@ -164,6 +172,9 @@ class DeltakerServiceImplTest {
 		every {
 			gjennomforingService.getGjennomforinger(any())
 		} returns listOf(gjennomforingInput.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor()))
+		every {
+			gjennomforingService.getGjennomforing(any())
+		} returns GJENNOMFORING_1.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor())
 
 		// Valider testdata tilstand
 		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
@@ -173,7 +184,7 @@ class DeltakerServiceImplTest {
 
 		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
 		status!!.type shouldBe DeltakerStatus.Type.FULLFORT
-		verify(exactly = 1) { publisherService.publish(DELTAKER_2.id, DataPublishType.DELTAKER) }
+		verify(exactly = 1) { publisherService.publish(DELTAKER_2.id, DataPublishType.DELTAKER, false) }
 	}
 
 	@Test
@@ -187,6 +198,9 @@ class DeltakerServiceImplTest {
 		every {
 			gjennomforingService.getGjennomforinger(any())
 		} returns listOf(GJENNOMFORING_KURS.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor()))
+		every {
+			gjennomforingService.getGjennomforing(any())
+		} returns GJENNOMFORING_1.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor())
 
 		// Valider testdata tilstand
 		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
@@ -196,7 +210,7 @@ class DeltakerServiceImplTest {
 
 		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
 		status!!.type shouldBe DeltakerStatus.Type.AVBRUTT
-		verify(exactly = 1) { publisherService.publish(DELTAKER_2.id, DataPublishType.DELTAKER) }
+		verify(exactly = 1) { publisherService.publish(DELTAKER_2.id, DataPublishType.DELTAKER, false) }
 	}
 
 	@Test
@@ -210,6 +224,9 @@ class DeltakerServiceImplTest {
 		every {
 			gjennomforingService.getGjennomforinger(any())
 		} returns listOf(GJENNOMFORING_2.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor()))
+		every {
+			gjennomforingService.getGjennomforing(any())
+		} returns GJENNOMFORING_2.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor())
 
 		// Valider testdata tilstand
 		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
@@ -221,7 +238,7 @@ class DeltakerServiceImplTest {
 		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
 
 		status!!.type shouldBe DeltakerStatus.Type.HAR_SLUTTET
-		verify(exactly = 1) { publisherService.publish(DELTAKER_1.id, DataPublishType.DELTAKER) }
+		verify(exactly = 1) { publisherService.publish(DELTAKER_1.id, DataPublishType.DELTAKER, false) }
 	}
 
 	@Test
@@ -235,6 +252,9 @@ class DeltakerServiceImplTest {
 		every {
 			gjennomforingService.getGjennomforinger(any())
 		} returns listOf(GJENNOMFORING_2.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_2.toArrangor()))
+		every {
+			gjennomforingService.getGjennomforing(GJENNOMFORING_2.id)
+		} returns GJENNOMFORING_2.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_2.toArrangor())
 
 		// Valider testdata tilstand
 		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
@@ -246,7 +266,7 @@ class DeltakerServiceImplTest {
 		val status = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
 
 		status!!.type shouldBe DeltakerStatus.Type.IKKE_AKTUELL
-		verify(exactly = 1) { publisherService.publish(DELTAKER_1.id, DataPublishType.DELTAKER) }
+		verify(exactly = 1) { publisherService.publish(DELTAKER_1.id, DataPublishType.DELTAKER, false) }
 	}
 
 	@Test
@@ -260,6 +280,9 @@ class DeltakerServiceImplTest {
 		every {
 			gjennomforingService.getGjennomforinger(any())
 		} returns listOf(GJENNOMFORING_2.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor()))
+		every {
+			gjennomforingService.getGjennomforing(any())
+		} returns GJENNOMFORING_2.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor())
 
 		// Valider testdata tilstand
 		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
@@ -272,12 +295,12 @@ class DeltakerServiceImplTest {
 
 		status!!.type shouldBe DeltakerStatus.Type.HAR_SLUTTET
 		status.aarsak shouldBe DeltakerStatus.Aarsak.SAMARBEIDET_MED_ARRANGOREN_ER_AVBRUTT
-		verify(exactly = 1) { publisherService.publish(DELTAKER_1.id, DataPublishType.DELTAKER) }
+		verify(exactly = 1) { publisherService.publish(DELTAKER_1.id, DataPublishType.DELTAKER, false) }
 	}
 
 	@Test
 	fun `upsertDeltaker - inserter ny deltaker`() {
-		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker, false)
 
 		val nyDeltaker = deltakerRepository.get(BRUKER_1.personIdent, deltaker.gjennomforingId)
 
@@ -286,25 +309,25 @@ class DeltakerServiceImplTest {
 		nyDeltaker.gjennomforingId shouldBe deltaker.gjennomforingId
 
 		verify(exactly = 1) { kafkaProducerService.publiserDeltaker(any(), any()) }
-		verify(exactly = 1) { publisherService.publish(deltaker.id, DataPublishType.DELTAKER) }
+		verify(exactly = 1) { publisherService.publish(deltaker.id, DataPublishType.DELTAKER, false) }
 	}
 
 	@Test
 	fun `upsertDeltaker - republiserer ikke uendrede deltakere`() {
 		verify(exactly = 0) { kafkaProducerService.publiserDeltaker(any(), any()) }
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
-		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker, false)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker, false)
 
 		verify(exactly = 1) { kafkaProducerService.publiserDeltaker(any(), any()) }
-		verify(exactly = 1) { publisherService.publish(deltaker.id, DataPublishType.DELTAKER) }
+		verify(exactly = 1) { publisherService.publish(deltaker.id, DataPublishType.DELTAKER, false) }
 	}
 
 	@Test
 	fun `upsertDeltaker - oppdaterer forrige deltaker`() {
 		val dagerPerUke = 2.5f
-		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
-		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker.copy(dagerPerUke = dagerPerUke))
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker, false)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker.copy(dagerPerUke = dagerPerUke), false)
 
 		val nyDeltaker = deltakerRepository.get(BRUKER_1.personIdent, deltaker.gjennomforingId)
 
@@ -314,7 +337,7 @@ class DeltakerServiceImplTest {
 		nyDeltaker.dagerPerUke shouldBe dagerPerUke
 
 		verify(exactly = 2) { kafkaProducerService.publiserDeltaker(any(), any()) }
-		verify(exactly = 2) { publisherService.publish(deltaker.id, DataPublishType.DELTAKER) }
+		verify(exactly = 2) { publisherService.publish(deltaker.id, DataPublishType.DELTAKER, false) }
 	}
 
 	@Test
@@ -329,16 +352,17 @@ class DeltakerServiceImplTest {
 				aarsak = null,
 				aarsaksbeskrivelse = null,
 				gyldigFra = LocalDateTime.now().minusHours(1)
-			)
+			),
+			false
 		)
 
 		verify(exactly = 1) { kafkaProducerService.publiserDeltaker(any(), any()) }
-		verify(exactly = 1) { publisherService.publish(DELTAKER_1.id, DataPublishType.DELTAKER) }
+		verify(exactly = 1) { publisherService.publish(DELTAKER_1.id, DataPublishType.DELTAKER, false) }
 	}
 
 	@Test
 	fun `insertStatus - ingester status`() {
-		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker, false)
 		val nyDeltaker = deltakerRepository.get(BRUKER_1.personIdent, GJENNOMFORING_1.id)
 		val now = LocalDate.now().atStartOfDay()
 
@@ -353,7 +377,7 @@ class DeltakerServiceImplTest {
 			gyldigFra = now
 		)
 
-		deltakerServiceImpl.insertStatus(statusInsertDbo)
+		deltakerServiceImpl.insertStatus(statusInsertDbo, false)
 
 		val statusEtterEndring = deltakerStatusRepository.getStatusForDeltaker(nyDeltaker.id)
 
@@ -369,12 +393,12 @@ class DeltakerServiceImplTest {
 			aktiv = true
 		)
 		verify(exactly = 2) { kafkaProducerService.publiserDeltaker(any(), any()) }
-		verify(exactly = 2) { publisherService.publish(nyDeltaker.id, DataPublishType.DELTAKER) }
+		verify(exactly = 2) { publisherService.publish(nyDeltaker.id, DataPublishType.DELTAKER, false) }
 	}
 
 	@Test
 	fun `insertStatus - deltaker får samme status igjen - oppdaterer ikke status`() {
-		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker, false)
 		val nyDeltaker = deltakerRepository.get(BRUKER_1.personIdent, GJENNOMFORING_1.id)
 
 		nyDeltaker shouldNotBe null
@@ -388,17 +412,17 @@ class DeltakerServiceImplTest {
 			gyldigFra = LocalDateTime.now()
 		)
 
-		deltakerServiceImpl.insertStatus(statusInsertDbo)
+		deltakerServiceImpl.insertStatus(statusInsertDbo, false)
 
 		val status1 = deltakerStatusRepository.getStatusForDeltaker(nyDeltaker.id)
 
-		deltakerServiceImpl.insertStatus(statusInsertDbo)
+		deltakerServiceImpl.insertStatus(statusInsertDbo, false)
 
 		val status2 = deltakerStatusRepository.getStatusForDeltaker(nyDeltaker.id)
 
 		status2 shouldBe status1
 		verify(exactly = 2) { kafkaProducerService.publiserDeltaker(any(), any()) }
-		verify(exactly = 2) { publisherService.publish(nyDeltaker.id, DataPublishType.DELTAKER) }
+		verify(exactly = 2) { publisherService.publish(nyDeltaker.id, DataPublishType.DELTAKER, false) }
 	}
 
 	@Test
@@ -419,13 +443,14 @@ class DeltakerServiceImplTest {
 			gyldigFra = LocalDateTime.now()
 		)
 
-		deltakerServiceImpl.insertStatus(statusInsertDbo)
+		deltakerServiceImpl.insertStatus(statusInsertDbo, false)
 
 		deltakerServiceImpl.insertStatus(
 			statusInsertDbo.copy(
 				id = UUID.randomUUID(),
 				type = DeltakerStatus.Type.VENTER_PA_OPPSTART
-			)
+			),
+			false
 		)
 
 		val statuser = deltakerStatusRepository.getStatuserForDeltaker(nyDeltaker.id)
@@ -435,25 +460,16 @@ class DeltakerServiceImplTest {
 		statuser.first().type shouldBe statusInsertDbo.type
 		statuser.last().aktiv shouldBe true
 		verify(exactly = 2) { kafkaProducerService.publiserDeltaker(any(), any()) }
-		verify(exactly = 2) { publisherService.publish(nyDeltaker.id, DataPublishType.DELTAKER) }
+		verify(exactly = 2) { publisherService.publish(nyDeltaker.id, DataPublishType.DELTAKER, false) }
 	}
 
 	@Test
 	fun `slettDeltaker - skal publisere sletting på kafka`() {
-		deltakerServiceImpl.slettDeltaker(deltakerId, Kilde.ARENA)
+		deltakerServiceImpl.slettDeltaker(deltakerId, false)
 
 		verify(exactly = 1) { kafkaProducerService.publiserSlettDeltaker(deltakerId) }
-		verify(exactly = 1) { publisherService.publish(deltakerId, DataPublishType.DELTAKER) }
+		verify(exactly = 1) { publisherService.publish(deltakerId, DataPublishType.DELTAKER, false) }
 	}
-
-	@Test
-	fun `slettDeltaker - skal ikke publisere sletting på v2-topic hvis kilde er KOMET`() {
-		deltakerServiceImpl.slettDeltaker(deltakerId, Kilde.KOMET)
-
-		verify(exactly = 1) { kafkaProducerService.publiserSlettDeltaker(deltakerId) }
-		verify(exactly = 0) { publisherService.publish(deltakerId, DataPublishType.DELTAKER) }
-	}
-
 
 	@Test
 	fun `slettDeltaker - skal slette deltaker og status`() {
@@ -465,11 +481,11 @@ class DeltakerServiceImplTest {
 			aarsaksbeskrivelse = null,
 			gyldigFra = LocalDateTime.now().minusDays(2)
 		)
-		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
-		deltakerServiceImpl.insertStatus(statusInsertDbo)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker, false)
+		deltakerServiceImpl.insertStatus(statusInsertDbo, false)
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldNotBe null
 
-		deltakerServiceImpl.slettDeltaker(deltakerId, Kilde.ARENA)
+		deltakerServiceImpl.slettDeltaker(deltakerId, false)
 
 		deltakerRepository.get(deltakerId) shouldBe null
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldBe null
@@ -486,8 +502,8 @@ class DeltakerServiceImplTest {
 			gyldigFra = LocalDateTime.now().minusDays(2)
 		)
 
-		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker)
-		deltakerServiceImpl.insertStatus(statusInsertDbo)
+		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker, false)
+		deltakerServiceImpl.insertStatus(statusInsertDbo, false)
 		endringsmeldingService.opprettForlengDeltakelseEndringsmelding(
 			deltaker.id,
 			ARRANGOR_ANSATT_1.id,
@@ -502,7 +518,7 @@ class DeltakerServiceImplTest {
 
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldNotBe null
 
-		deltakerServiceImpl.slettDeltaker(deltakerId, Kilde.ARENA)
+		deltakerServiceImpl.slettDeltaker(deltakerId, false)
 
 		deltakerRepository.get(deltakerId) shouldBe null
 
@@ -552,11 +568,14 @@ class DeltakerServiceImplTest {
 	@Test
 	fun `republiserAlleDeltakerePaKafka - skal publisere deltakere på kafka`() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
+		every {
+			gjennomforingService.getGjennomforing(any())
+		} returns GJENNOMFORING_KURS.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor())
 
 		deltakerServiceImpl.republiserAlleDeltakerePaKafka(1)
 
 		verify(exactly = 2) { kafkaProducerService.publiserDeltaker(any(), any()) }
-		verify(exactly = 2) { publisherService.publish(any(), DataPublishType.DELTAKER) }
+		verify(exactly = 2) { publisherService.publish(any(), DataPublishType.DELTAKER, false) }
 	}
 
 	@Test
@@ -611,7 +630,7 @@ class DeltakerServiceImplTest {
 		lagretVurdering.gyldigFra shouldBeEqualTo LocalDateTime.now()
 		lagretVurdering.gyldigTil shouldBe null
 		verify(exactly = 0) { kafkaProducerService.publiserDeltaker(any(), any()) }
-		verify(exactly = 1) { publisherService.publish(deltakerId, DataPublishType.DELTAKER) }
+		verify(exactly = 1) { publisherService.publish(deltakerId, DataPublishType.DELTAKER, null) }
 	}
 
 	@Test
@@ -671,21 +690,24 @@ class DeltakerServiceImplTest {
 		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_2)
 		testDataRepository.insertDeltakerStatus(DELTAKER_2_STATUS_1.copy(status = DeltakerStatus.Type.AVBRUTT.name, aarsak = DeltakerStatus.Aarsak.FATT_JOBB.name))
 		testDataRepository.insertDeltakerStatus(DELTAKER_4_STATUS_1.copy(status = DeltakerStatus.Type.FULLFORT.name, aarsak = null))
+		every {
+			gjennomforingService.getGjennomforing(any())
+		} returns GJENNOMFORING_KURS.toGjennomforing(TILTAK_1.toTiltak(), ARRANGOR_1.toArrangor())
 
 		deltakerServiceImpl.konverterStatuserForDeltakerePaaGjennomforing(GJENNOMFORING_KURS.id, false)
 
 		val status1 = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
 		status1!!.type shouldBe DeltakerStatus.Type.VENTER_PA_OPPSTART
-		verify(exactly = 0) { publisherService.publish(DELTAKER_1.id, DataPublishType.DELTAKER) }
+		verify(exactly = 0) { publisherService.publish(DELTAKER_1.id, DataPublishType.DELTAKER, false) }
 
 		val status2 = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
 		status2!!.type shouldBe DeltakerStatus.Type.HAR_SLUTTET
 		status2.aarsak shouldBe DeltakerStatus.Aarsak.FATT_JOBB
-		verify(exactly = 1) { publisherService.publish(DELTAKER_2.id, DataPublishType.DELTAKER) }
+		verify(exactly = 1) { publisherService.publish(DELTAKER_2.id, DataPublishType.DELTAKER, false) }
 
 		val status3 = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_4.id)
 		status3!!.type shouldBe DeltakerStatus.Type.HAR_SLUTTET
-		verify(exactly = 1) { publisherService.publish(DELTAKER_4.id, DataPublishType.DELTAKER) }
+		verify(exactly = 1) { publisherService.publish(DELTAKER_4.id, DataPublishType.DELTAKER, false) }
 	}
 
 	@Test
@@ -709,16 +731,16 @@ class DeltakerServiceImplTest {
 
 		val status1 = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_1.id)
 		status1!!.type shouldBe DeltakerStatus.Type.VENTER_PA_OPPSTART
-		verify(exactly = 0) { publisherService.publish(DELTAKER_1.id, DataPublishType.DELTAKER) }
+		verify(exactly = 0) { publisherService.publish(DELTAKER_1.id, DataPublishType.DELTAKER, false) }
 
 		val status2 = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_2.id)
 		status2!!.type shouldBe DeltakerStatus.Type.AVBRUTT
 		status2.aarsak shouldBe DeltakerStatus.Aarsak.FATT_JOBB
-		verify(exactly = 1) { publisherService.publish(DELTAKER_2.id, DataPublishType.DELTAKER) }
+		verify(exactly = 1) { publisherService.publish(DELTAKER_2.id, DataPublishType.DELTAKER, false) }
 
 		val status3 = deltakerStatusRepository.getStatusForDeltaker(DELTAKER_4.id)
 		status3!!.type shouldBe DeltakerStatus.Type.FULLFORT
-		verify(exactly = 1) { publisherService.publish(DELTAKER_4.id, DataPublishType.DELTAKER) }
+		verify(exactly = 1) { publisherService.publish(DELTAKER_4.id, DataPublishType.DELTAKER, false) }
 	}
 
 	val statusInsert = DeltakerStatusInsert(

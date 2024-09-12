@@ -11,6 +11,7 @@ import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltakService
+import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
 import no.nav.amt.tiltak.kafka.tiltaksgjennomforing_ingestor.GjennomforingStatusConverter
@@ -26,7 +27,8 @@ class DeltakerProcessor(
 	private val arrangorService: ArrangorService,
 	private val tiltakService: TiltakService,
 	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
-	private val transactionTemplate: TransactionTemplate
+	private val transactionTemplate: TransactionTemplate,
+	private val unleashService: UnleashService
 ) : GenericProcessor<DeltakerPayload>() {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -42,40 +44,52 @@ class DeltakerProcessor(
 	private fun upsert(message: MessageWrapper<DeltakerPayload>) {
 		val deltakerDto = message.payload
 
-		val gjennomforingId = gjennomforingService.getGjennomforingOrNull(deltakerDto.gjennomforingId)?.id
-			?: upsertGjennomforing(deltakerDto.gjennomforingId).id
+		val (gjennomforingId, tiltakstype) = getGjennomforingIdAndTiltakstype(deltakerDto.gjennomforingId)
 
-		val status = DeltakerStatusInsert(
-			id = UUID.randomUUID(),
-			deltakerId = deltakerDto.id,
-			type = tilDeltakerStatusType(deltakerDto.status),
-			aarsak = tilDeltakerAarsak(deltakerDto.statusAarsak),
-			aarsaksbeskrivelse = null,
-			gyldigFra = deltakerDto.statusEndretDato,
-		)
+		val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltakstype)
 
-		val deltakerUpsert = DeltakerUpsert(
-			id = deltakerDto.id,
-			statusInsert = status,
-			startDato = deltakerDto.startDato,
-			sluttDato = deltakerDto.sluttDato,
-			dagerPerUke = deltakerDto.dagerPerUke,
-			prosentStilling = deltakerDto.prosentDeltid,
-			registrertDato = deltakerDto.registrertDato,
-			gjennomforingId = gjennomforingId,
-			innsokBegrunnelse = deltakerDto.innsokBegrunnelse,
-			innhold = null,
-			kilde = Kilde.ARENA,
-			forsteVedtakFattet = null,
-			sistEndretAv = null,
-			sistEndretAvEnhet = null
-		)
+		if (!erKometDeltaker) {
+			val status = DeltakerStatusInsert(
+				id = UUID.randomUUID(),
+				deltakerId = deltakerDto.id,
+				type = tilDeltakerStatusType(deltakerDto.status),
+				aarsak = tilDeltakerAarsak(deltakerDto.statusAarsak),
+				aarsaksbeskrivelse = null,
+				gyldigFra = deltakerDto.statusEndretDato,
+			)
 
-		transactionTemplate.executeWithoutResult {
-			deltakerService.upsertDeltaker(deltakerDto.personIdent, deltakerUpsert)
+			val deltakerUpsert = DeltakerUpsert(
+				id = deltakerDto.id,
+				statusInsert = status,
+				startDato = deltakerDto.startDato,
+				sluttDato = deltakerDto.sluttDato,
+				dagerPerUke = deltakerDto.dagerPerUke,
+				prosentStilling = deltakerDto.prosentDeltid,
+				registrertDato = deltakerDto.registrertDato,
+				gjennomforingId = gjennomforingId,
+				innsokBegrunnelse = deltakerDto.innsokBegrunnelse,
+				innhold = null,
+				kilde = Kilde.ARENA,
+				forsteVedtakFattet = null,
+				sistEndretAv = null,
+				sistEndretAvEnhet = null
+			)
+
+			transactionTemplate.executeWithoutResult {
+				deltakerService.upsertDeltaker(deltakerDto.personIdent, deltakerUpsert, erKometDeltaker)
+			}
+			log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=${gjennomforingId}")
 		}
+	}
 
-		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=${gjennomforingId}")
+	private fun getGjennomforingIdAndTiltakstype(deltakerlisteId: UUID): GjennomforingIdOgTiltakstype {
+		val gjennomforing = gjennomforingService.getGjennomforingOrNull(deltakerlisteId)
+		if (gjennomforing != null) {
+			return GjennomforingIdOgTiltakstype(gjennomforing.id, gjennomforing.tiltak.kode)
+		} else {
+			val oppdatertGjennomforing = upsertGjennomforing(deltakerlisteId)
+			return GjennomforingIdOgTiltakstype(oppdatertGjennomforing.id, oppdatertGjennomforing.tiltakstype.arenaKode)
+		}
 	}
 
 	private fun upsertGjennomforing(gjennomforingId: UUID): Gjennomforing {
@@ -140,10 +154,21 @@ class DeltakerProcessor(
 
 	override fun processDeleteMessage(message: MessageWrapper<DeltakerPayload>) {
 		val deltakerId = message.payload.id
-
 		log.info("Motatt delete-melding, sletter deltaker med id=$deltakerId")
-
-		deltakerService.slettDeltaker(deltakerId, Kilde.ARENA)
+		val deltaker = deltakerService.hentDeltaker(deltakerId)
+		if (deltaker == null) {
+			log.info("Mottatt tombstone på arena-deltaker som ikke finnes $deltakerId")
+			return
+		}
+		val tiltakstype = gjennomforingService.getGjennomforing(deltaker.gjennomforingId).tiltak.kode
+		val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltakstype)
+		if (!erKometDeltaker) {
+			deltakerService.slettDeltaker(deltakerId, erKometDeltaker)
+		}
 	}
 
+	private data class GjennomforingIdOgTiltakstype(
+		val gjennomforingId: UUID,
+		val tiltakstype: String
+	)
 }

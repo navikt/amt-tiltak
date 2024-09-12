@@ -39,7 +39,7 @@ class EndringsmeldingServiceImplTest {
 		publisherService = mockk()
 		endringsmeldingService = EndringsmeldingServiceImpl(repository, auditLoggerService, transactionTemplate, publisherService)
 
-		every { publisherService.publish(id = any(), type = any()) } returns Unit
+		every { publisherService.publish(id = any(), type = any(), erKometDeltaker = any()) } returns Unit
 	}
 
 	@Test
@@ -63,7 +63,7 @@ class EndringsmeldingServiceImplTest {
 		verify(exactly = 1) {
 			repository.markerSomTilbakekalt(endringsmeldingDbo.id)
 		}
-		verify(exactly = 1) { publisherService.publish(endringsmeldingDbo.id, DataPublishType.ENDRINGSMELDING) }
+		verify(exactly = 1) { publisherService.publish(endringsmeldingDbo.id, DataPublishType.ENDRINGSMELDING, null) }
 	}
 
 	@Test
@@ -81,7 +81,7 @@ class EndringsmeldingServiceImplTest {
 		verify(exactly = 1) {
 			repository.markerSomUtfort(endringsmeldingDbo.id, NAV_ANSATT_1.id)
 		}
-		verify(exactly = 1) { publisherService.publish(endringsmeldingDbo.id, DataPublishType.ENDRINGSMELDING) }
+		verify(exactly = 1) { publisherService.publish(endringsmeldingDbo.id, DataPublishType.ENDRINGSMELDING, null) }
 	}
 
 	@Test
@@ -94,7 +94,7 @@ class EndringsmeldingServiceImplTest {
 
 		endringsmeldingService.opprettLeggTilOppstartsdatoEndringsmelding(endringsmeldingDbo.deltakerId, endringsmeldingDbo.opprettetAvArrangorAnsattId, nyOppstartsdato)
 
-		verify(exactly = 2) { publisherService.publish(any(), DataPublishType.ENDRINGSMELDING) }
+		verify(exactly = 2) { publisherService.publish(any(), DataPublishType.ENDRINGSMELDING, null) }
 	}
 
 	private val endringsmeldingDbo = EndringsmeldingDbo(

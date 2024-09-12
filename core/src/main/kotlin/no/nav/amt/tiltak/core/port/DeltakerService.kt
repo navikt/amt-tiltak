@@ -3,7 +3,6 @@ package no.nav.amt.tiltak.core.port
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
-import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import java.time.LocalDateTime
@@ -11,9 +10,9 @@ import java.util.UUID
 
 interface DeltakerService {
 
-	fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert)
+	fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert, erKometDeltaker: Boolean?)
 
-	fun insertStatus(status: DeltakerStatusInsert)
+	fun insertStatus(status: DeltakerStatusInsert, erKometDeltaker: Boolean?)
 
 	fun hentDeltakerePaaGjennomforing(gjennomforingId: UUID): List<Deltaker>
 
@@ -23,7 +22,7 @@ interface DeltakerService {
 
 	fun progressStatuser()
 
-	fun slettDeltaker(deltakerId: UUID, kilde: Kilde)
+	fun slettDeltaker(deltakerId: UUID, erKometDeltaker: Boolean?)
 
 	fun hentDeltakereMedPersonIdent(personIdent: String): List<Deltaker>
 
@@ -34,8 +33,6 @@ interface DeltakerService {
 	fun hentDeltakerMap(deltakerIder: List<UUID>): Map<UUID, Deltaker>
 
 	fun republiserAlleDeltakerePaKafka(batchSize: Int = 500)
-
-	fun republiserDeltakerPaKafka(deltakerId: UUID)
 
 	fun publiserDeltakerPaKafka(deltakerId: UUID, endretDato: LocalDateTime)
 

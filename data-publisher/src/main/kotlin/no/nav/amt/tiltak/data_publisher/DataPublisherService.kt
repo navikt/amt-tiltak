@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.data_publisher
 
 import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.data_publisher.publish.DeltakerPublishQuery
 import no.nav.amt.tiltak.data_publisher.publish.EndringsmeldingPublishQuery
@@ -21,13 +22,14 @@ class DataPublisherService(
 	private val stringKafkaProducer: KafkaProducerClient<String, String>,
 	private val template: NamedParameterJdbcTemplate,
 	private val publishRepository: PublishRepository,
+	private val unleashService: UnleashService
 ) {
 
 	private val logger = LoggerFactory.getLogger(javaClass)
 
-	fun publish(id: UUID, type: DataPublishType) {
+	fun publish(id: UUID, type: DataPublishType, erKometDeltaker: Boolean?) {
 		when (type) {
-			DataPublishType.DELTAKER -> publishDeltaker(id)
+			DataPublishType.DELTAKER -> publishDeltaker(id, erKometDeltaker = erKometDeltaker)
 			DataPublishType.ENDRINGSMELDING -> publishEndringsmelding(id)
 		}
 	}
@@ -47,7 +49,7 @@ class DataPublisherService(
 			DataPublishType.DELTAKER -> {
 				publishBatch(
 					idProvider = { offset -> idQueries.hentDeltakerIds(offset, batchSize, fromDate) },
-					publisher = { id -> publishDeltaker(id, forcePublish) }
+					publisher = { id -> publishDeltaker(id, forcePublish, erKometDeltaker = null) }
 				)
 			}
 
@@ -75,9 +77,12 @@ class DataPublisherService(
 		}
 	}
 
-	fun publishDeltaker(id: UUID, forcePublish: Boolean = false) {
-		when (val result = DeltakerPublishQuery(template).get(id)) {
-			is DeltakerPublishQuery.Result.DontPublish -> return
+	fun publishDeltaker(id: UUID, forcePublish: Boolean = false, erKometDeltaker: Boolean?) {
+		when (val result = DeltakerPublishQuery(template, unleashService).get(id, erKometDeltaker)) {
+			is DeltakerPublishQuery.Result.DontPublish -> {
+				logger.info("Publiserer ikke deltaker med id $id")
+				return
+			}
 			is DeltakerPublishQuery.Result.PublishTombstone -> {
 				ProducerRecord<String, String?>(kafkaTopicProperties.amtDeltakerTopic, id.toString(), null)
 					.let { stringKafkaProducer.sendSync(it) }

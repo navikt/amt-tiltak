@@ -17,6 +17,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
+import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.data_publisher.model.DeltakerKontaktinformasjonDto
 import no.nav.amt.tiltak.data_publisher.model.DeltakerNavVeilederDto
 import no.nav.amt.tiltak.data_publisher.model.DeltakerPersonaliaDto
@@ -31,16 +32,17 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 class DeltakerPublishQuery(
-	private val template: NamedParameterJdbcTemplate
+	private val template: NamedParameterJdbcTemplate,
+	private val unleashService: UnleashService
 ) {
-	fun get(id: UUID): Result<DeltakerPublishDto> {
+	fun get(id: UUID, erKometDeltaker: Boolean?): Result<DeltakerPublishDto> {
 		val deltaker = getDeltaker(id) ?: return Result.PublishTombstone()
 
 		if (deltaker.status == null) return Result.DontPublish()
 
-		val vurderinger = getVurderinger(id)
+		if (erKometDeltaker == true || unleashService.erKometMasterForTiltakstype(deltaker.tiltakstype)) return Result.DontPublish()
 
-		if (deltaker.kilde == Kilde.KOMET) return Result.DontPublish()
+		val vurderinger = getVurderinger(id)
 
 		return DeltakerPublishDto(
 			deltaker.id,
@@ -126,9 +128,11 @@ class DeltakerPublishQuery(
 				   status.aarsaksbeskrivelse                    as status_aarsaksbeskrivelse,
 				   status.gyldig_fra                            as status_gyldig_fra,
 				   status.created_at                            as status_opprettet_dato,
-				   gjennomforing.er_kurs
+				   gjennomforing.er_kurs,
+				   tiltak.type									as tiltakstype
 			from deltaker
 					 left join gjennomforing on deltaker.gjennomforing_id = gjennomforing.id
+					 left join tiltak on gjennomforing.tiltak_id = tiltak.id
 					 left join bruker on deltaker.bruker_id = bruker.id
 					 left join nav_enhet on bruker.nav_enhet_id = nav_enhet.id
 					 left join nav_ansatt on bruker.ansvarlig_veileder_id = nav_ansatt.id
@@ -205,6 +209,7 @@ class DeltakerPublishQuery(
 		val forsteVedtakFattet: LocalDate?,
 		val sistEndretAv: UUID?,
 		val sistEndretAvEnhet: UUID?,
+		val tiltakstype: String
 	) {
 		companion object {
 			val rowMapper = RowMapper { rs, _ ->
@@ -241,7 +246,8 @@ class DeltakerPublishQuery(
 					kilde = Kilde.valueOf(rs.getString("kilde")),
 					forsteVedtakFattet = rs.getNullableLocalDate("forste_vedtak_fattet"),
 					sistEndretAv = rs.getNullableUUID("sist_endret_av"),
-					sistEndretAvEnhet = rs.getNullableUUID("sist_endret_av_enhet")
+					sistEndretAvEnhet = rs.getNullableUUID("sist_endret_av_enhet"),
+					tiltakstype = rs.getString("tiltakstype")
 				)
 			}
 		}

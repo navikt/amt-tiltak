@@ -37,7 +37,11 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 
 	@Test
 	fun `ingest - ny deltaker - oppretter deltaker`() {
-		val deltakerDto = mockDeltakerDto(TestData.GJENNOMFORING_1.id)
+		val tiltakId = UUID.randomUUID()
+		val deltakerlisteId = UUID.randomUUID()
+		testDataRepository.insertTiltak(TestData.TILTAK_1.copy(id = tiltakId, type = "ARBFORB"))
+		testDataRepository.insertGjennomforing(TestData.GJENNOMFORING_1.copy(id = deltakerlisteId, tiltakId = tiltakId))
+		val deltakerDto = mockDeltakerDto(deltakerlisteId)
 		val value = toJsonString(deltakerDto)
 
 		kafkaMessageSender.sendTilDeltakerV2Topic(deltakerDto.id, value)
@@ -66,8 +70,12 @@ class DeltakerIngestorTest : IntegrationTestBase() {
 
 	@Test
 	fun `ingest - tombstone - sletter deltaker`() {
+		val tiltakId = UUID.randomUUID()
+		val deltakerlisteId = UUID.randomUUID()
+		testDataRepository.insertTiltak(TestData.TILTAK_1.copy(id = tiltakId, type = "ARBFORB"))
+		testDataRepository.insertGjennomforing(TestData.GJENNOMFORING_1.copy(id = deltakerlisteId, tiltakId = tiltakId))
 		val deltakerId = UUID.randomUUID()
-		testDataRepository.insertDeltaker(TestData.DELTAKER_2.copy(id = deltakerId, kilde = Kilde.KOMET))
+		testDataRepository.insertDeltaker(TestData.DELTAKER_2.copy(id = deltakerId, gjennomforingId = deltakerlisteId, kilde = Kilde.KOMET))
 		testDataRepository.insertDeltakerStatus(TestData.DELTAKER_2_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerId))
 		kafkaMessageSender.sendTilDeltakerV2Topic(deltakerId, null)
 

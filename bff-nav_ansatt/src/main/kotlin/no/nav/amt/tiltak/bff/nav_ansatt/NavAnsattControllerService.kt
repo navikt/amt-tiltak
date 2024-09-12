@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.bff.nav_ansatt
 
-import io.getunleash.Unleash
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.DeltakerDto
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.HentGjennomforingerDto
@@ -17,6 +16,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.core.port.VurderingService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -28,14 +28,11 @@ class NavAnsattControllerService(
 	private val deltakerService: DeltakerService,
 	private val gjennomforingService: GjennomforingService,
 	private val vurderingService: VurderingService,
-	private val unleashClient: Unleash,
+	private val unleashService: UnleashService
 ) {
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	companion object {
-
-		const val KOMET_DELTAKERE_TOGGEL = "amt.enable-komet-deltakere"
-
 		fun harTilgangTilDeltaker(deltaker: Deltaker, tilganger: List<AdGruppe>): Boolean {
 			val tilgangTilMuligAdressebeskyttetDeltaker = when (deltaker.adressebeskyttelse) {
 				Adressebeskyttelse.STRENGT_FORTROLIG_UTLAND,
@@ -100,11 +97,9 @@ class NavAnsattControllerService(
 
 
 	private fun hentEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding> {
-		if (unleashClient.isEnabled(KOMET_DELTAKERE_TOGGEL)) {
-			val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
-			if (gjennomforing.tiltak.kode in listOf("ARBFORB")) {
-				return emptyList()
-			}
+		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
+		if (unleashService.erKometMasterForTiltakstype(gjennomforing.tiltak.kode)) {
+			return emptyList()
 		}
 		return endringsmeldingService.hentEndringsmeldingerForGjennomforing(gjennomforingId)
 	}

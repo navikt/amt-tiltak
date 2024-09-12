@@ -3,7 +3,12 @@ package no.nav.amt.tiltak.test.integration
 import no.nav.amt.tiltak.application.Application
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
-import no.nav.amt.tiltak.test.integration.mocks.*
+import no.nav.amt.tiltak.test.integration.mocks.MockAmtArrangorServer
+import no.nav.amt.tiltak.test.integration.mocks.MockAmtPersonHttpServer
+import no.nav.amt.tiltak.test.integration.mocks.MockMachineToMachineHttpServer
+import no.nav.amt.tiltak.test.integration.mocks.MockMulighetsrommetApiServer
+import no.nav.amt.tiltak.test.integration.mocks.MockOAuthServer
+import no.nav.amt.tiltak.test.integration.mocks.MockPoaoTilgangHttpServer
 import no.nav.amt.tiltak.test.integration.utils.KafkaMessageSender
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient

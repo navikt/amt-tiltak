@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType.DELTAKER
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType.ENDRINGSMELDING
@@ -27,12 +28,13 @@ class DataPublisherServiceTest : FunSpec({
 	val kafkaTopicProperties = createTopicProperties()
 	val dbHandler = DatabaseTestDataHandler(template)
 	lateinit var kafkaProducerClient: KafkaProducerClient<String, String>
+	lateinit var unleashService: UnleashService
 	val publishRepository = PublishRepository(template)
 
 	lateinit var service: DataPublisherService
 
 	val publishAndVerify = fun(id: UUID, type: DataPublishType, expected: Int) {
-		service.publish(id, type)
+		service.publish(id, type, null)
 		verify(exactly = expected) { kafkaProducerClient.sendSync(any()) }
 	}
 
@@ -43,6 +45,7 @@ class DataPublisherServiceTest : FunSpec({
 		rootLogger.level = Level.INFO
 
 		kafkaProducerClient = mockk()
+		unleashService = mockk()
 
 		every { kafkaProducerClient.sendSync(any()) } returns RecordMetadata(
 			TopicPartition("", 0),
@@ -53,8 +56,10 @@ class DataPublisherServiceTest : FunSpec({
 			0
 		)
 
+		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
+
 		service = DataPublisherService(
-			kafkaTopicProperties, kafkaProducerClient, template, publishRepository
+			kafkaTopicProperties, kafkaProducerClient, template, publishRepository,unleashService
 		)
 	}
 
