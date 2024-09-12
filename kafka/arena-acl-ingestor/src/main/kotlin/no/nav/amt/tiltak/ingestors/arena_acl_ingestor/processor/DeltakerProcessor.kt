@@ -78,7 +78,7 @@ class DeltakerProcessor(
 			transactionTemplate.executeWithoutResult {
 				deltakerService.upsertDeltaker(deltakerDto.personIdent, deltakerUpsert, erKometDeltaker)
 			}
-			log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=${gjennomforingId}")
+			log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=$gjennomforingId tiltakstype $tiltakstype")
 		}
 	}
 
