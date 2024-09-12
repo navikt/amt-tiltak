@@ -44,11 +44,11 @@ class DeltakerIngestorImpl(
 			val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltakstype)
 			if (erKometDeltaker) {
 				deltakerService.slettDeltaker(deltakerId, erKometDeltaker)
+				log.info("Slettet deltaker fra ny løsning med id $deltakerId")
 			}
 		} else {
 			val deltakerDto: DeltakerDto = fromJsonString(value)
 			upsert(deltakerDto)
-			log.info("Håndterte deltaker fra ny løsning med id $deltakerId")
 		}
 	}
 
@@ -95,7 +95,9 @@ class DeltakerIngestorImpl(
 			transactionTemplate.executeWithoutResult {
 				deltakerService.upsertDeltaker(deltakerDto.personalia.personident, deltakerUpsert, erKometDeltaker)
 			}
-			log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} deltakerlisteId=${gjennomforingId} fra ny løsning")
+			log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} deltakerlisteId=$gjennomforingId tiltakstype $tiltakstype fra ny løsning")
+		} else {
+			log.info("Ignorerte arena-deltaker med id ${deltakerDto.id} og tiltakstype $tiltakstype fra deltaker-v2-topic")
 		}
 	}
 
