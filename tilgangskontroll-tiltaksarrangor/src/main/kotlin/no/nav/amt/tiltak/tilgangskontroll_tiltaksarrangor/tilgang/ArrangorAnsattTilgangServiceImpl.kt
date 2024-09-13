@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang
 
-import io.getunleash.Unleash
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorAnsatt
 import no.nav.amt.tiltak.core.domain.arrangor.ArrangorVeileder
 import no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRolle
@@ -34,12 +33,9 @@ open class ArrangorAnsattTilgangServiceImpl(
 	private val arrangorService: ArrangorService,
 	private val transactionTemplate: TransactionTemplate,
 	private val amtArrangorService: AmtArrangorService,
-	private val unleashClient: Unleash
 ) : ArrangorAnsattTilgangService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
-
-	private val adressebeskyttedeDeltakereToggle = "amt.enable-adressebeskyttede-deltakere"
 
 	override fun verifiserTilgangTilGjennomforing(ansattId: UUID, gjennomforingId: UUID) {
 		val arrangorId = gjennomforingService.getArrangorId(gjennomforingId)
@@ -56,19 +52,11 @@ open class ArrangorAnsattTilgangServiceImpl(
 
 		val arrangorId = gjennomforingService.getArrangorId(deltaker.gjennomforingId)
 
-		if (unleashClient.isEnabled(adressebeskyttedeDeltakereToggle)) {
-			if (deltaker.harAdressebeskyttelse() && !harVeilederTilgang(ansattId, deltakerId, arrangorId)) {
-				throw ResponseStatusException(HttpStatus.FORBIDDEN, "Arrangør ansatt med id:$ansattId har ikke tilgang til deltaker med id $deltakerId")
-			} else if (!harKoordinatorTilgang(ansattId, deltaker.gjennomforingId, arrangorId) && !harVeilederTilgang(ansattId, deltakerId, arrangorId)) {
-				throw ResponseStatusException(HttpStatus.FORBIDDEN, "Arrangør ansatt med id:$ansattId har ikke tilgang til deltaker med id $deltakerId")
-			}
-		} else {
-			if (deltaker.harAdressebeskyttelse() || (!harKoordinatorTilgang(ansattId, deltaker.gjennomforingId, arrangorId)
-					&& !harVeilederTilgang(ansattId, deltakerId, arrangorId))) {
-				throw ResponseStatusException(HttpStatus.FORBIDDEN, "Arrangør ansatt med id:$ansattId har ikke tilgang til deltaker med id $deltakerId")
-			}
+		if (deltaker.harAdressebeskyttelse() && !harVeilederTilgang(ansattId, deltakerId, arrangorId)) {
+			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Arrangør ansatt med id:$ansattId har ikke tilgang til deltaker med id $deltakerId")
+		} else if (!harKoordinatorTilgang(ansattId, deltaker.gjennomforingId, arrangorId) && !harVeilederTilgang(ansattId, deltakerId, arrangorId)) {
+			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Arrangør ansatt med id:$ansattId har ikke tilgang til deltaker med id $deltakerId")
 		}
-
 	}
 
 	override fun hentAnsattTilganger(ansattId: UUID): List<ArrangorAnsattRoller> {

@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.tilgang
 
-import io.getunleash.Unleash
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.mockk.Runs
@@ -53,8 +52,6 @@ class ArrangorAnsattTilgangServiceImplTest {
 	lateinit var gjennomforingService: GjennomforingService
 
 	lateinit var arrangorVeilederService: ArrangorVeilederService
-
-	lateinit var unleash: Unleash
 
 	val personligIdent = "fnr"
 
@@ -145,12 +142,10 @@ class ArrangorAnsattTilgangServiceImplTest {
 
 		gjennomforingService = mockk()
 
-		unleash = mockk()
-
 		arrangorAnsattTilgangServiceImpl = ArrangorAnsattTilgangServiceImpl(
 			arrangorAnsattService, ansattRolleService,
 			deltakerService, gjennomforingService, mineDeltakerlisterService, arrangorVeilederService,
-			arrangorService, TransactionTemplate(DataSourceTransactionManager(datasource)), amtArrangorService, unleash
+			arrangorService, TransactionTemplate(DataSourceTransactionManager(datasource)), amtArrangorService
 		)
 
 		every {
@@ -167,8 +162,6 @@ class ArrangorAnsattTilgangServiceImplTest {
 		every {
 			gjennomforingService.getArrangorId(gjennomforingId)
 		} returns arrangorId
-
-		every { unleash.isEnabled(any()) } returns false
 	}
 	@Test
 	fun `verifiserTilgangTilGjennomforing - koordinator har ikke lagt til deltakerliste - skal kaste exception`() {
@@ -347,33 +340,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 	}
 
 	@Test
-	fun `verifiserTilgangTilDeltaker - deltaker har adressebeskyttelse, toggle disabled - skal kaste exception`() {
-		every {
-			arrangorVeilederService.erVeilederFor(ansattId, deltakerId)
-		} returns true
-
-		every {
-			ansattRolleService.hentAktiveRoller(any())
-		} returns listOf(
-			no.nav.amt.tiltak.core.domain.tilgangskontroll.ArrangorAnsattRoller(
-				arrangorId = arrangorId,
-				roller = listOf(VEILEDER)
-			)
-		)
-
-		every {
-			deltakerService.hentDeltaker(deltakerId)
-		} returns deltaker.copy(adressebeskyttelse = Adressebeskyttelse.STRENGT_FORTROLIG)
-
-		shouldThrowExactly<ResponseStatusException> {
-			arrangorAnsattTilgangServiceImpl.verifiserTilgangTilDeltaker(ansattId, deltakerId)
-		}
-	}
-
-	@Test
-	fun `verifiserTilgangTilDeltaker - deltaker har adressebeskyttelse, koordinator, toggle enabled - skal kaste exception`() {
-		every { unleash.isEnabled(any()) } returns true
-
+	fun `verifiserTilgangTilDeltaker - deltaker har adressebeskyttelse, koordinator - skal kaste exception`() {
 		every {
 			mineDeltakerlisterService.hent(ansattId)
 		} returns listOf(gjennomforingId)
@@ -397,9 +364,7 @@ class ArrangorAnsattTilgangServiceImplTest {
 	}
 
 	@Test
-	fun `verifiserTilgangTilDeltaker - deltaker har adressebeskyttelse, veileder, toggle enabled - skal ikke kaste exception`() {
-		every { unleash.isEnabled(any()) } returns true
-
+	fun `verifiserTilgangTilDeltaker - deltaker har adressebeskyttelse, veileder - skal ikke kaste exception`() {
 		every {
 			arrangorVeilederService.erVeilederFor(ansattId, deltakerId)
 		} returns true
