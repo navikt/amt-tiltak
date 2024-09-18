@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.core.port
 
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
-import java.util.*
+import java.util.UUID
 
 interface GjennomforingService {
 
@@ -21,4 +21,6 @@ interface GjennomforingService {
 	fun slettGjennomforing(gjennomforingId: UUID)
 
 	fun getArrangorId(gjennomforingId: UUID): UUID
+
+	fun getGjennomforingIderForTiltakstype(tiltakstype: String): List<UUID>
 }

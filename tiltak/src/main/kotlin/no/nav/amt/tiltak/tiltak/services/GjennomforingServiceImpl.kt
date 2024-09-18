@@ -124,6 +124,10 @@ class GjennomforingServiceImpl(
 			}
 	}
 
+	override fun getGjennomforingIderForTiltakstype(tiltakstype: String): List<UUID> {
+		return gjennomforingRepository.getGjennomforingIderForTiltakstype(tiltakstype)
+	}
+
 	private fun getTiltakOgArrangor(tiltakId: UUID, arrangorId: UUID): Pair<Tiltak, Arrangor> {
 		val tiltak = tiltakService.getTiltakById(tiltakId)
 		val arrangor = arrangorService.getArrangorById(arrangorId)

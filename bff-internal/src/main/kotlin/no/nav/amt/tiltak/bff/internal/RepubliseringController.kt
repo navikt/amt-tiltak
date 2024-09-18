@@ -34,6 +34,20 @@ class RepubliseringController(
 		}
 	}
 
+	@GetMapping("/deltakere/{tiltakstype}")
+	fun republiserDeltakereForTiltakstype(
+		@PathVariable("tiltakstype") tiltakstype: String,
+		request: HttpServletRequest
+	) {
+		if (isInternal(request)) {
+			JobRunner.runAsync("republiser_deltakere_tiltakstype") {
+				deltakerService.republiserDeltakerePaDeltakerV2(tiltakstype = tiltakstype)
+			}
+		} else {
+			throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
+		}
+	}
+
 	@GetMapping("/deltakere/{id}")
 	fun republiserDeltaker(
 		@PathVariable("id") id: UUID,

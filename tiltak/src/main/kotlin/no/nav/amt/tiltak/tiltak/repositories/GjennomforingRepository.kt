@@ -6,7 +6,6 @@ import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Tiltak
 import no.nav.amt.tiltak.tiltak.dbo.GjennomforingDbo
-import no.nav.amt.tiltak.utils.getNullableUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -216,6 +215,19 @@ open class GjennomforingRepository(private val template: NamedParameterJdbcTempl
 		)
 
 		template.update(sql, parameters)
+	}
+
+	fun getGjennomforingIderForTiltakstype(tiltakstype: String): List<UUID> {
+		val sql = """
+			SELECT gjennomforing.id as gjennomforing_id
+			FROM gjennomforing
+			         INNER JOIN tiltak ON tiltak.id = gjennomforing.tiltak_id
+			WHERE tiltak.type = :tiltakstype;
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(mapOf("tiltakstype" to tiltakstype))
+
+		return template.query(sql, parameters) { rs, _ -> (UUID.fromString(rs.getString("gjennomforing_id"))) }
 	}
 
 	private fun deleteTiltaksansvarligGjennomforingTilgang(gjennomforingId: UUID) {

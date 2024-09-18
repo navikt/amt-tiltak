@@ -34,6 +34,8 @@ interface DeltakerService {
 
 	fun republiserAlleDeltakerePaKafka(batchSize: Int = 500)
 
+	fun republiserDeltakerePaDeltakerV2(tiltakstype: String)
+
 	fun publiserDeltakerPaKafka(deltakerId: UUID, endretDato: LocalDateTime)
 
 	fun publiserDeltakerPaDeltakerV2Kafka(deltakerId: UUID)
