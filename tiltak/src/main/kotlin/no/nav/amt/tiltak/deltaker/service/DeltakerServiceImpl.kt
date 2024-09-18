@@ -433,6 +433,23 @@ open class DeltakerServiceImpl(
 		log.info("Ferdig med republisering av deltakere på kafka")
 	}
 
+	override fun republiserDeltakerePaDeltakerV2(tiltakstype: String) {
+		if (unleashService.erKometMasterForTiltakstype(tiltakstype)) {
+			log.info("Republiserer ikke deltakere for tiltakstype $tiltakstype siden komet er master for tiltakstypen")
+			return
+		}
+		val gjennomforingIder = gjennomforingService.getGjennomforingIderForTiltakstype(tiltakstype)
+
+		gjennomforingIder.forEach {
+			val deltakerePaGjennomforing = hentDeltakerePaaGjennomforing(it)
+			deltakerePaGjennomforing.forEach {deltaker ->
+				publisherService.publish(deltaker.id, DataPublishType.DELTAKER, false)
+			}
+			log.info("Republiserte ${deltakerePaGjennomforing.size} deltakere for gjennomforingId $it")
+		}
+		log.info("Republiserte deltakere for ${gjennomforingIder.size} gjennomføringer på deltaker-v2")
+	}
+
 	override fun publiserDeltakerPaKafka(deltakerId: UUID, endretDato: LocalDateTime) {
 		val deltaker = hentDeltaker(deltakerId) ?: error("Fant ikke deltaker med id $deltakerId")
 
