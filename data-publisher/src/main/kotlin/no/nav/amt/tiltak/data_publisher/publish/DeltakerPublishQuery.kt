@@ -90,7 +90,8 @@ class DeltakerPublishQuery(
 			kilde = deltaker.kilde,
 			forsteVedtakFattet = deltaker.forsteVedtakFattet,
 			sistEndretAv = deltaker.sistEndretAv,
-			sistEndretAvEnhet = deltaker.sistEndretAvEnhet
+			sistEndretAvEnhet = deltaker.sistEndretAvEnhet,
+			sistEndret = deltaker.sistEndret
 		).let { Result.OK(it) }
 	}
 
@@ -117,6 +118,7 @@ class DeltakerPublishQuery(
 				   deltaker.forste_vedtak_fattet,
 				   deltaker.sist_endret_av,
 				   deltaker.sist_endret_av_enhet,
+				   deltaker.modified_at							as deltaker_sist_endret,
 				   nav_enhet.navn                               as nav_enhet_navn,
 				   nav_ansatt.id                                as nav_ansatt_id,
 				   nav_ansatt.navn                              as nav_ansatt_navn,
@@ -209,6 +211,7 @@ class DeltakerPublishQuery(
 		val forsteVedtakFattet: LocalDate?,
 		val sistEndretAv: UUID?,
 		val sistEndretAvEnhet: UUID?,
+		val sistEndret: LocalDateTime,
 		val tiltakstype: String
 	) {
 		companion object {
@@ -247,6 +250,7 @@ class DeltakerPublishQuery(
 					forsteVedtakFattet = rs.getNullableLocalDate("forste_vedtak_fattet"),
 					sistEndretAv = rs.getNullableUUID("sist_endret_av"),
 					sistEndretAvEnhet = rs.getNullableUUID("sist_endret_av_enhet"),
+					sistEndret = rs.getLocalDateTime("deltaker_sist_endret"),
 					tiltakstype = rs.getString("tiltakstype")
 				)
 			}
