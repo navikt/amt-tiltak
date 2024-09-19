@@ -34,7 +34,7 @@ class RepubliseringController(
 		}
 	}
 
-	@GetMapping("/deltakere/{tiltakstype}")
+	@GetMapping("/deltakere/tiltakstype/{tiltakstype}")
 	fun republiserDeltakereForTiltakstype(
 		@PathVariable("tiltakstype") tiltakstype: String,
 		request: HttpServletRequest
