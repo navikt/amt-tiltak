@@ -121,7 +121,7 @@ open class DeltakerRepository(
 
 	fun getDeltakerePaaTiltak(id: UUID): List<DeltakerDbo> {
 		val sql = """
-			SELECT deltaker.*, bruker.*, deltaker.modified_at as deltaker_sist_endret, ne.navn as navkontor, ne.enhet_id as enhet_id
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
@@ -137,7 +137,7 @@ open class DeltakerRepository(
 
 	fun get(id: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.*, bruker.*, deltaker.modified_at as deltaker_sist_endret, ne.navn as navkontor, ne.enhet_id as enhet_id
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
@@ -156,7 +156,7 @@ open class DeltakerRepository(
 
 	fun get(brukerId: UUID, gjennomforingId: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.*, bruker.*, deltaker.modified_at as deltaker_sist_endret, ne.navn as navkontor, ne.enhet_id as enhet_id
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
@@ -179,7 +179,7 @@ open class DeltakerRepository(
 		if (deltakerIder.isEmpty()) return emptyList()
 
 		val sql = """
-			SELECT deltaker.*, bruker.*, deltaker.modified_at as deltaker_sist_endret, ne.navn as navkontor, ne.enhet_id as enhet_id
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
@@ -198,7 +198,7 @@ open class DeltakerRepository(
 
 	fun getDeltakereMedPersonIdent(personIdent: String): List<DeltakerDbo> {
 		val sql = """
-			SELECT deltaker.*, bruker.*, deltaker.modified_at as deltaker_sist_endret, ne.navn as navkontor, ne.enhet_id as enhet_id
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
@@ -216,7 +216,7 @@ open class DeltakerRepository(
 
 	fun getDeltakereMedBrukerId(brukerId: UUID): List<DeltakerDbo> {
 		val sql = """
-			SELECT deltaker.*, bruker.*, deltaker.modified_at as deltaker_sist_endret, ne.navn as navkontor, ne.enhet_id as enhet_id
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
@@ -234,7 +234,7 @@ open class DeltakerRepository(
 
 	fun get(personIdent: String, gjennomforingId: UUID): DeltakerDbo? {
 		val sql = """
-			SELECT deltaker.*, bruker.*, deltaker.modified_at as deltaker_sist_endret, ne.navn as navkontor, ne.enhet_id as enhet_id
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker
 					 inner join bruker on bruker.id = deltaker.bruker_id
 					 LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
@@ -255,7 +255,7 @@ open class DeltakerRepository(
 
 	fun sluttDatoPassert(): List<DeltakerDbo> {
 		val sql = """
-			SELECT deltaker.*, bruker.*, deltaker.modified_at as deltaker_sist_endret, ne.navn as navkontor, ne.enhet_id as enhet_id
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker_status
 					 inner join deltaker on deltaker_status.deltaker_id = deltaker.id
 					 inner join bruker on bruker.id = deltaker.bruker_id
@@ -278,7 +278,7 @@ open class DeltakerRepository(
 
 	fun erPaaAvsluttetGjennomforing(): List<DeltakerDbo> {
 		val sql = """
-			SELECT deltaker.*, bruker.*, deltaker.modified_at as deltaker_sist_endret, ne.navn as navkontor, ne.enhet_id as enhet_id
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker_status
          		inner join deltaker on deltaker_status.deltaker_id = deltaker.id
          		inner join bruker on bruker.id = deltaker.bruker_id
@@ -300,7 +300,7 @@ open class DeltakerRepository(
 
 	fun skalHaStatusDeltar(): List<DeltakerDbo> {
 		val sql = """
-			SELECT deltaker.*, bruker.*, deltaker.modified_at as deltaker_sist_endret, ne.navn as navkontor, ne.enhet_id as enhet_id
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker_status
 					 inner join deltaker on deltaker_status.deltaker_id = deltaker.id
 					 inner join bruker on bruker.id = deltaker.bruker_id
@@ -317,7 +317,7 @@ open class DeltakerRepository(
 
 	fun hentDeltakere(offset: Int, limit: Int): List<DeltakerDbo> {
 		val sql = """
-			SELECT deltaker.*, bruker.*, deltaker.modified_at as deltaker_sist_endret, ne.navn as navkontor, ne.enhet_id as enhet_id
+			SELECT deltaker.*, bruker.*, ne.navn as navkontor, ne.enhet_id as enhet_id
 			FROM deltaker inner join bruker on bruker.id = deltaker.bruker_id
 				LEFT JOIN nav_enhet ne ON ne.id = bruker.nav_enhet_id
 			ORDER BY deltaker.id OFFSET :offset LIMIT :limit
