@@ -40,7 +40,9 @@ class DeltakerPublishQuery(
 
 		if (deltaker.status == null) return Result.DontPublish()
 
-		if (erKometDeltaker == true || unleashService.erKometMasterForTiltakstype(deltaker.tiltakstype)) return Result.DontPublish()
+		if (deltaker.kilde == Kilde.KOMET || erKometDeltaker == true || unleashService.erKometMasterForTiltakstype(deltaker.tiltakstype)) {
+			return Result.DontPublish()
+		}
 
 		val vurderinger = getVurderinger(id)
 
