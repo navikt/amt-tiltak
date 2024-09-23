@@ -30,6 +30,7 @@ data class DeltakerPublishDto(
 	val forsteVedtakFattet: LocalDate?,
 	val sistEndretAv: UUID?,
 	val sistEndretAvEnhet: UUID?,
+	val sistEndret: LocalDateTime,
 ) {
 	fun digest() = DigestUtils.md5DigestAsHex(JsonUtils.toJson(this).toByteArray())
 }
