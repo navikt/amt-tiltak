@@ -3,6 +3,8 @@ package no.nav.amt.tiltak.bff.internal
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.amt.tiltak.core.kafka.KafkaProducerService
 import no.nav.amt.tiltak.core.port.DeltakerService
+import no.nav.amt.tiltak.core.port.GjennomforingService
+import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.common.job.JobRunner
@@ -23,6 +25,8 @@ class RepubliseringController(
 	private val deltakerService: DeltakerService,
 	private val dataPublisher: DataPublisherService,
 	private val kafkaProducerService: KafkaProducerService,
+	private val gjennomforingService: GjennomforingService,
+	private val unleashService: UnleashService,
 ) {
 
 	@GetMapping("/deltakere")
@@ -56,8 +60,11 @@ class RepubliseringController(
 		if (isInternal(request)) {
 			JobRunner.runAsync("republiser_deltaker_kafka") {
 				val deltaker = deltakerService.hentDeltaker(id) ?: throw NoSuchElementException()
-				kafkaProducerService.publiserDeltaker(deltaker, deltaker.endretDato)
-				dataPublisher.publishDeltaker(deltaker.id, forcePublish = true, erKometDeltaker = null)
+				val tiltakstype = gjennomforingService.getGjennomforing(deltaker.gjennomforingId).tiltak.kode
+				if (!unleashService.erKometMasterForTiltakstype(tiltakstype)) {
+					kafkaProducerService.publiserDeltaker(deltaker, deltaker.endretDato)
+					dataPublisher.publishDeltaker(deltaker.id, forcePublish = true, erKometDeltaker = false)
+				}
 			}
 		} else {
 			throw ResponseStatusException(HttpStatus.UNAUTHORIZED)

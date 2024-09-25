@@ -47,7 +47,7 @@ open class DeltakerServiceImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	override fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert, erKometDeltaker: Boolean?) {
+	override fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert, erKometDeltaker: Boolean) {
 		val lagretDeltaker = hentDeltaker(deltaker.id)
 		val brukerId = brukerService.getIdOrCreate(personIdent)
 
@@ -63,7 +63,7 @@ open class DeltakerServiceImpl(
 		}
 	}
 
-	override fun insertStatus(status: DeltakerStatusInsert, erKometDeltaker: Boolean?) {
+	override fun insertStatus(status: DeltakerStatusInsert, erKometDeltaker: Boolean) {
 		transactionTemplate.executeWithoutResult {
 			val statusBleOppdatert = oppdaterStatus(status)
 
@@ -161,7 +161,9 @@ open class DeltakerServiceImpl(
 			deltakerStatusRepository.slett(deltakerId)
 			vurderingRepository.slett(deltakerId)
 			deltakerRepository.slettVeilederrelasjonOgDeltaker(deltakerId)
-			kafkaProducerService.publiserSlettDeltaker(deltakerId)
+			if (erKometDeltaker != true) {
+				kafkaProducerService.publiserSlettDeltaker(deltakerId)
+			}
 		}
 
 		log.info("Deltaker med id=$deltakerId er slettet")
@@ -453,10 +455,17 @@ open class DeltakerServiceImpl(
 	override fun publiserDeltakerPaKafka(deltakerId: UUID, endretDato: LocalDateTime) {
 		val deltaker = hentDeltaker(deltakerId) ?: error("Fant ikke deltaker med id $deltakerId")
 
-		publiser(deltaker, endretDato, null)
+		val tiltakstype = gjennomforingService.getGjennomforing(deltaker.gjennomforingId).tiltak.kode
+		if (!unleashService.erKometMasterForTiltakstype(tiltakstype)) {
+			publiser(deltaker, endretDato, false)
+		}
 	}
 
-	private fun publiser(deltaker: Deltaker, endretDato: LocalDateTime, erKometDeltaker: Boolean?) {
+	private fun publiser(deltaker: Deltaker, endretDato: LocalDateTime, erKometDeltaker: Boolean) {
+		if (erKometDeltaker) {
+			log.info("Publiserer ikke deltaker som komet er master for, id ${deltaker.id}")
+			return
+		}
 		kafkaProducerService.publiserDeltaker(deltaker, endretDato)
 		publisherService.publish(deltaker.id, DataPublishType.DELTAKER, erKometDeltaker)
 

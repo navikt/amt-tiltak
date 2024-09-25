@@ -10,9 +10,9 @@ import java.util.UUID
 
 interface DeltakerService {
 
-	fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert, erKometDeltaker: Boolean?)
+	fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert, erKometDeltaker: Boolean)
 
-	fun insertStatus(status: DeltakerStatusInsert, erKometDeltaker: Boolean?)
+	fun insertStatus(status: DeltakerStatusInsert, erKometDeltaker: Boolean)
 
 	fun hentDeltakerePaaGjennomforing(gjennomforingId: UUID): List<Deltaker>
 
