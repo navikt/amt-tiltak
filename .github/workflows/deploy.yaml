@@ -79,4 +79,3 @@ jobs:
           VARS: .nais/vars-prod.yaml
           VAR: image=${{ needs.test-build-and-push.outputs.image }}
           TELEMETRY: ${{ needs.test-build-and-push.outputs.telemetry }}
-
