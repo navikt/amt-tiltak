@@ -59,6 +59,9 @@ spec:
         - application: veilarboppfolging
           namespace: pto
           cluster: dev-fss
+        - application: veilarboppfolging
+          namespace: poao
+          cluster: dev-gcp
     outbound:
       rules:
         - application: amt-person-service
