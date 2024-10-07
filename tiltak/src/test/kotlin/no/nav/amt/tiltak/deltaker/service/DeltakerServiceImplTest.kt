@@ -127,7 +127,7 @@ class DeltakerServiceImplTest {
 		testDataRepository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
 
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource, TestDataSeeder::insertMinimum)
-		every { publisherService.publish(id = any(), type = any(), erKometDeltaker = any()) } returns Unit
+		every { publisherService.publish(id = any(), type = any(), erKometDeltaker = any(), forcePublish = any()) } returns Unit
 		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
 	}
 
@@ -575,7 +575,7 @@ class DeltakerServiceImplTest {
 		deltakerServiceImpl.republiserAlleDeltakerePaKafka(1)
 
 		verify(exactly = 2) { kafkaProducerService.publiserDeltaker(any(), any()) }
-		verify(exactly = 2) { publisherService.publish(any(), DataPublishType.DELTAKER, false) }
+		verify(exactly = 2) { publisherService.publish(any(), DataPublishType.DELTAKER, false, true) }
 	}
 
 	@Test

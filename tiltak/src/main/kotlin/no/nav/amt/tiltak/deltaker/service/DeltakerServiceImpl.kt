@@ -424,7 +424,7 @@ open class DeltakerServiceImpl(
 				val deltaker = it.toDeltaker(status)
 
 				kafkaProducerService.publiserDeltaker(deltaker, deltaker.endretDato)
-				publisherService.publish(deltaker.id, DataPublishType.DELTAKER, false)
+				publisherService.publish(deltaker.id, DataPublishType.DELTAKER, erKometDeltaker = false, forcePublish = true)
 			}
 
 			offset += deltakere.size
@@ -445,7 +445,7 @@ open class DeltakerServiceImpl(
 		gjennomforingIder.forEach {
 			val deltakerePaGjennomforing = hentDeltakerePaaGjennomforing(it)
 			deltakerePaGjennomforing.forEach {deltaker ->
-				publisherService.publish(deltaker.id, DataPublishType.DELTAKER, false)
+				publisherService.publish(deltaker.id, DataPublishType.DELTAKER, erKometDeltaker = false, forcePublish = true)
 			}
 			log.info("Republiserte ${deltakerePaGjennomforing.size} deltakere for gjennomforingId $it")
 		}

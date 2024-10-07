@@ -27,9 +27,9 @@ class DataPublisherService(
 
 	private val logger = LoggerFactory.getLogger(javaClass)
 
-	fun publish(id: UUID, type: DataPublishType, erKometDeltaker: Boolean?) {
+	fun publish(id: UUID, type: DataPublishType, erKometDeltaker: Boolean?, forcePublish: Boolean = false) {
 		when (type) {
-			DataPublishType.DELTAKER -> publishDeltaker(id, erKometDeltaker = erKometDeltaker)
+			DataPublishType.DELTAKER -> publishDeltaker(id, forcePublish = forcePublish, erKometDeltaker = erKometDeltaker)
 			DataPublishType.ENDRINGSMELDING -> publishEndringsmelding(id)
 		}
 	}
