@@ -98,7 +98,7 @@ class RepubliseringController(
 		request: HttpServletRequest
 	) {
 		if (isInternal(request)) {
-			JobRunner.runAsync("republiser_${type}_${id}") { dataPublisher.publish(id, type, null) }
+			JobRunner.runAsync("republiser_${type}_${id}") { dataPublisher.publish(id, type, erKometDeltaker = null, forcePublish = true) }
 		}
 	}
 
