@@ -52,7 +52,20 @@ Kilden til dataene om deltakerene er i hovedsak Arena per dags dato. I fremtiden
   "dagerPerUke": 3,
   "prosentStilling": 50,
   "endretDato": "2023-10-24T11:47:48.254204",
-  "kilde": "ARENA"
+  "kilde": "ARENA",
+  "innhold": {
+    "innhold": [
+      {
+        "tekst": "Karriereveiledning",
+        "innholdskode": "karriereveiledning"
+      },
+      {
+        "tekst": "Kartlegge hvordan helsen din påvirker muligheten din til å jobbe",
+        "innholdskode": "kartlegge-helse"
+      }
+    ],
+  "ledetekst": "Arbeidsforberedende trening er et tilbud for deg som først ønsker å jobbe i et tilrettelagt arbeidsmiljø. Du får veiledning og støtte av en veileder. Sammen kartlegger dere hvordan din kompetanse, interesser og ferdigheter påvirker muligheten din til å jobbe."
+  }
 }
 ```
 
@@ -124,14 +137,14 @@ data class DeltakerV1Dto(
 	val prosentStilling: Float?,
 	val endretDato: LocalDateTime,
 	val kilde: Kilde?, 
-    val innhold: DeltakelsesinnholdDto?,
+	val innhold: DeltakelsesinnholdDto?,
 )
 
 data class DeltakerStatusDto(
 	val type: Type,
-    val statusTekst: String?,
+	val statusTekst: String?,
 	val aarsak: Aarsak?,
-    val aarsakTekst: String?,
+	val aarsakTekst: String?,
 	val opprettetDato: LocalDateTime,
 ) {
 
@@ -155,12 +168,12 @@ enum class Kilde {
 }
 
 data class DeltakelsesinnholdDto(
-   val ledetekst: String?,
-   val innhold: List<InnholdDto>,
+	val ledetekst: String?,
+	val innhold: List<InnholdDto>,
 )
 
 data class InnholdDto(
-   val tekst: String,
-   val innholdskode: String,
+	val tekst: String,
+	val innholdskode: String,
 )
 ```
