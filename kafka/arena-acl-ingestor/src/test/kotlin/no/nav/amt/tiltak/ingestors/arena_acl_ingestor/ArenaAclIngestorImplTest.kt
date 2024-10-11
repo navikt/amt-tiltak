@@ -4,13 +4,13 @@ import io.kotest.core.spec.style.StringSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.DeltakerProcessor
+import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.ArenaDeltakerProcessor
 
 class ArenaAclIngestorImplTest : StringSpec({
 
-	val deltakerProcessor: DeltakerProcessor = mockk()
+	val arenaDeltakerProcessor: ArenaDeltakerProcessor = mockk()
 
-	val ingestor = ArenaAclIngestorImpl(deltakerProcessor)
+	val ingestor = ArenaAclIngestorImpl(arenaDeltakerProcessor)
 
 	"ingestKafkaMessageValue should parse DELTAKER message" {
 		val json = """
@@ -35,13 +35,13 @@ class ArenaAclIngestorImplTest : StringSpec({
 		""".trimIndent()
 
 		every {
-			deltakerProcessor.processMessage(any())
+			arenaDeltakerProcessor.processMessage(any())
 		} returns Unit
 
 		ingestor.ingestKafkaRecord(json)
 
 		verify(exactly = 1) {
-			deltakerProcessor.processMessage(any())
+			arenaDeltakerProcessor.processMessage(any())
 		}
 
 	}

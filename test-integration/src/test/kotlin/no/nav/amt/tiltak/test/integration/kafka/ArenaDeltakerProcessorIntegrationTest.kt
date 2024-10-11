@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.UUID
 
-class DeltakerProcessorIntegrationTest : IntegrationTestBase() {
+class ArenaDeltakerProcessorIntegrationTest : IntegrationTestBase() {
 
 	@Autowired
 	lateinit var deltakerService: DeltakerService

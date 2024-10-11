@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.kafka.producer
 
 import no.nav.amt.tiltak.common.json.JsonUtils
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.kafka.KafkaProducerService
+import no.nav.amt.tiltak.core.kafka.DeltakerV1ProducerService
 import no.nav.amt.tiltak.kafka.config.KafkaTopicProperties
 import no.nav.amt.tiltak.kafka.producer.dto.DeltakerV1Dto
 import no.nav.amt.tiltak.kafka.producer.dto.toDto
@@ -13,10 +13,10 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
-open class KafkaProducerServiceImpl(
+open class DeltakerV1Producer(
 	private val kafkaTopicProperties: KafkaTopicProperties,
 	private val kafkaProducerClient: KafkaProducerClient<ByteArray, ByteArray>
-) : KafkaProducerService {
+) : DeltakerV1ProducerService {
 
 	override fun publiserDeltaker(deltaker: Deltaker, endretDato: LocalDateTime) {
 		val deltakerDto = DeltakerV1Dto(

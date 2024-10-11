@@ -21,7 +21,7 @@ import org.springframework.transaction.support.TransactionTemplate
 import java.util.UUID
 
 @Service
-class DeltakerProcessor(
+class ArenaDeltakerProcessor(
 	private val gjennomforingService: GjennomforingService,
 	private val deltakerService: DeltakerService,
 	private val arrangorService: ArrangorService,
