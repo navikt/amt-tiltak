@@ -9,7 +9,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import no.nav.amt.tiltak.core.domain.tiltak.harIkkeStartet
 import no.nav.amt.tiltak.core.exceptions.ValidationException
-import no.nav.amt.tiltak.core.kafka.KafkaProducerService
+import no.nav.amt.tiltak.core.kafka.DeltakerV1ProducerService
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
@@ -39,7 +39,7 @@ open class DeltakerServiceImpl(
 	private val endringsmeldingService: EndringsmeldingService,
 	private val gjennomforingService: GjennomforingService,
 	private val transactionTemplate: TransactionTemplate,
-	private val kafkaProducerService: KafkaProducerService,
+	private val deltakerV1Producer: DeltakerV1ProducerService,
 	private val publisherService: DataPublisherService,
 	private val vurderingRepository: VurderingRepository,
 	private val unleashService: UnleashService
@@ -162,7 +162,7 @@ open class DeltakerServiceImpl(
 			vurderingRepository.slett(deltakerId)
 			deltakerRepository.slettVeilederrelasjonOgDeltaker(deltakerId)
 			if (erKometDeltaker != true) {
-				kafkaProducerService.publiserSlettDeltaker(deltakerId)
+				deltakerV1Producer.publiserSlettDeltaker(deltakerId)
 			}
 		}
 
@@ -423,7 +423,7 @@ open class DeltakerServiceImpl(
 
 				val deltaker = it.toDeltaker(status)
 
-				kafkaProducerService.publiserDeltaker(deltaker, deltaker.endretDato)
+				deltakerV1Producer.publiserDeltaker(deltaker, deltaker.endretDato)
 				publisherService.publish(deltaker.id, DataPublishType.DELTAKER, erKometDeltaker = false, forcePublish = true)
 			}
 
@@ -466,7 +466,7 @@ open class DeltakerServiceImpl(
 			log.info("Publiserer ikke deltaker som komet er master for, id ${deltaker.id}")
 			return
 		}
-		kafkaProducerService.publiserDeltaker(deltaker, endretDato)
+		deltakerV1Producer.publiserDeltaker(deltaker, endretDato)
 		publisherService.publish(deltaker.id, DataPublishType.DELTAKER, erKometDeltaker)
 
 		log.info("Publisert deltaker med id ${deltaker.id} på kafka")

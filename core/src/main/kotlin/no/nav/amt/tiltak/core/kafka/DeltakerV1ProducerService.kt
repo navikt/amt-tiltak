@@ -2,9 +2,9 @@ package no.nav.amt.tiltak.core.kafka
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
-interface KafkaProducerService {
+interface DeltakerV1ProducerService {
 
 	fun publiserDeltaker(deltaker: Deltaker, endretDato: LocalDateTime)
 

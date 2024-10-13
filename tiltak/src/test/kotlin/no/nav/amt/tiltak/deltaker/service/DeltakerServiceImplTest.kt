@@ -18,7 +18,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import no.nav.amt.tiltak.core.exceptions.ValidationException
-import no.nav.amt.tiltak.core.kafka.KafkaProducerService
+import no.nav.amt.tiltak.core.kafka.DeltakerV1ProducerService
 import no.nav.amt.tiltak.core.port.BrukerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavAnsattService
@@ -79,7 +79,7 @@ class DeltakerServiceImplTest {
 	lateinit var endringsmeldingService: EndringsmeldingServiceImpl
 	lateinit var endringsmeldingRepository: EndringsmeldingRepository
 	lateinit var gjennomforingService: GjennomforingService
-	lateinit var kafkaProducerService: KafkaProducerService
+	lateinit var deltakerV1ProducerService: DeltakerV1ProducerService
 	lateinit var objectMapper: ObjectMapper
 	lateinit var publisherService: DataPublisherService
 	lateinit var amtPersonClient: AmtPersonClient
@@ -98,7 +98,7 @@ class DeltakerServiceImplTest {
 
 		navEnhetService = mockk()
 		endringsmeldingService = mockk()
-		kafkaProducerService = mockk(relaxUnitFun = true)
+		deltakerV1ProducerService = mockk(relaxUnitFun = true)
 		publisherService = mockk()
 		amtPersonClient = mockk(relaxUnitFun = true)
 		navAnsattService = mockk(relaxUnitFun = true)
@@ -119,7 +119,7 @@ class DeltakerServiceImplTest {
 			endringsmeldingService = endringsmeldingService,
 			gjennomforingService = gjennomforingService,
 			transactionTemplate = transactionTemplate,
-			kafkaProducerService = kafkaProducerService,
+			deltakerV1Producer = deltakerV1ProducerService,
 			publisherService = publisherService,
 			vurderingRepository = vurderingRepository,
 			unleashService = unleashService
@@ -308,18 +308,18 @@ class DeltakerServiceImplTest {
 		nyDeltaker!!.id shouldBe deltaker.id
 		nyDeltaker.gjennomforingId shouldBe deltaker.gjennomforingId
 
-		verify(exactly = 1) { kafkaProducerService.publiserDeltaker(any(), any()) }
+		verify(exactly = 1) { deltakerV1ProducerService.publiserDeltaker(any(), any()) }
 		verify(exactly = 1) { publisherService.publish(deltaker.id, DataPublishType.DELTAKER, false) }
 	}
 
 	@Test
 	fun `upsertDeltaker - republiserer ikke uendrede deltakere`() {
-		verify(exactly = 0) { kafkaProducerService.publiserDeltaker(any(), any()) }
+		verify(exactly = 0) { deltakerV1ProducerService.publiserDeltaker(any(), any()) }
 
 		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker, false)
 		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker, false)
 
-		verify(exactly = 1) { kafkaProducerService.publiserDeltaker(any(), any()) }
+		verify(exactly = 1) { deltakerV1ProducerService.publiserDeltaker(any(), any()) }
 		verify(exactly = 1) { publisherService.publish(deltaker.id, DataPublishType.DELTAKER, false) }
 	}
 
@@ -336,7 +336,7 @@ class DeltakerServiceImplTest {
 		nyDeltaker.gjennomforingId shouldBe deltaker.gjennomforingId
 		nyDeltaker.dagerPerUke shouldBe dagerPerUke
 
-		verify(exactly = 2) { kafkaProducerService.publiserDeltaker(any(), any()) }
+		verify(exactly = 2) { deltakerV1ProducerService.publiserDeltaker(any(), any()) }
 		verify(exactly = 2) { publisherService.publish(deltaker.id, DataPublishType.DELTAKER, false) }
 	}
 
@@ -356,7 +356,7 @@ class DeltakerServiceImplTest {
 			false
 		)
 
-		verify(exactly = 1) { kafkaProducerService.publiserDeltaker(any(), any()) }
+		verify(exactly = 1) { deltakerV1ProducerService.publiserDeltaker(any(), any()) }
 		verify(exactly = 1) { publisherService.publish(DELTAKER_1.id, DataPublishType.DELTAKER, false) }
 	}
 
@@ -392,7 +392,7 @@ class DeltakerServiceImplTest {
 			opprettetDato = now,
 			aktiv = true
 		)
-		verify(exactly = 2) { kafkaProducerService.publiserDeltaker(any(), any()) }
+		verify(exactly = 2) { deltakerV1ProducerService.publiserDeltaker(any(), any()) }
 		verify(exactly = 2) { publisherService.publish(nyDeltaker.id, DataPublishType.DELTAKER, false) }
 	}
 
@@ -421,7 +421,7 @@ class DeltakerServiceImplTest {
 		val status2 = deltakerStatusRepository.getStatusForDeltaker(nyDeltaker.id)
 
 		status2 shouldBe status1
-		verify(exactly = 2) { kafkaProducerService.publiserDeltaker(any(), any()) }
+		verify(exactly = 2) { deltakerV1ProducerService.publiserDeltaker(any(), any()) }
 		verify(exactly = 2) { publisherService.publish(nyDeltaker.id, DataPublishType.DELTAKER, false) }
 	}
 
@@ -459,7 +459,7 @@ class DeltakerServiceImplTest {
 		statuser.first().aktiv shouldBe false
 		statuser.first().type shouldBe statusInsertDbo.type
 		statuser.last().aktiv shouldBe true
-		verify(exactly = 2) { kafkaProducerService.publiserDeltaker(any(), any()) }
+		verify(exactly = 2) { deltakerV1ProducerService.publiserDeltaker(any(), any()) }
 		verify(exactly = 2) { publisherService.publish(nyDeltaker.id, DataPublishType.DELTAKER, false) }
 	}
 
@@ -467,7 +467,7 @@ class DeltakerServiceImplTest {
 	fun `slettDeltaker - skal publisere sletting på kafka`() {
 		deltakerServiceImpl.slettDeltaker(deltakerId, false)
 
-		verify(exactly = 1) { kafkaProducerService.publiserSlettDeltaker(deltakerId) }
+		verify(exactly = 1) { deltakerV1ProducerService.publiserSlettDeltaker(deltakerId) }
 		verify(exactly = 1) { publisherService.publish(deltakerId, DataPublishType.DELTAKER, false) }
 	}
 
@@ -574,7 +574,7 @@ class DeltakerServiceImplTest {
 
 		deltakerServiceImpl.republiserAlleDeltakerePaKafka(1)
 
-		verify(exactly = 2) { kafkaProducerService.publiserDeltaker(any(), any()) }
+		verify(exactly = 2) { deltakerV1ProducerService.publiserDeltaker(any(), any()) }
 		verify(exactly = 2) { publisherService.publish(any(), DataPublishType.DELTAKER, false, true) }
 	}
 
@@ -629,7 +629,7 @@ class DeltakerServiceImplTest {
 		lagretVurdering.opprettetAvArrangorAnsattId shouldBe ARRANGOR_ANSATT_1.id
 		lagretVurdering.gyldigFra shouldBeEqualTo LocalDateTime.now()
 		lagretVurdering.gyldigTil shouldBe null
-		verify(exactly = 0) { kafkaProducerService.publiserDeltaker(any(), any()) }
+		verify(exactly = 0) { deltakerV1ProducerService.publiserDeltaker(any(), any()) }
 		verify(exactly = 1) { publisherService.publish(deltakerId, DataPublishType.DELTAKER, null) }
 	}
 

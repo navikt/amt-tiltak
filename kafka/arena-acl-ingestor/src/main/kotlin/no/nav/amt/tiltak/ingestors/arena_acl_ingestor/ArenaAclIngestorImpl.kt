@@ -6,15 +6,15 @@ import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.UnknownMessageWrapper
-import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.DeltakerProcessor
+import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor.ArenaDeltakerProcessor
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.UUID
 
 @Service
 class ArenaAclIngestorImpl(
-	private val deltakerProcessor: DeltakerProcessor,
+	private val arenaDeltakerProcessor: ArenaDeltakerProcessor,
 ) : ArenaAclIngestor {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -27,7 +27,7 @@ class ArenaAclIngestorImpl(
 				"DELTAKER" -> {
 					val deltakerPayload = fromJsonNode<DeltakerPayload>(unknownMessageWrapper.payload)
 					val deltakerMessage = toKnownMessageWrapper(deltakerPayload, unknownMessageWrapper)
-					deltakerProcessor.processMessage(deltakerMessage)
+					arenaDeltakerProcessor.processMessage(deltakerMessage)
 				}
 				else -> {
 					throw IllegalArgumentException("Ukjent meldingtype ${unknownMessageWrapper.type}")

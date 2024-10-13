@@ -1,7 +1,7 @@
 package no.nav.amt.tiltak.bff.internal
 
 import jakarta.servlet.http.HttpServletRequest
-import no.nav.amt.tiltak.core.kafka.KafkaProducerService
+import no.nav.amt.tiltak.core.kafka.DeltakerV1ProducerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.UnleashService
@@ -24,7 +24,7 @@ import java.util.UUID
 class RepubliseringController(
 	private val deltakerService: DeltakerService,
 	private val dataPublisher: DataPublisherService,
-	private val kafkaProducerService: KafkaProducerService,
+	private val deltakerV1ProducerService: DeltakerV1ProducerService,
 	private val gjennomforingService: GjennomforingService,
 	private val unleashService: UnleashService,
 ) {
@@ -62,7 +62,7 @@ class RepubliseringController(
 				val deltaker = deltakerService.hentDeltaker(id) ?: throw NoSuchElementException()
 				val tiltakstype = gjennomforingService.getGjennomforing(deltaker.gjennomforingId).tiltak.kode
 				if (!unleashService.erKometMasterForTiltakstype(tiltakstype)) {
-					kafkaProducerService.publiserDeltaker(deltaker, deltaker.endretDato)
+					deltakerV1ProducerService.publiserDeltaker(deltaker, deltaker.endretDato)
 					dataPublisher.publishDeltaker(deltaker.id, forcePublish = true, erKometDeltaker = false)
 				}
 			}
