@@ -8,7 +8,15 @@ import org.springframework.stereotype.Service
 class UnleashServiceImpl(
 	private val unleashClient: Unleash
 ) : UnleashService {
+	private val tiltakstyperKometAlltidErMasterFor = listOf(
+		"ARBFORB",
+	)
+
+	// her kan vi legge inn de neste tiltakstypene vi skal ta over
+	private val tiltakstyperKometKanskjeErMasterFor = emptyList<String>()
+
 	override fun erKometMasterForTiltakstype(tiltakstype: String): Boolean {
-		return unleashClient.isEnabled("amt.enable-komet-deltakere") && tiltakstype == "ARBFORB"
+		return tiltakstype in tiltakstyperKometAlltidErMasterFor ||
+			(unleashClient.isEnabled("amt.enable-komet-deltakere") && tiltakstype in tiltakstyperKometKanskjeErMasterFor)
 	}
 }
