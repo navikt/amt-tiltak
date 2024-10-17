@@ -25,7 +25,7 @@ class MulighetsrommetApiClientImpl(
 
 		httpClient.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
-				throw RuntimeException("Klarte ikke å hente gjennomføring $id arenadata fra Mulighetsrommet. gjennomføring=$id status=${response.code}")
+				throw RuntimeException("Klarte ikke å hente gjennomføring $id arenadata fra Mulighetsrommet. status=${response.code}")
 			}
 
 			val body = response.body?.string()
