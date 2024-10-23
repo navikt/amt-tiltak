@@ -30,9 +30,15 @@ class RepubliseringController(
 ) {
 
 	@GetMapping("/deltakere")
-	fun republiserDeltakere(request: HttpServletRequest) {
+	fun republiserDeltakere(
+		@PathVariable("ekstern") ekstern: Boolean,
+		@PathVariable("intern") intern: Boolean,
+		request: HttpServletRequest
+	) {
 		if (isInternal(request)) {
-			JobRunner.runAsync("republiser_deltakere_kafka", deltakerService::republiserAlleDeltakerePaKafka)
+			JobRunner.runAsync("republiser_deltakere_kafka") {
+				deltakerService.republiserAlleDeltakerePaKafka(publiserInternTopic = intern, publiserEksternTopic = ekstern)
+			}
 		} else {
 			throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
 		}

@@ -32,7 +32,7 @@ interface DeltakerService {
 
 	fun hentDeltakerMap(deltakerIder: List<UUID>): Map<UUID, Deltaker>
 
-	fun republiserAlleDeltakerePaKafka(batchSize: Int = 500)
+	fun republiserAlleDeltakerePaKafka(batchSize: Int = 500, publiserInternTopic: Boolean = true, publiserEksternTopic: Boolean = true)
 
 	fun republiserDeltakerePaDeltakerV2(tiltakstype: String)
 

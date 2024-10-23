@@ -397,7 +397,7 @@ open class DeltakerServiceImpl(
 		return mapDeltakereOgAktiveStatuser(deltakere).associateBy { it.id }
 	}
 
-	override fun republiserAlleDeltakerePaKafka(batchSize: Int) {
+	override fun republiserAlleDeltakerePaKafka(batchSize: Int, publiserInternTopic: Boolean, publiserEksternTopic: Boolean) {
 		var offset = 0
 
 		var deltakere: List<DeltakerDbo>
@@ -423,8 +423,12 @@ open class DeltakerServiceImpl(
 
 				val deltaker = it.toDeltaker(status)
 
-				deltakerV1Producer.publiserDeltaker(deltaker, deltaker.endretDato)
-				publisherService.publish(deltaker.id, DataPublishType.DELTAKER, erKometDeltaker = false, forcePublish = true)
+				if (publiserEksternTopic) {
+					deltakerV1Producer.publiserDeltaker(deltaker, deltaker.endretDato)
+				}
+				if (publiserInternTopic) {
+					publisherService.publish(deltaker.id, DataPublishType.DELTAKER, erKometDeltaker = false, forcePublish = true)
+				}
 			}
 
 			offset += deltakere.size
