@@ -54,51 +54,52 @@ class DeltakerIngestorImpl(
 
 	private fun upsert(deltakerDto: DeltakerDto) {
 		val (gjennomforingId, tiltakstype) = try {
-				getGjennomforingIdAndTiltakstype(deltakerDto.deltakerlisteId)
-			} catch (e: IllegalStateException) {
-				if (EnvironmentUtils.isDevelopment().orElse(false)) {
-					log.warn("Ignorerer deltaker med id ${deltakerDto.id} på gjennomføring ${deltakerDto.deltakerlisteId} i dev: ${e.message}")
-					return
-				} else {
-					throw e
-				}
+			getGjennomforingIdAndTiltakstype(deltakerDto.deltakerlisteId)
+		} catch (e: IllegalStateException) {
+			if (EnvironmentUtils.isDevelopment().orElse(false)) {
+				log.warn("Ignorerer deltaker med id ${deltakerDto.id} på gjennomføring ${deltakerDto.deltakerlisteId} i dev: ${e.message}")
+				return
+			} else {
+				throw e
 			}
-
-		val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltakstype)
-		if (erKometDeltaker) {
-			val status = DeltakerStatusInsert(
-				id = deltakerDto.status.id ?: UUID.randomUUID(),
-				deltakerId = deltakerDto.id,
-				type = deltakerDto.status.type,
-				aarsak = deltakerDto.status.aarsak,
-				aarsaksbeskrivelse = deltakerDto.status.aarsaksbeskrivelse,
-				gyldigFra = deltakerDto.status.gyldigFra,
-			)
-
-			val deltakerUpsert = DeltakerUpsert(
-				id = deltakerDto.id,
-				statusInsert = status,
-				startDato = deltakerDto.oppstartsdato,
-				sluttDato = deltakerDto.sluttdato,
-				dagerPerUke = deltakerDto.dagerPerUke,
-				prosentStilling = deltakerDto.prosentStilling?.toFloat(),
-				registrertDato = deltakerDto.innsoktDato.atStartOfDay(),
-				gjennomforingId = gjennomforingId,
-				innsokBegrunnelse = deltakerDto.bestillingTekst,
-				innhold = deltakerDto.innhold,
-				kilde = deltakerDto.kilde ?: Kilde.ARENA,
-				forsteVedtakFattet = deltakerDto.forsteVedtakFattet,
-				sistEndretAv = deltakerDto.sistEndretAv,
-				sistEndretAvEnhet = deltakerDto.sistEndretAvEnhet
-			)
-
-			transactionTemplate.executeWithoutResult {
-				deltakerService.upsertDeltaker(deltakerDto.personalia.personident, deltakerUpsert, erKometDeltaker)
-			}
-			log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} deltakerlisteId=$gjennomforingId tiltakstype $tiltakstype fra ny løsning")
-		} else {
-			log.info("Ignorerte arena-deltaker med id ${deltakerDto.id} og tiltakstype $tiltakstype fra deltaker-v2-topic")
 		}
+
+		if (!unleashService.erKometMasterForTiltakstype(tiltakstype)) {
+			log.info("Ignorerte arena-deltaker med id ${deltakerDto.id} og tiltakstype $tiltakstype fra deltaker-v2-topic")
+			return
+		}
+
+		val status = DeltakerStatusInsert(
+			id = deltakerDto.status.id ?: UUID.randomUUID(),
+			deltakerId = deltakerDto.id,
+			type = deltakerDto.status.type,
+			aarsak = deltakerDto.status.aarsak,
+			aarsaksbeskrivelse = deltakerDto.status.aarsaksbeskrivelse,
+			gyldigFra = deltakerDto.status.gyldigFra,
+		)
+
+		val deltakerUpsert = DeltakerUpsert(
+			id = deltakerDto.id,
+			statusInsert = status,
+			startDato = deltakerDto.oppstartsdato,
+			sluttDato = deltakerDto.sluttdato,
+			dagerPerUke = deltakerDto.dagerPerUke,
+			prosentStilling = deltakerDto.prosentStilling?.toFloat(),
+			registrertDato = deltakerDto.innsoktDato.atStartOfDay(),
+			gjennomforingId = gjennomforingId,
+			innsokBegrunnelse = deltakerDto.bestillingTekst,
+			innhold = deltakerDto.innhold,
+			kilde = deltakerDto.kilde ?: Kilde.ARENA,
+			forsteVedtakFattet = deltakerDto.forsteVedtakFattet,
+			sistEndretAv = deltakerDto.sistEndretAv,
+			sistEndretAvEnhet = deltakerDto.sistEndretAvEnhet
+		)
+
+		transactionTemplate.executeWithoutResult {
+			deltakerService.upsertDeltaker(deltakerDto.personalia.personident, deltakerUpsert, true)
+		}
+		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} deltakerlisteId=$gjennomforingId tiltakstype $tiltakstype fra ny løsning")
+
 	}
 
 	private fun getGjennomforingIdAndTiltakstype(deltakerlisteId: UUID): GjennomforingIdOgTiltakstype {

@@ -47,7 +47,7 @@ open class DeltakerServiceImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	override fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert, erKometDeltaker: Boolean) {
+	override fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert, erKometMaster: Boolean) {
 		val lagretDeltaker = hentDeltaker(deltaker.id)
 		val brukerId = brukerService.getIdOrCreate(personIdent)
 
@@ -59,7 +59,7 @@ open class DeltakerServiceImpl(
 			val oppdatertDeltaker = hentDeltaker(deltaker.id)
 				?: throw IllegalStateException("Fant ikke deltaker med id ${deltaker.id}")
 
-			publiser(oppdatertDeltaker, LocalDateTime.now(), erKometDeltaker)
+			publiser(oppdatertDeltaker, LocalDateTime.now(), erKometMaster)
 		}
 	}
 
@@ -465,13 +465,13 @@ open class DeltakerServiceImpl(
 		}
 	}
 
-	private fun publiser(deltaker: Deltaker, endretDato: LocalDateTime, erKometDeltaker: Boolean) {
-		if (erKometDeltaker) {
+	private fun publiser(deltaker: Deltaker, endretDato: LocalDateTime, erKometMaster: Boolean) {
+		if (erKometMaster) {
 			log.info("Publiserer ikke deltaker som komet er master for, id ${deltaker.id}")
 			return
 		}
 		deltakerV1Producer.publiserDeltaker(deltaker, endretDato)
-		publisherService.publish(deltaker.id, DataPublishType.DELTAKER, erKometDeltaker)
+		publisherService.publish(deltaker.id, DataPublishType.DELTAKER, erKometMaster)
 
 		log.info("Publisert deltaker med id ${deltaker.id} på kafka")
 	}

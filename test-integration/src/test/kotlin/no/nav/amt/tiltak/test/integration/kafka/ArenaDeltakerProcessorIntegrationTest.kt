@@ -202,7 +202,7 @@ class ArenaDeltakerProcessorIntegrationTest : IntegrationTestBase() {
 		}
 	}
 
-	private fun ingestGjennomforing(tiltakKode: String = "INDOPPFAG"): GjennomforingMessage {
+	private fun ingestGjennomforing(tiltakKode: String = "GRUPPEAMO"): GjennomforingMessage {
 		val overordnetArrangor = AmtArrangorClient.ArrangorMedOverordnetArrangor(
 			id = UUID.randomUUID(),
 			organisasjonsnummer = "888666555",

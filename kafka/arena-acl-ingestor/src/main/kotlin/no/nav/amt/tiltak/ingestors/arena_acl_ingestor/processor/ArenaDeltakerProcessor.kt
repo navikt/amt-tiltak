@@ -46,40 +46,43 @@ class ArenaDeltakerProcessor(
 
 		val (gjennomforingId, tiltakstype) = getGjennomforingIdAndTiltakstype(deltakerDto.gjennomforingId)
 
-		val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltakstype)
+		if (unleashService.erKometMasterForTiltakstype(tiltakstype)) return
 
-		if (!erKometDeltaker) {
-			val status = DeltakerStatusInsert(
-				id = UUID.randomUUID(),
-				deltakerId = deltakerDto.id,
-				type = tilDeltakerStatusType(deltakerDto.status),
-				aarsak = tilDeltakerAarsak(deltakerDto.statusAarsak),
-				aarsaksbeskrivelse = null,
-				gyldigFra = deltakerDto.statusEndretDato,
+		val status = DeltakerStatusInsert(
+			id = UUID.randomUUID(),
+			deltakerId = deltakerDto.id,
+			type = tilDeltakerStatusType(deltakerDto.status),
+			aarsak = tilDeltakerAarsak(deltakerDto.statusAarsak),
+			aarsaksbeskrivelse = null,
+			gyldigFra = deltakerDto.statusEndretDato,
+		)
+
+		val deltakerUpsert = DeltakerUpsert(
+			id = deltakerDto.id,
+			statusInsert = status,
+			startDato = deltakerDto.startDato,
+			sluttDato = deltakerDto.sluttDato,
+			dagerPerUke = deltakerDto.dagerPerUke,
+			prosentStilling = deltakerDto.prosentDeltid,
+			registrertDato = deltakerDto.registrertDato,
+			gjennomforingId = gjennomforingId,
+			innsokBegrunnelse = deltakerDto.innsokBegrunnelse,
+			innhold = null,
+			kilde = Kilde.ARENA,
+			forsteVedtakFattet = null,
+			sistEndretAv = null,
+			sistEndretAvEnhet = null
+		)
+
+		transactionTemplate.executeWithoutResult {
+			deltakerService.upsertDeltaker(
+				deltakerDto.personIdent,
+				deltakerUpsert,
+				unleashService.erKometMasterForTiltakstype(tiltakstype)
 			)
-
-			val deltakerUpsert = DeltakerUpsert(
-				id = deltakerDto.id,
-				statusInsert = status,
-				startDato = deltakerDto.startDato,
-				sluttDato = deltakerDto.sluttDato,
-				dagerPerUke = deltakerDto.dagerPerUke,
-				prosentStilling = deltakerDto.prosentDeltid,
-				registrertDato = deltakerDto.registrertDato,
-				gjennomforingId = gjennomforingId,
-				innsokBegrunnelse = deltakerDto.innsokBegrunnelse,
-				innhold = null,
-				kilde = Kilde.ARENA,
-				forsteVedtakFattet = null,
-				sistEndretAv = null,
-				sistEndretAvEnhet = null
-			)
-
-			transactionTemplate.executeWithoutResult {
-				deltakerService.upsertDeltaker(deltakerDto.personIdent, deltakerUpsert, erKometDeltaker)
-			}
-			log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=$gjennomforingId tiltakstype $tiltakstype")
 		}
+		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=$gjennomforingId tiltakstype $tiltakstype")
+
 	}
 
 	private fun getGjennomforingIdAndTiltakstype(deltakerlisteId: UUID): GjennomforingIdOgTiltakstype {
@@ -122,8 +125,9 @@ class ArenaDeltakerProcessor(
 		return gjennomforing
 
 	}
+
 	private fun tilDeltakerStatusType(status: DeltakerPayload.Status): DeltakerStatus.Type {
-		return when(status){
+		return when (status) {
 			DeltakerPayload.Status.VENTER_PA_OPPSTART -> DeltakerStatus.Type.VENTER_PA_OPPSTART
 			DeltakerPayload.Status.DELTAR -> DeltakerStatus.Type.DELTAR
 			DeltakerPayload.Status.HAR_SLUTTET -> DeltakerStatus.Type.HAR_SLUTTET
@@ -140,7 +144,7 @@ class ArenaDeltakerProcessor(
 	}
 
 	private fun tilDeltakerAarsak(aarsak: DeltakerPayload.StatusAarsak?): DeltakerStatus.Aarsak? {
-		return when(aarsak){
+		return when (aarsak) {
 			DeltakerPayload.StatusAarsak.SYK -> DeltakerStatus.Aarsak.SYK
 			DeltakerPayload.StatusAarsak.FATT_JOBB -> DeltakerStatus.Aarsak.FATT_JOBB
 			DeltakerPayload.StatusAarsak.TRENGER_ANNEN_STOTTE -> DeltakerStatus.Aarsak.TRENGER_ANNEN_STOTTE
