@@ -10,7 +10,7 @@ import java.util.UUID
 
 interface DeltakerService {
 
-	fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert, erKometDeltaker: Boolean)
+	fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert, erKometMaster: Boolean)
 
 	fun insertStatus(status: DeltakerStatusInsert, erKometDeltaker: Boolean)
 
