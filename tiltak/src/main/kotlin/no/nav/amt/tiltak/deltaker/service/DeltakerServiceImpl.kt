@@ -440,10 +440,6 @@ open class DeltakerServiceImpl(
 	}
 
 	override fun republiserDeltakerePaDeltakerV2(tiltakstype: String) {
-		if (unleashService.erKometMasterForTiltakstype(tiltakstype)) {
-			log.info("Republiserer ikke deltakere for tiltakstype $tiltakstype siden komet er master for tiltakstypen")
-			return
-		}
 		val gjennomforingIder = gjennomforingService.getGjennomforingIderForTiltakstype(tiltakstype)
 
 		gjennomforingIder.forEach {
