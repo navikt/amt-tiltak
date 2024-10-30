@@ -407,13 +407,7 @@ open class DeltakerServiceImpl(
 
 			val statuser = hentAktiveStatuserForDeltakere(deltakere.map { it.id })
 
-			val gjennomforingIder = deltakere
-				.map { it.gjennomforingId }.distinct()
-			val erKometMasterForGjennomforingMap = gjennomforingIder
-				.associateWith { unleashService.erKometMasterForTiltakstype(gjennomforingService.getGjennomforing(it).tiltak.kode) }
-				.toMutableMap()
-
-			deltakere.filterNot { erKometMasterForGjennomforingMap[it.gjennomforingId]!! }.forEach {
+			deltakere.forEach {
 				val status = statuser[it.id]?.toModel()
 
 				if (status == null) {
