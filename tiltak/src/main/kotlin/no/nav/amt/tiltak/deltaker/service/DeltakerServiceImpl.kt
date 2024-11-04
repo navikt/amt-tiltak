@@ -288,7 +288,10 @@ open class DeltakerServiceImpl(
 
 	private fun oppdaterStatus(status: DeltakerStatusInsert): Boolean {
 		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(status.deltakerId)
-		if (forrigeStatus?.type == status.type && forrigeStatus.aarsak == status.aarsak) return false
+		if (forrigeStatus?.type == status.type && (forrigeStatus.aarsak == status.aarsak
+			|| forrigeStatus.aarsak == DeltakerStatus.Aarsak.SAMARBEIDET_MED_ARRANGOREN_ER_AVBRUTT && status.aarsak == DeltakerStatus.Aarsak.AVLYST_KONTRAKT)) {
+			return false
+		}
 
 		val nyStatus = DeltakerStatusInsertDbo(
 			id = status.id,
