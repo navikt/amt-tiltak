@@ -32,6 +32,9 @@ jobs:
       - name: docker-build-push
         uses: nais/docker-build-push@v0
         id: docker-build-push
+        env: # Workaround for rate limiting inntil denne er fikset: https://github.com/aquasecurity/trivy-action/issues/389
+          TRIVY_DB_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-db"
+          TRIVY_JAVA_DB_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-java-db:1"
         with:
           team: amt
           tag: ${{ github.sha }}
