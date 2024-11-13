@@ -9,10 +9,12 @@ import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.common.job.JobRunner
 import no.nav.security.token.support.core.api.Unprotected
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -29,6 +31,7 @@ class RepubliseringController(
 	private val gjennomforingService: GjennomforingService,
 	private val unleashService: UnleashService,
 ) {
+	private val logger = LoggerFactory.getLogger(javaClass)
 
 	@GetMapping("/deltakere")
 	fun republiserDeltakere(
@@ -78,6 +81,30 @@ class RepubliseringController(
 		}
 	}
 
+	@PostMapping("/deltakere")
+	fun republiserDeltakereFraListe(
+		request: HttpServletRequest,
+		@RequestBody body: DeltakerIdRequest
+	) {
+		if (isInternal(request)) {
+			JobRunner.runAsync("republiser_deltakerider_kafka") {
+				body.deltakerIder.forEach {
+					val deltaker = deltakerService.hentDeltaker(it) ?: throw NoSuchElementException()
+					val tiltakstype = gjennomforingService.getGjennomforing(deltaker.gjennomforingId).tiltak.kode
+					if (!unleashService.erKometMasterForTiltakstype(tiltakstype)) {
+						if (body.publiserTilDeltakerV1) {
+							deltakerV1ProducerService.publiserDeltaker(deltaker, deltaker.endretDato)
+						}
+						dataPublisher.publishDeltaker(deltaker.id, forcePublish = true, erKometDeltaker = false)
+					}
+				}
+				logger.info("Republiserte ${body.deltakerIder.size} deltakere")
+			}
+		} else {
+			throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
+		}
+	}
+
 	@PostMapping
 	fun republishAll(request: HttpServletRequest) {
 		if (isInternal(request)) {
@@ -112,4 +139,9 @@ class RepubliseringController(
 	private fun isInternal(request: HttpServletRequest): Boolean {
 		return request.remoteAddr == "127.0.0.1"
 	}
+
+	data class DeltakerIdRequest(
+		val deltakerIder: List<UUID>,
+		val publiserTilDeltakerV1: Boolean
+	)
 }
