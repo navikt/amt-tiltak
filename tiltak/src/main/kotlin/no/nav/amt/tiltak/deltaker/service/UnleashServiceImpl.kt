@@ -13,13 +13,12 @@ class UnleashServiceImpl(
 		"INDOPPFAG",
 		"AVKLARAG",
 		"ARBRRHDAG",
-	)
-
-	// her kan vi legge inn de neste tiltakstypene vi skal ta over
-	private val tiltakstyperKometKanskjeErMasterFor = listOf(
 		"VASV",
 		"DIGIOPPARB",
 	)
+
+	// her kan vi legge inn de neste tiltakstypene vi skal ta over
+	private val tiltakstyperKometKanskjeErMasterFor = emptyList<String>()
 
 	override fun erKometMasterForTiltakstype(tiltakstype: String): Boolean {
 		return tiltakstype in tiltakstyperKometAlltidErMasterFor ||
