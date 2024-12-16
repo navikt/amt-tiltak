@@ -1,6 +1,7 @@
 # Deltaker-v1 Kafka Topic
 
 ## Innhold
+
 1. [Beskrivelse](#beskrivelse)
 1. [Meldinger](#meldinger)
     1. [Key](#key)
@@ -9,6 +10,7 @@
     1. [Skjema](#skjema)
 
 ## Beskrivelse
+
 På topicen `amt.deltaker-v1` publiseres det siste øyeblikksbildet av deltakere på følgende tiltakstyper:
 
 - INDOPPFAG
@@ -25,10 +27,12 @@ Topicen inneholder deltakere som kan ha **adressebeskyttelse** (kode 6/7), og sk
 
 Deltakere kan bli slettet, da vil det bli produsert en tombstone for den deltakeren.
 
-Topicen er satt opp med evig retention og compaction, så den skal inneholde alle deltakere som har vært registrert på de nevnte tilakene. Det er noen unntak: F.eks. så blir deltakere som er historisert i Arena pga gjentatte deltakelser på samme tiltaksgjennomføring slettet hos oss (kun den siste deltakelsen vil bli beholdt).
+Topicen er satt opp med evig retention og compaction, så den skal inneholde alle deltakere som har vært registrert på de
+nevnte tilakene. Det er noen unntak: F.eks. så blir deltakere som er historisert i Arena pga gjentatte deltakelser på
+samme tiltaksgjennomføring slettet hos oss (kun den siste deltakelsen vil bli beholdt).
 
-Kilden til dataene om deltakerene er i hovedsak Arena per dags dato. I fremtiden vil vi i Team Komet overta som kilde når vi har utviklet nye løsninger for å kunne melde på og endre deltakere utenfor Arena.
-
+Kilden til dataene om deltakerene er i hovedsak Arena per dags dato. I fremtiden vil vi i Team Komet overta som kilde
+når vi har utviklet nye løsninger for å kunne melde på og endre deltakere utenfor Arena.
 
 ## Meldinger
 
@@ -42,7 +46,7 @@ Kilden til dataene om deltakerene er i hovedsak Arena per dags dato. I fremtiden
   "startDato": "2022-02-25",
   "sluttDato": "2022-05-20",
   "status": {
-    "type": "HAR_SLUTTET", 
+    "type": "HAR_SLUTTET",
     "statusTekst": "Har sluttet",
     "aarsak": "FATT_JOBB",
     "aarsakTekst": "Fått jobb",
@@ -64,32 +68,41 @@ Kilden til dataene om deltakerene er i hovedsak Arena per dags dato. I fremtiden
         "innholdskode": "kartlegge-helse"
       }
     ],
-  "ledetekst": "Arbeidsforberedende trening er et tilbud for deg som først ønsker å jobbe i et tilrettelagt arbeidsmiljø. Du får veiledning og støtte av en veileder. Sammen kartlegger dere hvordan din kompetanse, interesser og ferdigheter påvirker muligheten din til å jobbe."
-  }
+    "ledetekst": "Arbeidsforberedende trening er et tilbud for deg som først ønsker å jobbe i et tilrettelagt arbeidsmiljø. Du får veiledning og støtte av en veileder. Sammen kartlegger dere hvordan din kompetanse, interesser og ferdigheter påvirker muligheten din til å jobbe."
+  },
+  "deltakelsesmengder": [
+    {
+      "deltakelsesprosent": 50,
+      "dagerPerUke": 3,
+      "gyldigFra": "2022-02-25",
+      "opprettet": "2022-01-27T00:00:00"
+    }
+  ]
 }
 ```
 
 ### Key - deltakerId
+
 - Format: `uuid`
 - Beskrivelse: En unik id som identifiserer en enkelt deltaker / deltakelse på ett tiltak.
 
-
 ### Deltaker
 
-| Felt                | Format         | Beskrivelse                                                                                                                                                                                                                                                                                                                                                                                                                 |
-|---------------------|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **id**              | `uuid`         | En unik id som identifiserer en enkelt deltaker / deltakelse på ett tiltak. Samme som `Key`                                                                                                                                                                                                                                                                                                                                 |
-| **gjennomforingId** | `uuid`         | En unik id som identifiserer en tiltaksgjennomføring fra [Team Valp](https://github.com/navikt/mulighetsrommet)                                                                                                                                                                                                                                                                                                             |
-| **personIdent**     | `string`       | Gjeldende folkeregisterident for personen, hvis en folkeregisterident ikke finnes kan det være en av: npid eller aktør-id                                                                                                                                                                                                                                                                                                   |
-| **startDato**       | `date\|null`   | Dagen deltakeren starter/startet på tiltaket                                                                                                                                                                                                                                                                                                                                                                                | 
-| **sluttDato**       | `date\|null`   | Dagen deltakeren slutter/sluttet på tiltaket                                                                                                                                                                                                                                                                                                                                                                                |
-| **status**          | `object`       | Nåværende status på deltakeren, forteller f.eks om deltakeren deltar på tiltaket akkurat nå eller venter på oppstart osv. Se [Status](#status)                                                                                                                                                                                                                                                                              |
-| **registrertDato**  | `datetime`     | Datoen deltakeren er registrert i Arena. Det er litt ukjent hva som definerer en registrertDato i fremtiden når vi i Komet overtar opprettelsen av deltakere.                                                                                                                                                                                                                                                               |
-| **dagerPerUke**     | `float\|null`  | Antall dager deltakeren deltar på tiltaket per uke. I Arena er det mulig å angi dette feltet som et desimaltall f.eks `2.5`, i ny løsning er det bare mulig å bruke heltall.<br /><br /> I ny løsning kan dette bare settes på tiltakstypene: <br/> - Arbeidsforberedende trening (AFT) <br/> - Varig tilrettelagt arbeid (VTA)                                                                                             |
-| **prosentStilling** | `float\|null`  | Prosentandelen deltakeren opptar av en tiltaksplass. Hva 100% innebærer av faktisk deltakelse vil variere fra tiltak til tiltak. <br /><br />I Arena er det mulig å angi dette feltet som et desimaltall f.eks `42.1`, i ny løsning er det bare mulig å bruke heltall.<br /><br /> I ny løsning kan dette bare settes på tiltakstypene: <br /> - Arbeidsforberedende trening (AFT) <br /> - Varig tilrettelagt arbeid (VTA) |
-| **endretDato**      | `datetime`     | Tidsstempel for siste endring på deltakeren                                                                                                                                                                                                                                                                                                                                                                                 |
-| **kilde**           | `string\|null` | Kilde for deltakeren. Kan være `null`, `ARENA` eller `KOMET`. Hvis kilden er `KOMET` ble deltakeren opprettet i Komets nye løsning. Hvis kilde er `null` eller `ARENA` ble deltakeren opprettet Arena.                                                                                                                                                                                                                      |
-| **innhold**         | `object\|null` | Innhold for tiltaksdeltakelsen på strukturert format. Kun for deltakere som er opprettet hos Komet, eller som har fått lagt til innhold etter at Komet ble master for deltakeren.                                                                                                                                                                                                                                           |
+| Felt                   | Format         | Beskrivelse                                                                                                                                                                                                                                                                                                                                                                                                                 |
+|------------------------|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **id**                 | `uuid`         | En unik id som identifiserer en enkelt deltaker / deltakelse på ett tiltak. Samme som `Key`                                                                                                                                                                                                                                                                                                                                 |
+| **gjennomforingId**    | `uuid`         | En unik id som identifiserer en tiltaksgjennomføring fra [Team Valp](https://github.com/navikt/mulighetsrommet)                                                                                                                                                                                                                                                                                                             |
+| **personIdent**        | `string`       | Gjeldende folkeregisterident for personen, hvis en folkeregisterident ikke finnes kan det være en av: npid eller aktør-id                                                                                                                                                                                                                                                                                                   |
+| **startDato**          | `date\|null`   | Dagen deltakeren starter/startet på tiltaket                                                                                                                                                                                                                                                                                                                                                                                | 
+| **sluttDato**          | `date\|null`   | Dagen deltakeren slutter/sluttet på tiltaket                                                                                                                                                                                                                                                                                                                                                                                |
+| **status**             | `object`       | Nåværende status på deltakeren, forteller f.eks om deltakeren deltar på tiltaket akkurat nå eller venter på oppstart osv. Se [Status](#status)                                                                                                                                                                                                                                                                              |
+| **registrertDato**     | `datetime`     | Datoen deltakeren er registrert i Arena. Det er litt ukjent hva som definerer en registrertDato i fremtiden når vi i Komet overtar opprettelsen av deltakere.                                                                                                                                                                                                                                                               |
+| **dagerPerUke**        | `float\|null`  | Antall dager deltakeren deltar på tiltaket per uke. I Arena er det mulig å angi dette feltet som et desimaltall f.eks `2.5`, i ny løsning er det bare mulig å bruke heltall.<br /><br /> I ny løsning kan dette bare settes på tiltakstypene: <br/> - Arbeidsforberedende trening (AFT) <br/> - Varig tilrettelagt arbeid (VTA)                                                                                             |
+| **prosentStilling**    | `float\|null`  | Prosentandelen deltakeren opptar av en tiltaksplass. Hva 100% innebærer av faktisk deltakelse vil variere fra tiltak til tiltak. <br /><br />I Arena er det mulig å angi dette feltet som et desimaltall f.eks `42.1`, i ny løsning er det bare mulig å bruke heltall.<br /><br /> I ny løsning kan dette bare settes på tiltakstypene: <br /> - Arbeidsforberedende trening (AFT) <br /> - Varig tilrettelagt arbeid (VTA) |
+| **endretDato**         | `datetime`     | Tidsstempel for siste endring på deltakeren                                                                                                                                                                                                                                                                                                                                                                                 |
+| **kilde**              | `string\|null` | Kilde for deltakeren. Kan være `null`, `ARENA` eller `KOMET`. Hvis kilden er `KOMET` ble deltakeren opprettet i Komets nye løsning. Hvis kilde er `null` eller `ARENA` ble deltakeren opprettet Arena.                                                                                                                                                                                                                      |
+| **innhold**            | `object\|null` | Innhold for tiltaksdeltakelsen på strukturert format. Kun for deltakere som er opprettet hos Komet, eller som har fått lagt til innhold etter at Komet ble master for deltakeren.                                                                                                                                                                                                                                           |
+| **deltakelsesmengder** | `list\|null`   | Periodiserte deltakelsesmengder. Finnes kun på deltakere som Komet er master for, men gamle meldinger på topic vil kunne mangle dette feltet uavhengig av hvem som er master. Listen vil kun inneholde elementer for deltakarer på AFT og VTA.                                                                                                                                                                          |
 
 #### Status
 
@@ -101,51 +114,66 @@ Kilden til dataene om deltakerene er i hovedsak Arena per dags dato. I fremtiden
 | **aarsakTekst**   | `string\|null` | Tekstrepresentasjon av statusårsaken (for visning).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | **opprettetDato** | `datetime`     | Tidsstempel for når statusen ble opprettet                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 
-For mer informasjon om når og hvordan deltakerstatuser settes og endres se mer utdypende dokumentasjon på [Confluence](https://confluence.adeo.no/pages/viewpage.action?pageId=573710206).
+For mer informasjon om når og hvordan deltakerstatuser settes og endres se mer utdypende dokumentasjon
+på [Confluence](https://confluence.adeo.no/pages/viewpage.action?pageId=573710206).
 
 #### Deltakelsesinnhold
 
 | Felt          | Format         | Beskrivelse                                             |
 |---------------|----------------|---------------------------------------------------------|
 | **ledetekst** | `string\|null` | Generell informasjon om tiltakstypen. Kommer fra Valp.  |
-| **innhold**   | `object`       | Liste over valgt innhold som gjelder denne deltakelsen. |
+| **innhold**   | `list`         | Liste over valgt innhold som gjelder denne deltakelsen. |
 
 #### Innhold
 
-| Felt             | Format         | Beskrivelse                                                           |
-|------------------|----------------|-----------------------------------------------------------------------|
-| **tekst**        | `string`       | Tekstlig beskrivelse av innholdselementet. Kommer fra Valp.           |
-| **innholdskode** | `string`       | Kodeverdi for innholdselementet. Kommer fra Valp.                     |
+| Felt             | Format   | Beskrivelse                                                 |
+|------------------|----------|-------------------------------------------------------------|
+| **tekst**        | `string` | Tekstlig beskrivelse av innholdselementet. Kommer fra Valp. |
+| **innholdskode** | `string` | Kodeverdi for innholdselementet. Kommer fra Valp.           |
+
+#### Deltakelsesmengde
+
+| Felt                   | Format        | Beskrivelse                                          |
+|------------------------|---------------|------------------------------------------------------|
+| **deltakelsesprosent** | `float`       | Prosentandelen deltakeren opptar av en tiltaksplass. |
+| **dagerPerUke**        | `float\|null` | Antall dager deltakeren deltar på tiltaket per uke.  |
+| **gyldigFra**          | `date`        | Dato f.o.m. når deltakalesesmengden trer i kraft.    |
+| **opprettet**          | `datetime`    | Når endringen ble opprettet.                         |
+
+Mer informasjon om hvordan periodiserte deltakelsesmengder settes og endres kommer snart.
 
 ### Skjema
 
 For oppdatert informasjon er det best å se siste versjon direkte:
-- [DeltakerV1Dto](https://github.com/navikt/amt-tiltak/blob/main/kafka/kafka-producer/src/main/kotlin/no/nav/amt/tiltak/kafka/producer/dto/DeltakerV1Dto.kt)
+
+- [DeltakerV1Dto](https://github.com/navikt/amt-deltaker/blob/main/src/main/kotlin/no/nav/amt/deltaker/deltaker/kafka/DeltakerV1Dto.kt) (Skjema for deltakere Komet er master for)
+- [DeltakerV1Dto](https://github.com/navikt/amt-tiltak/blob/main/kafka/kafka-producer/src/main/kotlin/no/nav/amt/tiltak/kafka/producer/dto/DeltakerV1Dto.kt) (Skjema for deltakere Arena er master for) 
 - [DeltakerStatusDto](https://github.com/navikt/amt-tiltak/blob/main/kafka/kafka-producer/src/main/kotlin/no/nav/amt/tiltak/kafka/producer/dto/DeltakerStatusDto.kt)
 - [DeltakerStatus.Type og DeltakerStatus.Aarsak](https://github.com/navikt/amt-tiltak/blob/main/core/src/main/kotlin/no/nav/amt/tiltak/core/domain/tiltak/DeltakerStatus.kt)
 
 ```kotlin
 data class DeltakerV1Dto(
-	val id: UUID,
-	val gjennomforingId: UUID,
-	val personIdent: String,
-	val startDato: LocalDate?,
-	val sluttDato: LocalDate?,
-	val status: DeltakerStatusDto,
-	val registrertDato: LocalDateTime,
-	val dagerPerUke: Float?,
-	val prosentStilling: Float?,
-	val endretDato: LocalDateTime,
-	val kilde: Kilde?, 
-	val innhold: DeltakelsesinnholdDto?,
+    val id: UUID,
+    val gjennomforingId: UUID,
+    val personIdent: String,
+    val startDato: LocalDate?,
+    val sluttDato: LocalDate?,
+    val status: DeltakerStatusDto,
+    val registrertDato: LocalDateTime,
+    val dagerPerUke: Float?,
+    val prosentStilling: Float?,
+    val endretDato: LocalDateTime,
+    val kilde: Kilde?,
+    val innhold: DeltakelsesinnholdDto?,
+    val deltakelsesmengder: List<DeltakelsesmengdeDto>?,
 )
 
 data class DeltakerStatusDto(
-	val type: Type,
-	val statusTekst: String?,
-	val aarsak: Aarsak?,
-	val aarsakTekst: String?,
-	val opprettetDato: LocalDateTime,
+    val type: Type,
+    val statusTekst: String?,
+    val aarsak: Aarsak?,
+    val aarsakTekst: String?,
+    val opprettetDato: LocalDateTime,
 ) {
 
     enum class Aarsak {
@@ -156,24 +184,32 @@ data class DeltakerStatusDto(
     enum class Type {
         UTKAST_TIL_PAMELDING, AVBRUTT_UTKAST,
         VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, FEILREGISTRERT,
-        SOKT_INN, VURDERES, VENTELISTE, AVBRUTT, FULLFORT, 
-        PABEGYNT_REGISTRERING, 
+        SOKT_INN, VURDERES, VENTELISTE, AVBRUTT, FULLFORT,
+        PABEGYNT_REGISTRERING,
     }
 
 }
 
 enum class Kilde {
-   KOMET,
-   ARENA
+    KOMET,
+    ARENA
 }
 
 data class DeltakelsesinnholdDto(
-	val ledetekst: String?,
-	val innhold: List<InnholdDto>,
+    val ledetekst: String?,
+    val innhold: List<InnholdDto>,
 )
 
 data class InnholdDto(
-	val tekst: String,
-	val innholdskode: String,
+    val tekst: String,
+    val innholdskode: String,
 )
+
+data class DeltakelsesmengdeDto(
+    val deltakelsesprosent: Float,
+    val dagerPerUke: Float?,
+    val gyldigFra: LocalDate,
+    val opprettet: LocalDateTime,
+)
+
 ```
