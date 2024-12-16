@@ -28,11 +28,7 @@ Topicen inneholder deltakere som kan ha **adressebeskyttelse** (kode 6/7), og sk
 Deltakere kan bli slettet, da vil det bli produsert en tombstone for den deltakeren.
 
 Topicen er satt opp med evig retention og compaction, så den skal inneholde alle deltakere som har vært registrert på de
-nevnte tilakene. Det er noen unntak: F.eks. så blir deltakere som er historisert i Arena pga gjentatte deltakelser på
-samme tiltaksgjennomføring slettet hos oss (kun den siste deltakelsen vil bli beholdt).
-
-Kilden til dataene om deltakerene er i hovedsak Arena per dags dato. I fremtiden vil vi i Team Komet overta som kilde
-når vi har utviklet nye løsninger for å kunne melde på og endre deltakere utenfor Arena.
+nevnte tiltakene. 
 
 ## Meldinger
 
