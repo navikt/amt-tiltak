@@ -25,19 +25,17 @@ data class GjennomforingMessage(
 	)
 
 	enum class Status {
-	  	PLANLAGT,
 		GJENNOMFORES,
 		AVBRUTT,
 		AVLYST,
-		AVSLUTTET,
-		APENT_FOR_INNSOK;
+		AVSLUTTET;
 	}
 
 	fun erKurs(): Boolean {
-		if (oppstart != null) {
-			return oppstart == Oppstartstype.FELLES
+		return if (oppstart != null) {
+			oppstart == Oppstartstype.FELLES
 		} else {
-			return kursTiltak.contains(tiltakstype.arenaKode)
+			kursTiltak.contains(tiltakstype.arenaKode)
 		}
 	}
 

@@ -46,7 +46,7 @@ internal class GjennomforingRepositoryTest : FunSpec({
 	test("insert() should insert gjennomforing and return object") {
 		val id = UUID.randomUUID()
 		val navn = "TEST Tiltaksgjennomforing"
-		val status = Gjennomforing.Status.PLANLAGT
+		val status = Gjennomforing.Status.GJENNOMFORES
 		val startDato = LocalDate.now().plusDays(2)
 		val sluttDato = LocalDate.now().plusDays(10)
 
@@ -88,7 +88,7 @@ internal class GjennomforingRepositoryTest : FunSpec({
 					arrangorId = UUID.randomUUID(),
 					tiltakId = UUID.randomUUID(),
 					navn = "idosfja",
-					status = Gjennomforing.Status.PLANLAGT,
+					status = Gjennomforing.Status.GJENNOMFORES,
 					startDato = null,
 					sluttDato = null,
 					createdAt = LocalDateTime.now(),
