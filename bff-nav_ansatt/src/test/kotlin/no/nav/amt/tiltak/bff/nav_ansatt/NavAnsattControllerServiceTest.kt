@@ -3,12 +3,16 @@ package no.nav.amt.tiltak.bff.nav_ansatt
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
+import java.util.UUID
 import no.nav.amt.tiltak.bff.nav_ansatt.NavAnsattControllerService.Companion.harTilgangTilDeltaker
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.DeltakerDto
 import no.nav.amt.tiltak.common.auth.AdGruppe
 import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
-import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
+import no.nav.amt.tiltak.core.domain.tiltak.VurderingDbo
 import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
@@ -29,10 +33,6 @@ import no.nav.amt.tiltak.test.database.data.TestData.createDeltakerInput
 import no.nav.amt.tiltak.test.database.data.TestData.createStatusInput
 import no.nav.amt.tiltak.test.database.data.inputs.BrukerInput
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZonedDateTime
-import java.util.UUID
 
 class NavAnsattControllerServiceTest {
 	private val endringsmeldingService = mockk<EndringsmeldingService>()
@@ -178,7 +178,7 @@ class NavAnsattControllerServiceTest {
 			innhold = Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(LocalDate.now()),
 			type = Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO
 		)
-		val vurdering = Vurdering(
+		val vurdering = VurderingDbo(
 			id = UUID.randomUUID(),
 			deltakerId = DELTAKER_1.id,
 			vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
@@ -226,7 +226,7 @@ class NavAnsattControllerServiceTest {
 			innhold = Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(LocalDate.now()),
 			type = Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO
 		)
-		val vurdering = Vurdering(
+		val vurdering = VurderingDbo(
 			id = UUID.randomUUID(),
 			deltakerId = deltakerInput.id,
 			vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
@@ -274,7 +274,7 @@ class NavAnsattControllerServiceTest {
 			innhold = Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(LocalDate.now()),
 			type = Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO
 		)
-		val vurdering = Vurdering(
+		val vurdering = VurderingDbo(
 			id = UUID.randomUUID(),
 			deltakerId = deltakerInput.id,
 			vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
@@ -418,7 +418,7 @@ class NavAnsattControllerServiceTest {
 			innhold = Endringsmelding.Innhold.LeggTilOppstartsdatoInnhold(LocalDate.now()),
 			type = Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO
 		)
-		val vurdering = Vurdering(
+		val vurdering = VurderingDbo(
 			id = UUID.randomUUID(),
 			deltakerId = deltaker.id,
 			vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,

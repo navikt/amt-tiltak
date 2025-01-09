@@ -1,7 +1,9 @@
 package no.nav.amt.tiltak.deltaker.service
 
 import io.kotest.matchers.shouldBe
-import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
+import java.time.LocalDateTime
+import java.util.UUID
+import no.nav.amt.tiltak.core.domain.tiltak.VurderingDbo
 import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import no.nav.amt.tiltak.deltaker.repositories.VurderingRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -10,8 +12,6 @@ import no.nav.amt.tiltak.test.database.data.TestData
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.time.LocalDateTime
-import java.util.UUID
 
 class VurderingServiceImplTest {
 	val dataSource = SingletonPostgresContainer.getDataSource()
@@ -26,7 +26,7 @@ class VurderingServiceImplTest {
 
 	@Test
 	fun `hentAktiveVurderingerForGjennomforing - henter aktive vurderinger pa gjennomforing`() {
-		vurderingRepository.insert(Vurdering(
+		vurderingRepository.insert(VurderingDbo(
 			UUID.randomUUID(),
 			TestData.DELTAKER_1.id,
 			Vurderingstype.OPPFYLLER_IKKE_KRAVENE,
@@ -35,7 +35,7 @@ class VurderingServiceImplTest {
 			gyldigFra = LocalDateTime.now(),
 			gyldigTil = null
 		))
-		vurderingRepository.insert(Vurdering(
+		vurderingRepository.insert(VurderingDbo(
 			UUID.randomUUID(),
 			TestData.DELTAKER_1.id,
 			Vurderingstype.OPPFYLLER_KRAVENE,
@@ -44,7 +44,7 @@ class VurderingServiceImplTest {
 			gyldigFra = LocalDateTime.now(),
 			gyldigTil = LocalDateTime.now()
 		))
-		vurderingRepository.insert(Vurdering(
+		vurderingRepository.insert(VurderingDbo(
 			UUID.randomUUID(),
 			TestData.DELTAKER_2.id,
 			Vurderingstype.OPPFYLLER_KRAVENE,

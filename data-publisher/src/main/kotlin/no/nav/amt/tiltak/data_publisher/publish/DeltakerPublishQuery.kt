@@ -174,8 +174,7 @@ class DeltakerPublishQuery(
 			vurderingstype = Vurderingstype.valueOf(rs.getString("vurderingstype")),
 			begrunnelse = rs.getString("begrunnelse"),
 			opprettetAvArrangorAnsattId = rs.getUUID("opprettet_av_arrangor_ansatt_id"),
-			gyldigFra = rs.getLocalDateTime("gyldig_fra"),
-			gyldigTil = rs.getNullableLocalDateTime("gyldig_til")
+			opprettet = rs.getLocalDateTime("gyldig_fra")
 		)
 	}
 

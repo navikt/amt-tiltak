@@ -9,6 +9,5 @@ data class Vurdering(
 	val vurderingstype: Vurderingstype,
 	val begrunnelse: String?,
 	val opprettetAvArrangorAnsattId: UUID,
-	val gyldigFra: LocalDateTime,
-	val gyldigTil: LocalDateTime?
+	val opprettet: LocalDateTime,
 )

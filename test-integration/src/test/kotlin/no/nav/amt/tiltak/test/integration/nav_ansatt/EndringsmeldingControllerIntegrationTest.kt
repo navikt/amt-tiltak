@@ -1,8 +1,10 @@
 package no.nav.amt.tiltak.test.integration.nav_ansatt
 
 import io.kotest.matchers.shouldBe
+import java.time.LocalDateTime
+import java.util.UUID
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
-import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
+import no.nav.amt.tiltak.core.domain.tiltak.VurderingDbo
 import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import no.nav.amt.tiltak.deltaker.repositories.VurderingRepository
 import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
@@ -23,8 +25,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDateTime
-import java.util.UUID
 
 class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 
@@ -395,8 +395,8 @@ class EndringsmeldingControllerIntegrationTest : IntegrationTestBase() {
 		return endringsmelding
 	}
 
-	private fun insertVurdering(deltakerId: UUID): Vurdering {
-		val vurdering = Vurdering(
+	private fun insertVurdering(deltakerId: UUID): VurderingDbo {
+		val vurdering = VurderingDbo(
 			id = UUID.fromString("866a387f-87d1-4623-8010-32fcdea5464e"),
 			deltakerId = deltakerId,
 			vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,

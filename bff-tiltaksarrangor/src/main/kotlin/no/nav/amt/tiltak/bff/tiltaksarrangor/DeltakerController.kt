@@ -1,5 +1,7 @@
 package no.nav.amt.tiltak.bff.tiltaksarrangor
 
+import java.time.LocalDate
+import java.util.UUID
 import no.nav.amt.tiltak.bff.tiltaksarrangor.request.AvsluttDeltakelseRequest
 import no.nav.amt.tiltak.bff.tiltaksarrangor.request.DeltakerIkkeAktuellRequest
 import no.nav.amt.tiltak.bff.tiltaksarrangor.request.EndreOppstartsdatoRequest
@@ -23,8 +25,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.time.LocalDate
-import java.util.UUID
 
 @RestController
 @RequestMapping("/api/tiltaksarrangor/deltaker")
@@ -167,10 +167,14 @@ class DeltakerController(
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 
 		return deltakerService.lagreVurdering(
-			deltakerId = deltakerId,
-			arrangorAnsattId = ansatt.id,
-			vurderingstype = request.vurderingstype,
-			begrunnelse = request.begrunnelse
+			Vurdering(
+				id = request.id,
+				deltakerId = deltakerId,
+				opprettet = request.opprettet,
+				opprettetAvArrangorAnsattId = ansatt.id,
+				vurderingstype = request.vurderingstype,
+				begrunnelse = request.begrunnelse
+			)
 		)
 	}
 
