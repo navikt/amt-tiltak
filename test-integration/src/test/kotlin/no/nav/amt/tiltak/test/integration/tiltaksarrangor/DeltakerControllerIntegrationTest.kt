@@ -17,6 +17,7 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.deltaker.repositories.VurderingRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.DbUtils.shouldBeCloseTo
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
@@ -407,7 +408,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 			method = "POST",
 			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/vurdering",
 			headers = createAnsatt1AuthHeader(),
-			body = """{"vurderingstype": "OPPFYLLER_IKKE_KRAVENE", "begrunnelse": "Mangler førerkort"}""".toJsonRequestBody()
+			body = """{"id": "${UUID.randomUUID()}", "opprettet": ${objectMapper.writeValueAsString(LocalDateTime.now())}, "vurderingstype": "OPPFYLLER_IKKE_KRAVENE", "begrunnelse": "Mangler førerkort"}""".toJsonRequestBody()
 		)
 
 		response.code shouldBe 403
@@ -442,7 +443,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		vurderingerFraResponse?.id shouldBe id
 		vurderingerFraResponse?.vurderingstype shouldBe Vurderingstype.OPPFYLLER_IKKE_KRAVENE
 		vurderingerFraResponse?.begrunnelse shouldBe "Mangler førerkort"
-		vurderingerFraResponse?.opprettet shouldBe opprettet
+		vurderingerFraResponse?.opprettet!! shouldBeCloseTo opprettet
 	}
 
 	@Test
