@@ -6,7 +6,6 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
-import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import no.nav.amt.tiltak.core.domain.tiltak.harIkkeStartet
 import no.nav.amt.tiltak.core.exceptions.ValidationException
 import no.nav.amt.tiltak.core.kafka.DeltakerV1ProducerService
@@ -30,6 +29,7 @@ import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
+import no.nav.amt.tiltak.core.domain.tiltak.VurderingDbo
 
 @Service
 open class DeltakerServiceImpl(
@@ -175,39 +175,36 @@ open class DeltakerServiceImpl(
 		return deltaker.erSkjermet
 	}
 
-	override fun lagreVurdering(
-		deltakerId: UUID,
-		arrangorAnsattId: UUID,
-		vurderingstype: Vurderingstype,
-		begrunnelse: String?
-	): List<Vurdering> {
-		val status = deltakerStatusRepository.getStatusForDeltaker(deltakerId)
+	override fun lagreVurdering(vurdering: Vurdering): List<Vurdering> {
+		val status = deltakerStatusRepository.getStatusForDeltaker(vurdering.deltakerId)
 		if (status?.type != DeltakerStatus.Type.VURDERES) {
-			log.error("Kan ikke opprette vurdering for deltaker med id $deltakerId som ikke har status VURDERES")
+			log.error("Kan ikke opprette vurdering for deltaker med id ${vurdering.deltakerId} som ikke har status VURDERES")
 			throw ValidationException("Kan ikke opprette vurdering for deltaker som ikke har status VURDERES")
 		}
 
-		val opprinneligeVurderinger = vurderingRepository.getVurderingerForDeltaker(deltakerId)
+		val opprinneligeVurderinger = vurderingRepository.getVurderingerForDeltaker(vurdering.deltakerId)
 		val forrigeVurdering = opprinneligeVurderinger.firstOrNull { it.gyldigTil == null }
-		if (forrigeVurdering?.vurderingstype == vurderingstype && forrigeVurdering.begrunnelse == begrunnelse) return opprinneligeVurderinger
+		if (forrigeVurdering?.vurderingstype == vurdering.vurderingstype && forrigeVurdering.begrunnelse == vurdering.begrunnelse) {
+			return opprinneligeVurderinger.map { it.toVurdering() }
+		}
 
-		val nyVurdering = Vurdering(
-			id = UUID.randomUUID(),
-			deltakerId = deltakerId,
-			vurderingstype = vurderingstype,
-			begrunnelse = begrunnelse,
-			opprettetAvArrangorAnsattId = arrangorAnsattId,
-			gyldigFra = LocalDateTime.now(),
+		val nyVurderingDbo = VurderingDbo(
+			id = vurdering.id,
+			deltakerId = vurdering.deltakerId,
+			vurderingstype = vurdering.vurderingstype,
+			begrunnelse = vurdering.begrunnelse,
+			opprettetAvArrangorAnsattId = vurdering.opprettetAvArrangorAnsattId,
+			gyldigFra = vurdering.opprettet,
 			gyldigTil = null
 		)
 
 		transactionTemplate.executeWithoutResult {
 			forrigeVurdering?.let { vurderingRepository.deaktiver(it.id) }
-			vurderingRepository.insert(nyVurdering)
+			vurderingRepository.insert(nyVurderingDbo)
 		}
 
-		publisherService.publish(deltakerId, DataPublishType.DELTAKER, null)
-		return vurderingRepository.getVurderingerForDeltaker(deltakerId)
+		publisherService.publish(vurdering.deltakerId, DataPublishType.DELTAKER, null)
+		return vurderingRepository.getVurderingerForDeltaker(vurdering.deltakerId).map { it.toVurdering() }
 	}
 
 	override fun konverterStatuserForDeltakerePaaGjennomforing(

@@ -67,6 +67,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.UUID
+import no.nav.amt.tiltak.core.domain.tiltak.VurderingDbo
+import no.nav.amt.tiltak.test.database.DbUtils.shouldBeCloseTo
 
 class DeltakerServiceImplTest {
 	lateinit var deltakerRepository: DeltakerRepository
@@ -510,10 +512,14 @@ class DeltakerServiceImplTest {
 			LocalDate.now().plusWeeks(4),
 		)
 		deltakerServiceImpl.lagreVurdering(
-			deltakerId = deltaker.id,
-			arrangorAnsattId = ARRANGOR_ANSATT_1.id,
-			vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
-			begrunnelse = null
+			Vurdering(
+				id = UUID.randomUUID(),
+				deltakerId = deltaker.id,
+				opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+				vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
+				begrunnelse = null,
+				opprettet = LocalDateTime.now(),
+			)
 		)
 
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldNotBe null
@@ -593,10 +599,14 @@ class DeltakerServiceImplTest {
 
 		shouldThrowExactly<ValidationException> {
 			deltakerServiceImpl.lagreVurdering(
-				deltakerId = deltakerId,
-				arrangorAnsattId = ARRANGOR_ANSATT_1.id,
-				vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
-				begrunnelse = null
+				Vurdering(
+					id = UUID.randomUUID(),
+					deltakerId = deltakerId,
+					opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+					vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
+					begrunnelse = null,
+					opprettet = LocalDateTime.now(),
+				)
 			)
 		}
 	}
@@ -615,10 +625,14 @@ class DeltakerServiceImplTest {
 		)
 
 		val vurderinger = deltakerServiceImpl.lagreVurdering(
-			deltakerId = deltakerId,
-			arrangorAnsattId = ARRANGOR_ANSATT_1.id,
-			vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
-			begrunnelse = null
+			Vurdering(
+				id = UUID.randomUUID(),
+				deltakerId = deltakerId,
+				opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+				vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
+				begrunnelse = null,
+				opprettet = LocalDateTime.now(),
+			)
 		)
 
 		vurderinger.size shouldBe 1
@@ -627,8 +641,7 @@ class DeltakerServiceImplTest {
 		lagretVurdering.vurderingstype shouldBe Vurderingstype.OPPFYLLER_KRAVENE
 		lagretVurdering.begrunnelse shouldBe null
 		lagretVurdering.opprettetAvArrangorAnsattId shouldBe ARRANGOR_ANSATT_1.id
-		lagretVurdering.gyldigFra shouldBeEqualTo LocalDateTime.now()
-		lagretVurdering.gyldigTil shouldBe null
+		lagretVurdering.opprettet shouldBeCloseTo LocalDateTime.now()
 		verify(exactly = 0) { deltakerV1ProducerService.publiserDeltaker(any(), any()) }
 		verify(exactly = 1) { publisherService.publish(deltakerId, DataPublishType.DELTAKER, null) }
 	}
@@ -645,7 +658,7 @@ class DeltakerServiceImplTest {
 				status = "VURDERES"
 			)
 		)
-		val forrigeVurdering = Vurdering(
+		val forrigeVurdering = VurderingDbo(
 			id = UUID.randomUUID(),
 			deltakerId = deltakerId,
 			begrunnelse = "Mangler førerkort",
@@ -657,25 +670,27 @@ class DeltakerServiceImplTest {
 		vurderingRepository.insert(forrigeVurdering)
 
 		val vurderinger = deltakerServiceImpl.lagreVurdering(
-			deltakerId = deltakerId,
-			arrangorAnsattId = ARRANGOR_ANSATT_1.id,
-			vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
-			begrunnelse = null
+			Vurdering(
+				id = UUID.randomUUID(),
+				deltakerId = deltakerId,
+				opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+				vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
+				begrunnelse = null,
+				opprettet = LocalDateTime.now(),
+			)
 		)
 
 		vurderinger.size shouldBe 2
 		val forrigeVurderingFraDb = vurderinger.find { it.id == forrigeVurdering.id }
 		forrigeVurderingFraDb?.vurderingstype shouldBe Vurderingstype.OPPFYLLER_IKKE_KRAVENE
 		forrigeVurderingFraDb?.begrunnelse shouldBe forrigeVurdering.begrunnelse
-		forrigeVurderingFraDb!!.gyldigFra shouldBeEqualTo forrigeVurdering.gyldigFra
-		forrigeVurderingFraDb.gyldigTil shouldNotBe null
+		forrigeVurderingFraDb!!.opprettet shouldBeEqualTo forrigeVurdering.gyldigFra
 
 		val nyVurderingFraDb = vurderinger.find { it.id != forrigeVurdering.id }
 		nyVurderingFraDb?.vurderingstype shouldBe Vurderingstype.OPPFYLLER_KRAVENE
 		nyVurderingFraDb?.begrunnelse shouldBe null
 		nyVurderingFraDb?.opprettetAvArrangorAnsattId shouldBe ARRANGOR_ANSATT_1.id
-		nyVurderingFraDb?.gyldigFra shouldNotBe null
-		nyVurderingFraDb?.gyldigTil shouldBe null
+		nyVurderingFraDb?.opprettet!! shouldBeCloseTo LocalDateTime.now()
 	}
 
 	@Test

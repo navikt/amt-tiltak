@@ -1,7 +1,6 @@
 package no.nav.amt.tiltak.deltaker.repositories
 
 import no.nav.amt.tiltak.common.db_utils.DbUtils
-import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import no.nav.amt.tiltak.utils.getLocalDateTime
 import no.nav.amt.tiltak.utils.getNullableLocalDateTime
@@ -12,13 +11,14 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.util.UUID
+import no.nav.amt.tiltak.core.domain.tiltak.VurderingDbo
 
 @Component
 open class VurderingRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
 	private val rowMapper = RowMapper { rs, _ ->
-		Vurdering(
+		VurderingDbo(
 			id = rs.getUUID("id"),
 			deltakerId = rs.getUUID("deltaker_id"),
 			vurderingstype = Vurderingstype.valueOf(rs.getString("vurderingstype")),
@@ -29,7 +29,7 @@ open class VurderingRepository(
 		)
 	}
 
-	fun getVurderingerForDeltaker(deltakerId: UUID): List<Vurdering> {
+	fun getVurderingerForDeltaker(deltakerId: UUID): List<VurderingDbo> {
 		val sql = """
 			SELECT *
 			FROM vurdering
@@ -43,7 +43,7 @@ open class VurderingRepository(
 		return template.query(sql, parameters, rowMapper)
 	}
 
-	fun getAktiveByGjennomforing(gjennomforingId: UUID): List<Vurdering> {
+	fun getAktiveByGjennomforing(gjennomforingId: UUID): List<VurderingDbo> {
 		val sql = """
 			SELECT *
 			FROM vurdering
@@ -56,7 +56,7 @@ open class VurderingRepository(
 		return template.query(sql, param, rowMapper)
 	}
 
-	fun insert(vurdering: Vurdering) {
+	fun insert(vurdering: VurderingDbo) {
 		val sql = """
 			INSERT INTO vurdering (id, deltaker_id, opprettet_av_arrangor_ansatt_id, vurderingstype, begrunnelse, gyldig_fra, gyldig_til)
 			VALUES (

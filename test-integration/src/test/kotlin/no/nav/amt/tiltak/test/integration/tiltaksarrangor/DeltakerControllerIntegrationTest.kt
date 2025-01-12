@@ -4,7 +4,11 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.beInstanceOf
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.UUID
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
+import no.nav.amt.tiltak.common.json.JsonUtils.objectMapper
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.domain.tiltak.EndringsmeldingStatusAarsak
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
@@ -13,6 +17,7 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.deltaker.repositories.VurderingRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.DbUtils.shouldBeCloseTo
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_2
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
@@ -24,8 +29,6 @@ import okhttp3.Request
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDate
-import java.util.UUID
 
 class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
@@ -405,7 +408,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 			method = "POST",
 			url = "/api/tiltaksarrangor/deltaker/${deltakerIkkeTilgang.id}/vurdering",
 			headers = createAnsatt1AuthHeader(),
-			body = """{"vurderingstype": "OPPFYLLER_IKKE_KRAVENE", "begrunnelse": "Mangler førerkort"}""".toJsonRequestBody()
+			body = """{"id": "${UUID.randomUUID()}", "opprettet": ${objectMapper.writeValueAsString(LocalDateTime.now())}, "vurderingstype": "OPPFYLLER_IKKE_KRAVENE", "begrunnelse": "Mangler førerkort"}""".toJsonRequestBody()
 		)
 
 		response.code shouldBe 403
@@ -413,7 +416,9 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	fun `registrerVurdering() skal returnere 200 og opprette vurdering`() {
+		val id = UUID.randomUUID()
 		val deltakerId = UUID.randomUUID()
+		val opprettet = LocalDateTime.now()
 		testDataRepository.insertDeltaker(DELTAKER_1.copy(id = deltakerId))
 		testDataRepository.insertDeltakerStatus(DELTAKER_1_STATUS_1.copy(id = UUID.randomUUID(), deltakerId = deltakerId, status = "VURDERES"))
 
@@ -421,7 +426,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 			method = "POST",
 			url = "/api/tiltaksarrangor/deltaker/$deltakerId/vurdering",
 			headers = createAnsatt1AuthHeader(),
-			body = """{"vurderingstype": "OPPFYLLER_IKKE_KRAVENE", "begrunnelse": "Mangler førerkort"}""".toJsonRequestBody()
+			body = """{"id": "$id", "opprettet": ${objectMapper.writeValueAsString(opprettet)}, "vurderingstype": "OPPFYLLER_IKKE_KRAVENE", "begrunnelse": "Mangler førerkort"}""".toJsonRequestBody()
 		)
 
 		response.code shouldBe 200
@@ -430,13 +435,15 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 		vurderinger shouldHaveSize 1
 
 		val vurdering = vurderinger.first()
+		vurdering.id shouldBe id
 		vurdering.vurderingstype shouldBe Vurderingstype.OPPFYLLER_IKKE_KRAVENE
 		vurdering.begrunnelse shouldBe "Mangler førerkort"
 		vurdering.gyldigTil shouldBe null
 		val vurderingerFraResponse = response.body?.string()?.let { fromJsonString<List<Vurdering>>(it) }?.firstOrNull()
+		vurderingerFraResponse?.id shouldBe id
 		vurderingerFraResponse?.vurderingstype shouldBe Vurderingstype.OPPFYLLER_IKKE_KRAVENE
 		vurderingerFraResponse?.begrunnelse shouldBe "Mangler førerkort"
-		vurderingerFraResponse?.gyldigTil shouldBe null
+		vurderingerFraResponse?.opprettet!! shouldBeCloseTo opprettet
 	}
 
 	@Test
@@ -445,7 +452,7 @@ class DeltakerControllerIntegrationTest : IntegrationTestBase() {
 			method = "POST",
 			url = "/api/tiltaksarrangor/deltaker/${DELTAKER_1.id}/vurdering",
 			headers = createAnsatt1AuthHeader(),
-			body = """{"vurderingstype": "OPPFYLLER_IKKE_KRAVENE", "begrunnelse": "Mangler førerkort"}""".toJsonRequestBody()
+			body = """{"id": "${UUID.randomUUID()}", "opprettet": ${objectMapper.writeValueAsString(LocalDateTime.now())}, "vurderingstype": "OPPFYLLER_IKKE_KRAVENE", "begrunnelse": "Mangler førerkort"}""".toJsonRequestBody()
 		)
 
 		response.code shouldBe 400

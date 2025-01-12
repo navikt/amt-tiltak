@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.bff.nav_ansatt
 
+import java.util.UUID
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.DeltakerDto
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.HentGjennomforingerDto
@@ -12,7 +13,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
-import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
+import no.nav.amt.tiltak.core.domain.tiltak.VurderingDbo
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.GjennomforingService
@@ -20,7 +21,6 @@ import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.core.port.VurderingService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class NavAnsattControllerService(
@@ -120,7 +120,7 @@ class NavAnsattControllerService(
 
 
 	private fun tilVurderingDto(
-		vurdering: Vurdering,
+		vurdering: VurderingDbo,
 		deltakerMap: Map<UUID, Deltaker>,
 		tilganger: List<AdGruppe>,
 	): VurderingDto? {
@@ -185,7 +185,7 @@ class NavAnsattControllerService(
 		}
 	}
 
-	private fun Vurdering.toDto(deltakerDto: DeltakerDto) = VurderingDto(
+	private fun VurderingDbo.toDto(deltakerDto: DeltakerDto) = VurderingDto(
 		id = id,
 		deltaker = deltakerDto,
 		vurderingstype = vurderingstype,
