@@ -5,11 +5,13 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.amt.lib.models.deltaker.DeltakerHistorikk
 import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.data_publisher.DatabaseTestDataHandler
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import java.time.LocalDate
 
 class DeltakerPublishQueryTest : FunSpec({
 	val dataSource = SingletonPostgresContainer.getDataSource()
@@ -43,6 +45,25 @@ class DeltakerPublishQueryTest : FunSpec({
 
 		when (val data = query.get(input.id, null)) {
 			is DeltakerPublishQuery.Result.DontPublish -> {}
+			else -> fail("Should be ok, was $data")
+		}
+	}
+
+	test("get - deltaker som arena er master for skal opprettes med importertFraArena data") {
+		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
+		val deltakerInput = db.createDeltaker()
+
+		when (val data = query.get(deltakerInput.id, null)) {
+			is DeltakerPublishQuery.Result.OK -> {
+				data.result.historikk!!.size shouldBe 1
+				val importertFraArenaElement = (data.result.historikk[0] as DeltakerHistorikk.ImportertFraArena).importertFraArena
+				importertFraArenaElement.deltakerId shouldBe deltakerInput.id
+				importertFraArenaElement.importertDato.toLocalDate() shouldBe LocalDate.now()
+				importertFraArenaElement.deltakerVedImport.deltakerId shouldBe deltakerInput.id
+				importertFraArenaElement.deltakerVedImport.startdato shouldBe deltakerInput.startDato
+				importertFraArenaElement.deltakerVedImport.sluttdato shouldBe deltakerInput.sluttDato
+
+			}
 			else -> fail("Should be ok, was $data")
 		}
 	}

@@ -5,6 +5,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
+import no.nav.amt.lib.models.deltaker.DeltakerHistorikk
 import no.nav.common.json.JsonUtils
 import org.springframework.util.DigestUtils
 import java.time.LocalDate
@@ -26,6 +27,7 @@ data class DeltakerPublishDto(
 	val navVeileder: DeltakerNavVeilederDto?,
 	val deltarPaKurs: Boolean,
 	val vurderingerFraArrangor: List<Vurdering>?,
+	val historikk: List<DeltakerHistorikk>?,
 	val kilde: Kilde?,
 	val forsteVedtakFattet: LocalDate?,
 	val sistEndretAv: UUID?,

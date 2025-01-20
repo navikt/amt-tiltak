@@ -45,7 +45,14 @@ class DeltakerPublishQuery(
 		}
 
 		val vurderinger = getVurderinger(id)
-
+		val status = DeltakerStatusDto(
+			id = deltaker.statusId,
+			type = DeltakerStatus.Type.valueOf(deltaker.status),
+			aarsak = deltaker.statusAarsak?.let { DeltakerStatus.Aarsak.valueOf(it) },
+			aarsaksbeskrivelse = deltaker.statusAarsakBeskrivelse,
+			gyldigFra = deltaker.statusGyldigFra!!,
+			opprettetDato = deltaker.statusCreatedAt!!
+		)
 		return DeltakerPublishDto(
 			deltaker.id,
 			deltakerlisteId = deltaker.deltakerlisteId,
@@ -79,16 +86,19 @@ class DeltakerPublishQuery(
 					telefonnummer = deltaker.navAnsattTelefonnummer
 				)
 			},
-			status = DeltakerStatusDto(
-				id = deltaker.statusId,
-				type = DeltakerStatus.Type.valueOf(deltaker.status),
-				aarsak = deltaker.statusAarsak?.let { DeltakerStatus.Aarsak.valueOf(it) },
-				aarsaksbeskrivelse = deltaker.statusAarsakBeskrivelse,
-				gyldigFra = deltaker.statusGyldigFra!!,
-				opprettetDato = deltaker.statusCreatedAt!!
-			),
+			status = status,
 			deltarPaKurs = deltaker.deltarPaKurs,
 			vurderingerFraArrangor = vurderinger,
+			historikk = listOf(
+				DeltakerHistorikk.ImportertFraArena(
+					importertFraArena = ImportertFraArena(
+						deltakerId = deltaker.id,
+						//Samme deltaker kan bli publisert flere ganger dersom identisk endringen kommer over 1 min senere
+						importertDato = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES),
+						deltakerVedImport = deltaker.toDeltakerVedImport(deltaker.registrertDato, status),
+					)
+				)
+			),
 			kilde = deltaker.kilde,
 			forsteVedtakFattet = deltaker.forsteVedtakFattet,
 			sistEndretAv = deltaker.sistEndretAv,
@@ -96,6 +106,27 @@ class DeltakerPublishQuery(
 			sistEndret = deltaker.sistEndret
 		).let { Result.OK(it) }
 	}
+
+	private fun DeltakerDbo.toDeltakerVedImport(innsoktDato: LocalDate, status: DeltakerStatusDto) = DeltakerVedImport(
+		deltakerId = id,
+		innsoktDato = innsoktDato,
+		startdato = startDato,
+		sluttdato = sluttDato,
+		dagerPerUke = dagerPerUke,
+		deltakelsesprosent = prosentStilling?.toFloat(),
+		status = no.nav.amt.lib.models.deltaker.DeltakerStatus(
+			id = id,
+			type = no.nav.amt.lib.models.deltaker.DeltakerStatus.Type.valueOf(status.type.name),
+			aarsak = status.aarsak?.let {no.nav.amt.lib.models.deltaker.DeltakerStatus.Aarsak(
+				type = no.nav.amt.lib.models.deltaker.DeltakerStatus.Aarsak.Type.valueOf(status.aarsak.name),
+				beskrivelse = status.aarsaksbeskrivelse
+			)},
+			gyldigFra = status.gyldigFra,
+			gyldigTil = null,
+			opprettet = status.opprettetDato
+
+		)
+	)
 
 	private fun getDeltaker(deltakerId: UUID): DeltakerDbo? {
 		val sql = """
