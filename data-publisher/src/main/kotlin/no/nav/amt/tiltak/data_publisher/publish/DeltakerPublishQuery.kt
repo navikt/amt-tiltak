@@ -1,5 +1,8 @@
 package no.nav.amt.tiltak.data_publisher.publish
 
+import no.nav.amt.lib.models.deltaker.DeltakerHistorikk
+import no.nav.amt.lib.models.deltaker.DeltakerVedImport
+import no.nav.amt.lib.models.deltaker.ImportertFraArena
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getLocalDate
 import no.nav.amt.tiltak.common.db_utils.getLocalDateTime
@@ -29,6 +32,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 class DeltakerPublishQuery(
@@ -45,7 +49,14 @@ class DeltakerPublishQuery(
 		}
 
 		val vurderinger = getVurderinger(id)
-
+		val status = DeltakerStatusDto(
+			id = deltaker.statusId,
+			type = DeltakerStatus.Type.valueOf(deltaker.status),
+			aarsak = deltaker.statusAarsak?.let { DeltakerStatus.Aarsak.valueOf(it) },
+			aarsaksbeskrivelse = deltaker.statusAarsakBeskrivelse,
+			gyldigFra = deltaker.statusGyldigFra!!,
+			opprettetDato = deltaker.statusCreatedAt!!
+		)
 		return DeltakerPublishDto(
 			deltaker.id,
 			deltakerlisteId = deltaker.deltakerlisteId,
@@ -79,16 +90,19 @@ class DeltakerPublishQuery(
 					telefonnummer = deltaker.navAnsattTelefonnummer
 				)
 			},
-			status = DeltakerStatusDto(
-				id = deltaker.statusId,
-				type = DeltakerStatus.Type.valueOf(deltaker.status),
-				aarsak = deltaker.statusAarsak?.let { DeltakerStatus.Aarsak.valueOf(it) },
-				aarsaksbeskrivelse = deltaker.statusAarsakBeskrivelse,
-				gyldigFra = deltaker.statusGyldigFra!!,
-				opprettetDato = deltaker.statusCreatedAt!!
-			),
+			status = status,
 			deltarPaKurs = deltaker.deltarPaKurs,
 			vurderingerFraArrangor = vurderinger,
+			historikk = listOf(
+				DeltakerHistorikk.ImportertFraArena(
+					importertFraArena = ImportertFraArena(
+						deltakerId = deltaker.id,
+						//Samme deltaker kan bli publisert flere ganger dersom identisk endringen kommer over 1 min senere
+						importertDato = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES),
+						deltakerVedImport = deltaker.toDeltakerVedImport(deltaker.registrertDato, status),
+					)
+				)
+			),
 			kilde = deltaker.kilde,
 			forsteVedtakFattet = deltaker.forsteVedtakFattet,
 			sistEndretAv = deltaker.sistEndretAv,
@@ -96,6 +110,27 @@ class DeltakerPublishQuery(
 			sistEndret = deltaker.sistEndret
 		).let { Result.OK(it) }
 	}
+
+	private fun DeltakerDbo.toDeltakerVedImport(innsoktDato: LocalDate, status: DeltakerStatusDto) = DeltakerVedImport(
+		deltakerId = id,
+		innsoktDato = innsoktDato,
+		startdato = startDato,
+		sluttdato = sluttDato,
+		dagerPerUke = dagerPerUke,
+		deltakelsesprosent = prosentStilling?.toFloat(),
+		status = no.nav.amt.lib.models.deltaker.DeltakerStatus(
+			id = status.id ?: throw IllegalStateException("Deltaker status ikke satt"),
+			type = no.nav.amt.lib.models.deltaker.DeltakerStatus.Type.valueOf(status.type.name),
+			aarsak = status.aarsak?.let {no.nav.amt.lib.models.deltaker.DeltakerStatus.Aarsak(
+				type = no.nav.amt.lib.models.deltaker.DeltakerStatus.Aarsak.Type.valueOf(status.aarsak.name),
+				beskrivelse = status.aarsaksbeskrivelse
+			)},
+			gyldigFra = status.gyldigFra,
+			gyldigTil = null,
+			opprettet = status.opprettetDato
+
+		)
+	)
 
 	private fun getDeltaker(deltakerId: UUID): DeltakerDbo? {
 		val sql = """
