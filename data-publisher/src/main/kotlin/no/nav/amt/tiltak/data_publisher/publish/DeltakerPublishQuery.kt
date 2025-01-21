@@ -119,7 +119,7 @@ class DeltakerPublishQuery(
 		dagerPerUke = dagerPerUke,
 		deltakelsesprosent = prosentStilling?.toFloat(),
 		status = no.nav.amt.lib.models.deltaker.DeltakerStatus(
-			id = id,
+			id = status.id ?: throw IllegalStateException("Deltaker status ikke satt"),
 			type = no.nav.amt.lib.models.deltaker.DeltakerStatus.Type.valueOf(status.type.name),
 			aarsak = status.aarsak?.let {no.nav.amt.lib.models.deltaker.DeltakerStatus.Aarsak(
 				type = no.nav.amt.lib.models.deltaker.DeltakerStatus.Aarsak.Type.valueOf(status.aarsak.name),
