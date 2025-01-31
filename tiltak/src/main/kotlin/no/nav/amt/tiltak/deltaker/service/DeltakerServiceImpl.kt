@@ -283,7 +283,15 @@ open class DeltakerServiceImpl(
 		}
 	}
 
+	private fun statusFinnesAllerede(status: DeltakerStatusInsert): Boolean {
+		val eksisterendeStatus = deltakerStatusRepository.get(status.id) ?: return false
+		if (eksisterendeStatus.type == status.type && eksisterendeStatus.aarsak == status.aarsak) return true
+		throw IllegalStateException("Deltaker status ${status.id} finnes fra før men med forskjellig type eller årsak")
+	}
+
 	private fun oppdaterStatus(status: DeltakerStatusInsert): Boolean {
+		if (statusFinnesAllerede(status)) return false
+
 		val forrigeStatus = deltakerStatusRepository.getStatusForDeltaker(status.deltakerId)
 		if (forrigeStatus?.type == status.type && forrigeStatus.aarsak == status.aarsak) return false
 

@@ -116,4 +116,19 @@ open class DeltakerStatusRepository(
 
 	}
 
+	fun get(id: UUID): DeltakerStatusDbo? {
+		val sql = """
+			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aarsaksbeskrivelse, aktiv, created_at
+			FROM deltaker_status
+			WHERE id = :id
+		""".trimIndent()
+
+		val parameters = MapSqlParameterSource().addValues(
+			mapOf("id" to id)
+		)
+
+		return template.query(sql, parameters, rowMapper).firstOrNull()
+
+	}
+
 }
