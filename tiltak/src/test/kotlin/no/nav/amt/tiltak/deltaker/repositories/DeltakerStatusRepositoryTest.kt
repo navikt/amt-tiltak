@@ -2,7 +2,9 @@ package no.nav.amt.tiltak.deltaker.repositories
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus.Type.DELTAR
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus.Type.VENTER_PA_OPPSTART
@@ -114,6 +116,21 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 		statuser.forEach {
 			it.aktiv shouldBe true
 		}
+	}
+
+	test("get- skal hente status") {
+		val deltaker1Cmd = createDeltakerInput(BRUKER_1, GJENNOMFORING_1)
+		testDataRepository.insertBruker(BRUKER_2)
+		testDataRepository.insertDeltaker(deltaker1Cmd)
+
+		val status1Cmd = createStatusInput(deltaker1Cmd)
+		testDataRepository.insertDeltakerStatus(status1Cmd.copy(id = UUID.randomUUID(), aktiv = false))
+		testDataRepository.insertDeltakerStatus(status1Cmd)
+
+		val status = repository.get(status1Cmd.id)
+		status shouldNotBe null
+		status!!.type shouldBe DeltakerStatus.Type.valueOf(status1Cmd.status)
+		status.aarsak shouldBe status1Cmd.aarsak
 	}
 
 })
