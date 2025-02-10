@@ -24,4 +24,6 @@ class UnleashServiceImpl(
 		return tiltakstype in tiltakstyperKometAlltidErMasterFor ||
 			(unleashClient.isEnabled("amt.enable-komet-deltakere") && tiltakstype in tiltakstyperKometKanskjeErMasterFor)
 	}
+
+	override fun isEnabled(toggle: String) = unleashClient.isEnabled(toggle)
 }
