@@ -1,11 +1,7 @@
 package no.nav.amt.tiltak.data_publisher
 
 import no.nav.amt.tiltak.common.json.JsonUtils
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
-import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
-import no.nav.amt.tiltak.core.domain.tiltak.Innhold
-import no.nav.amt.tiltak.core.domain.tiltak.Kilde
+import no.nav.amt.tiltak.core.domain.tiltak.*
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
@@ -58,6 +54,17 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 	): DeltakerInput = deltakerInput(brukerId, gjennomforingId, registrertDato, endretDato, kilde)
 		.also { testDataRepository.insertDeltaker(it) }
 		.also { testDataRepository.insertDeltakerStatus(createDeltakerStatus(it.id)) }
+
+	fun createVurdering(
+		id: UUID = UUID.randomUUID(),
+		deltakerId: UUID = UUID.randomUUID(),
+		vurderingstype: Vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
+		begrunnelse: String = "",
+		opprettetAvArrangorAnsattId: UUID = UUID.randomUUID(),
+		gyldigFra: LocalDateTime = LocalDateTime.now(),
+		gyldigTil: LocalDateTime? = null
+	) = VurderingDbo(id, deltakerId, vurderingstype,begrunnelse, opprettetAvArrangorAnsattId, gyldigFra, gyldigTil)
+		.also {testDataRepository.insertVurdering(it)}
 
 	fun createEndringsmelding(
 		deltakerId: UUID = createDeltaker().id,
