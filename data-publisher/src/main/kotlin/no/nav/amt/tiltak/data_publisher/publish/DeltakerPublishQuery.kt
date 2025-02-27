@@ -3,6 +3,7 @@ package no.nav.amt.tiltak.data_publisher.publish
 import no.nav.amt.lib.models.deltaker.DeltakerHistorikk
 import no.nav.amt.lib.models.deltaker.DeltakerVedImport
 import no.nav.amt.lib.models.deltaker.ImportertFraArena
+import no.nav.amt.lib.models.deltaker.VurderingFraArrangorData
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getLocalDate
 import no.nav.amt.tiltak.common.db_utils.getLocalDateTime
@@ -14,12 +15,7 @@ import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getNullableUUID
 import no.nav.amt.tiltak.common.db_utils.getUUID
 import no.nav.amt.tiltak.common.json.JsonUtils
-import no.nav.amt.tiltak.core.domain.tiltak.Adresse
-import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
-import no.nav.amt.tiltak.core.domain.tiltak.Kilde
-import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
-import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
+import no.nav.amt.tiltak.core.domain.tiltak.*
 import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.data_publisher.model.DeltakerKontaktinformasjonDto
 import no.nav.amt.tiltak.data_publisher.model.DeltakerNavVeilederDto
@@ -57,6 +53,8 @@ class DeltakerPublishQuery(
 			gyldigFra = deltaker.statusGyldigFra!!,
 			opprettetDato = deltaker.statusCreatedAt!!
 		)
+		val historikk = byggHistorikk(vurderinger, deltaker, status)
+
 		return DeltakerPublishDto(
 			deltaker.id,
 			deltakerlisteId = deltaker.deltakerlisteId,
@@ -93,22 +91,41 @@ class DeltakerPublishQuery(
 			status = status,
 			deltarPaKurs = deltaker.deltarPaKurs,
 			vurderingerFraArrangor = vurderinger,
-			historikk = listOf(
-				DeltakerHistorikk.ImportertFraArena(
-					importertFraArena = ImportertFraArena(
-						deltakerId = deltaker.id,
-						//Samme deltaker kan bli publisert flere ganger dersom identisk endringen kommer over 1 min senere
-						importertDato = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES),
-						deltakerVedImport = deltaker.toDeltakerVedImport(deltaker.registrertDato, status),
-					)
-				)
-			),
+			historikk = historikk,
 			kilde = deltaker.kilde,
 			forsteVedtakFattet = deltaker.forsteVedtakFattet,
 			sistEndretAv = deltaker.sistEndretAv,
 			sistEndretAvEnhet = deltaker.sistEndretAvEnhet,
 			sistEndret = deltaker.sistEndret
 		).let { Result.OK(it) }
+	}
+
+	private fun byggHistorikk(vurderinger: List<Vurdering>, deltaker: DeltakerDbo, status: DeltakerStatusDto): List<DeltakerHistorikk> {
+		val importertFraArena = DeltakerHistorikk.ImportertFraArena(
+			importertFraArena = ImportertFraArena(
+				deltakerId = deltaker.id,
+				//Samme deltaker kan bli publisert flere ganger dersom identisk endringen kommer over 1 min senere
+				importertDato = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES),
+				deltakerVedImport = deltaker.toDeltakerVedImport(deltaker.registrertDato, status),
+			)
+		)
+		val vurderingerHistorikk = vurderinger.map { vurdering ->
+			DeltakerHistorikk.VurderingFraArrangor(
+				data = VurderingFraArrangorData(
+					id = vurdering.id,
+					deltakerId = vurdering.deltakerId,
+					vurderingstype = no.nav.amt.lib.models.arrangor.melding.Vurderingstype.valueOf(vurdering.vurderingstype.name),
+					begrunnelse = vurdering.begrunnelse,
+					opprettetAvArrangorAnsattId = vurdering.opprettetAvArrangorAnsattId,
+					opprettet = vurdering.opprettet,
+				)
+			)
+		}
+
+		return vurderingerHistorikk
+			.plus(importertFraArena)
+			.sortedByDescending { it.sistEndret }
+
 	}
 
 	private fun DeltakerDbo.toDeltakerVedImport(innsoktDato: LocalDate, status: DeltakerStatusDto) = DeltakerVedImport(

@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.test.database.data
 
 import no.nav.amt.tiltak.common.db_utils.DbUtils
+import no.nav.amt.tiltak.core.domain.tiltak.VurderingDbo
 import no.nav.amt.tiltak.test.database.DbTestDataUtils.parameters
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattGjennomforingTilgangInput
 import no.nav.amt.tiltak.test.database.data.inputs.ArrangorAnsattInput
@@ -17,6 +18,7 @@ import no.nav.amt.tiltak.test.database.data.inputs.NavEnhetInput
 import no.nav.amt.tiltak.test.database.data.inputs.TiltakInput
 import no.nav.amt.tiltak.test.database.data.inputs.TiltaksansvarligGjennomforingTilgangInput
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import java.time.LocalDateTime
 
 class TestDataRepository(
 	private val template: NamedParameterJdbcTemplate
@@ -350,5 +352,25 @@ class TestDataRepository(
 		)
 
 		template.update(sql, parameters)
+	}
+
+	fun insertVurdering(vurdering: VurderingDbo) {
+		val sql = """
+			INSERT INTO vurdering (id, deltaker_id, opprettet_av_arrangor_ansatt_id, vurderingstype, begrunnelse, gyldig_fra, gyldig_til)
+			VALUES (
+				:id, :deltaker_id, :opprettet_av_arrangor_ansatt_id, :vurderingstype, :begrunnelse, :gyldig_fra, :gyldig_til
+			)
+		""".trimIndent()
+		val params = DbUtils.sqlParameters(
+			"id" to vurdering.id,
+			"deltaker_id" to vurdering.deltakerId,
+			"opprettet_av_arrangor_ansatt_id" to vurdering.opprettetAvArrangorAnsattId,
+			"vurderingstype" to vurdering.vurderingstype.name,
+			"begrunnelse" to vurdering.begrunnelse,
+			"gyldig_fra" to LocalDateTime.now(),
+			"gyldig_til" to null
+		)
+
+		template.update(sql, params)
 	}
 }
