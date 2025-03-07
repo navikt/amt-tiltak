@@ -7,17 +7,17 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
-@RestController("EndringsmeldingControllerTiltaksarrangor")
+@RestController("EndringsmeldingAPITiltaksarrangor")
 @RequestMapping("/api/tiltaksarrangor/endringsmelding")
-class EndringsmeldingController(
+class EndringsmeldingAPI(
 	private val endringsmeldingService: EndringsmeldingService,
 	private val arrangorTilgangService: ArrangorAnsattTilgangService,
-	private val controllerService: ControllerService
+	private val apiService: ApiService
 ) {
 	@PatchMapping("/{id}/tilbakekall")
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	fun tilbakekallEndringsmelding(@PathVariable("id") id: UUID) {
-		val ansattId = controllerService.hentInnloggetAnsatt().id
+		val ansattId = apiService.hentInnloggetAnsatt().id
 		val endringsmelding = endringsmeldingService.hentEndringsmelding(id)
 
 		arrangorTilgangService.verifiserTilgangTilDeltaker(ansattId, endringsmelding.deltakerId)

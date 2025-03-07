@@ -13,14 +13,14 @@ import no.nav.amt.tiltak.test.database.data.inputs.GjennomforingInput
 import no.nav.amt.tiltak.test.database.data.inputs.NavAnsattInput
 import no.nav.amt.tiltak.test.database.data.inputs.TiltaksansvarligGjennomforingTilgangInput
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
-import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testNavAnsattAutentisering
+import no.nav.amt.tiltak.test.integration.test_utils.ApiTestUtils.testNavAnsattAutentisering
 import okhttp3.Request
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 import java.util.*
 
-class GjennomforingControllerIntegrationTest : IntegrationTestBase() {
+class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 
 	@BeforeEach
 	internal fun setUp() {

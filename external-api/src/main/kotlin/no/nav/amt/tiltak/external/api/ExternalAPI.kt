@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/external")
-class ExternalController(
+class ExternalAPI(
 	private val deltakerService: DeltakerService,
 	private val gjennomforingService: GjennomforingService,
 	private val authService: AuthService

@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
-@RestController("UnleashControllerNavAnsatt")
+@RestController("UnleashAPINavAnsatt")
 @RequestMapping("/api/nav-ansatt/unleash")
 
-open class UnleashController(
+open class UnleashAPI(
     private val unleash: UnleashService
 ) {
 

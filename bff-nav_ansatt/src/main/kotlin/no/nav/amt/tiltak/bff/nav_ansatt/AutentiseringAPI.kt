@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@RestController("AutentiseringControllerNavAnsatt")
+@RestController("AutentiseringAPINavAnsatt")
 @RequestMapping("/api/nav-ansatt/autentisering")
-open class AutentiseringController(
+open class AutentiseringAPI(
     private val authService: AuthService,
     private val navAnsattService: NavAnsattService,
 ) {

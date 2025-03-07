@@ -28,8 +28,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/tiltaksarrangor/deltaker")
-class DeltakerController(
-	private val controllerService: ControllerService,
+class DeltakerAPI(
+	private val apiService: ApiService,
 	private val arrangorAnsattTilgangService: ArrangorAnsattTilgangService,
 	private val deltakerService: DeltakerService,
 	private val endringsmeldingService: EndringsmeldingService,
@@ -40,7 +40,7 @@ class DeltakerController(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestBody request: LeggTilOppstartsdatoRequest,
 	): OpprettEndringsmeldingResponse {
-		val ansatt = controllerService.hentInnloggetAnsatt()
+		val ansatt = apiService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 
@@ -53,7 +53,7 @@ class DeltakerController(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestBody request: EndreOppstartsdatoRequest,
 	): OpprettEndringsmeldingResponse {
-		val ansatt = controllerService.hentInnloggetAnsatt()
+		val ansatt = apiService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 
@@ -66,7 +66,7 @@ class DeltakerController(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestBody request: AvsluttDeltakelseRequest,
 	): OpprettEndringsmeldingResponse {
-		val ansatt = controllerService.hentInnloggetAnsatt()
+		val ansatt = apiService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 
@@ -79,7 +79,7 @@ class DeltakerController(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestBody request: ForlengDeltakelseRequest,
 	): OpprettEndringsmeldingResponse {
-		val ansatt = controllerService.hentInnloggetAnsatt()
+		val ansatt = apiService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 
@@ -99,7 +99,7 @@ class DeltakerController(
 			if (it < 1 || it > 5) throw ValidationException("Antall dager i uken må være mellom 1 og 5")
 		}
 
-		val ansatt = controllerService.hentInnloggetAnsatt()
+		val ansatt = apiService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 
@@ -118,7 +118,7 @@ class DeltakerController(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestBody request: DeltakerIkkeAktuellRequest,
 	): OpprettEndringsmeldingResponse {
-		val ansatt = controllerService.hentInnloggetAnsatt()
+		val ansatt = apiService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 
@@ -131,7 +131,7 @@ class DeltakerController(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestBody request: EndreSluttdatoRequest,
 	): OpprettEndringsmeldingResponse {
-		val ansatt = controllerService.hentInnloggetAnsatt()
+		val ansatt = apiService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 
@@ -144,7 +144,7 @@ class DeltakerController(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestBody request: EndreSluttaarsakRequest,
 	): OpprettEndringsmeldingResponse {
-		val ansatt = controllerService.hentInnloggetAnsatt()
+		val ansatt = apiService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 
@@ -162,7 +162,7 @@ class DeltakerController(
 		@PathVariable("deltakerId") deltakerId: UUID,
 		@RequestBody request: RegistrerVurderingRequest
 	): List<Vurdering> {
-		val ansatt = controllerService.hentInnloggetAnsatt()
+		val ansatt = apiService.hentInnloggetAnsatt()
 
 		arrangorAnsattTilgangService.verifiserTilgangTilDeltaker(ansatt.id, deltakerId)
 

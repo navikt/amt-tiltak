@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
-class NavAnsattControllerService(
+class NavAnsattApiService(
 	private val endringsmeldingService: EndringsmeldingService,
 	private val deltakerService: DeltakerService,
 	private val gjennomforingService: GjennomforingService,

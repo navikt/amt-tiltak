@@ -5,13 +5,13 @@ import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
-import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testNavAnsattAutentisering
+import no.nav.amt.tiltak.test.integration.test_utils.ApiTestUtils.testNavAnsattAutentisering
 import okhttp3.Request
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-class AutentiseringControllerIntegrationTest : IntegrationTestBase() {
+class AutentiseringAPIIntegrationTest : IntegrationTestBase() {
 
 	@BeforeEach
 	internal fun setUp() {

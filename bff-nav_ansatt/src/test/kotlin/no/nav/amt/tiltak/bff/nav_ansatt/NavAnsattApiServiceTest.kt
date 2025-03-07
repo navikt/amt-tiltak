@@ -7,7 +7,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.util.UUID
-import no.nav.amt.tiltak.bff.nav_ansatt.NavAnsattControllerService.Companion.harTilgangTilDeltaker
+import no.nav.amt.tiltak.bff.nav_ansatt.NavAnsattApiService.Companion.harTilgangTilDeltaker
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.DeltakerDto
 import no.nav.amt.tiltak.common.auth.AdGruppe
 import no.nav.amt.tiltak.core.domain.tiltak.Adressebeskyttelse
@@ -34,14 +34,14 @@ import no.nav.amt.tiltak.test.database.data.TestData.createStatusInput
 import no.nav.amt.tiltak.test.database.data.inputs.BrukerInput
 import org.junit.jupiter.api.Test
 
-class NavAnsattControllerServiceTest {
+class NavAnsattApiServiceTest {
 	private val endringsmeldingService = mockk<EndringsmeldingService>()
 	private val deltakerService = mockk<DeltakerService>()
 	private val taAuthService = mockk<TiltaksansvarligAutoriseringService>()
 	private val gjennomforingService = mockk<GjennomforingService>()
 	private val vurderingService = mockk<VurderingService>()
 	private val unleashService = mockk<UnleashService>()
-	private val controller = NavAnsattControllerService(
+	private val navAnsattApiService = NavAnsattApiService(
 		endringsmeldingService,
 		deltakerService,
 		gjennomforingService,
@@ -90,7 +90,7 @@ class NavAnsattControllerServiceTest {
 				ARRANGOR_1.toArrangor()
 			)
 
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
+		val endringsmeldingerResult = navAnsattApiService.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
 
 		endringsmeldingerResult.size shouldBe 1
 		endringsmeldingerResult[0].deltaker shouldBe umaskertDeltakerDto(BRUKER_1)
@@ -124,7 +124,7 @@ class NavAnsattControllerServiceTest {
 				ARRANGOR_1.toArrangor()
 			)
 
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
+		val endringsmeldingerResult = navAnsattApiService.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
 
 		endringsmeldingerResult.size shouldBe 1
 		endringsmeldingerResult[0].deltaker shouldBe maskertDeltakerDto(BRUKER_SKJERMET)
@@ -158,7 +158,7 @@ class NavAnsattControllerServiceTest {
 				ARRANGOR_1.toArrangor()
 			)
 
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilSkjermede)
+		val endringsmeldingerResult = navAnsattApiService.hentEndringsmeldinger(gjennomforingId, tilgangTilSkjermede)
 
 		endringsmeldingerResult.size shouldBe 1
 		endringsmeldingerResult.get(0).deltaker shouldBe umaskertDeltakerDto(BRUKER_SKJERMET)
@@ -200,7 +200,7 @@ class NavAnsattControllerServiceTest {
 			)
 		val forventetDeltaker = umaskertDeltakerDto(BRUKER_1)
 
-		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilLosning)
+		val meldingerFraArrangorResponse = navAnsattApiService.hentMeldinger(gjennomforingId, tilgangTilLosning)
 
 		meldingerFraArrangorResponse.endringsmeldinger.size shouldBe 1
 		meldingerFraArrangorResponse.endringsmeldinger[0].deltaker shouldBe forventetDeltaker
@@ -248,7 +248,7 @@ class NavAnsattControllerServiceTest {
 			)
 		val forventetDeltaker = maskertDeltakerDto(BRUKER_SKJERMET)
 
-		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilLosning)
+		val meldingerFraArrangorResponse = navAnsattApiService.hentMeldinger(gjennomforingId, tilgangTilLosning)
 
 		meldingerFraArrangorResponse.endringsmeldinger.size shouldBe 1
 		meldingerFraArrangorResponse.endringsmeldinger[0].deltaker shouldBe forventetDeltaker
@@ -296,7 +296,7 @@ class NavAnsattControllerServiceTest {
 			)
 		val forventetDeltaker = umaskertDeltakerDto(BRUKER_SKJERMET)
 
-		val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilSkjermede)
+		val meldingerFraArrangorResponse = navAnsattApiService.hentMeldinger(gjennomforingId, tilgangTilSkjermede)
 
 		meldingerFraArrangorResponse.endringsmeldinger.size shouldBe 1
 		meldingerFraArrangorResponse.endringsmeldinger[0].deltaker shouldBe forventetDeltaker
@@ -309,7 +309,7 @@ class NavAnsattControllerServiceTest {
 	fun `hentMeldinger - adressebeskyttede deltakere, ikke tilgang - returnerer maskert bruker`() {
 		brukereMedAdressebeskyttelse.forEach {
 			testTilganger(it) { gjennomforingId ->
-				val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilLosning)
+				val meldingerFraArrangorResponse = navAnsattApiService.hentMeldinger(gjennomforingId, tilgangTilLosning)
 				meldingerFraArrangorResponse.endringsmeldinger[0].deltaker shouldBe maskertDeltakerDto(it)
 				meldingerFraArrangorResponse.vurderinger[0].deltaker shouldBe maskertDeltakerDto(it)
 			}
@@ -320,7 +320,7 @@ class NavAnsattControllerServiceTest {
 	fun `hentEndringsmeldinger - adressebeskyttede deltakere, ikke tilgang - returnerer maskert bruker`() {
 		brukereMedAdressebeskyttelse.forEach {
 			testTilganger(it) { gjennomforingId ->
-				val meldingerFraArrangorResponse = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
+				val meldingerFraArrangorResponse = navAnsattApiService.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
 				meldingerFraArrangorResponse[0].deltaker shouldBe maskertDeltakerDto(it)
 			}
 		}
@@ -329,7 +329,7 @@ class NavAnsattControllerServiceTest {
 	fun `hentMeldinger - strengt fortrolig og skjermet deltaker, mangler tilgang til skjermet - returnerer maskert bruker`() {
 		val bruker = BRUKER_ADRESSEBESKYTTET.copy(erSkjermet = true)
 		testTilganger(bruker) { gjennomforingId ->
-			val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilStrengtFortrolig)
+			val meldingerFraArrangorResponse = navAnsattApiService.hentMeldinger(gjennomforingId, tilgangTilStrengtFortrolig)
 			meldingerFraArrangorResponse.endringsmeldinger[0].deltaker shouldBe maskertDeltakerDto(bruker)
 			meldingerFraArrangorResponse.vurderinger[0].deltaker shouldBe maskertDeltakerDto(bruker)
 		}
@@ -338,7 +338,7 @@ class NavAnsattControllerServiceTest {
 	@Test
 	fun `hentMeldinger - strengt fortrolig deltaker, har tilgang - returnerer umaskert bruker`() {
 		testTilganger(BRUKER_ADRESSEBESKYTTET) { gjennomforingId ->
-			val meldingerFraArrangorResponse = controller.hentMeldinger(gjennomforingId, tilgangTilStrengtFortrolig)
+			val meldingerFraArrangorResponse = navAnsattApiService.hentMeldinger(gjennomforingId, tilgangTilStrengtFortrolig)
 			meldingerFraArrangorResponse.endringsmeldinger[0].deltaker shouldBe umaskertDeltakerDto(BRUKER_ADRESSEBESKYTTET)
 			meldingerFraArrangorResponse.vurderinger[0].deltaker shouldBe umaskertDeltakerDto(BRUKER_ADRESSEBESKYTTET)
 		}
@@ -397,7 +397,7 @@ class NavAnsattControllerServiceTest {
 		every { taAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId) } returns Unit
 		every { unleashService.erKometMasterForTiltakstype(any()) } returns true
 
-		val endringsmeldingerResult = controller.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
+		val endringsmeldingerResult = navAnsattApiService.hentEndringsmeldinger(gjennomforingId, tilgangTilLosning)
 
 		endringsmeldingerResult.size shouldBe 0
 	}
