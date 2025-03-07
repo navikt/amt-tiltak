@@ -16,7 +16,7 @@ import java.util.UUID
 @Unprotected
 @RestController
 @RequestMapping("/internal/api")
-class InternalController(
+class InternalAPI(
 	val amtArrangorClient: AmtArrangorClient,
 	val gjennomforingService: GjennomforingService,
 	val deltakerService: DeltakerService,

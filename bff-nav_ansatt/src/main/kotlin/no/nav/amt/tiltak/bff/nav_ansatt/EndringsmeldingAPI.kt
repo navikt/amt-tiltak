@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.bff.nav_ansatt
 
-import no.nav.amt.tiltak.bff.nav_ansatt.NavAnsattControllerService.Companion.harTilgangTilDeltaker
+import no.nav.amt.tiltak.bff.nav_ansatt.NavAnsattApiService.Companion.harTilgangTilDeltaker
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.bff.nav_ansatt.response.MeldingerFraArrangorResponse
 import no.nav.amt.tiltak.common.auth.AuthService
@@ -15,13 +15,13 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
-@RestController("EndringsmeldingControllerNavAnsatt")
+@RestController("EndringsmeldingAPINavAnsatt")
 @RequestMapping("/api/nav-ansatt")
-class EndringsmeldingController(
+class EndringsmeldingAPI(
 	private val endringsmeldingService: EndringsmeldingService,
 	private val navAnsattService: NavAnsattService,
 	private val deltakerService: DeltakerService,
-	private val controllerService: NavAnsattControllerService,
+	private val navAnsattApiService: NavAnsattApiService,
 	private val tiltaksansvarligAuthService: TiltaksansvarligAutoriseringService,
 	private val authService: AuthService,
 ) {
@@ -36,7 +36,7 @@ class EndringsmeldingController(
 		tiltaksansvarligAuthService.verifiserTilgangTilEndringsmelding(navAnsattAzureId)
 		tiltaksansvarligAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId)
 
-		return controllerService.hentEndringsmeldinger(gjennomforingId, tilganger)
+		return navAnsattApiService.hentEndringsmeldinger(gjennomforingId, tilganger)
 	}
 
 	@GetMapping("/meldinger")
@@ -49,7 +49,7 @@ class EndringsmeldingController(
 		tiltaksansvarligAuthService.verifiserTilgangTilEndringsmelding(navAnsattAzureId)
 		tiltaksansvarligAuthService.verifiserTilgangTilGjennomforing(navIdent, gjennomforingId)
 
-		return controllerService.hentMeldinger(gjennomforingId, tilganger)
+		return navAnsattApiService.hentMeldinger(gjennomforingId, tilganger)
 	}
 
 	@PatchMapping("/endringsmelding/{endringsmeldingId}/ferdig")

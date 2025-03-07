@@ -484,7 +484,6 @@ open class DeltakerServiceImpl(
 
 	override fun publiserDeltakerPaDeltakerV2Kafka(deltakerId: UUID) {
 		publisherService.publish(deltakerId, DataPublishType.DELTAKER, null)
-		log.info("Publisert deltaker med id $deltakerId på kafkatopic deltaker-v2")
 	}
 
 	private fun DeltakerUpsert.toUpsertDbo(brukerId: UUID) = DeltakerUpsertDbo(

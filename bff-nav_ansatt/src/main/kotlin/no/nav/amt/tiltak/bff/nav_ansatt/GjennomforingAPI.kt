@@ -10,14 +10,14 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
-@RestController("GjennomforingControllerNavAnsatt")
+@RestController("GjennomforingAPINavAnsatt")
 @RequestMapping("/api/nav-ansatt/gjennomforing")
-class GjennomforingController(
+class GjennomforingAPI(
 	private val authService: AuthService,
 	private val gjennomforingService: GjennomforingService,
 	private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService,
 	private val tiltaksansvarligAutoriseringService: TiltaksansvarligAutoriseringService,
-	private val controllerService: NavAnsattControllerService,
+	private val ansattApiService: NavAnsattApiService,
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
@@ -30,7 +30,7 @@ class GjennomforingController(
 		val gjennomforingIder = tiltaksansvarligTilgangService.hentAktiveTilganger(navIdent)
 			.map { it.gjennomforingId }
 
-		return controllerService.hentGjennomforinger(gjennomforingIder)
+		return ansattApiService.hentGjennomforinger(gjennomforingIder)
 	}
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)

@@ -24,13 +24,13 @@ import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1_STATUS_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
 import no.nav.amt.tiltak.test.integration.IntegrationTestBase
-import no.nav.amt.tiltak.test.integration.test_utils.ControllerTestUtils.testTiltaksarrangorAutentisering
+import no.nav.amt.tiltak.test.integration.test_utils.ApiTestUtils.testTiltaksarrangorAutentisering
 import okhttp3.Request
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class DeltakerControllerIntegrationTest : IntegrationTestBase() {
+class DeltakerAPIIntegrationTest : IntegrationTestBase() {
 
 	@Autowired
 	lateinit var endringsmeldingService: EndringsmeldingService

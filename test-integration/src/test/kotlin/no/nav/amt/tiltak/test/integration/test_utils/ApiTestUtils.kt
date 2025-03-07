@@ -6,7 +6,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.*
 
-object ControllerTestUtils {
+object ApiTestUtils {
 
 	fun testTiltaksarrangorAutentisering(requestBuilders: List<Request.Builder>, client: OkHttpClient, oAuthServer: MockOAuthServer) {
 		requestBuilders.forEach {
