@@ -8,9 +8,9 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
-@RestController("TilgangControllerNavAnsatt")
+@RestController("TilgangAPINavAnsatt")
 @RequestMapping("/api/nav-ansatt/gjennomforing-tilgang")
-class TilgangController(
+class TilgangAPI(
     private val authService: AuthService,
     private val navAnsattService: NavAnsattService,
     private val tiltaksansvarligTilgangService: TiltaksansvarligTilgangService,

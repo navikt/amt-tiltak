@@ -8,7 +8,7 @@ import org.slf4j.MDC
 import org.springframework.stereotype.Service
 
 @Service
-open class ControllerService(
+open class ApiService(
 	private val arrangorAnsattService: ArrangorAnsattService,
 	private val authService: AuthService
 ) {

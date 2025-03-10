@@ -24,7 +24,7 @@ import java.util.UUID
 @Unprotected
 @RestController
 @RequestMapping("/internal/api/republisering")
-class RepubliseringController(
+class RepubliseringAPI(
 	private val deltakerService: DeltakerService,
 	private val dataPublisher: DataPublisherService,
 	private val deltakerV1ProducerService: DeltakerV1ProducerService,

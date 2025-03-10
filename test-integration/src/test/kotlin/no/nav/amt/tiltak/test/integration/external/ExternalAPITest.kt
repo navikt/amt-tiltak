@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 import java.util.UUID
 
 
-class ExternalControllerTest: IntegrationTestBase() {
+class ExternalAPITest: IntegrationTestBase() {
 	val getTokenXAuthHeader = { mapOf("Authorization" to "Bearer ${mockOAuthServer.issueTokenXToken(TestData.ARRANGOR_ANSATT_1.personligIdent)}") }
 	val getAzureAdM2MToken = { mapOf("Authorization" to "Bearer ${mockOAuthServer.issueAzureAdM2MToken()}") }
 	val getAzureAToken = { mapOf("Authorization" to "Bearer ${mockOAuthServer.issueAzureAdToken(ident = "", oid = UUID.randomUUID())}") }
