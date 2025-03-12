@@ -62,7 +62,7 @@ open class DeltakerStatusRepository(
 
 	fun getStatuserForDeltaker(deltakerId: UUID): List<DeltakerStatusDbo> {
 		val sql = """
-			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aarsaksbeskrivelse, aktiv, created_at
+			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aarsaksbeskrivelse, aktiv, created_at, er_manuelt_delt_med_arrangor
 			FROM deltaker_status
 			WHERE deltaker_id = :deltakerId;
 		""".trimIndent()
@@ -76,7 +76,7 @@ open class DeltakerStatusRepository(
 
 	fun getStatusForDeltaker(deltakerId: UUID): DeltakerStatusDbo? {
 		val sql = """
-			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aarsaksbeskrivelse, aktiv, created_at
+			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aarsaksbeskrivelse, aktiv, created_at, er_manuelt_delt_med_arrangor
 			FROM deltaker_status
 			WHERE deltaker_id = :deltakerId
 			AND aktiv = true
@@ -103,7 +103,7 @@ open class DeltakerStatusRepository(
 		if (deltakerIder.isEmpty()) return emptyList()
 
 		val sql = """
-			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aarsaksbeskrivelse, aktiv, created_at
+			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aarsaksbeskrivelse, aktiv, created_at, er_manuelt_delt_med_arrangor
 			FROM deltaker_status
 			WHERE deltaker_id IN (:deltakerIder)
 			AND aktiv = true
@@ -119,7 +119,7 @@ open class DeltakerStatusRepository(
 
 	fun get(id: UUID): DeltakerStatusDbo? {
 		val sql = """
-			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aarsaksbeskrivelse, aktiv, created_at
+			SELECT id, deltaker_id, gyldig_fra, status, aarsak, aarsaksbeskrivelse, aktiv, created_at, er_manuelt_delt_med_arrangor
 			FROM deltaker_status
 			WHERE id = :id
 		""".trimIndent()
