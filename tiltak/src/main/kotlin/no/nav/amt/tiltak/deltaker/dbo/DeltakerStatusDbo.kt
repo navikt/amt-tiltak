@@ -12,7 +12,8 @@ data class DeltakerStatusDbo(
 	val aarsaksbeskrivelse: String?,
 	val gyldigFra: LocalDateTime,
 	val opprettetDato: LocalDateTime,
-	val aktiv: Boolean
+	val aktiv: Boolean,
+	val erManueltDeltMedArrangor: Boolean = false,
 ) {
-	fun toModel() = DeltakerStatus(id, type, aarsak, aarsaksbeskrivelse, gyldigFra, opprettetDato, aktiv)
+	fun toModel() = DeltakerStatus(id, type, aarsak, aarsaksbeskrivelse, gyldigFra, opprettetDato, aktiv, erManueltDeltMedArrangor)
 }

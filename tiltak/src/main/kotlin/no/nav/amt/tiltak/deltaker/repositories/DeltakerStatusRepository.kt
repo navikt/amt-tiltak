@@ -28,6 +28,7 @@ open class DeltakerStatusRepository(
 			aktiv = rs.getBoolean("aktiv"),
 			gyldigFra = rs.getLocalDateTime("gyldig_fra"),
 			opprettetDato = rs.getTimestamp("created_at").toLocalDateTime(),
+			erManueltDeltMedArrangor = rs.getBoolean("er_manuelt_delt_med_arrangor"),
 		)
 
 	}
@@ -129,6 +130,20 @@ open class DeltakerStatusRepository(
 
 		return template.query(sql, parameters, rowMapper).firstOrNull()
 
+	}
+
+	fun delMedArrangor(statuser: List<UUID>) {
+		if (statuser.isEmpty()) return
+
+		val sql = """
+			update deltaker_status
+			set er_manuelt_delt_med_arrangor = true
+			where id = any(:ider)
+		""".trimIndent()
+
+		val parameters = sqlParameters("ider" to statuser)
+
+		template.update(sql, parameters)
 	}
 
 }
