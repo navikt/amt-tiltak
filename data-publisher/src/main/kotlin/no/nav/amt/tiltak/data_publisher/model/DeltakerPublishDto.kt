@@ -58,7 +58,8 @@ data class DeltakerStatusDto(
     val aarsak: DeltakerStatus.Aarsak?,
 	val aarsaksbeskrivelse: String?,
     val gyldigFra: LocalDateTime,
-    val opprettetDato: LocalDateTime
+    val opprettetDato: LocalDateTime,
+	val erManueltDeltMedArrangor: Boolean = false,
 )
 
 data class DeltakerKontaktinformasjonDto(
