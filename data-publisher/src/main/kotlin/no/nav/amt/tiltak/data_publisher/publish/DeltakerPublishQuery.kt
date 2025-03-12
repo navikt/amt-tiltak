@@ -194,7 +194,7 @@ class DeltakerPublishQuery(
 					 left join bruker on deltaker.bruker_id = bruker.id
 					 left join nav_enhet on bruker.nav_enhet_id = nav_enhet.id
 					 left join nav_ansatt on bruker.ansvarlig_veileder_id = nav_ansatt.id
-					 left join (select id, deltaker_id, status, aarsak, aarsaksbeskrivelse, gyldig_fra, created_at
+					 left join (select id, deltaker_id, status, aarsak, aarsaksbeskrivelse, gyldig_fra, created_at, er_manuelt_delt_med_arrangor
 								from deltaker_status
 								where aktiv is true) status on status.deltaker_id = deltaker.id
 			where deltaker.id = :deltakerId
