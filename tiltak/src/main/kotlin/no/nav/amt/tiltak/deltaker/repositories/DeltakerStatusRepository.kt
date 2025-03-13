@@ -141,7 +141,7 @@ open class DeltakerStatusRepository(
 			where id = any(:ider)
 		""".trimIndent()
 
-		val parameters = sqlParameters("ider" to statuser)
+		val parameters = sqlParameters("ider" to statuser.toTypedArray())
 
 		template.update(sql, parameters)
 	}
