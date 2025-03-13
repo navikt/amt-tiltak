@@ -133,4 +133,22 @@ internal class DeltakerStatusRepositoryTest : FunSpec({
 		status.aarsak shouldBe status1Cmd.aarsak
 	}
 
+	test("delMedArrangor - skal sette erManueltDeltMedArrangor") {
+		val deltaker1Cmd = createDeltakerInput(BRUKER_1, GJENNOMFORING_1)
+		testDataRepository.insertDeltaker(deltaker1Cmd)
+
+		val deltaker2Cmd = createDeltakerInput(BRUKER_2, GJENNOMFORING_1)
+		testDataRepository.insertBruker(BRUKER_2)
+		testDataRepository.insertDeltaker(deltaker2Cmd)
+
+		val status1Cmd = createStatusInput(deltaker1Cmd)
+		val status2Cmd = createStatusInput(deltaker2Cmd)
+		testDataRepository.insertDeltakerStatus(status1Cmd.copy(status = "SOKT_INN"))
+		testDataRepository.insertDeltakerStatus(status2Cmd.copy(status = "SOKT_INN"))
+
+		repository.delMedArrangor(listOf(status1Cmd.id, status2Cmd.id))
+		repository.get(status1Cmd.id)?.erManueltDeltMedArrangor shouldBe true
+		repository.get(status2Cmd.id)?.erManueltDeltMedArrangor shouldBe true
+	}
+
 })
