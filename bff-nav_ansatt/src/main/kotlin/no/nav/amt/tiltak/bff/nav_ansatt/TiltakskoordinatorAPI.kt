@@ -23,7 +23,7 @@ class TiltakskoordinatorAPI(
 ) {
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
-	@PostMapping
+	@PostMapping("/del-med-arrangor")
 	fun delMedArrangor(
 		@RequestBody body: List<UUID>,
     ): Map<UUID, DeltMedArrangorStatus> {
