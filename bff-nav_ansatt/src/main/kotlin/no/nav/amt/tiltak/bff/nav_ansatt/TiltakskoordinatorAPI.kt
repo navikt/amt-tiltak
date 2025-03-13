@@ -14,9 +14,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 @RestController
-@RequestMapping(
-	"/api/tiltakskoordinator"
-)
+@RequestMapping("/api/tiltakskoordinator")
 class TiltakskoordinatorAPI(
 	private val authService: AuthService,
 	private val deltakerService: DeltakerService,
@@ -33,10 +31,7 @@ class TiltakskoordinatorAPI(
 	}
 }
 
-private fun DeltakerStatus.toDeltMedArrangorStatus(): DeltMedArrangorStatus {
-	require(type == DeltakerStatus.Type.SOKT_INN && aktiv)
-
-	return DeltMedArrangorStatus(
+private fun DeltakerStatus.toDeltMedArrangorStatus() = DeltMedArrangorStatus(
 		id = id,
 		type = type,
 		gyldigFra = gyldigFra,
@@ -44,7 +39,6 @@ private fun DeltakerStatus.toDeltMedArrangorStatus(): DeltMedArrangorStatus {
 		opprettet = opprettetDato,
 		erManueltDeltMedArrangor = erManueltDeltMedArrangor,
 	)
-}
 
 data class DeltMedArrangorStatus(
 	val id: UUID,
@@ -53,5 +47,5 @@ data class DeltMedArrangorStatus(
 	val gyldigFra: LocalDateTime,
 	val gyldigTil: LocalDateTime?,
 	val opprettet: LocalDateTime,
-	val erManueltDeltMedArrangor: Boolean = false,
+	val erManueltDeltMedArrangor: Boolean,
 )
