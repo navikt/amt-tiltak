@@ -52,6 +52,7 @@ spec:
         - application: amt-tiltaksansvarlig-flate
         - application: amt-tiltaksarrangor-bff
         - application: amt-arena-acl
+        - application: amt-deltaker
         - application: tiltakspenger-tiltak
           namespace: tpts
         - application: tilleggsstonader-integrasjoner

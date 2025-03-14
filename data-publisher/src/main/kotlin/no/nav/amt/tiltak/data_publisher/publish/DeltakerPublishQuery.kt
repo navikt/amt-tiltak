@@ -51,7 +51,8 @@ class DeltakerPublishQuery(
 			aarsak = deltaker.statusAarsak?.let { DeltakerStatus.Aarsak.valueOf(it) },
 			aarsaksbeskrivelse = deltaker.statusAarsakBeskrivelse,
 			gyldigFra = deltaker.statusGyldigFra!!,
-			opprettetDato = deltaker.statusCreatedAt!!
+			opprettetDato = deltaker.statusCreatedAt!!,
+			erManueltDeltMedArrangor = deltaker.statusErManueltDeltMedArrangor,
 		)
 		val historikk = byggHistorikk(vurderinger, deltaker, status)
 
@@ -184,6 +185,7 @@ class DeltakerPublishQuery(
 				   status.aarsaksbeskrivelse                    as status_aarsaksbeskrivelse,
 				   status.gyldig_fra                            as status_gyldig_fra,
 				   status.created_at                            as status_opprettet_dato,
+				   status.er_manuelt_delt_med_arrangor          as status_er_manuelt_delt_med_arrangor,
 				   gjennomforing.er_kurs,
 				   tiltak.type									as tiltakstype
 			from deltaker
@@ -192,7 +194,7 @@ class DeltakerPublishQuery(
 					 left join bruker on deltaker.bruker_id = bruker.id
 					 left join nav_enhet on bruker.nav_enhet_id = nav_enhet.id
 					 left join nav_ansatt on bruker.ansvarlig_veileder_id = nav_ansatt.id
-					 left join (select id, deltaker_id, status, aarsak, aarsaksbeskrivelse, gyldig_fra, created_at
+					 left join (select id, deltaker_id, status, aarsak, aarsaksbeskrivelse, gyldig_fra, created_at, er_manuelt_delt_med_arrangor
 								from deltaker_status
 								where aktiv is true) status on status.deltaker_id = deltaker.id
 			where deltaker.id = :deltakerId
@@ -259,6 +261,7 @@ class DeltakerPublishQuery(
 		val statusAarsakBeskrivelse: String?,
 		val statusGyldigFra: LocalDateTime?,
 		val statusCreatedAt: LocalDateTime?,
+		val statusErManueltDeltMedArrangor: Boolean = false,
 		val deltarPaKurs: Boolean,
 		val kilde: Kilde,
 		val forsteVedtakFattet: LocalDate?,
@@ -298,6 +301,7 @@ class DeltakerPublishQuery(
 					statusAarsakBeskrivelse = rs.getNullableString("status_aarsaksbeskrivelse"),
 					statusGyldigFra = rs.getNullableLocalDateTime("status_gyldig_fra"),
 					statusCreatedAt = rs.getNullableLocalDateTime("status_opprettet_dato"),
+					statusErManueltDeltMedArrangor = rs.getBoolean("status_er_manuelt_delt_med_arrangor"),
 					deltarPaKurs = rs.getBoolean("er_kurs"),
 					kilde = Kilde.valueOf(rs.getString("kilde")),
 					forsteVedtakFattet = rs.getNullableLocalDate("forste_vedtak_fattet"),
