@@ -497,15 +497,10 @@ internal class DeltakerRepositoryTest : FunSpec({
 
 
 	test("delMedArrangor - skal sette erManueltDeltMedArrangor") {
-		val deltaker1Cmd = createDeltakerInput(
-			BRUKER_1, GJENNOMFORING_1)
+		val deltaker1Cmd = createDeltakerInput(BRUKER_1, GJENNOMFORING_1)
 		testDataRepository.insertDeltaker(deltaker1Cmd)
 
-		val deltaker2Cmd = createDeltakerInput(
-			BRUKER_2, GJENNOMFORING_1)
-		testDataRepository.insertBruker(
-			BRUKER_2
-		)
+		val deltaker2Cmd = createDeltakerInput(BRUKER_2, GJENNOMFORING_1)
 		testDataRepository.insertDeltaker(deltaker2Cmd)
 
 		val status1Cmd = createStatusInput(deltaker1Cmd)
@@ -513,8 +508,8 @@ internal class DeltakerRepositoryTest : FunSpec({
 		testDataRepository.insertDeltakerStatus(status1Cmd.copy(status = "SOKT_INN"))
 		testDataRepository.insertDeltakerStatus(status2Cmd.copy(status = "SOKT_INN"))
 
-		repository.delMedArrangor(listOf(status1Cmd.id, status2Cmd.id))
+		repository.delMedArrangor(listOf(deltaker1Cmd.id, deltaker2Cmd.id))
 		repository.get(deltaker1Cmd.id)?.erManueltDeltMedArrangor shouldBe true
-		repository.get(status2Cmd.id)?.erManueltDeltMedArrangor shouldBe true
+		repository.get(deltaker2Cmd.id)?.erManueltDeltMedArrangor shouldBe true
 	}
 })
