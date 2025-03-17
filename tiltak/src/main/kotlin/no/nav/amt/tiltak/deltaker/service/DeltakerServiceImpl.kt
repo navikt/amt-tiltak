@@ -228,17 +228,14 @@ open class DeltakerServiceImpl(
 
 	override fun delMedArrangor(
 		deltakerIder: List<UUID>,
-	) : Map<UUID, DeltakerStatus> {
+	) {
 		val deltakere = hentDeltakere(deltakerIder)
 
 		require(deltakere.none { it.status.type != DeltakerStatus.Type.SOKT_INN }) { "Kan ikke manuelt dele med arrangor, en eller flere deltakere har feil status"}
 
-		val statuser = deltakere.associate { it.id to it.status.copy(erManueltDeltMedArrangor = true) }
-		deltakerStatusRepository.delMedArrangor(statuser.values.map { it.id })
+		deltakerRepository.delMedArrangor(deltakerIder)
 
 		deltakere.forEach { publiserDeltakerPaDeltakerV2Kafka(it.id) }
-
-		return statuser
 	}
 
 	private fun konverterDeltakerstatuseFraKursTilLopendeInntak(deltakere: List<Deltaker>) {

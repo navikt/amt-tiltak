@@ -35,7 +35,8 @@ data class DeltakerDbo(
 	val kilde: Kilde,
 	val forsteVedtakFattet: LocalDate?,
 	val sistEndretAv: UUID?,
-	val sistEndretAvEnhet: UUID?
+	val sistEndretAvEnhet: UUID?,
+	val erManueltDeltMedArrangor: Boolean,
 ) {
 
 	fun toDeltaker(status: DeltakerStatus): Deltaker {

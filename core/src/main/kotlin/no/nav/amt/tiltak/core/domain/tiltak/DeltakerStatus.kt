@@ -11,7 +11,6 @@ data class DeltakerStatus(
 	val gyldigFra: LocalDateTime,
 	val opprettetDato: LocalDateTime,
 	val aktiv: Boolean,
-	val erManueltDeltMedArrangor: Boolean = false,
 ) {
 	enum class Aarsak {
 		SYK, FATT_JOBB, TRENGER_ANNEN_STOTTE, FIKK_IKKE_PLASS, IKKE_MOTT, ANNET, AVLYST_KONTRAKT, UTDANNING, SAMARBEIDET_MED_ARRANGOREN_ER_AVBRUTT

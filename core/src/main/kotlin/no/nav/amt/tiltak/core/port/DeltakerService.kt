@@ -49,5 +49,5 @@ interface DeltakerService {
 
 	fun konverterStatuserForDeltakerePaaGjennomforing(gjennomforingId: UUID, oppdatertGjennomforingErKurs: Boolean)
 
-	fun delMedArrangor(deltakerIder: List<UUID>) : Map<UUID, DeltakerStatus>
+	fun delMedArrangor(deltakerIder: List<UUID>)
 }

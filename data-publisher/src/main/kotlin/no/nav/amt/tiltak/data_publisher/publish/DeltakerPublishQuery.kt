@@ -52,7 +52,6 @@ class DeltakerPublishQuery(
 			aarsaksbeskrivelse = deltaker.statusAarsakBeskrivelse,
 			gyldigFra = deltaker.statusGyldigFra!!,
 			opprettetDato = deltaker.statusCreatedAt!!,
-			erManueltDeltMedArrangor = deltaker.statusErManueltDeltMedArrangor,
 		)
 		val historikk = byggHistorikk(vurderinger, deltaker, status)
 
@@ -97,7 +96,8 @@ class DeltakerPublishQuery(
 			forsteVedtakFattet = deltaker.forsteVedtakFattet,
 			sistEndretAv = deltaker.sistEndretAv,
 			sistEndretAvEnhet = deltaker.sistEndretAvEnhet,
-			sistEndret = deltaker.sistEndret
+			sistEndret = deltaker.sistEndret,
+			erManueltDeltMedArrangor = deltaker.erManueltDeltMedArrangor
 		).let { Result.OK(it) }
 	}
 
@@ -173,6 +173,7 @@ class DeltakerPublishQuery(
 				   deltaker.forste_vedtak_fattet,
 				   deltaker.sist_endret_av,
 				   deltaker.sist_endret_av_enhet,
+				   deltaker.er_manuelt_delt_med_arrangor,
 				   deltaker.modified_at							as deltaker_sist_endret,
 				   nav_enhet.navn                               as nav_enhet_navn,
 				   nav_ansatt.id                                as nav_ansatt_id,
@@ -185,7 +186,6 @@ class DeltakerPublishQuery(
 				   status.aarsaksbeskrivelse                    as status_aarsaksbeskrivelse,
 				   status.gyldig_fra                            as status_gyldig_fra,
 				   status.created_at                            as status_opprettet_dato,
-				   status.er_manuelt_delt_med_arrangor          as status_er_manuelt_delt_med_arrangor,
 				   gjennomforing.er_kurs,
 				   tiltak.type									as tiltakstype
 			from deltaker
@@ -194,7 +194,7 @@ class DeltakerPublishQuery(
 					 left join bruker on deltaker.bruker_id = bruker.id
 					 left join nav_enhet on bruker.nav_enhet_id = nav_enhet.id
 					 left join nav_ansatt on bruker.ansvarlig_veileder_id = nav_ansatt.id
-					 left join (select id, deltaker_id, status, aarsak, aarsaksbeskrivelse, gyldig_fra, created_at, er_manuelt_delt_med_arrangor
+					 left join (select id, deltaker_id, status, aarsak, aarsaksbeskrivelse, gyldig_fra, created_at
 								from deltaker_status
 								where aktiv is true) status on status.deltaker_id = deltaker.id
 			where deltaker.id = :deltakerId
@@ -268,7 +268,8 @@ class DeltakerPublishQuery(
 		val sistEndretAv: UUID?,
 		val sistEndretAvEnhet: UUID?,
 		val sistEndret: LocalDateTime,
-		val tiltakstype: String
+		val tiltakstype: String,
+		val erManueltDeltMedArrangor: Boolean,
 	) {
 		companion object {
 			val rowMapper = RowMapper { rs, _ ->
@@ -301,14 +302,14 @@ class DeltakerPublishQuery(
 					statusAarsakBeskrivelse = rs.getNullableString("status_aarsaksbeskrivelse"),
 					statusGyldigFra = rs.getNullableLocalDateTime("status_gyldig_fra"),
 					statusCreatedAt = rs.getNullableLocalDateTime("status_opprettet_dato"),
-					statusErManueltDeltMedArrangor = rs.getBoolean("status_er_manuelt_delt_med_arrangor"),
 					deltarPaKurs = rs.getBoolean("er_kurs"),
 					kilde = Kilde.valueOf(rs.getString("kilde")),
 					forsteVedtakFattet = rs.getNullableLocalDate("forste_vedtak_fattet"),
 					sistEndretAv = rs.getNullableUUID("sist_endret_av"),
 					sistEndretAvEnhet = rs.getNullableUUID("sist_endret_av_enhet"),
 					sistEndret = rs.getLocalDateTime("deltaker_sist_endret"),
-					tiltakstype = rs.getString("tiltakstype")
+					tiltakstype = rs.getString("tiltakstype"),
+					erManueltDeltMedArrangor = rs.getBoolean("er_manuelt_delt_med_arrangor"),
 				)
 			}
 		}

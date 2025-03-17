@@ -59,7 +59,8 @@ open class DeltakerRepository(
 			kilde = Kilde.valueOf(rs.getString("kilde")),
 			forsteVedtakFattet = rs.getDate("forste_vedtak_fattet")?.toLocalDate(),
 			sistEndretAv = rs.getNullableUUID("sist_endret_av"),
-			sistEndretAvEnhet = rs.getNullableUUID("sist_endret_av_enhet")
+			sistEndretAvEnhet = rs.getNullableUUID("sist_endret_av_enhet"),
+			erManueltDeltMedArrangor = rs.getBoolean("er_manuelt_delt_med_arrangor"),
 		)
 	}
 
@@ -349,6 +350,18 @@ open class DeltakerRepository(
 		)
 
 		template.update(sql, parameters)
+	}
+
+	fun delMedArrangor(deltakerIder: List<UUID>) {
+		val sql = """
+			update deltaker
+			set er_manuelt_delt_med_arrangor = true
+			where id = any(:ider)
+		""".trimIndent()
+
+		val params = sqlParameters("ider" to deltakerIder.toTypedArray())
+
+		template.update(sql, params)
 	}
 
 	private fun DeltakelsesInnhold.toPGObject() = PGobject().also {
