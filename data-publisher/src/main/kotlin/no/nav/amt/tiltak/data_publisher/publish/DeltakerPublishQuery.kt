@@ -51,7 +51,7 @@ class DeltakerPublishQuery(
 			aarsak = deltaker.statusAarsak?.let { DeltakerStatus.Aarsak.valueOf(it) },
 			aarsaksbeskrivelse = deltaker.statusAarsakBeskrivelse,
 			gyldigFra = deltaker.statusGyldigFra!!,
-			opprettetDato = deltaker.statusCreatedAt!!
+			opprettetDato = deltaker.statusCreatedAt!!,
 		)
 		val historikk = byggHistorikk(vurderinger, deltaker, status)
 
@@ -96,7 +96,8 @@ class DeltakerPublishQuery(
 			forsteVedtakFattet = deltaker.forsteVedtakFattet,
 			sistEndretAv = deltaker.sistEndretAv,
 			sistEndretAvEnhet = deltaker.sistEndretAvEnhet,
-			sistEndret = deltaker.sistEndret
+			sistEndret = deltaker.sistEndret,
+			erManueltDeltMedArrangor = deltaker.erManueltDeltMedArrangor
 		).let { Result.OK(it) }
 	}
 
@@ -172,6 +173,7 @@ class DeltakerPublishQuery(
 				   deltaker.forste_vedtak_fattet,
 				   deltaker.sist_endret_av,
 				   deltaker.sist_endret_av_enhet,
+				   deltaker.er_manuelt_delt_med_arrangor,
 				   deltaker.modified_at							as deltaker_sist_endret,
 				   nav_enhet.navn                               as nav_enhet_navn,
 				   nav_ansatt.id                                as nav_ansatt_id,
@@ -259,13 +261,15 @@ class DeltakerPublishQuery(
 		val statusAarsakBeskrivelse: String?,
 		val statusGyldigFra: LocalDateTime?,
 		val statusCreatedAt: LocalDateTime?,
+		val statusErManueltDeltMedArrangor: Boolean = false,
 		val deltarPaKurs: Boolean,
 		val kilde: Kilde,
 		val forsteVedtakFattet: LocalDate?,
 		val sistEndretAv: UUID?,
 		val sistEndretAvEnhet: UUID?,
 		val sistEndret: LocalDateTime,
-		val tiltakstype: String
+		val tiltakstype: String,
+		val erManueltDeltMedArrangor: Boolean,
 	) {
 		companion object {
 			val rowMapper = RowMapper { rs, _ ->
@@ -304,7 +308,8 @@ class DeltakerPublishQuery(
 					sistEndretAv = rs.getNullableUUID("sist_endret_av"),
 					sistEndretAvEnhet = rs.getNullableUUID("sist_endret_av_enhet"),
 					sistEndret = rs.getLocalDateTime("deltaker_sist_endret"),
-					tiltakstype = rs.getString("tiltakstype")
+					tiltakstype = rs.getString("tiltakstype"),
+					erManueltDeltMedArrangor = rs.getBoolean("er_manuelt_delt_med_arrangor"),
 				)
 			}
 		}

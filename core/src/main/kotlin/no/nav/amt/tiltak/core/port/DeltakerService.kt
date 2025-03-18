@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.core.port
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
+import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
@@ -47,4 +48,6 @@ interface DeltakerService {
 	fun lagreVurdering(vurdering: Vurdering): List<Vurdering>
 
 	fun konverterStatuserForDeltakerePaaGjennomforing(gjennomforingId: UUID, oppdatertGjennomforingErKurs: Boolean)
+
+	fun delMedArrangor(deltakerIder: List<UUID>)
 }

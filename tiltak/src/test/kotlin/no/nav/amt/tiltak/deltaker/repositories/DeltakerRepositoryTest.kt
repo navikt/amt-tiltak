@@ -14,11 +14,15 @@ import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusInsertDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerUpsertDbo
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_1
+import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.BRUKER_3
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_2
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_1
 import no.nav.amt.tiltak.test.database.data.TestData.GJENNOMFORING_2
+import no.nav.amt.tiltak.test.database.data.TestData.createDeltakerInput
+import no.nav.amt.tiltak.test.database.data.TestData.createStatusInput
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -491,4 +495,21 @@ internal class DeltakerRepositoryTest : FunSpec({
 		deltakere.any { it.id == DELTAKER_1.id } shouldBe true
 	}
 
+
+	test("delMedArrangor - skal sette erManueltDeltMedArrangor") {
+		val deltaker1Cmd = createDeltakerInput(BRUKER_1, GJENNOMFORING_1)
+		testDataRepository.insertDeltaker(deltaker1Cmd)
+
+		val deltaker2Cmd = createDeltakerInput(BRUKER_2, GJENNOMFORING_1)
+		testDataRepository.insertDeltaker(deltaker2Cmd)
+
+		val status1Cmd = createStatusInput(deltaker1Cmd)
+		val status2Cmd = createStatusInput(deltaker2Cmd)
+		testDataRepository.insertDeltakerStatus(status1Cmd.copy(status = "SOKT_INN"))
+		testDataRepository.insertDeltakerStatus(status2Cmd.copy(status = "SOKT_INN"))
+
+		repository.delMedArrangor(listOf(deltaker1Cmd.id, deltaker2Cmd.id))
+		repository.get(deltaker1Cmd.id)?.erManueltDeltMedArrangor shouldBe true
+		repository.get(deltaker2Cmd.id)?.erManueltDeltMedArrangor shouldBe true
+	}
 })

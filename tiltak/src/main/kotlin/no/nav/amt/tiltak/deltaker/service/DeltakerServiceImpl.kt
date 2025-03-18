@@ -226,6 +226,18 @@ open class DeltakerServiceImpl(
 		}
 	}
 
+	override fun delMedArrangor(
+		deltakerIder: List<UUID>,
+	) {
+		val deltakere = hentDeltakere(deltakerIder)
+
+		require(deltakere.none { it.status.type != DeltakerStatus.Type.SOKT_INN }) { "Kan ikke manuelt dele med arrangor, en eller flere deltakere har feil status"}
+
+		deltakerRepository.delMedArrangor(deltakerIder)
+
+		deltakere.forEach { publiserDeltakerPaDeltakerV2Kafka(it.id) }
+	}
+
 	private fun konverterDeltakerstatuseFraKursTilLopendeInntak(deltakere: List<Deltaker>) {
 		val deltakereSomSkalOppdateres =
 			deltakere.filter { it.status.type == DeltakerStatus.Type.AVBRUTT || it.status.type == DeltakerStatus.Type.FULLFORT }

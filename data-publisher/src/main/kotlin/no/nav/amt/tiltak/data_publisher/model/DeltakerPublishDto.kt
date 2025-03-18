@@ -33,6 +33,7 @@ data class DeltakerPublishDto(
 	val sistEndretAv: UUID?,
 	val sistEndretAvEnhet: UUID?,
 	val sistEndret: LocalDateTime,
+	val erManueltDeltMedArrangor: Boolean,
 ) {
 	fun digest() = DigestUtils.md5DigestAsHex(JsonUtils.toJson(this).toByteArray())
 }
@@ -58,7 +59,7 @@ data class DeltakerStatusDto(
     val aarsak: DeltakerStatus.Aarsak?,
 	val aarsaksbeskrivelse: String?,
     val gyldigFra: LocalDateTime,
-    val opprettetDato: LocalDateTime
+    val opprettetDato: LocalDateTime,
 )
 
 data class DeltakerKontaktinformasjonDto(
