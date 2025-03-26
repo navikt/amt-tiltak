@@ -177,9 +177,9 @@ open class DeltakerServiceImpl(
 
 	override fun lagreVurdering(vurdering: Vurdering): List<Vurdering> {
 		val status = deltakerStatusRepository.getStatusForDeltaker(vurdering.deltakerId)
-		if (status?.type != DeltakerStatus.Type.VURDERES) {
-			log.error("Kan ikke opprette vurdering for deltaker med id ${vurdering.deltakerId} som ikke har status VURDERES")
-			throw ValidationException("Kan ikke opprette vurdering for deltaker som ikke har status VURDERES")
+		if (!(status?.type == DeltakerStatus.Type.VURDERES || status?.type == DeltakerStatus.Type.SOKT_INN)) {
+			log.error("Kan ikke opprette vurdering for deltaker med id ${vurdering.deltakerId} som har status ${status?.type}")
+			throw ValidationException("Kan ikke opprette vurdering for deltaker som har status ${status?.type}")
 		}
 
 		val opprinneligeVurderinger = vurderingRepository.getVurderingerForDeltaker(vurdering.deltakerId)
