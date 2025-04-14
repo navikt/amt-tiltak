@@ -4,101 +4,79 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.endringsmelding.EndringsmeldingDbo
+import no.nav.amt.tiltak.endringsmelding.metrics.EndringsmeldingMetricRepository.EndringsmeldingMetricHolder
 import org.springframework.stereotype.Service
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.roundToInt
 
-private const val antallTotalEndringsmeldinger = "amt_tiltak_endringsmelding_totalt_antall"
-private const val antallAktivEndringsmeldinger = "amt_tiltak_endringsmelding_aktiv_antall"
-private const val antallManueltFerdigEndringsmeldinger = "amt_tiltak_endringsmelding_manuelt_ferdig_antall"
-private const val antallAutomatiskFerdigEndringsmeldinger = "amt_tiltak_endringsmelding_automatisk_ferdig_antall"
-private const val eldsteAktiveIMinutter = "amt_tiltak_endringsmelding_eldste_aktive_i_minutter"
-private const val gjennomsnitteligTidIMinutter = "amt_tiltak_endringsmelding_gjennomsnittelig_tid_i_minutter"
-private const val antallEndringsmeldingerPerType = "amt_tiltak_endringsmelding_per_type_antall"
-private const val antallEndringsmeldingerPerStatus = "amt_tiltak_endringsmelding_per_status_antall"
-
+@Suppress("SpellCheckingInspection")
 @Service
 class EndringsmeldingMetricService(
-	registry: MeterRegistry,
-	private val endringsmeldingMetricRepository: EndringsmeldingMetricRepository
+    registry: MeterRegistry,
+    private val endringsmeldingMetricRepository: EndringsmeldingMetricRepository
 ) {
 
-	private val simpleGauges: Map<String, AtomicInteger> = mapOf(
-		Pair(
-			antallTotalEndringsmeldinger,
-			registry.gauge(antallTotalEndringsmeldinger, AtomicInteger(0))!!
-		),
+    private val updaters = listOf(
+        "amt_tiltak_endringsmelding_totalt_antall" update { antallAktive },
+        "amt_tiltak_endringsmelding_aktiv_antall" update { antallAktive },
+        "amt_tiltak_endringsmelding_manuelt_ferdig_antall" update { manueltFerdige },
+        "amt_tiltak_endringsmelding_automatisk_ferdig_antall" update { automatiskFerdige },
+        "amt_tiltak_endringsmelding_eldste_aktive_i_minutter" update {
+            eldsteAktive?.let { minutesSince(it) }
+        },
+        "amt_tiltak_endringsmelding_gjennomsnittelig_tid_i_minutter" update {
+            gjennomsnitteligTidIMinutter.roundToInt()
+        }
+    )
 
-		Pair(
-			antallAktivEndringsmeldinger,
-			registry.gauge(antallAktivEndringsmeldinger, AtomicInteger(0))!!
-		),
+    private val simpleGauges: List<(EndringsmeldingMetricHolder?) -> Unit> = registry.add(updaters)
 
-		Pair(
-			antallManueltFerdigEndringsmeldinger,
-			registry.gauge(antallManueltFerdigEndringsmeldinger, AtomicInteger(0))!!
-		),
+    fun oppdaterMetrikker() {
+        endringsmeldingMetricRepository.getMetrics().let { metrics ->
+            for (updater in simpleGauges) updater(metrics)
+        }
+        endringsmeldingMetricRepository.getAntallEndringsmeldingerPerType().forEach {
+            antallEndringsmeldingerPerTypeGauges[it.type]?.set(it.antall)
+        }
+        endringsmeldingMetricRepository.getAntallEndringsmeldingerPerStatus().forEach {
+            antallEndringsmeldingerPerStatusGauges[it.key.name]?.set(it.value)
+        }
+    }
 
-		Pair(
-			antallAutomatiskFerdigEndringsmeldinger,
-			registry.gauge(antallAutomatiskFerdigEndringsmeldinger, AtomicInteger(0))!!
-		),
+    private val antallEndringsmeldingerPerTypeGauges: Map<String, AtomicInteger> =
+        EndringsmeldingDbo.Type.values().associate {
+            it.name to registry.gauge(
+                "amt_tiltak_endringsmelding_per_type_antall",
+                Tags.of("type", it.name),
+                AtomicInteger()
+            )!!
+        }
 
-		Pair(
-			eldsteAktiveIMinutter,
-			registry.gauge(eldsteAktiveIMinutter, AtomicInteger(0))!!
-		),
+    private val antallEndringsmeldingerPerStatusGauges: Map<String, AtomicInteger> =
+        Endringsmelding.Status.values().associate {
+            it.name to registry.gauge(
+                "amt_tiltak_endringsmelding_per_status_antall",
+                Tags.of("type", it.name),
+                AtomicInteger()
+            )!!
+        }
 
-		Pair(
-			gjennomsnitteligTidIMinutter,
-			registry.gauge(gjennomsnitteligTidIMinutter, AtomicInteger(0))!!
-		)
-	)
+    private fun minutesSince(time: LocalDateTime): Int = Duration.between(time, LocalDateTime.now()).toMinutes().toInt()
 
-	private val antallEndringsmeldingerPerTypeGauges: Map<String, AtomicInteger> =
-		EndringsmeldingDbo.Type.values().associate {
-			it.name to registry.gauge(antallEndringsmeldingerPerType, Tags.of("type", it.name), AtomicInteger(0))!!
-		}
+    private infix fun String.update(updater: EndringsmeldingMetricHolder.() -> Int?) =
+        this to updater
 
-	private val antallEndringsmeldingerPerStatusGauges: Map<String, AtomicInteger> =
-		Endringsmelding.Status.values().associate {
-			it.name to registry.gauge(antallEndringsmeldingerPerStatus, Tags.of("type", it.name), AtomicInteger(0))!!
-		}
+    private fun <T> MeterRegistry.add(pairs: List<Pair<String, T.() -> Int?>>) =
+        run {
+            pairs.map { (name, updater) ->
+                gauge(name, updater)
+            }
+        }
 
-	fun oppdaterMetrikker() {
-		val metrics = endringsmeldingMetricRepository.getMetrics()
-
-		simpleGauges.getValue(antallAktivEndringsmeldinger)
-			.set(metrics?.antallAktive ?: 0)
-
-		simpleGauges.getValue(antallTotalEndringsmeldinger)
-			.set(metrics?.antallTotalt ?: 0)
-
-		simpleGauges.getValue(antallManueltFerdigEndringsmeldinger)
-			.set(metrics?.manueltFerdige ?: 0)
-
-		simpleGauges.getValue(antallAutomatiskFerdigEndringsmeldinger)
-			.set(metrics?.automatiskFerdige ?: 0)
-
-		if (metrics?.eldsteAktive != null) {
-			val durationInMinutes = Duration.between(metrics.eldsteAktive, LocalDateTime.now()).toMinutes()
-			simpleGauges.getValue(eldsteAktiveIMinutter)
-				.set(durationInMinutes.toInt())
-		}
-
-		simpleGauges.getValue(gjennomsnitteligTidIMinutter)
-			.set(metrics?.gjennomsnitteligTidIMinutter?.roundToInt() ?: 0)
-
-		endringsmeldingMetricRepository.getAntallEndringsmeldingerPerType().forEach {
-			antallEndringsmeldingerPerTypeGauges[it.type]?.set(it.antall)
-		}
-
-		endringsmeldingMetricRepository.getAntallEndringsmeldingerPerStatus().forEach {
-			antallEndringsmeldingerPerStatusGauges[it.key.name]?.set(it.value)
-		}
-
-	}
-
+    private fun <T> MeterRegistry.gauge(name: String, updater: T.() -> Int?): (T?) -> Unit =
+        gauge(name, AtomicInteger())?.let { gauge ->
+            { it?.let(updater)?.run(gauge::set) }
+        }!!
 }
