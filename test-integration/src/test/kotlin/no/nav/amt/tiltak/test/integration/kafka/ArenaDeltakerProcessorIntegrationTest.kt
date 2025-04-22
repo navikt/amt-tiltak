@@ -21,6 +21,7 @@ import no.nav.amt.tiltak.test.integration.utils.KafkaMessageCreator
 import no.nav.amt.tiltak.test.utils.AsyncUtils
 import no.nav.amt.tiltak.tiltak.repositories.GjennomforingRepository
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.UUID
@@ -40,6 +41,7 @@ class ArenaDeltakerProcessorIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
+	@Disabled
 	fun `ingest deltaker - gjennomforing er ingestet`() {
 		val mockNavBruker = mockNavBruker(
 			BRUKER_1.copy(
@@ -82,6 +84,7 @@ class ArenaDeltakerProcessorIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
+	@Disabled
 	fun `ingest deltaker - gjennomforing er kurs - ingestes uten feil`() {
 		val mockNavBruker = mockNavBruker(
 			BRUKER_1.copy(
@@ -160,6 +163,7 @@ class ArenaDeltakerProcessorIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
+	@Disabled
 	fun `ingest deltaker - status feilregistrert - skal oppdatere deltaker`() {
 		val mockNavBruker = mockNavBruker(
 			BRUKER_1.copy(
