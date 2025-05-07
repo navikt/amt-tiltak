@@ -106,7 +106,7 @@ nevnte tiltakene.
 |-------------------|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **type**          | `string`       | En av følgende verdier: `VENTER_PA_OPPSTART`, `DELTAR`, `HAR_SLUTTET`, `IKKE_AKTUELL`, `FEILREGISTRERT`, `SOKT_INN`, `VURDERES`, `VENTELISTE`, `AVBRUTT`, `FULLFORT`, `PABEGYNT_REGISTRERING`, `UTKAST_TIL_PAMELDING`, `AVBRUTT_UTKAST` <br /><br /> Det er litt ulike typer statuser som kan settes på deltakere, basert på hvilke tiltak de deltar på. Hovedregelen er at `FULLFORT` og `AVBRUTT` kan kun settes på deltakere som går på tiltak hvor det er en felles oppstart, typisk kurs som `JOBBK`, `GRUPPEAMO`, `GRUFAGYRKE`, mens `HAR_SLUTTET` brukes kun på de andre tiltakene som har et "løpende" inntak og oppstart av deltakere. |
 | **statusTekst**   | `string\|null` | Tekstrepresentasjon av statustypen (for visning).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| **aarsak**        | `string\|null` | En årsak kan finnes på enkelte typer statuser (`HAR_SLUTTET`, `IKKE_AKTUELL` og `AVBRUTT`) og er en av følgende verdier: `SYK`, `FATT_JOBB`, `TRENGER_ANNEN_STOTTE`, `FIKK_IKKE_PLASS`, `IKKE_MOTT`, `ANNET`, `AVLYST_KONTRAKT`, `UTDANNING`, `SAMARBEIDET_MED_ARRANGOREN_ER_AVBRUTT` I tillegg kan status `AVBRUTT_UTKAST` få årsaken `SAMARBEIDET_MED_ARRANGOREN_ER_AVBRUTT` i enkelte tilfeller.                                                                                                                                                                                                                                                                                                                                                      |
+| **aarsak**        | `string\|null` | En årsak kan finnes på enkelte typer statuser (`HAR_SLUTTET`, `IKKE_AKTUELL` og `AVBRUTT`) og er en av følgende verdier: `SYK`, `FATT_JOBB`, `TRENGER_ANNEN_STOTTE`, `FIKK_IKKE_PLASS`, `IKKE_MOTT`, `ANNET`, `AVLYST_KONTRAKT`, `UTDANNING`, `SAMARBEIDET_MED_ARRANGOREN_ER_AVBRUTT`, `KRAV_IKKE_OPPFYLT`, `KURS_FULLT` I tillegg kan status `AVBRUTT_UTKAST` få årsaken `SAMARBEIDET_MED_ARRANGOREN_ER_AVBRUTT` i enkelte tilfeller.                                                                                                                                                                                                                                                                                                                                                      |
 | **aarsakTekst**   | `string\|null` | Tekstrepresentasjon av statusårsaken (for visning).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | **opprettetDato** | `datetime`     | Tidsstempel for når statusen ble opprettet                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 
@@ -145,7 +145,7 @@ For oppdatert informasjon er det best å se siste versjon direkte:
 - [DeltakerV1Dto](https://github.com/navikt/amt-deltaker/blob/main/src/main/kotlin/no/nav/amt/deltaker/deltaker/kafka/DeltakerV1Dto.kt) (Skjema for deltakere Komet er master for)
 - [DeltakerV1Dto](https://github.com/navikt/amt-tiltak/blob/main/kafka/kafka-producer/src/main/kotlin/no/nav/amt/tiltak/kafka/producer/dto/DeltakerV1Dto.kt) (Skjema for deltakere Arena er master for) 
 - [DeltakerStatusDto](https://github.com/navikt/amt-tiltak/blob/main/kafka/kafka-producer/src/main/kotlin/no/nav/amt/tiltak/kafka/producer/dto/DeltakerStatusDto.kt)
-- [DeltakerStatus.Type og DeltakerStatus.Aarsak](https://github.com/navikt/amt-tiltak/blob/main/core/src/main/kotlin/no/nav/amt/tiltak/core/domain/tiltak/DeltakerStatus.kt)
+- [DeltakerStatus.Type og DeltakerStatus.Aarsak](https://github.com/navikt/amt-lib/blob/main/lib/models/src/main/kotlin/no/nav/amt/lib/models/deltaker/DeltakerStatus.kt)
 
 ```kotlin
 data class DeltakerV1Dto(
@@ -173,8 +173,17 @@ data class DeltakerStatusDto(
 ) {
 
     enum class Aarsak {
-        SYK, FATT_JOBB, TRENGER_ANNEN_STOTTE, FIKK_IKKE_PLASS, IKKE_MOTT, ANNET, AVLYST_KONTRAKT,
-        UTDANNING, SAMARBEIDET_MED_ARRANGOREN_ER_AVBRUTT
+        SYK,
+        FATT_JOBB,
+        TRENGER_ANNEN_STOTTE,
+        FIKK_IKKE_PLASS,
+        IKKE_MOTT,
+        ANNET,
+        AVLYST_KONTRAKT,
+        UTDANNING,
+        SAMARBEIDET_MED_ARRANGOREN_ER_AVBRUTT,
+        KRAV_IKKE_OPPFYLT,
+        KURS_FULLT,
     }
 
     enum class Type {
