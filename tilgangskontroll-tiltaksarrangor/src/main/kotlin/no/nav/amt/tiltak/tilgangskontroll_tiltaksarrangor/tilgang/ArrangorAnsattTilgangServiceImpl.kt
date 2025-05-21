@@ -11,7 +11,6 @@ import no.nav.amt.tiltak.core.port.ArrangorVeilederService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.MineDeltakerlisterService
-import no.nav.amt.tiltak.log.SecureLog.secureLog
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.arrangor.AmtArrangorService
 import no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.arrangor.tilArrangorAnsattRoller
 import org.slf4j.LoggerFactory
@@ -41,7 +40,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 		val arrangorId = gjennomforingService.getArrangorId(gjennomforingId)
 
 		if (!harKoordinatorTilgang(ansattId, gjennomforingId, arrangorId)){
-			secureLog.warn("Ansatt med id=$ansattId har ikke tilgang til gjennomføring med id=$gjennomforingId")
+			log.warn("Ansatt med id=$ansattId har ikke tilgang til gjennomføring med id=$gjennomforingId")
 			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ansatt har ikke tilgang til gjennomforing")
 		}
 	}
@@ -66,6 +65,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 	override fun synkroniserRettigheter(ansattPersonligIdent: String) {
 		try {
 			val ansatt = amtArrangorService.getAnsatt(ansattPersonligIdent)
+
 			if (ansatt == null) {
 				log.warn("Fant ikke ansatt i amt-arrangor. Kan ikke oppdatere rettigheter.")
 				return
@@ -77,8 +77,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 
 			oppdaterRollerOgTilganger(ansatt)
 		} catch (t: Throwable) {
-			log.error("Feil under synkronisering av rettigheter", t)
-			secureLog.error("Feil under synkronisering av rettigheter for fnr=$ansattPersonligIdent", t)
+			log.error("Feil under synkronisering av rettigheter for ansatt", t)
 		}
 	}
 
@@ -103,8 +102,8 @@ open class ArrangorAnsattTilgangServiceImpl(
 		val hasRolle = harRolleHosArrangor(ansattId, arrangorId, rolle)
 
 		if (!hasRolle) {
-			secureLog.error("Ansatt ident: $ansattId har ikke $rolle rolle hos arrangør: $arrangorId")
-			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ansatt har ikke $rolle rolle. Se secure logs for deltaljer")
+			log.error("Ansatt: $ansattId har ikke $rolle rolle hos arrangør: $arrangorId")
+			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ansatt har ikke $rolle rolle.")
 		}
 	}
 
