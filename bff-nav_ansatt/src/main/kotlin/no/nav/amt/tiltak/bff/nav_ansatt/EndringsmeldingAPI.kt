@@ -10,7 +10,6 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
-import no.nav.amt.tiltak.log.SecureLog.secureLog
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -70,11 +69,7 @@ class EndringsmeldingAPI(
 		if (harTilgangTilDeltaker(deltaker, tilganger)) {
 			endringsmeldingService.markerSomUtfort(endringsmeldingId, navAnsatt.id)
 		} else {
-			secureLog.error(
-				"nav ansatt: <${navAnsatt}> kan ikke arkivere endringsmelding på person " +
-					"hvor skjermet = ${deltaker.erSkjermet} eller adressebeskyttelse = ${deltaker.harAdressebeskyttelse()}"
-			)
-			throw UnauthorizedException("Har ikke tilgang til operasjon på skjermet eller adressebeskyttet person. Sjekk secure logs")
+			throw UnauthorizedException("Har ikke tilgang til operasjon på skjermet eller adressebeskyttet person.")
 		}
 	}
 }

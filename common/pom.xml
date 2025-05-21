@@ -16,7 +16,6 @@
         <module>auth</module>
         <module>json</module>
         <module>db_utils</module>
-        <module>log</module>
         <module>utils</module>
     </modules>
 </project>

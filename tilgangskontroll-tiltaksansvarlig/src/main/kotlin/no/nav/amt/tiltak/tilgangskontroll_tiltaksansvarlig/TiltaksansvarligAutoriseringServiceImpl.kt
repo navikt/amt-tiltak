@@ -1,11 +1,9 @@
 package no.nav.amt.tiltak.tilgangskontroll_tiltaksansvarlig
 
-import no.nav.amt.tiltak.common.auth.AdGruppe
 import no.nav.amt.tiltak.common.auth.AuthService
 import no.nav.amt.tiltak.core.exceptions.UnauthorizedException
 import no.nav.amt.tiltak.core.port.TiltaksansvarligAutoriseringService
 import no.nav.amt.tiltak.core.port.TiltaksansvarligTilgangService
-import no.nav.amt.tiltak.log.SecureLog.secureLog
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
@@ -21,13 +19,6 @@ class TiltaksansvarligAutoriseringServiceImpl(
 		val harTilgang = authService.harTilgangTilTiltaksansvarligflate()
 
 		if (!harTilgang) {
-			secureLog.warn(
-				"""
-					$navAnsattAzureId har ikke tilgang til tiltaksansvarlig flate. Er ikke medlem av
-					${AdGruppe.TILTAKSANSVARLIG_FLATE_GRUPPE.name}
-				""".trimIndent()
-			)
-
 			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Mangler tilgang til AD-gruppe")
 		}
 	}
@@ -36,13 +27,6 @@ class TiltaksansvarligAutoriseringServiceImpl(
 		val harTilgang = authService.harTilgangTilEndringsmeldinger()
 
 		if (!harTilgang) {
-			secureLog.warn(
-				"""
-					$navAnsattAzureId har ikke tilgang til endringsmeldinger. Er ikke medlem av
-					${AdGruppe.TILTAKSANSVARLIG_ENDRINGSMELDING_GRUPPE.name}
-				""".trimIndent()
-			)
-
 			throw UnauthorizedException("Mangler tilgang til AD-gruppe")
 		}
 	}
@@ -51,8 +35,6 @@ class TiltaksansvarligAutoriseringServiceImpl(
 		val harTilgang = tiltaksansvarligTilgangService.harTilgangTilGjennomforing(navIdent, gjennomforingId)
 
 		if (!harTilgang) {
-			secureLog.warn("$navIdent har ikke tilgang til gjennomføring med id=$gjennomforingId")
-
 			throw UnauthorizedException("Ikke tilgang til gjennomføring")
 		}
 	}

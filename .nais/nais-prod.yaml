@@ -79,8 +79,6 @@ spec:
         - host: amt-unleash-api.nav.cloud.nais.io
   kafka:
     pool: nav-prod
-  secureLogs:
-    enabled: true
   envFrom:
     - secret: amt-tiltak-unleash-api-token
   env:
