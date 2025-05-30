@@ -57,6 +57,7 @@ class NavAnsattApiServiceTest {
 	private val tilgangTilSkjermede = tilgangTilLosning.plus(AdGruppe.TILTAKSANSVARLIG_EGNE_ANSATTE_GRUPPE)
 	private val tilgangTilStrengtFortrolig = tilgangTilLosning.plus(AdGruppe.TILTAKSANSVARLIG_STRENGT_FORTROLIG_ADRESSE_GRUPPE)
 	private val tilgangTilFortrolig = tilgangTilLosning.plus(AdGruppe.TILTAKSANSVARLIG_FORTROLIG_ADRESSE_GRUPPE)
+	@OptIn(ExperimentalStdlibApi::class)
 	private val tilgangTilAlt = AdGruppe.entries.toList()
 
 	private val brukereMedAdressebeskyttelse = listOf(
