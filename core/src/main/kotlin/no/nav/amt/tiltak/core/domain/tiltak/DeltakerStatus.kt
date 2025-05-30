@@ -13,14 +13,33 @@ data class DeltakerStatus(
 	val aktiv: Boolean,
 ) {
 	enum class Aarsak {
-		SYK, FATT_JOBB, TRENGER_ANNEN_STOTTE, FIKK_IKKE_PLASS, IKKE_MOTT, ANNET, AVLYST_KONTRAKT, UTDANNING, SAMARBEIDET_MED_ARRANGOREN_ER_AVBRUTT
+		SYK,
+		FATT_JOBB,
+		TRENGER_ANNEN_STOTTE,
+		FIKK_IKKE_PLASS,
+		IKKE_MOTT,
+		ANNET,
+		AVLYST_KONTRAKT,
+		UTDANNING,
+		SAMARBEIDET_MED_ARRANGOREN_ER_AVBRUTT,
+		KRAV_IKKE_OPPFYLT,
+		KURS_FULLT,
 	}
 
 	enum class Type {
-		UTKAST_TIL_PAMELDING, AVBRUTT_UTKAST, // nye statuser for påmelding utenfor Arena
-		VENTER_PA_OPPSTART, DELTAR, HAR_SLUTTET, IKKE_AKTUELL, FEILREGISTRERT,
-		SOKT_INN, VURDERES, VENTELISTE, AVBRUTT, FULLFORT, // kurs statuser
-		PABEGYNT_REGISTRERING, PABEGYNT, //PABEGYNT er erstattet av PABEGYNT_REGISTRERING, men må beholdes så lenge statusen er på topicen
+		UTKAST_TIL_PAMELDING,
+		AVBRUTT_UTKAST,
+		VENTER_PA_OPPSTART,
+		DELTAR,
+		HAR_SLUTTET,
+		IKKE_AKTUELL,
+		FEILREGISTRERT,
+		SOKT_INN,
+		VURDERES,
+		VENTELISTE,
+		AVBRUTT,
+		FULLFORT,
+		PABEGYNT_REGISTRERING,
 	}
 
 }
@@ -56,14 +75,13 @@ fun DeltakerStatus.Type.getStatustekst(): String {
 		DeltakerStatus.Type.DELTAR -> "Deltar"
 		DeltakerStatus.Type.HAR_SLUTTET -> "Har sluttet"
 		DeltakerStatus.Type.IKKE_AKTUELL -> "Ikke aktuell"
-		DeltakerStatus.Type.SOKT_INN -> "Søkt om plass"
+		DeltakerStatus.Type.SOKT_INN -> "Søkt inn"
 		DeltakerStatus.Type.VURDERES -> "Vurderes"
-		DeltakerStatus.Type.VENTELISTE -> "På venteliste"
+		DeltakerStatus.Type.VENTELISTE -> "Venteliste"
 		DeltakerStatus.Type.AVBRUTT -> "Avbrutt"
 		DeltakerStatus.Type.FULLFORT -> "Fullført"
 		DeltakerStatus.Type.FEILREGISTRERT -> "Feilregistrert"
 		DeltakerStatus.Type.PABEGYNT_REGISTRERING -> "Påbegynt registrering"
-		DeltakerStatus.Type.PABEGYNT -> "Påbegynt registrering"
 	}
 }
 
@@ -81,5 +99,7 @@ fun DeltakerStatus.Aarsak.getVisningsnavn(beskrivelse: String?): String {
 		DeltakerStatus.Aarsak.AVLYST_KONTRAKT -> "Avlyst kontrakt"
 		DeltakerStatus.Aarsak.UTDANNING -> "Utdanning"
 		DeltakerStatus.Aarsak.SAMARBEIDET_MED_ARRANGOREN_ER_AVBRUTT -> "Samarbeidet med arrangøren er avbrutt"
+		DeltakerStatus.Aarsak.KRAV_IKKE_OPPFYLT -> "Krav for deltakelse er ikke oppfylt"
+		DeltakerStatus.Aarsak.KURS_FULLT -> "Kurset er fullt"
 	}
 }
