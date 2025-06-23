@@ -3,10 +3,6 @@ plugins {
     id("spring-boot-conventions")
 }
 
-springBoot {
-    mainClass.set("no.nav.amt.tiltak.application.ApplicationKt")
-}
-
 // 'api' is used instead of 'implementation' for some dependencies in order to expose dependencies to consumers.
 dependencies {
     implementation(libs.nav.token.validation.spring) // not in POM

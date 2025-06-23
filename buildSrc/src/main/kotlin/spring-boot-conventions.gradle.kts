@@ -1,3 +1,4 @@
+import org.springframework.boot.gradle.dsl.SpringBootExtension
 import util.LibrariesUtils.getLibraryValue
 
 /**
@@ -56,4 +57,8 @@ dependencies {
     springBootTestDependencies.forEach {
         testImplementation(getLibraryValue(it))
     }
+}
+
+configure<SpringBootExtension> {
+    mainClass = "no.nav.amt.tiltak.application.ApplicationKt"
 }
