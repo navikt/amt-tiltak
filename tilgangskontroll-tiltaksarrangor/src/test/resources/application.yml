@@ -1,0 +1,8 @@
+spring:
+  main:
+    banner-mode: off
+
+  flyway:
+    clean-disabled: false
+    postgresql:
+      transactional-lock: false

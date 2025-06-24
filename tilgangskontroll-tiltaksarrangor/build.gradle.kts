@@ -24,9 +24,20 @@ dependencies {
     testImplementation(libs.nav.token.validation.spring)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotest.extensions.spring)
+    testImplementation(libs.kotest.runner.junit5)
     testImplementation("org.springframework.boot:spring-boot-starter-validation")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
+}
+
+tasks.test {
+    jvmArgs(
+        "-XX:+EnableDynamicAgentLoading",
+        "-Dkotest.framework.classpath.scanning.autoscan.disable=true",
+        "-Dkotest.framework.config.fqn=no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.KotestConfig"
+    )
 }
