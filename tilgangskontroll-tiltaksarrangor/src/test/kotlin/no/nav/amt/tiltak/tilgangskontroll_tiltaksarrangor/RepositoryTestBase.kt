@@ -2,6 +2,7 @@ package no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.core.test.TestCase
+import io.kotest.core.test.isRootTest
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
 import org.flywaydb.core.Flyway
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,8 +23,11 @@ abstract class RepositoryTestBase(
 	lateinit var flyway: Flyway
 
 	override suspend fun beforeContainer(testCase: TestCase) {
-		flyway.clean()
-		flyway.migrate()
+		// skip Given-block
+		if (!testCase.isRootTest()) {
+			flyway.clean()
+			flyway.migrate()
+		}
 	}
 
 	init {
