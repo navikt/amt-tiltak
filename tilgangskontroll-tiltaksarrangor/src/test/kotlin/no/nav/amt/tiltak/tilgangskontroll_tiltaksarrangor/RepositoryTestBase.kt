@@ -10,10 +10,10 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.context.annotation.Import
 
 @AutoConfigureJdbc
-@Import(TestDataRepository::class)
+@Import(TestDataRepository::class, JdbcTestConfiguration::class)
 abstract class RepositoryTestBase(
 	body: RepositoryTestBase.() -> Unit
-): BehaviorSpec() {
+) : BehaviorSpec() {
 
 	@Autowired
 	lateinit var testRepository: TestDataRepository
