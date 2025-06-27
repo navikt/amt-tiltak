@@ -35,7 +35,7 @@
     <parent>
         <artifactId>spring-boot-starter-parent</artifactId>
         <groupId>org.springframework.boot</groupId>
-        <version>3.5.0</version>
+        <version>3.5.3</version>
     </parent>
 
     <properties>
@@ -46,19 +46,19 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
 
-        <testcontainers.version>1.21.1</testcontainers.version>
+        <testcontainers.version>1.21.2</testcontainers.version>
         <mockito-kotlin.version>5.4.0</mockito-kotlin.version>
         <schedlock.version>6.9.0</schedlock.version>
         <nimbus.version>11.26</nimbus.version>
         <mockk.version>1.14.2</mockk.version>
         <kotest.version>5.6.1</kotest.version>
         <okhttp.version>4.12.0</okhttp.version>
-        <token-support.version>5.0.29</token-support.version>
+        <token-support.version>5.0.30</token-support.version>
         <mock-oauth2-server.version>2.2.1</mock-oauth2-server.version>
         <common.version>3.2025.05.30_07.00-bef2e550fb22</common.version>
         <logstash.version>8.1</logstash.version>
         <unleash.version>11.0.0</unleash.version>
-        <amtlib.version>1.2025.06.05_08.25-2338e0f39f58</amtlib.version>
+        <amtlib.version>1.2025.06.17_13.45-d25e1dc4de19</amtlib.version>
     </properties>
 
     <repositories>
