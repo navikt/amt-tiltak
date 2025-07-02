@@ -17,11 +17,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Set up java
+
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
-          cache: 'maven'
-      - name: Run maven tests
-        run: mvn -B verify
+          cache: 'gradle'
+
+      - name: Run tests
+        run: ./gradlew check --console=plain --no-daemon

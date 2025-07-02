@@ -4,8 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":common:json")) // not in POM
-
+    implementation(project(":common:json"))
     api(project(":core"))
     implementation(project(":clients:amt-person"))
     implementation(project(":clients:amt-arrangor-client"))
@@ -23,22 +22,20 @@ dependencies {
     implementation(libs.nav.common.kafka)
     implementation(libs.nav.poao.tilgang.client)
 
-    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.postgresql:postgresql")
     implementation("io.micrometer:micrometer-registry-prometheus")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-validation")
-    testImplementation(libs.nav.mock.oauth2.server)
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(project(":db-migrations"))
+    testImplementation(project(":test:database"))
+    testImplementation(project(":arrangor"))
+    testImplementation(project(":test:test-utils"))
+
+    testImplementation(libs.nav.mock.oauth2.server)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
-    testImplementation(project(":test:database"))
-    testImplementation("org.junit.jupiter:junit-jupiter-engine")
-    testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testImplementation(project(":arrangor"))
     testImplementation(libs.nav.token.validation.spring)
-    testImplementation(project(":test:test-utils"))
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-validation")
 }

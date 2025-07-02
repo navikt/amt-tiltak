@@ -10,12 +10,10 @@ dependencies {
     implementation(project(":kafka:gjennomforing-ingestor"))
     implementation(project(":clients:amt-person"))
     implementation(libs.nav.common.job)
-    implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
-    implementation("org.postgresql:postgresql")
+    runtimeOnly("org.postgresql:postgresql")
 
     testImplementation(project(":test:database"))
     testImplementation(project(":tiltak"))
     testImplementation(project(":arrangor"))
-    testImplementation("org.junit.jupiter:junit-jupiter-engine")
 }

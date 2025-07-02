@@ -4,14 +4,12 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":common:json")) // not in POM
-    implementation(project(":clients:amt-arrangor-client")) // not in POM
-    implementation(project(":clients:mulighetsrommet-api-client")) // not in POM
-    implementation(libs.nav.common.kafka) // not in POM
-
+    implementation(project(":common:json"))
+    implementation(project(":clients:amt-arrangor-client"))
+    implementation(project(":clients:mulighetsrommet-api-client"))
     implementation(project(":application"))
     implementation(project(":test:database"))
-    implementation(libs.testcontainers.base)
+    implementation(libs.nav.common.kafka)
     implementation(libs.testcontainers.postgres)
     implementation(libs.testcontainers.kafka)
     implementation(libs.kotest.framework.concurrency)
