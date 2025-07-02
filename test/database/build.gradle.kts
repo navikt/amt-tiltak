@@ -13,7 +13,6 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql")
 
     // Test and utility dependencies
-    compileOnly(libs.testcontainers.base)
     api(libs.testcontainers.postgres) // DataPublisherServiceTest fails with compileOnly
     compileOnly(libs.otj.pg.embedded)
     implementation(libs.kotest.assertions.core)
