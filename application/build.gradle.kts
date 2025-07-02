@@ -56,3 +56,7 @@ dependencies {
 tasks.jar {
     destinationDirectory = layout.buildDirectory.dir("libs-plain")
 }
+
+tasks.bootJar {
+    enabled = true
+}

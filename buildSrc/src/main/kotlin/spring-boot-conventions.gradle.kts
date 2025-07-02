@@ -1,4 +1,5 @@
 import org.springframework.boot.gradle.dsl.SpringBootExtension
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 import util.LibrariesUtils.getLibraryValue
 
 /**
@@ -62,4 +63,8 @@ dependencies {
 
 configure<SpringBootExtension> {
     mainClass = "no.nav.amt.tiltak.application.ApplicationKt"
+}
+
+tasks.withType<BootJar> {
+    enabled = false
 }
