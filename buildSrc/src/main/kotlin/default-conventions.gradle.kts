@@ -1,4 +1,7 @@
+
+import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import util.LibrariesUtils.getLibraryValue
 
 /**
  * This precompiled plugin sets up a Kotlin JVM project with standardized configurations,
@@ -39,16 +42,29 @@ repositories {
 
 plugins {
     kotlin("jvm")
+    id("io.spring.dependency-management") apply false
+}
+
+configure<DependencyManagementExtension> {
+    dependencies {
+        dependency(getLibraryValue("nav.common.kafka").toString()) {
+            exclude("org.xerial.snappy:snappy-java")
+        }
+    }
 }
 
 configure<KotlinJvmProjectExtension> {
     jvmToolchain(javaVersion)
+    compilerOptions {
+        freeCompilerArgs.add("-Xjsr305=strict")
+    }
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
-
     jvmArgs(
-        "-Xshare:off"
+        "-Xshare:off",
+        "-XX:+EnableDynamicAgentLoading",
+        "-Dkotest.framework.classpath.scanning.autoscan.disable=true",
     )
 }

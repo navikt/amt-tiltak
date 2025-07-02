@@ -9,12 +9,9 @@ dependencies {
     implementation(project(":common:db_utils"))
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("com.zaxxer:HikariCP")
-    implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
 
-    // Test and utility dependencies
-    compileOnly(libs.testcontainers.base)
-    implementation(libs.testcontainers.postgres) // DataPublisherServiceTest fails with compileOnly
+    implementation(libs.testcontainers.postgres)
     compileOnly(libs.otj.pg.embedded)
     implementation(libs.kotest.assertions.core)
 }

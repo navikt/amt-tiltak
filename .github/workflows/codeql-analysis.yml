@@ -25,18 +25,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-      - name: Setup java
+
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
-          cache: "maven"
-      - name: Build maven artifacts
-        run: mvn -B package -DskipTests
+          cache: "gradle"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build artifacts
+        run: ./gradlew build -x test --console=plain --no-daemon
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
@@ -44,7 +51,7 @@ jobs:
 
   check_codeql_status:
     name: Check CodeQL Status
-    needs: Analyze
+    needs: analyze
     permissions:
       contents: read
       checks: read

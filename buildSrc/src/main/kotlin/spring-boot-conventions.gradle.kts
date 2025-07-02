@@ -5,7 +5,7 @@ import util.LibrariesUtils.getLibraryValue
  * A Gradle build script configuration that sets up common dependencies and plugins for a Kotlin-based Spring Boot project.
  *
  * ## Features:
- * - Applies necessary plugins for Kotlin, Spring Boot, and dependency management:
+ * - Applies required plugins for Kotlin, Spring Boot, and dependency management:
  *   - `kotlin("jvm")`: Enables Kotlin support for JVM.
  *   - `org.jetbrains.kotlin.plugin.spring`: Adds Spring-specific features to Kotlin.
  *   - `org.springframework.boot`: Configures Spring Boot-specific functionality.
@@ -54,6 +54,7 @@ apply(plugin = "io.spring.dependency-management")
 
 dependencies {
     implementation(getLibraryValue("jackson.module.kotlin"))
+
     springBootTestDependencies.forEach {
         testImplementation(getLibraryValue(it))
     }

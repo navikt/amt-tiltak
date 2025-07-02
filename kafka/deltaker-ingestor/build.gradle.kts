@@ -10,7 +10,6 @@ dependencies {
     implementation(project(":kafka:gjennomforing-ingestor"))
     implementation(libs.nav.amt.lib.models)
     implementation(libs.unleash.client)
-    implementation(libs.nav.common.util) // Not in POM
-    implementation("org.springframework.boot:spring-boot-starter")
+    implementation(libs.nav.common.util)
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
 }

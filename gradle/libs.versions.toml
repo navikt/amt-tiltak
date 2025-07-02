@@ -1,9 +1,7 @@
 [versions]
 kotlin-version = "2.1.21"
-spring-boot-version = "3.5.2"
+spring-boot-version = "3.5.3"
 spring-dependency-management-version = "1.1.7"
-kotest-extensions-spring-version = "1.3.0"
-springmockk-version = "4.0.2"
 
 nav-poao-tilgang-client-version = "2025.06.06_07.18-71cefb1c2699"
 nav-amtlib-version = "1.2025.06.05_08.25-2338e0f39f58"
@@ -15,7 +13,6 @@ jackson-version = "2.19.1"
 okhttp-version = "4.12.0"
 logstash-version = "8.1"
 schedlock-version = "6.9.0"
-nimbus-version = "11.26"
 arrow-core-version = "2.1.2"
 caffeine-version = "3.2.1"
 unleash-version = "11.0.0"
@@ -43,11 +40,6 @@ nav-common-audit-log = { module = "no.nav.common:audit-log", version.ref = "nav-
 nav-common-kafka = { module = "no.nav.common:kafka", version.ref = "nav-common-version" }
 nav-common-util = { module = "no.nav.common:util", version.ref = "nav-common-version" }
 
-# Kotlin
-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin-version" }
-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin-version" }
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-version" }
-
 # Logging
 logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logstash-version" }
 
@@ -63,7 +55,6 @@ shedlock-jdbc = { module = "net.javacrumbs.shedlock:shedlock-provider-jdbc-templ
 unleash-client = { module = "io.getunleash:unleash-client-java", version.ref = "unleash-version" }
 
 # Others
-oauth2-oidc-sdk = { module = "com.nimbusds:oauth2-oidc-sdk", version.ref = "nimbus-version" }
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow-core-version" }
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine-version" }
 otj-pg-embedded = { module = "com.opentable.components:otj-pg-embedded", version.ref = "otj-pg-embedded-version" }
@@ -74,16 +65,13 @@ jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-dat
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-version" }
 
 # Testing
-mockk = { module = "io.mockk:mockk-jvm", version.ref = "mockk-version" }
+mockk = { module = "io.mockk:mockk-jvm", version.ref = "mockk-version" } # used in convention plugin
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin-version" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito-version" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest-version" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest-version" }
 kotest-framework-concurrency = { module = "io.kotest:kotest-framework-concurrency-jvm", version.ref = "kotest-version" }
-kotest-extensions-spring = { module = "io.kotest.extensions:kotest-extensions-spring", version.ref = "kotest-extensions-spring-version" }
-springmockk = { module = "com.ninja-squad:springmockk", version.ref = "springmockk-version" }
 
-testcontainers-base = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers-version" }
 testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers-version" }
 testcontainers-postgres = { module = "org.testcontainers:postgresql", version.ref = "testcontainers-version" }
 testcontainers-kafka = { module = "org.testcontainers:kafka", version.ref = "testcontainers-version" }
@@ -93,9 +81,3 @@ kotlin-jvm = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref
 springframework-boot = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "spring-boot-version" }
 spring-dependency-management = { module = "io.spring.gradle:dependency-management-plugin", version.ref = "spring-dependency-management-version" }
 kotlin-plugin-spring = { module = "org.jetbrains.kotlin.plugin.spring:org.jetbrains.kotlin.plugin.spring.gradle.plugin", version.ref = "kotlin-version" }
-
-[plugins]
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
-springframework-boot = { id = "org.springframework.boot", version.ref = "spring-boot-version" }
-spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management-version" }
-kotlin-plugin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin-version" }

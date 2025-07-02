@@ -15,7 +15,7 @@ dependencies {
     implementation(libs.nav.common.job)
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
-    implementation("org.postgresql:postgresql")
+    runtimeOnly("org.postgresql:postgresql")
     implementation("io.micrometer:micrometer-registry-prometheus")
 
     testImplementation(project(":db-migrations"))
@@ -23,9 +23,6 @@ dependencies {
     testImplementation(libs.nav.mock.oauth2.server)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
-    testImplementation("org.junit.jupiter:junit-jupiter-engine")
-    testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testImplementation("org.springframework.boot:spring-boot-starter-validation")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-validation")
 }

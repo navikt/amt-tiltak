@@ -4,7 +4,6 @@ plugins {
 }
 
 dependencies {
-    // Project dependencies
     implementation(project(":core"))
     implementation(project(":tilgangskontroll-tiltaksarrangor"))
     implementation(project(":clients:amt-person"))
@@ -12,12 +11,10 @@ dependencies {
     implementation(project(":data-publisher"))
     implementation(project(":common:db_utils"))
 
-    // External dependencies from version catalog
     implementation(libs.nav.common.job)
     implementation(libs.testcontainers.postgres)
     implementation(libs.nav.token.validation.spring)
 
-    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("io.micrometer:micrometer-core")
 

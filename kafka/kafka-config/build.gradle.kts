@@ -14,8 +14,5 @@ dependencies {
     testImplementation(project(":test:database"))
     testImplementation(libs.testcontainers.kafka)
     testImplementation(libs.testcontainers.junit.jupiter)
-    testImplementation("org.postgresql:postgresql")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine")
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testRuntimeOnly("org.postgresql:postgresql")
 }

@@ -19,16 +19,23 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Set up java
+
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
-          cache: 'maven'
-      - name: Build maven artifacts
-        run: mvn -B package
-      - name: Dependency submission (for dependabot)
-        uses: advanced-security/maven-dependency-submission-action@v5
+          cache: 'gradle'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build artifacts
+        run: ./gradlew build --console=plain --no-daemon
+
+      - name: Dependency submission (for Dependabot)
+        uses: gradle/actions/dependency-submission@v4
+
       - name: docker-build-push
         uses: nais/docker-build-push@v0
         id: docker-build-push
