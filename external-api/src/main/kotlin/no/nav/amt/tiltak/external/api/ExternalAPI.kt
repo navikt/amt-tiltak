@@ -28,20 +28,25 @@ class ExternalAPI(
 
 	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	@GetMapping("/mine-deltakelser")
+	@Deprecated("Er ikke i bruk så blir ikke erstattet")
 	fun hentMineDeltakelser(): List<DeltakerDto> {
 		val personIdent = authService.hentPersonligIdentTilInnloggetBruker()
 		return hentDeltakelser(personIdent)
 	}
 
+	//brukes av tiltakspenger for å vise tiltak for saksbehandler og i søknadsdialog
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@PostMapping("/deltakelser")
+	@Deprecated("api flyttet til amt-deltaker")
 	fun hentDeltakelserForPerson(@RequestBody body: HentDeltakelserRequest): List<DeltakerDto> {
 		authService.validerErM2MToken()
 		return hentDeltakelser(body.personIdent)
 	}
 
+	// Brukes av veilarboppfolging til å bestemme om oppfølgingsperioden kan avsluttes
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@PostMapping("/aktiv-deltaker")
+	@Deprecated("api flyttet til amt-deltaker")
 	fun harAktiveDeltakelser(@RequestBody body: HentDeltakelserRequest): HarAktiveDeltakelserResponse {
 		authService.validerErM2MToken()
 		val harAktiveDeltakelser = harAktiveDeltakelser(hentDeltakelser(body.personIdent))

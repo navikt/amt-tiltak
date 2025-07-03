@@ -19,6 +19,7 @@ class TiltakskoordinatorAPI(
 
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
 	@PostMapping("/del-med-arrangor")
+	@Deprecated("Skal ikke brukes etter vi ble master for kurstiltak")
 	fun delMedArrangor(
 		@RequestBody body: List<UUID>,
     ) {

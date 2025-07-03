@@ -14,6 +14,7 @@ import java.util.UUID
 import no.nav.amt.tiltak.core.domain.tiltak.VurderingDbo
 
 @Component
+@Deprecated("Portert til amt-deltaker")
 open class VurderingRepository(
 	private val template: NamedParameterJdbcTemplate
 ) {
