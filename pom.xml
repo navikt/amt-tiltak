@@ -367,7 +367,7 @@
             <dependency>
                 <groupId>no.nav.poao-tilgang</groupId>
                 <artifactId>client</artifactId>
-                <version>2025.07.01_08.44-8cfc2e4afeda</version>
+                <version>2025.07.04_08.56-814fa50f6740</version>
                 <exclusions>
                     <exclusion>
                         <groupId>com.squareup.okhttp3</groupId>
