@@ -14,7 +14,6 @@ import no.nav.common.kafka.consumer.feilhandtering.util.KafkaConsumerRecordProce
 import no.nav.common.kafka.consumer.util.KafkaConsumerClientBuilder
 import no.nav.common.kafka.consumer.util.deserializer.Deserializers.stringDeserializer
 import no.nav.common.kafka.spring.PostgresJdbcTemplateConsumerRepository
-import okhttp3.internal.toImmutableList
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -138,7 +137,7 @@ open class KafkaConfiguration(
 
 		client = KafkaConsumerClientBuilder.builder()
             .withProperties(kafkaProperties.consumer())
-            .withTopicConfigs(topicConfigs.toImmutableList())
+            .withTopicConfigs(topicConfigs.toList())
             .build()
     }
 

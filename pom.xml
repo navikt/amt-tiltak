@@ -342,6 +342,12 @@
                 <groupId>no.nav.common</groupId>
                 <artifactId>job</artifactId>
                 <version>${common.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.squareup.okhttp3</groupId>
+                        <artifactId>okhttp</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>no.nav.common</groupId>
@@ -362,12 +368,23 @@
                 <groupId>no.nav.poao-tilgang</groupId>
                 <artifactId>client</artifactId>
                 <version>2025.07.01_08.44-8cfc2e4afeda</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.squareup.okhttp3</groupId>
+                        <artifactId>okhttp</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
                 <groupId>no.nav.security</groupId>
                 <artifactId>token-validation-spring</artifactId>
                 <version>${token-support.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp-jvm</artifactId>
+                <version>${okhttp.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
