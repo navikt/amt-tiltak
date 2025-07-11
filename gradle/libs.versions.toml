@@ -19,7 +19,7 @@ unleash-version = "11.0.2"
 
 otj-pg-embedded-version = "1.1.1"
 mockito-version = "5.18.0"
-kotest-version = "5.6.1"
+kotest-version = "5.9.1"
 mockk-version = "1.14.4"
 testcontainers-version = "1.21.3"
 mockito-kotlin-version = "5.4.0"
