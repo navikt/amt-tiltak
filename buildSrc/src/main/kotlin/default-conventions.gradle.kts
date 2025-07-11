@@ -1,4 +1,3 @@
-
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import util.LibrariesUtils.getLibraryValue
@@ -56,7 +55,10 @@ configure<DependencyManagementExtension> {
 configure<KotlinJvmProjectExtension> {
     jvmToolchain(javaVersion)
     compilerOptions {
-        freeCompilerArgs.add("-Xjsr305=strict")
+        freeCompilerArgs.addAll(
+            "-Xjsr305=strict",
+            "-Xannotation-default-target=param-property"
+        )
     }
 }
 
