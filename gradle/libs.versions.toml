@@ -1,28 +1,27 @@
 [versions]
-kotlin-version = "2.1.21"
+kotlin-version = "2.2.0"
 spring-boot-version = "3.5.3"
 spring-dependency-management-version = "1.1.7"
 
-nav-poao-tilgang-client-version = "2025.06.06_07.18-71cefb1c2699"
-nav-amtlib-version = "1.2025.06.05_08.25-2338e0f39f58"
-nav-token-support-version = "5.0.29"
+nav-poao-tilgang-client-version = "2025.07.04_08.56-814fa50f6740"
+nav-amtlib-version = "1.2025.07.08_13.07-ee27800969bc"
+nav-token-support-version = "5.0.30"
 nav-mock-oauth2-server-version = "2.2.1"
 nav-common-version = "3.2025.05.30_07.00-bef2e550fb22"
 
 jackson-version = "2.19.1"
-okhttp-version = "4.12.0"
+okhttp-version = "5.1.0"
 logstash-version = "8.1"
-schedlock-version = "6.9.0"
+schedlock-version = "6.9.2"
 arrow-core-version = "2.1.2"
 caffeine-version = "3.2.1"
-unleash-version = "11.0.0"
+unleash-version = "11.0.2"
 
 otj-pg-embedded-version = "1.1.1"
 mockito-version = "5.18.0"
-kotest-version = "5.9.1"
-kotest-extensions-spring-version = "1.3.0"
-mockk-version = "1.14.2"
-testcontainers-version = "1.21.1"
+kotest-version = "5.6.1"
+mockk-version = "1.14.4"
+testcontainers-version = "1.21.3"
 mockito-kotlin-version = "5.4.0"
 
 [libraries]
@@ -72,7 +71,6 @@ mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito-ver
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest-version" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest-version" }
 kotest-framework-concurrency = { module = "io.kotest:kotest-framework-concurrency-jvm", version.ref = "kotest-version" }
-kotest-extensions-spring = { module = "io.kotest.extensions:kotest-extensions-spring", version.ref = "kotest-extensions-spring-version" }
 
 testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers-version" }
 testcontainers-postgres = { module = "org.testcontainers:postgresql", version.ref = "testcontainers-version" }
