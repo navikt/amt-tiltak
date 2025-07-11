@@ -8,13 +8,13 @@ import no.nav.common.job.JobRunner
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.Scheduled
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.atomic.AtomicInteger
 
 private const val gjennomforingerPerAnsatt = "amt_tiltak_antall_gjennomforinger_pr_ansatt"
 
 @Configuration
-open class ArrangorAnsattGjennomforingTiltakStatistikkUpdater(
+class ArrangorAnsattGjennomforingTiltakStatistikkUpdater(
 	private val repository: MineDeltakerlisterRepository,
 	private val registry: MeterRegistry
 ) {
@@ -25,7 +25,7 @@ open class ArrangorAnsattGjennomforingTiltakStatistikkUpdater(
 
 	@Scheduled(cron = "@hourly")
 	@SchedulerLock(name = "arrangorer_med_tilgang_til_gjennomforing_updater", lockAtMostFor = "120m")
-	open fun update() {
+	fun update() {
 		logger.info("Henter statistikk for antall gjennomføringer per arrangør...")
 		JobRunner.run("arrangorer_med_tilgang_til_gjennomforing_updater") { runner() }
 	}
@@ -41,7 +41,7 @@ open class ArrangorAnsattGjennomforingTiltakStatistikkUpdater(
 						gjennomforingerPerAnsatt,
 						Tags.of("ansattId", ansattId.toString()),
 						AtomicInteger(numberOfGjennomforinger)
-					)
+					) ?: error("Gauge registration failed for ansattId=$ansattId")
 			} else {
 				gauge.set(numberOfGjennomforinger)
 			}
