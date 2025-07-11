@@ -4,8 +4,6 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.caffeine) // not in POM
-
     implementation(project(":common:db_utils"))
     implementation(project(":data-publisher"))
     implementation(project(":clients:amt-arrangor-client"))
@@ -14,6 +12,7 @@ dependencies {
     implementation(libs.shedlock.spring)
     implementation(libs.nav.common.job)
     implementation(libs.unleash.client)
+    implementation(libs.caffeine)
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.data:spring-data-jdbc")
@@ -31,15 +30,12 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-validation")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine")
-    testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
 }
 
 tasks.test {
-    jvmArgs(
-        "-XX:+EnableDynamicAgentLoading",
-        "-Dkotest.framework.classpath.scanning.autoscan.disable=true",
+    @Suppress("UNNECESSARY_SAFE_CALL")
+    jvmArgs?.add(
         "-Dkotest.framework.config.fqn=no.nav.amt.tiltak.tilgangskontroll_tiltaksarrangor.KotestConfig"
     )
+    useJUnitPlatform()
 }
