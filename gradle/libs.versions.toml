@@ -1,0 +1,85 @@
+[versions]
+kotlin-version = "2.2.0"
+spring-boot-version = "3.5.4"
+spring-dependency-management-version = "1.1.7"
+
+nav-poao-tilgang-client-version = "2025.07.04_08.56-814fa50f6740"
+nav-amtlib-version = "1.2025.07.08_13.07-ee27800969bc"
+nav-token-support-version = "5.0.33"
+nav-mock-oauth2-server-version = "2.2.1"
+nav-common-version = "3.2025.06.23_14.50-3af3985d8555"
+
+jackson-version = "2.19.1"
+okhttp-version = "5.1.0"
+logstash-version = "8.1"
+schedlock-version = "6.9.2"
+arrow-core-version = "2.1.2"
+caffeine-version = "3.2.1"
+unleash-version = "11.0.2"
+
+otj-pg-embedded-version = "1.1.1"
+mockito-version = "5.18.0"
+kotest-version = "5.9.1"
+kotest-extensions-spring-version = "1.3.0"
+mockk-version = "1.14.4"
+testcontainers-version = "1.21.3"
+mockito-kotlin-version = "6.0.0"
+
+[libraries]
+# NAV misc
+nav-token-validation-spring = { module = "no.nav.security:token-validation-spring", version.ref = "nav-token-support-version" }
+nav-mock-oauth2-server = { module = "no.nav.security:mock-oauth2-server", version.ref = "nav-mock-oauth2-server-version" }
+nav-poao-tilgang-client = { module = "no.nav.poao-tilgang:client", version.ref = "nav-poao-tilgang-client-version" }
+nav-amt-lib-models = { module = "no.nav.amt.lib:models", version.ref = "nav-amtlib-version" }
+
+# NAV Common
+nav-token-client = { module = "no.nav.common:token-client", version.ref = "nav-common-version" }
+nav-common-log = { module = "no.nav.common:log", version.ref = "nav-common-version" }
+nav-common-job = { module = "no.nav.common:job", version.ref = "nav-common-version" }
+nav-common-rest = { module = "no.nav.common:rest", version.ref = "nav-common-version" }
+nav-common-audit-log = { module = "no.nav.common:audit-log", version.ref = "nav-common-version" }
+nav-common-kafka = { module = "no.nav.common:kafka", version.ref = "nav-common-version" }
+nav-common-util = { module = "no.nav.common:util", version.ref = "nav-common-version" }
+
+# Logging
+logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logstash-version" }
+
+# HTTP
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp-version" }
+mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp-version" }
+
+# Shedlock
+shedlock-spring = { module = "net.javacrumbs.shedlock:shedlock-spring", version.ref = "schedlock-version" }
+shedlock-jdbc = { module = "net.javacrumbs.shedlock:shedlock-provider-jdbc-template", version.ref = "schedlock-version" }
+
+# Feature Toggles
+unleash-client = { module = "io.getunleash:unleash-client-java", version.ref = "unleash-version" }
+
+# Others
+arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow-core-version" }
+caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine-version" }
+otj-pg-embedded = { module = "com.opentable.components:otj-pg-embedded", version.ref = "otj-pg-embedded-version" }
+
+# Jackson
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson-version" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson-version" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-version" }
+
+# Testing
+mockk = { module = "io.mockk:mockk-jvm", version.ref = "mockk-version" } # used in convention plugin
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin-version" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito-version" }
+kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest-version" }
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest-version" }
+kotest-framework-concurrency = { module = "io.kotest:kotest-framework-concurrency-jvm", version.ref = "kotest-version" }
+kotest-extensions-spring = { module = "io.kotest.extensions:kotest-extensions-spring", version.ref = "kotest-extensions-spring-version" }
+
+testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers-version" }
+testcontainers-postgres = { module = "org.testcontainers:postgresql", version.ref = "testcontainers-version" }
+testcontainers-kafka = { module = "org.testcontainers:kafka", version.ref = "testcontainers-version" }
+
+# plugins used in convention plugin
+kotlin-jvm = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin-version" }
+springframework-boot = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "spring-boot-version" }
+spring-dependency-management = { module = "io.spring.gradle:dependency-management-plugin", version.ref = "spring-dependency-management-version" }
+kotlin-plugin-spring = { module = "org.jetbrains.kotlin.plugin.spring:org.jetbrains.kotlin.plugin.spring.gradle.plugin", version.ref = "kotlin-version" }
