@@ -44,7 +44,7 @@ nav-common-util = { module = "no.nav.common:util", version.ref = "nav-common-ver
 logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logstash-version" }
 
 # HTTP
-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp-version" }
+okhttp = { module = "com.squareup.okhttp3:okhttp-jvm", version.ref = "okhttp-version" }
 mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp-version" }
 
 # Shedlock
