@@ -58,7 +58,7 @@
         <common.version>3.2025.06.23_14.50-3af3985d8555</common.version>
         <logstash.version>8.1</logstash.version>
         <unleash.version>11.0.2</unleash.version>
-        <amtlib.version>1.2025.07.21_09.55-93558d2bbc68</amtlib.version>
+        <amtlib.version>1.2025.08.11_07.06-7e39f538c3dd</amtlib.version>
     </properties>
 
     <repositories>
