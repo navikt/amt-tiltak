@@ -21,15 +21,13 @@ spec:
     path: /internal/health/liveness
     initialDelay: 50
   replicas:
+    disableAutoScaling: true
     min: 1
-    max: 3
-    cpuThresholdPercentage: 75
   resources:
-    limits:
-      cpu: "1"
-      memory: 2048Mi
     requests:
-      cpu: 250m
+      cpu: 10m
+      memory: 256Mi
+    limits:
       memory: 1024Mi
   azure:
     application:
