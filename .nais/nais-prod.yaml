@@ -21,7 +21,7 @@ spec:
     path: /internal/health/liveness
     initialDelay: 50
   replicas:
-    min: 1
+    min: 2
     max: 3
     scalingStrategy:
       cpu:
