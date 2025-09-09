@@ -49,16 +49,16 @@
         <testcontainers.version>1.21.3</testcontainers.version>
         <mockito-kotlin.version>6.0.0</mockito-kotlin.version>
         <schedlock.version>6.10.0</schedlock.version>
-        <nimbus.version>11.27.1</nimbus.version>
+        <nimbus.version>11.28</nimbus.version>
         <mockk.version>1.14.5</mockk.version>
         <kotest.version>5.6.1</kotest.version>
         <okhttp.version>5.1.0</okhttp.version>
         <token-support.version>5.0.34</token-support.version>
-        <mock-oauth2-server.version>2.2.1</mock-oauth2-server.version>
+        <mock-oauth2-server.version>2.3.0</mock-oauth2-server.version>
         <common.version>3.2025.08.18_11.44-04fe318bd185</common.version>
         <logstash.version>8.1</logstash.version>
         <unleash.version>11.1.0</unleash.version>
-        <amtlib.version>1.2025.08.20_15.50-3010e3ffdb61</amtlib.version>
+        <amtlib.version>1.2025.09.05_08.24-2bd638d77442</amtlib.version>
     </properties>
 
     <repositories>
@@ -155,7 +155,7 @@
             <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-clients</artifactId>
-                <version>4.0.0</version>
+                <version>4.1.0</version>
             </dependency>
             <dependency>
                 <groupId>no.nav.amt-tiltak</groupId>
