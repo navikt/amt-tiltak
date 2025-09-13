@@ -9,8 +9,6 @@ spec:
   image: {{image}}
   port: 8080
   webproxy: false
-  ingresses:
-    - https://amt-tiltak.intern.dev.nav.no
   prometheus:
     enabled: true
     path: /internal/prometheus
