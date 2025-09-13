@@ -141,19 +141,6 @@ spec:
           - name: cloudsql.logical_decoding
             value: "on"
 
-      - name: amt-tiltak
-        type: POSTGRES_17
-        diskAutoresize: false
-        tier: db-f1-micro
-        databases:
-          - name: amt-tiltak
-            envVarPrefix: DB
-            users:
-              - name: datastream
-        flags:
-          - name: cloudsql.logical_decoding
-            value: "on"
-
   observability:
     autoInstrumentation:
       enabled: true
