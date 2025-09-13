@@ -93,3 +93,12 @@ jobs:
           VARS: .nais/vars-prod.yaml
           VAR: image=${{ needs.test-build-and-push.outputs.image }}
           TELEMETRY: ${{ needs.test-build-and-push.outputs.telemetry }}
+
+      - name: Deploy temp application
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: prod-gcp
+          RESOURCE: .nais/nais-prod-temp.yaml
+          VARS: .nais/vars-prod.yaml
+          VAR: image=${{ needs.test-build-and-push.outputs.image }}
+          TELEMETRY: ${{ needs.test-build-and-push.outputs.telemetry }}

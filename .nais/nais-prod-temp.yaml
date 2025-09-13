@@ -1,7 +1,7 @@
 kind: Application
 apiVersion: nais.io/v1alpha1
 metadata:
-  name: amt-tiltak
+  name: amt-tiltak-temp
   namespace: amt
   labels:
     team: amt
@@ -9,8 +9,6 @@ spec:
   image: {{image}}
   port: 8080
   webproxy: false
-  ingresses:
-    - https://amt-tiltak.intern.dev.nav.no
   prometheus:
     enabled: true
     path: /internal/prometheus
@@ -24,10 +22,13 @@ spec:
     disableAutoScaling: true
     min: 0
     max: 0
+    scalingStrategy:
+      cpu:
+        thresholdPercentage: 500
   resources:
     requests:
-      cpu: 10m
-      memory: 256Mi
+      cpu: 20m
+      memory: 512Mi
     limits:
       memory: 1024Mi
   azure:
@@ -58,26 +59,26 @@ spec:
           namespace: tilleggsstonader
         - application: veilarboppfolging
           namespace: pto
-          cluster: dev-fss
+          cluster: prod-fss
         - application: veilarboppfolging
           namespace: poao
-          cluster: dev-gcp
+          cluster: prod-gcp
     outbound:
       rules:
         - application: amt-person-service
           namespace: amt
-          cluster: dev-gcp
+          cluster: prod-gcp
         - application: poao-tilgang
           namespace: poao
-          cluster: dev-gcp
+          cluster: prod-gcp
         - application: amt-arrangor
         - application: mulighetsrommet-api
           namespace: team-mulighetsrommet
-          cluster: dev-gcp
+          cluster: prod-gcp
       external:
         - host: amt-unleash-api.nav.cloud.nais.io
   kafka:
-    pool: nav-dev
+    pool: nav-prod
   envFrom:
     - secret: amt-tiltak-unleash-api-token
   env:
@@ -92,19 +93,19 @@ spec:
     - name: AD_GRUPPE_ID_STRENGT_FORTROLIG_ADRESSE
       value: {{ad_gruppe_strengt_fortrolig_adresse}}
     - name: AMT_ARRANGOR_SCOPE
-      value: api://dev-gcp.amt.amt-arrangor/.default
+      value: api://prod-gcp.amt.amt-arrangor/.default
     - name: AMT_ARRANGOR_URL
       value: http://amt-arrangor
     - name: AMT_PERSON_URL
       value: http://amt-person-service.amt.svc.cluster.local
     - name: AMT_PERSON_SCOPE
-      value: api://dev-gcp.amt.amt-person-service/.default
+      value: api://prod-gcp.amt.amt-person-service/.default
     - name: POAO_TILGANG_URL
       value: http://poao-tilgang.poao.svc.cluster.local
     - name: POAO_TILGANG_SCOPE
-      value: api://dev-gcp.poao.poao-tilgang/.default
+      value: api://prod-gcp.poao.poao-tilgang/.default
     - name: MULIGHETSROMMET_API_SCOPE
-      value: api://dev-gcp.team-mulighetsrommet.mulighetsrommet-api/.default
+      value: api://prod-gcp.team-mulighetsrommet.mulighetsrommet-api/.default
     - name: MULIGHETSROMMET_API_URL
       value: http://mulighetsrommet-api.team-mulighetsrommet.svc.cluster.local
     # Kafka topics
@@ -129,10 +130,11 @@ spec:
 
   gcp:
     sqlInstances:
-      - name: amt-tiltak-v1
-        type: POSTGRES_14
+      - name: amt-tiltak
+        type: POSTGRES_17
         diskAutoresize: true
-        tier: db-f1-micro
+        pointInTimeRecovery: true
+        tier: db-custom-1-3840
         databases:
           - name: amt-tiltak
             envVarPrefix: DB
