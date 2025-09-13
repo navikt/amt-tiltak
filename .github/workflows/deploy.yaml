@@ -54,11 +54,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+
       - name: Deploy application
         uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: dev-gcp
           RESOURCE: .nais/nais-dev.yaml
+          VARS: .nais/vars-dev.yaml
+          VAR: image=${{ needs.test-build-and-push.outputs.image }}
+          TELEMETRY: ${{ needs.test-build-and-push.outputs.telemetry }}
+
+      - name: Deploy temp application
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: dev-gcp
+          RESOURCE: .nais/nais-dev-temp.yaml
           VARS: .nais/vars-dev.yaml
           VAR: image=${{ needs.test-build-and-push.outputs.image }}
           TELEMETRY: ${{ needs.test-build-and-push.outputs.telemetry }}
@@ -74,6 +84,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+
       - name: Deploy application
         uses: nais/deploy/actions/deploy@v2
         env:
