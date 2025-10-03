@@ -134,7 +134,7 @@ spec:
       - name: amt-tiltak-v1
         type: POSTGRES_16
         diskAutoresize: true
-        tier: db-f1-micro
+        tier: db-g1-small
         databases:
           - name: amt-tiltak
             envVarPrefix: DB
