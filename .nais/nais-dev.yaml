@@ -22,8 +22,8 @@ spec:
     initialDelay: 50
   replicas:
     disableAutoScaling: true
-    min: 0
-    max: 0
+    min: 1
+    max: 1
   resources:
     requests:
       cpu: 10m
@@ -132,7 +132,7 @@ spec:
       - name: amt-tiltak-v1
         type: POSTGRES_16
         diskAutoresize: true
-        tier: db-g1-small
+        tier: db-f1-micro
         databases:
           - name: amt-tiltak
             envVarPrefix: DB
