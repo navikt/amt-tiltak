@@ -21,9 +21,11 @@ spec:
     path: /internal/health/liveness
     initialDelay: 50
   replicas:
-    disableAutoScaling: true
-    min: 0
-    max: 0
+    min: 1
+    max: 2
+    scalingStrategy:
+      cpu:
+        thresholdPercentage: 200
   resources:
     requests:
       cpu: 20m
@@ -129,10 +131,10 @@ spec:
 
   gcp:
     sqlInstances:
-      - name: amt-tiltak-v1
+      - name: amt-tiltak
         type: POSTGRES_17
-        diskAutoresize: true
-        highAvailability: true
+        diskAutoresize: false
+        highAvailability: false
         pointInTimeRecovery: false
         tier: db-custom-1-3840
         databases:

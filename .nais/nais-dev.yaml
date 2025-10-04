@@ -81,8 +81,6 @@ spec:
   envFrom:
     - secret: amt-tiltak-unleash-api-token
   env:
-    - name: SPRING_PROFILES_ACTIVE
-      value: "dev,default"
     - name: AD_GRUPPE_ID_TILGANG_TIL_EGNE_ANSATTE
       value: {{ad_gruppe_egne_ansatte}}
     - name: AD_GRUPPE_ID_TILTAK_ANSVARLIG
