@@ -130,9 +130,9 @@ spec:
   gcp:
     sqlInstances:
       - name: amt-tiltak-v1
-        type: POSTGRES_14
-        diskAutoresize: true
-        highAvailability: true
+        type: POSTGRES_17
+        diskAutoresize: false
+        highAvailability: false
         pointInTimeRecovery: false
         tier: db-custom-1-3840
         databases:
