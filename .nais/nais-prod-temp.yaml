@@ -1,7 +1,7 @@
 kind: Application
 apiVersion: nais.io/v1alpha1
 metadata:
-  name: amt-tiltak
+  name: amt-tiltak-temp
   namespace: amt
   labels:
     team: amt
