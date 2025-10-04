@@ -131,7 +131,7 @@ spec:
     sqlInstances:
       - name: amt-tiltak-v1
         type: POSTGRES_17
-        diskAutoresize: false
+        diskAutoresize: true
         highAvailability: false
         pointInTimeRecovery: false
         tier: db-custom-1-3840
