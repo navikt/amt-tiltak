@@ -131,10 +131,10 @@ spec:
 
   gcp:
     sqlInstances:
-      - name: amt-tiltak-v1
-        type: POSTGRES_16
-        diskAutoresize: true
-        tier: db-g1-small
+      - name: amt-tiltak
+        type: POSTGRES_17
+        diskAutoresize: false
+        tier: db-f1-micro
         databases:
           - name: amt-tiltak
             envVarPrefix: DB
