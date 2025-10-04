@@ -132,7 +132,7 @@ spec:
       - name: amt-tiltak-v1
         type: POSTGRES_17
         diskAutoresize: true
-        highAvailability: false
+        highAvailability: true
         pointInTimeRecovery: false
         tier: db-custom-1-3840
         databases:
