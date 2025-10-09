@@ -37,10 +37,6 @@ class KafkaMessageConsumer(
 		client.start()
 	}
 
-	fun getRecords(topic: Topic): List<ConsumerRecord<String, String?>> {
-		return records.filter { it.topic() == mapKafkaTopic(topic) }
-	}
-
 	fun getLatestRecord(topic: Topic):  ConsumerRecord<String, String?>? {
 		return records.filter { it.topic() == mapKafkaTopic(topic) }.maxByOrNull { it.offset() }
 	}

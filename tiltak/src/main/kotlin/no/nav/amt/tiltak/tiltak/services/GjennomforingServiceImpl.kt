@@ -78,10 +78,6 @@ class GjennomforingServiceImpl(
 
 		if (update.status == UpdateStatus.UPDATED) {
 			gjennomforingRepository.update(update.updatedObject!!)
-
-			if (storedGjennomforing.erKurs != updatedGjennomforing.erKurs) {
-				deltakerService.konverterStatuserForDeltakerePaaGjennomforing(storedGjennomforing.id, updatedGjennomforing.erKurs)
-			}
 		}
 	}
 

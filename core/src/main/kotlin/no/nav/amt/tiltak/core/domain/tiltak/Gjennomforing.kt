@@ -12,8 +12,8 @@ data class Gjennomforing(
 	val status: Status,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
-	val opprettetAar: Int,
-	val lopenr: Int,
+	val opprettetAar: Int?,
+	val lopenr: Int?,
 	val erKurs: Boolean
 ) {
 	enum class Status {

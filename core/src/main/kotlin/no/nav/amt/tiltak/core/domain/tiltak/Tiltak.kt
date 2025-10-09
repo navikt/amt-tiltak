@@ -6,4 +6,10 @@ class Tiltak(
 	val id: UUID,
 	val kode: String,
 	val navn: String
-)
+) {
+	fun erEnkeltplass() = kode in listOf(
+		"ENKELAMO",
+		"ENKFAGYRKE",
+		"HOYEREUTD",
+	)
+}

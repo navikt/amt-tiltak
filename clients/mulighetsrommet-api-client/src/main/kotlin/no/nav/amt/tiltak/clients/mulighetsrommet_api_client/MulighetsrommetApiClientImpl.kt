@@ -44,7 +44,7 @@ class MulighetsrommetApiClientImpl(
 		}
 	}
 
-	override fun hentGjennomforing(id: UUID): Gjennomforing {
+	override fun hentGjennomforing(id: UUID): GjennomforingResponse {
 		val request = Request.Builder()
 			.url("$baseUrl/api/v1/tiltaksgjennomforinger/$id")
 			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")

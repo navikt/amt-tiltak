@@ -84,9 +84,6 @@ class GjennomforingIngestorIntegrationTest : IntegrationTestBase() {
 				gjennomforing.startDato shouldBe gjennomforingMessage.startDato
 				gjennomforing.sluttDato shouldBe gjennomforingMessage.sluttDato
 				gjennomforing.tiltakId shouldBe gjennomforingMessage.tiltakId
-
-				gjennomforing.opprettetAar shouldBe gjennomforingArenaData.opprettetAar
-				gjennomforing.lopenr shouldBe gjennomforingArenaData.lopenr
 				gjennomforing.status shouldBe Gjennomforing.Status.GJENNOMFORES
 
 				val tiltak = tiltakRepository.getAll().find { it.id == gjennomforingMessage.tiltakId }!!

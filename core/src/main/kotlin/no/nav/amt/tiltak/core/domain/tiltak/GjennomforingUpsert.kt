@@ -11,8 +11,8 @@ data class GjennomforingUpsert(
 	val status: Gjennomforing.Status,
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
-	val opprettetAar: Int,
-	val lopenr: Int,
+	val opprettetAar: Int?,
+	val lopenr: Int?,
 	val erKurs: Boolean
 )
 

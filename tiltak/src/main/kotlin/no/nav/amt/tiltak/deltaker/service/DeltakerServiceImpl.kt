@@ -26,7 +26,6 @@ import no.nav.amt.tiltak.deltaker.repositories.VurderingRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 import no.nav.amt.tiltak.core.domain.tiltak.VurderingDbo
@@ -47,7 +46,7 @@ open class DeltakerServiceImpl(
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	override fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert, erKometMaster: Boolean) {
+	override fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert, erKometMaster: Boolean): Deltaker {
 		val lagretDeltaker = hentDeltaker(deltaker.id)
 		val brukerId = brukerService.getIdOrCreate(personIdent)
 
@@ -55,24 +54,15 @@ open class DeltakerServiceImpl(
 			val deltakerUpsertDbo = deltaker.toUpsertDbo(brukerId)
 			deltakerRepository.upsert(deltakerUpsertDbo)
 			oppdaterStatus(deltaker.statusInsert)
-
-			val oppdatertDeltaker = hentDeltaker(deltaker.id)
-				?: throw IllegalStateException("Fant ikke deltaker med id ${deltaker.id}")
-
-			publiser(oppdatertDeltaker, LocalDateTime.now(), erKometMaster)
 		}
+		return hentDeltaker(deltaker.id)
+			?: throw IllegalStateException("Fant ikke deltaker med id ${deltaker.id}")
+
 	}
 
 	override fun insertStatus(status: DeltakerStatusInsert, erKometDeltaker: Boolean) {
 		transactionTemplate.executeWithoutResult {
-			val statusBleOppdatert = oppdaterStatus(status)
-
-			if (statusBleOppdatert) {
-				val oppdatertDeltaker = hentDeltaker(status.deltakerId)
-					?: throw IllegalStateException("Fant ikke deltaker med id ${status.deltakerId}")
-
-				publiser(oppdatertDeltaker, LocalDateTime.now(), erKometDeltaker)
-			}
+			oppdaterStatus(status)
 		}
 	}
 
@@ -207,25 +197,6 @@ open class DeltakerServiceImpl(
 		return vurderingRepository.getVurderingerForDeltaker(vurdering.deltakerId).map { it.toVurdering() }
 	}
 
-	override fun konverterStatuserForDeltakerePaaGjennomforing(
-		gjennomforingId: UUID,
-		oppdatertGjennomforingErKurs: Boolean
-	) {
-		val tiltaktype = gjennomforingService.getGjennomforing(gjennomforingId).tiltak.kode
-		if (unleashService.erKometMasterForTiltakstype(tiltaktype)) {
-			return
-		} else {
-			val deltakere = hentDeltakerePaaGjennomforing(gjennomforingId)
-			if (deltakere.isNotEmpty()) {
-				if (oppdatertGjennomforingErKurs) {
-					konverterDeltakerstatuseFraLopendeInntakTilKurs(deltakere, gjennomforingId)
-				} else {
-					konverterDeltakerstatuseFraKursTilLopendeInntak(deltakere)
-				}
-			}
-		}
-	}
-
 	override fun delMedArrangor(
 		deltakerIder: List<UUID>,
 	) {
@@ -236,63 +207,6 @@ open class DeltakerServiceImpl(
 		deltakerRepository.delMedArrangor(deltakerIder)
 
 		deltakere.forEach { publiserDeltakerPaDeltakerV2Kafka(it.id) }
-	}
-
-	private fun konverterDeltakerstatuseFraKursTilLopendeInntak(deltakere: List<Deltaker>) {
-		val deltakereSomSkalOppdateres =
-			deltakere.filter { it.status.type == DeltakerStatus.Type.AVBRUTT || it.status.type == DeltakerStatus.Type.FULLFORT }
-
-		deltakereSomSkalOppdateres.forEach {
-			insertStatus(
-				DeltakerStatusInsert(
-					id = UUID.randomUUID(),
-					deltakerId = it.id,
-					type = DeltakerStatus.Type.HAR_SLUTTET,
-					aarsak = it.status.aarsak,
-					aarsaksbeskrivelse = it.status.aarsaksbeskrivelse,
-					gyldigFra = LocalDateTime.now()
-				),
-				erKometDeltaker = false
-			)
-		}
-		log.info("Oppdatert status for ${deltakereSomSkalOppdateres.size} deltakere på gjennomføring som gikk fra kurs til løpende inntak")
-	}
-
-	private fun konverterDeltakerstatuseFraLopendeInntakTilKurs(deltakere: List<Deltaker>, gjennomforingId: UUID) {
-		val deltakereSomSkalOppdateres =
-			deltakere.filter { it.status.type == DeltakerStatus.Type.HAR_SLUTTET }
-
-		if (deltakereSomSkalOppdateres.isNotEmpty()) {
-			val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
-
-			deltakereSomSkalOppdateres.forEach {
-				insertStatus(
-					DeltakerStatusInsert(
-						id = UUID.randomUUID(),
-						deltakerId = it.id,
-						type = getDeltakerStatusType(
-							deltakerSluttdato = it.sluttDato,
-							gjennomforingSluttdato = gjennomforing.sluttDato
-						),
-						aarsak = it.status.aarsak,
-						aarsaksbeskrivelse = it.status.aarsaksbeskrivelse,
-						gyldigFra = LocalDateTime.now()
-					),
-					erKometDeltaker = false
-				)
-			}
-		}
-		log.info("Oppdatert status for ${deltakereSomSkalOppdateres.size} deltakere på gjennomføring som gikk fra løpende inntak til kurs")
-	}
-
-	private fun getDeltakerStatusType(deltakerSluttdato: LocalDate?, gjennomforingSluttdato: LocalDate?): DeltakerStatus.Type {
-		return if (gjennomforingSluttdato == null || deltakerSluttdato == null) {
-			DeltakerStatus.Type.FULLFORT
-		} else if (deltakerSluttdato.isBefore(gjennomforingSluttdato)) {
-			DeltakerStatus.Type.AVBRUTT
-		} else {
-			DeltakerStatus.Type.FULLFORT
-		}
 	}
 
 	private fun statusFinnesAllerede(status: DeltakerStatusInsert): Boolean {
@@ -508,11 +422,7 @@ open class DeltakerServiceImpl(
 		dagerPerUke = this.dagerPerUke,
 		prosentStilling = this.prosentStilling,
 		innsokBegrunnelse = this.innsokBegrunnelse,
-		innhold = this.innhold,
-		kilde = this.kilde,
-		forsteVedtakFattet = this.forsteVedtakFattet,
-		sistEndretAv = this.sistEndretAv,
-		sistEndretAvEnhet = this.sistEndretAvEnhet
+		kilde = this.kilde
 	)
 }
 

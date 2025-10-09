@@ -1,17 +1,15 @@
 package no.nav.amt.tiltak.core.port
 
 import no.nav.amt.tiltak.core.domain.tiltak.Deltaker
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
-import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import java.time.LocalDateTime
 import java.util.UUID
 
 interface DeltakerService {
 
-	fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert, erKometMaster: Boolean)
+	fun upsertDeltaker(personIdent: String, deltaker: DeltakerUpsert, erKometMaster: Boolean): Deltaker
 
 	fun insertStatus(status: DeltakerStatusInsert, erKometDeltaker: Boolean)
 
@@ -37,8 +35,6 @@ interface DeltakerService {
 
 	fun republiserDeltakerePaDeltakerV2(tiltakstype: String)
 
-	fun publiserDeltakerPaKafka(deltakerId: UUID, endretDato: LocalDateTime)
-
 	fun publiserDeltakerPaDeltakerV2Kafka(deltakerId: UUID)
 
 	fun slettDeltakerePaaGjennomforing(gjennomforingId: UUID)
@@ -47,7 +43,7 @@ interface DeltakerService {
 
 	fun lagreVurdering(vurdering: Vurdering): List<Vurdering>
 
-	fun konverterStatuserForDeltakerePaaGjennomforing(gjennomforingId: UUID, oppdatertGjennomforingErKurs: Boolean)
 
 	fun delMedArrangor(deltakerIder: List<UUID>)
+	fun publiserDeltakerPaKafka(deltakerId: UUID, endretDato: LocalDateTime)
 }

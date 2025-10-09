@@ -4,10 +4,8 @@ import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider
 import no.nav.amt.tiltak.core.kafka.AmtArrangorIngestor
 import no.nav.amt.tiltak.core.kafka.AnsattIngestor
 import no.nav.amt.tiltak.core.kafka.ArenaAclIngestor
-import no.nav.amt.tiltak.core.kafka.DeltakerIngestor
 import no.nav.amt.tiltak.core.kafka.GjennomforingIngestor
 import no.nav.amt.tiltak.core.kafka.NavAnsattIngestor
-import no.nav.amt.tiltak.core.kafka.NavBrukerIngestor
 import no.nav.common.kafka.consumer.KafkaConsumerClient
 import no.nav.common.kafka.consumer.feilhandtering.KafkaConsumerRecordProcessor
 import no.nav.common.kafka.consumer.feilhandtering.util.KafkaConsumerRecordProcessorBuilder
@@ -34,9 +32,7 @@ open class KafkaConfiguration(
 	gjennomforingIngestor: GjennomforingIngestor,
 	arrangorIngestor: AmtArrangorIngestor,
 	ansattIngestor: AnsattIngestor,
-	navBrukerIngestor: NavBrukerIngestor,
 	navAnsattIngestor: NavAnsattIngestor,
-	deltakerIngestor: DeltakerIngestor,
 ) {
 	private val log = LoggerFactory.getLogger(javaClass)
     private var client: KafkaConsumerClient
@@ -98,32 +94,10 @@ open class KafkaConfiguration(
 				.withLogging()
 				.withStoreOnFailure(consumerRepository)
 				.withConsumerConfig(
-					kafkaTopicProperties.amtNavBrukerPersonaliaTopic,
-					stringDeserializer(),
-					stringDeserializer(),
-					Consumer<ConsumerRecord<String, String>> { navBrukerIngestor.ingest(it.key(), it.value()) }
-				)
-		)
-		topicConfigs.add(
-			KafkaConsumerClientBuilder.TopicConfig<String, String>()
-				.withLogging()
-				.withStoreOnFailure(consumerRepository)
-				.withConsumerConfig(
 					kafkaTopicProperties.amtNavAnsattPersonaliaTopic,
 					stringDeserializer(),
 					stringDeserializer(),
 					Consumer<ConsumerRecord<String, String>> { navAnsattIngestor.ingest(it.value()) }
-				)
-		)
-		topicConfigs.add(
-			KafkaConsumerClientBuilder.TopicConfig<String, String>()
-				.withLogging()
-				.withStoreOnFailure(consumerRepository)
-				.withConsumerConfig(
-					kafkaTopicProperties.amtDeltakerTopic,
-					stringDeserializer(),
-					stringDeserializer(),
-					Consumer<ConsumerRecord<String, String>> { deltakerIngestor.ingest(it.key(), it.value()) }
 				)
 		)
 
