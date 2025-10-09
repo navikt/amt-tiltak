@@ -7,7 +7,7 @@ interface MulighetsrommetApiClient {
 
 	fun hentGjennomforingArenaData(id: UUID): GjennomforingArenaData?
 
-	fun hentGjennomforing(id: UUID): Gjennomforing
+	fun hentGjennomforing(id: UUID): GjennomforingResponse
 }
 
 data class GjennomforingArenaData(
@@ -16,7 +16,7 @@ data class GjennomforingArenaData(
 )
 
 
-data class Gjennomforing (
+data class GjennomforingResponse (
 	val id: UUID,
 	val tiltakstype: Tiltakstype,
 	val navn: String,

@@ -1,10 +1,10 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.processor
 
-import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.Gjennomforing
 import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.MulighetsrommetApiClient
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatusInsert
 import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
+import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.port.ArrangorService
@@ -43,9 +43,10 @@ class ArenaDeltakerProcessor(
 
 	private fun upsert(message: MessageWrapper<DeltakerPayload>) {
 		val deltakerDto = message.payload
-
-		val (gjennomforingId, tiltakstype) = getGjennomforingIdAndTiltakstype(deltakerDto.gjennomforingId)
-
+		val gjennomforingId = deltakerDto.gjennomforingId
+		val gjennomforing =
+			gjennomforingService.getGjennomforingOrNull(gjennomforingId) ?: opprettGjennomforing(gjennomforingId)
+		val tiltakstype = gjennomforing.tiltak.kode
 		if (unleashService.erKometMasterForTiltakstype(tiltakstype)) return
 
 		val status = DeltakerStatusInsert(
@@ -67,35 +68,25 @@ class ArenaDeltakerProcessor(
 			registrertDato = deltakerDto.registrertDato,
 			gjennomforingId = gjennomforingId,
 			innsokBegrunnelse = deltakerDto.innsokBegrunnelse,
-			innhold = null,
-			kilde = Kilde.ARENA,
-			forsteVedtakFattet = null,
-			sistEndretAv = null,
-			sistEndretAvEnhet = null
+			kilde = Kilde.ARENA
 		)
 
 		transactionTemplate.executeWithoutResult {
 			deltakerService.upsertDeltaker(
 				deltakerDto.personIdent,
 				deltakerUpsert,
-				unleashService.erKometMasterForTiltakstype(tiltakstype)
+				unleashService.erKometMasterForTiltakstype(gjennomforing.tiltak.kode)
 			)
 		}
 		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=$gjennomforingId tiltakstype $tiltakstype")
 
-	}
-
-	private fun getGjennomforingIdAndTiltakstype(deltakerlisteId: UUID): GjennomforingIdOgTiltakstype {
-		val gjennomforing = gjennomforingService.getGjennomforingOrNull(deltakerlisteId)
-		if (gjennomforing != null) {
-			return GjennomforingIdOgTiltakstype(gjennomforing.id, gjennomforing.tiltak.kode)
-		} else {
-			val oppdatertGjennomforing = upsertGjennomforing(deltakerlisteId)
-			return GjennomforingIdOgTiltakstype(oppdatertGjennomforing.id, oppdatertGjennomforing.tiltakstype.arenaKode)
+		if(gjennomforing.tiltak.erEnkeltplass()) {
+			//TODO publiser deltaker på ny topic
 		}
+
 	}
 
-	private fun upsertGjennomforing(gjennomforingId: UUID): Gjennomforing {
+	private fun opprettGjennomforing(gjennomforingId: UUID): Gjennomforing {
 		val gjennomforing = mulighetsrommetApiClient.hentGjennomforing(gjennomforingId)
 		val gjennomforingArenaData = mulighetsrommetApiClient.hentGjennomforingArenaData(gjennomforingId)
 			?: throw IllegalStateException("Lagrer ikke gjennomføring med id ${gjennomforing.id} som er opprettet utenfor Arena")
@@ -122,7 +113,7 @@ class ArenaDeltakerProcessor(
 				erKurs = gjennomforing.erKurs()
 			)
 		)
-		return gjennomforing
+		return gjennomforingService.getGjennomforing(gjennomforing.id)
 
 	}
 

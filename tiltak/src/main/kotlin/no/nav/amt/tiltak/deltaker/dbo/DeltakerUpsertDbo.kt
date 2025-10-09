@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.deltaker.dbo
 
-import no.nav.amt.tiltak.core.domain.tiltak.DeltakelsesInnhold
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -16,9 +15,5 @@ data class DeltakerUpsertDbo(
 	val dagerPerUke: Float? = null,
 	val prosentStilling: Float? = null,
 	val innsokBegrunnelse: String? = null,
-	val innhold: DeltakelsesInnhold?,
-	val kilde: Kilde,
-	val forsteVedtakFattet: LocalDate?,
-	val sistEndretAv: UUID?,
-	val sistEndretAvEnhet: UUID?
+	val kilde: Kilde
 )

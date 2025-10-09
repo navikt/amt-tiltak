@@ -11,8 +11,8 @@ data class HentGjennomforingDto(
 	val startDato: LocalDate?,
 	val sluttDato: LocalDate?,
 	val arrangor: ArrangorDto,
-	val lopenr: Int,
-	val opprettetAr: Int,
+	val lopenr: Int?,
+	val opprettetAr: Int?,
 	val tiltak: TiltakDto,
 	val status: Gjennomforing.Status
 )

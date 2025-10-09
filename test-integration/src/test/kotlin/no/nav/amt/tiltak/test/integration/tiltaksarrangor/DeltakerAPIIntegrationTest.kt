@@ -13,7 +13,6 @@ import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.domain.tiltak.EndringsmeldingStatusAarsak
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
-import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.deltaker.repositories.VurderingRepository
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
@@ -34,9 +33,6 @@ class DeltakerAPIIntegrationTest : IntegrationTestBase() {
 
 	@Autowired
 	lateinit var endringsmeldingService: EndringsmeldingService
-
-	@Autowired
-	lateinit var deltakerService: DeltakerService
 
 	@Autowired
 	lateinit var vurderingRepository: VurderingRepository

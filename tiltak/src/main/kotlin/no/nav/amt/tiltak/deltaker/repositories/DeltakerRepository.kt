@@ -109,11 +109,11 @@ open class DeltakerRepository(
 				"prosentStilling" to deltaker.prosentStilling,
 				"registrertDato" to deltaker.registrertDato,
 				"innsokBegrunnelse" to deltaker.innsokBegrunnelse,
-				"innhold" to deltaker.innhold?.toPGObject(),
+				"innhold" to null,
 				"kilde" to deltaker.kilde.name,
-				"forste_vedtak_fattet" to deltaker.forsteVedtakFattet,
-				"sist_endret_av" to deltaker.sistEndretAv,
-				"sist_endret_av_enhet" to deltaker.sistEndretAvEnhet
+				"forste_vedtak_fattet" to null, // disse feltene lå opprinnelig i UpsertDbo selv om de aldri ble satt
+				"sist_endret_av" to null,
+				"sist_endret_av_enhet" to null
 			)
 		)
 

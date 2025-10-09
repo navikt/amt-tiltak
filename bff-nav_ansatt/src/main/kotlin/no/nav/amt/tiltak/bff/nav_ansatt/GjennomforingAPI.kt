@@ -80,11 +80,11 @@ class GjennomforingAPI(
 				HentGjennomforingMedLopenrDto(
 					id = it.id,
 					navn = it.navn,
-					lopenr = it.lopenr,
+					lopenr = it.lopenr!!,
 					status = it.status,
 					startDato = it.startDato,
 					sluttDato = it.sluttDato,
-					opprettetAr = it.opprettetAar,
+					opprettetAr = it.opprettetAar!!,
 					arrangorNavn = it.arrangor.overordnetEnhetNavn ?: it.arrangor.navn,
 					tiltak = TiltakDto(
 						kode = it.tiltak.kode,

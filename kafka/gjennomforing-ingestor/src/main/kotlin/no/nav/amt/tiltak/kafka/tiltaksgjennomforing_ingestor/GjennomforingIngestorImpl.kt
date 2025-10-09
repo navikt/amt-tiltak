@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.kafka.tiltaksgjennomforing_ingestor
 
-import no.nav.amt.tiltak.clients.mulighetsrommet_api_client.MulighetsrommetApiClient
 import no.nav.amt.tiltak.common.json.JsonUtils.fromJsonString
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.kafka.GjennomforingIngestor
@@ -17,8 +16,7 @@ class GjennomforingIngestorImpl(
 	private val arrangorService: ArrangorService,
 	private val gjennomforingService: GjennomforingService,
 	private val deltakerService: DeltakerService,
-	private val tiltakService: TiltakService,
-	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
+	private val tiltakService: TiltakService
 ): GjennomforingIngestor {
 
 	private val stottedeTiltak = setOf(
@@ -30,7 +28,10 @@ class GjennomforingIngestorImpl(
 		"DIGIOPPARB",
 		"JOBBK",
 		"GRUPPEAMO",
-		"GRUFAGYRKE"
+		"GRUFAGYRKE",
+		"ENKELAMO",
+		"ENKFAGYRKE",
+		"HOYEREUTD",
 	)
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -50,11 +51,6 @@ class GjennomforingIngestorImpl(
 			return
 		}
 
-		val arenaData = mulighetsrommetApiClient.hentGjennomforingArenaData(gjennomforing.id)
-		if (arenaData == null) {
-			log.info("Lagrer ikke gjennomføring med id ${gjennomforing.id} fordi gjennomføringen er opprettet utenfor Arena")
-			return
-		}
 		val arrangor = arrangorService.upsertArrangor(gjennomforing.virksomhetsnummer)
 
 		val tiltak = tiltakService.upsertTiltak(
@@ -72,8 +68,8 @@ class GjennomforingIngestorImpl(
 				status = GjennomforingStatusConverter.convert(gjennomforing.status.name),
 				startDato = gjennomforing.startDato,
 				sluttDato = gjennomforing.sluttDato,
-				lopenr = arenaData.lopenr,
-				opprettetAar = arenaData.opprettetAar,
+				lopenr = null,
+				opprettetAar = null,
 				erKurs = gjennomforing.erKurs()
 			)
 		)
