@@ -7,6 +7,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
+import no.nav.amt.tiltak.core.kafka.EnkeltplassDeltakerProducerService
 import no.nav.amt.tiltak.core.port.ArrangorService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
@@ -14,7 +15,6 @@ import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
-import no.nav.amt.tiltak.kafka.producer.EnkeltplassDeltakerV1Producer
 import no.nav.amt.tiltak.kafka.tiltaksgjennomforing_ingestor.GjennomforingStatusConverter
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -30,7 +30,7 @@ class ArenaDeltakerProcessor(
 	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
 	private val transactionTemplate: TransactionTemplate,
 	private val unleashService: UnleashService,
-	private val enkeltplassKafkaProducer: EnkeltplassDeltakerV1Producer
+	private val enkeltplassKafkaProducer: EnkeltplassDeltakerProducerService
 ) : GenericProcessor<DeltakerPayload>() {
 
 	private val log = LoggerFactory.getLogger(javaClass)

@@ -95,10 +95,6 @@
             <artifactId>mockk-jvm</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>no.nav.amt-tiltak</groupId>
-            <artifactId>kafka-producer</artifactId>
-        </dependency>
     </dependencies>
 
 </project>
