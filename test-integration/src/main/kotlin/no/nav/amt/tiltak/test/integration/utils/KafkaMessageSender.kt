@@ -24,10 +24,6 @@ class KafkaMessageSender(
 	private val navBrukerTopic: String,
 	@Value("\${app.env.amtNavAnsattPersonaliaTopic}")
 	private val navAnsattTopic: String,
-	@Value("\${app.env.amtDeltakerTopic}")
-	private val amtDeltakerTopic: String,
-	@Value("\${app.env.amtDeltakerTopic}")
-	private val amtEnkeltplassDeltakerTopic: String,
 ) {
 	private val kafkaProducer = KafkaProducerClientImpl<ByteArray, ByteArray>(properties.producer())
 
