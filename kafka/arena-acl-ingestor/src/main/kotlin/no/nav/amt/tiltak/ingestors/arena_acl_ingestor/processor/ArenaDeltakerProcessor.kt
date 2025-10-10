@@ -14,6 +14,7 @@ import no.nav.amt.tiltak.core.port.TiltakService
 import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.DeltakerPayload
 import no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto.MessageWrapper
+import no.nav.amt.tiltak.kafka.producer.EnkeltplassDeltakerV1Producer
 import no.nav.amt.tiltak.kafka.tiltaksgjennomforing_ingestor.GjennomforingStatusConverter
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -28,7 +29,8 @@ class ArenaDeltakerProcessor(
 	private val tiltakService: TiltakService,
 	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
 	private val transactionTemplate: TransactionTemplate,
-	private val unleashService: UnleashService
+	private val unleashService: UnleashService,
+	private val enkeltplassKafkaProducer: EnkeltplassDeltakerV1Producer
 ) : GenericProcessor<DeltakerPayload>() {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -47,6 +49,7 @@ class ArenaDeltakerProcessor(
 		val gjennomforing =
 			gjennomforingService.getGjennomforingOrNull(gjennomforingId) ?: opprettGjennomforing(gjennomforingId)
 		val tiltakstype = gjennomforing.tiltak.kode
+
 		if (unleashService.erKometMasterForTiltakstype(tiltakstype)) return
 
 		val status = DeltakerStatusInsert(
@@ -72,17 +75,16 @@ class ArenaDeltakerProcessor(
 		)
 
 		transactionTemplate.executeWithoutResult {
-			deltakerService.upsertDeltaker(
+			 val upsertedDeltaker = deltakerService.upsertDeltaker(
 				deltakerDto.personIdent,
 				deltakerUpsert,
 				unleashService.erKometMasterForTiltakstype(gjennomforing.tiltak.kode)
 			)
+			if(gjennomforing.tiltak.erEnkeltplass()) {
+				enkeltplassKafkaProducer.publiserDeltaker(upsertedDeltaker)
+			}
 		}
 		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=$gjennomforingId tiltakstype $tiltakstype")
-
-		if(gjennomforing.tiltak.erEnkeltplass()) {
-			//TODO publiser deltaker på ny topic
-		}
 
 	}
 
@@ -155,15 +157,13 @@ class ArenaDeltakerProcessor(
 			log.info("Mottatt tombstone på arena-deltaker som ikke finnes $deltakerId")
 			return
 		}
-		val tiltakstype = gjennomforingService.getGjennomforing(deltaker.gjennomforingId).tiltak.kode
-		val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltakstype)
+		val tiltakstype = gjennomforingService.getGjennomforing(deltaker.gjennomforingId).tiltak
+		val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltakstype.kode)
 		if (!erKometDeltaker) {
-			deltakerService.slettDeltaker(deltakerId, erKometDeltaker)
+			if(tiltakstype.erEnkeltplass()) {
+				enkeltplassKafkaProducer.publiserSlettDeltaker(deltakerId)
+			}
+			else deltakerService.slettDeltaker(deltakerId, erKometDeltaker)
 		}
 	}
-
-	private data class GjennomforingIdOgTiltakstype(
-		val gjennomforingId: UUID,
-		val tiltakstype: String
-	)
 }
