@@ -14,5 +14,6 @@ data class KafkaTopicProperties(
 	val amtArrangorTopic: String,
 	val amtArrangorAnsattTopic: String,
 	val amtDeltakerTopic: String,
-	val amtEndringsmeldingTopic: String
+	val amtEndringsmeldingTopic: String,
+	val amtEnkeltplassDeltakerTopic: String,
 )
