@@ -7,8 +7,8 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
-import no.nav.amt.tiltak.core.kafka.EnkeltplassDeltakerProducerService
 import no.nav.amt.tiltak.core.port.ArrangorService
+import no.nav.amt.tiltak.core.port.DataPublisherService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltakService
@@ -30,8 +30,8 @@ class ArenaDeltakerProcessor(
 	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
 	private val transactionTemplate: TransactionTemplate,
 	private val unleashService: UnleashService,
-	private val enkeltplassKafkaProducer: EnkeltplassDeltakerProducerService
-) : GenericProcessor<DeltakerPayload>() {
+	private val kafkaPublisher: DataPublisherService,
+	) : GenericProcessor<DeltakerPayload>() {
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
@@ -80,8 +80,10 @@ class ArenaDeltakerProcessor(
 				deltakerUpsert,
 				unleashService.erKometMasterForTiltakstype(gjennomforing.tiltak.kode)
 			)
+
 			if(gjennomforing.tiltak.erEnkeltplass()) {
-				enkeltplassKafkaProducer.publiserDeltaker(upsertedDeltaker)
+				log.info("Publiserer enkeltplass deltaker id=${deltakerUpsert.id} gjennomforingId=$gjennomforingId tiltakstype $tiltakstype")
+				kafkaPublisher.publishEnkeltplassDeltaker(upsertedDeltaker.id)
 			}
 		}
 		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=$gjennomforingId tiltakstype $tiltakstype")
@@ -160,10 +162,7 @@ class ArenaDeltakerProcessor(
 		val tiltakstype = gjennomforingService.getGjennomforing(deltaker.gjennomforingId).tiltak
 		val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltakstype.kode)
 		if (!erKometDeltaker) {
-			if(tiltakstype.erEnkeltplass()) {
-				enkeltplassKafkaProducer.publiserSlettDeltaker(deltakerId)
-			}
-			else deltakerService.slettDeltaker(deltakerId, erKometDeltaker)
+			deltakerService.slettDeltaker(deltakerId, erKometDeltaker = false, erEnkeltplassDeltaker = tiltakstype.erEnkeltplass())
 		}
 	}
 }

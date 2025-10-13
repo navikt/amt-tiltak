@@ -1,6 +1,7 @@
 package no.nav.amt.tiltak.data_publisher
 
 import no.nav.amt.tiltak.common.json.JsonUtils
+import no.nav.amt.tiltak.core.port.DataPublisherService
 import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.data_publisher.publish.DeltakerPublishQuery
@@ -17,13 +18,13 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
-class DataPublisherService(
+class DataPublisherServiceImpl(
 	private val kafkaTopicProperties: KafkaTopicProperties,
 	private val stringKafkaProducer: KafkaProducerClient<String, String>,
 	private val template: NamedParameterJdbcTemplate,
 	private val publishRepository: PublishRepository,
 	private val unleashService: UnleashService
-) {
+) : DataPublisherService {
 
 	private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -31,6 +32,7 @@ class DataPublisherService(
 		when (type) {
 			DataPublishType.DELTAKER -> publishDeltaker(id, forcePublish = forcePublish, erKometDeltaker = erKometDeltaker)
 			DataPublishType.ENDRINGSMELDING -> publishEndringsmelding(id)
+			DataPublishType.ENKELTPLASS_DELTAKER -> publishEnkeltplassDeltaker(id)
 		}
 	}
 
@@ -38,6 +40,7 @@ class DataPublisherService(
 		when (type) {
 			DataPublishType.DELTAKER -> publish(type, fromDate = LocalDateTime.MIN)
 			DataPublishType.ENDRINGSMELDING -> publish(type, fromDate = LocalDateTime.MIN)
+			DataPublishType.ENKELTPLASS_DELTAKER -> publish(type, fromDate = LocalDateTime.MIN)
 		}
 
 	}
@@ -48,7 +51,7 @@ class DataPublisherService(
 		when (type) {
 			DataPublishType.DELTAKER -> {
 				publishBatch(
-					idProvider = { offset -> idQueries.hentDeltakerIds(offset, batchSize, fromDate) },
+					idProvider = { offset -> idQueries.hentGruppeDeltakerIds(offset, batchSize, fromDate) },
 					publisher = { id -> publishDeltaker(id, forcePublish, erKometDeltaker = null) }
 				)
 			}
@@ -57,6 +60,13 @@ class DataPublisherService(
 				publishBatch(
 					idProvider = { offset -> idQueries.hentEndringsmeldingIds(offset, batchSize, fromDate) },
 					publisher = { id -> publishEndringsmelding(id, forcePublish) }
+				)
+			}
+
+			DataPublishType.ENKELTPLASS_DELTAKER -> {
+				publishBatch(
+					idProvider = { offset -> idQueries.hentEnkeltplassDeltakerIds(offset, batchSize, fromDate) },
+					publisher = { id -> publishEnkeltplassDeltaker(id) }
 				)
 			}
 		}
@@ -99,6 +109,33 @@ class DataPublisherService(
 						.also { logger.info("Republiserer DELTAKER med id $id") }
 						.also { stringKafkaProducer.sendSync(it) }
 						.also { publishRepository.set(id, DataPublishType.DELTAKER, result.result.digest()) }
+				}
+			}
+		}
+	}
+
+	override fun publishEnkeltplassDeltaker(id: UUID) {
+		when (val result = DeltakerPublishQuery(template, unleashService).get(id, false)) {
+			is DeltakerPublishQuery.Result.DontPublish -> {
+				logger.info("Publiserer ikke deltaker med id $id")
+				return
+			}
+			is DeltakerPublishQuery.Result.PublishTombstone -> {
+				ProducerRecord<String, String?>(kafkaTopicProperties.amtEnkeltplassDeltakerTopic, id.toString(), null)
+					.let { stringKafkaProducer.sendSync(it) }
+					.also { logger.info("Legger inn Tombstone på ENKELTPLASS_DELTAKER med id $id") }
+			}
+
+			is DeltakerPublishQuery.Result.OK -> {
+				if (!publishRepository.hasHash(id, DataPublishType.ENKELTPLASS_DELTAKER, result.result.digest())) {
+					ProducerRecord(
+						kafkaTopicProperties.amtEnkeltplassDeltakerTopic,
+						id.toString(),
+						JsonUtils.toJsonString(result.result)
+					)
+						.also { logger.info("Publiserer ENKELTPLASS_DELTAKER med id $id") }
+						.also { stringKafkaProducer.sendSync(it) }
+						.also { publishRepository.set(id, DataPublishType.ENKELTPLASS_DELTAKER, result.result.digest()) }
 				}
 			}
 		}

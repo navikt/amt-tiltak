@@ -31,7 +31,7 @@ class DataPublisherServiceTest : FunSpec({
 	lateinit var unleashService: UnleashService
 	val publishRepository = PublishRepository(template)
 
-	lateinit var service: DataPublisherService
+	lateinit var service: DataPublisherServiceImpl
 
 	val publishAndVerify = fun(id: UUID, type: DataPublishType, expected: Int) {
 		service.publish(id, type, null)
@@ -58,7 +58,7 @@ class DataPublisherServiceTest : FunSpec({
 
 		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
 
-		service = DataPublisherService(
+		service = DataPublisherServiceImpl(
 			kafkaTopicProperties, kafkaProducerClient, template, publishRepository,unleashService
 		)
 	}
