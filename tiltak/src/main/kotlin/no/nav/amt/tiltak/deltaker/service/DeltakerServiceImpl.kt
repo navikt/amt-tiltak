@@ -128,13 +128,10 @@ open class DeltakerServiceImpl(
 		val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltak.kode)
 		if (erKometDeltaker) {
 			return
-		} else if (tiltak.erEnkeltplass()) {
-
 		}
 		else {
 			hentDeltakerePaaGjennomforing(gjennomforingId).forEach {
-				//TODO: Skal dette være mulig på enkeltplass deltakere?
-				slettDeltaker(it.id, erKometDeltaker, false)
+				slettDeltaker(it.id, erKometDeltaker, tiltak.erEnkeltplass())
 			}
 		}
 	}
