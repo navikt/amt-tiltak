@@ -57,7 +57,7 @@
         <mock-oauth2-server.version>3.0.0</mock-oauth2-server.version>
         <common.version>3.2025.08.18_11.44-04fe318bd185</common.version>
         <logstash.version>8.1</logstash.version>
-        <unleash.version>11.1.0</unleash.version>
+        <unleash.version>11.1.1</unleash.version>
         <amtlib.version>1.2025.10.08_09.09-4d8d4f2abb10</amtlib.version>
     </properties>
 
