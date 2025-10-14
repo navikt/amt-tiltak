@@ -92,9 +92,6 @@ class ArenaDeltakerProcessor(
 
 	private fun opprettGjennomforing(gjennomforingId: UUID): Gjennomforing {
 		val gjennomforing = mulighetsrommetApiClient.hentGjennomforing(gjennomforingId)
-		val gjennomforingArenaData = mulighetsrommetApiClient.hentGjennomforingArenaData(gjennomforingId)
-			?: throw IllegalStateException("Lagrer ikke gjennomføring med id ${gjennomforing.id} som er opprettet utenfor Arena")
-
 		val arrangor = arrangorService.upsertArrangor(gjennomforing.virksomhetsnummer)
 
 		val tiltak = tiltakService.upsertTiltak(
@@ -112,8 +109,8 @@ class ArenaDeltakerProcessor(
 				status = GjennomforingStatusConverter.convert(gjennomforing.status.name),
 				startDato = gjennomforing.startDato,
 				sluttDato = gjennomforing.sluttDato,
-				lopenr = gjennomforingArenaData.lopenr,
-				opprettetAar = gjennomforingArenaData.opprettetAar,
+				lopenr = null,
+				opprettetAar = null,
 				erKurs = gjennomforing.erKurs()
 			)
 		)
