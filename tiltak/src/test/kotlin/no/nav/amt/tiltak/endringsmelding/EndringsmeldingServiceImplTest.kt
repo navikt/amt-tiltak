@@ -7,7 +7,7 @@ import io.mockk.verify
 import no.nav.amt.tiltak.core.domain.tiltak.Endringsmelding
 import no.nav.amt.tiltak.core.exceptions.EndringsmeldingIkkeAktivException
 import no.nav.amt.tiltak.core.port.AuditLoggerService
-import no.nav.amt.tiltak.data_publisher.DataPublisherService
+import no.nav.amt.tiltak.data_publisher.DataPublisherServiceImpl
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_ANSATT_1
 import no.nav.amt.tiltak.test.database.data.TestData.DELTAKER_1
@@ -28,7 +28,7 @@ class EndringsmeldingServiceImplTest {
 
 	lateinit var transactionTemplate: TransactionTemplate
 
-	lateinit var publisherService: DataPublisherService
+	lateinit var publisherService: DataPublisherServiceImpl
 
 
 	@BeforeEach
