@@ -117,7 +117,7 @@ class DataPublisherServiceImpl(
 	override fun publishEnkeltplassDeltaker(id: UUID) {
 		when (val result = DeltakerPublishQuery(template, unleashService).get(id, false)) {
 			is DeltakerPublishQuery.Result.DontPublish -> {
-				logger.info("Publiserer ikke deltaker med id $id")
+				logger.info("Publiserer ikke ENKELTPLASS_DELTAKER deltaker med id $id")
 				return
 			}
 			is DeltakerPublishQuery.Result.PublishTombstone -> {
