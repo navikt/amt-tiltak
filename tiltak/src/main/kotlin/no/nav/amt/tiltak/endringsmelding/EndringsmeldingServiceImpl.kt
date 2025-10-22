@@ -5,7 +5,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.EndringsmeldingStatusAarsak
 import no.nav.amt.tiltak.core.exceptions.EndringsmeldingIkkeAktivException
 import no.nav.amt.tiltak.core.port.AuditLoggerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
-import no.nav.amt.tiltak.data_publisher.DataPublisherServiceImpl
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -18,7 +18,7 @@ open class EndringsmeldingServiceImpl(
 	private val endringsmeldingRepository: EndringsmeldingRepository,
 	private val auditLoggerService: AuditLoggerService,
 	private val transactionTemplate: TransactionTemplate,
-	private val publisherService: DataPublisherServiceImpl
+	private val publisherService: DataPublisherService
 ) : EndringsmeldingService {
 
 	private val log = LoggerFactory.getLogger(javaClass)

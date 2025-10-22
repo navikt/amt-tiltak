@@ -5,7 +5,7 @@ import no.nav.amt.tiltak.core.kafka.DeltakerV1ProducerService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.UnleashService
-import no.nav.amt.tiltak.data_publisher.DataPublisherServiceImpl
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.common.job.JobRunner
 import no.nav.security.token.support.core.api.Unprotected
@@ -26,7 +26,7 @@ import java.util.UUID
 @RequestMapping("/internal/api/republisering")
 class RepubliseringAPI(
 	private val deltakerService: DeltakerService,
-	private val dataPublisher: DataPublisherServiceImpl,
+	private val dataPublisher: DataPublisherService,
 	private val deltakerV1ProducerService: DeltakerV1ProducerService,
 	private val gjennomforingService: GjennomforingService,
 	private val unleashService: UnleashService,

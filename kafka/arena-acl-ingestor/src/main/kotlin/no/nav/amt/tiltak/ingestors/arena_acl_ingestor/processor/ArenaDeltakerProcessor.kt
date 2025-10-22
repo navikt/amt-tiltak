@@ -8,7 +8,6 @@ import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.GjennomforingUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.port.ArrangorService
-import no.nav.amt.tiltak.core.port.DataPublisherService
 import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.TiltakService
@@ -29,8 +28,7 @@ class ArenaDeltakerProcessor(
 	private val tiltakService: TiltakService,
 	private val mulighetsrommetApiClient: MulighetsrommetApiClient,
 	private val transactionTemplate: TransactionTemplate,
-	private val unleashService: UnleashService,
-	private val kafkaPublisher: DataPublisherService,
+	private val unleashService: UnleashService
 	) : GenericProcessor<DeltakerPayload>() {
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -49,7 +47,6 @@ class ArenaDeltakerProcessor(
 		val gjennomforing =
 			gjennomforingService.getGjennomforingOrNull(gjennomforingId) ?: opprettGjennomforing(gjennomforingId)
 		val tiltakstype = gjennomforing.tiltak.kode
-
 		if (unleashService.erKometMasterForTiltakstype(tiltakstype)) return
 
 		val status = DeltakerStatusInsert(
@@ -75,16 +72,11 @@ class ArenaDeltakerProcessor(
 		)
 
 		transactionTemplate.executeWithoutResult {
-			 val upsertedDeltaker = deltakerService.upsertDeltaker(
+			 deltakerService.upsertDeltaker(
 				deltakerDto.personIdent,
 				deltakerUpsert,
 				unleashService.erKometMasterForTiltakstype(gjennomforing.tiltak.kode)
 			)
-
-			if(gjennomforing.tiltak.erEnkeltplass()) {
-				log.info("Publiserer enkeltplass deltaker id=${deltakerUpsert.id} gjennomforingId=$gjennomforingId tiltakstype $tiltakstype")
-				kafkaPublisher.publishEnkeltplassDeltaker(upsertedDeltaker.id)
-			}
 		}
 		log.info("Fullført upsert av deltaker id=${deltakerUpsert.id} gjennomforingId=$gjennomforingId tiltakstype $tiltakstype")
 
@@ -159,10 +151,15 @@ class ArenaDeltakerProcessor(
 			log.info("Mottatt tombstone på arena-deltaker som ikke finnes $deltakerId")
 			return
 		}
-		val tiltakstype = gjennomforingService.getGjennomforing(deltaker.gjennomforingId).tiltak
-		val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltakstype.kode)
+		val tiltakstype = gjennomforingService.getGjennomforing(deltaker.gjennomforingId).tiltak.kode
+		val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltakstype)
 		if (!erKometDeltaker) {
-			deltakerService.slettDeltaker(deltakerId, erKometDeltaker = false, erEnkeltplassDeltaker = tiltakstype.erEnkeltplass())
+			deltakerService.slettDeltaker(deltakerId, erKometDeltaker)
 		}
 	}
+
+	private data class GjennomforingIdOgTiltakstype(
+		val gjennomforingId: UUID,
+		val tiltakstype: String
+	)
 }

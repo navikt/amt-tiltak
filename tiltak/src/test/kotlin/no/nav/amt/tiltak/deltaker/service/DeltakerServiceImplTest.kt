@@ -24,7 +24,7 @@ import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.NavAnsattService
 import no.nav.amt.tiltak.core.port.NavEnhetService
 import no.nav.amt.tiltak.core.port.UnleashService
-import no.nav.amt.tiltak.data_publisher.DataPublisherServiceImpl
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
 import no.nav.amt.tiltak.deltaker.repositories.BrukerRepository
@@ -80,7 +80,7 @@ class DeltakerServiceImplTest {
 	lateinit var gjennomforingService: GjennomforingService
 	lateinit var deltakerV1ProducerService: DeltakerV1ProducerService
 	lateinit var objectMapper: ObjectMapper
-	lateinit var publisherService: DataPublisherServiceImpl
+	lateinit var publisherService: DataPublisherService
 	lateinit var amtPersonClient: AmtPersonClient
 	lateinit var navAnsattService: NavAnsattService
 	lateinit var vurderingRepository: VurderingRepository
@@ -434,7 +434,7 @@ class DeltakerServiceImplTest {
 
 	@Test
 	fun `slettDeltaker - skal publisere sletting på kafka`() {
-		deltakerServiceImpl.slettDeltaker(deltakerId, false, false)
+		deltakerServiceImpl.slettDeltaker(deltakerId, false)
 
 		verify(exactly = 1) { deltakerV1ProducerService.publiserSlettDeltaker(deltakerId) }
 		verify(exactly = 1) { publisherService.publish(deltakerId, DataPublishType.DELTAKER, false) }
@@ -454,7 +454,7 @@ class DeltakerServiceImplTest {
 		deltakerServiceImpl.insertStatus(statusInsertDbo, false)
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldNotBe null
 
-		deltakerServiceImpl.slettDeltaker(deltakerId, false, false)
+		deltakerServiceImpl.slettDeltaker(deltakerId, false)
 
 		deltakerRepository.get(deltakerId) shouldBe null
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldBe null
@@ -491,7 +491,7 @@ class DeltakerServiceImplTest {
 
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldNotBe null
 
-		deltakerServiceImpl.slettDeltaker(deltakerId, false, false)
+		deltakerServiceImpl.slettDeltaker(deltakerId, false)
 
 		deltakerRepository.get(deltakerId) shouldBe null
 
