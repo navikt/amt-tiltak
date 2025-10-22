@@ -21,7 +21,7 @@ interface DeltakerService {
 
 	fun progressStatuser()
 
-	fun slettDeltaker(deltakerId: UUID, erKometDeltaker: Boolean?, erEnkeltplassDeltaker: Boolean)
+	fun slettDeltaker(deltakerId: UUID, erKometDeltaker: Boolean?)
 
 	fun hentDeltakereMedPersonIdent(personIdent: String): List<Deltaker>
 

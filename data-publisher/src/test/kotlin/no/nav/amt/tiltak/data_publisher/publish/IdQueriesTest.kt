@@ -37,7 +37,7 @@ class IdQueriesTest : FunSpec({
 
 		val newDeltaker2 = db.createDeltaker()
 
-		val ids = idQueries.hentGruppeDeltakerIds(0, 10, LocalDateTime.now().minusDays(2))
+		val ids = idQueries.hentDeltakerIds(0, 10, LocalDateTime.now().minusDays(2))
 
 		ids shouldNotContain oldDeltaker.id
 		ids shouldContain newDeltaker1.id

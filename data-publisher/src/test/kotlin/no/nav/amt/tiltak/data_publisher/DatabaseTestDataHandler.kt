@@ -139,7 +139,7 @@ class DatabaseTestDataHandler(template: NamedParameterJdbcTemplate) {
 	private fun tiltakInput(
 		id: UUID = UUID.randomUUID(),
 		navn: String = UUID.randomUUID().toString(),
-		type: String = "GRUPPEAMO"
+		type: String = UUID.randomUUID().toString()
 	): TiltakInput = TiltakInput(id, navn, type)
 
 	private fun gjennomforingInput(

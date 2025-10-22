@@ -9,39 +9,13 @@ import java.util.UUID
 class IdQueries(
 	private val template: NamedParameterJdbcTemplate
 ) {
-	fun hentGruppeDeltakerIds(offset: Int, limit: Int, modifiedAfter: LocalDateTime): List<UUID> {
+	fun hentDeltakerIds(offset: Int, limit: Int, modifiedAfter: LocalDateTime): List<UUID> {
 		val sql = """
-        SELECT deltaker.id
-        FROM deltaker
-        JOIN gjennomforing ON deltaker.gjennomforing_id = gjennomforing.id
-        JOIN tiltak ON gjennomforing.tiltak_id = tiltak.id
-        WHERE tiltak.type IN ('INDOPPFAG','ARBFORB','AVKLARAG','VASV','ARBRRHDAG','DIGIOPPARB','JOBBK','GRUPPEAMO','GRUFAGYRKE')
-          AND deltaker.modified_at >= :modified_after
-        ORDER BY deltaker.id
-        OFFSET $offset LIMIT $limit
-    """.trimIndent()
-
-		return template.query(
-			sql,
-			sqlParameters(
-				"modified_after" to modifiedAfter,
-				"offset" to offset,
-				"limit" to limit
-			)
-		) { rs, _ -> rs.getUUID("id") }
-	}
-
-
-	fun hentEnkeltplassDeltakerIds(offset: Int, limit: Int, modifiedAfter: LocalDateTime): List<UUID> {
-		val sql = """
-			SELECT deltaker.id
+			SELECT id
 			FROM deltaker
-			JOIN gjennomforing on deltaker.gjennomforing_id = gjennomforing.id
-			JOIN tiltak on gjennomforing.tiltak_id = tiltak.id
-			WHERE tiltak.type in ('ENKELAMO','ENKFAGYRKE','HOYEREUTD')
-			AND deltaker.modified_at >= :modified_after
-			ORDER BY deltaker.id
-			OFFSET $offset LIMIT $limit
+			WHERE modified_at >= :modified_after
+			ORDER BY id
+			OFFSET :offset LIMIT :limit
 		""".trimIndent()
 
 		return template.query(

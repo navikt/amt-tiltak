@@ -14,7 +14,7 @@ import no.nav.amt.tiltak.core.port.DeltakerService
 import no.nav.amt.tiltak.core.port.EndringsmeldingService
 import no.nav.amt.tiltak.core.port.GjennomforingService
 import no.nav.amt.tiltak.core.port.UnleashService
-import no.nav.amt.tiltak.data_publisher.DataPublisherServiceImpl
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerDbo
 import no.nav.amt.tiltak.deltaker.dbo.DeltakerStatusDbo
@@ -39,7 +39,7 @@ open class DeltakerServiceImpl(
 	private val gjennomforingService: GjennomforingService,
 	private val transactionTemplate: TransactionTemplate,
 	private val deltakerV1Producer: DeltakerV1ProducerService,
-	private val publisherService: DataPublisherServiceImpl,
+	private val publisherService: DataPublisherService,
 	private val vurderingRepository: VurderingRepository,
 	private val unleashService: UnleashService
 ) : DeltakerService {
@@ -124,14 +124,13 @@ open class DeltakerServiceImpl(
 	}
 
 	override fun slettDeltakerePaaGjennomforing(gjennomforingId: UUID) {
-		val tiltak = gjennomforingService.getGjennomforing(gjennomforingId).tiltak
-		val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltak.kode)
+		val tiltaktype = gjennomforingService.getGjennomforing(gjennomforingId).tiltak.kode
+		val erKometDeltaker = unleashService.erKometMasterForTiltakstype(tiltaktype)
 		if (erKometDeltaker) {
 			return
-		}
-		else {
+		} else {
 			hentDeltakerePaaGjennomforing(gjennomforingId).forEach {
-				slettDeltaker(it.id, erKometDeltaker, tiltak.erEnkeltplass())
+				slettDeltaker(it.id, erKometDeltaker)
 			}
 		}
 	}
@@ -146,7 +145,7 @@ open class DeltakerServiceImpl(
 		}
 	}
 
-	override fun slettDeltaker(deltakerId: UUID, erKometDeltaker: Boolean?, erEnkeltplassDeltaker: Boolean) {
+	override fun slettDeltaker(deltakerId: UUID, erKometDeltaker: Boolean?) {
 		transactionTemplate.execute {
 			endringsmeldingService.slett(deltakerId)
 			deltakerStatusRepository.slett(deltakerId)
@@ -158,10 +157,7 @@ open class DeltakerServiceImpl(
 		}
 
 		log.info("Deltaker med id=$deltakerId er slettet")
-		if (erEnkeltplassDeltaker) {
-			publisherService.publish(deltakerId, DataPublishType.ENKELTPLASS_DELTAKER, erKometDeltaker)
-		}
-		else publisherService.publish(deltakerId, DataPublishType.DELTAKER, erKometDeltaker)
+		publisherService.publish(deltakerId, DataPublishType.DELTAKER, erKometDeltaker)
 	}
 
 	override fun erSkjermet(deltakerId: UUID): Boolean {

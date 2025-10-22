@@ -3,7 +3,7 @@ package no.nav.amt.tiltak.navansatt
 import no.nav.amt.tiltak.clients.amt_person.AmtPersonClient
 import no.nav.amt.tiltak.core.domain.nav_ansatt.NavAnsatt
 import no.nav.amt.tiltak.core.port.NavAnsattService
-import no.nav.amt.tiltak.data_publisher.DataPublisherServiceImpl
+import no.nav.amt.tiltak.data_publisher.DataPublisherService
 import no.nav.amt.tiltak.data_publisher.model.DataPublishType
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -13,7 +13,7 @@ import java.util.UUID
 internal class NavAnsattServiceImpl(
 	private val navAnsattRepository: NavAnsattRepository,
 	private val amtPersonClient: AmtPersonClient,
-	private val publisherService: DataPublisherServiceImpl,
+	private val publisherService: DataPublisherService,
 ) : NavAnsattService {
 
 	private val log = LoggerFactory.getLogger(javaClass)
