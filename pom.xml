@@ -49,7 +49,7 @@
         <testcontainers.version>1.21.3</testcontainers.version>
         <mockito-kotlin.version>6.1.0</mockito-kotlin.version>
         <schedlock.version>6.10.0</schedlock.version>
-        <nimbus.version>11.29.2</nimbus.version>
+        <nimbus.version>11.30</nimbus.version>
         <mockk.version>1.14.6</mockk.version>
         <kotest.version>5.6.1</kotest.version>
         <okhttp.version>5.2.1</okhttp.version>
@@ -57,8 +57,8 @@
         <mock-oauth2-server.version>3.0.0</mock-oauth2-server.version>
         <common.version>3.2025.08.18_11.44-04fe318bd185</common.version>
         <logstash.version>8.1</logstash.version>
-        <unleash.version>11.1.0</unleash.version>
-        <amtlib.version>1.2025.10.08_09.09-4d8d4f2abb10</amtlib.version>
+        <unleash.version>11.1.1</unleash.version>
+        <amtlib.version>1.2025.10.14_06.32-53cadc4ad6f2</amtlib.version>
     </properties>
 
     <repositories>
@@ -367,7 +367,7 @@
             <dependency>
                 <groupId>no.nav.poao-tilgang</groupId>
                 <artifactId>client</artifactId>
-                <version>2025.10.10_11.40-130253aa6597</version>
+                <version>2025.10.16_11.29-aaf8578da14c</version>
                 <exclusions>
                     <exclusion>
                         <groupId>com.squareup.okhttp3</groupId>
