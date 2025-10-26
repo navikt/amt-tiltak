@@ -7,7 +7,14 @@ updates:
       day: tuesday
       time: "03:00"
       timezone: Europe/Oslo
-    open-pull-requests-limit: 30
+    open-pull-requests-limit: 10
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "github-actions"
     directory: "/"
