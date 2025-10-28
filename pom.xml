@@ -56,7 +56,7 @@
         <token-support.version>5.0.34</token-support.version>
         <mock-oauth2-server.version>3.0.0</mock-oauth2-server.version>
         <common.version>3.2025.08.18_11.44-04fe318bd185</common.version>
-        <logstash.version>8.1</logstash.version>
+        <logstash.version>9.0</logstash.version>
         <unleash.version>11.1.1</unleash.version>
         <amtlib.version>1.2025.10.26_11.41-bce770cb3980</amtlib.version>
     </properties>
