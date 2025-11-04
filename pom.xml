@@ -52,9 +52,9 @@
         <nimbus.version>11.30</nimbus.version>
         <mockk.version>1.14.6</mockk.version>
         <kotest.version>5.6.1</kotest.version>
-        <okhttp.version>5.2.1</okhttp.version>
+        <okhttp.version>5.3.0</okhttp.version>
         <token-support.version>5.0.34</token-support.version>
-        <mock-oauth2-server.version>3.0.0</mock-oauth2-server.version>
+        <mock-oauth2-server.version>3.0.1</mock-oauth2-server.version>
         <common.version>3.2025.08.18_11.44-04fe318bd185</common.version>
         <logstash.version>9.0</logstash.version>
         <unleash.version>11.1.1</unleash.version>
@@ -367,7 +367,7 @@
             <dependency>
                 <groupId>no.nav.poao-tilgang</groupId>
                 <artifactId>client</artifactId>
-                <version>2025.10.16_11.29-aaf8578da14c</version>
+                <version>2025.11.03_13.40-18456d0598be</version>
                 <exclusions>
                     <exclusion>
                         <groupId>com.squareup.okhttp3</groupId>
