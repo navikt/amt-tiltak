@@ -87,7 +87,7 @@ abstract class IntegrationTestBase {
 
 			mockMachineToMachineHttpServer.start()
 			registry.add("nais.env.azureOpenIdConfigTokenEndpoint") {
-				mockMachineToMachineHttpServer.serverUrl() + MockMachineToMachineHttpServer.tokenPath
+				mockMachineToMachineHttpServer.serverUrl() + MockMachineToMachineHttpServer.TOKEN_PATH
 			}
 
 			registry.add("arrangoransatt.tilgang.updater.number-to-check") { 10 }
