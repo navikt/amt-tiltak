@@ -1,0 +1,1 @@
+ALTER TABLE publish ADD CONSTRAINT publish_pkey PRIMARY KEY (id);
