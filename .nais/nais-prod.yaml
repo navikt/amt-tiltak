@@ -83,6 +83,8 @@ spec:
   envFrom:
     - secret: amt-tiltak-unleash-api-token
   env:
+    - name: JDK_JAVA_OPTIONS
+      value: "-XX:MaxRAMPercentage=60.0"
     - name: AD_GRUPPE_ID_TILGANG_TIL_EGNE_ANSATTE
       value: {{ad_gruppe_egne_ansatte}}
     - name: AD_GRUPPE_ID_TILTAK_ANSVARLIG
