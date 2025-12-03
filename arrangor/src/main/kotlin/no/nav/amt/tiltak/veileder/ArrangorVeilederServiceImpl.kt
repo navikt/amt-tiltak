@@ -16,7 +16,6 @@ class ArrangorVeilederServiceImpl (
 	private val gjennomforingService: GjennomforingService
 ): ArrangorVeilederService {
 
-	private val log = LoggerFactory.getLogger(javaClass)
 	private val defaultGyldigTil = ZonedDateTime.parse("3000-01-01T00:00Z")
 
 	override fun hentVeiledereForDeltaker(deltakerId: UUID): List<ArrangorVeileder> {
@@ -42,23 +41,26 @@ class ArrangorVeilederServiceImpl (
 	}
 
 	override fun leggTilAnsattSomVeileder(ansattId: UUID, deltakerId: UUID, erMedveileder: Boolean) {
-		if (deltakerService.hentDeltaker(deltakerId) == null) {
-			log.warn("Deltaker med id $deltakerId finnes ikke, kan ikke sette ansatt $ansattId som veileder")
-		} else {
-			arrangorVeilederRepository.lagreVeileder(
-				deltakerId = deltakerId,
-				opprettVeilederDbo = OpprettVeilederDbo(
-					ansattId = ansattId,
-					erMedveileder = erMedveileder,
-					gyldigFra = ZonedDateTime.now(),
-					gyldigTil = defaultGyldigTil
-				)
+		if (deltakerService.hentDeltaker(deltakerId) == null) return
+
+		arrangorVeilederRepository.lagreVeileder(
+			deltakerId = deltakerId,
+			opprettVeilederDbo = OpprettVeilederDbo(
+				ansattId = ansattId,
+				erMedveileder = erMedveileder,
+				gyldigFra = ZonedDateTime.now(),
+				gyldigTil = defaultGyldigTil
 			)
-		}
+		)
+
 	}
 
 	override fun fjernAnsattSomVeileder(ansattId: UUID, deltakerId: UUID, erMedveileder: Boolean) {
-		arrangorVeilederRepository.inaktiverVeileder(ansattId = ansattId, deltakerId = deltakerId, erMedveileder = erMedveileder)
+		arrangorVeilederRepository.inaktiverVeileder(
+			ansattId = ansattId,
+			deltakerId = deltakerId,
+			erMedveileder = erMedveileder
+		)
 	}
 }
 
