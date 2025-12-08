@@ -55,7 +55,7 @@
         <okhttp.version>5.3.2</okhttp.version>
         <token-support.version>5.0.34</token-support.version>
         <mock-oauth2-server.version>3.0.1</mock-oauth2-server.version>
-        <common.version>3.2025.08.18_11.44-04fe318bd185</common.version>
+        <common.version>3.2025.11.10_14.07-a9f44944d7bc</common.version>
         <logstash.version>9.0</logstash.version>
         <unleash.version>11.1.1</unleash.version>
         <amtlib.version>1.2025.11.29_14.10-65f3180bda94</amtlib.version>
@@ -315,6 +315,10 @@
                 <version>${common.version}</version>
                 <exclusions>
                     <exclusion>
+                        <groupId>org.lz4</groupId>
+                        <artifactId>lz4-java</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <groupId>org.xerial.snappy</groupId>
                         <artifactId>snappy-java</artifactId>
                     </exclusion>
@@ -510,10 +514,24 @@
                 <version>${okhttp.version}</version>
                 <scope>test</scope>
             </dependency>
+
+            <!-- fjernes når  lz4-java er fikset permanent i kafka-clients -->
+            <dependency>
+                <groupId>at.yawk.lz4</groupId>
+                <artifactId>lz4-java</artifactId>
+                <version>1.10.1</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
+        <!-- fjernes når  lz4-java er fikset permanent i kafka-clients -->
+        <dependency>
+            <groupId>at.yawk.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>

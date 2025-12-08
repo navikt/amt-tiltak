@@ -48,6 +48,12 @@
         <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>kafka</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.lz4</groupId>
+                    <artifactId>lz4-java</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>no.nav.amt-tiltak</groupId>
