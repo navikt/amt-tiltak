@@ -58,7 +58,7 @@
         <common.version>3.2026.02.05_14.10-5533811c5158-beta</common.version>
         <logstash.version>9.0</logstash.version>
         <unleash.version>12.1.1</unleash.version>
-        <amtlib.version>1.2026.02.09_14.49-947c5129cb24</amtlib.version>
+        <amtlib.version>1.2026.02.10_08.44-78283cfd34bc</amtlib.version>
     </properties>
 
     <repositories>
