@@ -13,7 +13,7 @@ object SingletonPostgresContainer {
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	private const val POSTGRES_DOCKER_IMAGE_NAME = "postgres:14-alpine"
+	private const val POSTGRES_DOCKER_IMAGE_NAME = "postgres:17-alpine"
 
 	private var postgresContainer: PostgreSQLContainer<Nothing>? = null
 
