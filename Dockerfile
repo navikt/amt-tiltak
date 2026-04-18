@@ -1,4 +1,4 @@
-FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/jre:openjdk-21
+FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/jre:openjdk-25
 WORKDIR /app
 COPY /application/target/amt-tiltak-app.jar app.jar
 ENV TZ="Europe/Oslo"

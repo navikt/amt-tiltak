@@ -33,7 +33,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 21
+          java-version: 25
           cache: "maven"
       - name: Build maven artifacts
         run: mvn -B package -DskipTests
@@ -44,7 +44,7 @@ jobs:
 
   check_codeql_status:
     name: Check CodeQL Status
-    needs: Analyze
+    needs: analyze
     permissions:
       contents: read
       checks: read
