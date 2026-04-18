@@ -1,4 +1,9 @@
 version: 2
+registries:
+  maven-github:
+    type: maven-repository
+    url: https://github-package-registry-mirror.gc.nav.no/cached/maven-release
+
 updates:
   - package-ecosystem: "maven"
     directory: "/"
@@ -11,6 +16,9 @@ updates:
       default-days: 7
     open-pull-requests-limit: 10
     groups:
+      nav-dependencies:
+        patterns:
+          - "no.nav*"
       minor-and-patch:
         patterns:
           - "*"
