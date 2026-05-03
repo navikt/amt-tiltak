@@ -42,13 +42,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.code.style>official</kotlin.code.style>
         <kotlin.compiler.jvmTarget>25</kotlin.compiler.jvmTarget>
-        <kotlin.version>2.3.20</kotlin.version>
+        <kotlin.version>2.3.21</kotlin.version>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
 
         <testcontainers.version>1.21.4</testcontainers.version>
         <mockito-kotlin.version>6.3.0</mockito-kotlin.version>
-        <schedlock.version>7.6.0</schedlock.version>
+        <schedlock.version>7.7.0</schedlock.version>
         <nimbus.version>11.37</nimbus.version>
         <mockk.version>1.14.9</mockk.version>
         <kotest.version>5.6.1</kotest.version>
@@ -57,7 +57,7 @@
         <mock-oauth2-server.version>3.0.1</mock-oauth2-server.version>
         <common.version>4.2026.04.24_05.25-cab3c16705f7</common.version>
         <logstash.version>9.0</logstash.version>
-        <unleash.version>12.2.0</unleash.version>
+        <unleash.version>12.2.1</unleash.version>
         <amtlib.version>1.2026.02.25_21.37-43329f290d8a</amtlib.version>
     </properties>
 
@@ -519,7 +519,7 @@
             <dependency>
                 <groupId>at.yawk.lz4</groupId>
                 <artifactId>lz4-java</artifactId>
-                <version>1.10.4</version>
+                <version>1.11.0</version>
             </dependency>
 
         </dependencies>
