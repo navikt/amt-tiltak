@@ -18,7 +18,6 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
@@ -31,7 +30,6 @@ import javax.sql.DataSource
 @SpringBootTest(classes = [Application::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(IntegrationTestConfiguration::class)
 @ActiveProfiles("integration")
-@TestConfiguration("application-integration.properties")
 abstract class IntegrationTestBase {
 
 	@LocalServerPort
