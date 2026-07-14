@@ -6,7 +6,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerStatus
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
 import no.nav.amt.lib.models.deltaker.DeltakerHistorikk
-import no.nav.common.json.JsonUtils
+import no.nav.amt.tiltak.common.json.JsonUtils
 import org.springframework.util.DigestUtils
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -35,7 +35,7 @@ data class DeltakerPublishDto(
 	val sistEndret: LocalDateTime,
 	val erManueltDeltMedArrangor: Boolean,
 ) {
-	fun digest() = DigestUtils.md5DigestAsHex(JsonUtils.toJson(this).toByteArray())
+	fun digest() = DigestUtils.md5DigestAsHex(JsonUtils.toJsonString(this).toByteArray())
 }
 
 data class DeltakerPersonaliaDto(
