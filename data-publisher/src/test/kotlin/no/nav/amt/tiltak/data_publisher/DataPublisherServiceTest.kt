@@ -21,83 +21,95 @@ import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.util.UUID
 
-class DataPublisherServiceTest : FunSpec({
-	val dataSource = SingletonPostgresContainer.getDataSource()
-	val template = NamedParameterJdbcTemplate(dataSource)
+class DataPublisherServiceTest :
+	FunSpec({
+		val dataSource = SingletonPostgresContainer.getDataSource()
+		val template = NamedParameterJdbcTemplate(dataSource)
 
-	val kafkaTopicProperties = createTopicProperties()
-	val dbHandler = DatabaseTestDataHandler(template)
-	lateinit var kafkaProducerClient: KafkaProducerClient<String, String>
-	lateinit var unleashService: UnleashService
-	val publishRepository = PublishRepository(template)
+		val kafkaTopicProperties = createTopicProperties()
+		val dbHandler = DatabaseTestDataHandler(template)
+		lateinit var kafkaProducerClient: KafkaProducerClient<String, String>
+		lateinit var unleashService: UnleashService
+		val publishRepository = PublishRepository(template)
 
-	lateinit var service: DataPublisherService
+		lateinit var service: DataPublisherService
 
-	val publishAndVerify = fun(id: UUID, type: DataPublishType, expected: Int) {
-		service.publish(id, type, null)
-		verify(exactly = expected) { kafkaProducerClient.sendSync(any()) }
-	}
+		val publishAndVerify = fun(
+			id: UUID,
+			type: DataPublishType,
+			expected: Int,
+		) {
+			service.publish(id, type, null)
+			verify(exactly = expected) { kafkaProducerClient.sendSync(any()) }
+		}
 
-	beforeEach {
-		DbTestDataUtils.cleanDatabase(dataSource)
+		beforeEach {
+			DbTestDataUtils.cleanDatabase(dataSource)
 
-		val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
-		rootLogger.level = Level.INFO
+			val rootLogger: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
+			rootLogger.level = Level.INFO
 
-		kafkaProducerClient = mockk()
-		unleashService = mockk()
+			kafkaProducerClient = mockk()
+			unleashService = mockk()
 
-		every { kafkaProducerClient.sendSync(any()) } returns RecordMetadata(
-			TopicPartition("", 0),
-			0L,
-			0,
-			0L,
-			0,
-			0
-		)
+			every { kafkaProducerClient.sendSync(any()) } returns
+				RecordMetadata(
+					TopicPartition("", 0),
+					0L,
+					0,
+					0L,
+					0,
+					0,
+				)
 
-		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
+			every { unleashService.erKometMasterForTiltakstype(any()) } returns false
 
-		service = DataPublisherService(
-			kafkaTopicProperties, kafkaProducerClient, template, publishRepository,unleashService
-		)
-	}
+			service =
+				DataPublisherService(
+					kafkaTopicProperties,
+					kafkaProducerClient,
+					template,
+					publishRepository,
+					unleashService,
+				)
+		}
 
-	afterEach {
-		DbTestDataUtils.cleanDatabase(dataSource)
-	}
+		afterEach {
+			DbTestDataUtils.cleanDatabase(dataSource)
+		}
 
-	test("Ny Deltaker - Sendes") {
-		val input = dbHandler.createDeltaker()
-		publishAndVerify(input.id, DELTAKER, 1)
-	}
+		test("Ny Deltaker - Sendes") {
+			val input = dbHandler.createDeltaker()
+			publishAndVerify(input.id, DELTAKER, 1)
+		}
 
-	test("Deltaker to ganger uten endring - sendes en gang") {
-		val input = dbHandler.createDeltaker()
-		publishAndVerify(input.id, DELTAKER, 1)
-		publishAndVerify(input.id, DELTAKER, 1)
-	}
+		test("Deltaker to ganger uten endring - sendes en gang") {
+			val input = dbHandler.createDeltaker()
+			publishAndVerify(input.id, DELTAKER, 1)
+			publishAndVerify(input.id, DELTAKER, 1)
+		}
 
-	test("Ny endringsmelding - sendes") {
-		val input = dbHandler.createEndringsmelding()
-		publishAndVerify(input.id, ENDRINGSMELDING, 1)
-	}
+		test("Ny endringsmelding - sendes") {
+			val input = dbHandler.createEndringsmelding()
+			publishAndVerify(input.id, ENDRINGSMELDING, 1)
+		}
 
-	test("Endringsmelding to ganger uten endring - sendes en gang") {
-		val input = dbHandler.createEndringsmelding()
-		publishAndVerify(input.id, ENDRINGSMELDING, 1)
-		publishAndVerify(input.id, ENDRINGSMELDING, 1)
-	}
-})
+		test("Endringsmelding to ganger uten endring - sendes en gang") {
+			val input = dbHandler.createEndringsmelding()
+			publishAndVerify(input.id, ENDRINGSMELDING, 1)
+			publishAndVerify(input.id, ENDRINGSMELDING, 1)
+		}
+	})
 
-private fun createTopicProperties(): KafkaTopicProperties = KafkaTopicProperties(
-	amtTiltakTopic = "",
-	sisteTiltaksgjennomforingerTopic = "",
-	deltakerTopic = "",
-	amtArrangorTopic = "",
-	amtEndringsmeldingTopic = "",
-	amtDeltakerTopic = "",
-	amtArrangorAnsattTopic = "",
-	amtNavBrukerPersonaliaTopic = "",
-	amtNavAnsattPersonaliaTopic = ""
-)
+private fun createTopicProperties(): KafkaTopicProperties =
+	KafkaTopicProperties(
+		amtTiltakTopic = "",
+		sisteTiltaksgjennomforingerTopic = "",
+		deltakerTopic = "",
+		amtArrangorTopic = "",
+		amtEndringsmeldingTopic = "",
+		amtDeltakerTopic = "",
+		amtArrangorAnsattTopic = "",
+		amtNavBrukerPersonaliaTopic = "",
+		amtNavAnsattPersonaliaTopic = "",
+	)
