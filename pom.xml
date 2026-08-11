@@ -42,14 +42,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.code.style>official</kotlin.code.style>
         <kotlin.compiler.jvmTarget>25</kotlin.compiler.jvmTarget>
-        <kotlin.version>2.4.0</kotlin.version>
+        <kotlin.version>2.4.10</kotlin.version>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
 
         <testcontainers.version>1.21.4</testcontainers.version>
         <mockito-kotlin.version>6.3.0</mockito-kotlin.version>
         <schedlock.version>7.7.0</schedlock.version>
-        <nimbus.version>11.38.1</nimbus.version>
+        <nimbus.version>11.38.2</nimbus.version>
         <mockk.version>1.14.11</mockk.version>
         <kotest.version>5.6.1</kotest.version>
         <okhttp.version>5.4.0</okhttp.version>
@@ -57,7 +57,7 @@
         <mock-oauth2-server.version>5.0.2</mock-oauth2-server.version>
         <common.version>4.2026.07.17_11.36-f5bba2c96561</common.version>
         <logstash.version>9.0</logstash.version>
-        <unleash.version>12.2.2</unleash.version>
+        <unleash.version>12.2.3</unleash.version>
         <amtlib.version>1.2026.02.25_21.37-43329f290d8a</amtlib.version>
     </properties>
 
