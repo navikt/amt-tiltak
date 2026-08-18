@@ -21,7 +21,6 @@ import java.time.ZonedDateTime
 import java.util.*
 
 class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
-
 	@BeforeEach
 	internal fun setUp() {
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource)
@@ -29,11 +28,12 @@ class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 
 	@Test
 	internal fun `skal teste token autentisering`() {
-		val requestBuilders = listOf(
-			Request.Builder().get().url("${serverUrl()}/api/nav-ansatt/gjennomforing"),
-			Request.Builder().get().url("${serverUrl()}/api/nav-ansatt/gjennomforing/${UUID.randomUUID()}"),
-			Request.Builder().get().url("${serverUrl()}/api/nav-ansatt/gjennomforing?lopenr=1234"),
-		)
+		val requestBuilders =
+			listOf(
+				Request.Builder().get().url("${serverUrl()}/api/nav-ansatt/gjennomforing"),
+				Request.Builder().get().url("${serverUrl()}/api/nav-ansatt/gjennomforing/${UUID.randomUUID()}"),
+				Request.Builder().get().url("${serverUrl()}/api/nav-ansatt/gjennomforing?lopenr=1234"),
+			)
 		testNavAnsattAutentisering(requestBuilders, client, mockOAuthServer)
 	}
 
@@ -42,17 +42,19 @@ class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 		val token = lagTokenMedAdGruppe(NAV_ANSATT_1)
 		giTilgang(NAV_ANSATT_1, GJENNOMFORING_1)
 
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/nav-ansatt/gjennomforing",
-			headers = mapOf("Authorization" to "Bearer $token")
-		)
+		val response =
+			sendRequest(
+				method = "GET",
+				url = "/api/nav-ansatt/gjennomforing",
+				headers = mapOf("Authorization" to "Bearer $token"),
+			)
 
-		val expectedJson = """
-				[{"id":"513219ca-481b-4aae-9d51-435dba9929cd","navn":"Tiltaksgjennomforing2","arrangorNavn":"Org Tiltaksarrangør 2","lopenr":124,"opprettetAar":2020,"antallAktiveEndringsmeldinger":0,"harSkjermedeDeltakere":false,"adressebeskyttelser":[],"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"AVSLUTTET","startDato":"2022-02-01","sluttDato":"2022-02-13"},{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","arrangorNavn":"Org Tiltaksarrangør 1","lopenr":123,"opprettetAar":2020,"antallAktiveEndringsmeldinger":3,"harSkjermedeDeltakere":false,"adressebeskyttelser":[],"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"GJENNOMFORES","startDato":"2022-02-01","sluttDato":"2050-12-30"}]
+		val expectedJson =
+			"""
+			[{"id":"513219ca-481b-4aae-9d51-435dba9929cd","navn":"Tiltaksgjennomforing2","arrangorNavn":"Org Tiltaksarrangør 2","lopenr":124,"opprettetAar":2020,"antallAktiveEndringsmeldinger":0,"harSkjermedeDeltakere":false,"adressebeskyttelser":[],"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"AVSLUTTET","startDato":"2022-02-01","sluttDato":"2022-02-13"},{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","arrangorNavn":"Org Tiltaksarrangør 1","lopenr":123,"opprettetAar":2020,"antallAktiveEndringsmeldinger":3,"harSkjermedeDeltakere":false,"adressebeskyttelser":[],"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"GJENNOMFORES","startDato":"2022-02-01","sluttDato":"2050-12-30"}]
 			""".trimIndent()
 		response.code shouldBe 200
-		response.body?.string() shouldBe expectedJson
+		response.body.string() shouldBe expectedJson
 	}
 
 	@Test
@@ -62,34 +64,38 @@ class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 
 		insertPersonMedEndringsmeldinger(BRUKER_ADRESSEBESKYTTET.copy(erSkjermet = true))
 
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/nav-ansatt/gjennomforing",
-			headers = mapOf("Authorization" to "Bearer $token")
-		)
+		val response =
+			sendRequest(
+				method = "GET",
+				url = "/api/nav-ansatt/gjennomforing",
+				headers = mapOf("Authorization" to "Bearer $token"),
+			)
 
-		val expectedJson = """
-				[{"id":"513219ca-481b-4aae-9d51-435dba9929cd","navn":"Tiltaksgjennomforing2","arrangorNavn":"Org Tiltaksarrangør 2","lopenr":124,"opprettetAar":2020,"antallAktiveEndringsmeldinger":0,"harSkjermedeDeltakere":false,"adressebeskyttelser":[],"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"AVSLUTTET","startDato":"2022-02-01","sluttDato":"2022-02-13"},{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","arrangorNavn":"Org Tiltaksarrangør 1","lopenr":123,"opprettetAar":2020,"antallAktiveEndringsmeldinger":4,"harSkjermedeDeltakere":true,"adressebeskyttelser":["STRENGT_FORTROLIG"],"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"GJENNOMFORES","startDato":"2022-02-01","sluttDato":"2050-12-30"}]
+		val expectedJson =
+			"""
+			[{"id":"513219ca-481b-4aae-9d51-435dba9929cd","navn":"Tiltaksgjennomforing2","arrangorNavn":"Org Tiltaksarrangør 2","lopenr":124,"opprettetAar":2020,"antallAktiveEndringsmeldinger":0,"harSkjermedeDeltakere":false,"adressebeskyttelser":[],"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"AVSLUTTET","startDato":"2022-02-01","sluttDato":"2022-02-13"},{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","arrangorNavn":"Org Tiltaksarrangør 1","lopenr":123,"opprettetAar":2020,"antallAktiveEndringsmeldinger":4,"harSkjermedeDeltakere":true,"adressebeskyttelser":["STRENGT_FORTROLIG"],"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"GJENNOMFORES","startDato":"2022-02-01","sluttDato":"2050-12-30"}]
 			""".trimIndent()
 		response.code shouldBe 200
-		response.body?.string() shouldBe expectedJson
+		response.body.string() shouldBe expectedJson
 	}
 
 	@Test
 	fun `hentGjennomforinger() - skal returnere 403 hvis ikke tilgang til flate`() {
 		val oid = UUID.randomUUID()
 
-		val token = mockOAuthServer.issueAzureAdToken(
-			ident = NAV_ANSATT_1.navIdent,
-			oid = oid,
-			adGroupIds = emptyArray(),
-		)
+		val token =
+			mockOAuthServer.issueAzureAdToken(
+				ident = NAV_ANSATT_1.navIdent,
+				oid = oid,
+				adGroupIds = emptyArray(),
+			)
 
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/nav-ansatt/gjennomforing",
-			headers = mapOf("Authorization" to "Bearer $token")
-		)
+		val response =
+			sendRequest(
+				method = "GET",
+				url = "/api/nav-ansatt/gjennomforing",
+				headers = mapOf("Authorization" to "Bearer $token"),
+			)
 
 		response.code shouldBe 403
 	}
@@ -99,35 +105,39 @@ class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 		val token = lagTokenMedAdGruppe(NAV_ANSATT_1)
 		giTilgang(NAV_ANSATT_1, GJENNOMFORING_1)
 
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/nav-ansatt/gjennomforing/${GJENNOMFORING_1.id}",
-			headers = mapOf("Authorization" to "Bearer $token")
-		)
+		val response =
+			sendRequest(
+				method = "GET",
+				url = "/api/nav-ansatt/gjennomforing/${GJENNOMFORING_1.id}",
+				headers = mapOf("Authorization" to "Bearer $token"),
+			)
 
-		val expectedJson = """
+		val expectedJson =
+			"""
 			{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","tiltakNavn":"Tiltak1","startDato":"2022-02-01","sluttDato":"2050-12-30","arrangor":{"virksomhetNavn":"Tiltaksarrangør 1","virksomhetOrgnr":"111111111","organisasjonNavn":"Org Tiltaksarrangør 1","organisasjonOrgnr":"911111111"},"lopenr":123,"opprettetAr":2020,"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"GJENNOMFORES"}
-		""".trimIndent()
+			""".trimIndent()
 
 		response.code shouldBe 200
-		response.body?.string() shouldBe expectedJson
+		response.body.string() shouldBe expectedJson
 	}
 
 	@Test
 	fun `hentGjennomforing() - skal returnere 403 hvis ikke tilgang til flate`() {
 		val oid = UUID.randomUUID()
 
-		val token = mockOAuthServer.issueAzureAdToken(
-			ident = NAV_ANSATT_1.navIdent,
-			oid = oid,
-			adGroupIds = emptyArray(),
-		)
+		val token =
+			mockOAuthServer.issueAzureAdToken(
+				ident = NAV_ANSATT_1.navIdent,
+				oid = oid,
+				adGroupIds = emptyArray(),
+			)
 
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/nav-ansatt/gjennomforing/${GJENNOMFORING_1.id}",
-			headers = mapOf("Authorization" to "Bearer $token")
-		)
+		val response =
+			sendRequest(
+				method = "GET",
+				url = "/api/nav-ansatt/gjennomforing/${GJENNOMFORING_1.id}",
+				headers = mapOf("Authorization" to "Bearer $token"),
+			)
 
 		response.code shouldBe 403
 	}
@@ -136,11 +146,12 @@ class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 	fun `hentGjennomforing() - skal returnere 403 hvis ikke tilgang til gjennomforing`() {
 		val token = lagTokenMedAdGruppe(NAV_ANSATT_2)
 
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/nav-ansatt/gjennomforing/${GJENNOMFORING_1.id}",
-			headers = mapOf("Authorization" to "Bearer $token")
-		)
+		val response =
+			sendRequest(
+				method = "GET",
+				url = "/api/nav-ansatt/gjennomforing/${GJENNOMFORING_1.id}",
+				headers = mapOf("Authorization" to "Bearer $token"),
+			)
 
 		response.code shouldBe 403
 	}
@@ -149,48 +160,55 @@ class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 	internal fun `hentGjennomforingerMedLopenr - skal ha status 200 med korrekt respons`() {
 		val token = lagTokenMedAdGruppe(NAV_ANSATT_1)
 
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/nav-ansatt/gjennomforing?lopenr=${GJENNOMFORING_1.lopenr}",
-			headers = mapOf("Authorization" to "Bearer $token")
-		)
+		val response =
+			sendRequest(
+				method = "GET",
+				url = "/api/nav-ansatt/gjennomforing?lopenr=${GJENNOMFORING_1.lopenr}",
+				headers = mapOf("Authorization" to "Bearer $token"),
+			)
 
-		val expectedJson = """
+		val expectedJson =
+			"""
 			[{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","lopenr":123,"status":"GJENNOMFORES","startDato":"2022-02-01","sluttDato":"2050-12-30","opprettetAr":2020,"arrangorNavn":"Org Tiltaksarrangør 1","tiltak":{"kode":"AMO","navn":"Tiltak1"}}]
-		""".trimIndent()
+			""".trimIndent()
 
 		response.code shouldBe 200
-		response.body?.string() shouldBe expectedJson
+		response.body.string() shouldBe expectedJson
 	}
 
 	@Test
 	fun `hentGjennomforingerMedLopenr() - skal returnere 403 hvis ikke tilgang til flate`() {
 		val oid = UUID.randomUUID()
 
-		val token = mockOAuthServer.issueAzureAdToken(
-			ident = NAV_ANSATT_1.navIdent,
-			oid = oid,
-			adGroupIds = emptyArray(),
-		)
+		val token =
+			mockOAuthServer.issueAzureAdToken(
+				ident = NAV_ANSATT_1.navIdent,
+				oid = oid,
+				adGroupIds = emptyArray(),
+			)
 
-		val response = sendRequest(
-			method = "GET",
-			url = "/api/nav-ansatt/gjennomforing?lopenr=${GJENNOMFORING_1.lopenr}",
-			headers = mapOf("Authorization" to "Bearer $token")
-		)
+		val response =
+			sendRequest(
+				method = "GET",
+				url = "/api/nav-ansatt/gjennomforing?lopenr=${GJENNOMFORING_1.lopenr}",
+				headers = mapOf("Authorization" to "Bearer $token"),
+			)
 
 		response.code shouldBe 403
 	}
 
-	private fun giTilgang(ansatt: NavAnsattInput, gjennomforing: GjennomforingInput) {
+	private fun giTilgang(
+		ansatt: NavAnsattInput,
+		gjennomforing: GjennomforingInput,
+	) {
 		testDataRepository.insertTiltaksansvarligGjennomforingTilgang(
 			TiltaksansvarligGjennomforingTilgangInput(
 				id = UUID.randomUUID(),
 				navAnsattId = ansatt.id,
 				gjennomforingId = gjennomforing.id,
 				gyldigTil = ZonedDateTime.now().plusDays(1),
-				createdAt = ZonedDateTime.now()
-			)
+				createdAt = ZonedDateTime.now(),
+			),
 		)
 	}
 
@@ -203,7 +221,6 @@ class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 		)
 	}
 
-
 	private fun insertPersonMedEndringsmeldinger(bruker: BrukerInput) {
 		val deltaker = TestData.createDeltakerInput(bruker, GJENNOMFORING_1)
 		val endringsmelding = TestData.createEndringsmelding(deltaker, ARRANGOR_ANSATT_1)
@@ -214,6 +231,4 @@ class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 		testDataRepository.insertDeltakerStatus(status)
 		testDataRepository.insertEndringsmelding(endringsmelding)
 	}
-
-
 }

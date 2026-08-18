@@ -9,19 +9,20 @@ import java.util.UUID
 import java.util.function.Supplier
 
 class MulighetsrommetApiClientImpl(
-    private val baseUrl: String,
-    private val tokenProvider: Supplier<String>,
-    private val httpClient: OkHttpClient = baseClient(),
+	private val baseUrl: String,
+	private val tokenProvider: Supplier<String>,
+	private val httpClient: OkHttpClient = baseClient(),
 ) : MulighetsrommetApiClient {
-
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	override fun hentGjennomforingArenaData(id: UUID): GjennomforingArenaData? {
-		val request = Request.Builder()
-			.url("$baseUrl/api/v1/tiltaksgjennomforinger/arenadata/$id")
-			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
-			.get()
-			.build()
+		val request =
+			Request
+				.Builder()
+				.url("$baseUrl/api/v1/tiltaksgjennomforinger/arenadata/$id")
+				.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
+				.get()
+				.build()
 
 		httpClient.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
@@ -39,17 +40,19 @@ class MulighetsrommetApiClientImpl(
 
 			return GjennomforingArenaData(
 				opprettetAar = responseBody.opprettetAar,
-				lopenr = responseBody.lopenr
+				lopenr = responseBody.lopenr,
 			)
 		}
 	}
 
 	override fun hentGjennomforing(id: UUID): GjennomforingResponse {
-		val request = Request.Builder()
-			.url("$baseUrl/api/v1/tiltaksgjennomforinger/$id")
-			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
-			.get()
-			.build()
+		val request =
+			Request
+				.Builder()
+				.url("$baseUrl/api/v1/tiltaksgjennomforinger/$id")
+				.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
+				.get()
+				.build()
 
 		httpClient.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
@@ -59,15 +62,13 @@ class MulighetsrommetApiClientImpl(
 			val body = response.body?.string() ?: throw RuntimeException("Body is missing")
 
 			return fromJsonString(body)
-
 		}
 	}
 
 	object HentGjennomforingArenaData {
 		data class Response(
 			val opprettetAar: Int,
-			val lopenr: Int
+			val lopenr: Int,
 		)
 	}
-
 }

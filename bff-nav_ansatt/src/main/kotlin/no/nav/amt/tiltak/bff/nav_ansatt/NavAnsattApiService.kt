@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.bff.nav_ansatt
 
-import java.util.UUID
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.DeltakerDto
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.EndringsmeldingDto
 import no.nav.amt.tiltak.bff.nav_ansatt.dto.HentGjennomforingerDto
@@ -21,6 +20,7 @@ import no.nav.amt.tiltak.core.port.UnleashService
 import no.nav.amt.tiltak.core.port.VurderingService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class NavAnsattApiService(
@@ -28,37 +28,57 @@ class NavAnsattApiService(
 	private val deltakerService: DeltakerService,
 	private val gjennomforingService: GjennomforingService,
 	private val vurderingService: VurderingService,
-	private val unleashService: UnleashService
+	private val unleashService: UnleashService,
 ) {
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	companion object {
-		fun harTilgangTilDeltaker(deltaker: Deltaker, tilganger: List<AdGruppe>): Boolean {
-			val tilgangTilMuligAdressebeskyttetDeltaker = when (deltaker.adressebeskyttelse) {
-				Adressebeskyttelse.STRENGT_FORTROLIG_UTLAND,
-				Adressebeskyttelse.STRENGT_FORTROLIG -> tilganger.contains(AdGruppe.TILTAKSANSVARLIG_STRENGT_FORTROLIG_ADRESSE_GRUPPE)
-				Adressebeskyttelse.FORTROLIG -> tilganger.contains(AdGruppe.TILTAKSANSVARLIG_FORTROLIG_ADRESSE_GRUPPE)
-				null -> true
-			}
+		fun harTilgangTilDeltaker(
+			deltaker: Deltaker,
+			tilganger: List<AdGruppe>,
+		): Boolean {
+			val tilgangTilMuligAdressebeskyttetDeltaker =
+				when (deltaker.adressebeskyttelse) {
+					Adressebeskyttelse.STRENGT_FORTROLIG_UTLAND,
+					Adressebeskyttelse.STRENGT_FORTROLIG,
+					-> tilganger.contains(AdGruppe.TILTAKSANSVARLIG_STRENGT_FORTROLIG_ADRESSE_GRUPPE)
 
-			val tilgangTilMuligSkjermetDeltaker = if (deltaker.erSkjermet) {
-				tilganger.contains(AdGruppe.TILTAKSANSVARLIG_EGNE_ANSATTE_GRUPPE)
-			} else {
-				true
-			}
+					Adressebeskyttelse.FORTROLIG -> tilganger.contains(AdGruppe.TILTAKSANSVARLIG_FORTROLIG_ADRESSE_GRUPPE)
+
+					null -> true
+				}
+
+			val tilgangTilMuligSkjermetDeltaker =
+				if (deltaker.erSkjermet) {
+					tilganger.contains(AdGruppe.TILTAKSANSVARLIG_EGNE_ANSATTE_GRUPPE)
+				} else {
+					true
+				}
 
 			return tilgangTilMuligAdressebeskyttetDeltaker && tilgangTilMuligSkjermetDeltaker
 		}
 	}
 
-	fun hentEndringsmeldinger(gjennomforingId: UUID, tilganger: List<AdGruppe>): List<EndringsmeldingDto> {
+	fun hentEndringsmeldinger(
+		gjennomforingId: UUID,
+		tilganger: List<AdGruppe>,
+	): List<EndringsmeldingDto> {
 		val endringsmeldinger = hentEndringsmeldingerForGjennomforing(gjennomforingId)
 		val deltakerMap = deltakerService.hentDeltakerMap(endringsmeldinger.map { it.deltakerId })
 
-		return endringsmeldinger.mapNotNull { endringsmelding -> tilEndringsmeldingDto(endringsmelding, deltakerMap, tilganger) }
+		return endringsmeldinger.mapNotNull { endringsmelding ->
+			tilEndringsmeldingDto(
+				endringsmelding,
+				deltakerMap,
+				tilganger,
+			)
+		}
 	}
 
-	fun hentMeldinger(gjennomforingId: UUID, tilganger: List<AdGruppe>): MeldingerFraArrangorResponse {
+	fun hentMeldinger(
+		gjennomforingId: UUID,
+		tilganger: List<AdGruppe>,
+	): MeldingerFraArrangorResponse {
 		val alleEndringsmeldinger = hentEndringsmeldingerForGjennomforing(gjennomforingId)
 		val alleVurderinger = vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforingId)
 
@@ -68,33 +88,37 @@ class NavAnsattApiService(
 
 		val deltakerMap = deltakerService.hentDeltakerMap(deltakerIder.distinct())
 
-		val endringsmeldinger = alleEndringsmeldinger.mapNotNull { endringsmelding ->
-			tilEndringsmeldingDto(endringsmelding, deltakerMap, tilganger)
-		}
+		val endringsmeldinger =
+			alleEndringsmeldinger.mapNotNull { endringsmelding ->
+				tilEndringsmeldingDto(endringsmelding, deltakerMap, tilganger)
+			}
 
-		val vurderinger = alleVurderinger.mapNotNull { vurdering ->
-			tilVurderingDto(vurdering, deltakerMap, tilganger)
-		}
+		val vurderinger =
+			alleVurderinger.mapNotNull { vurdering ->
+				tilVurderingDto(vurdering, deltakerMap, tilganger)
+			}
 		return MeldingerFraArrangorResponse(endringsmeldinger, vurderinger)
 	}
 
-	fun hentGjennomforinger(gjennomforingIder: List<UUID>) : List<HentGjennomforingerDto> {
+	fun hentGjennomforinger(gjennomforingIder: List<UUID>): List<HentGjennomforingerDto> {
 		return gjennomforingService.getGjennomforinger(gjennomforingIder).map { gjennomforing ->
-			val aktiveEndringsmeldinger = hentEndringsmeldingerForGjennomforing(gjennomforing.id)
-				.filter { it.status == Endringsmelding.Status.AKTIV }
+			val aktiveEndringsmeldinger =
+				hentEndringsmeldingerForGjennomforing(gjennomforing.id)
+					.filter { it.status == Endringsmelding.Status.AKTIV }
 			val alleVurderinger = vurderingService.hentAktiveVurderingerForGjennomforing(gjennomforing.id)
 
-			val deltakere = deltakerService.hentDeltakere(
-				aktiveEndringsmeldinger.map { it.deltakerId }
-				.plus(alleVurderinger.map { it.deltakerId })
-			)
+			val deltakere =
+				deltakerService.hentDeltakere(
+					aktiveEndringsmeldinger
+						.map { it.deltakerId }
+						.plus(alleVurderinger.map { it.deltakerId }),
+				)
 			val harSkjermede = deltakere.any { it.erSkjermet }
 			val adressebeskyttelser = deltakere.mapNotNull { it.adressebeskyttelse }.distinct()
 
 			return@map gjennomforing.toDto(aktiveEndringsmeldinger.size, harSkjermede, adressebeskyttelser)
 		}
 	}
-
 
 	private fun hentEndringsmeldingerForGjennomforing(gjennomforingId: UUID): List<Endringsmelding> {
 		val gjennomforing = gjennomforingService.getGjennomforing(gjennomforingId)
@@ -114,10 +138,14 @@ class NavAnsattApiService(
 		return if (harTilgangTilDeltaker(deltaker, tilganger)) {
 			endringsmelding.toDto(deltaker.toDto())
 		} else {
-			endringsmelding.toDto(DeltakerDto(erSkjermet = deltaker.erSkjermet, adressebeskyttelse = deltaker.adressebeskyttelse))
+			endringsmelding.toDto(
+				DeltakerDto(
+					erSkjermet = deltaker.erSkjermet,
+					adressebeskyttelse = deltaker.adressebeskyttelse,
+				),
+			)
 		}
 	}
-
 
 	private fun tilVurderingDto(
 		vurdering: VurderingDbo,
@@ -129,21 +157,28 @@ class NavAnsattApiService(
 		return if (harTilgangTilDeltaker(deltaker, tilganger)) {
 			vurdering.toDto(deltaker.toDto())
 		} else {
-			vurdering.toDto(DeltakerDto(erSkjermet = deltaker.erSkjermet, adressebeskyttelse = deltaker.adressebeskyttelse))
+			vurdering.toDto(
+				DeltakerDto(
+					erSkjermet = deltaker.erSkjermet,
+					adressebeskyttelse = deltaker.adressebeskyttelse,
+				),
+			)
 		}
 	}
 
-
-	private fun getDeltaker(deltakerId: UUID, deltakerMap: Map<UUID, Deltaker>): Deltaker? {
+	private fun getDeltaker(
+		deltakerId: UUID,
+		deltakerMap: Map<UUID, Deltaker>,
+	): Deltaker? {
 		deltakerMap[deltakerId]?.let { return it }
-		log.warn("Fant ikke deltaker med id $deltakerId")
+		log.info("Fant ikke deltaker med id $deltakerId")
 		return null
 	}
 
-	private fun Gjennomforing.toDto (
+	private fun Gjennomforing.toDto(
 		antallAktiveEndringsmeldinger: Int,
 		harSkjermede: Boolean,
-		adressebeskyttelser: List<Adressebeskyttelse>
+		adressebeskyttelser: List<Adressebeskyttelse>,
 	) = HentGjennomforingerDto(
 		id = id,
 		navn = navn,
@@ -153,27 +188,29 @@ class NavAnsattApiService(
 		antallAktiveEndringsmeldinger = antallAktiveEndringsmeldinger,
 		harSkjermedeDeltakere = harSkjermede,
 		adressebeskyttelser = adressebeskyttelser,
-		tiltak = TiltakDto(
-			kode = tiltak.kode,
-			navn = tiltak.navn,
-		),
+		tiltak =
+			TiltakDto(
+				kode = tiltak.kode,
+				navn = tiltak.navn,
+			),
 		status = status,
 		startDato = startDato,
-		sluttDato = sluttDato
+		sluttDato = sluttDato,
 	)
 
-	private fun Endringsmelding.toDto(deltakerDto: DeltakerDto) = EndringsmeldingDto(
-		id = id,
-		deltaker = deltakerDto,
-		status = status.toDto(),
-		innhold = innhold?.toDto(),
-		opprettetDato = opprettet,
-		utfortTidspunkt = utfortTidspunkt,
-		type = type.toDto()
-	)
+	private fun Endringsmelding.toDto(deltakerDto: DeltakerDto) =
+		EndringsmeldingDto(
+			id = id,
+			deltaker = deltakerDto,
+			status = status.toDto(),
+			innhold = innhold?.toDto(),
+			opprettetDato = opprettet,
+			utfortTidspunkt = utfortTidspunkt,
+			type = type.toDto(),
+		)
 
-	private fun Endringsmelding.Type.toDto(): EndringsmeldingDto.Type {
-		return when (this) {
+	private fun Endringsmelding.Type.toDto(): EndringsmeldingDto.Type =
+		when (this) {
 			Endringsmelding.Type.LEGG_TIL_OPPSTARTSDATO -> EndringsmeldingDto.Type.LEGG_TIL_OPPSTARTSDATO
 			Endringsmelding.Type.ENDRE_OPPSTARTSDATO -> EndringsmeldingDto.Type.ENDRE_OPPSTARTSDATO
 			Endringsmelding.Type.FORLENG_DELTAKELSE -> EndringsmeldingDto.Type.FORLENG_DELTAKELSE
@@ -183,22 +220,23 @@ class NavAnsattApiService(
 			Endringsmelding.Type.ENDRE_SLUTTDATO -> EndringsmeldingDto.Type.ENDRE_SLUTTDATO
 			Endringsmelding.Type.ENDRE_SLUTTAARSAK -> EndringsmeldingDto.Type.ENDRE_SLUTTAARSAK
 		}
-	}
 
-	private fun VurderingDbo.toDto(deltakerDto: DeltakerDto) = VurderingDto(
-		id = id,
-		deltaker = deltakerDto,
-		vurderingstype = vurderingstype,
-		begrunnelse = begrunnelse,
-		opprettetDato = gyldigFra
-	)
+	private fun VurderingDbo.toDto(deltakerDto: DeltakerDto) =
+		VurderingDto(
+			id = id,
+			deltaker = deltakerDto,
+			vurderingstype = vurderingstype,
+			begrunnelse = begrunnelse,
+			opprettetDato = gyldigFra,
+		)
 
-	private fun Deltaker.toDto() = DeltakerDto(
-		fornavn = fornavn,
-		mellomnavn = mellomnavn,
-		etternavn = etternavn,
-		fodselsnummer = personIdent,
-		erSkjermet = erSkjermet,
-		adressebeskyttelse = adressebeskyttelse,
-	)
+	private fun Deltaker.toDto() =
+		DeltakerDto(
+			fornavn = fornavn,
+			mellomnavn = mellomnavn,
+			etternavn = etternavn,
+			fodselsnummer = personIdent,
+			erSkjermet = erSkjermet,
+			adressebeskyttelse = adressebeskyttelse,
+		)
 }

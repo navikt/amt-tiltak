@@ -22,7 +22,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
-open class ArrangorAnsattTilgangServiceImpl(
+class ArrangorAnsattTilgangServiceImpl(
 	private val arrangorAnsattService: ArrangorAnsattService,
 	private val ansattRolleService: AnsattRolleService,
 	private val deltakerService: DeltakerService,
@@ -33,41 +33,53 @@ open class ArrangorAnsattTilgangServiceImpl(
 	private val transactionTemplate: TransactionTemplate,
 	private val amtArrangorService: AmtArrangorService,
 ) : ArrangorAnsattTilgangService {
-
 	private val log = LoggerFactory.getLogger(javaClass)
 
-	override fun verifiserTilgangTilGjennomforing(ansattId: UUID, gjennomforingId: UUID) {
+	override fun verifiserTilgangTilGjennomforing(
+		ansattId: UUID,
+		gjennomforingId: UUID,
+	) {
 		val arrangorId = gjennomforingService.getArrangorId(gjennomforingId)
 
-		if (!harKoordinatorTilgang(ansattId, gjennomforingId, arrangorId)){
-			log.warn("Ansatt med id=$ansattId har ikke tilgang til gjennomføring med id=$gjennomforingId")
+		if (!harKoordinatorTilgang(ansattId, gjennomforingId, arrangorId)) {
+			log.info("Ansatt med id=$ansattId har ikke tilgang til gjennomføring med id=$gjennomforingId")
 			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Ansatt har ikke tilgang til gjennomforing")
 		}
 	}
 
-	override fun verifiserTilgangTilDeltaker(ansattId: UUID, deltakerId: UUID) {
-		val deltaker = deltakerService.hentDeltaker(deltakerId)
-			?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
+	override fun verifiserTilgangTilDeltaker(
+		ansattId: UUID,
+		deltakerId: UUID,
+	) {
+		val deltaker =
+			deltakerService.hentDeltaker(deltakerId)
+				?: throw NoSuchElementException("Fant ikke deltaker med id $deltakerId")
 
 		val arrangorId = gjennomforingService.getArrangorId(deltaker.gjennomforingId)
 
 		if (deltaker.harAdressebeskyttelse() && !harVeilederTilgang(ansattId, deltakerId, arrangorId)) {
-			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Arrangør ansatt med id:$ansattId har ikke tilgang til deltaker med id $deltakerId")
-		} else if (!harKoordinatorTilgang(ansattId, deltaker.gjennomforingId, arrangorId) && !harVeilederTilgang(ansattId, deltakerId, arrangorId)) {
-			throw ResponseStatusException(HttpStatus.FORBIDDEN, "Arrangør ansatt med id:$ansattId har ikke tilgang til deltaker med id $deltakerId")
+			throw ResponseStatusException(
+				HttpStatus.FORBIDDEN,
+				"Arrangør ansatt med id:$ansattId har ikke tilgang til deltaker med id $deltakerId",
+			)
+		} else if (!harKoordinatorTilgang(ansattId, deltaker.gjennomforingId, arrangorId) &&
+			!harVeilederTilgang(ansattId, deltakerId, arrangorId)
+		) {
+			throw ResponseStatusException(
+				HttpStatus.FORBIDDEN,
+				"Arrangør ansatt med id:$ansattId har ikke tilgang til deltaker med id $deltakerId",
+			)
 		}
 	}
 
-	override fun hentAnsattTilganger(ansattId: UUID): List<ArrangorAnsattRoller> {
-		return ansattRolleService.hentAktiveRoller(ansattId)
-	}
+	override fun hentAnsattTilganger(ansattId: UUID): List<ArrangorAnsattRoller> = ansattRolleService.hentAktiveRoller(ansattId)
 
 	override fun synkroniserRettigheter(ansattPersonligIdent: String) {
 		try {
 			val ansatt = amtArrangorService.getAnsatt(ansattPersonligIdent)
 
 			if (ansatt == null) {
-				log.warn("Fant ikke ansatt i amt-arrangor. Kan ikke oppdatere rettigheter.")
+				log.info("Fant ikke ansatt i amt-arrangor. Kan ikke oppdatere rettigheter.")
 				return
 			}
 			if (ansatt.arrangorer.isEmpty()) {
@@ -98,7 +110,11 @@ open class ArrangorAnsattTilgangServiceImpl(
 		oppdaterRollerOgTilganger(ansatt)
 	}
 
-	override fun verifiserRolleHosArrangor(ansattId: UUID, arrangorId: UUID, rolle: ArrangorAnsattRolle) {
+	override fun verifiserRolleHosArrangor(
+		ansattId: UUID,
+		arrangorId: UUID,
+		rolle: ArrangorAnsattRolle,
+	) {
 		val hasRolle = harRolleHosArrangor(ansattId, arrangorId, rolle)
 
 		if (!hasRolle) {
@@ -107,13 +123,20 @@ open class ArrangorAnsattTilgangServiceImpl(
 		}
 	}
 
-	override fun harRolleHosArrangor(ansattId: UUID, arrangorId: UUID, rolle: ArrangorAnsattRolle): Boolean {
+	override fun harRolleHosArrangor(
+		ansattId: UUID,
+		arrangorId: UUID,
+		rolle: ArrangorAnsattRolle,
+	): Boolean {
 		val ansatt = arrangorAnsattService.getAnsatt(ansattId)
-		val tilgangerHosArrangor = ansatt.arrangorer.first {it.id == arrangorId}
+		val tilgangerHosArrangor = ansatt.arrangorer.first { it.id == arrangorId }
 		return tilgangerHosArrangor.roller.contains(rolle)
 	}
 
-	private fun harLagtTilGjennomforing(ansattId: UUID, gjennomforingId: UUID): Boolean {
+	private fun harLagtTilGjennomforing(
+		ansattId: UUID,
+		gjennomforingId: UUID,
+	): Boolean {
 		val gjennomforinger = mineDeltakerlisterService.hent(ansattId)
 		return gjennomforinger.contains(gjennomforingId)
 	}
@@ -131,16 +154,19 @@ open class ArrangorAnsattTilgangServiceImpl(
 	}
 
 	private fun oppdaterRoller(ansatt: ArrangorAnsatt) {
-		val lagredeAnsattTilganger = ansattRolleService.hentAktiveRoller(ansatt.id)
-			.flatMap { it.roller.map { r -> AnsattTilgang(it.arrangorId, r) } }
+		val lagredeAnsattTilganger =
+			ansattRolleService
+				.hentAktiveRoller(ansatt.id)
+				.flatMap { it.roller.map { r -> AnsattTilgang(it.arrangorId, r) } }
 
-		val ansattTilganger = ansatt
-			.tilArrangorAnsattRoller()
-			.flatMap {
-				val arrangor = arrangorService.getOrCreateArrangor(it.arrangor)
+		val ansattTilganger =
+			ansatt
+				.tilArrangorAnsattRoller()
+				.flatMap {
+					val arrangor = arrangorService.getOrCreateArrangor(it.arrangor)
 
-				return@flatMap it.roller.map { rolle -> AnsattTilgang(arrangor.id, rolle) }
-			}
+					return@flatMap it.roller.map { rolle -> AnsattTilgang(arrangor.id, rolle) }
+				}
 
 		val tilgangerSomSkalLeggesTil = finnTilgangerSomSkalLeggesTil(ansattTilganger, lagredeAnsattTilganger)
 		val tilgangerSomSkalFjernes = finnTilgangerSomSkalFjernes(ansattTilganger, lagredeAnsattTilganger)
@@ -153,15 +179,19 @@ open class ArrangorAnsattTilgangServiceImpl(
 			transactionTemplate.executeWithoutResult {
 				ansattRolleService.deaktiverRolleHosArrangor(ansatt.id, tilgang.arrangorId, tilgang.arrangorAnsattRolle)
 				when (tilgang.arrangorAnsattRolle) {
-					ArrangorAnsattRolle.KOORDINATOR -> mineDeltakerlisterService.fjernAlleHosArrangor(
-						ansatt.id,
-						tilgang.arrangorId
-					)
+					ArrangorAnsattRolle.KOORDINATOR -> {
+						mineDeltakerlisterService.fjernAlleHosArrangor(
+							ansatt.id,
+							tilgang.arrangorId,
+						)
+					}
 
-					ArrangorAnsattRolle.VEILEDER -> arrangorVeilederService.fjernAlleDeltakereForVeilederHosArrangor(
-						ansatt.id,
-						tilgang.arrangorId
-					)
+					ArrangorAnsattRolle.VEILEDER -> {
+						arrangorVeilederService.fjernAlleDeltakereForVeilederHosArrangor(
+							ansatt.id,
+							tilgang.arrangorId,
+						)
+					}
 				}
 			}
 			log.info("Fjernet tilgang. ansattId=${ansatt.id} arrangorId=${tilgang.arrangorId} rolle=${tilgang.arrangorAnsattRolle}")
@@ -170,57 +200,65 @@ open class ArrangorAnsattTilgangServiceImpl(
 
 	private fun oppdaterDeltakerlisteTilganger(ansatt: ArrangorAnsatt) {
 		val lagredeDeltakerlister = mineDeltakerlisterService.hent(ansatt.id)
-		val deltakerlisterSomSkalLeggesTil = finnDeltakerlisterSomSkalLeggesTil(
-			amtArrangorDeltakerlister = ansatt.arrangorer.flatMap { it.koordinator },
-			lagredeDeltakerlister = lagredeDeltakerlister
-		)
-		val deltakerlisterSomSkalFjernes = finnDeltakerlisterSomSkalFjernes(
-			amtArrangorDeltakerlister = ansatt.arrangorer.flatMap { it.koordinator },
-			lagredeDeltakerlister = lagredeDeltakerlister
-		)
+		val deltakerlisterSomSkalLeggesTil =
+			finnDeltakerlisterSomSkalLeggesTil(
+				amtArrangorDeltakerlister = ansatt.arrangorer.flatMap { it.koordinator },
+				lagredeDeltakerlister = lagredeDeltakerlister,
+			)
+		val deltakerlisterSomSkalFjernes =
+			finnDeltakerlisterSomSkalFjernes(
+				amtArrangorDeltakerlister = ansatt.arrangorer.flatMap { it.koordinator },
+				lagredeDeltakerlister = lagredeDeltakerlister,
+			)
 		deltakerlisterSomSkalLeggesTil.forEach {
 			mineDeltakerlisterService.leggTil(
 				id = UUID.randomUUID(),
 				arrangorAnsattId = ansatt.id,
-				gjennomforingId = it
+				gjennomforingId = it,
 			)
 		}
 		deltakerlisterSomSkalFjernes.forEach {
 			mineDeltakerlisterService.fjern(arrangorAnsattId = ansatt.id, gjennomforingId = it)
 		}
-		log.info("Lagt til ${deltakerlisterSomSkalLeggesTil.size} deltakerlister og fjernet ${deltakerlisterSomSkalFjernes.size} for ansatt ${ansatt.id}")
+		log.info(
+			"Lagt til ${deltakerlisterSomSkalLeggesTil.size} deltakerlister og fjernet ${deltakerlisterSomSkalFjernes.size} for ansatt ${ansatt.id}",
+		)
 	}
 
 	private fun oppdaterVeilederTilganger(ansatt: ArrangorAnsatt) {
 		val lagretVeilederFor = arrangorVeilederService.hentDeltakereForVeileder(ansatt.id)
-		val veilederKoblingerSomSkalLeggesTil = finnVeilederkoblingerSomSkalLeggesTil(
-			lagredeVeilederkoblinger = lagretVeilederFor,
-			amtArrangorVeiledere = ansatt.arrangorer.flatMap { it.veileder }
-		)
-		val veilederKoblingerSomSkalFjernes = finnVeilederkoblingerSomSkalFjernes(
-			lagredeVeilederkoblinger = lagretVeilederFor,
-			amtArrangorVeiledere = ansatt.arrangorer.flatMap { it.veileder }
-		)
+		val veilederKoblingerSomSkalLeggesTil =
+			finnVeilederkoblingerSomSkalLeggesTil(
+				lagredeVeilederkoblinger = lagretVeilederFor,
+				amtArrangorVeiledere = ansatt.arrangorer.flatMap { it.veileder },
+			)
+		val veilederKoblingerSomSkalFjernes =
+			finnVeilederkoblingerSomSkalFjernes(
+				lagredeVeilederkoblinger = lagretVeilederFor,
+				amtArrangorVeiledere = ansatt.arrangorer.flatMap { it.veileder },
+			)
 		veilederKoblingerSomSkalFjernes.forEach {
 			arrangorVeilederService.fjernAnsattSomVeileder(
 				ansattId = ansatt.id,
 				deltakerId = it.deltakerId,
-				erMedveileder = it.type == ArrangorAnsatt.VeilederType.MEDVEILEDER
+				erMedveileder = it.type == ArrangorAnsatt.VeilederType.MEDVEILEDER,
 			)
 		}
 		veilederKoblingerSomSkalLeggesTil.forEach {
 			arrangorVeilederService.leggTilAnsattSomVeileder(
 				ansattId = ansatt.id,
 				deltakerId = it.deltakerId,
-				erMedveileder = it.type == ArrangorAnsatt.VeilederType.MEDVEILEDER
+				erMedveileder = it.type == ArrangorAnsatt.VeilederType.MEDVEILEDER,
 			)
 		}
-		log.info("Lagt til ${veilederKoblingerSomSkalLeggesTil.size} og fjernet ${veilederKoblingerSomSkalFjernes.size} veileder-relasjoner for ansatt ${ansatt.id}")
+		log.info(
+			"Lagt til ${veilederKoblingerSomSkalLeggesTil.size} og fjernet ${veilederKoblingerSomSkalFjernes.size} veileder-relasjoner for ansatt ${ansatt.id}",
+		)
 	}
 
 	private fun finnTilgangerSomSkalLeggesTil(
 		altinnTilganger: List<AnsattTilgang>,
-		lagredeTilganger: List<AnsattTilgang>
+		lagredeTilganger: List<AnsattTilgang>,
 	): List<AnsattTilgang> {
 		// Returnerer alle altinnTilganger som ikke finnes i lagredeTilganger
 		return altinnTilganger.subtract(lagredeTilganger.toSet()).toList()
@@ -228,7 +266,7 @@ open class ArrangorAnsattTilgangServiceImpl(
 
 	private fun finnTilgangerSomSkalFjernes(
 		altinnTilganger: List<AnsattTilgang>,
-		lagredeTilganger: List<AnsattTilgang>
+		lagredeTilganger: List<AnsattTilgang>,
 	): List<AnsattTilgang> {
 		// Returnerer alle lagredeTilganger som ikke finnes i altinnTilganger
 		return lagredeTilganger.subtract(altinnTilganger.toSet()).toList()
@@ -236,69 +274,75 @@ open class ArrangorAnsattTilgangServiceImpl(
 
 	private fun finnDeltakerlisterSomSkalLeggesTil(
 		amtArrangorDeltakerlister: List<UUID>,
-		lagredeDeltakerlister: List<UUID>
-	): List<UUID> {
-		return amtArrangorDeltakerlister.filter { id -> lagredeDeltakerlister.find { it == id } == null }
-	}
+		lagredeDeltakerlister: List<UUID>,
+	): List<UUID> = amtArrangorDeltakerlister.filter { id -> lagredeDeltakerlister.find { it == id } == null }
 
 	private fun finnDeltakerlisterSomSkalFjernes(
 		amtArrangorDeltakerlister: List<UUID>,
-		lagredeDeltakerlister: List<UUID>
-	): List<UUID> {
-		return lagredeDeltakerlister.filter { id -> amtArrangorDeltakerlister.find { it == id } == null }
-	}
+		lagredeDeltakerlister: List<UUID>,
+	): List<UUID> = lagredeDeltakerlister.filter { id -> amtArrangorDeltakerlister.find { it == id } == null }
 
 	private fun finnVeilederkoblingerSomSkalLeggesTil(
 		lagredeVeilederkoblinger: List<ArrangorVeileder>,
-		amtArrangorVeiledere: List<ArrangorAnsatt.VeilederDto>
+		amtArrangorVeiledere: List<ArrangorAnsatt.VeilederDto>,
 	): List<ArrangorAnsatt.VeilederDto> {
 		val lagredeVeiledere = lagredeVeilederkoblinger.map { it.toVeilederDto() }
 		return amtArrangorVeiledere.filter { veileder ->
-				lagredeVeiledere.find { it.deltakerId == veileder.deltakerId && it.type == veileder.type } == null
-			}
+			lagredeVeiledere.find { it.deltakerId == veileder.deltakerId && it.type == veileder.type } == null
+		}
 	}
 
 	private fun finnVeilederkoblingerSomSkalFjernes(
 		lagredeVeilederkoblinger: List<ArrangorVeileder>,
-		amtArrangorVeiledere: List<ArrangorAnsatt.VeilederDto>
-	): List<ArrangorAnsatt.VeilederDto> {
-		return lagredeVeilederkoblinger.map { it.toVeilederDto() }
+		amtArrangorVeiledere: List<ArrangorAnsatt.VeilederDto>,
+	): List<ArrangorAnsatt.VeilederDto> =
+		lagredeVeilederkoblinger
+			.map { it.toVeilederDto() }
 			.filter { veileder ->
 				amtArrangorVeiledere.find { it.deltakerId == veileder.deltakerId && it.type == veileder.type } == null
 			}
-	}
 
-	private fun ArrangorVeileder.toVeilederDto(): ArrangorAnsatt.VeilederDto {
-		return ArrangorAnsatt.VeilederDto(
+	private fun ArrangorVeileder.toVeilederDto(): ArrangorAnsatt.VeilederDto =
+		ArrangorAnsatt.VeilederDto(
 			deltakerId = deltakerId,
-			type = if (erMedveileder) {
-				ArrangorAnsatt.VeilederType.MEDVEILEDER
-			} else {
-				ArrangorAnsatt.VeilederType.VEILEDER
-			}
+			type =
+				if (erMedveileder) {
+					ArrangorAnsatt.VeilederType.MEDVEILEDER
+				} else {
+					ArrangorAnsatt.VeilederType.VEILEDER
+				},
 		)
-	}
 
-	private fun harKoordinatorTilgang(ansattId: UUID, gjennomforingId: UUID, arrangorId: UUID): Boolean {
-		val tilgangTilArrangor = hentAnsattTilganger(ansattId)
-			.find { it.arrangorId == arrangorId }
-			?.roller
-			?.contains(ArrangorAnsattRolle.KOORDINATOR)
+	private fun harKoordinatorTilgang(
+		ansattId: UUID,
+		gjennomforingId: UUID,
+		arrangorId: UUID,
+	): Boolean {
+		val tilgangTilArrangor =
+			hentAnsattTilganger(ansattId)
+				.find { it.arrangorId == arrangorId }
+				?.roller
+				?.contains(ArrangorAnsattRolle.KOORDINATOR)
 
 		return tilgangTilArrangor == true && harLagtTilGjennomforing(ansattId, gjennomforingId)
 	}
 
-	private fun harVeilederTilgang(ansattId: UUID, deltakerId: UUID, arrangorId: UUID): Boolean {
-		val tilgangTilArrangor = hentAnsattTilganger(ansattId)
-			.find { it.arrangorId == arrangorId }
-			?.roller
-			?.contains(ArrangorAnsattRolle.VEILEDER)
+	private fun harVeilederTilgang(
+		ansattId: UUID,
+		deltakerId: UUID,
+		arrangorId: UUID,
+	): Boolean {
+		val tilgangTilArrangor =
+			hentAnsattTilganger(ansattId)
+				.find { it.arrangorId == arrangorId }
+				?.roller
+				?.contains(ArrangorAnsattRolle.VEILEDER)
 
 		return tilgangTilArrangor == true && arrangorVeilederService.erVeilederFor(ansattId, deltakerId)
 	}
 
 	private data class AnsattTilgang(
 		val arrangorId: UUID,
-		val arrangorAnsattRolle: ArrangorAnsattRolle
+		val arrangorAnsattRolle: ArrangorAnsattRolle,
 	)
 }

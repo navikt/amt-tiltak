@@ -21,11 +21,10 @@ class AmtPersonClientImpl(
 	private val tokenProvider: Supplier<String>,
 	private val httpClient: OkHttpClient = baseClientBuilder().readTimeout(Duration.ofSeconds(15)).build(),
 ) : AmtPersonClient {
-
 	private val mediaTypeJson = "application/json".toMediaType()
 
-	override fun hentNavBruker(personident: String): Result<NavBruker> {
-		return hentEllerOpprett("nav-bruker", PersonRequest(personident)) { body ->
+	override fun hentNavBruker(personident: String): Result<NavBruker> =
+		hentEllerOpprett("nav-bruker", PersonRequest(personident)) { body ->
 			val navBruker = fromJsonString<NavBrukerDto>(body)
 
 			NavBruker(
@@ -40,17 +39,18 @@ class AmtPersonClientImpl(
 				epost = navBruker.epost,
 				erSkjermet = navBruker.erSkjermet,
 				adresse = navBruker.adresse,
-				adressebeskyttelse = navBruker.adressebeskyttelse
+				adressebeskyttelse = navBruker.adressebeskyttelse,
 			)
 		}
-	}
 
 	override fun hentNavAnsatt(id: UUID): Result<NavAnsatt> {
-		val request = Request.Builder()
-			.url("$baseUrl/api/nav-ansatt/$id")
-			.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
-			.get()
-			.build()
+		val request =
+			Request
+				.Builder()
+				.url("$baseUrl/api/nav-ansatt/$id")
+				.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
+				.get()
+				.build()
 
 		httpClient.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
@@ -59,14 +59,14 @@ class AmtPersonClientImpl(
 					else -> Result.failure(RuntimeException("Klarte ikke å hente nav-ansatt fra amt-person-service. status=${response.code}"))
 				}
 			}
-			val body = response.body?.string() ?: return Result.failure(RuntimeException("Body is missing"))
+			val body = response.body.string()
 
 			return Result.success(fromJsonString(body))
 		}
 	}
 
-	override fun hentNavAnsatt(navIdent: String): Result<NavAnsatt> {
-		return hentEllerOpprett("nav-ansatt", NavAnsattRequest(navIdent)) { body ->
+	override fun hentNavAnsatt(navIdent: String): Result<NavAnsatt> =
+		hentEllerOpprett("nav-ansatt", NavAnsattRequest(navIdent)) { body ->
 			val navAnsattDto = fromJsonString<NavAnsattDto>(body)
 
 			NavAnsatt(
@@ -77,21 +77,23 @@ class AmtPersonClientImpl(
 				telefonnummer = navAnsattDto.telefon,
 			)
 		}
-	}
 
-	override fun hentNavEnhet(enhetId: String): Result<NavEnhet> {
-		return hentEllerOpprett("nav-enhet", NavEnhetRequest(enhetId)) { body ->
+	override fun hentNavEnhet(enhetId: String): Result<NavEnhet> =
+		hentEllerOpprett("nav-enhet", NavEnhetRequest(enhetId)) { body ->
 			val navEnhetDto = fromJsonString<NavBrukerDto.NavEnhetDto>(body)
 
 			NavEnhet(
 				id = navEnhetDto.id,
 				enhetId = navEnhetDto.enhetId,
-				navn = navEnhetDto.navn
+				navn = navEnhetDto.navn,
 			)
 		}
-	}
 
-	private fun <T> hentEllerOpprett(endepunkt: String, requestBody: Any, fn: (body: String) -> T): Result<T> {
+	private fun <T> hentEllerOpprett(
+		endepunkt: String,
+		requestBody: Any,
+		fn: (body: String) -> T,
+	): Result<T> {
 		val request = buildPostRequest(endepunkt, requestBody)
 
 		httpClient.newCall(request).execute().use { response ->
@@ -101,16 +103,18 @@ class AmtPersonClientImpl(
 					else -> Result.failure(RuntimeException("Klarte ikke å hente $endepunkt fra amt-person-service. status=${response.code}"))
 				}
 			}
-			val body = response.body?.string() ?: return Result.failure(RuntimeException("Body is missing"))
+			val body = response.body.string()
 			return Result.success(fn(body))
 		}
 	}
 
-	private fun buildPostRequest(endepunkt: String, requestBody: Any) = Request.Builder()
+	private fun buildPostRequest(
+		endepunkt: String,
+		requestBody: Any,
+	) = Request
+		.Builder()
 		.url("$baseUrl/api/$endepunkt")
 		.addHeader("Authorization", "Bearer ${tokenProvider.get()}")
 		.post(toJsonString(requestBody).toRequestBody(mediaTypeJson))
 		.build()
-
 }
-

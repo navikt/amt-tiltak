@@ -12,16 +12,18 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @Service
-open class TiltaksansvarligTilgangServiceImpl(
+class TiltaksansvarligTilgangServiceImpl(
 	private val navAnsattService: NavAnsattService,
-	private val tiltaksansvarligGjennomforingTilgangRepository: TiltaksansvarligGjennomforingTilgangRepository
+	private val tiltaksansvarligGjennomforingTilgangRepository: TiltaksansvarligGjennomforingTilgangRepository,
 ) : TiltaksansvarligTilgangService {
-
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	private val defaultGyldigTil = ZonedDateTime.parse("3000-01-01T00:00:00.00000+00:00")
 
-	override fun harTilgangTilGjennomforing(navIdent: String, gjennomforingId: UUID): Boolean {
+	override fun harTilgangTilGjennomforing(
+		navIdent: String,
+		gjennomforingId: UUID,
+	): Boolean {
 		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 
 		val tilganger = hentAktiveTilganger(navAnsatt.id)
@@ -30,11 +32,14 @@ open class TiltaksansvarligTilgangServiceImpl(
 			.any { it.gjennomforingId == gjennomforingId }
 	}
 
-	override fun giTilgangTilGjennomforing(navAnsattId: UUID, gjennomforingId: UUID) {
+	override fun giTilgangTilGjennomforing(
+		navAnsattId: UUID,
+		gjennomforingId: UUID,
+	) {
 		val tilganger = hentAktiveTilganger(navAnsattId)
 
 		if (tilganger.any { it.gjennomforingId == gjennomforingId }) {
-			log.warn("Nav ansatt med id $navAnsattId prøver å gi tilgang til gjennomføring med id $gjennomforingId, men har det allerede.")
+			log.info("Nav ansatt med id $navAnsattId prøver å gi tilgang til gjennomføring med id $gjennomforingId, men har det allerede.")
 			throw HarAlleredeTilgangException("Har allerede tilgang til gjennomføring")
 		}
 
@@ -42,17 +47,24 @@ open class TiltaksansvarligTilgangServiceImpl(
 			id = UUID.randomUUID(),
 			navAnsattId = navAnsattId,
 			gjennomforingId = gjennomforingId,
-			gyldigTil = defaultGyldigTil
+			gyldigTil = defaultGyldigTil,
 		)
 	}
 
-	override fun stopTilgangTilGjennomforing(navAnsattId: UUID, gjennomforingId: UUID) {
+	override fun stopTilgangTilGjennomforing(
+		navAnsattId: UUID,
+		gjennomforingId: UUID,
+	) {
 		val tilganger = hentAktiveTilganger(navAnsattId)
 
 		// Kast heller custom exception og map
 
-		val tilgang = tilganger.find { it.gjennomforingId == gjennomforingId }
-			?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Tilgang finnes ikke eller er allerede stoppet")
+		val tilgang =
+			tilganger.find { it.gjennomforingId == gjennomforingId }
+				?: throw ResponseStatusException(
+					HttpStatus.BAD_REQUEST,
+					"Tilgang finnes ikke eller er allerede stoppet",
+				)
 
 		tiltaksansvarligGjennomforingTilgangRepository.stopTilgang(tilgang.id)
 	}
@@ -75,5 +87,4 @@ open class TiltaksansvarligTilgangServiceImpl(
 		val navAnsatt = navAnsattService.getNavAnsatt(navIdent)
 		return hentAktiveTilganger(navAnsatt.id)
 	}
-
 }
