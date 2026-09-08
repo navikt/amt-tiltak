@@ -404,7 +404,7 @@ object TestData {
 
 	val BRUKER_4 = BrukerInput(
 		id = UUID.fromString("6b5d7600-a9a6-4918-8e8a-068d1c1f5a65"),
-		personIdent = "10028029182",
+		personIdent = "00000000000",
 		fornavn = "Bruker 4 fornavn",
 		etternavn = "Bruker 4 etternavn",
 		telefonnummer = "11223344",
