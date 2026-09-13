@@ -48,7 +48,7 @@
 
         <testcontainers.version>1.21.4</testcontainers.version>
         <mockito-kotlin.version>6.3.0</mockito-kotlin.version>
-        <schedlock.version>7.9.0</schedlock.version>
+        <schedlock.version>7.10.0</schedlock.version>
         <nimbus.version>11.38.2</nimbus.version>
         <mockk.version>1.14.11</mockk.version>
         <kotest.version>5.6.1</kotest.version>
@@ -57,7 +57,7 @@
         <mock-oauth2-server.version>5.0.2</mock-oauth2-server.version>
         <common.version>4.2026.08.03_08.40-c4e43f2ee45b</common.version>
         <logstash.version>9.0</logstash.version>
-        <unleash.version>12.2.3</unleash.version>
+        <unleash.version>12.3.0</unleash.version>
         <amtlib.version>1.2026.02.25_21.37-43329f290d8a</amtlib.version>
     </properties>
 
@@ -85,7 +85,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.6</version>
+                <version>3.6.0</version>
             </plugin>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
