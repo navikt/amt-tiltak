@@ -52,7 +52,7 @@
 
         <dependency>
             <groupId>io.mockk</groupId>
-            <artifactId>mockk</artifactId>
+            <artifactId>mockk-jvm</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -90,11 +90,5 @@
             <artifactId>arrangor</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.mockk</groupId>
-            <artifactId>mockk-jvm</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-
 </project>
