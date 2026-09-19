@@ -7,6 +7,7 @@ on:
 
 env:
   TZ: Europe/Oslo
+  MAVEN_OPTS: "-Djdk.attach.allowAttachSelf=true"
 
 jobs:
   test:
