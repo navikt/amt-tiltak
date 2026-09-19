@@ -24,4 +24,4 @@ jobs:
           java-version: 25
           cache: 'maven'
       - name: Run maven tests
-        run: mvn -B verify
+        run: mvn -B -T 1C verify
