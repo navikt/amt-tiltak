@@ -59,6 +59,7 @@
         <logstash.version>9.0</logstash.version>
         <unleash.version>12.3.0</unleash.version>
         <amtlib.version>1.2026.02.25_21.37-43329f290d8a</amtlib.version>
+        <jackson2.version>2.21.5</jackson2.version>
     </properties>
 
     <repositories>
@@ -519,6 +520,44 @@
                 <version>1.11.2</version>
             </dependency>
 
+            <!-- CVE fixes -->
+            <dependency>
+                <groupId>tools.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>3.2.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>42.7.12</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>2.25.5</version>
+            </dependency>
+
+            <!-- Jackson2 -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-kotlin</artifactId>
+                <version>${jackson2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>2.22</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
