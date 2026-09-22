@@ -59,7 +59,7 @@
         <logstash.version>9.0</logstash.version>
         <unleash.version>12.3.0</unleash.version>
         <amtlib.version>1.2026.02.25_21.37-43329f290d8a</amtlib.version>
-        <jackson2.version>2.21.5</jackson2.version>
+        <jackson2.version>2.22.2</jackson2.version>
     </properties>
 
     <repositories>
@@ -517,7 +517,7 @@
             <dependency>
                 <groupId>at.yawk.lz4</groupId>
                 <artifactId>lz4-java</artifactId>
-                <version>1.11.2</version>
+                <version>1.11.3</version>
             </dependency>
 
             <!-- CVE fixes -->
@@ -529,12 +529,12 @@
             <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
-                <version>42.7.12</version>
+                <version>42.7.13</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-api</artifactId>
-                <version>2.25.5</version>
+                <version>2.26.1</version>
             </dependency>
 
             <!-- Jackson2 -->
