@@ -59,7 +59,7 @@
         <logstash.version>9.0</logstash.version>
         <unleash.version>12.3.0</unleash.version>
         <amtlib.version>1.2026.02.25_21.37-43329f290d8a</amtlib.version>
-        <jackson2.version>2.22.2</jackson2.version>
+        <jackson2.version>2.22.3</jackson2.version>
     </properties>
 
     <repositories>
