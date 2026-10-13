@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.test.integration.nav_ansatt
 
+import com.fasterxml.jackson.databind.JsonNode
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData
@@ -18,7 +19,7 @@ import okhttp3.Request
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 	@BeforeEach
@@ -38,7 +39,7 @@ class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 	}
 
 	@Test
-	internal fun `hentGjennomforinger - skal ha status 200 med korrekt respons`() {
+	internal fun `'hentGjennomforinger' - skal ha status 200 med korrekt respons`() {
 		val token = lagTokenMedAdGruppe(NAV_ANSATT_1)
 		giTilgang(NAV_ANSATT_1, GJENNOMFORING_1)
 
@@ -54,7 +55,10 @@ class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 			[{"id":"513219ca-481b-4aae-9d51-435dba9929cd","navn":"Tiltaksgjennomforing2","arrangorNavn":"Org Tiltaksarrangør 2","lopenr":124,"opprettetAar":2020,"antallAktiveEndringsmeldinger":0,"harSkjermedeDeltakere":false,"adressebeskyttelser":[],"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"AVSLUTTET","startDato":"2022-02-01","sluttDato":"2022-02-13"},{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","arrangorNavn":"Org Tiltaksarrangør 1","lopenr":123,"opprettetAar":2020,"antallAktiveEndringsmeldinger":3,"harSkjermedeDeltakere":false,"adressebeskyttelser":[],"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"GJENNOMFORES","startDato":"2022-02-01","sluttDato":"2050-12-30"}]
 			""".trimIndent()
 		response.code shouldBe 200
-		response.body.string() shouldBe expectedJson
+		assertJsonArrayEqualsIgnoringOrder(
+			expectedJson = expectedJson,
+			actualJson = response.body.string(),
+		)
 	}
 
 	@Test
@@ -76,7 +80,10 @@ class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 			[{"id":"513219ca-481b-4aae-9d51-435dba9929cd","navn":"Tiltaksgjennomforing2","arrangorNavn":"Org Tiltaksarrangør 2","lopenr":124,"opprettetAar":2020,"antallAktiveEndringsmeldinger":0,"harSkjermedeDeltakere":false,"adressebeskyttelser":[],"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"AVSLUTTET","startDato":"2022-02-01","sluttDato":"2022-02-13"},{"id":"b3420940-5479-48c8-b2fa-3751c7a33aa2","navn":"Tiltaksgjennomforing1","arrangorNavn":"Org Tiltaksarrangør 1","lopenr":123,"opprettetAar":2020,"antallAktiveEndringsmeldinger":4,"harSkjermedeDeltakere":true,"adressebeskyttelser":["STRENGT_FORTROLIG"],"tiltak":{"kode":"AMO","navn":"Tiltak1"},"status":"GJENNOMFORES","startDato":"2022-02-01","sluttDato":"2050-12-30"}]
 			""".trimIndent()
 		response.code shouldBe 200
-		response.body.string() shouldBe expectedJson
+		assertJsonArrayEqualsIgnoringOrder(
+			expectedJson = expectedJson,
+			actualJson = response.body.string(),
+		)
 	}
 
 	@Test
@@ -231,4 +238,19 @@ class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 		testDataRepository.insertDeltakerStatus(status)
 		testDataRepository.insertEndringsmelding(endringsmelding)
 	}
+
+	private fun assertJsonArrayEqualsIgnoringOrder(
+		expectedJson: String,
+		actualJson: String,
+	) {
+		val expected = objectMapper.readTree(expectedJson).sortedJsonArray()
+		val actual = objectMapper.readTree(actualJson).sortedJsonArray()
+
+		actual shouldBe expected
+	}
+
+	private fun JsonNode.sortedJsonArray(): List<JsonNode> =
+		this
+			.toList()
+			.sortedBy { it["id"].asText() }
 }
