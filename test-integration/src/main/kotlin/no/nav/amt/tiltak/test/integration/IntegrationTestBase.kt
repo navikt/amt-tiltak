@@ -1,5 +1,6 @@
 package no.nav.amt.tiltak.test.integration
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.amt.tiltak.application.Application
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
@@ -26,19 +27,22 @@ import org.springframework.test.context.DynamicPropertySource
 import java.time.Duration
 import javax.sql.DataSource
 
-
 @SpringBootTest(classes = [Application::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(IntegrationTestConfiguration::class)
 @ActiveProfiles("integration")
 abstract class IntegrationTestBase {
-
 	@LocalServerPort
 	private var port: Int = 0
 
-	val client = OkHttpClient.Builder()
-		.callTimeout(Duration.ofMinutes(5))
-		.readTimeout(Duration.ofMinutes(5))
-		.build()
+	val client =
+		OkHttpClient
+			.Builder()
+			.callTimeout(Duration.ofMinutes(5))
+			.readTimeout(Duration.ofMinutes(5))
+			.build()
+
+	@Autowired
+	lateinit var objectMapper: ObjectMapper
 
 	@Autowired
 	lateinit var kafkaMessageSender: KafkaMessageSender
@@ -117,12 +121,14 @@ abstract class IntegrationTestBase {
 		method: String,
 		url: String,
 		body: RequestBody = emptyRequest(),
-		headers: Map<String, String> = emptyMap()
+		headers: Map<String, String> = emptyMap(),
 	): Response {
 		val requestBody = if (method.equals("GET", true)) null else body
-		val reqBuilder = Request.Builder()
-			.url("${serverUrl()}$url")
-			.method(method, requestBody)
+		val reqBuilder =
+			Request
+				.Builder()
+				.url("${serverUrl()}$url")
+				.method(method, requestBody)
 
 		headers.forEach {
 			reqBuilder.addHeader(it.key, it.value)
@@ -130,11 +136,6 @@ abstract class IntegrationTestBase {
 
 		return client.newCall(reqBuilder.build()).execute()
 	}
-
-	fun sendRequest(request: Request): Response {
-		return client.newCall(request).execute()
-	}
-
 
 	fun String.toJsonRequestBody(): RequestBody {
 		val mediaTypeJson = "application/json".toMediaType()
@@ -145,5 +146,4 @@ abstract class IntegrationTestBase {
 		val mediaTypeHtml = "text/html".toMediaType()
 		return "".toRequestBody(mediaTypeHtml)
 	}
-
 }
