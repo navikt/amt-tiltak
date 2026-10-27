@@ -2,7 +2,7 @@ package no.nav.amt.tiltak.endringsmelding
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
-import com.fasterxml.jackson.databind.ObjectMapper
+import tools.jackson.databind.ObjectMapper
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.date.shouldBeAfter

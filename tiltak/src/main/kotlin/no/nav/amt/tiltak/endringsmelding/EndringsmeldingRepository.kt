@@ -1,7 +1,5 @@
 package no.nav.amt.tiltak.endringsmelding
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getNullableString
 import no.nav.amt.tiltak.common.db_utils.getNullableZonedDateTime
@@ -12,36 +10,40 @@ import no.nav.amt.tiltak.utils.getUUID
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.module.kotlin.readValue
 import java.util.UUID
 
 @Component
-open class EndringsmeldingRepository(
+class EndringsmeldingRepository(
 	private val template: NamedParameterJdbcTemplate,
 	private val objectMapper: ObjectMapper,
 ) {
-	private val rowMapper = RowMapper { rs, _ ->
-		val type = EndringsmeldingDbo.Type.valueOf(rs.getString("type"))
-		EndringsmeldingDbo(
-			id = rs.getUUID("id"),
-			deltakerId = rs.getUUID("deltaker_id"),
-			utfortAvNavAnsattId = rs.getNullableUUID("utfort_av_nav_ansatt_id"),
-			utfortTidspunkt = rs.getNullableZonedDateTime("utfort_tidspunkt"),
-			opprettetAvArrangorAnsattId = rs.getUUID("opprettet_av_arrangor_ansatt_id"),
-			status = Endringsmelding.Status.valueOf(rs.getString("status")),
-			type = type,
-			innhold = rs.getNullableString("innhold")?.let { parseInnholdJson(it, type)},
-			createdAt = rs.getZonedDateTime("created_at"),
-			modifiedAt = rs.getZonedDateTime("modified_at"),
-		)
-	}
+	private val rowMapper =
+		RowMapper { rs, _ ->
+			val type = EndringsmeldingDbo.Type.valueOf(rs.getString("type"))
+			EndringsmeldingDbo(
+				id = rs.getUUID("id"),
+				deltakerId = rs.getUUID("deltaker_id"),
+				utfortAvNavAnsattId = rs.getNullableUUID("utfort_av_nav_ansatt_id"),
+				utfortTidspunkt = rs.getNullableZonedDateTime("utfort_tidspunkt"),
+				opprettetAvArrangorAnsattId = rs.getUUID("opprettet_av_arrangor_ansatt_id"),
+				status = Endringsmelding.Status.valueOf(rs.getString("status")),
+				type = type,
+				innhold = rs.getNullableString("innhold")?.let { parseInnholdJson(it, type) },
+				createdAt = rs.getZonedDateTime("created_at"),
+				modifiedAt = rs.getZonedDateTime("modified_at"),
+			)
+		}
 
 	fun getByGjennomforing(gjennomforingId: UUID): List<EndringsmeldingDbo> {
-		val sql = """
+		val sql =
+			"""
 			SELECT *
 			FROM endringsmelding
 			JOIN deltaker on endringsmelding.deltaker_id = deltaker.id
 			WHERE deltaker.gjennomforing_id = :gjennomforing_id
-		""".trimIndent()
+			""".trimIndent()
 
 		val param = sqlParameters("gjennomforing_id" to gjennomforingId)
 
@@ -49,9 +51,10 @@ open class EndringsmeldingRepository(
 	}
 
 	fun getByDeltaker(deltakerId: UUID): List<EndringsmeldingDbo> {
-		val sql = """
+		val sql =
+			"""
 			SELECT * FROM endringsmelding WHERE deltaker_id = :deltakerId
-		""".trimIndent()
+			""".trimIndent()
 
 		val param = sqlParameters("deltakerId" to deltakerId)
 
@@ -59,13 +62,15 @@ open class EndringsmeldingRepository(
 	}
 
 	fun getAktive(deltakerIder: List<UUID>): List<EndringsmeldingDbo> {
-		if (deltakerIder.isEmpty())
+		if (deltakerIder.isEmpty()) {
 			return emptyList()
+		}
 
-		val sql = """
+		val sql =
+			"""
 			SELECT * FROM endringsmelding
 			WHERE status = 'AKTIV' and deltaker_id in(:deltakerIder)
-		""".trimIndent()
+			""".trimIndent()
 
 		val parameters = sqlParameters("deltakerIder" to deltakerIder)
 
@@ -73,11 +78,12 @@ open class EndringsmeldingRepository(
 	}
 
 	fun get(id: UUID): EndringsmeldingDbo {
-		val sql = """
+		val sql =
+			"""
 			SELECT *
 			FROM endringsmelding
 			WHERE id = :id
-		""".trimIndent()
+			""".trimIndent()
 
 		val params = sqlParameters("id" to id)
 
@@ -85,116 +91,157 @@ open class EndringsmeldingRepository(
 			?: throw NoSuchElementException("Fant ingen endringsmelding med id=$id")
 	}
 
-	fun getAktive(deltakerId: UUID, type: EndringsmeldingDbo.Type): List<EndringsmeldingDbo> {
-		val sql = """
+	fun getAktive(
+		deltakerId: UUID,
+		type: EndringsmeldingDbo.Type,
+	): List<EndringsmeldingDbo> {
+		val sql =
+			"""
 			SELECT * FROM endringsmelding
 			WHERE deltaker_id = :deltakerId AND type = :type AND status = 'AKTIV'
-		""".trimIndent()
+			""".trimIndent()
 
-		val parameters = sqlParameters(
-			"deltakerId" to deltakerId,
-			"type" to type.name
-		)
+		val parameters =
+			sqlParameters(
+				"deltakerId" to deltakerId,
+				"type" to type.name,
+			)
 
 		return template.query(sql, parameters, rowMapper)
 	}
 
 	fun markerSomTilbakekalt(id: UUID) {
-		val sql = """
+		val sql =
+			"""
 			UPDATE endringsmelding
 				SET status = 'TILBAKEKALT',
 					modified_at = CURRENT_TIMESTAMP
 				WHERE id = :id AND status = 'AKTIV'
-		""".trimIndent()
+			""".trimIndent()
 
-		val params = sqlParameters(
-			"id" to id
-		)
+		val params =
+			sqlParameters(
+				"id" to id,
+			)
 		template.update(sql, params)
 	}
 
-	fun markerSomUtfort(endringsmeldingId: UUID, navAnsattId: UUID) {
-		val sql = """
+	fun markerSomUtfort(
+		endringsmeldingId: UUID,
+		navAnsattId: UUID,
+	) {
+		val sql =
+			"""
 			UPDATE endringsmelding
 				SET status = 'UTFORT',
 					utfort_tidspunkt = current_timestamp,
 					modified_at = current_timestamp,
 					utfort_av_nav_ansatt_id = :navAnsattId
 				WHERE id = :endringsmeldingId
-		""".trimIndent()
+			""".trimIndent()
 
-		val params = sqlParameters(
-			"endringsmeldingId" to endringsmeldingId,
-			"navAnsattId" to navAnsattId,
-		)
+		val params =
+			sqlParameters(
+				"endringsmeldingId" to endringsmeldingId,
+				"navAnsattId" to navAnsattId,
+			)
 
 		template.update(sql, params)
 	}
 
-	fun markerAktiveSomUtdatert(deltakerId: UUID, type: EndringsmeldingDbo.Type) {
-		val sql = """
+	fun markerAktiveSomUtdatert(
+		deltakerId: UUID,
+		type: EndringsmeldingDbo.Type,
+	) {
+		val sql =
+			"""
 			UPDATE endringsmelding
 				SET status = 'UTDATERT',
 					modified_at = CURRENT_TIMESTAMP
 				WHERE deltaker_id = :deltakerId AND type = :type AND status = 'AKTIV'
-		""".trimIndent()
+			""".trimIndent()
 
-		val params = sqlParameters(
-			"deltakerId" to deltakerId,
-			"type" to type.name,
-		)
+		val params =
+			sqlParameters(
+				"deltakerId" to deltakerId,
+				"type" to type.name,
+			)
 		template.update(sql, params)
 	}
 
-
-	fun insert(id: UUID, deltakerId: UUID, opprettetAvArrangorAnsattId: UUID, type: EndringsmeldingDbo.Type, innhold: EndringsmeldingDbo.Innhold?) {
-		val sql = """
+	fun insert(
+		id: UUID,
+		deltakerId: UUID,
+		opprettetAvArrangorAnsattId: UUID,
+		type: EndringsmeldingDbo.Type,
+		innhold: EndringsmeldingDbo.Innhold?,
+	) {
+		val sql =
+			"""
 			INSERT INTO endringsmelding(id, deltaker_id, opprettet_av_arrangor_ansatt_id, type, innhold, status)
 			VALUES(:id, :deltakerId, :opprettetAvArrangorAnsattId, :type, CAST(:innhold as jsonb), 'AKTIV')
-		""".trimIndent()
+			""".trimIndent()
 
-		val params = sqlParameters(
-			"id" to id,
-			"deltakerId" to deltakerId,
-			"opprettetAvArrangorAnsattId" to opprettetAvArrangorAnsattId,
-			"type" to type.name,
-			"innhold" to innhold?.let { objectMapper.writeValueAsString(innhold) },
-		)
+		val params =
+			sqlParameters(
+				"id" to id,
+				"deltakerId" to deltakerId,
+				"opprettetAvArrangorAnsattId" to opprettetAvArrangorAnsattId,
+				"type" to type.name,
+				"innhold" to innhold?.let { objectMapper.writeValueAsString(innhold) },
+			)
 		template.update(sql, params)
 	}
 
 	fun deleteByDeltaker(deltakerId: UUID) {
-		val sql = """
+		val sql =
+			"""
 			DELETE FROM endringsmelding
 			WHERE deltaker_id = :deltakerId
-		""".trimIndent()
+			""".trimIndent()
 
-		val params = sqlParameters(
-			"deltakerId" to deltakerId,
-		)
+		val params =
+			sqlParameters(
+				"deltakerId" to deltakerId,
+			)
 		template.update(sql, params)
 	}
 
-	private fun parseInnholdJson(innholdJson: String, type: EndringsmeldingDbo.Type): EndringsmeldingDbo.Innhold {
-		return when(type) {
-			EndringsmeldingDbo.Type.LEGG_TIL_OPPSTARTSDATO ->
+	private fun parseInnholdJson(
+		innholdJson: String,
+		type: EndringsmeldingDbo.Type,
+	): EndringsmeldingDbo.Innhold =
+		when (type) {
+			EndringsmeldingDbo.Type.LEGG_TIL_OPPSTARTSDATO -> {
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.LeggTilOppstartsdatoInnhold>(innholdJson)
-			EndringsmeldingDbo.Type.ENDRE_OPPSTARTSDATO ->
+			}
+
+			EndringsmeldingDbo.Type.ENDRE_OPPSTARTSDATO -> {
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.EndreOppstartsdatoInnhold>(innholdJson)
-			EndringsmeldingDbo.Type.FORLENG_DELTAKELSE ->
+			}
+
+			EndringsmeldingDbo.Type.FORLENG_DELTAKELSE -> {
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.ForlengDeltakelseInnhold>(innholdJson)
-			EndringsmeldingDbo.Type.AVSLUTT_DELTAKELSE ->
+			}
+
+			EndringsmeldingDbo.Type.AVSLUTT_DELTAKELSE -> {
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.AvsluttDeltakelseInnhold>(innholdJson)
-			EndringsmeldingDbo.Type.DELTAKER_IKKE_AKTUELL ->
+			}
+
+			EndringsmeldingDbo.Type.DELTAKER_IKKE_AKTUELL -> {
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.DeltakerIkkeAktuellInnhold>(innholdJson)
-			EndringsmeldingDbo.Type.ENDRE_DELTAKELSE_PROSENT ->
+			}
+
+			EndringsmeldingDbo.Type.ENDRE_DELTAKELSE_PROSENT -> {
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.EndreDeltakelseProsentInnhold>(innholdJson)
-			EndringsmeldingDbo.Type.ENDRE_SLUTTDATO ->
+			}
+
+			EndringsmeldingDbo.Type.ENDRE_SLUTTDATO -> {
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.EndreSluttdatoInnhold>(innholdJson)
-			EndringsmeldingDbo.Type.ENDRE_SLUTTAARSAK ->
+			}
+
+			EndringsmeldingDbo.Type.ENDRE_SLUTTAARSAK -> {
 				objectMapper.readValue<EndringsmeldingDbo.Innhold.EndreSluttaarsakInnhold>(innholdJson)
+			}
 		}
-
-	}
-
 }

@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.ingestors.arena_acl_ingestor.dto
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import java.time.LocalDateTime
 
 enum class Operation {
