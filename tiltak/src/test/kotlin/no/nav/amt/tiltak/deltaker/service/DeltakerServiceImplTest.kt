@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.deltaker.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -16,6 +15,7 @@ import no.nav.amt.tiltak.core.domain.tiltak.DeltakerUpsert
 import no.nav.amt.tiltak.core.domain.tiltak.Gjennomforing
 import no.nav.amt.tiltak.core.domain.tiltak.Kilde
 import no.nav.amt.tiltak.core.domain.tiltak.Vurdering
+import no.nav.amt.tiltak.core.domain.tiltak.VurderingDbo
 import no.nav.amt.tiltak.core.domain.tiltak.Vurderingstype
 import no.nav.amt.tiltak.core.exceptions.ValidationException
 import no.nav.amt.tiltak.core.kafka.DeltakerV1ProducerService
@@ -34,6 +34,7 @@ import no.nav.amt.tiltak.deltaker.repositories.VurderingRepository
 import no.nav.amt.tiltak.endringsmelding.EndringsmeldingRepository
 import no.nav.amt.tiltak.endringsmelding.EndringsmeldingServiceImpl
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
+import no.nav.amt.tiltak.test.database.DbUtils.shouldBeCloseTo
 import no.nav.amt.tiltak.test.database.DbUtils.shouldBeEqualTo
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestData.ARRANGOR_1
@@ -60,12 +61,11 @@ import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
+import tools.jackson.databind.ObjectMapper
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.UUID
-import no.nav.amt.tiltak.core.domain.tiltak.VurderingDbo
-import no.nav.amt.tiltak.test.database.DbUtils.shouldBeCloseTo
 
 class DeltakerServiceImplTest {
 	lateinit var deltakerRepository: DeltakerRepository
@@ -107,26 +107,35 @@ class DeltakerServiceImplTest {
 		deltakerStatusRepository = DeltakerStatusRepository(jdbcTemplate)
 		gjennomforingService = mockk()
 		endringsmeldingRepository = EndringsmeldingRepository(jdbcTemplate, objectMapper)
-		endringsmeldingService = EndringsmeldingServiceImpl(endringsmeldingRepository, mockk(), transactionTemplate, publisherService)
+		endringsmeldingService =
+			EndringsmeldingServiceImpl(endringsmeldingRepository, mockk(), transactionTemplate, publisherService)
 		vurderingRepository = VurderingRepository(jdbcTemplate)
 		unleashService = mockk()
 
-		deltakerServiceImpl = DeltakerServiceImpl(
-			deltakerRepository = deltakerRepository,
-			deltakerStatusRepository = deltakerStatusRepository,
-			brukerService = brukerService,
-			endringsmeldingService = endringsmeldingService,
-			gjennomforingService = gjennomforingService,
-			transactionTemplate = transactionTemplate,
-			deltakerV1Producer = deltakerV1ProducerService,
-			publisherService = publisherService,
-			vurderingRepository = vurderingRepository,
-			unleashService = unleashService
-		)
+		deltakerServiceImpl =
+			DeltakerServiceImpl(
+				deltakerRepository = deltakerRepository,
+				deltakerStatusRepository = deltakerStatusRepository,
+				brukerService = brukerService,
+				endringsmeldingService = endringsmeldingService,
+				gjennomforingService = gjennomforingService,
+				transactionTemplate = transactionTemplate,
+				deltakerV1Producer = deltakerV1ProducerService,
+				publisherService = publisherService,
+				vurderingRepository = vurderingRepository,
+				unleashService = unleashService,
+			)
 		testDataRepository = TestDataRepository(NamedParameterJdbcTemplate(dataSource))
 
 		DbTestDataUtils.cleanAndInitDatabaseWithTestData(dataSource, TestDataSeeder::insertMinimum)
-		every { publisherService.publish(id = any(), type = any(), erKometDeltaker = any(), forcePublish = any()) } returns Unit
+		every {
+			publisherService.publish(
+				id = any(),
+				type = any(),
+				erKometDeltaker = any(),
+				forcePublish = any(),
+			)
+		} returns Unit
 		every { unleashService.erKometMasterForTiltakstype(any()) } returns false
 	}
 
@@ -164,7 +173,12 @@ class DeltakerServiceImplTest {
 		val gjennomforingInput = GJENNOMFORING_KURS.copy(sluttDato = LocalDate.now().minusDays(1))
 		testDataRepository.insertGjennomforing(gjennomforingInput)
 		testDataRepository.insertBruker(BRUKER_2)
-		testDataRepository.insertDeltaker(DELTAKER_2.copy(gjennomforingId = GJENNOMFORING_KURS.id, sluttDato = gjennomforingInput.sluttDato))
+		testDataRepository.insertDeltaker(
+			DELTAKER_2.copy(
+				gjennomforingId = GJENNOMFORING_KURS.id,
+				sluttDato = gjennomforingInput.sluttDato,
+			),
+		)
 		testDataRepository.insertDeltakerStatus(DELTAKER_2_STATUS_1)
 
 		every {
@@ -189,7 +203,12 @@ class DeltakerServiceImplTest {
 		val gjennomforingInput = GJENNOMFORING_KURS.copy(sluttDato = LocalDate.now().minusDays(1))
 		testDataRepository.insertGjennomforing(gjennomforingInput)
 		testDataRepository.insertBruker(BRUKER_2)
-		testDataRepository.insertDeltaker(DELTAKER_2.copy(gjennomforingId = GJENNOMFORING_KURS.id, sluttDato = gjennomforingInput.sluttDato.minusDays(1)))
+		testDataRepository.insertDeltaker(
+			DELTAKER_2.copy(
+				gjennomforingId = GJENNOMFORING_KURS.id,
+				sluttDato = gjennomforingInput.sluttDato.minusDays(1),
+			),
+		)
 		testDataRepository.insertDeltakerStatus(DELTAKER_2_STATUS_1)
 
 		every {
@@ -314,7 +333,6 @@ class DeltakerServiceImplTest {
 		nyDeltaker!!.id shouldBe deltaker.id
 		nyDeltaker.gjennomforingId shouldBe deltaker.gjennomforingId
 		nyDeltaker.dagerPerUke shouldBe dagerPerUke
-
 	}
 
 	@Test
@@ -328,11 +346,10 @@ class DeltakerServiceImplTest {
 				type = DeltakerStatus.Type.HAR_SLUTTET,
 				aarsak = null,
 				aarsaksbeskrivelse = null,
-				gyldigFra = LocalDateTime.now().minusHours(1)
+				gyldigFra = LocalDateTime.now().minusHours(1),
 			),
-			false
+			false,
 		)
-
 	}
 
 	@Test
@@ -343,30 +360,32 @@ class DeltakerServiceImplTest {
 
 		nyDeltaker shouldNotBe null
 
-		val statusInsertDbo = DeltakerStatusInsert(
-			id = UUID.randomUUID(),
-			deltakerId = nyDeltaker!!.id,
-			type = DeltakerStatus.Type.IKKE_AKTUELL,
-			aarsak = null,
-			aarsaksbeskrivelse = null,
-			gyldigFra = now
-		)
+		val statusInsertDbo =
+			DeltakerStatusInsert(
+				id = UUID.randomUUID(),
+				deltakerId = nyDeltaker!!.id,
+				type = DeltakerStatus.Type.IKKE_AKTUELL,
+				aarsak = null,
+				aarsaksbeskrivelse = null,
+				gyldigFra = now,
+			)
 
 		deltakerServiceImpl.insertStatus(statusInsertDbo, false)
 
 		val statusEtterEndring = deltakerStatusRepository.getStatusForDeltaker(nyDeltaker.id)
 
 		statusEtterEndring shouldNotBe null
-		statusEtterEndring!!.copy(opprettetDato = now) shouldBe DeltakerStatusDbo(
-			id = statusInsertDbo.id,
-			deltakerId = nyDeltaker.id,
-			type = statusInsertDbo.type,
-			gyldigFra = statusInsertDbo.gyldigFra!!,
-			aarsak = statusInsertDbo.aarsak,
-			aarsaksbeskrivelse = statusInsertDbo.aarsaksbeskrivelse,
-			opprettetDato = now,
-			aktiv = true
-		)
+		statusEtterEndring!!.copy(opprettetDato = now) shouldBe
+			DeltakerStatusDbo(
+				id = statusInsertDbo.id,
+				deltakerId = nyDeltaker.id,
+				type = statusInsertDbo.type,
+				gyldigFra = statusInsertDbo.gyldigFra!!,
+				aarsak = statusInsertDbo.aarsak,
+				aarsaksbeskrivelse = statusInsertDbo.aarsaksbeskrivelse,
+				opprettetDato = now,
+				aktiv = true,
+			)
 	}
 
 	@Test
@@ -376,14 +395,15 @@ class DeltakerServiceImplTest {
 
 		nyDeltaker shouldNotBe null
 
-		val statusInsertDbo = DeltakerStatusInsert(
-			id = UUID.randomUUID(),
-			deltakerId = nyDeltaker!!.id,
-			type = DeltakerStatus.Type.IKKE_AKTUELL,
-			aarsak = null,
-			aarsaksbeskrivelse = null,
-			gyldigFra = LocalDateTime.now()
-		)
+		val statusInsertDbo =
+			DeltakerStatusInsert(
+				id = UUID.randomUUID(),
+				deltakerId = nyDeltaker!!.id,
+				type = DeltakerStatus.Type.IKKE_AKTUELL,
+				aarsak = null,
+				aarsaksbeskrivelse = null,
+				gyldigFra = LocalDateTime.now(),
+			)
 
 		deltakerServiceImpl.insertStatus(statusInsertDbo, false)
 
@@ -405,23 +425,24 @@ class DeltakerServiceImplTest {
 
 		nyDeltaker shouldNotBe null
 
-		val statusInsertDbo = DeltakerStatusInsert(
-			id = UUID.randomUUID(),
-			deltakerId = nyDeltaker!!.id,
-			type = DeltakerStatus.Type.IKKE_AKTUELL,
-			aarsak = null,
-			aarsaksbeskrivelse = null,
-			gyldigFra = LocalDateTime.now()
-		)
+		val statusInsertDbo =
+			DeltakerStatusInsert(
+				id = UUID.randomUUID(),
+				deltakerId = nyDeltaker!!.id,
+				type = DeltakerStatus.Type.IKKE_AKTUELL,
+				aarsak = null,
+				aarsaksbeskrivelse = null,
+				gyldigFra = LocalDateTime.now(),
+			)
 
 		deltakerServiceImpl.insertStatus(statusInsertDbo, false)
 
 		deltakerServiceImpl.insertStatus(
 			statusInsertDbo.copy(
 				id = UUID.randomUUID(),
-				type = DeltakerStatus.Type.VENTER_PA_OPPSTART
+				type = DeltakerStatus.Type.VENTER_PA_OPPSTART,
 			),
-			false
+			false,
 		)
 
 		val statuser = deltakerStatusRepository.getStatuserForDeltaker(nyDeltaker.id)
@@ -436,21 +457,22 @@ class DeltakerServiceImplTest {
 	fun `slettDeltaker - skal publisere sletting på kafka`() {
 		deltakerServiceImpl.slettDeltaker(deltakerId, false)
 
-		//TODO: Endre test
+		// TODO: Endre test
 		verify(exactly = 1) { deltakerV1ProducerService.publiserSlettDeltaker(deltakerId) }
 		verify(exactly = 1) { publisherService.publish(deltakerId, DataPublishType.DELTAKER, false) }
 	}
 
 	@Test
 	fun `slettDeltaker - skal slette deltaker og status`() {
-		val statusInsertDbo = DeltakerStatusInsert(
-			id = UUID.randomUUID(),
-			deltakerId = deltaker.id,
-			type = DeltakerStatus.Type.DELTAR,
-			aarsak = null,
-			aarsaksbeskrivelse = null,
-			gyldigFra = LocalDateTime.now().minusDays(2)
-		)
+		val statusInsertDbo =
+			DeltakerStatusInsert(
+				id = UUID.randomUUID(),
+				deltakerId = deltaker.id,
+				type = DeltakerStatus.Type.DELTAR,
+				aarsak = null,
+				aarsaksbeskrivelse = null,
+				gyldigFra = LocalDateTime.now().minusDays(2),
+			)
 		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker, false)
 		deltakerServiceImpl.insertStatus(statusInsertDbo, false)
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldNotBe null
@@ -463,14 +485,15 @@ class DeltakerServiceImplTest {
 
 	@Test
 	fun `slettDeltaker - skal slette deltaker, status, endringsmeldinger, og vurdering`() {
-		val statusInsertDbo = DeltakerStatusInsert(
-			id = UUID.randomUUID(),
-			deltakerId = deltaker.id,
-			type = DeltakerStatus.Type.VURDERES,
-			aarsak = null,
-			aarsaksbeskrivelse = null,
-			gyldigFra = LocalDateTime.now().minusDays(2)
-		)
+		val statusInsertDbo =
+			DeltakerStatusInsert(
+				id = UUID.randomUUID(),
+				deltakerId = deltaker.id,
+				type = DeltakerStatus.Type.VURDERES,
+				aarsak = null,
+				aarsaksbeskrivelse = null,
+				gyldigFra = LocalDateTime.now().minusDays(2),
+			)
 
 		deltakerServiceImpl.upsertDeltaker(BRUKER_1.personIdent, deltaker, false)
 		deltakerServiceImpl.insertStatus(statusInsertDbo, false)
@@ -487,7 +510,7 @@ class DeltakerServiceImplTest {
 				vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
 				begrunnelse = null,
 				opprettet = LocalDateTime.now(),
-			)
+			),
 		)
 
 		deltakerStatusRepository.getStatusForDeltaker(deltakerId) shouldNotBe null
@@ -509,21 +532,24 @@ class DeltakerServiceImplTest {
 		val deltaker2 = DELTAKER_1.copy(id = UUID.randomUUID())
 		val deltaker3 = DELTAKER_1.copy(id = UUID.randomUUID())
 
-		val deltakerStatus1 = DELTAKER_1_STATUS_1.copy(
-			id = UUID.randomUUID(),
-			deltakerId = deltaker1.id,
-			status = DeltakerStatus.Type.VENTER_PA_OPPSTART.name
-		)
-		val deltakerStatus2 = DELTAKER_1_STATUS_1.copy(
-			id = UUID.randomUUID(),
-			deltakerId = deltaker2.id,
-			status = DeltakerStatus.Type.DELTAR.name
-		)
-		val deltakerStatus3 = DELTAKER_1_STATUS_1.copy(
-			id = UUID.randomUUID(),
-			deltakerId = deltaker3.id,
-			status = DeltakerStatus.Type.HAR_SLUTTET.name
-		)
+		val deltakerStatus1 =
+			DELTAKER_1_STATUS_1.copy(
+				id = UUID.randomUUID(),
+				deltakerId = deltaker1.id,
+				status = DeltakerStatus.Type.VENTER_PA_OPPSTART.name,
+			)
+		val deltakerStatus2 =
+			DELTAKER_1_STATUS_1.copy(
+				id = UUID.randomUUID(),
+				deltakerId = deltaker2.id,
+				status = DeltakerStatus.Type.DELTAR.name,
+			)
+		val deltakerStatus3 =
+			DELTAKER_1_STATUS_1.copy(
+				id = UUID.randomUUID(),
+				deltakerId = deltaker3.id,
+				status = DeltakerStatus.Type.HAR_SLUTTET.name,
+			)
 
 		testDataRepository.insertDeltaker(deltaker1)
 		testDataRepository.insertDeltaker(deltaker2)
@@ -534,9 +560,15 @@ class DeltakerServiceImplTest {
 		testDataRepository.insertDeltakerStatus(deltakerStatus3)
 
 		val deltakere = deltakerServiceImpl.hentDeltakerePaaGjennomforing(GJENNOMFORING_1.id)
-		deltakere.find { it.id == deltaker1.id }!!.status.type.name shouldBe deltakerStatus1.status
-		deltakere.find { it.id == deltaker2.id }!!.status.type.name shouldBe deltakerStatus2.status
-		deltakere.find { it.id == deltaker3.id }!!.status.type.name shouldBe deltakerStatus3.status
+		deltakere
+			.find { it.id == deltaker1.id }!!
+			.status.type.name shouldBe deltakerStatus1.status
+		deltakere
+			.find { it.id == deltaker2.id }!!
+			.status.type.name shouldBe deltakerStatus2.status
+		deltakere
+			.find { it.id == deltaker3.id }!!
+			.status.type.name shouldBe deltakerStatus3.status
 	}
 
 	@Test
@@ -561,8 +593,8 @@ class DeltakerServiceImplTest {
 			DELTAKER_1_STATUS_1.copy(
 				id = UUID.randomUUID(),
 				deltakerId = deltakerId,
-				status = "IKKE_AKTUELL"
-			)
+				status = "IKKE_AKTUELL",
+			),
 		)
 
 		shouldThrowExactly<ValidationException> {
@@ -574,7 +606,7 @@ class DeltakerServiceImplTest {
 					vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
 					begrunnelse = null,
 					opprettet = LocalDateTime.now(),
-				)
+				),
 			)
 		}
 	}
@@ -588,20 +620,21 @@ class DeltakerServiceImplTest {
 			DELTAKER_1_STATUS_1.copy(
 				id = UUID.randomUUID(),
 				deltakerId = deltakerId,
-				status = "VURDERES"
-			)
+				status = "VURDERES",
+			),
 		)
 
-		val vurderinger = deltakerServiceImpl.lagreVurdering(
-			Vurdering(
-				id = UUID.randomUUID(),
-				deltakerId = deltakerId,
-				opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
-				vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
-				begrunnelse = null,
-				opprettet = LocalDateTime.now(),
+		val vurderinger =
+			deltakerServiceImpl.lagreVurdering(
+				Vurdering(
+					id = UUID.randomUUID(),
+					deltakerId = deltakerId,
+					opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+					vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
+					begrunnelse = null,
+					opprettet = LocalDateTime.now(),
+				),
 			)
-		)
 
 		vurderinger.size shouldBe 1
 		val lagretVurdering = vurderinger.first()
@@ -623,30 +656,32 @@ class DeltakerServiceImplTest {
 			DELTAKER_1_STATUS_1.copy(
 				id = UUID.randomUUID(),
 				deltakerId = deltakerId,
-				status = "VURDERES"
-			)
+				status = "VURDERES",
+			),
 		)
-		val forrigeVurdering = VurderingDbo(
-			id = UUID.randomUUID(),
-			deltakerId = deltakerId,
-			begrunnelse = "Mangler førerkort",
-			vurderingstype = Vurderingstype.OPPFYLLER_IKKE_KRAVENE,
-			opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
-			gyldigFra = LocalDateTime.now().minusDays(2),
-			gyldigTil = null
-		)
-		vurderingRepository.insert(forrigeVurdering)
-
-		val vurderinger = deltakerServiceImpl.lagreVurdering(
-			Vurdering(
+		val forrigeVurdering =
+			VurderingDbo(
 				id = UUID.randomUUID(),
 				deltakerId = deltakerId,
+				begrunnelse = "Mangler førerkort",
+				vurderingstype = Vurderingstype.OPPFYLLER_IKKE_KRAVENE,
 				opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
-				vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
-				begrunnelse = null,
-				opprettet = LocalDateTime.now(),
+				gyldigFra = LocalDateTime.now().minusDays(2),
+				gyldigTil = null,
 			)
-		)
+		vurderingRepository.insert(forrigeVurdering)
+
+		val vurderinger =
+			deltakerServiceImpl.lagreVurdering(
+				Vurdering(
+					id = UUID.randomUUID(),
+					deltakerId = deltakerId,
+					opprettetAvArrangorAnsattId = ARRANGOR_ANSATT_1.id,
+					vurderingstype = Vurderingstype.OPPFYLLER_KRAVENE,
+					begrunnelse = null,
+					opprettet = LocalDateTime.now(),
+				),
+			)
 
 		vurderinger.size shouldBe 2
 		val forrigeVurderingFraDb = vurderinger.find { it.id == forrigeVurdering.id }
@@ -661,27 +696,27 @@ class DeltakerServiceImplTest {
 		nyVurderingFraDb?.opprettet!! shouldBeCloseTo LocalDateTime.now()
 	}
 
-	val statusInsert = DeltakerStatusInsert(
-		id = UUID.randomUUID(),
-		deltakerId = deltakerId,
-		type = DeltakerStatus.Type.DELTAR,
-		aarsak = null,
-		aarsaksbeskrivelse = null,
-		gyldigFra = LocalDateTime.now().minusDays(7),
-	)
+	val statusInsert =
+		DeltakerStatusInsert(
+			id = UUID.randomUUID(),
+			deltakerId = deltakerId,
+			type = DeltakerStatus.Type.DELTAR,
+			aarsak = null,
+			aarsaksbeskrivelse = null,
+			gyldigFra = LocalDateTime.now().minusDays(7),
+		)
 
-
-	val deltaker = DeltakerUpsert(
-		id = deltakerId,
-		statusInsert = statusInsert,
-		startDato = null,
-		sluttDato = null,
-		registrertDato = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
-		dagerPerUke = null,
-		prosentStilling = null,
-		gjennomforingId = GJENNOMFORING_1.id,
-		innsokBegrunnelse = null,
-		kilde = Kilde.ARENA
-	)
-
+	val deltaker =
+		DeltakerUpsert(
+			id = deltakerId,
+			statusInsert = statusInsert,
+			startDato = null,
+			sluttDato = null,
+			registrertDato = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+			dagerPerUke = null,
+			prosentStilling = null,
+			gjennomforingId = GJENNOMFORING_1.id,
+			innsokBegrunnelse = null,
+			kilde = Kilde.ARENA,
+		)
 }

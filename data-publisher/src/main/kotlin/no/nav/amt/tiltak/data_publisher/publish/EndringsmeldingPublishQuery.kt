@@ -1,6 +1,6 @@
 package no.nav.amt.tiltak.data_publisher.publish
 
-import com.fasterxml.jackson.module.kotlin.readValue
+import tools.jackson.module.kotlin.readValue
 import no.nav.amt.tiltak.common.db_utils.DbUtils.sqlParameters
 import no.nav.amt.tiltak.common.db_utils.getLocalDateTime
 import no.nav.amt.tiltak.common.db_utils.getNullableLocalDateTime

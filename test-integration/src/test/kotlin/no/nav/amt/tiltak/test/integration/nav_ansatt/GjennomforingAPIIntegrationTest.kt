@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.test.integration.nav_ansatt
 
-import com.fasterxml.jackson.databind.JsonNode
 import io.kotest.matchers.shouldBe
 import no.nav.amt.tiltak.test.database.DbTestDataUtils
 import no.nav.amt.tiltak.test.database.data.TestData
@@ -18,6 +17,7 @@ import no.nav.amt.tiltak.test.integration.test_utils.ApiTestUtils.testNavAnsattA
 import okhttp3.Request
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import tools.jackson.databind.JsonNode
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -125,7 +125,7 @@ class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 			""".trimIndent()
 
 		response.code shouldBe 200
-		response.body.string() shouldBe expectedJson
+		objectMapper.readTree(response.body.string()) shouldBe objectMapper.readTree(expectedJson)
 	}
 
 	@Test
@@ -180,7 +180,7 @@ class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 			""".trimIndent()
 
 		response.code shouldBe 200
-		response.body.string() shouldBe expectedJson
+		objectMapper.readTree(response.body.string()) shouldBe objectMapper.readTree(expectedJson)
 	}
 
 	@Test
@@ -252,5 +252,5 @@ class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 	private fun JsonNode.sortedJsonArray(): List<JsonNode> =
 		this
 			.toList()
-			.sortedBy { it["id"].asText() }
+			.sortedBy { it["id"].asString() }
 }

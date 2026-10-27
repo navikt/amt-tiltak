@@ -1,6 +1,5 @@
 package no.nav.amt.tiltak.test.integration
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.amt.tiltak.application.Application
 import no.nav.amt.tiltak.test.database.SingletonPostgresContainer
 import no.nav.amt.tiltak.test.database.data.TestDataRepository
@@ -24,6 +23,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import tools.jackson.databind.ObjectMapper
 import java.time.Duration
 import javax.sql.DataSource
 
@@ -61,6 +61,7 @@ abstract class IntegrationTestBase {
 		val mockMulighetsrommetApiServer = MockMulighetsrommetApiServer()
 		val mockAmtPersonHttpServer = MockAmtPersonHttpServer()
 
+		@Suppress("unused")
 		@JvmStatic
 		@DynamicPropertySource
 		fun startEnvironment(registry: DynamicPropertyRegistry) {
