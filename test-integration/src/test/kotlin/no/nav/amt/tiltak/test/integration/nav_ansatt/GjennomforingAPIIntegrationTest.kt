@@ -125,7 +125,7 @@ class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 			""".trimIndent()
 
 		response.code shouldBe 200
-		response.body.string() shouldBe expectedJson
+		objectMapper.readTree(response.body.string()) shouldBe objectMapper.readTree(expectedJson)
 	}
 
 	@Test
@@ -180,7 +180,7 @@ class GjennomforingAPIIntegrationTest : IntegrationTestBase() {
 			""".trimIndent()
 
 		response.code shouldBe 200
-		response.body.string() shouldBe expectedJson
+		objectMapper.readTree(response.body.string()) shouldBe objectMapper.readTree(expectedJson)
 	}
 
 	@Test
