@@ -4,8 +4,12 @@ on:
   push:
     branches:
       - main
-#    paths-ignore:
-#      - ".github/**"
+    paths-ignore:
+      - ".github/**"
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   PRINT_PAYLOAD: true
@@ -19,6 +23,7 @@ jobs:
       security-events: "write"
     name: Test, build and push
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -34,7 +39,7 @@ jobs:
         run: mvn -B package
 
       - name: Dependency submission (for dependabot)
-        uses: advanced-security/maven-dependency-submission-action@v6
+        uses: advanced-security/maven-dependency-submission-action@a64327a7329c9939cf675e458452febe1894a70c # v6
 
       - name: docker-build-push
         uses: nais/docker-build-push@dd7421d5068057a020ca46ead966c26190c516b1 # v0
@@ -55,8 +60,9 @@ jobs:
     name: Deploy application to dev
     needs: test-build-and-push
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
-      contents: "write"
+      contents: "read"
       id-token: "write"
     steps:
       - name: Checkout
@@ -75,8 +81,9 @@ jobs:
     name: Deploy application to prod
     needs: [ test-build-and-push, deploy-dev ]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
-      contents: "write"
+      contents: "read"
       id-token: "write"
     if: github.ref == 'refs/heads/main'
     steps:

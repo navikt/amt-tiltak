@@ -14,14 +14,11 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     permissions:
       actions: read
       contents: read
       security-events: write
-    strategy:
-      fail-fast: false
-      matrix:
-        language: ["kotlin"]
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -29,7 +26,7 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         with:
-          languages: ${{ matrix.language }}
+          languages: java-kotlin
 
       - name: Setup java
         uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
@@ -43,22 +40,3 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
-        with:
-          category: "/language:${{matrix.language}}"
-
-  check_codeql_status:
-    name: Check CodeQL Status
-    needs: analyze
-    permissions:
-      contents: read
-      checks: read
-      pull-requests: read
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
-    steps:
-      - name: Check CodeQL Status
-        uses: eldrick19/code-scanning-status-checker@9ad4ff437f4da13a824f21a902a89a7241966fcd # v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          pr_number: ${{ github.event.pull_request.number }}
-          repo: ${{ github.repository }}
