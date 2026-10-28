@@ -21,7 +21,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(project(":db-migrations"))
     testImplementation("org.mockito:mockito-core")
-    api(libs.mockito.kotlin)
+    testImplementation(libs.mockito.kotlin)
     testImplementation(project(":test:database"))
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
     testImplementation(libs.testcontainers.junit.jupiter)
