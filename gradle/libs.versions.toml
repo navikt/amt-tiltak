@@ -1,0 +1,73 @@
+[versions]
+kotlin = "2.4.21"
+spring-boot = "4.1.2"
+spring-dependency-management = "1.1.7"
+testcontainers = "1.21.4"
+mockito-kotlin = "6.4.0"
+shedlock = "7.10.1"
+nimbus = "11.38.2"
+mockk = "1.14.11"
+kotest = "5.6.1"
+okhttp = "5.5.0"
+token-support = "7.0.1"
+mock-oauth2-server = "6.1.3"
+nav-common = "4.2026.09.24_06.17-80dfc0eacb29"
+logstash = "9.0"
+unleash = "12.3.1"
+amt-lib = "1.2026.02.25_21.37-43329f290d8a"
+jackson = "3.2.4"
+kafka-clients = "4.4.0"
+poao-tilgang = "2026.05.05_13.02-76cbce4f654a"
+lz4 = "1.12.0"
+jackson-annotations = "2.22"
+postgresql = "42.7.14"
+log4j = "2.26.1"
+otj-pg-embedded = "1.1.3"
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
+
+[libraries]
+amt-lib-models = { module = "no.nav.amt.lib:models", version.ref = "amt-lib" }
+caffeine = { module = "com.github.ben-manes.caffeine:caffeine" }
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson-annotations" }
+jackson-core = { module = "tools.jackson.core:jackson-core", version.ref = "jackson" }
+jackson-databind = { module = "tools.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+kafka-clients = { module = "org.apache.kafka:kafka-clients", version.ref = "kafka-clients" }
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest" }
+kotest-assertions-json = { module = "io.kotest:kotest-assertions-json-jvm", version.ref = "kotest" }
+kotest-framework-concurrency = { module = "io.kotest:kotest-framework-concurrency-jvm", version.ref = "kotest" }
+kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
+log4j-api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4j" }
+logstash-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logstash" }
+lz4 = { module = "at.yawk.lz4:lz4-java", version.ref = "lz4" }
+mock-oauth2-server = { module = "no.nav.security:mock-oauth2-server", version.ref = "mock-oauth2-server" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
+mockk = { module = "io.mockk:mockk-jvm", version.ref = "mockk" }
+mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
+nav-common-audit-log = { module = "no.nav.common:audit-log", version.ref = "nav-common" }
+nav-common-job = { module = "no.nav.common:job", version.ref = "nav-common" }
+nav-common-kafka = { module = "no.nav.common:kafka", version.ref = "nav-common" }
+nav-common-log = { module = "no.nav.common:log", version.ref = "nav-common" }
+nav-common-rest = { module = "no.nav.common:rest", version.ref = "nav-common" }
+nav-common-token-client = { module = "no.nav.common:token-client", version.ref = "nav-common" }
+nav-common-types = { module = "no.nav.common:types", version.ref = "nav-common" }
+nimbus-oauth2-oidc-sdk = { module = "com.nimbusds:oauth2-oidc-sdk", version.ref = "nimbus" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+okhttp-jvm = { module = "com.squareup.okhttp3:okhttp-jvm", version.ref = "okhttp" }
+otj-pg-embedded = { module = "com.opentable.components:otj-pg-embedded", version.ref = "otj-pg-embedded" }
+poao-tilgang-client = { module = "no.nav.poao-tilgang:client", version.ref = "poao-tilgang" }
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+shedlock-jdbc-template = { module = "net.javacrumbs.shedlock:shedlock-provider-jdbc-template", version.ref = "shedlock" }
+shedlock-spring = { module = "net.javacrumbs.shedlock:shedlock-spring", version.ref = "shedlock" }
+testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers" }
+testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
+testcontainers-kafka = { module = "org.testcontainers:kafka", version.ref = "testcontainers" }
+testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
+token-validation-spring = { module = "no.nav.security:token-validation-spring", version.ref = "token-support" }
+unleash = { module = "io.getunleash:unleash-client-java", version.ref = "unleash" }

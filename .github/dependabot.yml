@@ -1,14 +1,14 @@
 version: 2
 registries:
-  maven-github:
+  nav-package-mirror:
     type: maven-repository
     url: https://github-package-registry-mirror.gc.nav.no/cached/maven-release
 
 updates:
-  - package-ecosystem: "maven"
+  - package-ecosystem: "gradle"
     directory: "/"
     registries:
-      - maven-github
+      - nav-package-mirror
     schedule:
       interval: weekly
       day: tuesday
